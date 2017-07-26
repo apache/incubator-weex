@@ -31,6 +31,7 @@
 #import "WXUtility.h"
 #import "WXMonitor.h"
 #import "NSObject+WXSwizzle.h"
+#import "WXComponent+Events.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -41,6 +42,12 @@ typedef enum : NSUInteger {
     WXRecyclerLayoutTypeFlex,
     WXRecyclerLayoutTypeGrid,
 } WXRecyclerLayoutType;
+
+typedef enum : NSUInteger {
+    WXRecyclerDragTriggerNormal,
+    WXRecyclerDragTriggerPan
+} WXRecyclerDragTriggerType;
+
 
 @interface WXCollectionView : UICollectionView
 
@@ -75,7 +82,7 @@ typedef enum : NSUInteger {
 - (void)prepareForReuse
 {
     [super prepareForReuse];
-
+    
     WXCellComponent *cellComponent = (WXCellComponent *)self.wx_component;
     if (cellComponent.isRecycle && [cellComponent isViewLoaded] && [self.contentView.subviews containsObject:cellComponent.view]) {
         [cellComponent _unloadViewWithReusing:YES];
@@ -89,6 +96,15 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong, readonly) WXRecyclerDataController *dataController;
 @property (nonatomic, strong, readonly) WXRecyclerUpdateController *updateController;
 @property (nonatomic, weak, readonly) UICollectionView *collectionView;
+@property (nonatomic, strong) UILongPressGestureRecognizer *currentLongPress;
+@property (nonatomic, strong) NSIndexPath  *startIndexPath;
+@property (nonatomic, strong) NSIndexPath  *dragingIndexPath;
+@property (nonatomic, strong) NSIndexPath  *targetIndexPath;
+@property (nonatomic, strong) NSMutableArray *excludedAry;
+@property (nonatomic, strong) UICollectionViewCell *dragingCell;
+@property (nonatomic, assign) BOOL isDragable;
+@property (nonatomic, assign) BOOL isDragAnchor;
+@property (nonatomic, assign) WXRecyclerDragTriggerType dragTriggerType;
 
 @end
 
@@ -106,6 +122,15 @@ typedef enum : NSUInteger {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         [self _fillPadding];
         
+        if ([attributes[@"draggable"] boolValue]) {
+            if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
+                _dragTriggerType = WXRecyclerDragTriggerPan;
+            }
+            _isDragable = YES;
+        }else{
+            _isDragable = NO;
+        }
+        
         if ([type isEqualToString:@"waterfall"] || (attributes[@"layout"] && [attributes[@"layout"] isEqualToString:@"multi-column"])) {
             // TODO: abstraction
             _layoutType = WXRecyclerLayoutTypeMultiColumn;
@@ -115,7 +140,7 @@ typedef enum : NSUInteger {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeAuto];
             layout.columnCount = [WXConvert WXLength:attributes[@"columnCount"] isFloat:NO scaleFactor:1.0] ? : [WXLength lengthWithInt:1 type:WXLengthTypeFixed];
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
-
+            
             layout.delegate = self;
         } else {
             _collectionViewlayout = [UICollectionViewLayout new];
@@ -156,6 +181,21 @@ typedef enum : NSUInteger {
     [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
     
+    _isDragAnchor = NO;
+    
+    _excludedAry = [[NSMutableArray alloc] init];
+    [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
+    [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
+    
+    _currentLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
+    _currentLongPress.minimumPressDuration = 0.3f;
+    [_collectionView addGestureRecognizer:_currentLongPress];
+    
+    _dragingCell = [[WXCollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 100, 100/2.0f)];
+    _dragingCell.hidden = true;
+    [_collectionView addSubview:_dragingCell];
+    
+    
     [self performUpdatesWithCompletion:^(BOOL finished) {
         
     }];
@@ -177,6 +217,16 @@ typedef enum : NSUInteger {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         WXMultiColumnLayout *layout = (WXMultiColumnLayout *)_collectionViewlayout;
         BOOL needUpdateLayout = NO;
+        
+        if ([attributes[@"draggable"] boolValue]) {
+            if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
+                _dragTriggerType = WXRecyclerDragTriggerPan;
+            }
+            _isDragable = YES;
+        }else{
+            _isDragable = NO;
+        }
+        
         if (attributes[@"columnWidth"]) {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor];
             needUpdateLayout = YES;
@@ -261,7 +311,7 @@ typedef enum : NSUInteger {
     }
     
     [_collectionView setContentOffset:contentOffset animated:animated];
-
+    
 }
 
 - (void)performUpdatesWithCompletion:(void (^)(BOOL finished))completion
@@ -297,7 +347,7 @@ typedef enum : NSUInteger {
     
     WXPerformBlockOnMainThread(^{
         [self performUpdatesWithCompletion:^(BOOL finished) {
-    
+            
         }];
     });
 }
@@ -353,6 +403,8 @@ typedef enum : NSUInteger {
     
     cellView.wx_component = contentView.wx_component;
     
+    [self goThroughAnchor:cellView.wx_component indexPath:indexPath];
+    
     if (contentView.superview == cellView.contentView) {
         return cellView;
     }
@@ -377,7 +429,7 @@ typedef enum : NSUInteger {
             for (UIView *view in reusableView.subviews) {
                 [view removeFromSuperview];
             }
-
+            
             [reusableView addSubview:contentView];
         }
     }
@@ -653,6 +705,166 @@ typedef enum : NSUInteger {
         NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
         [[self class] weex_swizzle:[WXCollectionView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
     });
+}
+
+#pragma mark - dragMethod
+- (void)longPressMethod:(UILongPressGestureRecognizer*)gesture
+{
+    if (_isDragable) {
+        switch (gesture.state) {
+            case UIGestureRecognizerStateBegan:
+                [self dragBegin:gesture];
+                break;
+            case UIGestureRecognizerStateChanged:
+                [self dragChanged:gesture];
+                break;
+            case UIGestureRecognizerStateEnded:
+                [self dragEnd:gesture];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)dragBegin:(UILongPressGestureRecognizer *)gesture{
+    
+    CGPoint point = [gesture locationInView:_collectionView];
+    
+    _startIndexPath = [self getDragingIndexPathWithPoint:point];
+    if (!_startIndexPath) {
+        return;
+    }
+    
+    [self fireEvent:@"dragstart" params:@{@"fromIndex":[NSString stringWithFormat:@"%ld",(long)_startIndexPath.row]}];
+    
+    _dragingIndexPath = [self getDragingIndexPathWithPoint:point];
+    if (!_dragingIndexPath) {
+        return;
+    }
+    
+    [_collectionView bringSubviewToFront:_dragingCell];
+    _dragingCell.frame = [_collectionView cellForItemAtIndexPath:_dragingIndexPath].frame;
+    _dragingCell.hidden = false;
+    [UIView animateWithDuration:0.3 animations:^{
+        [_dragingCell setTransform:CGAffineTransformMakeScale(1.2, 1.2)];
+    }];
+}
+
+- (void)dragChanged:(UILongPressGestureRecognizer *)gesture{
+    
+    if (!_startIndexPath) {
+        return;
+    }
+    CGPoint point = [gesture locationInView:_collectionView];
+    _dragingCell.center = point;
+    _targetIndexPath = [self getTargetIndexPathWithPoint:point];
+    
+    if (_targetIndexPath && _dragingIndexPath && (_targetIndexPath.section == _startIndexPath.section)){
+        [_collectionView moveItemAtIndexPath:_dragingIndexPath toIndexPath:_targetIndexPath];
+        _dragingIndexPath = _targetIndexPath;
+    }
+}
+
+- (void)dragEnd:(UILongPressGestureRecognizer *)gesture{
+    
+    if (!_startIndexPath || !_dragingIndexPath) {
+        return;
+    }
+    
+    [self fireEvent:@"dragend" params:@{@"toIndex":[NSString stringWithFormat:@"%ld",(long)_dragingIndexPath.row],@"fromIndex":[NSString stringWithFormat:@"%ld",(long)_startIndexPath.row]}];
+    
+    CGRect endFrame = [_collectionView cellForItemAtIndexPath:_dragingIndexPath].frame;
+    
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.3 animations:^{
+        [weakSelf.dragingCell setTransform:CGAffineTransformMakeScale(1.0, 1.0)];
+        weakSelf.dragingCell.frame = endFrame;
+    } completion:^(BOOL finished) {
+        weakSelf.dragingCell.hidden = YES;
+        NSMutableArray *oldComponents = [[NSMutableArray alloc] initWithArray:weakSelf.dataController.sections[weakSelf.startIndexPath.section].cellComponents];
+        if(oldComponents.count > 1){
+            WXCellComponent *startComponent = weakSelf.dataController.sections[weakSelf.startIndexPath.section].cellComponents[weakSelf.startIndexPath.item];
+            [oldComponents removeObject:startComponent];
+            [oldComponents insertObject:startComponent atIndex:weakSelf.targetIndexPath.item];
+            weakSelf.dataController.sections[weakSelf.startIndexPath.section].cellComponents = oldComponents;
+        }
+    }];
+}
+
+- (NSIndexPath *)getDragingIndexPathWithPoint:(CGPoint)point{
+    NSIndexPath *dragingIndexPath = nil;
+    for (NSIndexPath *indexPath in [_collectionView indexPathsForVisibleItems]){
+        if (CGRectContainsPoint([_collectionView cellForItemAtIndexPath:indexPath].frame,point)) {
+            dragingIndexPath = indexPath;
+            break;
+        }
+    }
+    
+    BOOL isExcluded = NO;
+    if (dragingIndexPath) {
+        for (NSIndexPath *indexPath in _excludedAry) {
+            if (indexPath.row == dragingIndexPath.row) {
+                isExcluded = YES;
+            }
+        }
+    }
+    return isExcluded?nil:dragingIndexPath;
+}
+
+- (NSIndexPath *)getTargetIndexPathWithPoint:(CGPoint)point{
+    NSIndexPath *targetIndexPath = nil;
+    for (NSIndexPath *indexPath in _collectionView.indexPathsForVisibleItems) {
+        if (CGRectContainsPoint([_collectionView cellForItemAtIndexPath:indexPath].frame, point)) {
+            targetIndexPath = indexPath;
+        }
+    }
+    return targetIndexPath;
+}
+
+
+- (void)goThroughAnchor:(WXComponent *)wxComponent indexPath:(NSIndexPath *)indexPath{
+    if (wxComponent.attributes && [wxComponent.attributes[@"dragExcluded"] boolValue]){
+        [_excludedAry addObject:indexPath];
+        NSSet *set = [NSSet setWithArray:_excludedAry];
+        [_excludedAry removeAllObjects];
+        [_excludedAry addObjectsFromArray:[set allObjects]];
+    }
+    
+    //遍历获取锚点
+    NSMutableArray *subviewComponents = [[NSMutableArray alloc] init];
+    [subviewComponents addObjectsFromArray:wxComponent.subcomponents];
+    WXComponent *anchorComponent;
+    for (int i = 0 ; i < subviewComponents.count ; i++){
+        WXComponent *compoent = subviewComponents[i];
+        if (compoent.attributes[@"dragAnchor"]) {
+            anchorComponent = compoent;
+            _isDragAnchor = YES;
+            break;
+        }
+        
+        if (compoent.subcomponents && compoent.subcomponents.count && compoent.subcomponents.count > 0) {
+            [subviewComponents addObjectsFromArray:compoent.subcomponents];
+        }
+    }
+    
+    if (anchorComponent) {
+        //去除全局UILongPressGestureRecognizer手势
+        if (_currentLongPress) {
+            [self.collectionView removeGestureRecognizer:_currentLongPress];
+            _currentLongPress = nil;
+        }
+        
+        //添加锚点的手势
+        if (_dragTriggerType == WXRecyclerDragTriggerPan) {
+            UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
+            [anchorComponent.view addGestureRecognizer:panGestureRecognizer];
+            
+        }else{
+            UILongPressGestureRecognizer *longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
+            [anchorComponent.view addGestureRecognizer:longPressGestureRecognizer];
+        }
+    }
 }
 
 - (void)fixedFlickerSelector
