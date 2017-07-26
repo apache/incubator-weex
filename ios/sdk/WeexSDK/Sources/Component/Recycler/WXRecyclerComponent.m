@@ -800,22 +800,20 @@ typedef enum : NSUInteger {
         }
     }
     
-    __block BOOL isExcluded = NO;
-    [_excludedAry enumerateObjectsUsingBlock:^(NSIndexPath*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.row == dragingIndexPath.row) {
-            isExcluded = YES;
+    BOOL isExcluded = NO;
+    if (dragingIndexPath) {
+        for (NSIndexPath *indexPath in _excludedAry) {
+            if (indexPath.row == dragingIndexPath.row) {
+                isExcluded = YES;
+            }
         }
-    }];
+    }
     return isExcluded?nil:dragingIndexPath;
 }
 
 - (NSIndexPath *)getTargetIndexPathWithPoint:(CGPoint)point{
     NSIndexPath *targetIndexPath = nil;
     for (NSIndexPath *indexPath in _collectionView.indexPathsForVisibleItems) {
-        if ([indexPath isEqual:_dragingCell]) {
-            continue;
-        }
-        
         if (CGRectContainsPoint([_collectionView cellForItemAtIndexPath:indexPath].frame, point)) {
             targetIndexPath = indexPath;
         }
