@@ -6,7 +6,9 @@
   margin: 0;
   background: $bg-white;
   border-top: 1px solid #DDDDDD;
-
+  a{
+   text-decoration: underline 
+  }
   .ali-logo {
     width: 83px;
     height: 41px;
@@ -69,3 +71,4 @@
     margin-bottom: 10px;
   }
 }
+

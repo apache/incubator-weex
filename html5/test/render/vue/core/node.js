@@ -37,8 +37,8 @@ init('core node', (Vue, helper) => {
     let infoStr = ''
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
-      expect(tracker).to.equal(shouldBe)
       infoStr = shouldBe
+      expect(tracker).to.equal(shouldBe)
     }
 
     it('should trigger the closest parent.', function (done) {
@@ -54,7 +54,6 @@ init('core node', (Vue, helper) => {
 
       helper.registerDone(id, (tracker) => {
         trackerShouldBe(tracker, ' > in-bar-outter-div > component-bar')
-        helper.unregisterDone(id)
         done()
       })
     })
@@ -65,7 +64,7 @@ init('core node', (Vue, helper) => {
        * click inner div. should just trigget the inner handler and
        * shouldn't bubbe to outter div.
        */
-      const evt = new Event('tap', { bubbles: true })
+      const evt = new Event('tap', { bubbles: false })
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
