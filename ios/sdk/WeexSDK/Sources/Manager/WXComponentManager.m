@@ -40,6 +40,8 @@
 static NSThread *WXComponentThread;
 
 #define WXAssertComponentExist(component)  WXAssert(component, @"component not exists")
+#define WXAUTH_ISV_COMPONENT_TAG    @"isv-div"
+#define WXAUTH_ISV_COMPONENT_KEY    @"isvAppKey"
 
 @implementation WXComponentManager
 {
@@ -201,7 +203,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(data);
     
-    _rootComponent = [self _buildComponentForData:data];
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
     
     [self _initRootCSSNode];
     __weak typeof(self) weakSelf = self;
@@ -244,7 +246,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
-    WXComponent *component = [self _buildComponentForData:componentData];
+    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent];
     if (!supercomponent.subcomponents) {
         index = 0;
     } else {
@@ -353,7 +355,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     return _indexDict.count;
 }
 
-- (WXComponent *)_buildComponentForData:(NSDictionary *)data
+- (WXComponent *)_buildComponentForData:(NSDictionary *)data supercomponent:(WXComponent *)supercomponent
 {
     NSString *ref = data[@"ref"];
     NSString *type = data[@"type"];
@@ -364,8 +366,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     if (self.weexInstance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
-            WXComponentValidateResult* validateResult =  [validateHandler validateWithWXSDKInstance:self.weexInstance component:type];
-            if (validateResult && !validateResult.isSuccess) {
+            WXComponentValidateResult* validateResult;
+            if ([validateHandler respondsToSelector:@selector(validateWithWXSDKInstance:component:supercomponent:)]) {
+                validateResult = [validateHandler validateWithWXSDKInstance:self.weexInstance component:type supercomponent:supercomponent];
+            }
+            if (validateResult==nil || !validateResult.isSuccess) {
                 type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
                 WXLogError(@"%@",[validateResult.error.userInfo objectForKey:@"errorMsg"]);
             }
