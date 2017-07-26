@@ -36,7 +36,6 @@ describe('utils', function () {
     it('fireLazyload', (done) => {
       const node = document.createElement('figure')
       const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
-      const IMG_REC_INDENT = 500
       node.setAttribute('img-src', invalidImage)
       node.setAttribute('img-placeholder', validImageBlack)
       node.style.height = '10px'
@@ -56,7 +55,6 @@ describe('utils', function () {
     })
     describe('getThrottleLazyload', () => {
       it('should use default value while params is undefined', (done) => {
-        const IMG_REC_INDENT = 500
         window._first_screen_detected = true
         getThrottleLazyload()()
         setTimeout(() => {
@@ -67,7 +65,6 @@ describe('utils', function () {
         const node = document.createElement('figure')
         const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
         const wait = 100
-        const IMG_REC_INDENT = 500
         node.style.height = '10px'
         node.setAttribute('img-src', validImageTransparent)
         node.setAttribute('img-placeholder', validImageBlack)
