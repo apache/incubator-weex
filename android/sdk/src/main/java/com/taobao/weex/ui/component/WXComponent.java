@@ -726,7 +726,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     T host = getHostView();
     boolean ret = false;
     if (host != null) {
-      float value = WXUtils.getFloatByViewport(param, getInstance().getInstanceViewPortWidth());
+      float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(param), getInstance().getInstanceViewPortWidth());
       float scale = host.getResources().getDisplayMetrics().density;
       if (!Float.isNaN(value) && value > 0) {
         host.setCameraDistance(value * scale);

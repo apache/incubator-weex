@@ -124,12 +124,10 @@ public class WXAnimationBean {
                                                       @NonNull List<String> rawValue) {
                 Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(propertyList.size());
                 List<Float> convertedList = new ArrayList<>(propertyList.size());
-                if (propertyList.contains(View.ROTATION)) {
+                if (propertyList.contains(View.ROTATION) ||
+                    propertyList.contains(View.ROTATION_X) ||
+                    propertyList.contains(View.ROTATION_Y)) {
                   convertedList.addAll(parseRotationZ(rawValue));
-                }else if(propertyList.contains(View.ROTATION_X)) {
-                  convertedList.addAll(parseRotationXY(rawValue));
-                }else if(propertyList.contains(View.ROTATION_Y)) {
-                  convertedList.addAll(parseRotationXY(rawValue));
                 }else if (propertyList.contains(View.TRANSLATION_X) ||
                            propertyList.contains(View.TRANSLATION_Y)) {
                   convertedList.addAll(parseTranslation(propertyList, width, height, rawValue,viewportW));
@@ -156,14 +154,6 @@ public class WXAnimationBean {
                   convertedList.addAll(rawFloat);
                 }
                 return convertedList;
-              }
-
-              private List<Float> parseRotationXY(@NonNull List<String> rawValue) {
-                List<Float> intermediate = parseRotationZ(rawValue);
-                for (int i = 0; i < intermediate.size(); i++) {
-                  intermediate.set(i, -intermediate.get(i));
-                }
-                return intermediate;
               }
 
               private @NonNull List<Float> parseRotationZ(@NonNull List<String> rawValue) {
