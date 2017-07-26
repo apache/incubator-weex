@@ -61,6 +61,8 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 @implementation WXImageComponent
 
+WX_EXPORT_METHOD(@selector(save:))
+
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
@@ -115,6 +117,57 @@ static dispatch_queue_t WXImageUpdateQueue;
                 [self updateImage];
             }
         }
+    }
+}
+
+- (void)save:(WXCallback)resultCallback
+{
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
+    if(!info[@"NSPhotoLibraryUsageDescription"]) {
+        if (resultCallback) {
+            resultCallback(@{
+                             @"success" : @(false),
+                             @"errorDesc": @"This maybe crash above iOS 10 because it attempted to access privacy-sensitive data without a usage description.  The app's Info.plist must contain an NSPhotoLibraryUsageDescription key with a string value explaining to the user how the app uses this data."
+                             });
+        }
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+            // if the iOS version is above 10.0, this operation will skip
+            return;
+        }
+    }
+    if (![self isViewLoaded]) {
+        if (resultCallback) {
+            resultCallback(@{@"success": @(false),
+                             @"errorDesc":@"the image is not ready"});
+        }
+        return;
+    }
+    UIImageView * imageView = (UIImageView*)self.view;
+    if (!resultCallback) {
+        // there is no need to callback any result;
+        UIImageWriteToSavedPhotosAlbum(imageView.image, nil, nil, NULL);
+    }else {
+        UIImageWriteToSavedPhotosAlbum(imageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), (void*)CFBridgingRetain(resultCallback));
+    }
+}
+
+// the callback for PhotoAlbum.
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
+{
+    if (!contextInfo) {
+        return;
+    }
+    NSMutableDictionary * callbackResult = [NSMutableDictionary new];
+    BOOL success = false;
+    if (!error) {
+        success = true;
+    } else {
+        [callbackResult setObject:[error description] forKey:@"errorDesc"];
+    }
+    if (contextInfo) {
+        [callbackResult setObject:@(success) forKey:@"success"];
+        ((__bridge WXCallback)contextInfo)(callbackResult);
+        CFRelease(contextInfo);
     }
 }
 
