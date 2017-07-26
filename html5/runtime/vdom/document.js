@@ -185,8 +185,10 @@ Object.assign(Document.prototype, {
    * Destroy current document, and remove itself form docMap.
    */
   destroy () {
+    this.taskCenter.destroyCallback()
     delete this.listener
     delete this.nodeMap
+    delete this.taskCenter
     removeDoc(this.id)
   }
 })
