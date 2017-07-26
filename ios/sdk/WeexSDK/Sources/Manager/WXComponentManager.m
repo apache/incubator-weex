@@ -40,8 +40,6 @@
 static NSThread *WXComponentThread;
 
 #define WXAssertComponentExist(component)  WXAssert(component, @"component not exists")
-#define WXAUTH_ISV_COMPONENT_TAG    @"isv-div"
-#define WXAUTH_ISV_COMPONENT_KEY    @"isvAppKey"
 
 @implementation WXComponentManager
 {
