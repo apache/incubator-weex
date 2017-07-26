@@ -381,7 +381,9 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     }
     deletedLines.forEach(lineNumber => {
       var name = blames[lineNumber]
-      reviewers && reviewers[name] = (reviewers[name] || 0) + 3
+      if (!!reviewers) {
+        reviewers[name] = (reviewers[name] || 0) + 3
+      }
     })
   });
 
@@ -394,7 +396,9 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     }
     normalLines.forEach(lineNumber => {
       var name = blames[lineNumber]
-      reviewers && reviewers[name] = (reviewers[name] || 0) + 1
+      if (!!reviewers) {
+        reviewers[name] = (reviewers[name] || 0) + 1
+      }
     })
   });
 
