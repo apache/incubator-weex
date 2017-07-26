@@ -170,6 +170,7 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
     if (styles[@"perspective"]) {
+        // if the perspective is none, treated as 0
         _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
         if (_perspective <= 0) {
             _perspective = CGFLOAT_MAX;
@@ -236,11 +237,12 @@ do {\
     }
     
     if (styles[@"perspective"]) {
+        // if the perspective is none, treated as 0
         _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
         if (_perspective <= 0) {
             _perspective = CGFLOAT_MAX;
         }
-         _transform.perspective = _perspective;
+        _transform.perspective = _perspective;
     }
     
     if (styles[@"visibility"]) {
