@@ -85,6 +85,7 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    [self applyTransform];
 }
 
 -(void)applyTransform
@@ -118,7 +119,10 @@
         return;
     }
     
-    [self applyTransform];
+    float perspective = _animationInfo.target->_perspective;
+    if (!isinf(perspective)) {
+        [self applyTransform];
+    }
     
     if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
         /*

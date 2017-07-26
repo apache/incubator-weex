@@ -174,7 +174,7 @@
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
     if (_perspective && !isinf(_perspective)) {
-        nativeTansform3D.m34 = -1.0/_perspective;
+        nativeTansform3D.m34 = -1.0/_perspective*[UIScreen mainScreen].scale;
     }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
         return nativeTansform3D;
@@ -232,7 +232,7 @@
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
     if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
         CATransform3D presentationTransform = view.layer.presentationLayer.transform;
-        if (presentationTransform.m34 != 0) {
+        if (presentationTransform.m34 != 0 && !isinf(_perspective)) {
             //  just for perspective
             nativeTransform3d = presentationTransform;
         }
