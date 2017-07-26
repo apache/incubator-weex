@@ -30,7 +30,7 @@ export class TaskCenter {
     })
     Object.defineProperty(this, 'callbackManager', {
       enumerable: true,
-      value: new CallbackManager()
+      value: new CallbackManager(id)
     })
     fallback = sendTasks || function () {}
   }
