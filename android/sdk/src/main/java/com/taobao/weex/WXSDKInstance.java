@@ -1212,6 +1212,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mGlobalEvents.clear();
     }
 
+    if(mComponentObserver != null){
+        mComponentObserver = null;
+    }
 
     mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;
