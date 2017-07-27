@@ -94,9 +94,7 @@
         return;
     }
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
-        float perspective = _animationInfo.target->_perspective;
         WXTransform *transform = _animationInfo.target->_transform;
-        transform.perspective = perspective;
         [transform applyTransformForView:_animationInfo.target.view];
     } else if ([_animationInfo.propertyName isEqualToString:@"backgroundColor"]) {
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
@@ -119,7 +117,7 @@
         return;
     }
     
-    float perspective = _animationInfo.target->_perspective;
+    float perspective = _animationInfo.target->_transform.perspective;
     if (!isinf(perspective)) {
         [self applyTransform];
     }
@@ -200,7 +198,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         if ([property isEqualToString:@"transform"]) {
             NSString *transformOrigin = styles[@"transformOrigin"];
             WXTransform *wxTransform = [[WXTransform alloc] initWithCSSValue:value origin:transformOrigin instance:self.weexInstance];
-            wxTransform.perspective = target->_perspective;
             WXTransform *oldTransform = target->_transform;
             if (wxTransform.rotateAngle != oldTransform.rotateAngle) {
                 WXAnimationInfo *newInfo = [info copy];
@@ -373,6 +370,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             [delegate applyTransform];
         }
     } else {
+        CATransform3D transform = layer.transform;
+        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) {
+            transform.m34 = -1.0/info.target->_transform.perspective*[UIScreen mainScreen].scale;
+            layer.transform = transform;
+        }
         [layer addAnimation:animation forKey:info.propertyName];
     }
 }

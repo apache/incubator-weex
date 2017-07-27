@@ -55,9 +55,6 @@
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
     
-    // default is parallel projection, so this will be CGFLOAT_MAX
-    CGFloat _perspective;
-    
     /**
      * accessibility support
      */

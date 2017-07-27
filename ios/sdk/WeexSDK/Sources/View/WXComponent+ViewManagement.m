@@ -169,15 +169,6 @@ do {\
     if (_boxShadow) {
         _lastBoxShadow = _boxShadow;
     }
-    if (styles[@"perspective"]) {
-        // if the perspective is none, treated as 0
-        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
-        if (_perspective <= 0) {
-            _perspective = CGFLOAT_MAX;
-        }
-        
-        _transform.perspective = _perspective;
-    }
 }
 
 - (void)_updateViewStyles:(NSDictionary *)styles
@@ -236,15 +227,6 @@ do {\
         });
     }
     
-    if (styles[@"perspective"]) {
-        // if the perspective is none, treated as 0
-        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
-        if (_perspective <= 0) {
-            _perspective = CGFLOAT_MAX;
-        }
-        _transform.perspective = _perspective;
-    }
-    
     if (styles[@"visibility"]) {
         _visibility = [WXConvert WXVisibility:styles[@"visibility"]];
         if (_visibility == WXVisibilityShow) {
@@ -256,7 +238,6 @@ do {\
     }
     if (styles[@"transform"]) {
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
-        _transform.perspective = _perspective;
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];

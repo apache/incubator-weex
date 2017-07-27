@@ -230,8 +230,8 @@
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
-    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
-        CATransform3D presentationTransform = view.layer.presentationLayer.transform;
+    CATransform3D presentationTransform = view.layer.presentationLayer.transform;
+    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d) && !CATransform3DEqualToTransform(view.layer.transform, presentationTransform)){
         if (presentationTransform.m34 != 0 && !isinf(_perspective)) {
             //  just for perspective
             nativeTransform3d = presentationTransform;
@@ -340,6 +340,14 @@
 - (void)parseRotatez:(NSArray *)value
 {
    _rotateZ = [self getAngle:value[0]];
+}
+
+- (void)parsePerspective:(NSArray *)value
+{
+    _perspective = [value[0] doubleValue];
+    if (_perspective <= 0 ) {
+        _perspective = CGFLOAT_MAX;
+    }
 }
 
 - (void)parseTranslate:(NSArray *)value
