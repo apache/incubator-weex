@@ -287,7 +287,7 @@
                     
                     [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
                     if (completedReloadSection) {
-                        WXLogDebug(@"Reload section:%lu", insertIndex - 1);
+                        WXLogDebug(@"Reload section:%lu", (unsigned long)(insertIndex - 1));
                         _completedSections[insertIndex - 1] = completedReloadSection;
                     }
                     
@@ -608,7 +608,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    WXHeaderComponent *header = ((WXSection *)_completedSections[section]).header;
+    WXHeaderComponent *header = ((WXSection *)[_completedSections wx_safeObjectAtIndex:section]).header;
     if (header) {
         return header.calculatedFrame.size.height;
     } else {

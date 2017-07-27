@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,33 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-
-@interface WXRadii : NSObject
-
-@property (nonatomic, assign) CGFloat topLeft;
-@property (nonatomic, assign) CGFloat topRight;
-@property (nonatomic, assign) CGFloat bottomLeft;
-@property (nonatomic, assign) CGFloat bottomRight;
-
-- (BOOL)hasBorderRadius;
-
-- (BOOL)radiusesAreEqual;
-
-@end
-
-@interface WXRoundedRect : NSObject
-
-@property (nonatomic, assign) CGRect rect;
-@property (nonatomic, strong) WXRadii *radii;
-
-- (instancetype)initWithRect:(CGRect)rect
-                     topLeft:(CGFloat)topLeft
-                    topRight:(CGFloat)topRight
-                  bottomLeft:(CGFloat)bottomLeft
-                 bottomRight:(CGFloat)bottomRight;
-
-@end
+import * as navigator from '../../../../render/vue/modules/navigator'
+describe('navigator module', () => {
+  const callback = sinon.spy()
+  it('should push be worked', () => {
+    const {
+      push
+    } = navigator.default
+    const config = {
+      url: '/'
+    }
+    expect(push).to.be.a('function')
+    push(config, callback)
+    expect(callback.callCount).to.be.equal(1)
+  })
+  it('should push be worked', () => {
+    const {
+      pop
+    } = navigator.default
+    const config = {
+      url: '/'
+    }
+    expect(pop).to.be.a('function')
+    pop(config, callback)
+    expect(callback.callCount).to.be.equal(2)
+  })
+})

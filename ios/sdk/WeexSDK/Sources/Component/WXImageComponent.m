@@ -170,6 +170,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     UIImageView *imageView = (UIImageView *)self.view;
     imageView.contentMode = _resizeMode;
     imageView.userInteractionEnabled = YES;

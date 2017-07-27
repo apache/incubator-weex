@@ -25,24 +25,24 @@ import eventBubbleBundle from '../data/build/dotvue/event-bubble.js'
 
 init('core node', (Vue, helper) => {
   const id = 'test-event-bubble'
-
+  let vm = null
+  let el = null
   before(() => {
     helper.register('div', div)
+    vm = helper.createVm(eventBubbleBundle, id)
+    el = vm.$el.querySelector('.event-bubble-outter')
   })
 
   describe('stop event bubble', function () {
     let infoStr = ''
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
-      expect(tracker).to.equal(shouldBe)
       infoStr = shouldBe
+      expect(tracker).to.equal(shouldBe)
     }
 
     it('should trigger the closest parent.', function (done) {
-      const vm = helper.createVm(eventBubbleBundle, id)
-      const el = vm.$el.querySelector('.event-bubble-outter')
       expect(vm.tracker).to.equal('')
-
       /**
        * click outter div. should trigget event on the outter div.
        * and should execute handlers by the priority of:
@@ -54,20 +54,17 @@ init('core node', (Vue, helper) => {
 
       helper.registerDone(id, (tracker) => {
         trackerShouldBe(tracker, ' > in-bar-outter-div > component-bar')
-        helper.unregisterDone(id)
         done()
       })
     })
 
     it('should not bubble if already triggered.', function (done) {
-      const vm = helper.createVm(eventBubbleBundle, id)
       const inner = vm.$el.querySelector('.event-bubble-inner')
-
       /**
        * click inner div. should just trigget the inner handler and
        * shouldn't bubbe to outter div.
        */
-      const evt = new Event('tap', { bubbles: true })
+      const evt = new Event('tap', { bubbles: false })
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {

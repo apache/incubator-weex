@@ -85,6 +85,14 @@ static id<WXLogProtocol> _externalLog;
         
         [[WXSDKManager bridgeMgr] resetEnvironment];
     }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    Class propertyClass = NSClassFromString(@"WXTracingViewControllerManager");
+    SEL sel =NSSelectorFromString(@"loadTracingView");
+    if(propertyClass && [propertyClass respondsToSelector:sel]){
+        [propertyClass performSelector:sel];
+    }
+#pragma clang diagnostic pop
 }
 
 + (WXLogLevel)logLevel

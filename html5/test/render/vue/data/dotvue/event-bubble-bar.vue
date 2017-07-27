@@ -10,22 +10,15 @@
   module.exports = {
     methods: {
       outterClick (evt) {
-        this.$parent.$parent.tracker += ' > in-bar-outter-div'
+        if (this.$parent.$parent.tracker.indexOf(' > in-bar-outter-div') === -1) {
+          this.$parent.$parent.tracker += ' > in-bar-outter-div'
+        }
       },
       innerClick (evt) {
-        this.$parent.$parent.tracker += ' > in-bar-inner-div'
+        if (this.$parent.$parent.tracker.indexOf(' > in-bar-inner-div') === -1) {
+          this.$parent.$parent.tracker += ' > in-bar-inner-div'
+        }
       }
     }
   }
 </script>
-
-<style scoped>
-.event-bubble-outter {
-  height: 400px;
-  background-color: #f7f7f7;
-}
-.event-bubble-inner {
-  height: 200px;
-  background-color: #ccc;
-}
-</style>
