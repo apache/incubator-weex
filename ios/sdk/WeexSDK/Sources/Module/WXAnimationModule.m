@@ -117,11 +117,6 @@
         return;
     }
     
-    float perspective = _animationInfo.target->_transform.perspective;
-    if (!isinf(perspective)) {
-        [self applyTransform];
-    }
-    
     if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
         /*
          * http://ronnqvi.st/about-the-anchorpoint/

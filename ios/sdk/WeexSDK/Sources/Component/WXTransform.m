@@ -153,17 +153,17 @@
     }
     
     CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
-    if (_rotateX != 0) {
-        CATransform3D rotateXTransform = CATransform3DMakeRotation(_rotateX, 1, 0, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateXTransform);
-    }
-    if (_rotateY != 0) {
-        CATransform3D rotateYTransform = CATransform3DMakeRotation(_rotateY, 0, 1, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateYTransform);
-    }
+
     if (_rotateAngle != 0 || _rotateZ != 0) {
-        CATransform3D rotateZTransform = CATransform3DMakeRotation(_rotateAngle?:_rotateZ, 0, 0, 1);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateZTransform);
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateAngle?:_rotateZ, 0, 0, 1);
+    }
+    
+    if (_rotateY != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateY, 0, 1, 0);
+    }
+    
+    if (_rotateX != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateX, 1, 0, 0);
     }
     
     return nativeTransform3d;
@@ -230,12 +230,7 @@
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
-    CATransform3D presentationTransform = view.layer.presentationLayer.transform;
-    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d) && !CATransform3DEqualToTransform(view.layer.transform, presentationTransform)){
-        if (presentationTransform.m34 != 0 && !isinf(_perspective)) {
-            //  just for perspective
-            nativeTransform3d = presentationTransform;
-        }
+    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
         view.layer.transform = nativeTransform3d;
     }
 }
