@@ -22,6 +22,26 @@
 
 @protocol WXExtendCallNativeProtocol <NSObject>
 
-- (id)excuteCallNative:(NSDictionary *)dict;
+@required
+
+/**
+ * @abstract check parameters
+ *
+ * @param parameters the checked parameters.
+ *
+ * @return YES or NO.
+ *
+ */
++ (BOOL)checkParameters:(NSDictionary *)parameters;
+
+/**
+ * @abstract excuteCallNative
+ *
+ * @param parameters the checked parameters.
+ *
+ * @return A value.
+ *
+ */
++ (id)excuteCallNative:(NSDictionary *)parameters;
 
 @end

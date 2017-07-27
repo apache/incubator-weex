@@ -34,7 +34,7 @@
 #import "JSValue+Weex.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXSDKManager.h"
-#import "WXExtendCallNativeProtocol.h"
+#import "WXExtendCallNativeManager.h"
 
 #import <dlfcn.h>
 
@@ -503,9 +503,8 @@
 
 -(id)extendCallNative:(NSDictionary *)dict
 {
-    id extendCallNative = [WXSDKEngine handlerForProtocol:@protocol(WXExtendCallNativeProtocol)];
-    if(extendCallNative){
-        return [extendCallNative excuteCallNative:dict];
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
     }
     return @(-1);
 }

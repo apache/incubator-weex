@@ -239,6 +239,8 @@
 		C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */; };
 		C4424E5B1F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */; };
+		C47B78CE1F2998EE001D3B0C /* WXExtendCallNativeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C47B78CC1F2998EE001D3B0C /* WXExtendCallNativeManager.h */; };
+		C47B78CF1F2998EE001D3B0C /* WXExtendCallNativeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78CD1F2998EE001D3B0C /* WXExtendCallNativeManager.m */; };
 		C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
 		C4B3D6D51E6954300013F38D /* WXEditComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3D6D31E6954300013F38D /* WXEditComponent.m */; };
 		C4B834271DE69B09007AD27E /* WXPickerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B834251DE69B09007AD27E /* WXPickerModule.m */; };
@@ -557,6 +559,8 @@
 		C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXPrerenderManager.h; sourceTree = "<group>"; };
 		C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXPrerenderManager.m; sourceTree = "<group>"; };
 		C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXExtendCallNativeProtocol.h; sourceTree = "<group>"; };
+		C47B78CC1F2998EE001D3B0C /* WXExtendCallNativeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXExtendCallNativeManager.h; sourceTree = "<group>"; };
+		C47B78CD1F2998EE001D3B0C /* WXExtendCallNativeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtendCallNativeManager.m; sourceTree = "<group>"; };
 		C4B3D6D21E6954300013F38D /* WXEditComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEditComponent.h; sourceTree = "<group>"; };
 		C4B3D6D31E6954300013F38D /* WXEditComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXEditComponent.m; sourceTree = "<group>"; };
 		C4B834251DE69B09007AD27E /* WXPickerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXPickerModule.m; sourceTree = "<group>"; };
@@ -970,6 +974,8 @@
 				741081221CED6756001BC6E5 /* WXComponentFactory.m */,
 				DCAB35FC1D658EB700C0EA70 /* WXRuleManager.h */,
 				DCAB35FD1D658EB700C0EA70 /* WXRuleManager.m */,
+				C47B78CC1F2998EE001D3B0C /* WXExtendCallNativeManager.h */,
+				C47B78CD1F2998EE001D3B0C /* WXExtendCallNativeManager.m */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -1259,6 +1265,7 @@
 				77D161621C02ED790010B15B /* WXLog.h in Headers */,
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
+				C47B78CE1F2998EE001D3B0C /* WXExtendCallNativeManager.h in Headers */,
 				745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */,
 				749DC27B1D40827B009E1C91 /* WXMonitor.h in Headers */,
 				77E659DA1C07F594008B8775 /* WXDomModule.h in Headers */,
@@ -1558,6 +1565,7 @@
 				C4F012831E1502E9003378D0 /* WXWebSocketModule.m in Sources */,
 				59D3CA401CF9ED57008835DC /* Layout.c in Sources */,
 				DCF087621DCAE161005CD6EB /* WXInvocationConfig.m in Sources */,
+				C47B78CF1F2998EE001D3B0C /* WXExtendCallNativeManager.m in Sources */,
 				77D161311C02DE4E0010B15B /* WXComponent.m in Sources */,
 				74862F7A1E02B88D00B7A041 /* JSValue+Weex.m in Sources */,
 				740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */,
