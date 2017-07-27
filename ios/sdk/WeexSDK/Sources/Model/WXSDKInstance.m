@@ -199,6 +199,7 @@ typedef enum : NSUInteger {
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
     
     [self _handleConfigCenter];
     
@@ -246,9 +247,9 @@ typedef enum : NSUInteger {
     }
     _options = [newOptions copy];
   
-    if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = url.absoluteString ? : @"";
-    }
+//    if (!self.pageName || [self.pageName isEqualToString:@""]) {
+//        self.pageName = url.absoluteString ? : @"";
+//    }
     
     request.userAgent = [WXUtility userAgent];
     
