@@ -171,10 +171,11 @@ typedef enum : NSUInteger {
         return;
     }
     
-    if (self.pageName && ![self.pageName isEqualToString:@""]) {
+    if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
     } else {
         WXLogWarning(@"WXSDKInstance's pageName should be specified.");
+        WXAssertCondition(![WXUtility isBlankString:_pageName], WXSDKInstance.pageName);
     }
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
