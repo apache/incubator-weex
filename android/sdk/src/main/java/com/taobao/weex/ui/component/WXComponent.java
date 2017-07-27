@@ -48,7 +48,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
@@ -676,8 +675,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           updateElevation();
         }
         return true;
-      case Name.PERSPECTIVE:
-        return setPerspective(param);
       case PROP_FIXED_SIZE:
         String fixedSize = WXUtils.getString(param, PROP_FS_MATCH_PARENT);
         setFixedSize(fixedSize);
@@ -720,22 +717,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       default:
         return false;
     }
-  }
-
-  private boolean setPerspective(Object param) {
-    T host = getHostView();
-    boolean ret = false;
-    if (host != null) {
-      float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(param), getInstance().getInstanceViewPortWidth());
-      float scale = host.getResources().getDisplayMetrics().density;
-      if (!Float.isNaN(value) && value > 0) {
-        host.setCameraDistance(value * scale);
-        ret = true;
-      } else {
-        host.setCameraDistance(Float.MAX_VALUE);
-      }
-    }
-    return ret;
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -963,9 +944,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   @CallSuper
   protected void onHostViewInitialized(T host){
-    if(host!=null){
-      host.setCameraDistance(Float.MAX_VALUE);
-    }
     if (mAnimationHolder != null) {
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);

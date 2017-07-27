@@ -26,7 +26,9 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.util.Property;
 import android.view.View;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXUtils;
@@ -91,6 +93,7 @@ public class WXAnimationBean {
       wxToAndroidMap.put(WX_SCALE, Arrays.asList(View.SCALE_X, View.SCALE_Y));
       wxToAndroidMap.put(WX_SCALE_X, Collections.singletonList(View.SCALE_X));
       wxToAndroidMap.put(WX_SCALE_Y, Collections.singletonList(View.SCALE_Y));
+      wxToAndroidMap.put(Name.PERSPECTIVE, Collections.singletonList(CameraDistanceProperty.getInstance()));
       wxToAndroidMap = Collections.unmodifiableMap(wxToAndroidMap);
     }
 
@@ -103,6 +106,7 @@ public class WXAnimationBean {
     private Map<Property<View, Float>, Float> transformMap = new HashMap<>();
     private Pair<Float, Float> pivot;
     private List<PropertyValuesHolder> holders=new LinkedList<>();
+    private float cameraDistance = Float.MAX_VALUE;
 
     private static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
                                                 final int height,final int viewportW) {
@@ -134,6 +138,9 @@ public class WXAnimationBean {
                 } else if (propertyList.contains(View.SCALE_X) ||
                            propertyList.contains(View.SCALE_Y)) {
                   convertedList.addAll(parseScale(propertyList.size(), rawValue));
+                }
+                else if(propertyList.contains(CameraDistanceProperty.getInstance())){
+                  convertedList.add(parseCameraDistance(rawValue));
                 }
                 if (propertyList.size() == convertedList.size()) {
                   for (int i = 0; i < propertyList.size(); i++) {
@@ -208,6 +215,18 @@ public class WXAnimationBean {
                 }
                 convertedList.add(parsePercentOrPx(first, width,viewportW));
                 convertedList.add(parsePercentOrPx(second, height,viewportW));
+              }
+
+              private Float parseCameraDistance(List<String> rawValue){
+                float ret=Float.MAX_VALUE;
+                if(rawValue.size() == 1){
+                  float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(rawValue.get(0)), viewportW);
+                  float scale = WXEnvironment.getApplication().getResources().getDisplayMetrics().density;
+                  if (!Float.isNaN(value) && value > 0) {
+                    ret = value * scale;
+                  }
+                }
+                return ret;
               }
             });
         return parser.parse();
@@ -300,6 +319,9 @@ public class WXAnimationBean {
       pivot = parsePivot(transformOrigin,width,height,viewportW);
       transformMap = createDefaultTransform();
       transformMap.putAll(parseTransForm(rawTransform,width,height,viewportW));
+      if(transformMap.containsKey(CameraDistanceProperty.getInstance())){
+        cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());
+      }
       initHolders();
     }
 
@@ -314,6 +336,10 @@ public class WXAnimationBean {
 
     public List<PropertyValuesHolder> getHolders(){
       return holders;
+    }
+
+    public float getCameraDistance(){
+      return cameraDistance;
     }
   }
 }
