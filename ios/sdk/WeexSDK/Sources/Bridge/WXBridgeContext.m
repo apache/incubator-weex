@@ -325,7 +325,7 @@ _Pragma("clang diagnostic pop") \
             return nil;
         }
         
-        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
         if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
             [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
             return nil;
@@ -396,7 +396,8 @@ _Pragma("clang diagnostic pop") \
             [WXTracingManager startTracingWithInstanceId:instanceId ref:task[@"ref"] className:nil name:task[@"component"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
         } else {
             NSString *moduleName = task[@"module"];
-            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+            NSDictionary *options = task[@"options"];
+            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
             [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
             [method invoke];
         }
