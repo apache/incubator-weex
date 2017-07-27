@@ -93,6 +93,11 @@
             [[WXTracingManager sharedInstance].tracingTasks setObject:task forKey:tracing.iid];
         }
         WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:tracing.iid];
+        if(task.bundleUrl.length == 0){
+            if(tracing.bundleUrl.length>0){
+                task.bundleUrl = tracing.bundleUrl;
+            }
+        }
         if(!task.tracings){
             task.tracings = [NSMutableArray new];
         }
@@ -171,6 +176,9 @@
         }
         if(options && options[@"parentRef"]){
             tracing.parentRef = options[@"parentRef"];
+        }
+        if(options && options[@"bundleUrl"]){
+            tracing.bundleUrl = options[@"bundleUrl"];
         }
         [self startTracing:tracing];
     }
@@ -312,18 +320,12 @@
     [task.tracings addObject:tracing];
 }
 
-+(WXTracingTask *)getTracingData
++(NSMutableDictionary *)getTracingData
 {
     if(![self isTracing]){
         return nil;
     }
-    NSArray *instanceIds = [[WXSDKManager bridgeMgr] getInstanceIdStack];
-    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:[instanceIds firstObject]];
-    NSMutableArray *ary = [NSMutableArray new];
-    for (WXTracing *tracing in task.tracings) {
-        [ary addObject:[tracing dictionary]];
-    }
-    return task;
+    return [WXTracingManager sharedInstance].tracingTasks;
 }
 
 +(NSDictionary *)getTacingApi
