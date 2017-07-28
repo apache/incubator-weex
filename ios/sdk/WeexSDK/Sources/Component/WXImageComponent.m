@@ -377,6 +377,8 @@ WX_EXPORT_METHOD(@selector(save:))
                         if (!error) {
                             sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
                             sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        } else {
+                            [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
                         }
                         [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
