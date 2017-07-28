@@ -145,6 +145,7 @@ WX_EXPORT_METHOD(@selector(save:))
             return;
         }
     }
+    
     if (![self isViewLoaded]) {
         if (resultCallback) {
             resultCallback(@{@"success": @(false),
