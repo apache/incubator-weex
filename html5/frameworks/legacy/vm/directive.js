@@ -259,7 +259,6 @@ function setClass (vm, el, classList) {
   if (typeof classList !== 'function' && !Array.isArray(classList)) {
     return
   }
-  console.log(` => setClass:`, classList)
   if (Array.isArray(classList) && !classList.length) {
     el.setClassStyle({})
     return
