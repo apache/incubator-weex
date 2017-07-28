@@ -16,32 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { supportSticky } from '../../../utils/style'
+
+import list from './list'
+import scroller from './scroller'
+import waterfall from './waterfall'
+import cell from './cell'
+import header from './header'
+import loading from './loading'
+import refresh from './refresh'
+import loadingIndicator from './loading-indicator'
+
+import './style.css'
+
+const modules = [
+  list,
+  scroller,
+  waterfall,
+  cell,
+  header,
+  loading,
+  refresh,
+  loadingIndicator
+]
 
 export default {
-  methods: {
-    handleListScroll (event) {
-      this.handleScroll(event)
-
-      if (supportSticky()) {
-        return
-      }
-
-      const scrollTop = this.$el.scrollTop
-      const h = this.$children.filter(vm => vm.$refs.header)
-
-      if (h.length <= 0) {
-        return
-      }
-
-      for (let i = 0; i < h.length; i++) {
-        if (h[i].initTop < scrollTop) {
-          h[i].addSticky()
-        }
-        else {
-          h[i].removeSticky()
-        }
-      }
-    }
+  init (weex) {
+    modules.forEach(function (mod) {
+      weex.install(mod)
+    })
   }
 }
