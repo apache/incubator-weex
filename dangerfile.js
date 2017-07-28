@@ -295,7 +295,7 @@ function findReviewer(resolve, reject) {
   }, function (err, result) {
     console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
-      reject()
+      resolve()
       return
     }
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
