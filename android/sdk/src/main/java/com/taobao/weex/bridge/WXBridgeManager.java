@@ -134,7 +134,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   static volatile WXBridgeManager mBridgeManager;
 
-  private static final int CRASHREINIT = 8;
+  private static final int CRASHREINIT = 10;
   private static int reInitCount = 1;
 
 
@@ -880,7 +880,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
       try {
-        callReportCrash(crashFile);
+        callReportCrash(crashFile, instanceId);
         if (reInitCount > CRASHREINIT) {
           return IWXBridge.INSTANCE_RENDERING_ERROR;
         }
@@ -909,7 +909,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
   }
 
-  public void callReportCrash(String crashFile) {
+  public void callReportCrash(String crashFile, final String instanceId) {
       // statistic weexjsc process crash
       Date date = new Date();
       DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -936,7 +936,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
-                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString());
+                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId);
                 File file = new File(origin_filename);
                 if (file.exists()) {
                   file.delete();
@@ -1219,7 +1219,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
 
-  public void commitJscCrashAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {
+  public void commitJscCrashAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg, String instanceId) {
     if (TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
@@ -1229,15 +1229,30 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               TextUtils.isEmpty(errMsg) ? errorCode.getErrorMsg() : errMsg);
     }
 
-    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (userTrackAdapter == null) {
-      return;
+    IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+    if (adapter != null) {
+      final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(instance != null){
+        Map<String,String> extParams = null;
+        extParams.put("jscCrashStack", errMsg);
+        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, instance.getBundleUrl(), errorCode.getErrorCode(), null, null, extParams);
+        adapter.onJSException(jsException);
+        if (WXEnvironment.isApkDebugable()) {
+          Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
+          WXLogUtils.e(jsException.toString());
+        }
+      }
     }
-    WXPerformance performance = new WXPerformance();
-    performance.errCode = errorCode.getErrorCode();
-    performance.appendErrMsg(errMsg);
-    Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
-    userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
+
+//    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+//    if (userTrackAdapter == null) {
+//      return;
+//    }
+//    WXPerformance performance = new WXPerformance();
+//    performance.errCode = errorCode.getErrorCode();
+//    performance.appendErrMsg(errMsg);
+//    Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
+//    userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
 
   /**
