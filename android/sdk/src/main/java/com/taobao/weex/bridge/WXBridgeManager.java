@@ -60,9 +60,9 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.FileReader;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -116,7 +116,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String KEY_ARGS = "args";
 
   // default crash file path
-  public static final String CRASHPATH = "/data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs";
+  // public static final String CRASHPATH = "/data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs";
 
   // args
   public static final String COMPONENT = "component";
@@ -879,19 +879,21 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
-      callReportCrash(crashFile);
-      if (reInitCount > CRASHREINIT) {
+      try {
+        callReportCrash(crashFile);
+        if (reInitCount > CRASHREINIT) {
           return IWXBridge.INSTANCE_RENDERING_ERROR;
-      }
-      reInitCount ++;
-      // reinit frame work
-      mInit = false;
-      initScriptsFramework("");
-      // statistic weexjsc process crash
-     commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "[WXBridgeManager] weexjsc process crash and reload");
+        }
+        reInitCount++;
+        // reinit frame work
+        mInit = false;
+        initScriptsFramework("");
 
-      if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+        if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
           return IWXBridge.DESTROY_INSTANCE;
+        }
+      } catch (Exception e) {
+        WXLogUtils.e("[WXBridgeManager] callReportCrashReloadPage exception: ", e);
       }
       try {
           if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
@@ -908,36 +910,63 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public void callReportCrash(String crashFile) {
-      final String origin_filename = crashFile;
+      // statistic weexjsc process crash
+      Date date = new Date();
+      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+      String time = format.format(date);
+      final String origin_filename = crashFile + "." + time;
+      File oldfile = new File(crashFile);
+      File newfile = new File(origin_filename);
+      if (oldfile.exists()) {
+          oldfile.renameTo(newfile);
+      }
       Thread t = new Thread(new Runnable() {
-          public void run() {
+           public void run() {
               try {
-                  Log.e("reportServerCrash", "WXBridge reportServerCrash crashFile:" + origin_filename);
-                  String filename = CRASHPATH;
-                  File oldfile = new File(origin_filename);
-                  File newfile = new File(filename);
-                  if (newfile.exists() && newfile.isDirectory()) {
-                      Date date = new Date();
-                      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-                      String time = format.format(date);
-
-                      filename += "/native" + time + "_bg_jni.log";
-                      newfile = new File(filename);
-                      Log.e("reportServerCrash", "WXBridge reportServerCrash time:" + time + " filename" + filename);
-                      if (oldfile.exists()) {
-                          oldfile.renameTo(newfile);
-                          try {
-                              FileOutputStream fos = new FileOutputStream (new File(filename), true) ;
-                              String str = "log end: " + time + "\n";
-                              fos.write(str.getBytes()) ;
-                              fos.close ();
-                          } catch (IOException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                  } else {
-                      Log.e("reportServerCrash", "WXBridge /data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs not exsist");
-                  }
+                StringBuilder result = new StringBuilder();
+                try{
+                    BufferedReader br = new BufferedReader(new FileReader(origin_filename));
+                    //构造一个BufferedReader类来读取文件
+                    String s = null;
+                    while((s = br.readLine()) != null){
+                        //使用readLine方法，一次读一行
+                        result.append(s + "\n");
+                    }
+                    br.close();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString());
+                File file = new File(origin_filename);
+                if (file.exists()) {
+                  file.delete();
+                }
+//                  Log.e("reportServerCrash", "WXBridge reportServerCrash crashFile:" + origin_filename);
+//                  String filename = CRASHPATH;
+//                  File oldfile = new File(origin_filename);
+//                  File newfile = new File(filename);
+//                  if (newfile.exists() && newfile.isDirectory()) {
+//                      Date date = new Date();
+//                      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+//                      String time = format.format(date);
+//
+//                      filename += "/native" + time + "_bg_jni.log";
+//                      newfile = new File(filename);
+//                      Log.e("reportServerCrash", "WXBridge reportServerCrash time:" + time + " filename" + filename);
+//                      if (oldfile.exists()) {
+//                          oldfile.renameTo(newfile);
+//                          try {
+//                              FileOutputStream fos = new FileOutputStream (new File(filename), true) ;
+//                              String str = "log end: " + time + "\n";
+//                              fos.write(str.getBytes()) ;
+//                              fos.close ();
+//                          } catch (IOException e) {
+//                              e.printStackTrace();
+//                          }
+//                      }
+//                  } else {
+//                      Log.e("reportServerCrash", "WXBridge /data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs not exsist");
+//                  }
               } catch (Throwable throwable) {
                   WXLogUtils.e("[WXBridgeManager] callReportCrash exception: ", throwable);
               }
