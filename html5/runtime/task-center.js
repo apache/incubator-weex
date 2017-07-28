@@ -74,6 +74,9 @@ export class TaskCenter {
         if (v instanceof Element) {
           return v.ref
         }
+        if (v._isVue && v.$el instanceof Element) {
+          return v.$el.ref
+        }
         return v
       case 'function':
         return this.callbackManager.add(v).toString()
