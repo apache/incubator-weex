@@ -326,6 +326,20 @@
     
     _jsContext[@"callRemoveEvent"] = WXJSCallRemoveEventBlock;
 }
+    
+- (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish
+{
+    id WXJSCallCreateFinishBlock = ^(JSValue *instanceId, JSValue *ifCallback) {
+            
+        NSString *instanceIdString = [instanceId toString];
+        
+        WXLogDebug(@"callRCreateFinish...%@", instanceIdString);
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:nil];
+        return [JSValue valueWithInt32:(int32_t)callCreateFinish(instanceIdString) inContext:[JSContext currentContext]];
+    };
+        
+    _jsContext[@"callCreateFinish"] = WXJSCallCreateFinishBlock;
+}
 
 - (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock
 {

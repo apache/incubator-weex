@@ -613,7 +613,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    WXHeaderComponent *header = ((WXSection *)_completedSections[section]).header;
+    WXHeaderComponent *header = ((WXSection *)[_completedSections wx_safeObjectAtIndex:section]).header;
     if (header) {
         return header.calculatedFrame.size.height;
     } else {

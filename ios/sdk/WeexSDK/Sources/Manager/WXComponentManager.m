@@ -203,7 +203,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(data);
     
-    _rootComponent = [self _buildComponentForData:data];
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
     
     [self _initRootCSSNode];
     YGNodeInsertChild(_rootCSSNode, _rootComponent.cssNode,(int32_t)[_fixedComponents count]);
@@ -247,7 +247,7 @@ static NSThread *WXComponentThread;
 
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
-    WXComponent *component = [self _buildComponentForData:componentData];
+    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent];
     if (!supercomponent.subcomponents) {
         index = 0;
     } else {
@@ -360,7 +360,7 @@ static NSThread *WXComponentThread;
     return _indexDict.count;
 }
 
-- (WXComponent *)_buildComponentForData:(NSDictionary *)data
+- (WXComponent *)_buildComponentForData:(NSDictionary *)data supercomponent:(WXComponent *)supercomponent
 {
     NSString *ref = data[@"ref"];
     NSString *type = data[@"type"];
@@ -371,8 +371,11 @@ static NSThread *WXComponentThread;
     if (self.weexInstance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
-            WXComponentValidateResult* validateResult =  [validateHandler validateWithWXSDKInstance:self.weexInstance component:type];
-            if (validateResult && !validateResult.isSuccess) {
+            WXComponentValidateResult* validateResult;
+            if ([validateHandler respondsToSelector:@selector(validateWithWXSDKInstance:component:supercomponent:)]) {
+                validateResult = [validateHandler validateWithWXSDKInstance:self.weexInstance component:type supercomponent:supercomponent];
+            }
+            if (validateResult==nil || !validateResult.isSuccess) {
                 type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
                 WXLogError(@"%@",[validateResult.error.userInfo objectForKey:@"errorMsg"]);
             }
@@ -526,6 +529,7 @@ static NSThread *WXComponentThread;
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
             instance.renderFinish(rootView);
         }
     }];
