@@ -298,11 +298,13 @@ function findReviewer(resolve, reject) {
       return
     }
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
+    console.log('getContent')
     var promises = danger.git.modified_files.map(function(file) {
       let repoURL = danger.github.pr.base.repo.html_url
       let fileName = file.replace(/^.*[\\\/]/, '')
       let blameURL = repoURL + '/blame/' + danger.github.pr.base.ref + '/' + file
       // console.log("Getting blame html: " + blameURL)
+      console.log('getContent2')
       return getContent(blameURL)
     });
 
@@ -324,6 +326,7 @@ function getContent(url) {
     const lib = url.startsWith('https') ? require('https') : require('http');
     const request = lib.get(url, (response) => {
       // handle http errors
+      console.log('response:', response.statusCode)
       if (response.statusCode < 200 || response.statusCode > 299) {
          reject(new Error('Failed to load page, status code: ' + response.statusCode));
        }
