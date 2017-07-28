@@ -195,12 +195,15 @@ if (danger.git.modified_files) {
     checkFileToVerifySrcHeader(file);
   });
 }
+
+console.log('checkFileToVerifySrcHeader')
 if (danger.git.created_files) {
   danger.git.created_files.forEach(file => {
     checkChangedFile(file);
     checkFileToVerifySrcHeader(file);
   });
 }
+console.log('checkAndroidBreakChange')
 if (danger.git.deleted_files) {
   danger.git.deleted_files.forEach(file => {
     checkChangedFile(file);
@@ -242,6 +245,7 @@ const ignoreCopyrightVerifyPath = [
   'ios/sdk/WeexSDK/dependency/SRWebSocket'
 ]
 
+console.log('copyright_header_components')
 filesToVerifySrcHeader.forEach(filepath => {
   for(var i=ignoreCopyrightVerifyPath.length-1;i>=0;i--){
     if(filepath.startsWith(ignoreCopyrightVerifyPath[i])){
@@ -263,6 +267,7 @@ filesToVerifySrcHeader.forEach(filepath => {
  * will be seperated to a danger plugin
  */
 
+console.log('findReviewer')
 schedule(new Promise((resolve, reject) => {
   try {
     findReviewer(resolve, reject)
@@ -287,6 +292,7 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff'}
   }, function (err, result) {
+    console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
       reject()
       return
@@ -300,6 +306,7 @@ function findReviewer(resolve, reject) {
       return getContent(blameURL)
     });
 
+    console.log('findBlameReviewers')
     Promise.all(promises).then(datas => {
       datas.forEach(function(data, index) {
         fileToBlamesMap[danger.git.modified_files[index]] = parseBlame(data);
