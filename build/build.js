@@ -26,7 +26,6 @@ const rollup = require('rollup')
 const watch = require('rollup-watch')
 const webpack = require('webpack')
 const scan = require('weex-vue-bundle-util')
-const webExamplesWebpackConfig = require('./webpack.examples.web.config')
 const exec = require('child_process').execSync
 
 const getConfig = require('./config')
@@ -120,6 +119,7 @@ function absolutePath (p) {
 }
 
 function buildForWebExamples (config, minifyConfig) {
+  const webExamplesWebpackConfig = require('./webpack.examples.web.config')
   config.entry = minifyConfig.entry = absolutePath('../entry.js')
   config.dest = absolutePath('../dist/render.vue.js')
   delete config.banner
