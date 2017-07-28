@@ -92,13 +92,15 @@ WX_EXPORT_METHOD(@selector(save:))
     return self;
 }
 
-- (void)configPlaceHolder:(NSDictionary*)attributes {
+- (void)configPlaceHolder:(NSDictionary*)attributes
+{
     if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
         _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
 }
 
-- (void)configFilter:(NSDictionary *)styles {
+- (void)configFilter:(NSDictionary *)styles
+{
     if (styles[@"filter"]) {
         NSString *filter = styles[@"filter"];
         
