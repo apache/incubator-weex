@@ -64,8 +64,7 @@ init('<switch> component', (Vue, helper) => {
   })
 
   it('toggle <switch>', () => {
-    const vm = new Vue(_switch)
-
+    const vm = compile(`<switch ref="switch"></switch>`).$refs.switch
     expect(vm.isChecked).to.not.be.true
     vm.toggle()
     expect(vm.isChecked).to.be.true
@@ -74,7 +73,7 @@ init('<switch> component', (Vue, helper) => {
   })
 
   it('toggle & disabled <switch>', () => {
-    const vm = new Vue(_switch)
+    const vm = compile(`<switch ref="switch"></switch>`).$refs.switch
     vm.isDisabled = true
 
     expect(vm.isChecked).to.not.be.true

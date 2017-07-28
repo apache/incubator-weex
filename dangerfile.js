@@ -286,9 +286,10 @@ function findReviewer(resolve, reject) {
   var fileToDeletedLinesMap = {}
   var fileToNormalLinesMap = {}
   var fileToBlamesMap = {}
+  var repoName = danger.github.pr.base.repo && danger.github.pr.base.repo.name
   github.pullRequests.get({
     owner: danger.github.pr.base.user.login,
-    repo: danger.github.pr.base.repo.name,
+    repo: repoName,
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff'}
   }, function (err, result) {
@@ -324,19 +325,26 @@ function getContent(url) {
   return new Promise((resolve, reject) => {
     // select http or https module, depending on reqested url
     const lib = url.startsWith('https') ? require('https') : require('http');
-    const request = lib.get(url, (response) => {
-      // handle http errors
-      console.log('response:', response.statusCode)
-      if (response.statusCode < 200 || response.statusCode > 299) {
-         reject(new Error('Failed to load page, status code: ' + response.statusCode));
-       }
-      // temporary data holder
-      const body = [];
-      // on every content chunk, push it to the data array
-      response.on('data', (chunk) => body.push(chunk));
-      // we are done, resolve promise with those joined chunks
-      response.on('end', () => resolve(body.join('')));
-    });
+    const request = lib.get(url, (function (url) {
+      return (response) => {
+        // handle http errors
+        console.log('response:', response.statusCode)
+        if (response.statusCode < 200 || response.statusCode > 299) {
+          if (response.statusCode === 404) {
+            // ignore this, probably a renamed file.
+            return resolve('')
+          }
+          reject(new Error('Failed to load page, status code: ' + response.statusCode + ', '
+            + ' url: ' + url));
+        }
+        // temporary data holder
+        const body = [];
+        // on every content chunk, push it to the data array
+        response.on('data', (chunk) => body.push(chunk));
+        // we are done, resolve promise with those joined chunks
+        response.on('end', () => resolve(body.join('')));
+      }
+    })(url));
     // handle connection errors of the request
     request.on('error', (err) => reject(err))
     })

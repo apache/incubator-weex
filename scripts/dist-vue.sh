@@ -45,7 +45,7 @@ echo " => writing version number into weex-vue-render's package.json..."
 # get version of weex-html5 from subversion of main package.json.
 pkg=./package.json
 dist_pkg=${base_dir}/package.json
-version=$( grep -o -E "\"vue-render\": \"([0-9.]+)\"" ${pkg} | grep -o -E "[0-9.]+" )
+version=$( grep -o -E "\"vue-render\": \"([0-9]+[.a-z0-9-]+)\"" ${pkg} | grep -o -E "[0-9]+[.a-z0-9-]+" )
 echo " => version:" ${version}
 
 # update package.json for weex-html5 package.

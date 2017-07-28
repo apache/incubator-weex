@@ -17,13 +17,15 @@
  * under the License.
  */
 /*global Event*/
-import * as globalEvent from '../../../../render/vue/modules/globalEvent'
+import globalEvent from '../../../../render/vue/modules/globalEvent'
 describe('globalEvent module', () => {
+  weex.install(globalEvent)
+  const globalEventModule = weex.requireModule('globalEvent')
   const callback = sinon.spy()
   it('should addEventListener be worked', () => {
     const {
       addEventListener
-    } = globalEvent.default
+    } = globalEventModule
     const event = 'click'
     expect(addEventListener).to.be.a('function')
     addEventListener(event, callback)
@@ -35,7 +37,7 @@ describe('globalEvent module', () => {
   it('should removeEventListener be worked', () => {
     const {
       removeEventListener
-    } = globalEvent.default
+    } = globalEventModule
     const event = 'click'
     expect(removeEventListener).to.be.a('function')
     removeEventListener(event)

@@ -23,7 +23,7 @@ const DEFAULT_NEIGHBOR_ALPHA = 0.6
 const DEFAULT_NEIGHBOR_SCALE = 0.8
 const DEFAULT_CURRENT_ITEM_SCALE = 0.9
 
-export default {
+const sliderNeighbor = {
   mixins: [slideMixin],
   props: {
     index: {
@@ -95,10 +95,12 @@ export default {
   },
 
   render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
     return this._renderSlides(createElement)
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerComponent('slider-neighbor', sliderNeighbor)
   }
 }

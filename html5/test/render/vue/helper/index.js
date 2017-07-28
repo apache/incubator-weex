@@ -58,7 +58,7 @@ export function init (title, fn) {
        * @param  {object} component.
        */
       register (name, component) {
-        global.weex.registerComponent(name, component)
+        global.weex.install(component)
       },
 
       /**
