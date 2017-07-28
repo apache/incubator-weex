@@ -226,10 +226,10 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     
     UIEdgeInsets padding = {
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight)))
     };
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
@@ -313,20 +313,20 @@ do {\
         }
     
         //TODO:more elegant way to use max and min constrained size
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        if (!isnan(YGNodeStyleGetMinWidth(weakSelf.cssNode).value)) {
+            computedSize.width = MAX(computedSize.width, YGNodeStyleGetMinWidth(weakSelf.cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        if (!isnan(YGNodeStyleGetMaxWidth(weakSelf.cssNode).value)) {
+            computedSize.width = MIN(computedSize.width, YGNodeStyleGetMaxWidth(weakSelf.cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+        if (!isnan(YGNodeStyleGetMinHeight(_cssNode).value)) {
+            computedSize.height = MAX(computedSize.height, YGNodeStyleGetMinHeight(_cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        if (!isnan(YGNodeStyleGetMaxHeight(_cssNode).value)) {
+            computedSize.height = MIN(computedSize.height, YGNodeStyleGetMaxHeight(_cssNode).value);
         }
         if (textStorage && [WXUtility isBlankString:textStorage.string]) {
             //  if the text value is empty or nil, then set the height is 0.
@@ -618,6 +618,7 @@ do {\
         [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
         [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
     } else {
+        
         CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
         // sufficient height for text to draw, or frame lines will be empty
         textFrame.size.height = bounds.size.height * 2;

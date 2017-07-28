@@ -134,8 +134,9 @@
 
 - (void)dealloc
 {
-    free_css_node(_cssNode);
-
+    if (_cssNode) {
+        YGNodeFree(_cssNode);
+    }
     [self _removeAllEvents];
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
@@ -144,6 +145,19 @@
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
 
+}
+
++ (YGConfigRef)yogaConfig
+{
+    static YGConfigRef yogaConfig;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        yogaConfig = YGConfigNew();
+        // Turnig off pixel rounding.
+        YGConfigSetPointScaleFactor(yogaConfig, 0.0);
+        YGConfigSetUseLegacyStretchBehaviour(yogaConfig, true);
+    });
+    return yogaConfig;
 }
 
 - (NSDictionary *)styles
@@ -342,7 +356,7 @@
     return _absolutePosition;
 }
 
-- (css_node_t *)cssNode
+- (YGNodeRef)cssNode
 {
     return _cssNode;
 }
@@ -362,6 +376,11 @@
 - (WXComponent *)supercomponent
 {
     return _supercomponent;
+}
+
+- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
+{
+    YGNodeInsertChild(self.cssNode, subcomponent.cssNode, (int32_t)index);
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index

@@ -96,87 +96,89 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 #pragma mark CSS Layout
 
-+(css_position_type_t)css_position_type_t:(id)value
++(YGPositionType)YGPositionType:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         if ([value isEqualToString:@"absolute"]) {
-            return CSS_POSITION_ABSOLUTE;
+            return YGPositionTypeAbsolute;
         } else if ([value isEqualToString:@"relative"]) {
-            return CSS_POSITION_RELATIVE;
+            return YGPositionTypeRelative;
         } else if ([value isEqualToString:@"fixed"]) {
-            return CSS_POSITION_ABSOLUTE;
+            return YGPositionTypeAbsolute;
         } else if ([value isEqualToString:@"sticky"]) {
-            return CSS_POSITION_RELATIVE;
+            return YGPositionTypeRelative;
         }
     }
-    return CSS_POSITION_RELATIVE;
+    return YGPositionTypeRelative;
 }
 
-+ (css_flex_direction_t)css_flex_direction_t:(id)value
++ (YGFlexDirection)YGFlexDirection:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         if ([value isEqualToString:@"column"]) {
-            return CSS_FLEX_DIRECTION_COLUMN;
+            return YGFlexDirectionColumn;
         } else if ([value isEqualToString:@"column-reverse"]) {
-            return CSS_FLEX_DIRECTION_COLUMN_REVERSE;
+            return YGFlexDirectionColumnReverse;
         } else if ([value isEqualToString:@"row"]) {
-            return CSS_FLEX_DIRECTION_ROW;
+            return YGFlexDirectionRow;
         } else if ([value isEqualToString:@"row-reverse"]) {
-            return CSS_FLEX_DIRECTION_ROW_REVERSE;
+            return YGFlexDirectionRowReverse;
         }
     }
-    return CSS_FLEX_DIRECTION_COLUMN;
+    return YGFlexDirectionColumn;
 }
 
-+ (css_align_t)css_align_t:(id)value
++ (YGAlign)YGAlign:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         if ([value isEqualToString:@"stretch"]) {
-            return CSS_ALIGN_STRETCH;
+            return YGAlignStretch;
         } else if ([value isEqualToString:@"flex-start"]) {
-            return CSS_ALIGN_FLEX_START;
+            return YGAlignFlexStart;
         } else if ([value isEqualToString:@"flex-end"]) {
-            return CSS_ALIGN_FLEX_END;
+            return YGAlignFlexEnd;
         } else if ([value isEqualToString:@"center"]) {
-            return CSS_ALIGN_CENTER;
+            return YGAlignCenter;
         } else if ([value isEqualToString:@"auto"]) {
-            return CSS_ALIGN_AUTO;
+            return YGAlignAuto;
+        } else if ([value isEqualToString:@"baseline"]) {
+            return YGAlignBaseline;
         }
     }
     
-    return CSS_ALIGN_STRETCH;
+    return YGAlignStretch;
 }
 
-+ (css_wrap_type_t)css_wrap_type_t:(id)value
++ (YGWrap)YGWrap:(id)value
 {
     if([value isKindOfClass:[NSString class]]) {
         if ([value isEqualToString:@"nowrap"]) {
-            return CSS_NOWRAP;
+            return YGWrapNoWrap;
         } else if ([value isEqualToString:@"wrap"]) {
-            return CSS_WRAP;
+            return YGWrapWrap;
         }
     }
     
-    return CSS_NOWRAP;
+    return YGWrapNoWrap;
 }
 
-+ (css_justify_t)css_justify_t:(id)value
++ (YGJustify)YGJustify:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         if ([value isEqualToString:@"flex-start"]) {
-            return CSS_JUSTIFY_FLEX_START;
+            return YGJustifyFlexStart;
         } else if ([value isEqualToString:@"center"]) {
-            return CSS_JUSTIFY_CENTER;
+            return YGJustifyCenter;
         } else if ([value isEqualToString:@"flex-end"]) {
-            return CSS_JUSTIFY_FLEX_END;
+            return YGJustifyFlexEnd;
         } else if ([value isEqualToString:@"space-between"]) {
-            return CSS_JUSTIFY_SPACE_BETWEEN;
+            return YGJustifySpaceBetween;
         } else if ([value isEqualToString:@"space-around"]) {
-            return CSS_JUSTIFY_SPACE_AROUND;
+            return YGJustifySpaceAround;
         }
     }
     
-    return CSS_JUSTIFY_FLEX_START;
+    return YGJustifyFlexStart;
 }
 
 #pragma mark Style

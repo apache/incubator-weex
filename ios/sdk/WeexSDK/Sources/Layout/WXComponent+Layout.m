@@ -36,6 +36,10 @@
 {
     _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
+    if ([self measureBlock]) {
+        YGNodeMarkDirty(self.cssNode);
+    }
+    YGNodeSetHasNewLayout(self.cssNode, true);
     if(supercomponent){
         [supercomponent setNeedsLayout];
     }
@@ -60,27 +64,25 @@
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-    _cssNode = new_css_node();
-    
-    _cssNode->print = cssNodePrint;
-    _cssNode->get_child = cssNodeGetChild;
-    _cssNode->is_dirty = cssNodeIsDirty;
+    _cssNode = YGNodeNewWithConfig([[self class] yogaConfig]);
+    YGNodeSetPrintFunc(_cssNode, cssNodePrint);
+//    _cssNode->get_child = cssNodeGetChild;
+//    _cssNode->is_dirty = cssNodeIsDirty;
     if ([self measureBlock]) {
-        _cssNode->measure = cssNodeMeasure;
+        YGNodeSetMeasureFunc(_cssNode, cssNodeMeasure);
     }
-    _cssNode->context = (__bridge void *)self;
-    
+    YGNodeSetContext(_cssNode, (__bridge void *)self);
     [self _recomputeCSSNodeChildren];
     [self _fillCSSNode:styles];
     
     // To be in conformity with Android/Web, hopefully remove this in the future.
     if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-        if (isUndefined(_cssNode->style.dimensions[CSS_HEIGHT]) && self.weexInstance.frame.size.height) {
-            _cssNode->style.dimensions[CSS_HEIGHT] = self.weexInstance.frame.size.height;
+        if (YGFloatIsUndefined(YGNodeStyleGetHeight(_cssNode).value) && self.weexInstance.frame.size.height) {
+            YGNodeStyleSetHeight(_cssNode, self.weexInstance.frame.size.height);
         }
         
-        if (isUndefined(_cssNode->style.dimensions[CSS_WIDTH]) && self.weexInstance.frame.size.width) {
-            _cssNode->style.dimensions[CSS_WIDTH] = self.weexInstance.frame.size.width;
+        if (YGFloatIsUndefined(YGNodeStyleGetWidth(_cssNode).value) && self.weexInstance.frame.size.width) {
+            YGNodeStyleSetWidth(_cssNode, self.weexInstance.frame.size.width);
         }
     }
 }
@@ -97,7 +99,7 @@
 
 - (void)_recomputeCSSNodeChildren
 {
-    _cssNode->children_count = (int)[self _childrenCountForLayout];
+//    _cssNode->children_count = (int)[self _childrenCountForLayout];
 }
 
 - (NSUInteger)_childrenCountForLayout
@@ -157,17 +159,20 @@
                            gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
     WXAssertComponentThread();
-    
-    if (!_cssNode->layout.should_update) {
+    if (!YGNodeGetHasNewLayout(_cssNode)) {
         return;
     }
-    _cssNode->layout.should_update = false;
-    _isLayoutDirty = NO;
+    YGNodeSetHasNewLayout(_cssNode, false);
     
-    CGRect newFrame = CGRectMake(WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]),
-                                 WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
+    if (YGNodeStyleGetDisplay(_cssNode) == YGDisplayNone) {
+        return;
+    }
+    _isLayoutDirty = NO;
+    CGRect newFrame = CGRectZero;
+    newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
+                          WXRoundPixelValue((YGFloatIsUndefined(YGNodeLayoutGetTop(_cssNode)))?0:YGNodeLayoutGetTop(_cssNode)),
+                          WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
+                          WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
     
     BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
@@ -178,10 +183,10 @@
     
     CGPoint newAbsolutePosition = [self computeNewAbsolutePosition:superAbsolutePosition];
     
-    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-    _cssNode->layout.position[CSS_LEFT] = 0;
-    _cssNode->layout.position[CSS_TOP] = 0;
+//    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
+//    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
+//    _cssNode->layout.position[CSS_LEFT] = 0;
+//    _cssNode->layout.position[CSS_TOP] = 0;
     
     [self _frameDidCalculated:isFrameChanged];
     
@@ -206,39 +211,6 @@
     [self layoutDidFinish];
 }
 
-#define WX_STYLE_FILL_CSS_NODE(key, cssProp, type)\
-do {\
-    id value = styles[@#key];\
-    if (value) {\
-        typeof(_cssNode->style.cssProp) convertedValue = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
-        _cssNode->style.cssProp = convertedValue;\
-        [self setNeedsLayout];\
-    }\
-} while(0);
-
-#define WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp)\
-do {\
-    id value = styles[@#key];\
-    if (value) {\
-        CGFloat pixel = [self WXPixelType:value];\
-        if (isnan(pixel)) {\
-            WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
-        } else {\
-            _cssNode->style.cssProp = pixel;\
-            [self setNeedsLayout];\
-        }\
-    }\
-} while(0);
-
-#define WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(key, cssProp)\
-do {\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_TOP])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_LEFT])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_RIGHT])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_BOTTOM])\
-} while(0);
-
-
 - (CGFloat)WXPixelType:(id)value
 {
     return [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];
@@ -247,166 +219,287 @@ do {\
 - (void)_fillCSSNode:(NSDictionary *)styles
 {
     // flex
-    WX_STYLE_FILL_CSS_NODE(flex, flex, CGFloat)
-    WX_STYLE_FILL_CSS_NODE(flexDirection, flex_direction, css_flex_direction_t)
-    WX_STYLE_FILL_CSS_NODE(alignItems, align_items, css_align_t)
-    WX_STYLE_FILL_CSS_NODE(alignSelf, align_self, css_align_t)
-    WX_STYLE_FILL_CSS_NODE(flexWrap, flex_wrap, css_wrap_type_t)
-    WX_STYLE_FILL_CSS_NODE(justifyContent, justify_content, css_justify_t)
+    if (styles[@"flex"]) {
+        YGNodeStyleSetFlex(_cssNode, [WXConvert CGFloat:styles[@"flex"]]);
+    } else {
+        // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
+        YGNodeStyleSetFlex(_cssNode, 0);
+    }
+    if (styles[@"flexDirection"]) {
+        YGNodeStyleSetFlexDirection(_cssNode, [WXConvert YGFlexDirection:styles[@"flexDirection"]]);
+    }
+    if (styles[@"alignItems"]) {
+        YGNodeStyleSetAlignItems(_cssNode, [WXConvert YGAlign:styles[@"alignItems"]]);
+    }
+    if (styles[@"alignSelf"]) {
+        YGNodeStyleSetAlignSelf(_cssNode, [WXConvert YGAlign:styles[@"alignSelf"]]);
+    }
+    if (styles[@"flexWrap"]) {
+        YGNodeStyleSetFlexWrap(_cssNode, [WXConvert YGWrap:styles[@"flexWrap"]]);
+    }
+    if (styles[@"justifyContent"]) {
+        YGNodeStyleSetJustifyContent(_cssNode, [WXConvert YGJustify:styles[@"justifyContent"]]);
+    }
     
     // position
-    WX_STYLE_FILL_CSS_NODE(position, position_type, css_position_type_t)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(top, position[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(left, position[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(right, position[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position[CSS_BOTTOM])
+    if (styles[@"position"]) {
+        YGNodeStyleSetPositionType(_cssNode, [WXConvert YGPositionType:styles[@"position"]]);
+    }
+    if (styles[@"top"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"top"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"left"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"left"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if(styles[@"right"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"right"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"bottom"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"bottom"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // dimension
-    WX_STYLE_FILL_CSS_NODE_PIXEL(width, dimensions[CSS_WIDTH])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(height, dimensions[CSS_HEIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(minWidth, minDimensions[CSS_WIDTH])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(minHeight, minDimensions[CSS_HEIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(maxWidth, maxDimensions[CSS_WIDTH])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(maxHeight, maxDimensions[CSS_HEIGHT])
+    if (styles[@"width"]) {
+        YGNodeStyleSetWidth(_cssNode, [WXConvert WXPixelType:styles[@"width"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"height"]) {
+        YGNodeStyleSetHeight(_cssNode, [WXConvert WXPixelType:styles[@"height"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"minWidth"]) {
+        YGNodeStyleSetMinWidth(_cssNode, [WXConvert WXPixelType:styles[@"minWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"minHeight"]) {
+        YGNodeStyleSetMinHeight(_cssNode, [WXConvert WXPixelType:styles[@"minHeight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"maxWidth"]) {
+        YGNodeStyleSetMaxWidth(_cssNode, [WXConvert WXPixelType:styles[@"maxWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"maxHeight"]) {
+        YGNodeStyleSetMaxHeight(_cssNode, [WXConvert WXPixelType:styles[@"maxHeight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // margin
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(margin, margin)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginTop, margin[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginLeft, margin[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginRight, margin[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginBottom, margin[CSS_BOTTOM])
+    if (styles[@"margin"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"margin"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginTop"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginBottom"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"marginBottom"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginRight"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"marginRight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginLeft"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"marginLeft"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // border
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(borderWidth, border)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderTopWidth, border[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderLeftWidth, border[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderRightWidth, border[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderBottomWidth, border[CSS_BOTTOM])
+    if (styles[@"border"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"border"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"borderTopWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"borderTopWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    
+    if (styles[@"borderLeftWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"borderLeftWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    
+    if (styles[@"borderBottomWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"borderBottomWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"borderRightWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"borderRightWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // padding
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(padding, padding)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingTop, padding[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingLeft, padding[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingRight, padding[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingBottom, padding[CSS_BOTTOM])
+    if (styles[@"padding"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"padding"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingTop"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"paddingTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingLeft"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"paddingLeft"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingBottom"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"paddingBottom"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingRight"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"paddingRight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    [self setNeedsLayout];
 }
-
-#define WX_STYLE_RESET_CSS_NODE(key, cssProp, defaultValue)\
-do {\
-    if (styles && [styles containsObject:@#key]) {\
-        _cssNode->style.cssProp = defaultValue;\
-        [self setNeedsLayout];\
-    }\
-} while(0);
-
-#define WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(key, cssProp, defaultValue)\
-do {\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_TOP], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_LEFT], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_RIGHT], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_BOTTOM], defaultValue)\
-} while(0);
 
 - (void)_resetCSSNode:(NSArray *)styles;
 {
     // flex
-    WX_STYLE_RESET_CSS_NODE(flex, flex, 0.0)
-    WX_STYLE_RESET_CSS_NODE(flexDirection, flex_direction, CSS_FLEX_DIRECTION_COLUMN)
-    WX_STYLE_RESET_CSS_NODE(alignItems, align_items, CSS_ALIGN_STRETCH)
-    WX_STYLE_RESET_CSS_NODE(alignSelf, align_self, CSS_ALIGN_AUTO)
-    WX_STYLE_RESET_CSS_NODE(flexWrap, flex_wrap, CSS_NOWRAP)
-    WX_STYLE_RESET_CSS_NODE(justifyContent, justify_content, CSS_JUSTIFY_FLEX_START)
+    if ([styles containsObject:@"flex"]){
+        YGNodeStyleSetFlex(_cssNode, 0);
+    }
+    if ([styles containsObject:@"flexDirection"]) {
+        YGNodeStyleSetFlexDirection(_cssNode, YGFlexDirectionColumn);
+    }
+    if ([styles containsObject:@"alignItems"]) {
+        YGNodeStyleSetAlignItems(_cssNode, YGAlignStretch);
+    }
+    if ([styles containsObject:@"alignSelf"]) {
+        YGNodeStyleSetAlignSelf(_cssNode, YGAlignAuto);
+    }
+    if ([styles containsObject:@"flexWrap"]) {
+        YGNodeStyleSetFlexWrap(_cssNode, YGWrapNoWrap);
+    }
+    if ([styles containsObject:@"justifyContent"]) {
+        YGNodeStyleSetJustifyContent(_cssNode, YGJustifyFlexStart);
+    }
 
     // position
-    WX_STYLE_RESET_CSS_NODE(position, position_type, CSS_POSITION_RELATIVE)
-    WX_STYLE_RESET_CSS_NODE(top, position[CSS_TOP], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(left, position[CSS_LEFT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(right, position[CSS_RIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(bottom, position[CSS_BOTTOM], CSS_UNDEFINED)
+    if ([styles containsObject:@"position"]) {
+        YGNodeStyleSetPositionType(_cssNode, YGPositionTypeRelative);
+    }
+    if ([styles containsObject:@"top"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeTop, YGUndefined);
+    }
+    if ([styles containsObject:@"left"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeLeft, YGUndefined);
+    }
+    if ([styles containsObject:@"right"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeRight, YGUndefined);
+    }
+    if([styles containsObject:@"botttom"]) {
+        YGNodeStyleSetPosition(_cssNode, YGEdgeBottom, YGUndefined);
+    }
     
     // dimension
-    WX_STYLE_RESET_CSS_NODE(width, dimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(height, dimensions[CSS_HEIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(minWidth, minDimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(minHeight, minDimensions[CSS_HEIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(maxWidth, maxDimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
+    if ([styles containsObject:@"width"]) {
+        YGNodeStyleSetWidth(_cssNode, YGUndefined);
+    }
+    if ([styles containsObject:@"height"]) {
+        YGNodeStyleSetHeight(_cssNode, YGUndefined);
+    }
+    if ([styles containsObject:@"minWidth"]) {
+        YGNodeStyleSetMinWidth(_cssNode, YGUndefined);
+    }
+    if ([styles containsObject:@"minHeight"]) {
+        YGNodeStyleSetMinHeight(_cssNode, YGUndefined);
+    }
+    if ([styles containsObject:@"maxWidth"]) {
+        YGNodeStyleSetMaxWidth(_cssNode, YGUndefined);
+    }
+    if ([styles containsObject:@"maxHeight"]) {
+        YGNodeStyleSetMaxHeight(_cssNode, YGUndefined);
+    }
     
     // margin
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(margin, margin, 0.0)
-    WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], 0.0)
-    WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], 0.0)
+    if ([styles containsObject:@"margin"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeAll, 0.0);
+    }
+    if ([styles containsObject:@"marginTop"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeTop, 0.0);
+    }
+    if ([styles containsObject:@"marginLeft"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeLeft, 0.0);
+    }
+    if ([styles containsObject:@"marginRight"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeRight, 0.0);
+    }
+    if ([styles containsObject:@"marginBottom"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeBottom, 0.0);
+    }
     
     // border
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(borderWidth, border, 0.0)
-    WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], 0.0)
-    WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], 0.0)
+    if ([styles containsObject:@"border"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeAll, 0.0);
+    }
+    if ([styles containsObject:@"borderTopWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeTop, 0.0);
+    }
+    if ([styles containsObject:@"borderLeftWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeLeft, 0.0);
+    }
+    if ([styles containsObject:@"borderRightWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeRight, 0.0);
+    }
+    if ([styles containsObject:@"borderBottomWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeBottom, 0.0);
+    }
     
     // padding
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(padding, padding, 0.0)
-    WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], 0.0)
-    WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], 0.0)
-    WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
+    if ([styles containsObject:@"padding"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeAll, 0.0);
+    }
+    if ([styles containsObject:@"paddingTop"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeTop, 0.0);
+    }
+    if ([styles containsObject:@"paddingLeft"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeLeft, 0.0);
+    }
+    if ([styles containsObject:@"paddingRight"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeLeft, 0.0);
+    }
+    if ([styles containsObject:@"paddingBottom"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeBottom, 0.0);
+    }
+    
+    [self setNeedsLayout];
 }
 
 #pragma mark CSS Node Override
 
-static void cssNodePrint(void *context)
+static void cssNodePrint(YGNodeRef node)
 {
-    WXComponent *component = (__bridge WXComponent *)context;
+    WXComponent *component = (__bridge WXComponent *)(YGNodeGetContext(node));
     // TODO:
     printf("%s:%s ", component.ref.UTF8String, component->_type.UTF8String);
 }
 
-static css_node_t * cssNodeGetChild(void *context, int i)
-{
-    WXComponent *component = (__bridge WXComponent *)context;
-    NSArray *subcomponents = component->_subcomponents;
-    for (int j = 0; j <= i && j < subcomponents.count; j++) {
-        WXComponent *child = subcomponents[j];
-        if (!child->_isNeedJoinLayoutSystem) {
-            i++;
-        }
-    }
-    
-    if(i >= 0 && i < subcomponents.count){
-        WXComponent *child = subcomponents[i];
-        return child->_cssNode;
-    }
-    
-    
-    WXAssert(NO, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
-    return NULL;
-}
+//static css_node_t * cssNodeGetChild(void *context, int i)
+//{
+//    WXComponent *component = (__bridge WXComponent *)context;
+//    NSArray *subcomponents = component->_subcomponents;
+//    for (int j = 0; j <= i && j < subcomponents.count; j++) {
+//        WXComponent *child = subcomponents[j];
+//        if (!child->_isNeedJoinLayoutSystem) {
+//            i++;
+//        }
+//    }
+//    
+//    if(i >= 0 && i < subcomponents.count){
+//        WXComponent *child = subcomponents[i];
+//        return child->_cssNode;
+//    }
+//    
+//    
+//    WXAssert(NO, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
+//    return NULL;
+//}
 
-static bool cssNodeIsDirty(void *context)
-{
-    WXAssertComponentThread();
-    
-    WXComponent *component = (__bridge WXComponent *)context;
-    BOOL needsLayout = [component needsLayout];
-    
-    return needsLayout;
-}
+//static bool cssNodeIsDirty(void *context)
+//{
+//    WXAssertComponentThread();
+//    
+//    WXComponent *component = (__bridge WXComponent *)context;
+//    BOOL needsLayout = [component needsLayout];
+//    
+//    return needsLayout;
+//}
 
-static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t widthMode, float height, css_measure_mode_t heightMode)
+
+static YGSize cssNodeMeasure(YGNodeRef node, float width, YGMeasureMode widthMode, float height, YGMeasureMode heightMode)
 {
-    WXComponent *component = (__bridge WXComponent *)context;
+    WXComponent *component = (__bridge WXComponent *)(YGNodeGetContext(node));
     CGSize (^measureBlock)(CGSize) = [component measureBlock];
     
     if (!measureBlock) {
-        return (css_dim_t){NAN, NAN};
+        return (YGSize){NAN, NAN};
     }
     
     CGSize constrainedSize = CGSizeMake(width, height);
     CGSize resultSize = measureBlock(constrainedSize);
     
-    return (css_dim_t){resultSize.width, resultSize.height};
+    return (YGSize){resultSize.width, resultSize.height};
 }
 
 @end

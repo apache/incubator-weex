@@ -62,6 +62,5 @@
 #import "WXAppConfiguration.h"
 #import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
-#import "Layout.h"
 
 #endif /* __OBJC__ */

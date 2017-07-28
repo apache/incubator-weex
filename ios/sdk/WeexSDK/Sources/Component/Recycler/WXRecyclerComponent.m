@@ -143,6 +143,11 @@ typedef enum : NSUInteger {
     return [[WXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_collectionViewlayout];
 }
 
+- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
+{
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -337,7 +342,6 @@ typedef enum : NSUInteger {
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     NSInteger numberOfItems = [self.dataController numberOfItemsInSection:section];
-    
     WXLogDebug(@"Number of items is %ld in section:%ld", (long)numberOfItems, (long)section);
     
     return numberOfItems;
@@ -406,7 +410,7 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    return YGNodeStyleGetWidth(self.scrollerCSSNode).value;
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -577,10 +581,10 @@ typedef enum : NSUInteger {
 - (void)_fillPadding
 {
     UIEdgeInsets padding = {
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight)))
     };
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
