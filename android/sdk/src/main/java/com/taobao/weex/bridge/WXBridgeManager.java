@@ -1236,6 +1236,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     WXPerformance performance = new WXPerformance();
     performance.errCode = errorCode.getErrorCode();
     performance.appendErrMsg(errMsg);
+    Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
 
