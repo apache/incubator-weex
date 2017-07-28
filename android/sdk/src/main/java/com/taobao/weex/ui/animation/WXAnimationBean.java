@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class WXAnimationBean {
 
@@ -80,7 +81,9 @@ public class WXAnimationBean {
     private static final String ZERO = "0%";
     private static final String PX = "px";
     private static final String DEG = "deg";
-    public static Map<String, List<Property<View,Float>>> wxToAndroidMap = new HashMap<>();
+    public static Map<String, List<Property<View,Float>>> wxToAndroidMap = new ArrayMap<>();
+    private static Map<Property<View, Float>, Float> defaultMap= new ArrayMap<>();
+
 
     static {
       wxToAndroidMap.put(WX_TRANSLATE, Arrays.asList
@@ -95,6 +98,13 @@ public class WXAnimationBean {
       wxToAndroidMap.put(WX_SCALE_Y, Collections.singletonList(View.SCALE_Y));
       wxToAndroidMap.put(Name.PERSPECTIVE, Collections.singletonList(CameraDistanceProperty.getInstance()));
       wxToAndroidMap = Collections.unmodifiableMap(wxToAndroidMap);
+      defaultMap.put(View.TRANSLATION_X, 0f);
+      defaultMap.put(View.TRANSLATION_Y, 0f);
+      defaultMap.put(View.SCALE_X, 1f);
+      defaultMap.put(View.SCALE_Y, 1f);
+      defaultMap.put(View.ROTATION, 0f);
+      defaultMap.put(View.ROTATION_X, 0f);
+      defaultMap.put(View.ROTATION_Y, 0f);
     }
 
     public String opacity;
@@ -103,7 +113,7 @@ public class WXAnimationBean {
     public String height;
     public String transform;
     public String transformOrigin;
-    private Map<Property<View, Float>, Float> transformMap = new HashMap<>();
+    private Map<Property<View, Float>, Float> transformMap = new LinkedHashMap<>();
     private Pair<Float, Float> pivot;
     private List<PropertyValuesHolder> holders=new LinkedList<>();
     private float cameraDistance = Float.MAX_VALUE;
@@ -300,14 +310,12 @@ public class WXAnimationBean {
       return WXUtils.fastGetFloat(percent, precision) / 100 * unit;
     }
 
-    private static @NonNull Map<Property<View, Float>, Float> createDefaultTransform(){
-      Map<Property<View, Float>, Float> defaultMap= new ArrayMap<>(5);
-      defaultMap.put(View.TRANSLATION_X, 0f);
-      defaultMap.put(View.TRANSLATION_Y, 0f);
-      defaultMap.put(View.SCALE_X, 1f);
-      defaultMap.put(View.SCALE_Y, 1f);
-      defaultMap.put(View.ROTATION, 0f);
-      return defaultMap;
+    private void resetToDefaultIfAbsent() {
+      for (Entry<Property<View, Float>, Float> entry : defaultMap.entrySet()) {
+        if (!transformMap.containsKey(entry.getKey())) {
+          transformMap.put(entry.getKey(), entry.getValue());
+        }
+      }
     }
 
     public @Nullable Pair<Float, Float> getPivot() {
@@ -317,9 +325,9 @@ public class WXAnimationBean {
     public void init(@Nullable String transformOrigin,@Nullable String rawTransform,
                      final int width, final int height,int viewportW){
       pivot = parsePivot(transformOrigin,width,height,viewportW);
-      transformMap = createDefaultTransform();
       transformMap.putAll(parseTransForm(rawTransform,width,height,viewportW));
-      if(transformMap.containsKey(CameraDistanceProperty.getInstance())){
+      resetToDefaultIfAbsent();
+      if (transformMap.containsKey(CameraDistanceProperty.getInstance())) {
         cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());
       }
       initHolders();
