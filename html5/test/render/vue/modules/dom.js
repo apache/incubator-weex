@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as dom from '../../../../render/vue/modules/dom'
+import dom from '../../../../render/vue/modules/dom'
 describe('dom module', () => {
   const callback = sinon.spy()
+  weex.install(dom)
+  const domModule = weex.requireModule('dom')
   it('should scrollToElement be worked', (done) => {
     const {
       scrollToElement
-    } = dom.default
+    } = domModule
     const node = document.createElement('div')
     const vnode = {
       $el: node
@@ -48,7 +50,7 @@ describe('dom module', () => {
   it('should getComponentRect be worked', () => {
     const {
       getComponentRect
-    } = dom.default
+    } = domModule
     const node = document.createElement('div')
     const vnode = {
       $el: node
@@ -96,7 +98,7 @@ describe('dom module', () => {
   it('should addRule be worked', () => {
     const {
       addRule
-    } = dom.default
+    } = domModule
     const key = 'font-face'
     const styles = {
       'font-family': 'iconfont'

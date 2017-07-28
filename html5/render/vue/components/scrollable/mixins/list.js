@@ -16,21 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../../../validator'
-import { extractComponentStyle, createEventMap } from '../../../core'
 
 export default {
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    return createElement('section', {
-      attrs: { 'weex-type': 'cell' },
-      on: createEventMap(this),
-      staticClass: 'weex-cell weex-ct',
-      staticStyle: extractComponentStyle(this)
-    }, this.$slots.default)
+  methods: {
+    handleListScroll (event) {
+      this.handleScroll(event)
+
+      if (weex.utils.supportSticky()) {
+        return
+      }
+
+      const scrollTop = this.$el.scrollTop
+      const h = this.$children.filter(vm => vm.$refs.header)
+
+      if (h.length <= 0) {
+        return
+      }
+
+      for (let i = 0; i < h.length; i++) {
+        if (h[i].initTop < scrollTop) {
+          h[i].addSticky()
+        }
+        else {
+          h[i].removeSticky()
+        }
+      }
+    }
   }
 }

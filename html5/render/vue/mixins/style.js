@@ -44,7 +44,9 @@ function getIdentifiedBeforeCreate () {
      * For vue-loader ^11.3.x, there's no injectStyle function. The styleSheet
      * is already injected into the head. Just scan it.
      */
-    if (this === this.$root && this.$options && !this._firstScanned) {
+    // async component.
+    if ((this.$vnode && this.$vnode.data && this.$vnode.data.tag === 'component')
+      || (this === this.$root && this.$options && !this._firstScanned)) {
       this._firstScanned = true
       extend(weex._styleMap, getHeadStyleMap())
     }
