@@ -351,21 +351,26 @@ function getContent(url) {
 }
 
 function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormalLinesMap) {
-  var diffs = parseDiff(diffData)
-  diffs.forEach(diff => {
-    fileToDeletedLinesMap[diff.from] = [];
-    fileToNormalLinesMap[diff.from] = [];
-    diff.chunks.forEach(chunk => {
-      chunk.changes.forEach(change => {
-        if (change.del) {
-          fileToDeletedLinesMap[diff.from].push(change.ln)
-        }
-        if (change.normal) {
-          fileToNormalLinesMap[diff.from].push(change.ln1)
-        }
+  try {
+    var diffs = parseDiff(diffData)
+    diffs.forEach(diff => {
+      fileToDeletedLinesMap[diff.from] = [];
+      fileToNormalLinesMap[diff.from] = [];
+      diff.chunks.forEach(chunk => {
+        chunk.changes.forEach(change => {
+          if (change.del) {
+            fileToDeletedLinesMap[diff.from].push(change.ln)
+          }
+          if (change.normal) {
+            fileToNormalLinesMap[diff.from].push(change.ln1)
+          }
+        })
       })
-    })
-  })
+    }) 
+  } catch (error) {
+    console.log(error)
+  }
+
 }
 
 
