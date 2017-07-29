@@ -19,7 +19,6 @@
 
 #import <Foundation/Foundation.h>
 #import "WXModuleProtocol.h"
-#import "SRWebSocket.h"
 
 @interface WXWebSocketModule : NSObject <WXModuleProtocol>
 
