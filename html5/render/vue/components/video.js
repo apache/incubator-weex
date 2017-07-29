@@ -16,63 +16,70 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../validator'
-import { extractComponentStyle, createEventMap } from '../core'
 
-export default {
-  props: {
-    src: String,
-    playStatus: {
-      type: String,
-      default: 'pause',
-      validator (value) {
-        return ['play', 'pause'].indexOf(value) !== -1
+function getVideo (weex) {
+  const { extractComponentStyle, createEventMap } = weex
+
+  return {
+    name: 'weex-video',
+    props: {
+      src: String,
+      playStatus: {
+        type: String,
+        default: 'pause',
+        validator (value) {
+          return ['play', 'pause'].indexOf(value) !== -1
+        }
+      },
+      autoplay: {
+        type: [String, Boolean],
+        default: false
+      },
+      autoPlay: {
+        type: [String, Boolean],
+        default: false
+      },
+      playsinline: {
+        type: [String, Boolean],
+        default: true
+      },
+      controls: {
+        type: [String, Boolean],
+        default: false
       }
     },
-    autoplay: {
-      type: [String, Boolean],
-      default: false
-    },
-    autoPlay: {
-      type: [String, Boolean],
-      default: false
-    },
-    playsinline: {
-      type: [String, Boolean],
-      default: true
-    },
-    controls: {
-      type: [String, Boolean],
-      default: false
-    }
-  },
 
-  render (createElement) {
-    this._renderHook()
+    render (createElement) {
+      if (this.playStatus === 'play') {
+        this.$nextTick(function () {
+          this.$el && this.$el.play()
+        })
+      }
+      else if (this.playStatus === 'pause') {
+        this.$nextTick(function () {
+          this.$el && this.$el.pause()
+        })
+      }
 
-    if (this.playStatus === 'play') {
-      this.$nextTick(function () {
-        this.$el && this.$el.play()
+      return createElement('html:video', {
+        attrs: {
+          'weex-type': 'video',
+          autoplay: ((this.autoplay !== 'false' && this.autoplay !== false)
+            || (this.autoPlay !== 'false' && this.autoPlay !== false)),
+          'webkit-playsinline': this.playsinline,
+          controls: this.controls,
+          src: this.src
+        },
+        on: createEventMap(this, ['start', 'pause', 'finish', 'fail']),
+        staticClass: 'weex-video weex-el',
+        staticStyle: extractComponentStyle(this)
       })
     }
-    else if (this.playStatus === 'pause') {
-      this.$nextTick(function () {
-        this.$el && this.$el.pause()
-      })
-    }
+  }
+}
 
-    return createElement('html:video', {
-      attrs: {
-        'weex-type': 'video',
-        autoplay: ((this.autoplay !== 'false' && this.autoplay !== false)
-          || (this.autoPlay !== 'false' && this.autoPlay !== false)),
-        'webkit-playsinline': this.playsinline,
-        controls: this.controls,
-        src: this.src
-      },
-      on: createEventMap(this, ['start', 'pause', 'finish', 'fail']),
-      staticClass: 'weex-video weex-el',
-      staticStyle: extractComponentStyle(this)
-    })
+export default {
+  init (weex) {
+    weex.registerComponent('video', getVideo(weex))
   }
 }

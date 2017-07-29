@@ -39,6 +39,9 @@ examples/vue/test/
 html5/browser/extend/packer.js
 html5/render/browser/extend/packer.js
 
+# Created by weex-vue-bundle-util
+weex-vue-plugins.js
+
 android/playground/app/gradlew
 android/playground/app/gradlew.bat
 android/playground/app/gradle/wrapper/gradle-wrapper.jar

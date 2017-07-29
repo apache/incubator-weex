@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as navigator from '../../../../render/vue/modules/navigator'
+import navigatorMod from '../../../../render/vue/modules/navigator'
 describe('navigator module', () => {
+  weex.install(navigatorMod)
+  const navigatorModule = weex.requireModule('navigator')
   const callback = sinon.spy()
   it('should push be worked', () => {
     const {
       push
-    } = navigator.default
+    } = navigatorModule
     const config = {
       url: '/'
     }
@@ -33,7 +35,7 @@ describe('navigator module', () => {
   it('should push be worked', () => {
     const {
       pop
-    } = navigator.default
+    } = navigatorModule
     const config = {
       url: '/'
     }

@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { getThrottleLazyload, throttle, getRangeWidth } from '../utils'
-import { processSticky } from '../core'
 
 const DEFAULT_OFFSET_ACCURACY = 10
 const DEFAULT_LOADMORE_OFFSET = 0
@@ -31,7 +29,7 @@ function getThrottledScroll (context) {
         ? wrapper.scrollLeft
         : wrapper.scrollTop)
       || 0
-    context._throttleScroll = throttle(function (evt) {
+    context._throttleScroll = weex.utils.throttle(function (evt) {
       const offset = context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop
@@ -118,7 +116,7 @@ export default {
       // inner width is always the viewport width somehow in horizontal
       // scoller, therefore the inner width should be reclaculated.
       if (this.scrollDirection === 'horizontal' && children) {
-        this._innerWidth = getRangeWidth(inner)
+        this._innerWidth = weex.utils.getRangeWidth(inner)
       }
     },
 
@@ -126,11 +124,47 @@ export default {
       this._loadmoreReset = true
     },
 
+    /**
+     * process sticky children in scrollable components.
+     * current only support list and vertical scroller.
+     */
+    processSticky () {
+      /**
+       * current browser support 'sticky' or '-webkit-sticky', so there's no need
+       * to do further more.
+       */
+      if (weex.utils.supportSticky()) {
+        return
+      }
+      // current only support list and vertical scroller.
+      if (this.scrollDirection === 'horizontal') {
+        return
+      }
+      const stickyChildren = this._stickyChildren
+      const len = stickyChildren && stickyChildren.length || 0
+      if (len <= 0) { return }
+
+      const container = this.$el
+      if (!container) { return }
+      const scrollTop = container.scrollTop
+
+      let stickyChild
+      for (let i = 0; i < len; i++) {
+        stickyChild = stickyChildren[i]
+        if (stickyChild._initOffsetTop < scrollTop) {
+          stickyChild._addSticky()
+        }
+        else {
+          stickyChild._removeSticky()
+        }
+      }
+    },
+
     handleScroll (event) {
-      getThrottleLazyload(25, this.$el, 'scroll')()
+      weex.utils.getThrottleLazyload(25, this.$el, 'scroll')()
       getThrottledScroll(this)(event)
 
-      processSticky(this)
+      this.processSticky()
 
       // fire loadmore event.
       const inner = this.$refs.inner
