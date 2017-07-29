@@ -138,9 +138,7 @@ public class WXWebView implements IWebView {
     }
 
     private void showProgressBar(boolean shown) {
-        if (mShowLoading) {
-            mProgressBar.setVisibility(shown ? View.VISIBLE : View.GONE);
-        }
+        mProgressBar.setVisibility(shown ? View.VISIBLE : View.GONE);
     }
 
     private void showWebView(boolean shown) {
@@ -218,7 +216,7 @@ public class WXWebView implements IWebView {
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
                 showWebView(newProgress == 100);
-                showProgressBar(newProgress != 100);
+                showProgressBar(newProgress != 100 && mShowLoading);
                 WXLogUtils.v("tag", "onPageProgressChanged " + newProgress);
             }
 
