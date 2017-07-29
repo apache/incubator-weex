@@ -195,12 +195,15 @@ if (danger.git.modified_files) {
     checkFileToVerifySrcHeader(file);
   });
 }
+
+console.log('checkFileToVerifySrcHeader')
 if (danger.git.created_files) {
   danger.git.created_files.forEach(file => {
     checkChangedFile(file);
     checkFileToVerifySrcHeader(file);
   });
 }
+console.log('checkAndroidBreakChange')
 if (danger.git.deleted_files) {
   danger.git.deleted_files.forEach(file => {
     checkChangedFile(file);
@@ -242,6 +245,7 @@ const ignoreCopyrightVerifyPath = [
   'ios/sdk/WeexSDK/dependency/SRWebSocket'
 ]
 
+console.log('copyright_header_components')
 filesToVerifySrcHeader.forEach(filepath => {
   for(var i=ignoreCopyrightVerifyPath.length-1;i>=0;i--){
     if(filepath.startsWith(ignoreCopyrightVerifyPath[i])){
@@ -263,6 +267,7 @@ filesToVerifySrcHeader.forEach(filepath => {
  * will be seperated to a danger plugin
  */
 
+console.log('findReviewer')
 schedule(new Promise((resolve, reject) => {
   try {
     findReviewer(resolve, reject)
@@ -288,18 +293,23 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff'}
   }, function (err, result) {
+    console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
-      reject()
+      resolve()
       return
     }
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
+    console.log('getContent')
     var promises = danger.git.modified_files.map(function(file) {
       let repoURL = danger.github.pr.base.repo.html_url
       let fileName = file.replace(/^.*[\\\/]/, '')
       let blameURL = repoURL + '/blame/' + danger.github.pr.base.ref + '/' + file
+      // console.log("Getting blame html: " + blameURL)
+      console.log('getContent2')
       return getContent(blameURL)
     });
 
+    console.log('findBlameReviewers')
     Promise.all(promises).then(datas => {
       datas.forEach(function(data, index) {
         fileToBlamesMap[danger.git.modified_files[index]] = parseBlame(data);
@@ -318,6 +328,7 @@ function getContent(url) {
     const request = lib.get(url, (function (url) {
       return (response) => {
         // handle http errors
+        console.log('response:', response.statusCode)
         if (response.statusCode < 200 || response.statusCode > 299) {
           if (response.statusCode === 404) {
             // ignore this, probably a renamed file.
@@ -340,21 +351,26 @@ function getContent(url) {
 }
 
 function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormalLinesMap) {
-  var diffs = parseDiff(diffData)
-  diffs.forEach(diff => {
-    fileToDeletedLinesMap[diff.from] = [];
-    fileToNormalLinesMap[diff.from] = [];
-    diff.chunks.forEach(chunk => {
-      chunk.changes.forEach(change => {
-        if (change.del) {
-          fileToDeletedLinesMap[diff.from].push(change.ln)
-        }
-        if (change.normal) {
-          fileToNormalLinesMap[diff.from].push(change.ln1)
-        }
+  try {
+    var diffs = parseDiff(diffData)
+    diffs.forEach(diff => {
+      fileToDeletedLinesMap[diff.from] = [];
+      fileToNormalLinesMap[diff.from] = [];
+      diff.chunks.forEach(chunk => {
+        chunk.changes.forEach(change => {
+          if (change.del) {
+            fileToDeletedLinesMap[diff.from].push(change.ln)
+          }
+          if (change.normal) {
+            fileToNormalLinesMap[diff.from].push(change.ln1)
+          }
+        })
       })
-    })
-  })
+    }) 
+  } catch (error) {
+    console.log(error)
+  }
+
 }
 
 
