@@ -16,62 +16,70 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { supportSticky } from '../../utils/style'
-import { extractComponentStyle, createEventMap } from '../../core'
 
-export default {
-  data () {
-    return {
-      sticky: false,
-      initTop: 0,
-      placeholder: null,
-      supportSticky: supportSticky()
-    }
-  },
+function getHeader (weex) {
+  const { extractComponentStyle, createEventMap } = weex
+  const { supportSticky } = weex.utils
 
-  mounted () {
-    this.initTop = this.$el.offsetTop
-    this.placeholder = window.document.createElement('div')
-  },
-
-  updated () {
-    if (!this.sticky) {
-      this.initTop = this.$el.offsetTop
-    }
-  },
-
-  methods: {
-    addSticky () {
-      this.sticky = true
-      this.placeholder.style.display = 'block'
-      this.placeholder.style.width = this.$el.offsetWidth + 'px'
-      this.placeholder.style.height = this.$el.offsetHeight + 'px'
-      this.$el.parentNode.insertBefore(this.placeholder, this.$el)
+  return {
+    data () {
+      return {
+        sticky: false,
+        initTop: 0,
+        placeholder: null,
+        supportSticky: supportSticky()
+      }
     },
 
-    removeSticky () {
-      this.sticky = false
-      try {
-        this.$el.parentNode.removeChild(this.placeholder)
-      }
-      catch (e) {
-      }
-    }
-  },
+    mounted () {
+      this.initTop = this.$el.offsetTop
+      this.placeholder = window.document.createElement('div')
+    },
 
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    return createElement('html:header', {
-      attrs: { 'weex-type': 'header' },
-      on: createEventMap(this),
-      ref: 'header',
-      staticClass: 'weex-header weex-ct',
-      class: { 'weex-sticky': this.sticky, 'weex-ios-sticky': this.supportSticky },
-      staticStyle: extractComponentStyle(this)
-    }, this.$slots.default)
+    updated () {
+      if (!this.sticky) {
+        this.initTop = this.$el.offsetTop
+      }
+    },
+
+    methods: {
+      addSticky () {
+        this.sticky = true
+        this.placeholder.style.display = 'block'
+        this.placeholder.style.width = this.$el.offsetWidth + 'px'
+        this.placeholder.style.height = this.$el.offsetHeight + 'px'
+        this.$el.parentNode.insertBefore(this.placeholder, this.$el)
+      },
+
+      removeSticky () {
+        this.sticky = false
+        try {
+          this.$el.parentNode.removeChild(this.placeholder)
+        }
+        catch (e) {
+        }
+      }
+    },
+
+    render (createElement) {
+      /* istanbul ignore next */
+      // if (process.env.NODE_ENV === 'development') {
+      //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
+      // }
+      return createElement('html:header', {
+        attrs: { 'weex-type': 'header' },
+        on: createEventMap(this),
+        ref: 'header',
+        staticClass: 'weex-header weex-ct',
+        class: { 'weex-sticky': this.sticky, 'weex-ios-sticky': this.supportSticky },
+        staticStyle: extractComponentStyle(this)
+      }, this.$slots.default)
+    }
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerComponent('header', getHeader(weex))
   }
 }

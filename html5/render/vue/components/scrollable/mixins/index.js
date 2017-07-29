@@ -16,19 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default `
-body > .weex-list {
-  max-height: 100%;
-}
 
-.weex-list-wrapper {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: scroll !important;
-  overflow-x: hidden;
-}
+import scrollable from './scrollable'
+import list from './list'
 
-.weex-list-inner {
-  -webkit-overflow-scrolling: touch;
-  width: 100%;
+export {
+  scrollable,
+  list
 }
-`
