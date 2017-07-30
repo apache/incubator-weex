@@ -1253,13 +1253,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
-        Map<String,String> extParams = new HashMap<String, String>();
-        extParams.put("jscCrashStack", errMsg);
+//        Map<String,String> extParams = new HashMap<String, String>();
+//        extParams.put("jscCrashStack", errMsg);
         String method = "callReportCrash";
-        String exception = "weexjsc process crash and restart exception";
-        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, extParams);
+        String exception = "weexjsc process crash and restart exception, jscCrashStack: " + errMsg;
+        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, null);
         adapter.onJSException(jsException);
-        Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
+        Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log function:" + method + " exception:" + exception);
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.e(jsException.toString());
         }
