@@ -933,7 +933,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                     BufferedReader br = new BufferedReader(new FileReader(origin_filename));
                     //构造一个BufferedReader类来读取文件
                     String s = null;
-                    while((s = br.readLine()) != null){
+                    while((s = br.readLine()) != null) {
+                        //  文件太长，做一定裁剪
+                        if (("r0:").equals(s)) {
+                            break;
+                        }
                         //使用readLine方法，一次读一行
                         result.append(s + "\n");
                     }
