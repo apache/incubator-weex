@@ -69,6 +69,7 @@ describe('dom module', () => {
     node.style.width = '100px'
     document.body.appendChild(node)
     expect(getComponentRect).to.be.a('function')
+    // while node is an element
     message = getComponentRect([vnode], callback)
     expect(message.result).to.be.true
     expect(message.size.width).to.be.equal(recalc({
@@ -77,7 +78,14 @@ describe('dom module', () => {
     expect(message.size.height).to.be.equal(recalc({
       height: 100
     }).height)
+    expect(message.contentsize.width).to.be.equal(recalc({
+      width: 100
+    }).width)
+    expect(message.contentsize.height).to.be.equal(recalc({
+      height: 100
+    }).height)
     expect(callback.callCount).to.be.equal(1)
+    // while node is a viewport
     message = getComponentRect('viewport', callback)
     expect(message.result).to.be.true
     expect(message.size.width).to.be.equal(recalc({
@@ -91,6 +99,12 @@ describe('dom module', () => {
     }).height)
     expect(message.size.bottom).to.be.equal(recalc({
       bottom: document.documentElement.clientHeight
+    }).bottom)
+    expect(message.contentsize.width).to.be.equal(recalc({
+      bottom: document.documentElement.offsetWidth
+    }).bottom)
+    expect(message.contentsize.height).to.be.equal(recalc({
+      bottom: document.documentElement.offsetHeight
     }).bottom)
     expect(callback.callCount).to.be.equal(2)
     document.body.removeChild(node)

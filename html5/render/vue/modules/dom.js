@@ -182,7 +182,9 @@ const dom = {
     function recalc (rect) {
       const res = {}
       rectKeys.forEach(key => {
-        res[key] = rect[key] / scale
+        if (rect[key]) {
+          res[key] = rect[key] / scale
+        }
       })
       return res
     }
@@ -197,10 +199,18 @@ const dom = {
         right: document.documentElement.clientWidth,
         bottom: document.documentElement.clientHeight
       })
+      info.contentsize = recalc({
+        width: document.documentElement.offsetWidth,
+        height: document.documentElement.offsetHeight
+      })
     }
     else if (vnode && vnode.$el) {
       info.result = true
       info.size = recalc(vnode.$el.getBoundingClientRect())
+      info.contentsize = recalc({
+        width: vnode.$el.offsetWidth,
+        height: vnode.$el.offsetHeight
+      })
     }
 
     const message = info.result ? info : {
