@@ -27,6 +27,7 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXRoundedRect.h"
 #import "UIBezierPath+Weex.h"
+#import "WXSDKEngine.h"
 
 @interface WXImageView : UIImageView
 
