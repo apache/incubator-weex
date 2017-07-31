@@ -134,6 +134,8 @@
                     task.bundleJSType = @"Vue";
                 }else if([searchStr rangeOfString:@"Rax"].location != NSNotFound){
                     task.bundleJSType = @"Rax";
+                }else{
+                    task.bundleJSType = @"Weex";
                 }
             }
         }
