@@ -947,9 +947,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                         // } else {
                         //  foundStart = true;
                         // }
-                        // if (("r0:").equals(s)) {
-                        //    break;
-                        // }
+                        if (("r0:").equals(s)) {
+                            break;
+                        }
                         // 使用readLine方法，一次读一行
                         result.append(s + "\n");
                     }
@@ -1252,25 +1252,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     extParams.put("jscCrashStack", errMsg);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
-
         WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, extParams);
         adapter.onJSException(jsException);
-        Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log url:" + url + " function:" + method + " exception:" + exception);
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.e(jsException.toString());
         }
     }
-//    Map<String,String> extParams = new HashMap<String, String>();
-//    extParams.put("jscCrashStack", errMsg);
-//    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-//    if (userTrackAdapter == null) {
-//      return;
-//    }
-//    WXPerformance performance = new WXPerformance();
-//    performance.errCode = errorCode.getErrorCode();
-//    performance.appendErrMsg(errMsg);
-//    Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log");
-//    userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
 
   /**
