@@ -53,7 +53,6 @@
 			pickTime:function(){
 				var self = this;
 				picker.pickTime({
-                    height: '300px'
 				}, function(ret) {
 					var result = ret.result;
 					if (result == 'success') {

@@ -106,7 +106,7 @@
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
-    "@weex-project/weex-picker": "^0.2.2",
+    "@weex-project/weex-picker": "^0.2.4",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
