@@ -1256,7 +1256,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 //        Map<String,String> extParams = new HashMap<String, String>();
 //        extParams.put("jscCrashStack", errMsg);
         String method = "callReportCrash";
-        String exception = "weexjsc process crash and restart exception, jscCrashStack: " + errMsg;
+        String exception = "weexjsc process crash and restart exception, jscCrashStack: ";// + errMsg;
         WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, null);
         adapter.onJSException(jsException);
         Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log function:" + method + " exception:" + exception);
