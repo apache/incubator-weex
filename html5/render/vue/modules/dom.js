@@ -199,7 +199,7 @@ const dom = {
         right: document.documentElement.clientWidth,
         bottom: document.documentElement.clientHeight
       })
-      info.contentsize = recalc({
+      info.contentSize = recalc({
         width: document.documentElement.offsetWidth,
         height: document.documentElement.offsetHeight
       })
@@ -207,7 +207,7 @@ const dom = {
     else if (vnode && vnode.$el) {
       info.result = true
       info.size = recalc(vnode.$el.getBoundingClientRect())
-      info.contentsize = recalc({
+      info.contentSize = recalc({
         width: vnode.$el.offsetWidth,
         height: vnode.$el.offsetHeight
       })

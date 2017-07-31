@@ -78,10 +78,10 @@ describe('dom module', () => {
     expect(message.size.height).to.be.equal(recalc({
       height: 100
     }).height)
-    expect(message.contentsize.width).to.be.equal(recalc({
+    expect(message.contentSize.width).to.be.equal(recalc({
       width: 100
     }).width)
-    expect(message.contentsize.height).to.be.equal(recalc({
+    expect(message.contentSize.height).to.be.equal(recalc({
       height: 100
     }).height)
     expect(callback.callCount).to.be.equal(1)
@@ -100,10 +100,10 @@ describe('dom module', () => {
     expect(message.size.bottom).to.be.equal(recalc({
       bottom: document.documentElement.clientHeight
     }).bottom)
-    expect(message.contentsize.width).to.be.equal(recalc({
+    expect(message.contentSize.width).to.be.equal(recalc({
       bottom: document.documentElement.offsetWidth
     }).bottom)
-    expect(message.contentsize.height).to.be.equal(recalc({
+    expect(message.contentSize.height).to.be.equal(recalc({
       bottom: document.documentElement.offsetHeight
     }).bottom)
     expect(callback.callCount).to.be.equal(2)
