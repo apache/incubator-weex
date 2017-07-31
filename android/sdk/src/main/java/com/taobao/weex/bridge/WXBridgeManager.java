@@ -925,31 +925,31 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       if (oldfile.exists()) {
           oldfile.renameTo(newfile);
       }
-//      Thread t = new Thread(new Runnable() {
-//           public void run() {
+      Thread t = new Thread(new Runnable() {
+           public void run() {
               try {
                 StringBuilder result = new StringBuilder();
                 try{
                     BufferedReader br = new BufferedReader(new FileReader(origin_filename));
                     //构造一个BufferedReader类来读取文件
                     String s = null;
-                    boolean foundStart = false;
+                    // boolean foundStart = false;
                     while((s = br.readLine()) != null) {
                         // 去空行
                         if ("".equals(s)) {
                             continue;
                         }
                         //  文件太长，做一定裁剪
-                        if (!("backtrace:").equals(s)){
-                            if (!foundStart) {
-                                continue;
-                            }
-                        } else {
-                          foundStart = true;
-                        }
-                        if (("r0:").equals(s)) {
-                            break;
-                        }
+                        // if (!("backtrace:").equals(s)){
+                        //    if (!foundStart) {
+                        //        continue;
+                        //    }
+                        // } else {
+                        //  foundStart = true;
+                        // }
+                        // if (("r0:").equals(s)) {
+                        //    break;
+                        // }
                         // 使用readLine方法，一次读一行
                         result.append(s + "\n");
                     }
@@ -991,9 +991,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               } catch (Throwable throwable) {
                   WXLogUtils.e("[WXBridgeManager] callReportCrash exception: ", throwable);
               }
-//          }
-//      });
-//      t.start();
+          }
+      });
+      t.start();
 
   }
 
@@ -1247,15 +1247,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
 
     String method = "callReportCrash";
-    String exception = "weexjsc process crash and restart exception, jscCrashStack: " + errMsg;
-    WXSDKInstance instance;
-    if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
-      instance.onJSException(errorCode.getErrorCode(), method, exception);
-    }
+    String exception = "weexjsc process crash and restart exception";
+    Map<String,String> extParams = new HashMap<String, String>();
+    extParams.put("jscCrashStack", errMsg);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
 
-        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, null);
+        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, extParams);
         adapter.onJSException(jsException);
         Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log url:" + url + " function:" + method + " exception:" + exception);
         if (WXEnvironment.isApkDebugable()) {
