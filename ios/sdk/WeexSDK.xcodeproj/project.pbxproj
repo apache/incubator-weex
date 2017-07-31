@@ -275,6 +275,10 @@
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
+		DC0D2DD21F2EE3C100017E00 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0D2DD01F2EE3C100017E00 /* WXVoiceOverModule.h */; };
+		DC0D2DD31F2EE3C100017E00 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2DD11F2EE3C100017E00 /* WXVoiceOverModule.m */; };
+		DC0D2DD41F2EE3F800017E00 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2DD11F2EE3C100017E00 /* WXVoiceOverModule.m */; };
+		DC0D2DD51F2EE3FC00017E00 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0D2DD01F2EE3C100017E00 /* WXVoiceOverModule.h */; };
 		DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
 		DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */; };
@@ -840,6 +844,8 @@
 		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextAreaComponent.m; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
+		DC0D2DD01F2EE3C100017E00 /* WXVoiceOverModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXVoiceOverModule.h; sourceTree = "<group>"; };
+		DC0D2DD11F2EE3C100017E00 /* WXVoiceOverModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVoiceOverModule.m; sourceTree = "<group>"; };
 		DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterProtocol.h; sourceTree = "<group>"; };
 		DC9867431D826D1E000AF388 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStreamModuleTests.m; sourceTree = "<group>"; };
@@ -1323,6 +1329,8 @@
 		77E659D71C07F585008B8775 /* Module */ = {
 			isa = PBXGroup;
 			children = (
+				DC0D2DD01F2EE3C100017E00 /* WXVoiceOverModule.h */,
+				DC0D2DD11F2EE3C100017E00 /* WXVoiceOverModule.m */,
 				C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */,
 				C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */,
 				C4F012801E1502E9003378D0 /* WXWebSocketModule.h */,
@@ -1510,6 +1518,7 @@
 				2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */,
 				C4C30DE91E1B833D00786B6C /* WXComponent+PseudoClassManagement.h in Headers */,
 				591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */,
+				DC0D2DD21F2EE3C100017E00 /* WXVoiceOverModule.h in Headers */,
 				D362F94F1C83EDA20003F546 /* WXWebViewModule.h in Headers */,
 				C4F012861E150307003378D0 /* WXWebSocketLoader.h in Headers */,
 				C4E97D331F1EF46D00ABC314 /* WXTracingManager.h in Headers */,
@@ -1710,6 +1719,7 @@
 				DCA445E51EFA59E100D0CFA8 /* WXDivComponent.h in Headers */,
 				DCA446211EFA5ABA00D0CFA8 /* WXSDKInstance_private.h in Headers */,
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
+				DC0D2DD51F2EE3FC00017E00 /* WXVoiceOverModule.h in Headers */,
 				DCA445EE1EFA5A1500D0CFA8 /* WXWebComponent.h in Headers */,
 				DCA4460D1EFA5A7900D0CFA8 /* WXThreadSafeMutableArray.h in Headers */,
 				DCA445DA1EFA59A600D0CFA8 /* WXMultiColumnLayout.h in Headers */,
@@ -2004,6 +2014,7 @@
 				744D61111E49979000B624B3 /* WXFooterComponent.m in Sources */,
 				745B2D6F1E5A8E1E0092D38A /* WXRecyclerUpdateController.m in Sources */,
 				745B2D6B1E5A8E1E0092D38A /* WXRecyclerComponent.m in Sources */,
+				DC0D2DD31F2EE3C100017E00 /* WXVoiceOverModule.m in Sources */,
 				2A837AB71CD9DE9200AEDF03 /* WXRefreshComponent.m in Sources */,
 				74A4BA9B1CB3BAA100195969 /* WXThreadSafeMutableDictionary.m in Sources */,
 				77E65A1A1C155F25008B8775 /* WXScrollerComponent.m in Sources */,
@@ -2151,6 +2162,7 @@
 				DCA445501EFA55B300D0CFA8 /* WXScrollerComponent.m in Sources */,
 				DCA445511EFA55B300D0CFA8 /* WXCycleSliderComponent.m in Sources */,
 				DCA445521EFA55B300D0CFA8 /* WXSliderComponent.m in Sources */,
+				DC0D2DD41F2EE3F800017E00 /* WXVoiceOverModule.m in Sources */,
 				DCA445531EFA55B300D0CFA8 /* WXCellComponent.m in Sources */,
 				DCA445541EFA55B300D0CFA8 /* WXListComponent.m in Sources */,
 				DCA445551EFA55B300D0CFA8 /* WXIndicatorComponent.m in Sources */,
