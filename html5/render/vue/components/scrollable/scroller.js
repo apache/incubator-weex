@@ -35,17 +35,24 @@ function getScroller (weex) {
         validator (value) {
           return ['horizontal', 'vertical'].indexOf(value) !== -1
         }
+      },
+      scrollable: {
+        type: [Boolean],
+        default: true
       }
     },
-
     computed: {
       wrapperClass () {
+        console.log(this.scrollable)
         const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
         if (this.scrollDirection === 'horizontal') {
           classArray.push('weex-scroller-horizontal')
         }
         else {
           classArray.push('weex-scroller-vertical')
+        }
+        if (!this.scrollable) {
+          classArray.push('weex-scroller-disabled')
         }
         return classArray.join(' ')
       }
