@@ -925,8 +925,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       if (oldfile.exists()) {
           oldfile.renameTo(newfile);
       }
-      Thread t = new Thread(new Runnable() {
-           public void run() {
+//      Thread t = new Thread(new Runnable() {
+//           public void run() {
               try {
                 StringBuilder result = new StringBuilder();
                 try{
@@ -991,9 +991,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               } catch (Throwable throwable) {
                   WXLogUtils.e("[WXBridgeManager] callReportCrash exception: ", throwable);
               }
-          }
-      });
-      t.start();
+//          }
+//      });
+//      t.start();
 
   }
 
@@ -1245,26 +1245,25 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
-    if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
-      WXSDKManager.getInstance().getWXStatisticsListener().onException("0",
-              errorCode.getErrorCode(),
-              TextUtils.isEmpty(errMsg) ? errorCode.getErrorMsg() : errMsg);
-    }
 
+    String method = "callReportCrash";
+    String exception = "weexjsc process crash and restart exception, jscCrashStack: " + errMsg;
+    WXSDKInstance instance;
+    if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
+      instance.onJSException(errorCode.getErrorCode(), method, exception);
+    }
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
-//        Map<String,String> extParams = new HashMap<String, String>();
-//        extParams.put("jscCrashStack", errMsg);
-        String method = "callReportCrash";
-        String exception = "weexjsc process crash and restart exception, jscCrashStack: ";// + errMsg;
+
         WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, null);
         adapter.onJSException(jsException);
-        Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log function:" + method + " exception:" + exception);
+        Log.e("WXBridgeManager", "commitJscCrashAlarmMonitor collect crash log url:" + url + " function:" + method + " exception:" + exception);
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.e(jsException.toString());
         }
     }
-
+//    Map<String,String> extParams = new HashMap<String, String>();
+//    extParams.put("jscCrashStack", errMsg);
 //    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
 //    if (userTrackAdapter == null) {
 //      return;
