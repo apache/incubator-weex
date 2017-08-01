@@ -16,21 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../../../validator'
-import { extractComponentStyle, createEventMap } from '../../../core'
-
-export default {
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    return createElement('section', {
-      attrs: { 'weex-type': 'cell' },
-      on: createEventMap(this),
-      staticClass: 'weex-cell weex-ct',
-      staticStyle: extractComponentStyle(this)
-    }, this.$slots.default)
-  }
-}
+import navigatorMod from '../../../../render/vue/modules/navigator'
+describe('navigator module', () => {
+  weex.install(navigatorMod)
+  const navigatorModule = weex.requireModule('navigator')
+  const callback = sinon.spy()
+  it('should push be worked', () => {
+    const {
+      push
+    } = navigatorModule
+    const config = {
+      url: '/'
+    }
+    expect(push).to.be.a('function')
+    push(config, callback)
+    expect(callback.callCount).to.be.equal(1)
+  })
+  it('should push be worked', () => {
+    const {
+      pop
+    } = navigatorModule
+    const config = {
+      url: '/'
+    }
+    expect(pop).to.be.a('function')
+    pop(config, callback)
+    expect(callback.callCount).to.be.equal(2)
+  })
+})
