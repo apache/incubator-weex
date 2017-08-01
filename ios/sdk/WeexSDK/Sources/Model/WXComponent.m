@@ -267,8 +267,9 @@
         if (_view.isAccessibilityElement != _accessible) {
             [_view setIsAccessibilityElement:_accessible];
         }
-        
-        _view.accessibilityElementsHidden = _ariaHidden;
+        if (self.view.accessibilityElementsHidden != _ariaHidden) {
+            _view.accessibilityElementsHidden = _ariaHidden;
+        }
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -556,7 +557,9 @@
     }
     if (attributes[@"ariaHidden"]) {
         _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
-        self.view.accessibilityElementsHidden = _ariaHidden;
+        if (self.view.accessibilityElementsHidden != _ariaHidden) {
+            self.view.accessibilityElementsHidden = _ariaHidden;
+        }
     }
     if (attributes[@"accessible"]) {
         _accessible = [WXConvert BOOL:attributes[@"accessible"]];
