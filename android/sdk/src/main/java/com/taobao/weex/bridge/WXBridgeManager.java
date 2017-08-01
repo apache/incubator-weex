@@ -928,16 +928,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       Thread t = new Thread(new Runnable() {
            public void run() {
               try {
-                StringBuilder result = new StringBuilder();
-                try{
-                    BufferedReader br = new BufferedReader(new FileReader(origin_filename));
-                    //构造一个BufferedReader类来读取文件
-                    String s = null;
-                    // boolean foundStart = false;
-                    while((s = br.readLine()) != null) {
-                        // 去空行
+                File file = new File(origin_filename);
+                if (file.exists()) {
+                  if (file.length() > 0) {
+                    StringBuilder result = new StringBuilder();
+                    try{
+                      BufferedReader br = new BufferedReader(new FileReader(origin_filename));
+                      String s = null;
+                      // boolean foundStart = false;
+                      while((s = br.readLine()) != null) {
                         if ("".equals(s)) {
-                            continue;
+                          continue;
                         }
                         //  文件太长，做一定裁剪
                         // if (!("backtrace:").equals(s)){
@@ -948,18 +949,18 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                         //  foundStart = true;
                         // }
                         if (("r0:").equals(s)) {
-                            break;
+                          break;
                         }
-                        // 使用readLine方法，一次读一行
                         result.append(s + "\n");
+                      }
+                      br.close();
+                    } catch(Exception e) {
+                      e.printStackTrace();
                     }
-                    br.close();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
-                File file = new File(origin_filename);
-                if (file.exists()) {
+                    commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
+                  } else {
+                    commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "crash info file empty", instanceId, url);
+                  }
                   file.delete();
                 }
 //                  Log.e("reportServerCrash", "WXBridge reportServerCrash crashFile:" + origin_filename);
