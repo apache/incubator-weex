@@ -24,8 +24,10 @@
 
 @implementation WXVoiceOverModule
 @synthesize weexInstance;
+
 WX_EXPORT_METHOD(@selector(read:))
 WX_EXPORT_METHOD(@selector(focusToElement:))
+
 - (void)read:(NSString *)string
 {
     if ([string isKindOfClass:[NSString class]]) {
