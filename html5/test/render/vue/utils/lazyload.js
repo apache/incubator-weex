@@ -20,25 +20,14 @@ import {
   fireLazyload,
   getThrottleLazyload
 } from '../../../../render/vue/utils/lazyload'
+import { isPhantom } from '../helper/utils'
+
 describe('utils', function () {
   describe('lazyload', function () {
     const validImageTransparent = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
     const validImageBlack = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-    const invalidImage = 'data:image/jpeg;base64,'
+    const invalidImage = isPhantom() ? 'data:image/gif;base64,' : 'http://invalid.img'
     before(() => {
-      // for test collectStat in utils/perf.js
-      window.performance = {
-        getEntries: () => {
-          return [{
-            entryType: 'resource',
-            name: 'weex-invalid.jpg'
-          }, {
-            entryType: 'resource',
-            name: 'weex-test.jpg'
-          }]
-        }
-      }
-      window.history.pushState(null, null, '?_wx_tpl=./weex-test.jpg')
       this.weexEmit = sinon.stub(window.weex, 'emit')
     })
     after(() => {
@@ -47,44 +36,35 @@ describe('utils', function () {
     it('fireLazyload', (done) => {
       const node = document.createElement('figure')
       const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
-      const IMG_REC_INDENT = 500
       node.setAttribute('img-src', invalidImage)
       node.setAttribute('img-placeholder', validImageBlack)
       node.style.height = '10px'
-        //  coverage branch if (item._src_loading)
+      document.body.appendChild(node)
+      //  coverage branch if (item._src_loading)
       node._src_loading = true
-        //  coverage branch if (Array.isArray(el))
+      //  coverage branch if (Array.isArray(el))
       fireLazyload([node])
       node._src_loading = false
-      fireLazyload(node, true)
+      fireLazyload(node)
       setTimeout(() => {
-        expect(node.style.backgroundImage.replace(urlReg, '')).to.be.equal('url(' + validImageBlack + ')')
-        setTimeout(() => {
-          expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
-          expect(this.weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(0)
-          done()
-          document.body.removeChild(node)
-        }, IMG_REC_INDENT)
+        expect(node.style.backgroundImage.replace(/"/g, '')
+          .replace(urlReg, '')).to.be.equal('url(' + validImageBlack + ')')
+        done()
+        document.body.removeChild(node)
       }, 100)
     })
     describe('getThrottleLazyload', () => {
-      it('should use default value while parmas is undefined', (done) => {
-        const IMG_REC_INDENT = 500
+      it('should use default value while params is undefined', (done) => {
         window._first_screen_detected = true
         getThrottleLazyload()()
         setTimeout(() => {
-          setTimeout(() => {
-            expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
-            expect(this.weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(0)
-            done()
-          }, IMG_REC_INDENT)
+          done()
         }, 16)
       })
-      it('should be work', (done) => {
+      it('should be working', (done) => {
         const node = document.createElement('figure')
         const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
         const wait = 100
-        const IMG_REC_INDENT = 500
         node.style.height = '10px'
         node.setAttribute('img-src', validImageTransparent)
         node.setAttribute('img-placeholder', validImageBlack)
@@ -92,13 +72,10 @@ describe('utils', function () {
         window._first_screen_detected = false
         getThrottleLazyload(wait, node)()
         setTimeout(() => {
-          expect(node.style.backgroundImage.replace(urlReg, '')).to.be.equal('url(' + validImageTransparent + ')')
-          setTimeout(() => {
-            expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(2)
-            expect(this.weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(1)
-            done()
-            document.body.removeChild(node)
-          }, IMG_REC_INDENT)
+          expect(node.style.backgroundImage.replace(/"/g, '')
+            .replace(urlReg, '')).to.be.equal('url(' + validImageTransparent + ')')
+          done()
+          document.body.removeChild(node)
         }, 100)
       })
     })

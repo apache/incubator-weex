@@ -20,9 +20,7 @@
 /**
  * Navigator module
  */
-
-// TODO: config.animated
-export default {
+const navigatorModule = {
   push: function (config, callback) {
     window.location.href = config.url
     callback && callback()
@@ -31,5 +29,11 @@ export default {
   pop: function (config, callback) {
     window.history.back()
     callback && callback()
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerModule('navigator', navigatorModule)
   }
 }

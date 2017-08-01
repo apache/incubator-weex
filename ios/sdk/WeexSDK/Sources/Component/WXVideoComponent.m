@@ -20,6 +20,7 @@
 #import "WXVideoComponent.h"
 #import "WXHandlerFactory.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXSDKEngine.h"
 
 #import <AVFoundation/AVPlayer.h>
 #import <AVKit/AVPlayerViewController.h>

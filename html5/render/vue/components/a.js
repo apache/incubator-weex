@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
 // import { validateStyles } from '../validator'
 
 const _css = `
@@ -26,43 +25,56 @@ const _css = `
 `
 let cnt = 0
 
-export default {
-  name: 'weex-a',
-  props: {
-    href: String
-  },
-  mounted () {
-    const $el = this.$el
-    const id = $el.id
+function getA (weex) {
+  const {
+    extractComponentStyle,
+    trimTextVNodes,
+    createEventMap
+  } = weex
 
-    /**
-     * if there is a child component already triggered a click handler, then
-     * this link jumping should be prevented.
-     */
-    $el.addEventListener('click', (e) => {
-      const el = e._triggered && e._triggered.el
-      if (el && (el !== $el) && !el.querySelector(`#${id}`)) {
-        e.preventDefault()
-      }
-    })
-  },
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    const id = cnt++
-    return createElement('html:a', {
-      attrs: {
-        'weex-type': 'a',
-        'id': `weex-a-${id}`,
-        href: this.href
-      },
-      on: createEventMap(this),
-      staticClass: 'weex-a weex-ct',
-      staticStyle: extractComponentStyle(this)
-    }, trimTextVNodes(this.$slots.default))
-  },
-  _css
+  return {
+    name: 'weex-a',
+    props: {
+      href: String
+    },
+    mounted () {
+      const $el = this.$el
+      const id = $el.id
+
+      /**
+       * if there is a child component already triggered a click handler, then
+       * this link jumping should be prevented.
+       */
+      $el.addEventListener('click', (e) => {
+        const el = e._triggered && e._triggered.el
+        if (el && (el !== $el) && !el.querySelector(`#${id}`)) {
+          e.preventDefault()
+        }
+      })
+    },
+    render (createElement) {
+      /* istanbul ignore next */
+      // if (process.env.NODE_ENV === 'development') {
+      //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
+      // }
+      const id = cnt++
+      return createElement('html:a', {
+        attrs: {
+          'weex-type': 'a',
+          'id': `weex-a-${id}`,
+          href: this.href
+        },
+        on: createEventMap(this),
+        staticClass: 'weex-a weex-ct',
+        staticStyle: extractComponentStyle(this)
+      }, trimTextVNodes(this.$slots.default))
+    },
+    _css
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerComponent('a', getA(weex))
+  }
 }
