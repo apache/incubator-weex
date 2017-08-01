@@ -12,6 +12,7 @@ test/build
 weex_tmp
 coverage
 dist
+*.js.gz
 
 # Node
 logs

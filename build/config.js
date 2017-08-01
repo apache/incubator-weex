@@ -63,6 +63,19 @@ const configs = {
       }),
     ]
   },
+  'weex-legacy-framework': {
+    moduleName: 'WeexVanillaFramework',
+    entry: absolute('html5/frameworks/legacy/index.js'),
+    dest: absolute('packages/weex-legacy-framework/index.js'),
+    banner: `/* 'WEEX VANILLA FRAMEWORK ${subversion.framework}, Build ${now()}. */\n`,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
   'weex-web-render': {
     moduleName: 'Weex',
     entry: absolute('html5/render/browser/index.js'),
