@@ -499,6 +499,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  public float getLayoutWidth(){
+    return mDomObj == null ? 0 : mDomObj.getLayoutWidth();
+  }
+
+  public float getLayoutHeight(){
+    return mDomObj == null ? 0 : mDomObj.getLayoutHeight();
+  }
+
   public void setPadding(Spacing padding, Spacing border) {
     int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
     int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
@@ -949,7 +957,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   @CallSuper
   protected void onHostViewInitialized(T host){
-    host.setCameraDistance(Float.MAX_VALUE);
+    if(host!=null){
+      host.setCameraDistance(Float.MAX_VALUE);
+    }
     if (mAnimationHolder != null) {
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);

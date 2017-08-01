@@ -42,6 +42,7 @@
 #import "WXTextComponent.h"
 #import "WXConvert.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -146,6 +147,7 @@ typedef enum : NSUInteger {
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@""}];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
@@ -156,6 +158,8 @@ typedef enum : NSUInteger {
     _jsData = data;
     
     [self _renderWithMainBundleString:source];
+    
+    [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
@@ -198,6 +202,8 @@ typedef enum : NSUInteger {
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"bundleUrl":self.scriptURL?[self.scriptURL absoluteString]:@""}];
+    
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
@@ -207,16 +213,16 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
-        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL];
+        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXCycleSliderComponent" isDefault:NULL];
         if(sliderConfig){
             NSString *sliderClassName = [WXConvert NSString:sliderConfig];
             if(sliderClassName.length>0){
                 [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
             }else{
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
             }
         }else{
-            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
         }
     }
 }
@@ -288,6 +294,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
         
         [strongSelf _renderWithMainBundleString:jsBundleString];
+        [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {

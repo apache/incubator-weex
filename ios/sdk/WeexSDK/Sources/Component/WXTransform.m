@@ -149,26 +149,18 @@
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     
-    float x = 0,y = 0,z = 0;
-    float rotateAngle = 0;
-    if (_rotateZ != 0) {
-        z = 1;
-        rotateAngle = _rotateZ;
-    }
-    if (_rotateAngle != 0) {
-        rotateAngle = _rotateAngle;
-        z = 1;
+    if (_rotateX != 0) {
+        CATransform3D rotateXTransform = CATransform3DMakeRotation(_rotateX, 1, 0, 0);
+        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateXTransform);
     }
     if (_rotateY != 0) {
-        y = 1;
-        rotateAngle = _rotateY;
+        CATransform3D rotateYTransform = CATransform3DMakeRotation(_rotateY, 0, 1, 0);
+        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateYTransform);
     }
-    if (_rotateX != 0) {
-        x = 1;
-        rotateAngle = _rotateX;
+    if (_rotateAngle != 0 || _rotateZ != 0) {
+        CATransform3D rotateZTransform = CATransform3DMakeRotation(_rotateAngle?:_rotateZ, 0, 0, 1);
+        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateZTransform);
     }
-    
-    nativeTransform3d = CATransform3DRotate(nativeTransform3d, rotateAngle, x, y, z);
     
     return nativeTransform3d;
 }
