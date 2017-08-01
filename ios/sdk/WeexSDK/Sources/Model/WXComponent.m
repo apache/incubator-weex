@@ -115,6 +115,9 @@
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         }
+        if (attributes[@"accessible"]) {
+            _accessible = [WXConvert BOOL:attributes[@"accessible"]];
+        }
         
         if (attributes[@"testId"]) {
             _testId = [WXConvert NSString:attributes[@"testId"]];
@@ -224,10 +227,8 @@
         
         _layer = _view.layer;
         _view.frame = _calculatedFrame;
-        
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
-        
         if (![self _needsDrawBorder]) {
             _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
@@ -262,6 +263,9 @@
         
         if (_ariaLabel) {
             _view.accessibilityLabel = _ariaLabel;
+        }
+        if (_view.isAccessibilityElement != _accessible) {
+            [_view setIsAccessibilityElement:_accessible];
         }
         
         _view.accessibilityElementsHidden = _ariaHidden;
@@ -553,6 +557,12 @@
     if (attributes[@"ariaHidden"]) {
         _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
         self.view.accessibilityElementsHidden = _ariaHidden;
+    }
+    if (attributes[@"accessible"]) {
+        _accessible = [WXConvert BOOL:attributes[@"accessible"]];
+        if (self.view.isAccessibilityElement != _accessible) {
+            [self.view setIsAccessibilityElement:_accessible];
+        }
     }
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
