@@ -81,7 +81,7 @@
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
-    "copy:js": "cp -vf ./dist/native.js ./android/sdk/assets/main.js",
+    "copy:js": "cp -vf ./packages/weex-js-framework/index.js ./pre-build/native-bundle-main.js",
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples",
     "danger": "danger"
