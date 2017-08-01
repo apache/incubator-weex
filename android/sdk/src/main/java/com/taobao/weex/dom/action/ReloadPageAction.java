@@ -41,7 +41,6 @@ final class ReloadPageAction implements DOMAction, RenderAction {
 
   @Override
   public void executeDom(DOMActionContext context) {
-      Log.e("reportServerCrash", "ReloadPageAction executeDom instanceId:" + context.getInstanceId());
       if (context.isDestory()) {
         return;
       }

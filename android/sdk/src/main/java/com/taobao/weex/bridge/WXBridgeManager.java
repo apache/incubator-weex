@@ -134,7 +134,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   static volatile WXBridgeManager mBridgeManager;
 
-  private static final int CRASHREINIT = 10;
+  private static final int CRASHREINIT = 50;
   private static int reInitCount = 1;
 
 
@@ -953,13 +953,15 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                         }
                         result.append(s + "\n");
                       }
+                      commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
                       br.close();
                     } catch(Exception e) {
                       e.printStackTrace();
                     }
-                    commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
                   } else {
-                    commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "crash info file empty", instanceId, url);
+                    WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
+                    // 没收集到crash堆栈不上传
+                    // commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "crash info file empty", instanceId, url);
                   }
                   file.delete();
                 }
