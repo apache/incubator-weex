@@ -12,7 +12,6 @@ test/build
 weex_tmp
 coverage
 dist
-packages
 
 # Node
 logs
