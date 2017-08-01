@@ -247,9 +247,9 @@ typedef enum : NSUInteger {
     }
     _options = [newOptions copy];
   
-//    if (!self.pageName || [self.pageName isEqualToString:@""]) {
-//        self.pageName = url.absoluteString ? : @"";
-//    }
+    if (!self.pageName || [self.pageName isEqualToString:@""]) {
+        self.pageName = url.absoluteString ? : @"";
+    }
     
     request.userAgent = [WXUtility userAgent];
     
