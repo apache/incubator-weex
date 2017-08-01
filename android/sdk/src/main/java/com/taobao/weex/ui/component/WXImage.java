@@ -70,7 +70,6 @@ import java.util.Map;
 public class WXImage extends WXComponent<ImageView> {
 
   public static final String SUCCEED = "success";
-  public static final String PATH = "path";
   public static final String ERRORDESC = "errorDesc";
 
   private String mSrc;
@@ -364,6 +363,16 @@ public class WXImage extends WXComponent<ImageView> {
         Map<String, Object> result = new HashMap<>();
         result.put(SUCCEED, false);
         result.put(ERRORDESC,"Image component not initialized");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    if (mSrc == null || mSrc.equals("")) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Image does not have the correct src");
         saveStatuCallback.invoke(result);
       }
       return;

@@ -29,6 +29,9 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.view.View;
+
+import com.taobao.weex.WXSDKManager;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,11 +45,6 @@ public class WXViewToImageUtil {
     public static int mBackgroundColor = Color.TRANSPARENT;
 
     /**
-     * Use this variable to ensure that only one save image task occurs at the same time
-     */
-    private static boolean isSaving = false;
-
-    /**
      * Generate image and return path via callback
      */
     public static void generateImage(final View imageView, final int width,
@@ -54,18 +52,12 @@ public class WXViewToImageUtil {
 
         mBackgroundColor = backgroundColor;
 
-        // The new task can not be triggered until the last task completes
-        if (isSaving) {
-            return;
-        }
-        isSaving = true;
-
         // Only one save image task occurs at the same time
-        new Thread(new Runnable() {
+        WXSDKManager.getInstance().getWXWorkThreadManager().post(new Thread(new Runnable() {
             @Override
             public void run() {
                 // Generate bitmap from ImageView
-                Bitmap bitmap = getImageViewToBitmap(imageView, width);
+                Bitmap bitmap = getBitmapFromImageView(imageView, width);
 
                 if (bitmap == null) {
                     if (mOnImageSavedCallback != null) {
@@ -86,9 +78,8 @@ public class WXViewToImageUtil {
                         }
                     }
                 });
-                isSaving = false;
             }
-        }).start();
+        }));
     }
 
     /**
@@ -146,7 +137,7 @@ public class WXViewToImageUtil {
     /**
      * Get bitmap from imageview
      */
-    public static Bitmap getImageViewToBitmap(final View view, int width) {
+    public static Bitmap getBitmapFromImageView(final View view, int width) {
         if (view.getWidth() <= 0 || view.getHeight() <= 0) {
             view.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
