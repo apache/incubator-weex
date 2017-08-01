@@ -45,7 +45,7 @@ export class TaskCenter {
 
   typof (v) {
     const s = Object.prototype.toString.call(v)
-    return s.substring(8, s.length - 1).toLowerCase()
+    return s.substring(8, s.length - 1)
   }
 
   /**
@@ -59,18 +59,18 @@ export class TaskCenter {
     const type = this.typof(v)
 
     switch (type) {
-      case 'undefined':
-      case 'null':
+      case 'Undefined':
+      case 'Null':
         return ''
-      case 'regexp':
+      case 'RegExp':
         return v.toString()
-      case 'date':
+      case 'Date':
         return v.toISOString()
-      case 'number':
-      case 'string':
-      case 'boolean':
-      case 'array':
-      case 'object':
+      case 'Number':
+      case 'String':
+      case 'Boolean':
+      case 'Array':
+      case 'Object':
         if (v instanceof Element) {
           return v.ref
         }
@@ -78,7 +78,21 @@ export class TaskCenter {
           return v.$el.ref
         }
         return v
-      case 'function':
+
+      case 'ArrayBuffer':
+        return { type, buffer: v }
+      case 'Int8Array':
+      case 'Uint8Array':
+      case 'Uint8ClampedArray':
+      case 'Int16Array':
+      case 'Uint16Array':
+      case 'Int32Array':
+      case 'Uint32Array':
+      case 'Float32Array':
+      case 'Float64Array':
+        return { type, buffer: v.buffer }
+
+      case 'Function':
         return this.callbackManager.add(v).toString()
       /* istanbul ignore next */
       default:
