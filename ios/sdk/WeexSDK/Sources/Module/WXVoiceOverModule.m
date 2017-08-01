@@ -25,13 +25,23 @@
 @implementation WXVoiceOverModule
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD(@selector(read:))
+WX_EXPORT_METHOD(@selector(read:param:))
 WX_EXPORT_METHOD(@selector(focusToElement:))
-
-- (void)read:(NSString *)string
+WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
+- (instancetype)init {
+    if ([super init]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voiceOverStatusListener) name:UIAccessibilityVoiceOverStatusChanged object:nil];
+    }
+    return self;
+}
+- (void)read:(NSString *)string param:(NSDictionary*)param
 {
+    float delay = 0.5;
+    if (param[@"delay"]) {
+        delay = [param[@"delay"] floatValue];
+    }
     if ([string isKindOfClass:[NSString class]]) {
-        dispatch_after(3.0, dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, string);
         });
     }
@@ -46,4 +56,21 @@ WX_EXPORT_METHOD(@selector(focusToElement:))
         }
     });
 }
+
+- (BOOL)isVoiceOverOn
+{
+    return UIAccessibilityIsVoiceOverRunning();
+}
+
+- (void)voiceOverStatusListener
+{
+    if ([weexInstance checkModuleEventRegistered:@"WXVoiceOverStatusChanged" moduleClassName:NSStringFromClass([self class])]) {
+        [weexInstance fireModuleEvent:[self class] eventName:@"WXVoiceOverStatusChanged" params:nil];
+    }
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIAccessibilityVoiceOverStatusChanged object:self];
+}
+
 @end
