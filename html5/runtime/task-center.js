@@ -18,6 +18,7 @@
  */
 import CallbackManager from './callback-manager'
 import Element from './vdom/element'
+import { bufferToString } from './buffer'
 
 let fallback = function () {}
 
@@ -80,7 +81,7 @@ export class TaskCenter {
         return v
 
       case 'ArrayBuffer':
-        return { type, buffer: v }
+        return { type, buffer: v, string: bufferToString(v) }
       case 'Int8Array':
       case 'Uint8Array':
       case 'Uint8ClampedArray':
@@ -90,7 +91,7 @@ export class TaskCenter {
       case 'Uint32Array':
       case 'Float32Array':
       case 'Float64Array':
-        return { type, buffer: v.buffer }
+        return { type, buffer: v.buffer, string: bufferToString(v.buffer) }
 
       case 'Function':
         return this.callbackManager.add(v).toString()
