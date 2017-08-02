@@ -53,7 +53,8 @@ describe('dom module', () => {
     } = domModule
     const node = document.createElement('div')
     const vnode = {
-      $el: node
+      $el: node,
+      $refs: {}
     }
     const rectKeys = ['width', 'height', 'top', 'bottom', 'left', 'right']
     let message
