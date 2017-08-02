@@ -43,7 +43,6 @@ function getScroller (weex) {
     },
     computed: {
       wrapperClass () {
-        console.log(this.scrollable)
         const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
         if (this.scrollDirection === 'horizontal') {
           classArray.push('weex-scroller-horizontal')
