@@ -18,7 +18,7 @@
  */
 import CallbackManager from './callback-manager'
 import Element from './vdom/element'
-import { bufferToString } from './buffer'
+import { typof, normalizePrimitive } from './normalize'
 
 let fallback = function () {}
 
@@ -44,61 +44,28 @@ export class TaskCenter {
     return this.callbackManager.close()
   }
 
-  typof (v) {
-    const s = Object.prototype.toString.call(v)
-    return s.substring(8, s.length - 1)
-  }
-
   /**
    * Normalize a value. Specially, if the value is a function, then generate a function id
    * and save it to `CallbackManager`, at last return the function id.
    * @param  {any}        v
-   * @param  {object}     app
    * @return {primitive}
    */
   normalize (v) {
-    const type = this.typof(v)
+    const type = typof(v)
 
-    switch (type) {
-      case 'Undefined':
-      case 'Null':
-        return ''
-      case 'RegExp':
-        return v.toString()
-      case 'Date':
-        return v.toISOString()
-      case 'Number':
-      case 'String':
-      case 'Boolean':
-      case 'Array':
-      case 'Object':
-        if (v instanceof Element) {
-          return v.ref
-        }
-        if (v._isVue && v.$el instanceof Element) {
-          return v.$el.ref
-        }
-        return v
-
-      case 'ArrayBuffer':
-        return { type, buffer: v, string: bufferToString(v) }
-      case 'Int8Array':
-      case 'Uint8Array':
-      case 'Uint8ClampedArray':
-      case 'Int16Array':
-      case 'Uint16Array':
-      case 'Int32Array':
-      case 'Uint32Array':
-      case 'Float32Array':
-      case 'Float64Array':
-        return { type, buffer: v.buffer, string: bufferToString(v.buffer) }
-
-      case 'Function':
-        return this.callbackManager.add(v).toString()
-      /* istanbul ignore next */
-      default:
-        return JSON.stringify(v)
+    if (v instanceof Element) {
+      return v.ref
     }
+
+    if (v._isVue && v.$el instanceof Element) {
+      return v.$el.ref
+    }
+
+    if (type === 'Function') {
+      return this.callbackManager.add(v).toString()
+    }
+
+    return normalizePrimitive(v)
   }
 
   send (type, params, args, options) {
