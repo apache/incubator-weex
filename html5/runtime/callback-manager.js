@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import { decodePrimitive } from './normalize'
+
 /**
  * For general callback management of a certain Weex instance.
  * Because function can not passed into native, so we create callback
@@ -46,7 +48,7 @@ export default class CallbackManager {
       delete this.callbacks[callbackId]
     }
     if (typeof callback === 'function') {
-      return callback(data)
+      return callback(decodePrimitive(data))
     }
     return new Error(`invalid callback id "${callbackId}"`)
   }
