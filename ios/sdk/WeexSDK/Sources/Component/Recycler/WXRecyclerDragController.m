@@ -1,10 +1,21 @@
-//
-//  WXRecyclerDragController.m
-//  Pods
-//
-//  Created by ximu on 2017/7/31.
-//
-//
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 #import "WXRecyclerDragController.h"
 
@@ -43,7 +54,6 @@
         [_excludedAry addObjectsFromArray:[set allObjects]];
     }
     
-    //遍历获取锚点
     NSMutableArray *subviewComponents = [[NSMutableArray alloc] init];
     [subviewComponents addObjectsFromArray:wxComponent.subcomponents];
     WXComponent *anchorComponent;
@@ -61,13 +71,11 @@
     }
     
     if (anchorComponent) {
-        //去除全局UILongPressGestureRecognizer手势
         if (_currentLongPress) {
             [self.collectionView removeGestureRecognizer:_currentLongPress];
             _currentLongPress = nil;
         }
         
-        //添加锚点的手势
         if (_dragTriggerType == WXRecyclerDragTriggerPan) {
             UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
             [anchorComponent.view addGestureRecognizer:panGestureRecognizer];
