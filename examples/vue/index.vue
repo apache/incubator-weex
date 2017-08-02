@@ -37,6 +37,7 @@
           {name: root + '/modules/webSocket', title: 'WebSocket'},
           {name: root + '/modules/stream', title: 'Stream'},
           {name: root + '/modules/storage',title:'Storage'},
+          {name: root + '/modules/picker',title:'picker'},
           // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
 
           // showcase

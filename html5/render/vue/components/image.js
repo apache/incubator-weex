@@ -17,8 +17,7 @@
  * under the License.
  */
 
-import { extractComponentStyle, createEventMap } from '../core'
-import { extend } from '../utils'
+let extractComponentStyle, createEventMap, extend
 
 const _css = `
 .weex-image, .weex-img {
@@ -53,7 +52,8 @@ function preProcessSrc (context, url, mergedStyle) {
   }) || url
 }
 
-export default {
+const image = {
+  name: 'weex-image',
   props: {
     src: String,
     placeholder: String,
@@ -79,7 +79,6 @@ export default {
     // const style = this._normalizeInlineStyles(this.$vnode.data)
     const resizeStyle = getResizeStyle(this)
     const style = extractComponentStyle(this)
-    this._renderHook()
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
@@ -92,4 +91,15 @@ export default {
     })
   },
   _css
+}
+
+export default {
+  init (weex) {
+    extractComponentStyle = weex.extractComponentStyle
+    createEventMap = weex.createEventMap
+    extend = weex.utils.extend
+
+    weex.registerComponent('image', image)
+    weex.registerComponent('img', image)
+  }
 }

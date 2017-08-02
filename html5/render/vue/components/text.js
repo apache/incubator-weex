@@ -25,9 +25,6 @@
  * be clipped according to the 'lines'. Otherwise, it'll be the 'height'.
  */
 
-import { extractComponentStyle, createEventMap } from '../core'
-import { extend } from '../utils'
-
 const _css = `
 .weex-text {
   display: -webkit-box;
@@ -55,26 +52,33 @@ function getTextSpecStyle (ms = {}) {
   }
 }
 
-export default {
-  props: {
-    lines: [Number, String],
-    value: [String]
-  },
+function getText (weex) {
+  const { extractComponentStyle, createEventMap } = weex
+  const { extend } = weex.utils
 
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    const style = extractComponentStyle(this)
-    const textSpecStyle = getTextSpecStyle(style)
-    this._renderHook()
-    return createElement('p', {
-      attrs: { 'weex-type': 'text' },
-      on: createEventMap(this),
-      staticClass: 'weex-text weex-el',
-      staticStyle: extend(style, textSpecStyle)
-    }, this.$slots.default || [this.value])
-  },
-  _css
+  return {
+    name: 'weex-text',
+    props: {
+      lines: [Number, String],
+      value: [String]
+    },
+
+    render (createElement) {
+      const style = extractComponentStyle(this)
+      const textSpecStyle = getTextSpecStyle(style)
+      return createElement('p', {
+        attrs: { 'weex-type': 'text' },
+        on: createEventMap(this),
+        staticClass: 'weex-text weex-el',
+        staticStyle: extend(style, textSpecStyle)
+      }, this.$slots.default || [this.value])
+    },
+    _css
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerComponent('text', getText(weex))
+  }
 }
