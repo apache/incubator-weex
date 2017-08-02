@@ -21,7 +21,9 @@ const utils = {}
 
 function getParentScroller (vnode) {
   if (!vnode) return null
-  const vm = vnode.$el ? vnode : vnode.elm ? vnode.componentInstance || vnode.context : null
+  const vm = vnode.$el
+  ? vnode : vnode.elm
+  ? vnode.componentInstance || vnode.context : null
   if (!vm) return null
   const type = vm.$el && vm.$el.getAttribute('weex-type')
   if (config.scrollableTypes.indexOf(type) > -1) {
@@ -31,7 +33,8 @@ function getParentScroller (vnode) {
 }
 
 function now () {
-  const now = window.performance && window.performance.now ? window.performance.now.bind(window.performance) : Date.now
+  const now = window.performance && window.performance.now
+  ? window.performance.now.bind(window.performance) : Date.now
   return now()
 }
 
@@ -48,18 +51,18 @@ function step (context) {
   context.frame = window.requestAnimationFrame(step.bind(window, context))
   const time = now()
   let elapsed = (time - context.startTime) / 468
-    // avoid elapsed times higher than one
+  // avoid elapsed times higher than one
   elapsed = elapsed > 1 ? 1 : elapsed
-    // apply easing to elapsed time
+  // apply easing to elapsed time
   const value = ease(elapsed)
   const currentPosition = context.startPosition + (context.position - context.startPosition) * value
   context.method.call(context.scrollable, context.dSuffix, currentPosition)
-    // return when end points have been reached
-    /**
-     * NOTE: should use ~~ to parse position number into integer. Otherwise
-     * this two float numbers maybe have a slicely little difference, which
-     * will cause this function never to stop.
-     */
+  // return when end points have been reached
+  /**
+    * NOTE: should use ~~ to parse position number into integer. Otherwise
+    * this two float numbers maybe have a slicely little difference, which
+    * will cause this function never to stop.
+  */
   if (~~currentPosition === ~~context.position) {
     window.cancelAnimationFrame(context.frame)
     return
@@ -105,10 +108,10 @@ const dom = {
       })[scrollDirection]
       const ctRect = ct.getBoundingClientRect()
       let elRect = el.getBoundingClientRect()
-        /**
-         * if it's a waterfall, and you want to scroll to a header, then just
-         * scroll to the top.
-         */
+      /**
+        * if it's a waterfall, and you want to scroll to a header, then just
+        * scroll to the top.
+      */
       if (scroller && scroller.weexType === 'waterfall' && scroller._headers && scroller._headers.indexOf(vnode.$vnode || vnode) > -1) {
         // it's in waterfall. just scroll to the top.
         elRect = ct.firstElementChild.getBoundingClientRect()
@@ -117,10 +120,11 @@ const dom = {
       let offset = (isWindow ? 0 : ct[`scroll${dSuffix}`]) + elRect[dir] - ctRect[dir]
       if (options) {
         offset += options.offset && options.offset * weex.config.env.scale || 0
-          // offset *= weex.config.env.scale /* adapt offset to different screen scales. */
+        // offset *= weex.config.env.scale /* adapt offset to different screen scales. */
       }
       else if (process.env.NODE_ENV === 'development') {
-        console.warn('[Vue Render] The second parameter of "scrollToElement" is required, ' + 'otherwise it may not works well on native.')
+        console.warn('[Vue Render] The second parameter of "scrollToElement" is required, '
+        + 'otherwise it may not works well on native.')
       }
       if (options && options.animated === false) {
         return scrollElement.call(ct, dSuffix, offset)
