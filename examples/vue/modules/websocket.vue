@@ -88,7 +88,13 @@
           self.onopeninfo = 'websocket open';
         }
         websocket.onmessage = function(e) {
-          self.onmessage = e.data;
+          if(Object.prototype.toString.apply(e.data) === 'ArrayBuffer'){
+            self.onmessage = 'you receive array buffer'
+          }
+          if(Object.prototype.toString.apply(e.data) === 'String'){
+            self.onmessage = e.data;
+          }
+
         }
         websocket.onerror = function(e) {
           self.onerrorinfo = e.data;
@@ -101,7 +107,12 @@
       send: function(e) {
         var input = this.$refs.input;
         input.blur();
-        websocket.send(this.txtInput);
+        var buffer = new ArrayBuffer(16)
+        var view = new Float32Array(buffer)
+        view.set([4,89,36.9,0.765])
+        console.log(buffer);
+        this.sendinfo = buffer;
+        websocket.send(buffer);
         this.sendinfo = this.txtInput;
       },
       oninput: function(event) {
