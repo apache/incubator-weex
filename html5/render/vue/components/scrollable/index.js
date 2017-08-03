@@ -16,21 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../../../validator'
-import { extractComponentStyle, createEventMap } from '../../../core'
+
+import list from './list'
+import scroller from './scroller'
+import waterfall from './waterfall'
+import cell from './cell'
+import header from './header'
+import loading from './loading'
+import refresh from './refresh'
+import loadingIndicator from './loading-indicator'
+
+import './style.css'
+
+const modules = [
+  list,
+  scroller,
+  waterfall,
+  cell,
+  header,
+  loading,
+  refresh,
+  loadingIndicator
+]
 
 export default {
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    return createElement('section', {
-      attrs: { 'weex-type': 'cell' },
-      on: createEventMap(this),
-      staticClass: 'weex-cell weex-ct',
-      staticStyle: extractComponentStyle(this)
-    }, this.$slots.default)
+  init (weex) {
+    modules.forEach(function (mod) {
+      weex.install(mod)
+    })
   }
 }

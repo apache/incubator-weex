@@ -12,8 +12,7 @@ const helper = {
    * @param  {object} component.
    */
   register (name, component) {
-    weex.registerComponent(name, component)
-    // components[name] = component
+    weex.install(component)
   },
 
   /**

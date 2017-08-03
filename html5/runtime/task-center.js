@@ -18,6 +18,7 @@
  */
 import CallbackManager from './callback-manager'
 import Element from './vdom/element'
+import { typof, normalizePrimitive } from './normalize'
 
 let fallback = function () {}
 
@@ -43,47 +44,28 @@ export class TaskCenter {
     return this.callbackManager.close()
   }
 
-  typof (v) {
-    const s = Object.prototype.toString.call(v)
-    return s.substring(8, s.length - 1).toLowerCase()
-  }
-
   /**
    * Normalize a value. Specially, if the value is a function, then generate a function id
    * and save it to `CallbackManager`, at last return the function id.
    * @param  {any}        v
-   * @param  {object}     app
    * @return {primitive}
    */
   normalize (v) {
-    const type = this.typof(v)
+    const type = typof(v)
 
-    switch (type) {
-      case 'undefined':
-      case 'null':
-        return ''
-      case 'regexp':
-        return v.toString()
-      case 'date':
-        return v.toISOString()
-      case 'number':
-      case 'string':
-      case 'boolean':
-      case 'array':
-      case 'object':
-        if (v instanceof Element) {
-          return v.ref
-        }
-        if (v._isVue && v.$el instanceof Element) {
-          return v.$el.ref
-        }
-        return v
-      case 'function':
-        return this.callbackManager.add(v).toString()
-      /* istanbul ignore next */
-      default:
-        return JSON.stringify(v)
+    if (v instanceof Element) {
+      return v.ref
     }
+
+    if (v._isVue && v.$el instanceof Element) {
+      return v.$el.ref
+    }
+
+    if (type === 'Function') {
+      return this.callbackManager.add(v).toString()
+    }
+
+    return normalizePrimitive(v)
   }
 
   send (type, params, args, options) {

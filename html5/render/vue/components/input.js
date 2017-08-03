@@ -21,10 +21,8 @@
  * @fileOverview Input component.
  * Support v-model only if vue version is large than 2.2.0
  */
-import { extractComponentStyle, createEventMap } from '../core'
-import { inputCommon } from '../mixins'
-import { extend, mapFormEvents, appendCss } from '../utils'
-// import { validateStyles } from '../validator'
+let extractComponentStyle, createEventMap
+let extend, mapFormEvents, appendCss
 
 const ID_PREFIX_PLACEHOLDER_COLOR = 'wipt_plc_'
 const ID_PREFIX_INPUT = 'wipt_'
@@ -68,61 +66,77 @@ function processStyle (vm) {
   return styles
 }
 
-export default {
-  mixins: [inputCommon],
-  props: {
-    type: {
-      type: String,
-      default: 'text',
-      validator (value) {
-        return [
-          'email', 'number', 'password', 'search', 'tel', 'text', 'url', 'date',
-          'datetime', 'time'
-          // unsupported type:
-          // button, checkbox, color, file, hidden, image,
-          // month, radio, range, reset, submit, week,
-        ].indexOf(value) !== -1
-      }
-    },
-    value: String,
-    placeholder: String,
-    disabled: {
-      type: [String, Boolean],
-      default: false
-    },
-    autofocus: {
-      type: [String, Boolean],
-      default: false
-    },
-    maxlength: [String, Number],
-    returnKeyType: String
-  },
+function getInput (weex) {
+  const { inputCommon } = weex.mixins
 
-  render (createElement) {
-    if (!this._id) {
-      this._id = idCount++
-    }
-    const events = extend(createEventMap(this), mapFormEvents(this))
-    this._renderHook()
-    return createElement('html:input', {
-      attrs: {
-        'weex-type': 'input',
-        id: `${ID_PREFIX_INPUT}${this._id}`,
-        type: this.type,
-        value: this.value,
-        disabled: (this.disabled !== 'false' && this.disabled !== false),
-        autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
-        placeholder: this.placeholder,
-        maxlength: this.maxlength,
-        'returnKeyType': this.returnKeyType
+  return {
+    name: 'weex-input',
+    mixins: [inputCommon],
+    props: {
+      type: {
+        type: String,
+        default: 'text',
+        validator (value) {
+          return [
+            'email', 'number', 'password', 'search', 'tel', 'text', 'url', 'date',
+            'datetime', 'time'
+            // unsupported type:
+            // button, checkbox, color, file, hidden, image,
+            // month, radio, range, reset, submit, week,
+          ].indexOf(value) !== -1
+        }
       },
-      domProps: {
-        value: this.value
+      value: String,
+      placeholder: String,
+      disabled: {
+        type: [String, Boolean],
+        default: false
       },
-      on: this.createKeyboardEvent(events),
-      staticClass: 'weex-input weex-el',
-      staticStyle: processStyle(this)
-    })
-  },
-  _css
+      autofocus: {
+        type: [String, Boolean],
+        default: false
+      },
+      maxlength: [String, Number],
+      returnKeyType: String
+    },
+
+    render (createElement) {
+      if (!this._id) {
+        this._id = idCount++
+      }
+      const events = extend(createEventMap(this), mapFormEvents(this))
+      return createElement('html:input', {
+        attrs: {
+          'weex-type': 'input',
+          id: `${ID_PREFIX_INPUT}${this._id}`,
+          type: this.type,
+          value: this.value,
+          disabled: (this.disabled !== 'false' && this.disabled !== false),
+          autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
+          placeholder: this.placeholder,
+          maxlength: this.maxlength,
+          'returnKeyType': this.returnKeyType
+        },
+        domProps: {
+          value: this.value
+        },
+        on: this.createKeyboardEvent(events),
+        staticClass: 'weex-input weex-el',
+        staticStyle: processStyle(this)
+      })
+    },
+    _css
+  }
+}
+
+export default {
+  init (weex) {
+    extractComponentStyle = weex.extractComponentStyle
+    createEventMap = weex.createEventMap
+    extend = weex.utils.extend
+    mapFormEvents = weex.utils.mapFormEvents
+    appendCss = weex.utils.appendCss
+
+    weex.registerComponent('input', getInput(weex))
+  }
 }

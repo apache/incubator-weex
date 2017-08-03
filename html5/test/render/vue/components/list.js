@@ -18,7 +18,7 @@
  */
 import { init } from '../helper'
 import list from '../../../../render/vue/components/scrollable/list'
-import cell from '../../../../render/vue/components/scrollable/list/cell'
+import cell from '../../../../render/vue/components/scrollable/cell'
 
 init('<list> component', (Vue, helper) => {
   const { utils, compile } = helper

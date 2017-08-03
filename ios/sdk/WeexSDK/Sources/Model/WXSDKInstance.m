@@ -157,6 +157,8 @@ typedef enum : NSUInteger {
     _options = options;
     _jsData = data;
     
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
+    
     [self _renderWithMainBundleString:source];
     
     [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
