@@ -39,6 +39,7 @@ import {
   elementTypes,
   setElement
 } from './element-types'
+import { filterDirective } from './directive'
 
 const DEFAULT_TAG_NAME = 'div'
 const BUBBLE_EVENTS = ['click', 'longpress', 'touchstart', 'touchmove', 'touchend', 'panstart', 'panmove', 'panend', 'horizontalpan', 'verticalpan', 'swipe']
@@ -296,7 +297,7 @@ Object.assign(Element.prototype, {
     const taskCenter = getTaskCenter(this.docId)
     if (!silent && taskCenter) {
       const result = {}
-      result[key] = value
+      result[key] = filterDirective(value)
       taskCenter.send(
         'dom',
         { action: 'updateAttrs' },
@@ -432,7 +433,7 @@ Object.assign(Element.prototype, {
     const result = {
       ref: this.ref.toString(),
       type: this.type,
-      attr: this.attr,
+      attr: filterDirective(this.attr),
       style: this.toStyle()
     }
     const event = Object.keys(this.event)
