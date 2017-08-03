@@ -88,11 +88,11 @@
           self.onopeninfo = 'websocket open';
         }
         websocket.onmessage = function(e) {
-          if(Object.prototype.toString.apply(e.data) === 'ArrayBuffer'){
-            self.onmessage = 'you receive array buffer'
-          }
-          if(Object.prototype.toString.apply(e.data) === 'String'){
+          if(typeof(e.data) === 'String'){
             self.onmessage = e.data;
+          }else
+          {
+            self.onmessage = 'you receive array buffer'
           }
 
         }

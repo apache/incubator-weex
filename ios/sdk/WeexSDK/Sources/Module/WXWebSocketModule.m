@@ -62,11 +62,7 @@ WX_EXPORT_METHOD(@selector(onclose:))
             if([message isKindOfClass:[NSString class]]) {
                 [dic setObject:message forKey:@"data"];
             }else if([message isKindOfClass:[NSData class]]){
-                NSMutableDictionary *dataDict = [NSMutableDictionary new];
-                NSString *base64Encoded = [message base64EncodedStringWithOptions:0];
-                [dataDict setObject:@"binary" forKey:@"@type"];
-                [dataDict setObject:base64Encoded forKey:@"base64"];
-                [dic setObject:dataDict forKey:@"data"];
+                [dic setObject:[WXUtility dataToBase64Dict:message] forKey:@"data"];
             }
             if (weakSelf.messageCallBack) {
                 weakSelf.messageCallBack(dic,true);;
@@ -114,11 +110,11 @@ WX_EXPORT_METHOD(@selector(onclose:))
     if([data isKindOfClass:[NSString class]]){
         [loader send:data];
     }else if([data isKindOfClass:[NSDictionary class]]){
-        if([@"binary" isEqualToString:data[@"@type"]]){
-            NSString *base64 = data[@"base64"];
-            NSData *sendData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+        NSData *sendData = [WXUtility base64DictToData:data];
+        if(sendData){
             [loader send:sendData];
         }
+        
     }
     
     
