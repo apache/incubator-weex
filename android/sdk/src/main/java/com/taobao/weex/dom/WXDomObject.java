@@ -663,7 +663,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       }
       domObject.parseFromJson(json);
       domObject.mDomContext = wxsdkInstance;
-
+      domObject.parent = parentDomObject;
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {
         JSONArray childrenArray = (JSONArray) children;
