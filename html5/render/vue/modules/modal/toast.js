@@ -40,7 +40,7 @@ function showToastWindow (msg, callback) {
   toastWin.addEventListener('webkitTransitionEnd', handleTransitionEnd)
   setTimeout(function () {
     toastWin.classList.remove('hide')
-  }, 0)
+  }, 16)
 }
 
 function hideToastWindow (callback) {
@@ -56,7 +56,7 @@ function hideToastWindow (callback) {
   toastWin.addEventListener('webkitTransitionEnd', handleTransitionEnd)
   setTimeout(function () {
     toastWin.classList.add('hide')
-  }, 0)
+  }, 16)
 }
 
 export default {
