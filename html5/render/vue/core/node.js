@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { extend, isArray } from '../utils'
+import { isArray, createEvent } from '../utils'
 
 /**
  * remove text nodes in the nodes array.
@@ -116,10 +116,7 @@ export function createEventMap (context, ...extras) {
                 }
                 let evt = e
                 if (originalType && evtName !== listenTo) {
-                  evt = extend({}, { type: listenTo })
-                  // weex didn't provide these two methods for event object.
-                  delete event.preventDefault
-                  delete event.stopPropagation
+                  evt = createEvent(e.target, listenTo)
                 }
                 on && on.call(vm, evt)
                 idx++
@@ -178,6 +175,8 @@ export function createEventMap (context, ...extras) {
    * we already use tap to trigger click event, so the click event should:
    * 1. trigger none of any vm's click listeners.
    * 2. prevent default behaviour for a `<a>` element.
+   * 3. stop propagation if triggered already.
+   * 4. set a _triggered flag to the event object if triggered already.
    * This means the click event should always be swallowed in silence.
    */
   bindFunc('click')(function (e) {
@@ -188,10 +187,10 @@ export function createEventMap (context, ...extras) {
     while (vm) {
       const ons = getListeners(vm.$vnode, 'click')
       const len = ons.length
-      if (len > 0 && vm.$el && isInANode(vm.$el)) {
-        e.preventDefault()
+      if (len > 0 && vm.$el) {
+        e.stopPropagation()
         e._triggered = { el: vm.$el }
-        return
+        return isInANode(vm.$el) && e.preventDefault()
       }
       vm = vm.$parent
     }
