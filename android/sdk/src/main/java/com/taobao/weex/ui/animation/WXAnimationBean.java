@@ -54,7 +54,7 @@ public class WXAnimationBean {
   public long delay;
   public long duration;
   public String timingFunction;
-  public Style styles;
+  public @Nullable Style styles;
   public boolean needLayout;
 
   public static class Style {
@@ -331,6 +331,18 @@ public class WXAnimationBean {
         cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());
       }
       initHolders();
+    }
+
+    /**
+     * Use this method to init if you already have a list of Property
+     * The key is something like {@link View#TRANSLATION_X} and the value is a {@link Pair},
+     * of which the first is beginning value and the second is ending value.
+     * @param styles a list of Property
+     */
+    public void init(@NonNull Map<Property<View, Float>, Pair<Float, Float>> styles){
+      for(Entry<Property<View, Float>, Pair<Float, Float>> entry:styles.entrySet()){
+        holders.add(PropertyValuesHolder.ofFloat(entry.getKey(), entry.getValue().first, entry.getValue().second));
+      }
     }
 
     private void initHolders(){
