@@ -28,7 +28,7 @@ export default class CallbackManager {
   constructor (instanceId) {
     this.instanceId = instanceId
     this.lastCallbackId = 0
-    this.callbacks = []
+    this.callbacks = {}
   }
   add (callback) {
     this.lastCallbackId++
@@ -37,13 +37,13 @@ export default class CallbackManager {
   }
   remove (callbackId) {
     const callback = this.callbacks[callbackId]
-    this.callbacks[callbackId] = undefined
+    delete this.callbacks[callbackId]
     return callback
   }
   consume (callbackId, data, ifKeepAlive) {
     const callback = this.callbacks[callbackId]
     if (typeof ifKeepAlive === 'undefined' || ifKeepAlive === false) {
-      this.callbacks[callbackId] = undefined
+      delete this.callbacks[callbackId]
     }
     if (typeof callback === 'function') {
       return callback(data)
@@ -51,6 +51,6 @@ export default class CallbackManager {
     return new Error(`invalid callback id "${callbackId}"`)
   }
   close () {
-    this.callbacks = this.callbacks.map(cb => undefined)
+    this.callbacks = {}
   }
 }
