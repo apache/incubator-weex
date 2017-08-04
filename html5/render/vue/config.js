@@ -17,5 +17,14 @@
  * under the License.
  */
 export default {
-  scrollableTypes: ['scroller', 'list', 'waterfall']
+  scrollableTypes: ['scroller', 'list', 'waterfall'],
+  gestureEvents: [
+    'longpress',
+    'panstart',
+    'panmove',
+    'panend',
+    'swipe',
+    'longpress',
+    'tap'
+  ]
 }
