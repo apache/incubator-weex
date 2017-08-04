@@ -280,6 +280,9 @@ public class WXImage extends WXComponent<ImageView> {
             if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
               params.put("success", result);
               params.put("size", size);
+              if(null!=extra){
+                params.put("extra",extra);
+              }
               fireEvent(Constants.Event.ONLOAD, params);
             }
           }
