@@ -219,37 +219,37 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
-    return  callModuleMethod(instanceId, moduleStr, methodStr, args, null);
+    public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
+      return  callModuleMethod(instanceId, moduleStr, methodStr, args, null);
   }
 
-  public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args, JSONObject options) {
-    WXSDKInstance wxsdkInstance = WXSDKManager.getInstance()
-            .getSDKInstance(instanceId);
-    if (wxsdkInstance == null) {
-      return null;
-    }
-
-    if (wxsdkInstance.isNeedValidate()
-            && WXSDKManager.getInstance().getValidateProcessor() != null) {
-      WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
-              .getInstance().getValidateProcessor()
-              .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args, options);
-      if (validateResult == null) {
+    public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args, JSONObject options) {
+      WXSDKInstance wxsdkInstance = WXSDKManager.getInstance()
+              .getSDKInstance(instanceId);
+      if (wxsdkInstance == null) {
         return null;
       }
-      if (validateResult.isSuccess) {
-        return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
-                args);
-      } else {
-        JSONObject validateInfo = validateResult.validateInfo;
-        if (validateInfo != null) {
-          WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
-        }
-        return validateInfo;
+  
+      if (wxsdkInstance.isNeedValidate()
+              && WXSDKManager.getInstance().getValidateProcessor() != null) {
+          WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
+                  .getInstance().getValidateProcessor()
+                  .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args, options);
+          if (validateResult == null) {
+              return null;
+          }
+          if (validateResult.isSuccess) {
+              return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
+                      args);
+          } else {
+              JSONObject validateInfo = validateResult.validateInfo;
+            if (validateInfo != null) {
+              WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
+            }
+              return validateInfo;
+          }
       }
-    }
-    return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+      return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
   }
 
   /**
@@ -329,27 +329,30 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     mJSHandler.removeMessages(what, obj);
   }
 
-  public Object callNativeModule(String instanceId, String module,String method, JSONArray arguments, JSONObject options) {
-    if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
-              .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
+    public Object callNativeModule(String instanceId, String module,String method, JSONArray arguments, JSONObject options) {
+
+        if (WXEnvironment.isApkDebugable()) {
+            mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+                    .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+            WXLogUtils.d(mLodBuilder.substring(0));
+            mLodBuilder.setLength(0);
+        }
+
+        try {
+            if(WXDomModule.WXDOM.equals(module)){
+              WXDomModule dom = getDomModule(instanceId);
+              return dom.callDomMethod(method,arguments);
+            }else {
+              return callModuleMethod(instanceId, module,
+                      method, arguments, options);
+            }
+        } catch (Exception e) {
+            WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+            commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
+        }
+
+        return null;
     }
-    try {
-      if(WXDomModule.WXDOM.equals(module)){
-        WXDomModule dom = getDomModule(instanceId);
-        return dom.callDomMethod(method,arguments);
-      }else {
-        return callModuleMethod(instanceId, module,
-                method, arguments, options);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
-    }
-    return null;
-  }
 
     public Object callNativeComponent(String instanceId, String componentRef, String method, JSONArray arguments, Object options) {
         if (WXEnvironment.isApkDebugable()) {
