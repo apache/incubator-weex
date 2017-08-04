@@ -37,6 +37,7 @@
 + (void)registerComponents:(NSArray *)components;
 
 + (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name;
++ (NSMutableDictionary *)componentSelectorMapsWithName:(NSString *)name;
 
 + (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method;
 
