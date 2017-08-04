@@ -329,6 +329,30 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     mJSHandler.removeMessages(what, obj);
   }
 
+    public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, Object options) {
+
+        if (WXEnvironment.isApkDebugable()) {
+            mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+                    .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+            WXLogUtils.d(mLodBuilder.substring(0));
+            mLodBuilder.setLength(0);
+        }
+
+        try {
+            if(WXDomModule.WXDOM.equals(module)){
+              WXDomModule dom = getDomModule(instanceId);
+              return dom.callDomMethod(method,arguments);
+            }else {
+              return callModuleMethod(instanceId, module,
+                      method, arguments);
+            }
+        } catch (Exception e) {
+            WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+            commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
+        }
+
+    return null;
+  }
     public Object callNativeModule(String instanceId, String module,String method, JSONArray arguments, JSONObject options) {
 
         if (WXEnvironment.isApkDebugable()) {
