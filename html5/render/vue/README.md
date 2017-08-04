@@ -130,7 +130,7 @@ vue: {
 * pack a core sdk for weex-vue-render into `weex-vue-render/dist/index.core.js`.
 * pack modules and components into npm packages, and make them able to install.
 
-#### 0.12.2
+#### 0.12.3
 
 * support component method `image.save` for `<image>` component.
 * distinguish gesture events with the same named events generated elsewhere.
