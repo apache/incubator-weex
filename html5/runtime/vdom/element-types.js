@@ -42,22 +42,11 @@ export function registerElement (type, methods) {
   }
 
   // Init constructor.
-  const XElement = function (props) {
-    Element.call(this, type, props, true)
-  }
-
-  // Init prototype.
-  XElement.prototype = Object.create(Element.prototype)
-  Object.defineProperty(XElement.prototype, 'constructor', {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: Element
-  })
+  class WeexElement extends Element {}
 
   // Add methods to prototype.
   methods.forEach(methodName => {
-    XElement.prototype[methodName] = function (...args) {
+    WeexElement.prototype[methodName] = function (...args) {
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
         return taskCenter.send('component', {
@@ -70,7 +59,7 @@ export function registerElement (type, methods) {
   })
 
   // Add to element type map.
-  elementTypes[type] = XElement
+  elementTypes[type] = WeexElement
 }
 
 /**

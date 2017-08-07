@@ -17,31 +17,27 @@
  * under the License.
  */
 
-/**
- * @fileOverview
- * Virtual-DOM Comment.
- */
-
 import Node from './node'
 import { uniqueId } from './operation'
 
-export default function Comment (value) {
-  this.nodeType = 8
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.type = 'comment'
-  this.value = value
-  this.children = []
-  this.pureChildren = []
-}
+export default class Comment extends Node {
+  constructor (value) {
+    super()
 
-Comment.prototype = Object.create(Node.prototype)
-Comment.prototype.constructor = Comment
+    this.nodeType = 8
+    this.nodeId = uniqueId()
+    this.ref = this.nodeId
+    this.type = 'comment'
+    this.value = value
+    this.children = []
+    this.pureChildren = []
+  }
 
-/**
- * Convert to HTML comment string.
- * @return {stirng} html
- */
-Comment.prototype.toString = function () {
-  return '<!-- ' + this.value + ' -->'
+  /**
+  * Convert to HTML comment string.
+  * @return {stirng} html
+  */
+  toString () {
+    return '<!-- ' + this.value + ' -->'
+  }
 }

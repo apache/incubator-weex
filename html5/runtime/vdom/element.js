@@ -17,12 +17,6 @@
  * under the License.
  */
 
-/**
- * @fileOverview
- * Virtual-DOM Element.
- */
-
-import '../../shared/objectAssign'
 import Node from './node'
 import {
   getDoc,
@@ -35,44 +29,42 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
-import {
-  elementTypes,
-  setElement
-} from './element-types'
+import { elementTypes, setElement } from './element-types'
 import { filterDirective } from './directive'
 
 const DEFAULT_TAG_NAME = 'div'
-const BUBBLE_EVENTS = ['click', 'longpress', 'touchstart', 'touchmove', 'touchend', 'panstart', 'panmove', 'panend', 'horizontalpan', 'verticalpan', 'swipe']
-
-export default function Element (type = DEFAULT_TAG_NAME, props, isExtended) {
-  const XElement = elementTypes[type]
-  if (XElement && !isExtended) {
-    return new XElement(props)
-  }
-  props = props || {}
-  this.nodeType = 1
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.type = type
-  this.attr = props.attr || {}
-  this.style = props.style || {}
-  this.classStyle = props.classStyle || {}
-  this.event = {}
-  this.children = []
-  this.pureChildren = []
-}
-
-Element.prototype = Object.create(Node.prototype)
-Element.prototype.constructor = Element
+const BUBBLE_EVENTS = [
+  'click', 'longpress', 'touchstart', 'touchmove', 'touchend',
+  'panstart', 'panmove', 'panend', 'horizontalpan', 'verticalpan', 'swipe'
+]
 
 function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
 
-setElement(Element)
+export default class Element extends Node {
+  constructor (type = DEFAULT_TAG_NAME, props, isExtended) {
+    super()
 
-Object.assign(Element.prototype, {
+    const WeexElement = elementTypes[type]
+    if (WeexElement && !isExtended) {
+      return new WeexElement(props)
+    }
+
+    props = props || {}
+    this.nodeType = 1
+    this.nodeId = uniqueId()
+    this.ref = this.nodeId
+    this.type = type
+    this.attr = props.attr || {}
+    this.style = props.style || {}
+    this.classStyle = props.classStyle || {}
+    this.event = {}
+    this.children = []
+    this.pureChildren = []
+  }
+
   /**
    * Append a child node.
    * @param {object} node
@@ -115,7 +107,7 @@ Object.assign(Element.prototype, {
         }
       }
     }
-  },
+  }
 
   /**
    * Insert a node before specified node.
@@ -177,7 +169,7 @@ Object.assign(Element.prototype, {
         }
       }
     }
-  },
+  }
 
   /**
    * Insert a node after specified node.
@@ -234,7 +226,7 @@ Object.assign(Element.prototype, {
         }
       }
     }
-  },
+  }
 
   /**
    * Remove a child node, and decide whether it should be destroyed.
@@ -259,7 +251,7 @@ Object.assign(Element.prototype, {
     if (!preserved) {
       node.destroy()
     }
-  },
+  }
 
   /**
    * Clear all child nodes.
@@ -281,7 +273,7 @@ Object.assign(Element.prototype, {
     })
     this.children.length = 0
     this.pureChildren.length = 0
-  },
+  }
 
   /**
    * Set an attribute, and decide whether the task should be send to native.
@@ -304,7 +296,7 @@ Object.assign(Element.prototype, {
         [this.ref, result]
       )
     }
-  },
+  }
 
   /**
    * Set a style property, and decide whether the task should be send to native.
@@ -327,7 +319,7 @@ Object.assign(Element.prototype, {
         [this.ref, result]
       )
     }
-  },
+  }
 
   /**
    * Set style properties from class.
@@ -348,7 +340,7 @@ Object.assign(Element.prototype, {
         [this.ref, this.toStyle()]
       )
     }
-  },
+  }
 
   /**
    * Add an event handler.
@@ -367,7 +359,7 @@ Object.assign(Element.prototype, {
         )
       }
     }
-  },
+  }
 
   /**
    * Remove an event handler.
@@ -385,7 +377,7 @@ Object.assign(Element.prototype, {
         )
       }
     }
-  },
+  }
 
   /**
    * Fire an event manually.
@@ -415,7 +407,7 @@ Object.assign(Element.prototype, {
     }
 
     return result
-  },
+  }
 
   /**
    * Get all styles of current element.
@@ -423,7 +415,7 @@ Object.assign(Element.prototype, {
    */
   toStyle () {
     return Object.assign({}, this.classStyle, this.style)
-  },
+  }
 
   /**
    * Convert current element to JSON like object.
@@ -444,7 +436,7 @@ Object.assign(Element.prototype, {
       result.children = this.pureChildren.map((child) => child.toJSON())
     }
     return result
-  },
+  }
 
   /**
    * Convert to HTML element tag string.
@@ -457,4 +449,6 @@ Object.assign(Element.prototype, {
     this.pureChildren.map((child) => child.toString()).join('') +
     '</' + this.type + '>'
   }
-})
+}
+
+setElement(Element)
