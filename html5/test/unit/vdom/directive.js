@@ -52,7 +52,7 @@ describe('filterDirective', () => {
   })
 
   it('parse object', () => {
-    expect(filterDirective({ key: '[[x]]' })).to.deep.equal({ key: { '@binding': 'x' } })
+    expect(filterDirective({ key: '[[x]]' })).to.deep.equal({ key: { '@binding': 'x' }})
     expect(filterDirective({ a: '[[A]]', b: '[[B]]' })).to.deep.equal({
       a: { '@binding': 'A' },
       b: { '@binding': 'B' }

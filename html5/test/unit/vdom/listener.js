@@ -23,7 +23,7 @@ const { expect } = chai
 chai.use(sinonChai)
 
 import { Document } from '../../../runtime/vdom'
-import Listener from '../../../runtime/listener'
+import Listener from '../../../runtime/bridge/Listener'
 
 describe('dom listener basic', () => {
   it('works with no id', () => {

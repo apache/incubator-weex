@@ -26,7 +26,7 @@ import * as bundle from '../../../../frameworks/legacy/app/bundle'
 import * as register from '../../../../frameworks/legacy/app/register'
 import { removeWeexPrefix } from '../../../../frameworks/legacy/util'
 import { Document } from '../../../../runtime/vdom'
-import Listener from '../../../../runtime/listener'
+import Listener from '../../../../runtime/bridge/Listener'
 
 describe('parsing a bundle file', () => {
   const componentTemplate = {

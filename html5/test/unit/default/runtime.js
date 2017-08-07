@@ -27,7 +27,7 @@ chai.use(sinonChai)
 import runtime from '../../../runtime'
 import frameworks from '../../../frameworks'
 import defaultConfig from '../../../frameworks/legacy/config'
-import { init as resetTaskHandler } from '../../../runtime/task-center'
+import { init as resetTaskHandler } from '../../../runtime/bridge/TaskCenter'
 
 const { init, config } = runtime
 config.frameworks = frameworks
