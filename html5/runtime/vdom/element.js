@@ -29,7 +29,7 @@ import {
   removeIndex
 } from './operation'
 import { uniqueId } from '../utils'
-import { elementTypes, setElement } from './element-types'
+import { getWeexElement, setElement } from './WeexElement'
 import { filterDirective } from './directive'
 
 const DEFAULT_TAG_NAME = 'div'
@@ -47,7 +47,7 @@ export default class Element extends Node {
   constructor (type = DEFAULT_TAG_NAME, props, isExtended) {
     super()
 
-    const WeexElement = elementTypes[type]
+    const WeexElement = getWeexElement(type)
     if (WeexElement && !isExtended) {
       return new WeexElement(props)
     }

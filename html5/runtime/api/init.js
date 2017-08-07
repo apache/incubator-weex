@@ -17,7 +17,7 @@
  * under the License.
  */
 import { init as initTaskHandler } from '../bridge/TaskCenter'
-import { registerElement } from '../vdom/element-types'
+import { registerElement } from '../vdom/WeexElement'
 import { services, register, unregister } from './service'
 
 let frameworks

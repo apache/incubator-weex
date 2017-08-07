@@ -28,7 +28,7 @@ export function setElement (El) {
  * A map which stores all type of elements.
  * @type {Object}
  */
-export const elementTypes = {}
+const registeredElements = {}
 
 /**
  * Register an extended element type with component methods.
@@ -59,14 +59,26 @@ export function registerElement (type, methods) {
   })
 
   // Add to element type map.
-  elementTypes[type] = WeexElement
+  registeredElements[type] = WeexElement
+}
+
+export function unregisterElement (type) {
+  delete registeredElements[type]
+}
+
+export function getWeexElement (type) {
+  return registeredElements[type]
+}
+
+export function isWeexElement (type) {
+  return !!registeredElements[type]
 }
 
 /**
  * Clear all element types. Only for testing.
  */
-export function clearElementTypes () {
-  for (const type in elementTypes) {
-    delete elementTypes[type]
+export function clearWeexElements () {
+  for (const type in registeredElements) {
+    unregisterElement(type)
   }
 }

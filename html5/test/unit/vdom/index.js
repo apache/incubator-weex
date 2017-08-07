@@ -26,9 +26,9 @@ import {
   Document,
   Element,
   Comment,
-  elementTypes,
+  isWeexElement,
   registerElement,
-  clearElementTypes
+  clearWeexElements
 } from '../../../runtime/vdom'
 
 describe('document constructor', () => {
@@ -51,11 +51,11 @@ describe('component methods management', () => {
   })
 
   after(() => {
-    clearElementTypes()
+    clearWeexElements()
   })
 
   it('has registered element types', () => {
-    expect(Object.keys(elementTypes)).eql(['x'])
+    expect(isWeexElement('x')).to.be.true
   })
 
   it('will call component method', () => {
