@@ -19,7 +19,6 @@
 export default {
   scrollableTypes: ['scroller', 'list', 'waterfall'],
   gestureEvents: [
-    'longpress',
     'panstart',
     'panmove',
     'panend',
