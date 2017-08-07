@@ -20,6 +20,7 @@ package com.taobao.weex.dom.action;
 
 import android.util.Log;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
@@ -33,6 +34,7 @@ import com.taobao.weex.dom.RenderActionContext;
  */
 
 final class ReloadPageAction implements DOMAction, RenderAction {
+  private final String TAG = "ReloadPageAction";
   private String mInstanceId;
 
   ReloadPageAction(String instanceId) {
@@ -45,11 +47,16 @@ final class ReloadPageAction implements DOMAction, RenderAction {
         return;
       }
       // context.postRenderTask(this);
-//
+
     WXSDKInstance instance = context.getInstance();
     if (instance != null) {
+      if (WXEnvironment.isApkDebugable()) {
+         Log.e(TAG, "ReloadPageAction executeDom reloadPage");
+      }
          // instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
          instance.reloadPage();
+    } else {
+      Log.e(TAG, "ReloadPageAction executeDom reloadPage instance is null");
     }
   }
 
