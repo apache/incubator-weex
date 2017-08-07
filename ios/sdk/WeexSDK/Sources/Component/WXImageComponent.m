@@ -27,6 +27,7 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXRoundedRect.h"
 #import "UIBezierPath+Weex.h"
+#import "WXSDKEngine.h"
 
 @interface WXImageView : UIImageView
 
@@ -215,6 +216,11 @@ WX_EXPORT_METHOD(@selector(save:))
     [self configFilter:styles];
 }
 
+- (void)dealloc
+{
+    [self cancelImage];
+}
+
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
@@ -310,21 +316,23 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     __weak typeof(self) weakSelf = self;
     dispatch_async(WXImageUpdateQueue, ^{
-        [self cancelImage];
+         __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf cancelImage];
        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
             weakSelf.imageDownloadFinish = YES;
             WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
         };
         
-        [self updatePlaceHolderWithFailedBlock:downloadFailed];
-        [self updateContentImageWithFailedBlock:downloadFailed];
+        [strongSelf updatePlaceHolderWithFailedBlock:downloadFailed];
+        [strongSelf updateContentImageWithFailedBlock:downloadFailed];
         
-        if (!weakSelf.imageSrc && !weakSelf.placeholdSrc) {
+        if (!strongSelf.imageSrc && !strongSelf.placeholdSrc) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.layer.contents = nil;
-                weakSelf.imageDownloadFinish = YES;
-                [weakSelf readyToRender];
+               
+                strongSelf.layer.contents = nil;
+                strongSelf.imageDownloadFinish = YES;
+                [strongSelf readyToRender];
             });
         }
     });
@@ -348,7 +356,7 @@ WX_EXPORT_METHOD(@selector(save:))
                     downloadFailedBlock(placeholderSrc,error);
                     if ([strongSelf isViewLoaded] && !viewImage) {
                         ((UIImageView *)(strongSelf.view)).image = nil;
-                        [self readyToRender];
+                        [strongSelf readyToRender];
                     }
                     return;
                 }
@@ -358,11 +366,11 @@ WX_EXPORT_METHOD(@selector(save:))
                 
                 if ([strongSelf isViewLoaded] && !viewImage) {
                     ((UIImageView *)strongSelf.view).image = image;
-                    weakSelf.imageDownloadFinish = YES;
-                    [self readyToRender];
+                    strongSelf.imageDownloadFinish = YES;
+                    [strongSelf readyToRender];
                 } else if (strongSelf->_isCompositingChild) {
                     strongSelf->_image = image;
-                    weakSelf.imageDownloadFinish = YES;
+                    strongSelf.imageDownloadFinish = YES;
                 }
             });
         }];

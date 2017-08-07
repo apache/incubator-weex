@@ -58,6 +58,11 @@ body > .weex-waterfall {
   overflow-y: hidden;
 }
 
+.weex-scroller-wrapper.weex-scroller-disabled {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
 .weex-scroller-horizontal .weex-scroller-inner {
   -webkit-flex-direction: row;
       -ms-flex-direction: row;
