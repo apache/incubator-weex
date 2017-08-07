@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import CallbackManager from './callback-manager'
-import Element from './vdom/element'
-import { typof, normalizePrimitive } from './normalize'
+import CallbackManager from './CallbackManager'
+import Element from '../vdom/Element'
+import { typof } from '../utils'
+import { normalizePrimitive } from './normalize'
 
 let fallback = function () {}
 

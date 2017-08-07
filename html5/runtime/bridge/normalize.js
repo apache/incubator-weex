@@ -1,7 +1,4 @@
-export function typof (v) {
-  const s = Object.prototype.toString.call(v)
-  return s.substring(8, s.length - 1)
-}
+import { typof } from '../utils'
 
 export function bufferToBase64 (buffer) {
   if (typeof btoa !== 'function') {

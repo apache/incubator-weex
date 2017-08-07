@@ -17,11 +17,11 @@
  * under the License.
  */
 
-import Comment from './comment'
-import Element from './element'
-import Listener from '../listener'
-import { TaskCenter } from '../task-center'
-import { createHandler } from '../handler'
+import Comment from './Comment'
+import Element from './Element'
+import Listener from '../bridge/Listener'
+import { TaskCenter } from '../bridge/TaskCenter'
+import { createHandler } from '../bridge/Handler'
 import { addDoc, removeDoc, appendBody, setBody } from './operation'
 
 /**

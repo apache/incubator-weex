@@ -1,7 +1,4 @@
-function typof (v) {
-  const s = Object.prototype.toString.call(v)
-  return s.substring(8, s.length - 1)
-}
+import { typof } from '../utils'
 
 // match the binding delimiter
 const delimiterRE = /\[\[((?:.|\n)+?)\]\]/g

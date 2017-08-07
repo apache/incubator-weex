@@ -17,11 +17,10 @@
  * under the License.
  */
 
-import Node from './node'
+import Node from './Node'
 import {
   getDoc,
   getTaskCenter,
-  uniqueId,
   linkParent,
   nextElement,
   previousElement,
@@ -29,6 +28,7 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
+import { uniqueId } from '../utils'
 import { elementTypes, setElement } from './element-types'
 import { filterDirective } from './directive'
 

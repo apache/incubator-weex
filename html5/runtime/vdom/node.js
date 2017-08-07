@@ -17,7 +17,8 @@
  * under the License.
  */
 
-import { getDoc, uniqueId } from './operation'
+import { uniqueId } from '../utils'
+import { getDoc } from './operation'
 
 export default class Node {
   constructor () {

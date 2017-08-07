@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import Node from './node'
-import Element from './element'
-import Comment from './comment'
-import Document from './document'
+import Node from './Node'
+import Element from './Element'
+import Comment from './Comment'
+import Document from './Document'
 
 export {
   elementTypes,

@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import Node from './node'
-import { uniqueId } from './operation'
+import Node from './Node'
+import { uniqueId } from '../utils'
 
 export default class Comment extends Node {
   constructor (value) {

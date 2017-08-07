@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { init as initTaskHandler } from './task-center'
-import { registerElement } from './vdom/element-types'
+import { init as initTaskHandler } from '../bridge/TaskCenter'
+import { registerElement } from '../vdom/element-types'
 import { services, register, unregister } from './service'
 
 let frameworks
