@@ -27,14 +27,6 @@ export function init (cfg) {
   config.sendTasks = cfg.sendTasks
 }
 
-export function registerComponents (components) {}
-
-export function registerModules (modules) {}
-
-export function registerMethods (apis) {}
-
-export function prepareInstance (id, options, data) {}
-
 export function createInstance (id, code, options = {}, data = {}, serviceObjects = {}) {
   const document = new config.Document(id, options.bundleUrl)
   const callbacks = {}
@@ -59,8 +51,9 @@ export function createInstance (id, code, options = {}, data = {}, serviceObject
     Document: config.Document,
     Element: config.Element,
     Comment: config.Comment,
-    sendTasks: (...args) => config.sendTasks(id, ...args),
-    options, document
+    sendTasks: tasks => config.sendTasks(id, tasks, -1),
+    options,
+    document
   }, serviceObjects)
 
   const globalKeys = []
@@ -78,8 +71,6 @@ export function createInstance (id, code, options = {}, data = {}, serviceObject
 
   return instance
 }
-
-export function refreshInstance (id, data) {}
 
 export function destroyInstance (id) {
   delete instanceMap[id]
