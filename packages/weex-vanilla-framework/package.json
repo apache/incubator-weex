@@ -2,7 +2,7 @@
   "name": "weex-vanilla-framework",
   "main": "index.js",
   "description": "Weex Vanilla Framework",
-  "version": "0.21.2",
+  "version": "0.21.7",
   "engines": {
     "node": ">=4"
   },
