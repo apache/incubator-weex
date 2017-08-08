@@ -3,7 +3,7 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.21.6",
+    "framework": "0.21.7",
     "vue-render": "0.12.1",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -110,6 +110,7 @@
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
+    "@weex-project/weex-picker": "^0.2.4",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",

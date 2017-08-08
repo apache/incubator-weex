@@ -20,6 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WXResourceResponse : NSURLResponse
+@interface WXResourceResponse : NSHTTPURLResponse
 
 @end
