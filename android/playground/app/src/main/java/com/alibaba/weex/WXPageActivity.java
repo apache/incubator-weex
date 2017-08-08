@@ -149,6 +149,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       loadWXfromLocal(false);
     }
     mInstance.onActivityCreate();
+    Log.e("WXPageActivity", "registerBroadcastReceiver WXPageActivity reload");
     registerBroadcastReceiver();
 
     mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
@@ -575,13 +576,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     @Override
     public void onReceive(Context context, Intent intent) {
       if (IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+        Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH");
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
             String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
             String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
+            Log.e("WXPageActivity", "loadWXfromService reload url");
             loadWXfromService(url);
           } else {
+            Log.e("WXPageActivity", "loadWXfromLocal reload from local");
             loadWXfromLocal(true);
           }
         }
