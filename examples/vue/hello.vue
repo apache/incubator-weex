@@ -41,7 +41,7 @@
         this.target = 'Weex'
         console.log('target:', this.target)
         var dict = extendCallNative({
-          'className':'WXExtendCallNativeTest'
+          'className':'test'
         })
         modal.toast({
           'message': dict['value'],

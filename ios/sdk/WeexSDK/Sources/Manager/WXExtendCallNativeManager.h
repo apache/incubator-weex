@@ -10,6 +10,7 @@
 
 @interface WXExtendCallNativeManager : NSObject
 
-+(id)sendExtendCallNativeEvent:(NSDictionary *)parameters;
-
++ (id)sendExtendCallNativeEvent:(NSDictionary *)parameters;
++ (void)registerExtendCallNative:(NSString *)name withClass:(Class)clazz;
++ (Class)classWithComponentName:(NSString *)name;
 @end
