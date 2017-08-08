@@ -50,9 +50,6 @@ final class ReloadPageAction implements DOMAction, RenderAction {
 
     WXSDKInstance instance = context.getInstance();
     if (instance != null) {
-      //if (WXEnvironment.isApkDebugable()) {
-         Log.e(TAG, "ReloadPageAction executeDom reloadPage");
-      //}
          // instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
          instance.reloadPage();
     } else {

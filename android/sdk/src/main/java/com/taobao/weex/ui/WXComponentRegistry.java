@@ -104,7 +104,6 @@ public class WXComponentRegistry {
         }
       }
     });
-    Log.e("WXComponentRegistry", "WXComponentRegistry reload");
   }
 
 }

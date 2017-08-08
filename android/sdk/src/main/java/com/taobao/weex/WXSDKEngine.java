@@ -520,10 +520,10 @@ public class WXSDKEngine {
     }
   }
   public static void reload(final Context context,String framework, boolean remoteDebug) {
-    Log.e("weex", "WXSDKEngine reload remoteDebug:" + remoteDebug);
     WXEnvironment.sRemoteDebugMode = remoteDebug;
-    WXBridgeManager.getInstance().restart();
     WXBridgeManager.getInstance().initScriptsFramework(framework);
+    WXBridgeManager.getInstance().restart();
+
     WXModuleManager.reload();
     WXComponentRegistry.reload();
     WXSDKManager.getInstance().postOnUiThread(new Runnable() {

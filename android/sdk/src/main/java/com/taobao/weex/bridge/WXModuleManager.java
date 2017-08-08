@@ -409,7 +409,6 @@ public class WXModuleManager {
         registerJSModule(entry.getKey(), entry.getValue());
       }
     }
-    Log.e("WXModuleManager", "WXModuleManager reload");
   }
 
 }
