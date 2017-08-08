@@ -16,10 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.common;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-#import <Foundation/Foundation.h>
+/**
+ * Class for managing work thread
+ */
+public final class WXWorkThreadManager {
 
-@interface WXResourceResponse : NSHTTPURLResponse
+  private ExecutorService singleThreadExecutor;
 
-@end
+  public WXWorkThreadManager() {
+    singleThreadExecutor = Executors.newSingleThreadExecutor();
+  }
+
+  public void post(Runnable task) {
+    if (singleThreadExecutor != null)
+      singleThreadExecutor.execute(task);
+  }
+
+  /**
+   * Destroy current instance
+   */
+  public void destroy() {
+    if (singleThreadExecutor != null)
+      singleThreadExecutor.shutdown();
+    singleThreadExecutor = null;
+  }
+}

@@ -81,6 +81,8 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 
 #define WX_COMPONENT_NOTIFICATION_VIEW_LOADED    @"WXComponentViewLoaded"
 
+#define WX_SDKINSTANCE_WILL_RENDER    @"WXSDKInstanceWillRender"
+
 #define WX_COMPONENT_THREAD_NAME @"com.taobao.weex.component"
 
 #define WX_BRIDGE_THREAD_NAME @"com.taobao.weex.bridge"

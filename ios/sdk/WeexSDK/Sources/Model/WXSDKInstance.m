@@ -199,6 +199,7 @@ typedef enum : NSUInteger {
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
     
     [self _handleConfigCenter];
     
