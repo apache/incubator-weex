@@ -589,12 +589,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void reloadPage() {
     WXSDKEngine.reload();
+
     // 可以发送广播吗？
     Intent intent = new Intent();
     intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
     intent.putExtra("url", mBundleUrl);
+    Log.e("WXSDKInstance", "WXSDKInstance reloadPage send IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH broadcase mBundleUrl:" + mBundleUrl);
     mContext.sendBroadcast(intent);
-    Log.e("WXSDKInstance", "WXSDKInstance reloadPage send IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH broadcase");
+
     // mRendered = false;
     //    destroy();
     // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
