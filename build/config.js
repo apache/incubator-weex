@@ -64,10 +64,23 @@ const configs = {
     ]
   },
   'weex-legacy-framework': {
-    moduleName: 'WeexVanillaFramework',
+    moduleName: 'WeexLegacyFramework',
     entry: absolute('html5/frameworks/legacy/index.js'),
     dest: absolute('packages/weex-legacy-framework/index.js'),
     banner: `/* 'WEEX VANILLA FRAMEWORK ${subversion.framework}, Build ${now()}. */\n`,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
+  'weex-vanilla-framework': {
+    moduleName: 'WeexVanillaFramework',
+    entry: absolute('html5/frameworks/vanilla/index.js'),
+    dest: absolute('packages/weex-vanilla-framework/index.js'),
+    banner: `/* 'Weex Vanilla Framework ${subversion.framework}, Build ${now()}. */\n`,
     format: 'umd',
     plugins: [
       nodeResolve({
