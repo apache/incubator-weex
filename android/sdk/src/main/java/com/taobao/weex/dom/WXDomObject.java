@@ -630,12 +630,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance) {
       return parse(json, wxsdkInstance, null);
   }
-  
-  /**
-   * Parse the jsonObject to {@link WXDomObject} recursively
-   * @param json the original JSONObject
-   * @return Dom Object corresponding to the JSONObject.
-   */
+
   public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance, WXDomObject parentDomObject){
       if (json == null || json.size() <= 0) {
         return null;
@@ -673,6 +668,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       domObject.parseFromJson(json);
       domObject.mDomContext = wxsdkInstance;
       domObject.parent = parentDomObject;
+
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {
         JSONArray childrenArray = (JSONArray) children;

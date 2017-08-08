@@ -229,7 +229,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       if (wxsdkInstance == null) {
         return null;
       }
-  
       if (wxsdkInstance.isNeedValidate()
               && WXSDKManager.getInstance().getValidateProcessor() != null) {
           WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
@@ -351,8 +350,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
             commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
         }
 
-    return null;
-  }
+        return null;
+    }
     public Object callNativeModule(String instanceId, String module,String method, JSONArray arguments, JSONObject options) {
 
         if (WXEnvironment.isApkDebugable()) {
