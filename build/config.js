@@ -37,7 +37,7 @@ const configs = {
   'weex-js-framework': {
     moduleName: 'Weex',
     entry: absolute('html5/render/native/index.js'),
-    dest: absolute('dist/native.js'),
+    dest: absolute('packages/weex-js-framework/index.js'),
     banner: `(this.nativeLog || function(s) {console.log(s)})`
       + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}.');\n`
       + frameworkBanner,
@@ -52,9 +52,22 @@ const configs = {
   'weex-js-runtime': {
     moduleName: 'WeexRuntime',
     entry: absolute('html5/runtime/index.js'),
-    dest: absolute('dist/runtime.js'),
+    dest: absolute('packages/weex-js-runtime/index.js'),
     banner: `/* 'WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
       + frameworkBanner,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
+  'weex-legacy-framework': {
+    moduleName: 'WeexVanillaFramework',
+    entry: absolute('html5/frameworks/legacy/index.js'),
+    dest: absolute('packages/weex-legacy-framework/index.js'),
+    banner: `/* 'WEEX VANILLA FRAMEWORK ${subversion.framework}, Build ${now()}. */\n`,
     format: 'umd',
     plugins: [
       nodeResolve({
