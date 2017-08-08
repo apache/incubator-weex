@@ -21,6 +21,7 @@ package com.taobao.weex.bridge;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
@@ -408,6 +409,7 @@ public class WXModuleManager {
         registerJSModule(entry.getKey(), entry.getValue());
       }
     }
+    Log.e("WXModuleManager", "WXModuleManager reload");
   }
 
 }

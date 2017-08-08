@@ -220,8 +220,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
     }
     if (remoteDebug && mWxDebugProxy != null) {
+      Log.e("WXBridgeManager", "initWXBridge mWxDebugProxy not null use mWxDebugProxy.getWXBridge reload");
       mWXBridge = mWxDebugProxy.getWXBridge();
     } else {
+      Log.e("WXBridgeManager", "initWXBridge use new WXBridge reload");
       mWXBridge = new WXBridge();
     }
   }
@@ -1481,16 +1483,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
           commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, "success");
+          Log.e("WXBridgeManager", "initFramework reload success");
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
           String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
+          Log.e("WXBridgeManager", "initFramework reload failed");
           commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
         String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
+        Log.e("WXBridgeManager", "initFramework reload failed and exception:" + e.toString());
         commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
       }
+
     }
   }
 
