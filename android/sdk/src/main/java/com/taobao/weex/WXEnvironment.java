@@ -186,28 +186,28 @@ public class WXEnvironment {
   }
 
   public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
-    }
-
-    if (isPerf) {
-      return false;
-    }
-
-    if (!isApkDebug) {
-      return false;
-    }
-    try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
-    }
-    return false;
+//    if (sApplication == null) {
+//      return false;
+//    }
+//
+//    if (isPerf) {
+//      return false;
+//    }
+//
+//    if (!isApkDebug) {
+//      return false;
+//    }
+//    try {
+//      ApplicationInfo info = sApplication.getApplicationInfo();
+//      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+//      return isApkDebug;
+//    } catch (Exception e) {
+//      /**
+//       * Don't call WXLogUtils.e here,will cause stackoverflow
+//       */
+//      e.printStackTrace();
+//    }
+    return true;
   }
 
   public static boolean isPerf() {
