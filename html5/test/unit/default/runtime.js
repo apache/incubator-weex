@@ -193,7 +193,7 @@ describe('framework entry', () => {
       expect(frameworks.xxx.createInstance.firstCall.args.slice(0, 4)).eql([
         instanceId + '~',
         code,
-        { bundleVersion: '0.3.1', env: {}},
+        { env: {}},
         undefined
       ])
 
@@ -216,7 +216,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.firstCall.args.slice(0, 4)).eql([
         instanceId + '~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { env: {}},
         undefined
       ])
 
@@ -237,7 +237,7 @@ describe('framework entry', () => {
       expect(frameworks.yyy.createInstance.firstCall.args.slice(0, 4)).eql([
         instanceId + '~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { env: {}},
         undefined
       ])
 
@@ -250,7 +250,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.secondCall.args.slice(0, 4)).eql([
         instanceId + '~~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { env: {}},
         undefined
       ])
 
@@ -263,7 +263,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.thirdCall.args.slice(0, 4)).eql([
         instanceId + '~~~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { env: {}},
         undefined
       ])
 
