@@ -436,15 +436,34 @@
 
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    if (isUpdateStyles) {
-        pthread_mutex_lock(&_propertyMutex);
-        [_styles addEntriesFromDictionary:styles];
-        pthread_mutex_unlock(&_propertyMutex);
+    
+    //根据当前的style是否含有transitionProperty属性来判断是否有Layout Animation
+    if (_styles[@"transitionProperty"]) {
+        [self _handleLayoutAnimationWithStyles:styles];
     }
-    styles = [self parseStyles:styles];
-    [self _updateCSSNodeStyles:styles];
+    else//如果没有动画属性标明 直接触发layout
+    {
+        styles = [self parseStyles:styles];
+        [self _updateCSSNodeStyles:styles];
+    }
+    
+    if (isUpdateStyles) {
+        [self _modifyStyles:styles];
+    }//修改_style
+    
     [self _resetCSSNodeStyles:resetStyles];
 }
+
+- (void)_modifyStyles:(NSDictionary *)styles //主要目的是来更新_style
+{
+    pthread_mutex_lock(&_propertyMutex);
+    [_styles addEntriesFromDictionary:styles];
+    pthread_mutex_unlock(&_propertyMutex);
+}
+
+
+
+
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
 {
@@ -650,4 +669,6 @@
 }
 
 @end
+@implementation WXLayoutAnimationInfo
 
+@end

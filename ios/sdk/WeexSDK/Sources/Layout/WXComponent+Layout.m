@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#define SOLVE_EPS(dur) (1. / (1000. * (dur)))
+
+
 #import "WXComponent+Layout.h"
 #import "WXComponent_internal.h"
 #import "WXTransform.h"
@@ -111,6 +114,211 @@
     }
     return (int)(count);
 }
+
+
+#pragma mark LayoutAnimationDisplayLink
+- (void)_startLayoutAnimationDisplayLink
+{
+    WXAssertComponentThread();
+    if (!_layoutAnimationDisplayLink) {
+        _layoutAnimationDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(_handleLayoutAnimationDisplayLink)];
+        [_layoutAnimationDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    }
+    else{
+        [self _awakeLayoutAnimationDisplayLink];
+    }
+    
+}
+
+- (void)_stopLayoutAnimationDisplayLink
+{
+    WXAssertComponentThread();
+    if (_layoutAnimationDisplayLink) {
+        [_layoutAnimationDisplayLink invalidate];
+        _layoutAnimationDisplayLink = nil;
+    }
+}
+
+- (void)_suspendLayoutAnimationDisplayLink
+{
+    WXAssertComponentThread();
+    if(_layoutAnimationDisplayLink && !_layoutAnimationDisplayLink.paused)
+    {
+        _layoutAnimationDisplayLink.paused = YES;
+    }
+}
+
+
+- (void)_awakeLayoutAnimationDisplayLink
+{
+    WXAssertComponentThread();
+    if (_layoutAnimationDisplayLink && _layoutAnimationDisplayLink.paused) {
+        _layoutAnimationDisplayLink.paused = NO;
+    }
+}
+
+- (void)_handleLayoutAnimationDisplayLink
+{
+    WXAssertComponentThread();
+    int count = _layoutAnimationDuration * 60 / 1000;
+    if (_layoutAnimationCount >= count) {
+        [self _suspendLayoutAnimationDisplayLink];
+        [self _resetProcessAnimationParameter];
+        return;
+    }
+    else
+    {
+        [self _calculateLayoutAnimationProcessingStyle];
+    }
+    _layoutAnimationCount ++;
+}
+
+
+- (void)_resetProcessAnimationParameter
+{
+    
+    _layoutAnimationCount = 0;
+    _layoutAnimationDuration = 0;
+    _widthInfo = nil;
+    _heightInfo = nil;
+    _leftInfo = nil;
+    _rightInfo = nil;
+    _topInfo = nil;
+    _bottomInfo = nil;
+}
+
+- (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles
+{
+    [self _suspendLayoutAnimationDisplayLink];
+    
+    if (!_addStyles) {
+        _fromStyles = [NSMutableDictionary dictionaryWithDictionary:self.styles];
+        _addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
+    }
+    else
+    {
+        [_addStyles addEntriesFromDictionary:styles];
+    }//保证_addStyles是唯一的
+    
+    _toStyles = [NSMutableDictionary dictionaryWithDictionary:_fromStyles];
+    [_toStyles addEntriesFromDictionary:_addStyles];
+    
+    _layoutAnimationDuration = _fromStyles[@"transitionDuration"] ? [WXConvert CGFloat:_fromStyles[@"transitionDuration"]] : 0;
+    _layoutAnimationDelay = _fromStyles[@"transitionDelay"] ? [WXConvert CGFloat:_fromStyles[@"transitionDelay"]] : 0;
+    _layoutAnimationTimingFunction = [WXConvert CAMediaTimingFunction:_fromStyles[@"transitionTimingFunction"]];
+    
+    
+    if (_layoutAnimationDuration == 0) {
+        [self _fillCSSNode:styles];
+        return;//如果duration为零直接关闭动画效果
+    }
+    
+    if (![[NSString stringWithFormat:@"%@",_layoutAnimationTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+        float vec[4] = {0.};
+        [_layoutAnimationTimingFunction getControlPointAtIndex:1 values:&vec[0]];
+        [_layoutAnimationTimingFunction getControlPointAtIndex:2 values:&vec[2]];
+        [self unitBezierp1x:vec[0] p1y:vec[1] p2x:vec[2] p2y:vec[3]];
+    }
+    
+    
+    NSString *layoutAnimationProperty = _fromStyles[@"transitionProperty"];
+    if ([layoutAnimationProperty containsString:@"width"]) {
+        _widthInfo = [WXLayoutAnimationInfo new];
+        _widthInfo.isAnimated = YES;
+        _widthInfo.fromValue = @(_fromStyles[@"width"] ? [WXConvert CGFloat:_fromStyles[@"width" ]] : 0);
+        _widthInfo.toValue = @(_toStyles[@"width"] ? [WXConvert CGFloat:_toStyles[@"width"]] : 0 );
+        _widthInfo.perValue = @([_widthInfo.toValue doubleValue] - [_widthInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"height"])
+    {
+        _heightInfo = [WXLayoutAnimationInfo new];
+        _heightInfo.isAnimated = YES;
+        _heightInfo.fromValue = @(_fromStyles[@"height"] ? [WXConvert CGFloat:_fromStyles[@"height" ]] : 0);
+        _heightInfo.toValue = @(_toStyles[@"height"] ? [WXConvert CGFloat:_toStyles[@"height"]] : 0 );
+        _heightInfo.perValue = @([_heightInfo.toValue doubleValue] - [_heightInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"left"])
+    {
+        _leftInfo = [WXLayoutAnimationInfo new];
+        _leftInfo.isAnimated = YES;
+        _leftInfo.fromValue = @(_fromStyles[@"left"] ? [WXConvert CGFloat:_fromStyles[@"left" ]] : 0);
+        _leftInfo.toValue = @(_toStyles[@"left"] ? [WXConvert CGFloat:_toStyles[@"left"]] : 0 );
+        _leftInfo.perValue = @([_leftInfo.toValue doubleValue] - [_leftInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"right"])
+    {
+        _rightInfo = [WXLayoutAnimationInfo new];
+        _rightInfo.isAnimated = YES;
+        _rightInfo.fromValue = @(_fromStyles[@"right"] ? [WXConvert CGFloat:_fromStyles[@"right" ]] : 0);
+        _rightInfo.toValue = @(_toStyles[@"right"] ? [WXConvert CGFloat:_toStyles[@"right"]] : 0 );
+        _rightInfo.perValue = @([_rightInfo.toValue doubleValue] - [_rightInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"top"])
+    {
+        _topInfo = [WXLayoutAnimationInfo new];
+        _topInfo.isAnimated = YES;
+        _topInfo.fromValue = @(_fromStyles[@"top"] ? [WXConvert CGFloat:_fromStyles[@"top" ]] : 0);
+        _topInfo.toValue = @(_toStyles[@"top"] ? [WXConvert CGFloat:_toStyles[@"top"]] : 0 );
+        _topInfo.perValue = @([_topInfo.toValue doubleValue] - [_topInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"bottom"])
+    {
+        _bottomInfo = [WXLayoutAnimationInfo new];
+        _bottomInfo.isAnimated = YES;
+        _bottomInfo.fromValue = @(_fromStyles[@"bottom"] ? [WXConvert CGFloat:_fromStyles[@"bottom" ]] : 0);
+        _bottomInfo.toValue = @(_toStyles[@"bottom"] ? [WXConvert CGFloat:_toStyles[@"bottom"]] : 0 );
+        _bottomInfo.perValue = @([_widthInfo.toValue doubleValue] - [_bottomInfo.fromValue doubleValue]);
+        
+    }
+    if ([layoutAnimationProperty containsString:@"transform"]) {
+        
+        
+    }
+    
+    
+    [self performSelector:@selector(_startLayoutAnimationDisplayLink) withObject:self afterDelay:_layoutAnimationDelay/1000];
+    //    [self _startLayoutAnimationDisplayLink];
+    
+}
+
+
+- (void)_calculateLayoutAnimationProcessingStyle
+{
+    //linear 在做贝塞尔曲线模型
+    double per = 1000 * (_layoutAnimationCount + 1 ) / (60 * _layoutAnimationDuration);//linear
+    if (![[NSString stringWithFormat:@"%@",_layoutAnimationTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+        per = [self solveWithx:((_layoutAnimationCount+2)*16)/_layoutAnimationDuration epsilon:SOLVE_EPS(_layoutAnimationDuration)];
+    }
+    
+    double currentWidth = [_widthInfo.fromValue doubleValue] + [_widthInfo.perValue doubleValue] * per;
+    double currentHeight = [_heightInfo.fromValue doubleValue] + [_heightInfo.perValue doubleValue] * per;
+    double currentLeft = [_leftInfo.fromValue doubleValue] + [_leftInfo.perValue doubleValue] * per;
+    double currentRight = [_rightInfo.fromValue doubleValue] + [_rightInfo.perValue doubleValue] * per;
+    double currentTop = [_topInfo.fromValue doubleValue] + [_topInfo.perValue doubleValue] * per;
+    double currentBottom = [_bottomInfo.fromValue doubleValue] + [_bottomInfo.perValue doubleValue] * per;
+    
+    
+    
+    _widthInfo.isAnimated ? [_fromStyles setObject:@(currentWidth) forKey:@"width"]:0;
+    _heightInfo.isAnimated ? [_fromStyles setObject:@(currentHeight) forKey:@"height"]:0;
+    _leftInfo.isAnimated ? [_fromStyles setObject:@(currentLeft) forKey:@"left"]:0;
+    _rightInfo.isAnimated ? [_fromStyles setObject:@(currentRight) forKey:@"right"]:0;
+    _topInfo.isAnimated ? [_fromStyles setObject:@(currentTop) forKey:@"top"]:0;
+    _bottomInfo.isAnimated ? [_fromStyles setObject:@(currentBottom) forKey:@"bottom"]:0;
+    
+    NSLog(@"%@",_fromStyles);
+    
+    [self _fillCSSNode:_fromStyles];
+    
+}
+
+
+
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
@@ -408,5 +616,78 @@ static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t w
     
     return (css_dim_t){resultSize.width, resultSize.height};
 }
+
+//贝塞尔曲线计算
+- (void)unitBezierp1x:(double)p1x p1y:(double)p1y p2x:(double)p2x p2y:(double)p2y
+{
+    cx = 3.0 * p1x;
+    bx = 3.0 * (p2x - p1x) - cx;
+    ax = 1.0 - cx -bx;
+    
+    cy = 3.0 * p1y;
+    by = 3.0 * (p2y - p1y) - cy;
+    ay = 1.0 - cy - by;
+}
+- (double)sampleCurveX:(double)t
+{
+    return ((ax * t + bx) * t + cx) * t;
+}
+
+- (double)sampleCurveY:(double)t
+{
+    return ((ay * t + by) * t + cy) * t;
+}
+
+- (double)sampleCurveDerivativeX:(double)t
+{
+    return (3.0 * ax * t + 2.0 * bx) * t + cx;
+}
+
+- (double)solveCurveX:(double)x epsilon:(double)epsilon
+{
+    double t0;
+    double t1;
+    double t2;
+    double x2;
+    double d2;
+    int i;
+    
+    for (t2 = x, i = 0; i < 8; i++) {
+        x2 = [self sampleCurveX:t2] - x;
+        if (fabs (x2) < epsilon)
+            return t2;
+        d2 = [self sampleCurveDerivativeX:t2];
+        if (fabs(d2) < 1e-6)
+            break;
+        t2 = t2 - x2 / d2;
+    }
+    t0 = 0.0;
+    t1 = 1.0;
+    t2 = x;
+    
+    if (t2 < t0)
+        return t0;
+    if (t2 > t1)
+        return t1;
+    
+    while (t0 < t1) {
+        x2 = [self sampleCurveX:t2];
+        if (fabs(x2 - x) < epsilon)
+            return t2;
+        if (x > x2)
+            t0 = t2;
+        else
+            t1 = t2;
+        t2 = (t1 - t0) * .5 + t0;
+    }
+    return t2;
+}
+
+- (double)solveWithx:(double)x epsilon:(double)epsilon
+{
+    return [self sampleCurveY:([self solveCurveX:x epsilon:epsilon])];
+}
+
+
 
 @end

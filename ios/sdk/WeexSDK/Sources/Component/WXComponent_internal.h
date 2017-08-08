@@ -23,6 +23,8 @@
 #import "WXTransform.h"
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
+@class WXLayoutAnimationInfo;
+
 
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
@@ -41,6 +43,36 @@
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
+    
+    
+    
+    //LayoutAnimation
+    WXLayoutAnimationInfo *_heightInfo;
+    WXLayoutAnimationInfo *_widthInfo;
+    WXLayoutAnimationInfo *_topInfo;
+    WXLayoutAnimationInfo *_rightInfo;
+    WXLayoutAnimationInfo *_leftInfo;
+    WXLayoutAnimationInfo *_bottomInfo;
+    double ax;
+    double bx;
+    double cx;
+    
+    double ay;
+    double by;
+    double cy;
+    
+    
+    float _layoutAnimationDuration;
+    float _layoutAnimationDelay;
+    CAMediaTimingFunction *_layoutAnimationTimingFunction;
+    NSUInteger _layoutAnimationCount;
+    
+    NSMutableDictionary *_toStyles;
+    NSMutableDictionary *_fromStyles;
+    NSMutableDictionary *_addStyles;
+    CADisplayLink *_layoutAnimationDisplayLink;
+
+    
     
     /**
      *  View
@@ -171,6 +203,11 @@
 /// @name Private Methods
 ///--------------------------------------
 
+- (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles;
+
+- (void)_modifyStyles:(NSDictionary *)styles;
+
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
@@ -214,3 +251,11 @@
 - (void)setGradientLayer;
 
 @end
+
+@interface WXLayoutAnimationInfo : NSObject
+@property (nonatomic, strong) id fromValue;
+@property (nonatomic, strong) id toValue;
+@property (nonatomic, strong) id perValue;
+@property (nonatomic, assign) BOOL isAnimated;
+@end
+
