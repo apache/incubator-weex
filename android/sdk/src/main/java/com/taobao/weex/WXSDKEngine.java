@@ -521,8 +521,8 @@ public class WXSDKEngine {
   }
   public static void reload(final Context context,String framework, boolean remoteDebug) {
     WXEnvironment.sRemoteDebugMode = remoteDebug;
-    WXBridgeManager.getInstance().initScriptsFramework(framework);
     WXBridgeManager.getInstance().restart();
+    WXBridgeManager.getInstance().initScriptsFramework(framework);
 
     WXModuleManager.reload();
     WXComponentRegistry.reload();
