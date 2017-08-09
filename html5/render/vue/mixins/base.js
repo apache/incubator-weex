@@ -19,6 +19,8 @@
 import {
   getThrottleLazyload,
   watchAppear,
+  triggerAppear,
+  triggerDisappear,
   extend
 } from '../utils'
 
@@ -35,7 +37,7 @@ import {
 
 // import { extractComponentStyle } from '../core'
 
-const scrollableTypes = ['scroller', 'list']
+// import config from '../config'
 
 let lazyloadWatched = false
 function watchLazyload () {
@@ -98,7 +100,7 @@ export default {
     if (this.$el && (i = j = this.$vnode) && (i = i.data) && (j = j.componentOptions)) {
       this.$el.attrs = extend({}, i.attrs, j.propsData)
     }
-
+    triggerAppear(this)
     watchAppear(this)
   },
 
@@ -112,7 +114,10 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
-    watchAppear(this)
+  },
+
+  destroyed () {
+    triggerDisappear(this)
   },
 
   methods: {
@@ -134,19 +139,19 @@ export default {
       return arr
     },
 
-    _getParentScroller () {
-      let parent = this
-      while (parent && scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
-        parent = parent.$options.parent
-      }
-      return parent
-    },
+    // _getParentScroller () {
+    //   let parent = this
+    //   while (parent && config.scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
+    //     parent = parent.$options.parent
+    //   }
+    //   return parent
+    // },
 
     _fireLazyload (el) {
       if (process.env.NODE_ENV === 'development') {
         tagBegin('base._fireLazyload')
       }
-      getThrottleLazyload(500)()
+      getThrottleLazyload(25)()
       if (process.env.NODE_ENV === 'development') {
         tagEnd('base._fireLazyload')
       }

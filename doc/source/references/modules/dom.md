@@ -255,3 +255,22 @@ Example Useage:
 
 [try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
 
+
+### addRule
+`support:v0.12.0`
+
+you can add your rule for dom by this, now we support `fontFace` only for building your custom `font-family`, use it on [text](../components/text.html#iconfont) directly.
+
+#### fontFace
+
+```html
+var domModule = weex.requireModule('dom');
+domModule.addRule('fontFace', {
+    'fontFamily': "iconfont2",
+    'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+});
+
+```
+[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
+
+

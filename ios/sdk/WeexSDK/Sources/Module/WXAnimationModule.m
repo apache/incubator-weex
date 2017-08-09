@@ -85,10 +85,14 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    [self applyTransform];
+}
+
+-(void)applyTransform
+{
     if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
         return;
     }
-    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
@@ -199,6 +203,30 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                  **/
                 newInfo.fromValue = @(oldTransform.rotateAngle);
                 newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
+                [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateX != oldTransform.rotateX)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.x";
+                newInfo.fromValue = @(oldTransform.rotateX);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
+                 [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateY != oldTransform.rotateY)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.y";
+                newInfo.fromValue = @(oldTransform.rotateY);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
+                [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateZ != oldTransform.rotateZ)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.z";
+                newInfo.fromValue = @(oldTransform.rotateZ);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
                 [infos addObject:newInfo];
             }
             
@@ -331,7 +359,14 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         layer.anchorPoint = CGPointZero;
         layer.frame = originFrame;
     }
-    [layer addAnimation:animation forKey:info.propertyName];
+    
+    if(!WXFloatGreaterThan(animation.duration, 0)){
+        if([delegate respondsToSelector:@selector(applyTransform)]) {
+            [delegate applyTransform];
+        }
+    } else {
+        [layer addAnimation:animation forKey:info.propertyName];
+    }
 }
 
 @end

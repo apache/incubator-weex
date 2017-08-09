@@ -30,6 +30,7 @@
 		846FC8DB1E1B853600949E7D /* WXATViewHierarchyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF21D029685001C8592 /* WXATViewHierarchyPlugin.m */; };
 		84D7CAC71CE3266C00D48D46 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */; };
 		8A0B5EFFF75BF82EA481983D /* libPods-WeexUITestDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E48C20F443AA337D1FE97622 /* libPods-WeexUITestDemo.a */; };
+		C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C43CDA021F1C6E01005A6B03 /* libz.tbd */; };
 		DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */; };
 		DC5B53691E8CED9400E02125 /* WXScannerHistoryVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DC5B53681E8CED9400E02125 /* WXScannerHistoryVC.m */; };
 		DC5E503E1D0D97130059F0EB /* weex.png in Resources */ = {isa = PBXBuildFile; fileRef = DC5E503C1D0D97130059F0EB /* weex.png */; };
@@ -89,6 +90,7 @@
 		775BEE9A1C1E8ECC008D1629 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84361D751CA10F8E00F43825 /* WeexUITestDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeexUITestDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9420131417A731ED089B0814 /* Pods-WeexDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo.release.xcconfig"; sourceTree = "<group>"; };
+		C43CDA021F1C6E01005A6B03 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		DC20B8E41ECADA2500845F39 /* WXConfigCenterDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterDefaultImpl.h; sourceTree = "<group>"; };
 		DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXConfigCenterDefaultImpl.m; sourceTree = "<group>"; };
 		DC5B53671E8CED9400E02125 /* WXScannerHistoryVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WXScannerHistoryVC.h; path = Scanner/WXScannerHistoryVC.h; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */,
 				741DFE091DDDD519009B020F /* libstdc++.tbd in Frameworks */,
 				DC6DD9D21CFE9BC400549297 /* libsqlite3.0.tbd in Frameworks */,
 				EAEC716BE3E43DBC8494EC51 /* libPods-WeexDemo.a in Frameworks */,
@@ -155,6 +158,7 @@
 		327BB19797F63D5309FB91BF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C43CDA021F1C6E01005A6B03 /* libz.tbd */,
 				741DFE081DDDD519009B020F /* libstdc++.tbd */,
 				7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */,
 				7601607D735D7F8D88971230 /* libPods-WeexDemo.a */,
@@ -477,7 +481,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DEST=$CONFIGURATION_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\n\nif [[ \"$CONFIGURATION\" = \"Debug\" && \"$PLATFORM_NAME\" != \"iphonesimulator\" ]]; then\nipconfig getifaddr en0 | awk '{printf(\"%s\",$0)}' > \"$DEST/localServer-ip.txt\"\nfi\n\nset -x\n\nif nc -w 5 -z localhost 12580 ; then\n    echo \"Port 12580 already in use, server is running\"\nelse\n    open -a Terminal \"$SRCROOT/../../start\"\nfi\n\n";
+			shellScript = "DEST=$CONFIGURATION_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\n\nif [[ \"$CONFIGURATION\" = \"Debug\" && \"$PLATFORM_NAME\" != \"iphonesimulator\" ]]; then\nipconfig getifaddr en0 | awk '{printf(\"%s\",$0)}' > \"$DEST/localServer-ip.txt\"\nfi\n\nset -x\n\nif nc -w 5 -z localhost 12580 ; then\n    echo \"Port 12580 already in use, server is running\"\nelse\n    if [ $BUILD_ENV = \"macaca\" ];then\n        echo \"you define auto test\"\n    else\n        open -a Terminal \"$SRCROOT/../../start\"\n    fi\nfi\n\n";
 		};
 		84361D271CA10F8E00F43825 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

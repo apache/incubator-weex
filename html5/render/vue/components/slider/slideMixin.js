@@ -19,7 +19,6 @@
 import './slider.css'
 import {
   throttle,
-  extend,
   createEvent,
   fireLazyload,
   addTransform,
@@ -48,18 +47,19 @@ export default {
   },
 
   updated () {
-    this._startAutoPlay()
     const children = this.$children
     const len = children && children.length
     if (children && len > 0) {
-      const indicator = children[len - 1]
-      if (indicator.$options._componentTag === 'indicator'
-        || indicator.$vnode.data.ref === 'indicator') {
-        indicator._watcher.get()
+      for (let i = 0; i < len; i++) {
+        const vm = children[i]
+        if (vm.$options._componentTag === 'indicator'
+          || vm.$vnode.data.ref === 'indicator') {
+          vm._watcher.get()
+          break
+        }
       }
     }
     fireLazyload(this.$el, true)
-    this._preIndex = this._showNodes[0].index
     if (this._preIndex !== this.currentIndex) {
       this._slideTo(this.currentIndex)
     }
@@ -67,7 +67,6 @@ export default {
 
   mounted () {
     this._getWrapperSize()
-    this._startAutoPlay()
     this._slideTo(this.currentIndex)
     fireLazyload(this.$el, true)
   },
@@ -77,8 +76,8 @@ export default {
       const wrapper = this.$refs.wrapper
       if (wrapper) {
         const rect = wrapper.getBoundingClientRect()
-        this.wrapperWidth = rect.width
-        this.wrapperHeight = rect.height
+        this._wrapperWidth = rect.width
+        this._wrapperHeight = rect.height
       }
     },
 
@@ -116,12 +115,16 @@ export default {
         {
           ref: 'wrapper',
           attrs: { 'weex-type': this.isNeighbor ? 'slider-neighbor' : 'slider' },
-          on: extend(createEventMap(this, ['scroll', 'scrollstart', 'scrollend']), {
-            touchstart: this._handleTouchStart,
-            touchmove: throttle(bind(this._handleTouchMove, this), 25),
-            touchend: this._handleTouchEnd,
-            touchcancel: this._handleTouchCancel
-          }),
+          on: createEventMap(
+            this,
+            ['scroll', 'scrollstart', 'scrollend'],
+            {
+              touchstart: this._handleTouchStart,
+              touchmove: throttle(bind(this._handleTouchMove, this), 25),
+              touchend: this._handleTouchEnd,
+              touchcancel: this._handleTouchCancel
+            }
+          ),
           staticClass: 'weex-slider weex-slider-wrapper weex-ct',
           staticStyle: extractComponentStyle(this)
         },
@@ -162,6 +165,9 @@ export default {
     },
 
     _slideTo (index, isTouchScroll) {
+      if (this.frameCount <= 0) {
+        return
+      }
       if (!this.infinite || this.infinite === 'false') {
         if (index === -1 || index > (this.frameCount - 1)) {
           this._slideTo(this.currentIndex)
@@ -193,7 +199,7 @@ export default {
         const match = translate && translate.match(/translate[^(]+\(([+-\d.]+)/)
         const innerX = match && match[1] || 0
         const dist = innerX - this.innerOffset
-        this.innerOffset += step * this.wrapperWidth
+        this.innerOffset += step * this._wrapperWidth
         // transform the whole slides group.
         inner.style.webkitTransition = `-webkit-transform ${TRANSITION_TIME / 1000}s ease-in-out`
         inner.style.transition = `transform ${TRANSITION_TIME / 1000}s ease-in-out`
@@ -336,7 +342,7 @@ export default {
       }
 
       node._inShow = true
-      const translateX = index * this.wrapperWidth - this.innerOffset
+      const translateX = index * this._wrapperWidth - this.innerOffset
       addTransform(node, {
         translate: `translate3d(${translateX}px, 0px, 0px)`
       })
@@ -434,7 +440,7 @@ export default {
       origNode._inShow = true
       const transObj = getTransformObj(clone)
       transObj.translate = transObj.translate.replace(/[+-\d.]+[pw]x/, ($0) => {
-        return pos * this.wrapperWidth - this.innerOffset + 'px'
+        return pos * this._wrapperWidth - this.innerOffset + 'px'
       })
       this._copyStyle(clone, origNode, styleProps, transObj)
       this._removeClone(clone)
@@ -451,6 +457,10 @@ export default {
         this.currentIndex = 0
         return
       }
+
+      // clear autoPlay timer (and restart after updated hook).
+      this._startAutoPlay()
+
       /**
        * clean nodes. replace current node with non-cloned node.
        * set current index to the new index.
@@ -500,7 +510,7 @@ export default {
         }
         // calculate position offsets according to neighbor scales.
         if (Math.abs(i) === 1) {
-          const dist = ((this.wrapperWidth - this._neighborWidth * this.neighborScale) / 2
+          const dist = ((this._wrapperWidth - this._neighborWidth * this.neighborScale) / 2
             + this.neighborSpace * weex.config.env.scale) / this.neighborScale
           translateX = -i * dist
         }
@@ -577,7 +587,7 @@ export default {
           this._clearNodesOffset()
         }
         this._emitScrollEvent('scroll', {
-          offsetXRatio: offsetX / this.wrapperWidth
+          offsetXRatio: offsetX / this._wrapperWidth
         })
         inner.style.transform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
         inner.style.webkitTransform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
@@ -597,7 +607,7 @@ export default {
       if (inner) {
         this._nodesOffsetCleared = false
         // TODO: test the velocity if it's less than 0.2.
-        const reset = Math.abs(offsetX / this.wrapperWidth) < 0.2
+        const reset = Math.abs(offsetX / this._wrapperWidth) < 0.2
         const direction = offsetX > 0 ? 1 : -1
         const newIndex = reset ? this.currentIndex : (this.currentIndex - direction)
         this._slideTo(newIndex, true)
@@ -618,7 +628,7 @@ export default {
       const throttleTime = THROTTLE_SCROLL_TIME
       const cnt = parseInt(TRANSITION_TIME / throttleTime) - 1
       const sign = offset > 0 ? 1 : -1
-      const r = Math.abs(offset / this.wrapperWidth)
+      const r = Math.abs(offset / this._wrapperWidth)
       const throttledScroll = () => {
         if (++i > cnt) {
           return callback && callback.call(this)

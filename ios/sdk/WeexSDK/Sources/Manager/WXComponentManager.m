@@ -34,6 +34,8 @@
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
+#import "WXLayoutDefine.h"
 
 static NSThread *WXComponentThread;
 
@@ -202,11 +204,10 @@ static NSThread *WXComponentThread;
     _rootComponent = [self _buildComponentForData:data];
     
     [self _initRootCSSNode];
-    
-    self.weexInstance.rootView.wx_component = _rootComponent;
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;
+        strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
         [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
     }];
 }
@@ -255,8 +256,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
-    
+
     [self _addUITask:^{
+        
         [supercomponent insertSubview:component atIndex:index];
     }];
 
@@ -508,7 +510,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssertComponentThread();
     
     WXSDKInstance *instance  = self.weexInstance;
-    [self _addUITask:^{        
+    [self _addUITask:^{
         UIView *rootView = instance.rootView;
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
@@ -517,6 +519,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
             instance.renderFinish(rootView);
         }
     }];

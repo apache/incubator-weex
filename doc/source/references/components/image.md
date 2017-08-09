@@ -42,7 +42,7 @@ This component supports no child components.
 
 - support `click` event. Check out [common events](../common-event.html)
 - support `appear` / `disappear` event. Check out [common events](../common-event.html)    
-- `load`<sup class="api-version">v0.8+</sup> event. The `load` event fires on an image has been loaded. Only Android and iOS are supported currently. [example](http://dotwe.org/vue/98ee340348d7cc3e6fbfe68dbaef1eed)    
+- `load`<sup class="api-version">v0.8+</sup> event. The `load` event fires on an image has been loaded. Only Android and iOS are supported currently. [example](http://dotwe.org/vue/e291159ac60b35dcd4994638a78d54ad)    
   - event object
     - `success` : `true` if the image was loaded successfully, otherwise `false`
     - `size` : the original size of image, contains two parameters: `naturalWidth` representing the original width of image in pixels, `naturalHeight` representing the original height of image in pixels. default value. The default value for both parameters is `0`.

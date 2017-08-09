@@ -11,7 +11,7 @@ Weex 2.0 实现了 W3C 标准的事件冒泡机制。
 
 ### 使用
 
-```javascript
+```html
 <template>
   <div class="root" @click="rootClick" bubble="true">
     <text style="font-size: 40px;">{{rootText}}</text>
@@ -81,7 +81,7 @@ Weex 2.0 实现了 W3C 标准的事件冒泡机制。
 
 在事件处理函数中，可以使用 `e.stopPropagation()` 方法，来阻止本次事件向上的传递过程。注意，`e.stopPropagation()` 与 `bubble="true"` 不同，前者只会影响当前元素以及父元素的传播，不会影响子元素的传播；后者是为了版本兼容而增加的开关机制，会全局关闭或者开启冒泡机制，两者可以共同存在使用，如下：
 
-```javascript
+```html
 <template>
   <div class="root" @click="rootClick" bubble="true">
     <text style="font-size: 40px;">{{rootText}}</text>

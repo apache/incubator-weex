@@ -29,14 +29,22 @@ import { extend } from '../utils'
 export function initEnv (viewportInfo, envInfo) {
   const browserName = envInfo.browser ? envInfo.browser.name : navigator.appName
   const browserVersion = envInfo.browser ? envInfo.browser.version.val : null
+  let osName = envInfo.os.name
+  if (osName.match(/(iPhone|iPad|iPod)/i)) {
+    osName = 'iOS'
+  }
+  else if (osName.match(/Android/i)) {
+    osName = 'android'
+  }
+  const osVersion = envInfo.os.version.val
   const env = {
     platform: 'Web',
     weexVersion: 'process.env.WEEX_VERSION',
     userAgent: navigator.userAgent,
     appName: browserName,
     appVersion: browserVersion,
-    osName: envInfo.browser ? envInfo.browser.name : null,
-    osVersion: envInfo.browser ? envInfo.browser.version.val : null,
+    osName,
+    osVersion,
     deviceModel: envInfo.os.name || null
   }
   /**

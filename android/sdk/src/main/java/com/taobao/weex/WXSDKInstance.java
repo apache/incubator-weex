@@ -141,6 +141,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private LayoutFinishListener mLayoutFinishListener;
 
+  private boolean mCurrentGround = false;
+  private ComponentObserver mComponentObserver;
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -248,12 +250,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mNestedInstanceInterceptor = interceptor;
   }
 
-  public WXSDKInstance createNestedInstance(NestedContainer container){
-    WXSDKInstance sdkInstance = new WXSDKInstance(mContext);
+  public final WXSDKInstance createNestedInstance(NestedContainer container){
+    WXSDKInstance sdkInstance = newNestedInstance();
     if(mNestedInstanceInterceptor != null){
       mNestedInstanceInterceptor.onCreateNestInstance(sdkInstance,container);
     }
     return sdkInstance;
+  }
+
+  protected WXSDKInstance newNestedInstance() {
+    return new WXSDKInstance(mContext);
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
@@ -273,6 +279,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+  }
+
+  /**
+   * Set a Observer for component.
+   * This observer will be called in each component, should not doing
+   * anything will impact render performance.
+   *
+   * @param observer
+   */
+  public void setComponentObserver(ComponentObserver observer){
+    mComponentObserver = observer;
+  }
+
+  public ComponentObserver getComponentObserver(){
+    return mComponentObserver;
   }
 
   public NativeInvokeHelper getNativeInvokeHelper() {
@@ -738,6 +759,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return true;
   }
 
+
   @Override
   public void onActivityPause() {
     onViewDisappear();
@@ -760,10 +782,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    WXLogUtils.i("Application onActivityPause()");
+    if (!mCurrentGround) {
+      WXLogUtils.i("Application to be in the backround");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      this.mCurrentGround = true;
+    }
   }
 
 
@@ -779,10 +806,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    if (mCurrentGround) {
+      WXLogUtils.i("Application  to be in the foreground");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      mCurrentGround = false;
+    }
 
     onViewAppear();
 
@@ -1181,6 +1212,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mGlobalEvents.clear();
     }
 
+    if(mComponentObserver != null){
+        mComponentObserver = null;
+    }
 
     mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;

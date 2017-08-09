@@ -6,6 +6,7 @@ version: 2.1
 ---
 
 # WebSocket
+<span class="weex-version">v0.12+</span>
 
 ## Summary
 
@@ -16,7 +17,6 @@ WebSockets is an advanced technology that makes it possible to open an interacti
   - [DefaultWebSocketAdapter.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
   - [DefaultWebSocketAdapterFactory.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
   - refer:  [weex playground](https://github.com/apache/incubator-weex/tree/dev/android/playground)
-- only support in .we file,not support in vue2.0
 
 ## API
 ### `WebSocket(url, protocol)`
@@ -89,87 +89,91 @@ An event listener to be called when an error occurs.
   <scroller>
     <div>
       <div style="background-color: #286090">
-        <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">websocket</text>
+        <text class="title" style="height: 80px ;padding: 20px;color: white">websocket</text>
       </div>
-      <input
-              type="text"
-              placeholder="please input message to send"
-              class="input"
-              autofocus="false"
-              value=""
-              onchange="onchange"
-              oninput="oninput"
-              id = "input"
-      />
+      <input type="text" placeholder="please input message to send" class="input" autofocus="false" value="" @change="onchange" @input="oninput" ref="input"/>
       <div style="flex-direction: row; justify-content: center;">
-        <text class="button" onclick="{{connect}}">connect</text>
-        <text class="button" onclick="{{send}}">send</text>
-        <text class="button" onclick="{{close}}">close</text>
+        <text class="button" @click="connect">connect</text>
+        <text class="button" @click="send">send</text>
+        <text class="button" @click="close">close</text>
       </div>
-      <div style="background-color: #D3D3D3;margin-top: 20">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = send</text>
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = send</text>
       </div>
-      <text style="color: #000000;height: 80">{{sendinfo}}</text>
-      <div style="background-color: #D3D3D3">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onopen</text>
+      <text style="color: black;height: 80px">{{sendinfo}}</text>
+
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onopen</text>
       </div>
-      <text style="color: #000000;height: 80">{{onopeninfo}}</text>
-      <div style="background-color: #D3D3D3">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onmessage</text>
+      <text style="color: black;height: 80px">{{onopeninfo}}</text>
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onmessage</text>
       </div>
-      <text style="color: #000000;height: 100">{{onmessage}}</text>
-      <div style="background-color: #D3D3D3">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onclose</text>
+      <text style="color: black;height: 400px">{{onmessage}}</text>
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onclose</text>
       </div>
-      <text style="color: #000000;height: 80">{{oncloseinfo}}</text>
-      <div style="background-color: #D3D3D3">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onerror</text>
+      <text style="color: black;height: 80px">{{oncloseinfo}}</text>
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onerror</text>
       </div>
-      <text style="color: #000000;height: 80">{{onerrorinfo}}</text>
-      <div style="background-color: #D3D3D3">
-        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = close</text>
+      <text style="color: black;height: 80px">{{onerrorinfo}}</text>
+
+      <div style="background-color: lightgray">
+        <text class="title" style="height: 80px ;padding: 20px;color: black">method = close</text>
       </div>
-      <text style="color: #000000;height: 80">{{closeinfo}}</text>
+      <text style="color: black;height: 80px">{{closeinfo}}</text>
+
     </div>
-    </div>
+
   </scroller>
 </template>
-<style>
+
+<style scoped>
   .input {
-    font-size: 40;
-    height: 80;
-    width: 600;
+    font-size: 40px;
+    height: 80px;
+    width: 600px;
   }
   .button {
-    font-size: 36;
-    width: 150;
+    font-size: 36px;
+    width: 150px;
     color: #41B883;
     text-align: center;
-    padding-top: 10;
-    padding-bottom: 10;
-    border-width: 2;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    border-width: 2px;
     border-style: solid;
-    margin-right: 20;
+    margin-right: 20px;
     border-color: rgb(162, 217, 192);
     background-color: rgba(162, 217, 192, 0.2);
   }
 </style>
+
+
 <script>
-  var websocket = require('@weex-module/webSocket');
-  module.exports = {
-    data: {
-      connectinfo: '',
-      sendinfo: '',
-      onopeninfo: '',
-      onmessage: '',
-      oncloseinfo: '',
-      onerrorinfo: '',
-      closeinfo: '',
-      txtInput:'',
-      navBarHeight: 88,
-      title: 'Navigator',
-      dir: 'examples',
-      baseURL: '',
+  var websocket = weex.requireModule('webSocket')
+  export default {
+    data () {
+      return {
+        connectinfo: '',
+        sendinfo: '',
+        onopeninfo: '',
+        onmessage: '',
+        oncloseinfo: '',
+        onerrorinfo: '',
+        closeinfo: '',
+        txtInput:'',
+        navBarHeight: 88,
+        title: 'Navigator',
+        dir: 'examples',
+        baseURL: ''
+      }
     },
     methods: {
       connect:function() {
@@ -195,7 +199,7 @@ An event listener to be called when an error occurs.
         }
       },
       send:function(e) {
-        var input = this.$el('input');
+        var input = this.$refs.input;
         input.blur();
         websocket.send(this.txtInput);
         this.sendinfo = this.txtInput;
@@ -206,9 +210,9 @@ An event listener to be called when an error occurs.
       close:function(e) {
         websocket.close();
       },
-    }
-  };
+    },
+  }
 </script>
 ```
 
-[Have a try](http://dotwe.org/weex/0256bbfc448f0fdbe8b10ba311c947b4)
+[Have a try](http://dotwe.org/vue/6d8bdfe66f24fda1a2dc6158b0182573)

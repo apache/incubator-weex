@@ -26,13 +26,11 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.util.Property;
 import android.view.View;
-
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +63,8 @@ public class WXAnimationBean {
     public final static String WX_SCALE_X = "scaleX";
     public final static String WX_SCALE_Y = "scaleY";
     public final static String WX_SCALE = "scale";
+    public final static String WX_ROTATE_X ="rotateX";
+    public final static String WX_ROTATE_Y ="rotateY";
     public final static String BACKGROUND_COLOR = Constants.Name.BACKGROUND_COLOR;
     public final static String WIDTH = Constants.Name.WIDTH;
     public final static String HEIGHT = Constants.Name.HEIGHT;
@@ -86,6 +86,8 @@ public class WXAnimationBean {
       wxToAndroidMap.put(WX_TRANSLATE_X, Collections.singletonList(View.TRANSLATION_X));
       wxToAndroidMap.put(WX_TRANSLATE_Y, Collections.singletonList(View.TRANSLATION_Y));
       wxToAndroidMap.put(WX_ROTATE, Collections.singletonList(View.ROTATION));
+      wxToAndroidMap.put(WX_ROTATE_X, Collections.singletonList(View.ROTATION_X));
+      wxToAndroidMap.put(WX_ROTATE_Y, Collections.singletonList(View.ROTATION_Y));
       wxToAndroidMap.put(WX_SCALE, Arrays.asList(View.SCALE_X, View.SCALE_Y));
       wxToAndroidMap.put(WX_SCALE_X, Collections.singletonList(View.SCALE_X));
       wxToAndroidMap.put(WX_SCALE_Y, Collections.singletonList(View.SCALE_Y));
@@ -110,31 +112,34 @@ public class WXAnimationBean {
               @Override
               public Map<Property<View,Float>, Float> map(String functionName, List<String> raw) {
                 if (raw != null && !raw.isEmpty()) {
-                  if (WXAnimationBean.Style.wxToAndroidMap.containsKey(functionName)) {
-                    return convertParam(width, height,viewportW,
-                                        WXAnimationBean.Style.wxToAndroidMap.get(functionName), raw);
+                  if (wxToAndroidMap.containsKey(functionName)) {
+                    return convertParam(width, height,viewportW, wxToAndroidMap.get(functionName), raw);
                   }
                 }
                 return new HashMap<>();
               }
 
               private Map<Property<View,Float>, Float> convertParam(int width, int height,int viewportW,
-                                                      @NonNull List<Property<View,Float>> nameSet,
+                                                      @NonNull List<Property<View,Float>> propertyList,
                                                       @NonNull List<String> rawValue) {
-                Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(nameSet.size());
-                List<Float> convertedList = new ArrayList<>(nameSet.size());
-                if (nameSet.contains(View.ROTATION)) {
-                  convertedList.addAll(parseRotation(rawValue));
-                } else if (nameSet.contains(View.TRANSLATION_X) ||
-                           nameSet.contains(View.TRANSLATION_Y)) {
-                  convertedList.addAll(parseTranslation(nameSet, width, height, rawValue,viewportW));
-                } else if (nameSet.contains(View.SCALE_X) ||
-                           nameSet.contains(View.SCALE_Y)) {
-                  convertedList.addAll(parseScale(nameSet.size(), rawValue));
+                Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(propertyList.size());
+                List<Float> convertedList = new ArrayList<>(propertyList.size());
+                if (propertyList.contains(View.ROTATION)) {
+                  convertedList.addAll(parseRotationZ(rawValue));
+                }else if(propertyList.contains(View.ROTATION_X)) {
+                  convertedList.addAll(parseRotationXY(rawValue));
+                }else if(propertyList.contains(View.ROTATION_Y)) {
+                  convertedList.addAll(parseRotationXY(rawValue));
+                }else if (propertyList.contains(View.TRANSLATION_X) ||
+                           propertyList.contains(View.TRANSLATION_Y)) {
+                  convertedList.addAll(parseTranslation(propertyList, width, height, rawValue,viewportW));
+                } else if (propertyList.contains(View.SCALE_X) ||
+                           propertyList.contains(View.SCALE_Y)) {
+                  convertedList.addAll(parseScale(propertyList.size(), rawValue));
                 }
-                if (nameSet.size() == convertedList.size()) {
-                  for (int i = 0; i < nameSet.size(); i++) {
-                    result.put(nameSet.get(i), convertedList.get(i));
+                if (propertyList.size() == convertedList.size()) {
+                  for (int i = 0; i < propertyList.size(); i++) {
+                    result.put(propertyList.get(i), convertedList.get(i));
                   }
                 }
                 return result;
@@ -153,7 +158,15 @@ public class WXAnimationBean {
                 return convertedList;
               }
 
-              private List<Float> parseRotation(@NonNull List<String> rawValue) {
+              private List<Float> parseRotationXY(@NonNull List<String> rawValue) {
+                List<Float> intermediate = parseRotationZ(rawValue);
+                for (int i = 0; i < intermediate.size(); i++) {
+                  intermediate.set(i, -intermediate.get(i));
+                }
+                return intermediate;
+              }
+
+              private @NonNull List<Float> parseRotationZ(@NonNull List<String> rawValue) {
                 List<Float> convertedList = new ArrayList<>(1);
                 int suffix;
                 for (String raw : rawValue) {
@@ -166,25 +179,30 @@ public class WXAnimationBean {
                 return convertedList;
               }
 
-
-              private List<Float> parseTranslation(List<Property<View,Float>> nameSet,
+              /**
+               * As "translate(50%, 25%)" or "translate(25px, 30px)" both are valid,
+               * parsing translate is complicated than other method.
+               * Add your waste time here if you try to optimize this method like {@link #parseScale(int, List)}
+               * Time: 0.5h
+               */
+              private List<Float> parseTranslation(List<Property<View,Float>> propertyList,
                                                    int width, int height,
                                                    @NonNull List<String> rawValue,int viewportW) {
                 List<Float> convertedList = new ArrayList<>(2);
                 String first = rawValue.get(0);
-                if (nameSet.size() == 1) {
-                  parseSingleTranslation(nameSet, width, height, convertedList, first,viewportW);
+                if (propertyList.size() == 1) {
+                  parseSingleTranslation(propertyList, width, height, convertedList, first,viewportW);
                 } else {
                   parseDoubleTranslation(width, height, rawValue, convertedList, first,viewportW);
                 }
                 return convertedList;
               }
 
-              private void parseSingleTranslation(List<Property<View,Float>> nameSet, int width, int height,
+              private void parseSingleTranslation(List<Property<View,Float>> propertyList, int width, int height,
                                                   List<Float> convertedList, String first,int viewportW) {
-                if (nameSet.contains(View.TRANSLATION_X)) {
+                if (propertyList.contains(View.TRANSLATION_X)) {
                   convertedList.add(parsePercentOrPx(first, width,viewportW));
-                } else if (nameSet.contains(View.TRANSLATION_Y)) {
+                } else if (propertyList.contains(View.TRANSLATION_Y)) {
                   convertedList.add(parsePercentOrPx(first, height,viewportW));
                 }
               }

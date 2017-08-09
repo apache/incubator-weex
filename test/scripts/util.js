@@ -24,6 +24,7 @@ var fs = require('fs')
 const BlinkDiff = require('blink-diff');
 
 var platform = process.env.platform || 'android';
+const servePort = process.env.serport || 12581
 platform = platform.toLowerCase();
 var browser = process.env.browser || '';
 
@@ -83,8 +84,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:isIOS?{y:128}:{y:72,height:1700},
-      cropImageB:isIOS?{y:128}:{y:72,height:1700}
+      cropImageA:isIOS?{y:128}:{y:242,height:1530},//android: 242 - status bar(72)+navigator bar(170)
+      cropImageB:isIOS?{y:128}:{y:242,height:1530}
     });
 
     diff.run((err, result) => {
@@ -113,9 +114,9 @@ module.exports = {
     getPage:function(name){
         let url
         if(browser){
-             url = 'http://'+ getIpAddress()+':12581/vue.html?page=/test/build-web'+name
+             url = 'http://'+ getIpAddress()+':'+servePort+'/vue.html?page=/test/build-web'+name
         }else{
-            url = 'wxpage://' + getIpAddress()+":12581/test/build"+name;
+            url = 'wxpage://' + getIpAddress()+":"+servePort+"/test/build"+name;
         }
         console.log(url)
         return url
@@ -193,7 +194,7 @@ module.exports = {
             return driver.status()
         else{
             driver._isInit = true;
-            return driver.initDriver()
+            return driver.initDriver().sleep(20000) //ios cannot detect at once
         }
     },
     quit:function(driver){

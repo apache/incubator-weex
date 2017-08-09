@@ -30,6 +30,29 @@ const noUnitsNumberKeys = [
   'lines'
 ]
 
+// whether to support using 0.5px to paint 1px width border.
+let _supportHairlines: ?boolean
+export function supportHairlines () {
+  if (typeof _supportHairlines === 'undefined') {
+    const dpr = window.devicePixelRatio
+    if (dpr && dpr >= 2 && document.documentElement) {
+      const docElm = document.documentElement
+      const testElm = document.createElement('div')
+      const fakeBody = document.createElement('body')
+      const beforeNode = docElm.firstElementChild || docElm.firstChild
+      testElm.style.border = '0.5px solid transparent'
+      fakeBody.appendChild(testElm)
+      docElm.insertBefore(fakeBody, beforeNode)
+      _supportHairlines = testElm.offsetHeight === 1
+      docElm.removeChild(fakeBody)
+    }
+    else {
+      _supportHairlines = false
+    }
+  }
+  return _supportHairlines
+}
+
 /**
  * remove comments from a cssText.
  */
@@ -77,7 +100,12 @@ function getUnitScaleMap () {
 function limitScale (val, limit) {
   limit = limit || 1
   const sign = val === 0 ? 0 : val > 0 ? 1 : -1
-  return Math.abs(val) > limit ? val : sign * limit
+  let newVal = Math.abs(val) > limit ? val : sign * limit
+  // support 1px device width.
+  if (newVal === 1 && val < 1 && supportHairlines()) {
+    newVal = 0.5
+  }
+  return newVal
 }
 
 function parseScale (val: number, unit: string): string {
@@ -253,4 +281,81 @@ export function copyTransform (from: HTMLElement, to: HTMLElement, key: string |
   }
   to.style.webkitTransform = str
   to.style.transform = str
+}
+
+/**
+ * get color's r, g, b value.
+ * @param {string} color support all kinds of value of color.
+ */
+export function getRgb (color: string) {
+  const haxReg = /#([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})/
+  const rgbReg = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/
+  const span = document.createElement('span')
+  const body = document.body
+  span.style.cssText = `color: ${color}; width: 0px; height: 0px;`
+  body && body.appendChild(span)
+  color = window.getComputedStyle(span).color + ''
+  body && body.removeChild(span)
+
+  let match
+  match = color.match(haxReg)
+  if (match) {
+    return {
+      r: parseInt(match[1], 16),
+      g: parseInt(match[2], 16),
+      b: parseInt(match[3], 16)
+    }
+  }
+  match = color.match(rgbReg)
+  if (match) {
+    return {
+      r: parseInt(match[1]),
+      g: parseInt(match[2]),
+      b: parseInt(match[3])
+    }
+  }
+}
+
+/**
+ * get style sheet with owner node's id
+ * @param {string} id owner node id.
+ */
+export function getStyleSheetById (id?: string) {
+  if (!id) { return }
+  const styleSheets = document.styleSheets
+  const len = styleSheets.length
+  for (let i = 0; i < len; i++) {
+    const styleSheet = styleSheets[i]
+    if (styleSheet.ownerNode.id === id) {
+      return styleSheet
+    }
+  }
+}
+
+function getChildrenTotalWidth (children) {
+  const len = children.length
+  let total = 0
+  for (let i = 0; i < len; i++) {
+    total += children[i].getBoundingClientRect().width
+  }
+  return total
+}
+/**
+ * get total content width of the element.
+ * @param {HTMLElement} elm
+ */
+export function getRangeWidth (elm: HTMLElement) {
+  const children = elm.children
+  if (!children) {
+    return elm.getBoundingClientRect().width
+  }
+  if (!Range) {
+    return getChildrenTotalWidth(children)
+  }
+  const range = document.createRange()
+  if (!range.selectNodeContents) {
+    return getChildrenTotalWidth(children)
+  }
+  range.selectNodeContents(elm)
+  return range.getBoundingClientRect().width
 }

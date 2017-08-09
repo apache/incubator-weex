@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#import <CoreGraphics/CoreGraphics.h>
+#import <Foundation/Foundation.h>
+
 @class WXBridgeMethod;
 @class WXSDKInstance;
 @class WXComponent;

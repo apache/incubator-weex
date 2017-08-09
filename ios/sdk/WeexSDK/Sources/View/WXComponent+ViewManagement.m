@@ -24,7 +24,7 @@
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
-
+#import "WXTracingManager.h"
 
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
@@ -138,6 +138,7 @@ do {\
 
 - (void)viewDidLoad
 {
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:self.ref className:nil name:_type phase:WXTracingEnd functionName:WXTRender options:nil];
     WXAssertMainThread();
 }
 
@@ -235,11 +236,16 @@ do {\
             self.view.hidden = YES;
         }
     }
+    if (styles[@"transform"]) {
+        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
+        if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
+            [_transform applyTransformForView:_view];
+            [_layer setNeedsDisplay];
+        }
+    }
     
-    if (styles[@"transformOrigin"] || styles[@"transform"]) {
-        id transform = styles[@"transform"] ? : self.styles[@"transform"];
-        id transformOrigin = styles[@"transformOrigin"] ? [WXConvert NSString:styles[@"transformOrigin"]] : [WXConvert NSString:self.styles[@"transformOrigin"]];
-        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:transform] origin:transformOrigin instance:self.weexInstance];
+    if (styles[@"transformOrigin"]) {
+        [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];
@@ -278,6 +284,10 @@ do {\
         _lastBoxShadow = _boxShadow;
         _boxShadow = nil;
         [self setNeedsDisplay];
+    }
+    if (styles && [styles containsObject:@"backgroundImage"]) {
+        _backgroundImage = @"linear-gradient(to left,rgba(255,255,255,0),rgba(255,255,255,0))"; // if backgroundImage is nil, give defalut color value.
+        [self setGradientLayer];
     }
     
     [self resetBorder:styles];

@@ -27,6 +27,7 @@
 #import "WXUtility.h"
 #import "WXRuleManager.h"
 #import "WXSDKInstance.h"
+#import "WXTracingManager.h"
 
 @interface WXDomModule ()
 
@@ -50,7 +51,6 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
-
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -94,6 +94,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
     }];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"addElement" options:nil];
 }
 
 - (void)removeElement:(NSString *)ref
@@ -129,6 +130,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
 - (void)updateFinish
@@ -181,14 +183,16 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         UIView *rootView = manager.weexInstance.rootView;
-        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         if ([ref isEqualToString:@"viewport"]) {
-            NSMutableDictionary * callbackRsp = nil;
-            callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
-            [callbackRsp setObject:@(true) forKey:@"result"];
-            if (callback) {
-                callback(callbackRsp, false);
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableDictionary * callbackRsp = nil;
+                CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
+                callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
+                [callbackRsp setObject:@(true) forKey:@"result"];
+                if (callback) {
+                    callback(callbackRsp, false);
+                }
+            });
         } else {
             WXComponent *component = [manager componentForRef:ref];
             __weak typeof (self) weakSelf = self;
@@ -200,7 +204,13 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                     [callbackRsp setObject:@(false) forKey:@"result"];
                     [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found", ref] forKey:@"errMsg"];
                 } else {
-                    CGRect componentRect = [component.view.superview convertRect:component.view.frame toView:rootView];
+                    CGRect componentRect = CGRectZero;
+                    // if current component view is not loaded or it hasn't been inserted to its superview, so the position cannot be obtained correct except width and height
+                    if ([component isViewLoaded] && component.view.superview) {
+                        componentRect = [component.view.superview convertRect:component.view.frame toView:rootView];
+                    } else {
+                        componentRect = component.calculatedFrame;
+                    }
                     callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }

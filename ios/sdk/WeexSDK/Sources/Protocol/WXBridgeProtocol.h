@@ -21,6 +21,14 @@
 
 typedef NSInteger(^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
 typedef NSInteger(^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
+typedef NSInteger(^WXJSCallCreateBody)(NSString *instanceId, NSDictionary *bodyData);
+typedef NSInteger(^WXJSCallRemoveElement)(NSString *instanceId,NSString *ref);
+typedef NSInteger(^WXJSCallMoveElement)(NSString *instanceId,NSString *ref,NSString *parentRef,NSInteger index);
+typedef NSInteger(^WXJSCallUpdateAttrs)(NSString *instanceId,NSString *ref,NSDictionary *attrsData);
+typedef NSInteger(^WXJSCallUpdateStyle)(NSString *instanceId,NSString *ref,NSDictionary *stylesData);
+typedef NSInteger(^WXJSCallAddEvent)(NSString *instanceId,NSString *ref,NSString *event);
+typedef NSInteger(^WXJSCallRemoveEvent)(NSString *instanceId,NSString *ref,NSString *event);
+typedef NSInteger(^WXJSCallCreateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
 
@@ -71,6 +79,41 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  */
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement;
 
+/**
+ * Register callback when createBody tasks occur
+ */
+- (void)registerCallCreateBody:(WXJSCallCreateBody)callCreateBody;
+
+/**
+ * Register callback when removeElement tasks occur
+ */
+- (void)registerCallRemoveElement:(WXJSCallRemoveElement)callRemoveElement;
+
+/**
+ * Register callback when removeElement tasks occur
+ */
+- (void)registerCallMoveElement:(WXJSCallMoveElement)callMoveElement;
+
+/**
+ * Register callback when updateAttrs tasks occur
+ */
+- (void)registerCallUpdateAttrs:(WXJSCallUpdateAttrs)callUpdateAttrs;
+/**
+ * Register callback when updateStyle tasks occur
+ */
+- (void)registerCallUpdateStyle:(WXJSCallUpdateStyle)callUpdateStyle;
+/**
+ * Register callback when addEvent tasks occur
+ */
+- (void)registerCallAddEvent:(WXJSCallAddEvent)callAddEvent;
+/**
+ * Register callback when removeEvent tasks occur
+ */
+- (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent;
+/**
+ * Register callback when createFinish tasks occur
+*/
+- (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish;
 /**
  * Register callback for global js function `callNativeModule`
  */

@@ -9,13 +9,13 @@ version: 2.1
 
 ## Vue in Weex
 
-[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi) which is very ease and flexible to use. Developers can write `*.vue` files with friendly `<template>`, `<style>`, `<script>` tags to build componentized web app.
+[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi) which is very easy and flexible to use. Developers can write `*.vue` files with friendly `<template>`, `<style>`, `<script>` tags to build componentized web apps.
 
 ![a vue file](//cn.vuejs.org/images/vue-component.png)
 
-In Oct 2016 Vue.js has launched 2.0. It brings virtual-DOM and pre-compiler for HTML template. So it makes Vue.js possible to run in JS-only environment without HTML / CSS parser. And also the virtual-DOM layer makes Vue 2.x possible to render native UI through JavaScript.
+In Oct 2016 Vue.js launched 2.0, which includes the virtual-DOM and pre-compiler for HTML templates. This means Vue.js can run in a JS-only environment without HTML / CSS parsers. The virtual-DOM layer also makes Vue 2.x able to render native UIs through JavaScript.
 
-Now Weex and Vue has supported each other officially. Weex put Vue 2.x as its built-in JS Framework, and Vue has already been able to develop native mobile app.
+Weex and Vue now support each other officially. Now that Weex includes Vue 2.x as its built-in JS Framework, Vue can be used to develop native mobile apps.
 
 **Links**
 

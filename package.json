@@ -4,7 +4,7 @@
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.20.6",
-    "vue-render": "0.11.44",
+    "vue-render": "0.11.56",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -37,9 +37,11 @@
     "node": ">=4"
   },
   "scripts": {
-    "postinstall": "bash ./bin/install-hooks.sh",
+    "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
     "build:runtime": "node build/build.js runtime",
+    "install:buildtools": "npm i rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-flow rollup-plugin-flow-no-whitespace rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve wwp flow-bin babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime eslint-plugin-flowtype",
+    "build:source": "npm run build:native && npm run build:browser && node build/build.js vue",
     "build:browser": "wwp && node build/build.js browser",
     "build:browser:common": "rollup -c build/rollup.browser.common.config.js",
     "build:vue": "flow check && node build/build.js vue",
@@ -51,8 +53,8 @@
     "build:ci:native": "webpack --watch --config build/webpack.ci.config.js",
     "build:ci": "npm run build:ci:native && npm run build:ci:web",
     "build": "npm run build:native && npm run build:browser && npm run build:vue && npm run build:examples && npm run build:test",
-    "dist:vue": "npm run build:vue && bash ./bin/dist-vue.sh",
-    "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
+    "dist:vue": "npm run build:vue && bash ./scripts/dist-vue.sh",
+    "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./scripts/dist-browser.sh",
     "dist": "npm run dist:browser && npm run dist:vue",
     "dev:native": "node build/build.js native --watch",
     "dev:runtime": "node build/build.js runtime --watch",
@@ -71,7 +73,7 @@
     "test:cover": "babel-istanbul cover --report text node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:e2e": "npm run build:browser && node html5/test/e2e/runner.js",
     "serve": "serve ./ -p 12580",
-    "serve:ui-test": "serve ./ -p 12581",
+    "serve:no-port": "serve ./",
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
@@ -81,6 +83,7 @@
     "danger": "danger"
   },
   "dependencies": {
+    "autoprefixer": "^6.7.7",
     "animationjs": "^0.1.5",
     "blink-diff": "~1.0.12",
     "core-js": "^2.4.0",
@@ -99,7 +102,6 @@
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
-    "autoprefixer": "^6.7.7",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
@@ -153,11 +155,11 @@
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.4",
     "vue": "^2.2.6",
-    "vue-loader": "^11.3.3",
+    "vue-loader": "^12.2.1",
     "vue-template-compiler": "^2.2.6",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
-    "weex-gcanvas": "^0.3.5",
+    "weex-gcanvas": "^0.4.2",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.23",

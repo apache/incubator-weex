@@ -33,6 +33,7 @@ And there are two special components that can only be used inside scroller compo
   * Use `scroll-direction:vertical` and `flex-direction: column` when a vertical layout and scrollable scroller is expected. But thoes two values are default, if you don't set them, it also works fine.
 * loadmoreoffset : <number> default value is 0. The loadmore event will be triggered when the list is loadmoreoffset left to reach the bottom of the list view. e.g. a list has total content length of 1000, and the loadmoreoffset is set to 400, the loadmore event will be triggered when 600 has beed scrolled and there is less than 400 left.
 * loadmoreretry : <number> default value 0，whether to reset loadmore related UI when loadmore failed, will be deprecated in further release.
+* offset-accuracy：<number> default value is 0, the vertical offset distance required to trigger the scroll event.
 
 
 ## Styles
@@ -47,7 +48,9 @@ common styles: check out [common styles for components](../common-style.html)
 
 ## Events
 
-onloadmore  used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
+`loadmore`  used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
+
+`scroll`  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.  See details in [scroll event demo](http://dotwe.org/vue/9ef0e52bacaa20182a693f2187d851aa).
 
 common events: check out the [common events](../common-event.html)
 

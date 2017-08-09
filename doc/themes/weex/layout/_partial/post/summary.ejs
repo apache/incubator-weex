@@ -1,6 +1,17 @@
 <% var result = page.path.match(/(v-)(\d+(\.\d+))/) %>
 <% var version = result ? +result[2] : 2.1 %>
 
+<div class="doc-nav-version">
+  <select class="versionBtn" stype="<%- url_for_lang(page.type) %>">
+  <% if (version == 2.1) { %>
+    <option value="2v" selected>v2.x</option>
+    <option value="1v">v1.x</option>
+  <% } else { %>
+    <option value="2v">v2.x</option>
+    <option value="1v" selected>v1.x</option>
+  <% } %>
+ </select>
+</div>
 <div class="summary">
   <h2 class="part-title">
     <% if (type) { %>
@@ -34,10 +45,11 @@
       </li>
     <% }) %>
     
-    <% if (version == 2.1) { %>
-      <li>
-        <h3 class="chapter-title"><a href="<%- url_for_lang('v-0.10/' + page.type + '/index.html') %>" class="sidebar-link"><%- _p('menu.legacy') %></a></h3>
-      </li>
-    <% } %>
   </ul>
+</div>
+<div class="hostbyaliyun">
+  <a href="https://render.alipay.com/p/s/taobaonpm_click/weex_banner_click">
+    <img src="https://render.alipay.com/p/s/taobaonpm_click/weex_banner" alt="" width="180px">
+  </a>
+  <div style="color: #7f8c8d;font-size: 12px;">阿里云赞助</div>
 </div>

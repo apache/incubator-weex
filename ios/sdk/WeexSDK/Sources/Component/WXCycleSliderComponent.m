@@ -80,6 +80,13 @@ typedef NS_ENUM(NSInteger, Direction) {
     return self;
 }
 
+- (void)dealloc
+{
+    if (_scrollView) {
+        _scrollView.delegate = nil;
+    }
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -209,9 +216,10 @@ typedef NS_ENUM(NSInteger, Direction) {
         if (_infinite) {
             [self.scrollView setContentOffset:CGPointMake(self.width * 2, 0) animated:YES];
         } else {
-            _currentIndex += 1;
-            if (_currentIndex - 1 < _itemViews.count) {
-                [self.scrollView setContentOffset:CGPointMake(_currentIndex * self.width, 0) animated:YES];
+            // the currentindex will be set at the end of animation
+            NSInteger nextIndex = self.currentIndex + 1;
+            if(nextIndex < _itemViews.count) {
+                [self.scrollView setContentOffset:CGPointMake(nextIndex * self.width, 0) animated:YES];
             }
         }
     }
@@ -452,6 +460,12 @@ typedef NS_ENUM(NSInteger, Direction) {
                 }
             }
             [recycleSliderView insertItemView:view atIndex:index - offset];
+            
+            // check if should apply current contentOffset
+            // in case inserting subviews after layoutDidFinish
+            if (index-offset == _index && _index>0) {
+                recycleSliderView.currentIndex = _index;
+            }
         }
         [recycleSliderView layoutSubviews];
     }

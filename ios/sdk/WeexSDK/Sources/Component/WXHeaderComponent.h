@@ -17,7 +17,8 @@
  * under the License.
  */
 
-#import <WeexSDK/WeexSDK.h>
+#import "WXComponent.h"
+
 @class WXHeaderComponent;
 
 @protocol WXHeaderRenderDelegate <NSObject>

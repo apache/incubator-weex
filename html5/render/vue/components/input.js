@@ -23,8 +23,12 @@
  */
 import { extractComponentStyle, createEventMap } from '../core'
 import { inputCommon } from '../mixins'
-import { extend, mapFormEvents } from '../utils'
+import { extend, mapFormEvents, appendCss } from '../utils'
 // import { validateStyles } from '../validator'
+
+const ID_PREFIX_PLACEHOLDER_COLOR = 'wipt_plc_'
+const ID_PREFIX_INPUT = 'wipt_'
+let idCount = 0
 
 const _css = `
 .weex-input, .weex-textarea {
@@ -35,6 +39,35 @@ const _css = `
 }
 `
 
+function setPlaceholderColor (inputVm, placeholderColor) {
+  if (!placeholderColor) {
+    return
+  }
+  const vendors = [
+    '::-webkit-input-placeholder',
+    ':-moz-placeholder',
+    '::-moz-placeholder',
+    ':-ms-input-placeholder',
+    ':placeholder-shown'
+  ]
+  const id = inputVm._id
+  appendCss(
+    vendors.map(function (vendor, idx) {
+      return `#${ID_PREFIX_INPUT}${id}${vendors[idx]}{color:${placeholderColor};}`
+    }).join(''),
+    `${ID_PREFIX_PLACEHOLDER_COLOR}${id}`,
+    true)
+}
+
+function processStyle (vm) {
+  const styles = extractComponentStyle(vm)
+  const phColor = styles.placeholderColor
+  if (phColor) {
+    setPlaceholderColor(vm, phColor)
+  }
+  return styles
+}
+
 export default {
   mixins: [inputCommon],
   props: {
@@ -43,10 +76,11 @@ export default {
       default: 'text',
       validator (value) {
         return [
-          'email', 'number', 'password', 'search', 'tel', 'text', 'url'
+          'email', 'number', 'password', 'search', 'tel', 'text', 'url', 'date',
+          'datetime', 'time'
           // unsupported type:
-          // button, checkbox, color, date, datetime, file, hidden, image,
-          // month, radio, range, reset, submit, time, week,
+          // button, checkbox, color, file, hidden, image,
+          // month, radio, range, reset, submit, week,
         ].indexOf(value) !== -1
       }
     },
@@ -65,15 +99,15 @@ export default {
   },
 
   render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
+    if (!this._id) {
+      this._id = idCount++
+    }
     const events = extend(createEventMap(this), mapFormEvents(this))
     this._renderHook()
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
+        id: `${ID_PREFIX_INPUT}${this._id}`,
         type: this.type,
         value: this.value,
         disabled: (this.disabled !== 'false' && this.disabled !== false),
@@ -87,7 +121,7 @@ export default {
       },
       on: this.createKeyboardEvent(events),
       staticClass: 'weex-input weex-el',
-      staticStyle: extractComponentStyle(this)
+      staticStyle: processStyle(this)
     })
   },
   _css

@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertTrue;
@@ -36,7 +36,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Created by zhengshihan on 16/12/21.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
 @PrepareForTest(WXBridgeManager.class)
