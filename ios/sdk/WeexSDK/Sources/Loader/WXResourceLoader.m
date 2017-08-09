@@ -87,7 +87,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *fileData = [[NSFileManager defaultManager] contentsAtPath:[url path]];
         if (self.onFinished) {
-            self.onFinished([WXResourceResponse new], fileData);
+            self.onFinished([[WXResourceResponse alloc]initWithURL:url statusCode:200 HTTPVersion:@"1.1" headerFields:nil], fileData);
         }
     });
 }
