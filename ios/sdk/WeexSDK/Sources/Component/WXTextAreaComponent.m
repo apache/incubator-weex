@@ -46,6 +46,9 @@ typedef UITextView WXTextAreaView;
         self.placeHolderLabel.numberOfLines = 0;
         [_textView addSubview:self.placeHolderLabel];
     }
+    // default placeholder hide from voice over
+    self.placeHolderLabel.isAccessibilityElement = NO;
+    _textView.isAccessibilityElement = YES;
     _textView.delegate = self;
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];

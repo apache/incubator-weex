@@ -279,9 +279,7 @@ do {\
     if (!useCoreText) {
         ((WXText *)self.view).textStorage = _textStorage;
     }
-    if (_ariaLabel && !self.view.isAccessibilityElement) {
-        self.view.isAccessibilityElement = YES;
-    }
+    self.view.isAccessibilityElement = YES;
     
     [self setNeedsDisplay];
 }
