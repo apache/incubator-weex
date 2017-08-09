@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
 npm run build:vue
 npm run build:ci &
 port="${serport:-12581}"
