@@ -152,6 +152,25 @@ static WXModuleFactory *_sharedInstance = nil;
     return dict;
 }
 
+- (NSMutableDictionary *)_moduleSelctorMapsWithName:(NSString *)name
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSMutableArray *methods = [self _defaultModuleMethod];
+    
+    [_moduleLock lock];
+    [dict setValue:methods forKey:name];
+    
+    WXModuleConfig *config = _moduleMap[name];
+    void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        [methods addObject:mObj];
+    };
+    [config.syncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [_moduleLock unlock];
+    
+    return dict;
+}
+
 // module common method
 - (NSMutableArray*)_defaultModuleMethod
 {
@@ -194,6 +213,11 @@ static WXModuleFactory *_sharedInstance = nil;
 + (NSMutableDictionary *)moduleMethodMapsWithName:(NSString *)name
 {
     return [[self _sharedInstance] _moduleMethodMapsWithName:name];
+}
+
++ (NSMutableDictionary *)moduleSelectorMapsWithName:(NSString *)name
+{
+    return [[self _sharedInstance] _moduleSelctorMapsWithName:name];
 }
 
 @end

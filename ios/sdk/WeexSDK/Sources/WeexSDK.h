@@ -23,6 +23,7 @@
 #import "WXUtility.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXType.h"
+#import "WXTracingProtocol.h"
 #import "WXTracingManager.h"
 #import "WXScrollerProtocol.h"
 #import "WXScrollerComponent.h"
