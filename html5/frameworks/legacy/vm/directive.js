@@ -232,6 +232,12 @@ function setAttr (vm, el, attr) {
 }
 
 function setClassStyle (el, css, classList) {
+  if (typeof classList === 'string') {
+    classList = classList.split(/\s+/)
+  }
+  classList.forEach((name, i) => {
+    classList.splice(i, 1, ...name.split(/\s+/))
+  })
   const classStyle = {}
   const length = classList.length
 

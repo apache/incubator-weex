@@ -169,6 +169,7 @@ function build (name) {
   switch (name) {
     case 'native': pkgName = 'weex-js-framework'; break;
     case 'runtime': pkgName = 'weex-js-runtime'; break;
+    case 'legacy': pkgName = 'weex-legacy-framework'; break;
     case 'browser': pkgName = 'weex-web-render'; break;
     case 'vue': pkgName = 'weex-vue-render'; break;
     case 'vue-plugins': pkgName = 'weex-vue-render-plugins'; break;

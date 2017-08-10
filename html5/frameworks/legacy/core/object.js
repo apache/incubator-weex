@@ -17,6 +17,8 @@ _.define(
   objProto,
   '$add',
   function $add (key, val) {
+    console.warn(`[JS Framework] "Object.prototype.$add" is not a standard API,`
+      + ` it will be removed in the next version.`)
     if (this.hasOwnProperty(key)) return
     var ob = this.__ob__
     if (!ob || _.isReserved(key)) {
@@ -49,6 +51,8 @@ _.define(
   objProto,
   '$set',
   function $set (key, val) {
+    console.warn(`[JS Framework] "Object.prototype.$set" is not a standard API,`
+      + ` it will be removed in the next version.`)
     this.$add(key, val)
     this[key] = val
   }
@@ -66,6 +70,8 @@ _.define(
   objProto,
   '$delete',
   function $delete (key) {
+    console.warn(`[JS Framework] "Object.prototype.$delete" is not a standard API,`
+      + ` it will be removed in the next version.`)
     if (!this.hasOwnProperty(key)) return
     delete this[key]
     var ob = this.__ob__

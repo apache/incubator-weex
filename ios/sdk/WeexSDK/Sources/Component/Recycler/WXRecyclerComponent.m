@@ -31,6 +31,8 @@
 #import "WXUtility.h"
 #import "WXMonitor.h"
 #import "NSObject+WXSwizzle.h"
+#import "WXComponent+Events.h"
+#import "WXRecyclerDragController.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -75,7 +77,7 @@ typedef enum : NSUInteger {
 - (void)prepareForReuse
 {
     [super prepareForReuse];
-
+    
     WXCellComponent *cellComponent = (WXCellComponent *)self.wx_component;
     if (cellComponent.isRecycle && [cellComponent isViewLoaded] && [self.contentView.subviews containsObject:cellComponent.view]) {
         [cellComponent _unloadViewWithReusing:YES];
@@ -84,11 +86,12 @@ typedef enum : NSUInteger {
 
 @end
 
-@interface WXRecyclerComponent () <UICollectionViewDataSource, UICollectionViewDelegate, WXMultiColumnLayoutDelegate, WXRecyclerUpdateControllerDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
+@interface WXRecyclerComponent () <UICollectionViewDataSource, UICollectionViewDelegate, WXMultiColumnLayoutDelegate, WXRecyclerUpdateControllerDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate, WXRecyclerDragControllerDelegate>
 
 @property (nonatomic, strong, readonly) WXRecyclerDataController *dataController;
 @property (nonatomic, strong, readonly) WXRecyclerUpdateController *updateController;
 @property (nonatomic, weak, readonly) UICollectionView *collectionView;
+@property (nonatomic, strong) WXRecyclerDragController *dragController;
 
 @end
 
@@ -106,6 +109,7 @@ typedef enum : NSUInteger {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         [self _fillPadding];
         
+        
         if ([type isEqualToString:@"waterfall"] || (attributes[@"layout"] && [attributes[@"layout"] isEqualToString:@"multi-column"])) {
             // TODO: abstraction
             _layoutType = WXRecyclerLayoutTypeMultiColumn;
@@ -115,7 +119,7 @@ typedef enum : NSUInteger {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeAuto];
             layout.columnCount = [WXConvert WXLength:attributes[@"columnCount"] isFloat:NO scaleFactor:1.0] ? : [WXLength lengthWithInt:1 type:WXLengthTypeFixed];
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
-
+            
             layout.delegate = self;
         } else {
             _collectionViewlayout = [UICollectionViewLayout new];
@@ -125,6 +129,17 @@ typedef enum : NSUInteger {
         _updateController = [WXRecyclerUpdateController new];
         _updateController.delegate = self;
         [self fixFlicker];
+        
+        _dragController = [WXRecyclerDragController new];
+        _dragController.delegate = self;
+        if ([attributes[@"draggable"] boolValue]) {
+            if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
+                _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
+            }
+            _dragController.isDragable = YES;
+        }else{
+            _dragController.isDragable = NO;
+        }
     }
     
     return self;
@@ -156,6 +171,9 @@ typedef enum : NSUInteger {
     [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
     
+    _dragController.dragingCell = [[WXCollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 100, 100/2.0f)];
+    _dragController.collectionView = _collectionView;
+    
     [self performUpdatesWithCompletion:^(BOOL finished) {
         
     }];
@@ -177,6 +195,16 @@ typedef enum : NSUInteger {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         WXMultiColumnLayout *layout = (WXMultiColumnLayout *)_collectionViewlayout;
         BOOL needUpdateLayout = NO;
+        
+        if ([attributes[@"draggable"] boolValue]) {
+            if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
+                _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
+            }
+            _dragController.isDragable = YES;
+        }else{
+            _dragController.isDragable = NO;
+        }
+        
         if (attributes[@"columnWidth"]) {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor];
             needUpdateLayout = YES;
@@ -261,7 +289,7 @@ typedef enum : NSUInteger {
     }
     
     [_collectionView setContentOffset:contentOffset animated:animated];
-
+    
 }
 
 - (void)performUpdatesWithCompletion:(void (^)(BOOL finished))completion
@@ -297,7 +325,7 @@ typedef enum : NSUInteger {
     
     WXPerformBlockOnMainThread(^{
         [self performUpdatesWithCompletion:^(BOOL finished) {
-    
+            
         }];
     });
 }
@@ -353,6 +381,8 @@ typedef enum : NSUInteger {
     
     cellView.wx_component = contentView.wx_component;
     
+    [self.dragController goThroughAnchor:cellView.wx_component indexPath:indexPath];
+    
     if (contentView.superview == cellView.contentView) {
         return cellView;
     }
@@ -377,7 +407,7 @@ typedef enum : NSUInteger {
             for (UIView *view in reusableView.subviews) {
                 [view removeFromSuperview];
             }
-
+            
             [reusableView addSubview:contentView];
         }
     }
@@ -653,6 +683,22 @@ typedef enum : NSUInteger {
         NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
         [[self class] weex_swizzle:[WXCollectionView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
     });
+}
+
+#define mark dragControllerDelegate
+
+- (void)updateDataSource{
+    NSMutableArray *oldComponents = [[NSMutableArray alloc] initWithArray:self.dataController.sections[self.dragController.startIndexPath.section].cellComponents];
+    if(oldComponents.count > 1){
+        WXCellComponent *startComponent = self.dataController.sections[self.dragController.startIndexPath.section].cellComponents[self.dragController.startIndexPath.item];
+        [oldComponents removeObject:startComponent];
+        [oldComponents insertObject:startComponent atIndex:self.dragController.targetIndexPath.item];
+        self.dataController.sections[self.dragController.startIndexPath.section].cellComponents = oldComponents;
+    }
+}
+
+- (void)dragFireEvent:(NSString *)eventName params:(NSDictionary *)params{
+    [self fireEvent:eventName params:params];
 }
 
 - (void)fixedFlickerSelector

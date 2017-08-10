@@ -28,6 +28,7 @@
 #import "WXScannerVC.h"
 #import "WXScannerHistoryVC.h"
 #import "WXSyncTestModule.h"
+#import "WXExtModule.h"
 #import "UIView+UIThreadCheck.h"
 #import <WeexSDK/WeexSDK.h>
 #import <AVFoundation/AVFoundation.h>
@@ -119,6 +120,8 @@
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
     [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];
+    [WXSDKEngine registerModule:@"ext" withClass:[WXExtModule class]];
+    
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];
@@ -148,11 +151,6 @@
 #else
     ((WXDemoViewController *)demo).url = [NSURL URLWithString:BUNDLE_URL];
 #endif
-    
-#ifdef UITEST
-    ((WXDemoViewController *)demo).url = [NSURL URLWithString:UITEST_HOME_URL];
-#endif
-    
     return demo;
 }
 
