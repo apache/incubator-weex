@@ -22,10 +22,6 @@
 import { isElementVisible } from './component'
 import { createEvent, dispatchEvent } from './event'
 import { throttle } from './func'
-import { tagImg } from './perf'
-
-const SCREEN_REC_LIMIT = 3  // just record the first 3 times for screen-render finishing.
-let doRecord = true
 
 function preLoadImg (src: string,
     loadCallback: ?(Event) => void,
@@ -40,14 +36,9 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
   if (!src) { return }
   function finallCb () {
     delete item._src_loading
-    if (doRecord) {
-      if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
-        tagImg() // tag lastest img onload time.
-      }
-      else {
-        doRecord = false
-      }
-    }
+  }
+  if (item._src_loading) {
+    return
   }
   /**
    * 1. apply src immediately in case javscript blocks the image loading
@@ -59,9 +50,6 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
    * 2. then load the img src with Image constructor (but would not post
    *  a request again), just to trigger the load event.
    */
-  if (item._src_loading) {
-    return
-  }
   item._src_loading = true
   preLoadImg(src, function (evt) {
     item.style.backgroundImage = `url(${src || ''})`
@@ -103,12 +91,6 @@ export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?bo
     else if (isElementVisible(img, el)) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
-    // In somecases there are images out of the screen in x-axis. There
-    // should not be a break point in these cases.
-    // else {
-    //   // alreay out of view, no need to compare any more.
-    //   break
-    // }
   }
 }
 

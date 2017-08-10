@@ -17,8 +17,9 @@
  * under the License.
  */
 
-import { extractComponentStyle, createEventMap } from '../core'
-import { extend } from '../utils'
+let extractComponentStyle, createEventMap, extend
+
+const IMG_NAME_BITS = 15
 
 const _css = `
 .weex-image, .weex-img {
@@ -53,7 +54,53 @@ function preProcessSrc (context, url, mergedStyle) {
   }) || url
 }
 
-export default {
+function download (url, callback) {
+  function success () {
+    callback && callback({
+      success: true
+    })
+  }
+  function fail (err) {
+    callback && callback({
+      success: false,
+      errorDesc: err + ''
+    })
+  }
+  try {
+    let isDataUrl = false
+    let parts
+    let name
+    if (url.match(/data:image\/[^;]+;base64,/)) {
+      isDataUrl = true
+      parts = url.split(',')
+    }
+    if (!isDataUrl) {
+      name = url
+        .replace(/\?[^?]+/, '')
+        .replace(/#[^#]+/, '')
+        .match(/([^/]+)$/)
+    }
+    else {
+      name = parts[1].substr(0, IMG_NAME_BITS)
+    }
+    const aEl = document.createElement('a')
+    aEl.href = url
+    /**
+     * Not all browser support this 'download' attribute. In these browsers it'll jump
+     * to the photo url page and user have to longpress the photo to save it.
+     */
+    aEl.download = name
+    const clickEvt = new Event('click', { bubbles: false })
+    aEl.dispatchEvent(clickEvt)
+    success()
+  }
+  catch (err) {
+    fail(err)
+  }
+}
+
+const image = {
+  name: 'weex-image',
   props: {
     src: String,
     placeholder: String,
@@ -71,15 +118,15 @@ export default {
     this._fireLazyload()
   },
 
+  methods: {
+    save (callback) {
+      download(this.src, callback)
+    }
+  },
+
   render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    // const style = this._normalizeInlineStyles(this.$vnode.data)
     const resizeStyle = getResizeStyle(this)
     const style = extractComponentStyle(this)
-    this._renderHook()
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
@@ -92,4 +139,15 @@ export default {
     })
   },
   _css
+}
+
+export default {
+  init (weex) {
+    extractComponentStyle = weex.extractComponentStyle
+    createEventMap = weex.createEventMap
+    extend = weex.utils.extend
+
+    weex.registerComponent('image', image)
+    weex.registerComponent('img', image)
+  }
 }

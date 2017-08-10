@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { extractComponentStyle } from '../../core'
-import { getRgb, loopArray, getStyleSheetById } from '../../utils'
+let extractComponentStyle, getRgb, loopArray, getStyleSheetById
 
 const _css = `
 .weex-refresh-indicator,
@@ -180,10 +179,10 @@ function processStyle (vm) {
   return style
 }
 
-export default {
+const loadingIndicator = {
+  name: 'weex-loading-indicator',
   render (createElement) {
     this.weexType = 'loading-indicator'
-    this._renderHook()
     return createElement('mark', {
       attrs: { 'weex-type': 'loading-indicator' },
       staticClass: 'weex-loading-indicator weex-ct',
@@ -191,4 +190,14 @@ export default {
     })
   },
   _css
+}
+
+export default {
+  init (weex) {
+    extractComponentStyle = weex.extractComponentStyle
+    getRgb = weex.utils.getRgb
+    loopArray = weex.utils.loopArray
+    getStyleSheetById = weex.utils.getStyleSheetById
+    weex.registerComponent('loading-indicator', loadingIndicator)
+  }
 }

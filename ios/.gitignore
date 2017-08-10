@@ -64,4 +64,5 @@ fastlane/screenshots
 # Created by https://www.gitignore.io/api/node
 
 *.gcno
+.xcodecoverageignore
 

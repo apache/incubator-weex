@@ -25,6 +25,7 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXComponentManager.h"
 #import "WXDefine.h"
+#import "WXSDKEngine.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
