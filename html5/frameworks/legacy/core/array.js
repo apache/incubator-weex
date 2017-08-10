@@ -64,6 +64,8 @@ def(
   arrayProto,
   '$set',
   function $set (index, val) {
+    console.warn(`[JS Framework] "Array.prototype.$set" is not a standard API,`
+      + ` it will be removed in the next version.`)
     if (index >= this.length) {
       this.length = index + 1
     }
@@ -82,6 +84,8 @@ def(
   arrayProto,
   '$remove',
   function $remove (index) {
+    console.warn(`[JS Framework] "Array.prototype.$remove" is not a standard API,`
+      + ` it will be removed in the next version.`)
     /* istanbul ignore if */
     if (!this.length) return
     /* istanbul ignore else */

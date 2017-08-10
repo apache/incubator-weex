@@ -31,6 +31,11 @@ import {
 import {
   init
 } from '../../../../render/vue/env/viewport'
+
+function trimSpace (str) {
+  return str.replace(/\s/g, '')
+}
+
 describe('style', function () {
   // const rect = document.documentElement.getBoundingClientRect()
   // const info = {}
@@ -108,15 +113,20 @@ describe('transform', () => {
     })
     it('should inherit transform properties from element', () => {
       addTransform(node, style, false)
-      expect(node.style.transform).to.be.equal(style.translate + ' ' + nodeStyle.scale + ' ' + style.rotate + ' ')
-        // webkitTransform will remove last whitespace automatically
-      expect(node.style.webkitTransform).to.be.equal(style.translate + ' ' + nodeStyle.scale + ' ' + style.rotate)
+      expect(trimSpace(node.style.transform)).to.be.equal(
+        trimSpace(style.translate + nodeStyle.scale + style.rotate))
+      // webkitTransform will remove last whitespace automatically
+      expect(trimSpace(node.style.webkitTransform)).to.be.equal(
+        trimSpace(style.translate + nodeStyle.scale + style.rotate)
+      )
     })
     it('should replace all transform properties', () => {
       addTransform(node, style, true)
-      expect(node.style.transform).to.be.equal(style.translate + ' ' + style.rotate + ' ')
-        // webkitTransform will remove last whitespace automatically
-      expect(node.style.webkitTransform).to.be.equal(style.translate + ' ' + style.rotate)
+      expect(trimSpace(node.style.transform)).to.be.equal(
+        trimSpace(style.translate + style.rotate))
+      // webkitTransform will remove last whitespace automatically
+      expect(trimSpace(node.style.webkitTransform)).to.be.equal(
+        trimSpace(style.translate + style.rotate))
     })
   })
   describe('should add translate X to the element', () => {
@@ -128,8 +138,8 @@ describe('transform', () => {
     let node = null
     beforeEach(() => {
       node = document.createElement('div')
-        // node.style.transform = nodeStyle.translate+' '+nodeStyle.scale+' '+ nodeStyle.rotate
-        // node.style.webkitTransform = nodeStyle.translate+' '+nodeStyle.scale+' '+ nodeStyle.rotate
+      // node.style.transform = nodeStyle.translate+' '+nodeStyle.scale+' '+ nodeStyle.rotate
+      // node.style.webkitTransform = nodeStyle.translate+' '+nodeStyle.scale+' '+ nodeStyle.rotate
     })
     it('should element has translate property', () => {
       const toAdd = 2
@@ -137,14 +147,19 @@ describe('transform', () => {
       const translateReplaceFunction = ($0) => {
         return (parseFloat($0) + toAdd) + 'px'
       }
-      const removeSpaceReg = /(\s?)/g
       node.style.transform = nodeStyle.translate + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate
       node.style.webkitTransform = nodeStyle.translate + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate
       addTranslateX(node, toAdd)
       // webkitTransform will reserved whitespace between translate value but transform will not.
-      expect(node.style.transform).to.be.equal(nodeStyle.translate.replace(translateReg, translateReplaceFunction).replace(removeSpaceReg, '') + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate + ' ')
+      expect(trimSpace(node.style.transform)).to.be.equal(
+        trimSpace(nodeStyle.translate.replace(translateReg, translateReplaceFunction)
+        + nodeStyle.scale
+        + nodeStyle.rotate))
       // webkitTransform will remove last whitespace automatically
-      expect(node.style.webkitTransform).to.be.equal(nodeStyle.translate.replace(translateReg, translateReplaceFunction) + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate)
+      expect(trimSpace(node.style.webkitTransform)).to.be.equal(
+        trimSpace(nodeStyle.translate.replace(translateReg, translateReplaceFunction)
+        + nodeStyle.scale
+        + nodeStyle.rotate))
     })
     it('should element does not have translate property', () => {
       const toAdd = 2
@@ -157,17 +172,22 @@ describe('transform', () => {
       node.style.webkitTransform = nodeStyle.scale + ' ' + nodeStyle.rotate
       addTranslateX(node, toAdd)
       // transform will reserved whitespace when translate on the last position.
-      expect(node.style.transform).to.be.equal(nodeStyle.scale + ' ' + nodeStyle.rotate + ' ' + defaultTranslate.replace(translateReg, translateReplaceFunction) + ' ')
+      expect(trimSpace(node.style.transform)).to.be.equal(
+        trimSpace(nodeStyle.scale + nodeStyle.rotate + defaultTranslate.replace(translateReg, translateReplaceFunction)))
       // webkitTransform will remove last whitespace automatically
-      expect(node.style.webkitTransform).to.be.equal(nodeStyle.scale + ' ' + nodeStyle.rotate + ' ' + defaultTranslate.replace(translateReg, translateReplaceFunction))
+      expect(trimSpace(node.style.webkitTransform)).to.be.equal(
+        trimSpace(nodeStyle.scale + nodeStyle.rotate + defaultTranslate.replace(translateReg, translateReplaceFunction)))
     })
     it('should elemet remain', () => {
       const toAdd = 0
       node.style.transform = nodeStyle.scale + ' ' + nodeStyle.rotate
       node.style.webkitTransform = nodeStyle.scale + ' ' + nodeStyle.rotate
       addTranslateX(node, toAdd)
-      expect(node.style.transform).to.be.equal(nodeStyle.scale + ' ' + nodeStyle.rotate)
-      expect(node.style.webkitTransform).to.be.equal(nodeStyle.scale + ' ' + nodeStyle.rotate)
+      expect(trimSpace(node.style.transform)).to.be.equal(
+        trimSpace(nodeStyle.scale + nodeStyle.rotate))
+      expect(trimSpace(node.style.webkitTransform)).to.be.equal(
+        trimSpace(nodeStyle.scale + nodeStyle.rotate)
+      )
     })
   })
 })

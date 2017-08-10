@@ -16,53 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../../validator'
-// import indicator from './indicator'
-import slideMixin from './slideMixin'
+
+import slider from './slider'
+import indicator from './indicator'
 
 export default {
-  mixins: [slideMixin],
-  props: {
-    index: {
-      type: [String, Number],
-      default: 0
-    },
-    'auto-play': {
-      type: [String, Boolean],
-      default: false
-    },
-    interval: {
-      type: [String, Number],
-      default: 3000
-    },
-    infinite: {
-      type: [String, Boolean],
-      default: true
-    }
-  },
-
-  watch: {
-    index () {
-      this.currentIndex = this._normalizeIndex(this.index)
-    }
-  },
-
-  data () {
-    return {
-      frameCount: 0,
-      currentIndex: this.index
-    }
-  },
-
-  beforeCreate () {
-    this.weexType = 'slider'
-  },
-
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    return this._renderSlides(createElement)
+  init (weex) {
+    weex.install(slider)
+    weex.install(indicator)
   }
 }

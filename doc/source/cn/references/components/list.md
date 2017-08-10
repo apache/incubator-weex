@@ -62,8 +62,8 @@ version: 2.1
 ## 事件
 
 - `loadmore` <sup class="wx-v">0.5+</sup>：如果列表滚动到底部将会立即触发这个事件，你可以在这个事件的处理函数中加载下一页的列表项。
-- `onscroll` <sup class="wx-v">0.11+</sup>: 列表发生滚动时将会触发该事件，事件的默认抽样率为10px，即列表每滚动10px触发一次，可通过属性`offset-accuracy`设置抽样率。    
-  
+- `scroll` <sup class="wx-v">0.11+</sup>: 列表发生滚动时将会触发该事件，事件的默认抽样率为10px，即列表每滚动10px触发一次，可通过属性`offset-accuracy`设置抽样率。    
+
   事件中 event 对象属性：
   - `contentSize {Object}`：列表的内容尺寸
     - `width {number}`: 列表内容宽度
@@ -73,10 +73,6 @@ version: 2.1
     - `y {number}`: y轴上的偏移量
 
   [体验一下](http://dotwe.org/bc445ede8746a31360e3607d210304c5)
-
-- `scroll` <sup class="wx-v">0.12+</sup>：列表滚动时触发这个事件。此事件回调中会给出当前`contentOffset`值。
-
-  [体验一下](http://dotwe.org/weex/7ba3b6222d912b4b0b4aafb8248ca22f)
 
 - 通用事件
 

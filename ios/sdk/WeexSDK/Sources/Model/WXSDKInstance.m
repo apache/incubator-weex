@@ -157,6 +157,8 @@ typedef enum : NSUInteger {
     _options = options;
     _jsData = data;
     
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
+    
     [self _renderWithMainBundleString:source];
     
     [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
@@ -197,6 +199,7 @@ typedef enum : NSUInteger {
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
     
     [self _handleConfigCenter];
     

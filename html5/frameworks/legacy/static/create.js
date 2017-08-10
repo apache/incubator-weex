@@ -42,13 +42,10 @@ export function createInstance (id, code, options, data, info) {
   if (!instance) {
     instance = new App(id, options)
     instanceMap[id] = instance
-    result = initApp(instance,
-                     code,
-                     data,
-                     services)
+    result = initApp(instance, code, data, services)
   }
   else {
     result = new Error(`invalid instance id "${id}"`)
   }
-  return result
+  return (result instanceof Error) ? result : instance
 }

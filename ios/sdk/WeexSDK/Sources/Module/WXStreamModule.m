@@ -24,6 +24,7 @@
 #import "WXNetworkProtocol.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXResourceLoader.h"
+#import "WXSDKEngine.h"
 
 @implementation WXStreamModule
 

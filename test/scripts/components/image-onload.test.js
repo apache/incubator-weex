@@ -51,6 +51,16 @@ describe('image onload @ignore-ios', function () {
         }
         assert.equal(text, '360,388')
     })
+  });
+
+  it('#2 test download image failed event', () => {
+    return driver
+    .sleep(5000)
+    .elementById('download')
+    .text()
+    .then((text)=>{
+        assert.equal(text, 'failed')
+    })
   })
 });
 

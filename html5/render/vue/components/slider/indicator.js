@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { extractComponentStyle } from '../../core'
-import { extend, extendKeys } from '../../utils'
 
 const _css = `
 .weex-indicator {
@@ -47,6 +45,8 @@ const _css = `
   background-color: blue;
 }
 `
+
+let extractComponentStyle, extend, extendKeys
 
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
@@ -157,8 +157,8 @@ function _reLayout (context, virtualRect, ltbr) {
   })
 }
 
-export default {
-  name: 'indicator',
+const indicator = {
+  name: 'weex-indicator',
   methods: {
     show: function () {
       this.$el.style.visibility = 'visible'
@@ -175,8 +175,16 @@ export default {
     this.count = count
     this.active = active
     if (!this.count) { return }
-    this._renderHook()
     return _render(this, createElement)
   },
   _css
+}
+
+export default {
+  init (weex) {
+    extractComponentStyle = weex.extractComponentStyle
+    extend = weex.utils.extend
+    extendKeys = weex.utils.extendKeys
+    weex.registerComponent('indicator', indicator)
+  }
 }
