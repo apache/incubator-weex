@@ -155,6 +155,7 @@ class AnimationAction implements DOMAction, RenderAction {
             if (interpolator != null) {
               animator.setInterpolator(interpolator);
             }
+            component.getHostView().setCameraDistance(mAnimationBean.styles.getCameraDistance());
             animator.setDuration(mAnimationBean.duration);
             animator.start();
           }
