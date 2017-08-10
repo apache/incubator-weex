@@ -4,7 +4,7 @@
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.21.7",
-    "vue-render": "0.12.1",
+    "vue-render": "0.12.3",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -89,8 +89,9 @@
     "danger": "danger"
   },
   "dependencies": {
-    "autoprefixer": "^6.7.7",
+    "@weex-project/downgrade": "^1.0.3",
     "animationjs": "^0.1.5",
+    "autoprefixer": "^6.7.7",
     "blink-diff": "~1.0.12",
     "core-js": "^2.4.0",
     "cubicbezier": "^0.1.1",
@@ -104,8 +105,8 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.7",
-    "weex-vue-framework": "2.4.2-weex.3",
-    "weex-styler": "0.1.9"
+    "weex-styler": "0.1.9",
+    "weex-vue-framework": "2.4.2-weex.3"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",

@@ -632,6 +632,11 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
    * @param json the original JSONObject
    * @return Dom Object corresponding to the JSONObject.
    */
+  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance) {
+      return parse(json, wxsdkInstance, null);
+  }
+
+  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance, WXDomObject parentDomObject){
   public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance){
       long startNanos = System.nanoTime();
       long timestamp = System.currentTimeMillis();
@@ -646,15 +651,17 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
                 .getValidateProcessor();
         if (processor != null) {
           WXValidateProcessor.WXComponentValidateResult result = processor
-                  .onComponentValidate(wxsdkInstance, type);
+                  .onComponentValidate(wxsdkInstance, type, parentDomObject);
           if (result != null && !result.isSuccess) {
             type = TextUtils.isEmpty(result.replacedComponent) ? WXBasicComponentType.DIV
                     : result.replacedComponent;
             json.put(TYPE, type);
-            if(WXEnvironment.isApkDebugable()&&result.validateInfo!=null){
-              String tag = "[WXDomObject]onComponentValidate failure. >>> "+result.validateInfo.toJSONString();
+            if (WXEnvironment.isApkDebugable() && result.validateInfo != null) {
+              String tag = "[WXDomObject]onComponentValidate failure. >>> " + result.validateInfo.toJSONString();
               WXLogUtils.e(tag);
             }
+          } else if (result == null){
+            return null;
           }
         }
       }
@@ -668,13 +675,14 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       }
       domObject.parseFromJson(json);
       domObject.mDomContext = wxsdkInstance;
+      domObject.parent = parentDomObject;
 
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {
         JSONArray childrenArray = (JSONArray) children;
         int count = childrenArray.size();
         for (int i = 0; i < count; ++i) {
-          domObject.add(parse(childrenArray.getJSONObject(i),wxsdkInstance),-1);
+          domObject.add(parse(childrenArray.getJSONObject(i),wxsdkInstance, domObject),-1);
         }
       }
 

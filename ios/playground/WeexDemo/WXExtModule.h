@@ -16,14 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default {
-  scrollableTypes: ['scroller', 'list', 'waterfall'],
-  gestureEvents: [
-    'panstart',
-    'panmove',
-    'panend',
-    'swipe',
-    'longpress',
-    'tap'
-  ]
-}
+
+#import <Foundation/Foundation.h>
+
+#import <WeexSDK/WXModuleProtocol.h>
+
+@interface WXExtModule : NSObject <WXModuleProtocol>
+
+@end

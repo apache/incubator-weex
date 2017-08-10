@@ -88,7 +88,7 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
 
     //only non-root has parent.
     Stopwatch.tick();
-    WXDomObject domObject = WXDomObject.parse(dom, instance);
+    WXDomObject domObject = WXDomObject.parse(dom, instance, null);
     Stopwatch.split("parseDomObject");
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
