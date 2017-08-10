@@ -19,12 +19,14 @@
 /**
  * websocket module
  */
+/*global WebSocket*/
 export default (function () {
   const registerListeners = ['onopen', 'onmessage', 'onerror', 'onclose']
   const ws = {
     INSTANCE: null,
     WebSocket: function (url, protocol) {
       if (!url) {
+        ws.INSTANCE = null
         return
       }
       if (!protocol) {

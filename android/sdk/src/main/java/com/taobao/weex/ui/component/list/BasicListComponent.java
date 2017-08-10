@@ -92,6 +92,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private int mListCellCount = 0;
   private boolean mForceLoadmoreNextTime = false;
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
+  private static int visibleCellCount = 6;
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
@@ -113,7 +114,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
-  private boolean mStable = false;
 
   private RecyclerView.ItemAnimator mItemAnimator;
 
@@ -301,16 +301,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
 
-        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-          for (ListBaseViewHolder holder : recycleViewList) {
-            if (holder != null
-                && holder.getComponent() != null
-                && !holder.getComponent().isUsing()) {
-               holder.recycled();
-            }
-          }
-          recycleViewList.clear();
-        }
+        if (newState == RecyclerView.SCROLL_STATE_IDLE)
+          recycleViewHolderList();
+
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         if (listeners != null && listeners.size() > 0) {
           for (OnWXScrollListener listener : listeners) {
@@ -366,6 +359,17 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return bounceRecyclerView;
   }
 
+  private void recycleViewHolderList() {
+    for (ListBaseViewHolder holder : recycleViewList) {
+      if (holder != null
+              && holder.getComponent() != null
+              && !holder.getComponent().isUsing()) {
+        holder.recycled();
+      }
+    }
+    recycleViewList.clear();
+  }
+
   @Override
   public void bindStickStyle(WXComponent component) {
     stickyHelper.bindStickStyle(component, mStickyMap);
@@ -403,9 +407,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       case Constants.Name.OFFSET_ACCURACY:
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
-        return true;
-      case Constants.Name.STABLE:
-        this.mStable = WXUtils.getBoolean(param, false);
         return true;
       case Constants.Name.DRAGGABLE:
         boolean draggable = WXUtils.getBoolean(param,false);
@@ -817,6 +818,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     holder.setComponentUsing(false);
     if(holder.canRecycled()) {
       recycleViewList.add(holder);
+
+      // recycleViewList allowed max size
+      int threshold = visibleCellCount >= 6 ? (visibleCellCount * 6) : (6*6);
+
+      /**
+       * Recycle cache{@link recycleViewList} when recycleViewList.size() > list max child count or threshold
+       */
+      if (recycleViewList.size() > getChildCount() + 1 || recycleViewList.size() >= threshold) {
+        WXLogUtils.d(TAG, "Recycle holder list recycled : cache size is " + recycleViewList.size() +
+                ", visibleCellCount is " + visibleCellCount + ", threshold is " + threshold +
+                ", child count is " + getChildCount());
+        recycleViewHolderList();
+      }
     } else {
       WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
     }
@@ -1183,6 +1197,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
 
+    if (mColumnCount > 0)
+      visibleCellCount = (lastVisible - firstVisible) * mColumnCount;
+
     while (it.hasNext()) {
       AppearanceHelper item = it.next();
       WXComponent component = item.getAwareChild();
@@ -1240,41 +1257,61 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
       WXRecyclerView innerView = getHostView().getInnerView();
       innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-        private int totalDy = 0;
+        private int offsetXCorrection, offsetYCorrection;
+        private boolean mFirstEvent = true;
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
           super.onScrolled(recyclerView, dx, dy);
+//          WXLogUtils.e("SCROLL", dx + ", " + dy + ", " + recyclerView.computeHorizontalScrollRange()
+//          + ", " + recyclerView.computeVerticalScrollRange()
+//          + ", " + recyclerView.computeHorizontalScrollOffset()
+//          + ", " + recyclerView.computeVerticalScrollOffset());
+
           int offsetX = recyclerView.computeHorizontalScrollOffset();
-          int offsetY = 0;
-          if (mStable) {
-            totalDy -= dy;
-            offsetY = totalDy;
+          int offsetY = recyclerView.computeVerticalScrollOffset();
+
+          if (dx == 0 && dy == 0) {
+            offsetXCorrection = offsetX;
+            offsetYCorrection = offsetY;
+            offsetX = 0;
+            offsetY = 0;
           } else {
-            offsetY = recyclerView.computeVerticalScrollOffset();
+            offsetX = offsetX - offsetXCorrection;
+            offsetY = offsetY - offsetYCorrection;
+          }
+
+          if (mFirstEvent) {
+            //skip first event
+            mFirstEvent = false;
+            return;
           }
 
           if (shouldReport(offsetX, offsetY)) {
-            int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-            int contentHeight = recyclerView.computeVerticalScrollRange();
-
-            Map<String, Object> event = new HashMap<>(2);
-            Map<String, Object> contentSize = new HashMap<>(2);
-            Map<String, Object> contentOffset = new HashMap<>(2);
-
-            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
-            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
-
-            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getInstanceViewPortWidth()));
-            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
-            event.put(Constants.Name.CONTENT_SIZE, contentSize);
-            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-            fireEvent(Constants.Event.SCROLL, event);
+            fireScrollEvent(recyclerView, offsetX, offsetY);
           }
         }
       });
     }
+  }
+
+  private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+    int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
+    int contentHeight = recyclerView.computeVerticalScrollRange();
+
+    Map<String, Object> event = new HashMap<>(2);
+    Map<String, Object> contentSize = new HashMap<>(2);
+    Map<String, Object> contentOffset = new HashMap<>(2);
+
+    contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
+    contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
+
+    contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getInstanceViewPortWidth()));
+    contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
+    event.put(Constants.Name.CONTENT_SIZE, contentSize);
+    event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+    fireEvent(Constants.Event.SCROLL, event);
   }
 
   private boolean shouldReport(int offsetX, int offsetY) {
@@ -1284,7 +1321,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       return true;
     }
 
-    if (Math.abs(mLastReport.x - offsetX) >= mOffsetAccuracy || Math.abs(mLastReport.y - offsetY) >= mOffsetAccuracy) {
+    int gapX = Math.abs(mLastReport.x - offsetX);
+    int gapY = Math.abs(mLastReport.y - offsetY);
+
+    if (gapX >= mOffsetAccuracy || gapY >= mOffsetAccuracy) {
       mLastReport.x = offsetX;
       mLastReport.y = offsetY;
       return true;

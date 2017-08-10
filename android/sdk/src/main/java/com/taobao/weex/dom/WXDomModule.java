@@ -93,7 +93,6 @@ public final class WXDomModule extends WXModule {
     if (method == null) {
       return null;
     }
-    WXLogUtils.e("shiwentao  callDomMethod:" + method);
     //TODO：add pooling
     try {
       Action action = Actions.get(method,args);

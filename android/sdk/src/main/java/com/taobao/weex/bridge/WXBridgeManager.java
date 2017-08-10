@@ -1410,14 +1410,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private WXParams assembleDefaultOptions() {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
-    wxParams.setPlatform(config.get("os"));
-    wxParams.setOsVersion(config.get("sysVersion"));
-    wxParams.setAppVersion(config.get("appVersion"));
-    wxParams.setWeexVersion(config.get("weexVersion"));
-    wxParams.setDeviceModel(config.get("sysModel"));
+    wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setOsVersion(config.get(WXConfig.sysVersion));
+    wxParams.setAppVersion(config.get(WXConfig.appVersion));
+    wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
+    wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
-    String appName = config.get("appName");
+    String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
     }

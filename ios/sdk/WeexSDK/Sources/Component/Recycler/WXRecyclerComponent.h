@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#import <WeexSDK/WeexSDK.h>
+
+#import "WXScrollerComponent.h"
 
 @interface WXRecyclerComponent : WXScrollerComponent
 

@@ -254,12 +254,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mNestedInstanceInterceptor = interceptor;
   }
 
-  public WXSDKInstance createNestedInstance(NestedContainer container){
-    WXSDKInstance sdkInstance = new WXSDKInstance(mContext);
+  public final WXSDKInstance createNestedInstance(NestedContainer container){
+    WXSDKInstance sdkInstance = newNestedInstance();
     if(mNestedInstanceInterceptor != null){
       mNestedInstanceInterceptor.onCreateNestInstance(sdkInstance,container);
     }
     return sdkInstance;
+  }
+
+  protected WXSDKInstance newNestedInstance() {
+    return new WXSDKInstance(mContext);
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
@@ -1222,6 +1226,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mGlobalEvents.clear();
     }
 
+    if(mComponentObserver != null){
+        mComponentObserver = null;
+    }
 
     mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;

@@ -18,14 +18,3 @@
     }
   }
 </script>
-
-<style scoped>
-.event-bubble-outter {
-  height: 400px;
-  background-color: #f7f7f7;
-}
-.event-bubble-inner {
-  height: 200px;
-  background-color: #ccc;
-}
-</style>
