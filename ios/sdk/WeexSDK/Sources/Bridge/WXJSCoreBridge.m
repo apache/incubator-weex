@@ -34,6 +34,7 @@
 #import "JSValue+Weex.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXSDKManager.h"
+#import "WXExtendCallNativeManager.h"
 #import "WXTracingManager.h"
 
 #import <dlfcn.h>
@@ -103,6 +104,9 @@
             NSString *base64Decoded = [[NSString alloc]
                                        initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
             return base64Decoded;
+        };
+        _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
+            return [weakSelf extendCallNative:[value toDictionary]];
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -511,4 +515,13 @@
         [_timers removeObject:ret];
     }
 }
+
+-(id)extendCallNative:(NSDictionary *)dict
+{
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
+    }
+    return @(-1);
+}
+
 @end

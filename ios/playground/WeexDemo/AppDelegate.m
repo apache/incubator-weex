@@ -120,8 +120,8 @@
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
     [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];
+    [WXSDKEngine registerExtendCallNative:@"test" withClass:NSClassFromString(@"WXExtendCallNativeTest")];
     [WXSDKEngine registerModule:@"ext" withClass:[WXExtModule class]];
-    
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];
