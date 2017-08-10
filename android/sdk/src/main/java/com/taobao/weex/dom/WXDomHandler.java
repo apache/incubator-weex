@@ -23,9 +23,8 @@ import android.os.Message;
 import android.os.SystemClock;
 
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.common.WXTracing;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.dom.action.TraceableAction;
 
 /**
  * Handler for dom operations.
@@ -45,8 +44,6 @@ public class WXDomHandler implements Handler.Callback {
 
   @Override
   public boolean handleMessage(Message msg) {
-    long s = System.nanoTime();
-    String actionName = WXTracing.getFunctionName(msg);
     if (msg == null) {
       return false;
     }
@@ -54,11 +51,12 @@ public class WXDomHandler implements Handler.Callback {
     Object obj = msg.obj;
     WXDomTask task = null;
 
-    if (obj instanceof WXDomTask) {
+    if (obj != null && obj instanceof WXDomTask) {
       task = (WXDomTask) obj;
-      WXLogUtils.e("Tracing", "Method " + actionName + ", Queue time " + ((s - task.startTime) / 1000000.0) + " ms");
-    } else {
-      WXLogUtils.e("Tracing", "Method " + actionName + ", Queue time " + (SystemClock.uptimeMillis() - msg.getWhen()) + " ms");
+      Object action = ((WXDomTask) obj).args.get(0);
+      if (action != null && action instanceof TraceableAction) {
+        ((TraceableAction) action).mDomQueueTime = SystemClock.uptimeMillis() - msg.getWhen();
+      }
     }
 
     if (!mHasBatch) {
@@ -86,7 +84,6 @@ public class WXDomHandler implements Handler.Callback {
       default:
         break;
     }
-    WXLogUtils.e("Tracing", "Method " + actionName + ", Dom execute time " + ((System.nanoTime() - s) / 1000000.0) + " ms");
     return true;
   }
 

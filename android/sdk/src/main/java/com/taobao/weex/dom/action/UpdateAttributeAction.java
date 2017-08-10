@@ -33,7 +33,7 @@ import com.taobao.weex.ui.component.WXComponent;
  * Created by sospartan on 28/02/2017.
  */
 
-class UpdateAttributeAction implements DOMAction, RenderAction {
+class UpdateAttributeAction extends TraceableAction implements DOMAction, RenderAction {
   private final String mRef;
   private final JSONObject mData;
 

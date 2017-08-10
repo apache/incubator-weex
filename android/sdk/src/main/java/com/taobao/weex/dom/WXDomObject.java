@@ -86,7 +86,11 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   private boolean mYoung = false;
 
+  public long mDomThreadNanos;
+  public long mDomThreadTimestamp;
+
   public void traverseTree(Consumer...consumers){
+    long startNanos = System.nanoTime();
     if (consumers == null) {
       return;
     }
@@ -101,6 +105,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       child = getChild(i);
       child.traverseTree(consumers);
     }
+    mDomThreadNanos += (System.nanoTime() - startNanos);
   }
 
 
@@ -628,6 +633,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
    * @return Dom Object corresponding to the JSONObject.
    */
   public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance){
+      long startNanos = System.nanoTime();
+      long timestamp = System.currentTimeMillis();
       if (json == null || json.size() <= 0) {
         return null;
       }
@@ -671,6 +678,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
         }
       }
 
+      domObject.mDomThreadNanos = System.nanoTime() - startNanos;
+      domObject.mDomThreadTimestamp = timestamp;
       return domObject;
   }
 

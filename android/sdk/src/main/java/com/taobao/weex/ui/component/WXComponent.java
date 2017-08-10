@@ -31,6 +31,7 @@ import android.os.Build;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -76,6 +77,10 @@ import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1556,16 +1561,49 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 
-  public void onRenderFinish() {
-    if (isLazy()) {
-      return;
+  public static final int STATE_DOM_FINISH = 0;
+  public static final int STATE_UI_FINISH = 1;
+  public static final int STATE_ALL_FINISH = 2;
+  @IntDef({STATE_DOM_FINISH, STATE_UI_FINISH, STATE_ALL_FINISH})
+  @Retention(RetentionPolicy.SOURCE)
+  @Target(ElementType.PARAMETER)
+  public @interface RenderState {}
+
+  @CallSuper
+  public void onRenderFinish(@RenderState int state) {
+    if (WXTracing.isAvailable()) {
+      double domTime = Stopwatch.nanosToMillis(((WXDomObject) mDomObj).mDomThreadNanos + mTraceInfo.domThreadNanos);
+      double uiTime = Stopwatch.nanosToMillis(mTraceInfo.uiThreadNanos);
+      if (state == STATE_ALL_FINISH || state == STATE_DOM_FINISH) {
+        WXTracing.TraceEvent domEvent = WXTracing.newEvent("DomExecute", getInstanceId(), mTraceInfo.rootEventId);
+        domEvent.ph = "X";
+        domEvent.duration = domTime;
+        domEvent.ts = mTraceInfo.domThreadStart;
+        domEvent.tname = "DOMThread";
+        domEvent.name = getDomObject().getType();
+        domEvent.classname = getClass().getSimpleName();
+        if (getParent() != null) {
+          domEvent.parentRef = getParent().getRef();
+        }
+        domEvent.submit();
+      }
+
+      if (state == STATE_ALL_FINISH || state == STATE_UI_FINISH) {
+        if (mTraceInfo.uiThreadStart != -1) {
+          WXTracing.TraceEvent uiEvent = WXTracing.newEvent("UIExecute", getInstanceId(), mTraceInfo.rootEventId);
+          uiEvent.ph = "X";
+          uiEvent.duration = uiTime;
+          uiEvent.ts = mTraceInfo.uiThreadStart;
+          uiEvent.name = getDomObject().getType();
+          uiEvent.classname = getClass().getSimpleName();
+          if (getParent() != null) {
+            uiEvent.parentRef = getParent().getRef();
+          }
+          uiEvent.submit();
+        } else {
+          WXLogUtils.w("onRenderFinish", "createView() not called");
+        }
+      }
     }
-    double domTime = Stopwatch.nanosToMillis(((WXDomObject) mDomObj).mDomThreadNanos + mTraceInfo.domThreadNanos);
-    double uiTime = Stopwatch.nanosToMillis(mTraceInfo.uiThreadNanos);
-    WXLogUtils.e("RenderFinish", "Ref: " + getRef() + ", type: " + mDomObj.getType() + ", dom: " + mTraceInfo.domQueueTime + "/" + domTime + ", ui: " + mTraceInfo.uiQueueTime + "/" + uiTime);
-    WXTracing.TraceEvent domEvent = WXTracing.measureAndSubmit("dom " + mDomObj.getType() + "@" + getRef(), "X", mTraceInfo.rootEventId, getInstanceId(), domTime);
-    domEvent.ts = mTraceInfo.domThreadStart;
-    domEvent.tname = "DOMThread";
-    WXTracing.measureAndSubmit("ui " + mDomObj.getType() + "@" + getRef(), "X", mTraceInfo.rootEventId, getInstanceId(), uiTime).ts = mTraceInfo.uiThreadStart;
   }
 }

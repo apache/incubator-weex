@@ -850,7 +850,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
       if(holder.isRecycled()) {
         holder.bindData(component);
-        component.onRenderFinish();
+        component.onRenderFinish(STATE_UI_FINISH);
       }
       if (mDragHelper == null || !mDragHelper.isDraggable()) {
         return;

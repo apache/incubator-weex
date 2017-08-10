@@ -26,12 +26,13 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.utils.Stopwatch;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -172,9 +173,18 @@ class DOMActionContextImpl implements DOMActionContext {
     if (!mDirty || mDestroy) {
       return;
     }
-
+    long start = System.currentTimeMillis();
+    long startNanos = System.nanoTime();
     WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
     layout(rootDom);
+
+    if (WXTracing.isAvailable()) {
+      WXTracing.TraceEvent batchEvent = WXTracing.newEvent("domBatch", mInstanceId, -1);
+      batchEvent.duration = Stopwatch.nanosToMillis(System.nanoTime() - startNanos);
+      batchEvent.ts = start;
+      batchEvent.ph = "X";
+      WXTracing.submit(batchEvent);
+    }
   }
 
   void layout(WXDomObject rootDom) {
@@ -182,9 +192,7 @@ class DOMActionContextImpl implements DOMActionContext {
       return;
     }
     long start0 = System.currentTimeMillis();
-    Stopwatch.tick();
     rebuildingFixedDomTree(rootDom);
-    WXLogUtils.e("Tracing", "rebuildingFixedDomTree " + Stopwatch.tackAndTick() + " ms");
 
     rootDom.traverseTree( new WXDomObject.Consumer() {
       @Override
@@ -195,13 +203,9 @@ class DOMActionContextImpl implements DOMActionContext {
         dom.layoutBefore();
       }
     });
-    WXLogUtils.e("Tracing", "layoutBefore " + Stopwatch.tackAndTick() + " ms");
     long start = System.currentTimeMillis();
 
-
-    long s = System.nanoTime();
     rootDom.calculateLayout(mLayoutContext);
-    WXLogUtils.e("Tracing", "layout " + Stopwatch.tackAndTick() + " ms");
 
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
@@ -217,11 +221,9 @@ class DOMActionContextImpl implements DOMActionContext {
         dom.layoutAfter();
       }
     });
-    WXLogUtils.e("Tracing", "layoutAfter " + Stopwatch.tackAndTick() + " ms");
 
     start = System.currentTimeMillis();
     rootDom.traverseTree(new ApplyUpdateConsumer());
-    WXLogUtils.e("Tracing", "applyUpdateConsumer " + Stopwatch.tackAndTick() + " ms");
 
     if (instance != null) {
       instance.applyUpdateTime(System.currentTimeMillis() - start);
@@ -232,7 +234,6 @@ class DOMActionContextImpl implements DOMActionContext {
     if (instance != null) {
       instance.updateDomObjTime(System.currentTimeMillis() - start);
     }
-    WXLogUtils.e("Tracing", "updateDomObj " + Stopwatch.tack() + " ms");
     parseAnimation();
 
     boolean isPreRenderMode = instance != null && instance.isPreRenderMode();

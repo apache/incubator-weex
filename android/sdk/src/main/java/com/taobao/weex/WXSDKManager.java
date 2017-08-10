@@ -27,6 +27,7 @@ import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -83,6 +84,7 @@ public class WXSDKManager {
   private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
+  private ITracingAdapter mTracingAdapter;
   private WXValidateProcessor mWXValidateProcessor;
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
@@ -410,4 +412,11 @@ public class WXSDKManager {
     }
   }
 
+  public void setTracingAdapter(ITracingAdapter adapter) {
+    this.mTracingAdapter = adapter;
+  }
+
+  public ITracingAdapter getTracingAdapter() {
+    return mTracingAdapter;
+  }
 }
