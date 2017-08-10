@@ -637,7 +637,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   }
 
   public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance, WXDomObject parentDomObject){
-  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance){
       long startNanos = System.nanoTime();
       long timestamp = System.currentTimeMillis();
       if (json == null || json.size() <= 0) {
