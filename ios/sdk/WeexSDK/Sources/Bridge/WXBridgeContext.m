@@ -126,15 +126,16 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
             }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
         });
         
         return 0;
@@ -148,15 +149,17 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
             }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager createRoot:bodyData];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+            
         });
         
         return 0;
@@ -170,15 +173,16 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
             }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager removeComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         });
         
         return 0;
@@ -192,7 +196,7 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -200,7 +204,6 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager moveComponent:ref toSuper:parentRef atIndex:index];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         });
         
         return 0;
@@ -215,14 +218,16 @@ _Pragma("clang diagnostic pop") \
             return -1;
         }
         
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
             }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager updateAttributes:attrsData forComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
         });
         
         return 0;
@@ -236,7 +241,7 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -244,7 +249,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager updateStyles:stylesData forComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:nil];
+            
         });
         
         return 0;
@@ -302,15 +307,17 @@ _Pragma("clang diagnostic pop") \
         if(![weakSelf checkInstance:instance]) {
             return -1;
         }
-        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
             }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager createFinish];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+            
         });
         
         return 0;
@@ -398,7 +405,7 @@ _Pragma("clang diagnostic pop") \
             NSString *moduleName = task[@"module"];
             NSDictionary *options = task[@"options"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:@{@"threadName":WXTJSBridgeThread}];
             [method invoke];
         }
     }

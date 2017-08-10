@@ -439,4 +439,16 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value;
 
+/**
+ *  @abstract format to base64 dictionary
+ *
+ */
++ (NSDictionary *_Nonnull)dataToBase64Dict:(NSData *_Nullable)data;
+
+/**
+ *  @abstract format to data
+ *
+ */
++ (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
+
 @end
