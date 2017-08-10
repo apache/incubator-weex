@@ -7,7 +7,7 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-var switchTag = 'XCUIElementTypeSwitch';
+var switchTag = 'switch-obj';
 
 var goal = 'switch-event';
 var interval = util.getGETActionWaitTimeMills();
@@ -27,11 +27,11 @@ describe('weex '+goal+' test', function () {
 
   it('#1 '+goal + ' event', () => {
     return driver
-      .waitForElementByClassName(switchTag, interval, 2000)
+      .waitForElementById(switchTag, interval, 2000)
       .click()
       .waitForElementByName('change response:true', interval, 2000)
 
-      .waitForElementByClassName(switchTag, interval, 2000)
+      .waitForElementById(switchTag, interval, 2000)
       .click()
       .waitForElementByName('change response:false', interval, 2000)
   })

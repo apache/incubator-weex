@@ -7,7 +7,6 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-var inputTag = 'XCUIElementTypeTextField';
 
 var goal = 'input-event';
 var interval = util.getGETActionWaitTimeMills();
@@ -27,7 +26,7 @@ describe('weex '+goal+' test', function () {
 
   it('#1 '+goal + ' event', () => {
     return driver
-      .waitForElementByClassName(inputTag, interval, 2000)
+      .waitForElementById("input-obj", interval, 2000)
       .sendKeys('testChange')
       .sleep(500)
       .sendKeys('\n')

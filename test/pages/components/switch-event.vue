@@ -2,7 +2,7 @@
   <div>
     <panel title = 'switch-event' :padding-body='0'>
       <div style='flex-direction:row'> 
-        <switch class="origin mr-base" @change="change"></switch>
+        <switch test-id="switch-obj" class="origin mr-base" @change="change"></switch>
       </div>
       <panel title='校验结果：'>
         <text style="font-size:30px">{{resultTxt}}</text>

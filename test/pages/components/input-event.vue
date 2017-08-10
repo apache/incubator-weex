@@ -2,7 +2,7 @@
   <div>
     <panel title = 'input-event' :padding-body='0'>
       <div>
-        <input class="input mr-base" type="text" placeholder="onchange" @change="eventChange"></input>
+        <input test-id="input-obj" class="input mr-base" type="text" placeholder="onchange" @change="eventChange"></input>
       </div>
       <panel title='校验结果：'>
         <text style="font-size:30px">{{resultTxt}}</text>
