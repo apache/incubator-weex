@@ -560,7 +560,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     CGRect scrollRect = CGRectMake(vx, vy, vw, vh);;
     
     // notify action for appear
-    for(WXScrollToTarget *target in self.listenerArray){
+    NSArray *listenerArrayCopy = [self.listenerArray copy];
+    for(WXScrollToTarget *target in listenerArrayCopy){
         [self scrollToTarget:target scrollRect:scrollRect];
     }
 }
