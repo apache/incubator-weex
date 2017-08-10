@@ -940,17 +940,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                         if ("".equals(s)) {
                           continue;
                         }
-                        //  文件太长，做一定裁剪
-                        // if (!("backtrace:").equals(s)){
-                        //    if (!foundStart) {
-                        //        continue;
-                        //    }
-                        // } else {
-                        //  foundStart = true;
+                        // 寄存器内容裁剪
+                        // if (("r0:").equals(s)) {
+                        //  break;
                         // }
-                        if (("r0:").equals(s)) {
-                          break;
-                        }
                         result.append(s + "\n");
                       }
                       commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
