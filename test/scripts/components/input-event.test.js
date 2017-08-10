@@ -29,7 +29,6 @@ describe('weex '+goal+' test', function () {
       .waitForElementById("input-obj", interval, 2000)
       .sendKeys('testInput')
       .sleep(500)
-      .sendKeys('\n')
       .waitForElementByName('input:testInput', interval, 2000)
 
 
