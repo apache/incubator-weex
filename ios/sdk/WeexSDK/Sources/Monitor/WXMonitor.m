@@ -104,12 +104,12 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     if (instance.userInfo[@"weex_bundlejs_requestType"]) {
         commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
     }
-    if (instance.userInfo[@"weex_cache_processTime"]) {
-        commitDict[@"cacheProcessTime"] = instance.userInfo[@"weex_cache_processTime"];
+    if (instance.userInfo[CACHEPROCESSTIME]) {
+        commitDict[CACHEPROCESSTIME] = instance.userInfo[CACHEPROCESSTIME];
     }
     
-    if (instance.userInfo[@"weex_cache_ratio"]) {
-        commitDict[@"cacheRatio"] = instance.userInfo[@"weex_cache_ratio"];
+    if (instance.userInfo[CACHERATIO]) {
+        commitDict[CACHERATIO] = instance.userInfo[CACHERATIO];
     }
     if (instance.userInfo[WXCUSTOMMONITORINFO]) {
         if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSDictionary class]]) {
