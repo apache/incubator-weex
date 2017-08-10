@@ -27,10 +27,10 @@ describe('weex '+goal+' test', function () {
   it('#1 '+goal + ' event', () => {
     return driver
       .waitForElementById("input-obj", interval, 2000)
-      .sendKeys('testChange')
+      .sendKeys('testInput')
       .sleep(500)
       .sendKeys('\n')
-      .waitForElementByName('change:testChange', interval, 2000)
+      .waitForElementByName('input:testInput', interval, 2000)
 
 
   })
