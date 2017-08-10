@@ -53,19 +53,15 @@ export class TaskCenter {
    */
   normalize (v) {
     const type = typof(v)
-
-    if (v instanceof Element) {
+    if (v && v instanceof Element) {
       return v.ref
     }
-
-    if (v._isVue && v.$el instanceof Element) {
+    if (v && v._isVue && v.$el instanceof Element) {
       return v.$el.ref
     }
-
     if (type === 'Function') {
       return this.callbackManager.add(v).toString()
     }
-
     return normalizePrimitive(v)
   }
 
