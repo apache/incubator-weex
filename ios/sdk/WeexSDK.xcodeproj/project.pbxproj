@@ -236,7 +236,8 @@
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
-		C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; };
+		C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C42E8FAA1F3C7AA1001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */; };
 		C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
@@ -1732,6 +1733,7 @@
 				DCA446011EFA5A4B00D0CFA8 /* WXTimerModule.h in Headers */,
 				DCA446001EFA5A4800D0CFA8 /* WXDomModule.h in Headers */,
 				DCA446021EFA5A5000D0CFA8 /* WXWebViewModule.h in Headers */,
+				C42E8FAA1F3C7AA1001EBE9D /* WXTracingProtocol.h in Headers */,
 				DCA446181EFA5A9B00D0CFA8 /* JSValue+Weex.h in Headers */,
 				DCA446061EFA5A5B00D0CFA8 /* NSTimer+Weex.h in Headers */,
 				DCA445D61EFA598600D0CFA8 /* WXView.h in Headers */,
