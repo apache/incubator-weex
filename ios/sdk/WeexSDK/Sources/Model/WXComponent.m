@@ -436,12 +436,13 @@
 
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    
-    //根据当前的style是否含有transitionProperty属性来判断是否有Layout Animation
-    if (_styles[@"transitionProperty"]) {
-        [self _handleLayoutAnimationWithStyles:styles];
+    if ([self _isPropertyTransition]) {
+        if (!_transition) {
+            _transition = [WXTransition new];
+        }
+        [_transition _handleTransitionWithStyles:styles withTarget:self];
     }
-    else//如果没有动画属性标明 直接触发layout
+    else
     {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
@@ -449,21 +450,29 @@
     
     if (isUpdateStyles) {
         [self _modifyStyles:styles];
-    }//修改_style
+    }
     
     [self _resetCSSNodeStyles:resetStyles];
 }
 
-- (void)_modifyStyles:(NSDictionary *)styles //主要目的是来更新_style
+- (BOOL)_isPropertyTransition
+{
+    BOOL yesOrNo = false;
+    NSString *property = _styles[@"transitionProperty"];
+    if (property) {
+        if ([property containsString:@"width"]||[property containsString:@"height"]||[property containsString:@"top"]||[property containsString:@"left"]||[property containsString:@"bottom"]||[property containsString:@"transform"]) {
+            yesOrNo = true;
+        }
+    }
+    return yesOrNo;
+}
+
+- (void)_modifyStyles:(NSDictionary *)styles
 {
     pthread_mutex_lock(&_propertyMutex);
     [_styles addEntriesFromDictionary:styles];
     pthread_mutex_unlock(&_propertyMutex);
 }
-
-
-
-
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
 {
@@ -667,8 +676,5 @@
     id weakWrapper = [[WXWeakObjectWrapper alloc] initWithWeakObject:wx_component];
     objc_setAssociatedObject(self, @selector(wx_component), weakWrapper, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-
-@end
-@implementation WXLayoutAnimationInfo
 
 @end

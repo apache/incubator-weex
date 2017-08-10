@@ -21,9 +21,9 @@
 #import "WXComponent.h"
 #import "WXConvert.h"
 #import "WXTransform.h"
+#import "WXTransition.h"
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
-@class WXLayoutAnimationInfo;
 
 
 /**
@@ -45,34 +45,8 @@
     WXPositionType _positionType;
     
     
-    
-    //LayoutAnimation
-    WXLayoutAnimationInfo *_heightInfo;
-    WXLayoutAnimationInfo *_widthInfo;
-    WXLayoutAnimationInfo *_topInfo;
-    WXLayoutAnimationInfo *_rightInfo;
-    WXLayoutAnimationInfo *_leftInfo;
-    WXLayoutAnimationInfo *_bottomInfo;
-    double ax;
-    double bx;
-    double cx;
-    
-    double ay;
-    double by;
-    double cy;
-    
-    
-    float _layoutAnimationDuration;
-    float _layoutAnimationDelay;
-    CAMediaTimingFunction *_layoutAnimationTimingFunction;
-    NSUInteger _layoutAnimationCount;
-    
-    NSMutableDictionary *_toStyles;
-    NSMutableDictionary *_fromStyles;
-    NSMutableDictionary *_addStyles;
-    CADisplayLink *_layoutAnimationDisplayLink;
-
-    
+    //Transition
+    WXTransition *_transition;
     
     /**
      *  View
@@ -252,10 +226,4 @@
 
 @end
 
-@interface WXLayoutAnimationInfo : NSObject
-@property (nonatomic, strong) id fromValue;
-@property (nonatomic, strong) id toValue;
-@property (nonatomic, strong) id perValue;
-@property (nonatomic, assign) BOOL isAnimated;
-@end
 
