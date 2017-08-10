@@ -564,7 +564,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         public void run() {
           mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
         }
-      }, 16);
+      }, 100);
     }
     return true;
   }
