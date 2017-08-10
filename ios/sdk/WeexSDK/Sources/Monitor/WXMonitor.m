@@ -27,6 +27,7 @@
 #import "WXComponentManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXAppConfiguration.h"
+#import "WXTracingManager.h"
 
 NSString *const kStartKey = @"start";
 NSString *const kEndKey = @"end";
@@ -162,6 +163,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     }
     
     [self printPerformance:commitDict];
+    [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];
 }
 
 + (NSMutableDictionary *)performanceDictForInstance:(WXSDKInstance *)instance

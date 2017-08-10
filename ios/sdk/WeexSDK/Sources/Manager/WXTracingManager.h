@@ -20,8 +20,8 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
-#define WXTNetworkHanding          @"downloadBundleJS"
-#define WXTExecJS                  @"executeBundleJS"
+#define WXTNetworkHanding          @"loadJS"
+#define WXTExecJS                  @"execJS"
 #define WXTJSCall                  @"jsCall"
 #define WXTDomCall                 @"domCall"
 #define WXTRender                  @"render"
@@ -70,6 +70,7 @@ typedef enum : NSUInteger {
 @property (nonatomic) long long parentId;// parent event id
 @property (nonatomic, copy) NSString *bundleUrl;
 @property (nonatomic, copy) NSString *threadName;
+@property (nonatomic, strong) NSMutableArray *childrenRefs; // children ids
 -(NSDictionary *)dictionary;
 @end
 
@@ -134,5 +135,17 @@ typedef enum : NSUInteger {
  *  @return  the weex moudle component handler info
  */
 +(NSDictionary *)getTacingApi;
+
+/**
+ *  @discusstion commit tracing info
+ *  @param instanceId the instance  id.
+ */
++(void )commitTracing:(NSString *)instanceId;
+
+/**
+ *  @discusstion commit summary info
+ *  @param instanceId the instance  id.
+ */
++ (void)commitTracingSummaryInfo:(NSDictionary *)info withInstanceId:(NSString *)instanceId;
 
 @end

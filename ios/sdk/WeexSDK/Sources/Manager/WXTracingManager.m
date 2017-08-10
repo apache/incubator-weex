@@ -26,6 +26,8 @@
 #import <WeexSDK/WXHandlerFactory.h>
 #import "WXUtility.h"
 #import "WXComponentManager.h"
+#import "WXTracingProtocol.h"
+#import "WXSDKEngine.h"
 
 
 @implementation WXTracing
@@ -198,7 +200,31 @@
         if(options && options[@"threadName"]){
             tracing.threadName = options[@"threadName"];
         }
+        if(options && options[@"componentData"]){
+            tracing.childrenRefs = [self getChildrenRefs:options[@"componentData"]];
+        }
         [self startTracing:tracing];
+    }
+}
+
++ (NSMutableArray *)getChildrenRefs:(NSDictionary *)componentData
+{
+    NSMutableArray *mArray = [NSMutableArray new];
+    [self recursively:mArray componentData:componentData];
+    return mArray;
+}
+
++(void)recursively:(NSMutableArray *)mArray componentData:(NSDictionary *)componentData
+{
+    if([componentData valueForKey:@"children"]){
+        NSArray *children = [componentData valueForKey:@"children"];
+        for(NSDictionary *subcomponentData in children){
+            NSString *ref = [subcomponentData objectForKey:@"ref"];
+            if(ref){
+                [mArray addObject:ref];
+            }
+            [self recursively:mArray componentData:subcomponentData];
+        }
     }
 }
 
@@ -265,7 +291,8 @@
     if(tracings && [tracings count]>0){
         for (NSInteger i = [tracings count] - 1; i >= 0; i--) {
             WXTracing *t = tracings[i];
-            if([t.threadName isEqualToString:WXTJSBridgeThread]&& [t.ref isEqualToString:tracing.ref] && ([t.name isEqualToString:tracing.name] || [t.name isEqualToString:WXTJSCall])){
+//            if([t.threadName isEqualToString:WXTJSBridgeThread]&& [self compareRef:tracing.ref withTracing:t] && ([t.name isEqualToString:tracing.name] || [t.name isEqualToString:WXTJSCall])){
+            if([t.threadName isEqualToString:WXTJSBridgeThread]&& [self compareRef:tracing.ref withTracing:t]){
                 if([t.fName isEqualToString:tracing.fName]){
                     return t.traceId;
                 }
@@ -273,6 +300,21 @@
         }
     }
     return -1;
+}
+
++(BOOL)compareRef:(NSString *)ref withTracing:(WXTracing *)tracing
+{
+    if([tracing.ref isEqualToString:ref]){
+        return YES;
+    }
+    if(tracing.childrenRefs && [tracing.childrenRefs count] > 0){
+        for (NSString *childRef in tracing.childrenRefs) {
+            if([childRef isEqualToString:ref]){
+                return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 +(void)updateTracings:(WXTracingTask *)task tracing:(WXTracing *)tracing
@@ -296,25 +338,6 @@
         }
     }
     
-//    if([WXTExecJS isEqualToString:task.tag]){
-//        if([WXTJSCall isEqualToString:tracing.name]){
-//            NSMutableArray *tracings = task.tracings;
-//            [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
-//                if(([WXTExecJS isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
-//                    WXTracing *newTracing = [self copyTracing:bTracing];
-//                    newTracing.iid = tracing.iid;
-//                    newTracing.ph = WXTracingEnd;
-//                    newTracing.ts = tracing.ts ;
-//                    newTracing.duration = newTracing.ts - bTracing.ts ;
-//                    bTracing.duration = newTracing.duration;
-//                    [task.tracings addObject:newTracing];
-//                    *stop = YES;
-//                }
-//            }];
-//            task.tag = WXTRender;
-//        }
-//    }
-    
     if([WXTracingBegin isEqualToString:tracing.ph]){
         if(tracing.ref.length>0){
             WXPerformBlockOnComponentThread(^{
@@ -327,13 +350,13 @@
                     tracing.parentRef = com.supercomponent.ref;
                 }
                 tracing.name = com.type;
-                if(tracing.parentId == -1){
-                    tracing.parentId = [self getParentId:task tracing:tracing];
-                }
                 if(tracing.className.length == 0){
                     tracing.className = [self getclassName:tracing];
                 }
             });
+            if(tracing.parentId == -1){
+                tracing.parentId = [self getParentId:task tracing:tracing];
+            }
         } else {
             if(tracing.parentId == -1){
                 tracing.parentId = [self getParentId:task tracing:tracing];
@@ -368,7 +391,11 @@
             }
         }];
     }
+    
     [task.tracings addObject:tracing];
+    if([@"renderFinish" isEqualToString:tracing.fName] && [WXTracingInstant isEqualToString:tracing.ph] && [WXTUIThread isEqualToString:tracing.threadName]) {
+        [WXTracingManager commitTracing:task.iid];
+    }
 }
 
 +(NSMutableDictionary *)getTracingData
@@ -431,6 +458,40 @@
     }
     
     return dict;
+}
+
++ (void)commitTracing:(NSString *)instanceId
+{
+    if(![self isTracing]){
+        return ;
+    }
+    id tracingHandle = [WXSDKEngine handlerForProtocol:@protocol(WXTracingProtocol)];
+    if ([tracingHandle respondsToSelector:@selector(commitTracingInfo:)]){
+        WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:instanceId];
+        if(task) {
+            [tracingHandle commitTracingInfo:task];
+        }
+        
+    }
+}
+
++ (void)commitTracingSummaryInfo:(NSDictionary *)info withInstanceId:(NSString *)instanceId
+{
+    if(![self isTracing]){
+        return ;
+    }
+    id tracingHandle = [WXSDKEngine handlerForProtocol:@protocol(WXTracingProtocol)];
+    if ([tracingHandle respondsToSelector:@selector(commitTracingSummaryInfo:)]){
+        if(info) {
+            NSMutableDictionary *newInfo = [info mutableCopy];
+            if(instanceId.length > 0){
+                [newInfo setObject:instanceId forKey:@"instanceId"];
+                [newInfo setObject:[[WXUtility getEnvironment] objectForKey:@"platform"] forKey:@"platform"];
+            }
+            [tracingHandle commitTracingSummaryInfo:newInfo];
+        }
+        
+    }
 }
 
 @end
