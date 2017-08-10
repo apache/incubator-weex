@@ -28,7 +28,7 @@
 
 - (instancetype)initWithUrl:(NSString *)url protocol:(NSString *)protocol;
 - (void)open;
-- (void)send:(NSString *)data;
+- (void)send:(id)data;
 - (void)close;
 - (void)close:(NSInteger)code reason:(NSString *)reason;
 - (void)clear;
