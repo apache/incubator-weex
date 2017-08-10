@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
 set -e
 port="${serport:-12581}"
 
@@ -32,10 +32,13 @@ function buildiOS {
     builddir=$(pwd)'/ios/playground'
     current_dir=$PWD
     cd $builddir
-    product=$(PWD)'/build/Debug-iphoneos/WeexDemo.app'
-
+    
     pod update
-    [ -f product ] && rm -rf product
+    if [ $needCoverage = "cover" ] && [ -d "./XcodeCoverage/" ]; then
+        ./XcodeCoverage/podsGcovConfig
+    fi
+    product=$(PWD)'/build/Debug-iphonesimulator/'
+    [ -f $product ] && rm -rf $product
     
     xcodebuild clean build -quiet -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme Pods-WeexDemo SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     xcodebuild clean build -quiet -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme WeexSDK SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
@@ -46,16 +49,28 @@ function buildiOS {
 
 }
 
+function coverageGenerate {
+    current_dir=$PWD
+    xcodeCover="${current_dir}/ios/playground/XcodeCoverage"
+    if [ -d $xcodeCover ]; then
+        cd $xcodeCover
+        ./getcov -o . -p WeexSDK -x
+    fi
+}
+
 function runiOS {
     echo 'Run in iOS...'
     echo $1
-    buildiOS
+    buildiOS $2
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     # ps -ef
     startMacacaServer
     startWeexServer
     platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
+    if [ $needCoverage = "cover" ]; then
+        coverageGenerate
+    fi
 }
 
 function runWeb {
@@ -71,6 +86,8 @@ function killserver {
 
 platform_android='android'
 platform=${1:-$platform_android}
+coverage_status='noCover'
+needCoverage=${2:-$coverage_status}
  
 killserver
 #run tests
@@ -80,6 +97,7 @@ elif [ $platform = 'web' ];
 then
     runWeb ./test/scripts/
 else
-    runiOS ./test/scripts/
+    echo "$needCoverage"
+    runiOS ./test/scripts/ "$needCoverage"
 fi
 killserver
