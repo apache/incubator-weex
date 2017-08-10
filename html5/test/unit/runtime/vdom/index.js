@@ -29,7 +29,7 @@ import {
   isWeexElement,
   registerElement,
   clearWeexElements
-} from '../../../runtime/vdom'
+} from '../../../../runtime/vdom'
 
 describe('document constructor', () => {
   it('create & destroy document', () => {
@@ -563,26 +563,6 @@ describe('complicated situations', () => {
     expect(spy.args.length).eql(4)
     expect(doc.body.children).eql([el, el2, c2, c, el3, c3])
     expect(doc.body.pureChildren).eql([el, el2, el3])
-  })
-
-  it.skip('move a node from another parent', () => {
-    doc.body.appendChild(el)
-    el.appendChild(el2)
-    el.appendChild(el3)
-    expect(doc.body.children).eql([el])
-    expect(el.children).eql([el2, el3])
-
-    doc.body.insertBefore(el2, el)
-    expect(doc.body.children).eql([el2, el])
-    expect(doc.body.pureChildren).eql([el2, el])
-    expect(el.children).eql([el3])
-    expect(el.pureChildren).eql([el3])
-
-    doc.body.insertAfter(el3, el)
-    expect(doc.body.children).eql([el2, el, el3])
-    expect(doc.body.pureChildren).eql([el2, el, el3])
-    expect(el.children).eql([])
-    expect(el.pureChildren).eql([])
   })
 
   it('insert before a comment', () => {

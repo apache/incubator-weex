@@ -25,19 +25,15 @@ chai.use(sinonChai)
 import * as shared from '../../../shared'
 
 describe('a polyfill of', () => {
-  it.skip('Promise', () => {
-    sinon.spy(global, 'Promise')
-    sinon.stub(console, 'warn')
+  it('Promise', () => {
     expect(typeof Promise).to.be.equal('function')
-    new Promise(sinon.spy()).then(sinon.spy())
-    Promise.all()
-    Promise.race()
-    Promise.resolve()
-    Promise.reject()
-    expect(global.Promise.callCount).to.be.equal(1)
-    expect(console.warn.callCount).to.be.equal(5)
-    console.warn.restore()
-    global.Promise.restore()
+    expect(() => {
+      new Promise(sinon.spy()).then(sinon.spy())
+      Promise.all()
+      Promise.race()
+      Promise.resolve()
+      Promise.reject()
+    }).to.not.throw
   })
 
   it('Object.assign', () => {

@@ -22,8 +22,8 @@ import sinonChai from 'sinon-chai'
 const { expect } = chai
 chai.use(sinonChai)
 
-import { Document } from '../../../runtime/vdom'
-import Listener from '../../../runtime/bridge/Listener'
+import { Document } from '../../../../runtime/vdom'
+import Listener from '../../../../runtime/bridge/Listener'
 
 describe('dom listener basic', () => {
   it('works with no id', () => {
@@ -240,48 +240,6 @@ describe('dom listener details', () => {
       args: ['_root', el3.toJSON(), 2]
     }], '-1'])
 
-    done()
-  })
-
-  it.skip('batch when document closed', (done) => {
-    const body = doc.createBody('r')
-
-    doc.documentElement.appendChild(body)
-
-    expect(spy.args[0]).eql([[{
-      module: 'dom', method: 'createBody',
-      args: [body.toJSON()]
-    }]])
-
-    const el = doc.createElement('a')
-    el.setAttr('x', 1)
-    el.addEvent('click', () => {})
-    doc.body.appendChild(el)
-
-    expect(spy.args[1]).eql([[{
-      module: 'dom', method: 'addElement',
-      args: ['_root', el.toJSON(), -1]
-    }]])
-
-    doc.close()
-
-    const el2 = doc.createElement('b')
-    doc.body.insertBefore(el2, el) // [el2, el]
-
-    const el3 = doc.createElement('c')
-    doc.body.insertAfter(el3, el) // [el2, el, el3]
-
-    expect(spy.args.length).eql(2)
-    expect(doc.listener.updates).eql([
-      {
-        module: 'dom', method: 'addElement',
-        args: ['_root', el2.toJSON(), 0]
-      },
-      {
-        module: 'dom', method: 'addElement',
-        args: ['_root', el3.toJSON(), 2]
-      }
-    ])
     done()
   })
 

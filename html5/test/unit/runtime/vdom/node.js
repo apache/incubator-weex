@@ -21,7 +21,7 @@ const { expect } = chai
 
 import {
   Node
-} from '../../../runtime/vdom'
+} from '../../../../runtime/vdom'
 
 describe('Node', () => {
   it('create node', () => {

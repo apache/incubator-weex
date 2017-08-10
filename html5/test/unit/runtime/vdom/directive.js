@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { filterDirective } from '../../../runtime/vdom/directive'
+import { filterDirective } from '../../../../runtime/vdom/directive'
 
 describe('filterDirective', () => {
   it('other type', () => {
