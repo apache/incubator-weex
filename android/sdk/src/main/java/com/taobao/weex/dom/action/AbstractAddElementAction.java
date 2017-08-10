@@ -80,7 +80,7 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
     }
 
     //only non-root has parent.
-    WXDomObject domObject = WXDomObject.parse(dom, instance);
+    WXDomObject domObject = WXDomObject.parse(dom, instance, null);
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
       if (WXEnvironment.isApkDebugable()) {
