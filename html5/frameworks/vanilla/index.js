@@ -20,22 +20,22 @@ const config = {}
 
 const instanceMap = {}
 
-function init (cfg) {
+export function init (cfg) {
   config.Document = cfg.Document
   config.Element = cfg.Element
   config.Comment = cfg.Comment
   config.sendTasks = cfg.sendTasks
 }
 
-function registerComponents (components) {}
+export function registerComponents (components) {}
 
-function registerModules (modules) {}
+export function registerModules (modules) {}
 
-function registerMethods (apis) {}
+export function registerMethods (apis) {}
 
-function prepareInstance (id, options, data) {}
+export function prepareInstance (id, options, data) {}
 
-function createInstance (id, code, options, data, serviceObjects) {
+export function createInstance (id, code, options, data, serviceObjects) {
   const document = new config.Document(id, options.bundleUrl)
   const callbacks = {}
 
@@ -71,20 +71,22 @@ function createInstance (id, code, options, data, serviceObjects) {
   globalKeys.push(code)
 
   const result = new Function(...globalKeys)
-  return result(...globalValues)
+  result(...globalValues)
+
+  return { document }
 }
 
-function refreshInstance (id, data) {}
+export function refreshInstance (id, data) {}
 
-function destroyInstance (id) {
+export function destroyInstance (id) {
   delete instanceMap[id]
 }
 
-function getRoot (id) {
+export function getRoot (id) {
   return instanceMap[id].body.toJSON()
 }
 
-function receiveTasks (id, tasks) {
+export function receiveTasks (id, tasks) {
   const jsHandlers = {
     fireEvent: (id, ref, type, data, domChanges) => {
       const document = instanceMap[id]
@@ -112,14 +114,3 @@ function receiveTasks (id, tasks) {
     return results
   }
 }
-
-exports.init = init
-exports.registerComponents = registerComponents
-exports.registerModules = registerModules
-exports.registerMethods = registerMethods
-exports.prepareInstance = prepareInstance
-exports.createInstance = createInstance
-exports.refreshInstance = refreshInstance
-exports.destroyInstance = destroyInstance
-exports.getRoot = getRoot
-exports.receiveTasks = receiveTasks

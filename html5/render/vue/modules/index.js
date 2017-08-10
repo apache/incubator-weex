@@ -17,50 +17,34 @@
  * under the License.
  */
 
-// modules from render/browesr
+// modules from render/browesr (legacy modules)
 
-import event from '../../browser/extend/api/event'
 import geolocation from '../../browser/extend/api/geolocation'
-import pageInfo from '../../browser/extend/api/pageInfo'
 import storage from '../../browser/extend/api/storage'
 import stream from '../../browser/extend/api/stream'
 import clipboard from '../../browser/extend/api/clipboard'
+import eventModule from '../../browser/extend/api/event'
 
 // custom modules
 import animation from './animation'
 import dom from './dom'
 import globalEvent from './globalEvent'
 import modal from './modal'
-import navigator from './navigator'
+import navigatorModule from './navigator'
 import webview from './webview'
 import websocket from './websocket'
 
-const legacyModules = {
-  event,
+export default [
   geolocation,
-  pageInfo,
   storage,
   stream,
-  clipboard
-}
-
-const modules = {
+  clipboard,
+  eventModule,
+  modal,
+  websocket,
   animation,
   dom,
   globalEvent,
-  navigator,
+  navigatorModule,
   webview
-}
-
-export default {
-  init (weex) {
-    for (const k in legacyModules) {
-      weex.install(legacyModules[k])
-    }
-    weex.install(modal)
-    weex.install(websocket)
-    for (const k in modules) {
-      weex.registerModule(k, modules[k])
-    }
-  }
-}
+]

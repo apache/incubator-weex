@@ -22,6 +22,7 @@
 #import "WXUtility.h"
 #import "WXHandlerFactory.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXSDKEngine.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
 

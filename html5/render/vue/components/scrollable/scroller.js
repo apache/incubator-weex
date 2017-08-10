@@ -16,77 +16,94 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { extractComponentStyle, createEventMap } from '../../core'
-import { scrollable } from '../../mixins'
-// import { validateStyles } from '../../validator'
-import listMixin from './list/listMixin'
+
+import { scrollable, list as listMixin } from './mixins'
+
+function getScroller (weex) {
+  const {
+    extractComponentStyle,
+    createEventMap
+  } = weex
+
+  return {
+    name: 'weex-scroller',
+    mixins: [scrollable, listMixin],
+    props: {
+      scrollDirection: {
+        type: [String],
+        default: 'vertical',
+        validator (value) {
+          return ['horizontal', 'vertical'].indexOf(value) !== -1
+        }
+      },
+      scrollable: {
+        type: [Boolean],
+        default: true
+      }
+    },
+    computed: {
+      wrapperClass () {
+        const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
+        if (this.scrollDirection === 'horizontal') {
+          classArray.push('weex-scroller-horizontal')
+        }
+        else {
+          classArray.push('weex-scroller-vertical')
+        }
+        if (!this.scrollable) {
+          classArray.push('weex-scroller-disabled')
+        }
+        return classArray.join(' ')
+      }
+    },
+
+    methods: {
+      createChildren (h) {
+        const slots = this.$slots.default || []
+        this._cells = slots.filter(vnode => {
+          if (!vnode.tag || !vnode.componentOptions) return false
+          return true
+        })
+        return [
+          h('html:div', {
+            ref: 'inner',
+            staticClass: 'weex-scroller-inner weex-ct'
+          }, this._cells)
+        ]
+      }
+    },
+
+    render (createElement) {
+      this.weexType = 'scroller'
+
+      /* istanbul ignore next */
+      // if (process.env.NODE_ENV === 'development') {
+      //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+      // }
+
+      this._cells = this.$slots.default || []
+      this.$nextTick(() => {
+        this.updateLayout()
+      })
+
+      return createElement('main', {
+        ref: 'wrapper',
+        attrs: { 'weex-type': 'scroller' },
+        on: createEventMap(this, {
+          scroll: this.handleScroll,
+          touchstart: this.handleTouchStart,
+          touchmove: this.handleTouchMove,
+          touchend: this.handleTouchEnd
+        }),
+        staticClass: this.wrapperClass,
+        staticStyle: extractComponentStyle(this)
+      }, this.createChildren(createElement))
+    }
+  }
+}
 
 export default {
-  mixins: [scrollable, listMixin],
-  props: {
-    scrollDirection: {
-      type: [String],
-      default: 'vertical',
-      validator (value) {
-        return ['horizontal', 'vertical'].indexOf(value) !== -1
-      }
-    }
-  },
-
-  computed: {
-    wrapperClass () {
-      const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
-      if (this.scrollDirection === 'horizontal') {
-        classArray.push('weex-scroller-horizontal')
-      }
-      else {
-        classArray.push('weex-scroller-vertical')
-      }
-      return classArray.join(' ')
-    }
-  },
-
-  methods: {
-    createChildren (h) {
-      const slots = this.$slots.default || []
-      this._cells = slots.filter(vnode => {
-        if (!vnode.tag || !vnode.componentOptions) return false
-        return true
-      })
-      return [
-        h('html:div', {
-          ref: 'inner',
-          staticClass: 'weex-scroller-inner weex-ct'
-        }, this._cells)
-      ]
-    }
-  },
-
-  render (createElement) {
-    this.weexType = 'scroller'
-
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-
-    this._cells = this.$slots.default || []
-    this.$nextTick(() => {
-      this.updateLayout()
-    })
-
-    this._renderHook()
-    return createElement('main', {
-      ref: 'wrapper',
-      attrs: { 'weex-type': 'scroller' },
-      on: createEventMap(this, {
-        scroll: this.handleScroll,
-        touchstart: this.handleTouchStart,
-        touchmove: this.handleTouchMove,
-        touchend: this.handleTouchEnd
-      }),
-      staticClass: this.wrapperClass,
-      staticStyle: extractComponentStyle(this)
-    }, this.createChildren(createElement))
+  init (weex) {
+    weex.registerComponent('scroller', getScroller(weex))
   }
 }
