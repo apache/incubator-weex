@@ -3,8 +3,8 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.20.6",
-    "vue-render": "0.12.1",
+    "framework": "0.21.8",
+    "vue-render": "0.12.3",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -40,6 +40,7 @@
     "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
     "build:runtime": "node build/build.js runtime",
+    "build:legacy": "node build/build.js legacy",
     "install:buildtools": "npm i webpack@^1.0 weex-vue-bundle-util rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-flow rollup-plugin-flow-no-whitespace rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve wwp flow-bin babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime eslint-plugin-flowtype",
     "build:source": "npm run build:native && npm run build:browser && node build/build.js vue",
     "build:browser": "wwp && node build/build.js browser",
@@ -62,6 +63,7 @@
     "dist": "npm run dist:browser && npm run dist:vue",
     "dev:native": "node build/build.js native --watch",
     "dev:runtime": "node build/build.js runtime --watch",
+    "dev:legacy": "node build/build.js legacy --watch",
     "dev:browser": "wwp && node build/build.js native --watch",
     "dev:vue": "node build/build.js vue --watch",
     "dev:examples": "webpack --watch --config build/webpack.examples.config.js",
@@ -81,14 +83,15 @@
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
-    "copy:js": "cp -vf ./dist/native.js ./android/sdk/assets/main.js",
+    "copy:js": "cp -vf ./packages/weex-js-framework/index.js ./pre-build/native-bundle-main.js",
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples",
     "danger": "danger"
   },
   "dependencies": {
-    "autoprefixer": "^6.7.7",
+    "@weex-project/downgrade": "^1.0.3",
     "animationjs": "^0.1.5",
+    "autoprefixer": "^6.7.7",
     "blink-diff": "~1.0.12",
     "core-js": "^2.4.0",
     "cubicbezier": "^0.1.1",
@@ -101,11 +104,12 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.3.5",
-    "weex-vue-framework": "2.2.6-weex.1",
-    "weex-styler": "0.1.9"
+    "weex-rax-framework": "0.4.7",
+    "weex-styler": "0.1.9",
+    "weex-vue-framework": "2.4.2-weex.3"
   },
   "devDependencies": {
+    "@weex-project/weex-picker": "^0.2.4",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",

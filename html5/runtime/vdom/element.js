@@ -394,23 +394,26 @@ Object.assign(Element.prototype, {
    * @return {} anything returned by handler function
    */
   fireEvent (type, e, isBubble) {
+    let result = null
     let isStopPropagation = false
     const handler = this.event[type]
     if (handler && e) {
       e.stopPropagation = () => {
         isStopPropagation = true
       }
-      handler.call(this, e)
+      result = handler.call(this, e)
     }
 
-    if (isStopPropagation) {
-      return
-    }
-
-    if (isBubble && BUBBLE_EVENTS.includes(type) && this.parentNode && this.parentNode.fireEvent) {
+    if (!isStopPropagation
+      && isBubble
+      && BUBBLE_EVENTS.includes(type)
+      && this.parentNode
+      && this.parentNode.fireEvent) {
       e.currentTarget = this.parentNode
       this.parentNode.fireEvent(type, e, isBubble)
     }
+
+    return result
   },
 
   /**

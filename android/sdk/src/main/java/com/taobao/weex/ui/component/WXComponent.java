@@ -719,19 +719,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  private void setPerspective(Object param) {
-    T host = getHostView();
-    if (host != null) {
-      float value = WXUtils.getFloatByViewport(param, getInstance().getInstanceViewPortWidth());
-      float scale = host.getResources().getDisplayMetrics().density;
-      if (!Float.isNaN(value) && value > 0) {
-        host.setCameraDistance(value * scale);
-      } else {
-        host.setCameraDistance(Float.MAX_VALUE);
-      }
-    }
-  }
-
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
   protected void setAriaHidden(boolean isHidden) {
     View host = getHostView();
@@ -957,9 +944,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   @CallSuper
   protected void onHostViewInitialized(T host){
-    if(host!=null){
-      host.setCameraDistance(Float.MAX_VALUE);
-    }
     if (mAnimationHolder != null) {
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);

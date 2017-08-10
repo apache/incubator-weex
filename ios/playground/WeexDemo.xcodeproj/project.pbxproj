@@ -28,6 +28,11 @@
 		84361D5B1CA10F8E00F43825 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 775BEE8A1C1E8ECC008D1629 /* Assets.xcassets */; };
 		846FC8DA1E1B853100949E7D /* WXSyncTestModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7478481D1E0CD4910044500D /* WXSyncTestModule.m */; };
 		846FC8DB1E1B853600949E7D /* WXATViewHierarchyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF21D029685001C8592 /* WXATViewHierarchyPlugin.m */; };
+		847CAF2B1F39BB6B00551725 /* UIView+UIThreadCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 747DF6671E2F176A005C53A8 /* UIView+UIThreadCheck.m */; };
+		847CAF2C1F39BB8A00551725 /* WXATLoggerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF01D029685001C8592 /* WXATLoggerPlugin.m */; };
+		847CAF2D1F39BBB900551725 /* WXScannerHistoryVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DC5B53681E8CED9400E02125 /* WXScannerHistoryVC.m */; };
+		847CAF2E1F39BBFB00551725 /* WXConfigCenterDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */; };
+		847CAF311F39E3F100551725 /* WXExtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CAF301F39E3F100551725 /* WXExtModule.m */; };
 		84D7CAC71CE3266C00D48D46 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */; };
 		8A0B5EFFF75BF82EA481983D /* libPods-WeexUITestDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E48C20F443AA337D1FE97622 /* libPods-WeexUITestDemo.a */; };
 		C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C43CDA021F1C6E01005A6B03 /* libz.tbd */; };
@@ -37,7 +42,6 @@
 		DC5E503F1D0D97130059F0EB /* weex@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC5E503D1D0D97130059F0EB /* weex@2x.png */; };
 		DC65C4FA1CEB032F00B2F84F /* bundlejs in Resources */ = {isa = PBXBuildFile; fileRef = DC65C4F91CEB032F00B2F84F /* bundlejs */; };
 		DC6DD9D21CFE9BC400549297 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */; };
-		DCA812F91D0401420029BF62 /* WXSelectComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFFA1D029748001C8592 /* WXSelectComponent.m */; };
 		DCA812FA1D0401500029BF62 /* WXEventModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABB0001D02975E001C8592 /* WXEventModule.m */; };
 		DCA812FB1D0401570029BF62 /* WXImgLoaderDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFFD1D029753001C8592 /* WXImgLoaderDefaultImpl.m */; };
 		DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF01D029685001C8592 /* WXATLoggerPlugin.m */; };
@@ -89,6 +93,8 @@
 		775BEE981C1E8ECC008D1629 /* WeexDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeexDemoTests.m; sourceTree = "<group>"; };
 		775BEE9A1C1E8ECC008D1629 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84361D751CA10F8E00F43825 /* WeexUITestDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeexUITestDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		847CAF2F1F39E3F100551725 /* WXExtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXExtModule.h; sourceTree = "<group>"; };
+		847CAF301F39E3F100551725 /* WXExtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtModule.m; sourceTree = "<group>"; };
 		9420131417A731ED089B0814 /* Pods-WeexDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo.release.xcconfig"; sourceTree = "<group>"; };
 		C43CDA021F1C6E01005A6B03 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		DC20B8E41ECADA2500845F39 /* WXConfigCenterDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterDefaultImpl.h; sourceTree = "<group>"; };
@@ -297,6 +303,8 @@
 				DCABB0001D02975E001C8592 /* WXEventModule.m */,
 				7478481C1E0CD4910044500D /* WXSyncTestModule.h */,
 				7478481D1E0CD4910044500D /* WXSyncTestModule.m */,
+				847CAF2F1F39E3F100551725 /* WXExtModule.h */,
+				847CAF301F39E3F100551725 /* WXExtModule.m */,
 			);
 			name = module;
 			sourceTree = "<group>";
@@ -573,6 +581,7 @@
 				DCABB0011D02975E001C8592 /* WXEventModule.m in Sources */,
 				7478481E1E0CD4910044500D /* WXSyncTestModule.m in Sources */,
 				775BEE831C1E8ECC008D1629 /* AppDelegate.m in Sources */,
+				847CAF311F39E3F100551725 /* WXExtModule.m in Sources */,
 				DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */,
 				DCABAFF41D029685001C8592 /* WXATViewHierarchyPlugin.m in Sources */,
 				775BEE801C1E8ECC008D1629 /* main.m in Sources */,
@@ -593,16 +602,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				846FC8DB1E1B853600949E7D /* WXATViewHierarchyPlugin.m in Sources */,
-				846FC8DA1E1B853100949E7D /* WXSyncTestModule.m in Sources */,
-				DCA812FB1D0401570029BF62 /* WXImgLoaderDefaultImpl.m in Sources */,
-				DCA812FA1D0401500029BF62 /* WXEventModule.m in Sources */,
-				DCA812F91D0401420029BF62 /* WXSelectComponent.m in Sources */,
+				847CAF2D1F39BBB900551725 /* WXScannerHistoryVC.m in Sources */,
+				847CAF2C1F39BB8A00551725 /* WXATLoggerPlugin.m in Sources */,
 				84361D2F1CA10F8E00F43825 /* WXScannerVC.m in Sources */,
 				84361D331CA10F8E00F43825 /* WXDemoViewController.m in Sources */,
 				84361D371CA10F8E00F43825 /* UIViewController+WXDemoNaviBar.m in Sources */,
+				DCA812FA1D0401500029BF62 /* WXEventModule.m in Sources */,
+				846FC8DA1E1B853100949E7D /* WXSyncTestModule.m in Sources */,
 				84361D381CA10F8E00F43825 /* AppDelegate.m in Sources */,
+				847CAF2E1F39BBFB00551725 /* WXConfigCenterDefaultImpl.m in Sources */,
+				846FC8DB1E1B853600949E7D /* WXATViewHierarchyPlugin.m in Sources */,
 				84361D3B1CA10F8E00F43825 /* main.m in Sources */,
+				DCA812FB1D0401570029BF62 /* WXImgLoaderDefaultImpl.m in Sources */,
+				847CAF2B1F39BB6B00551725 /* UIView+UIThreadCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

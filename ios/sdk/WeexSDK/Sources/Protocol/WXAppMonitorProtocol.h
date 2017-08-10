@@ -36,6 +36,8 @@
 #define SCREENRENDERTIME    @"screenRenderTime"
 #define TOTALTIME           @"totalTime"
 
+#define CACHEPROCESSTIME    @"cacheProcessTime"
+#define CACHERATIO          @"cacheRatio"
 
 @protocol WXAppMonitorProtocol <WXModuleProtocol>
 

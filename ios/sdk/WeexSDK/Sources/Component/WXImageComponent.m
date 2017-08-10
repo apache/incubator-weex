@@ -27,6 +27,8 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXRoundedRect.h"
 #import "UIBezierPath+Weex.h"
+#import "WXSDKEngine.h"
+#import "WXUtility.h"
 
 @interface WXImageView : UIImageView
 
@@ -215,6 +217,11 @@ WX_EXPORT_METHOD(@selector(save:))
     [self configFilter:styles];
 }
 
+- (void)dealloc
+{
+    [self cancelImage];
+}
+
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
@@ -310,21 +317,23 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     __weak typeof(self) weakSelf = self;
     dispatch_async(WXImageUpdateQueue, ^{
-        [self cancelImage];
+         __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf cancelImage];
        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
             weakSelf.imageDownloadFinish = YES;
             WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
         };
         
-        [self updatePlaceHolderWithFailedBlock:downloadFailed];
-        [self updateContentImageWithFailedBlock:downloadFailed];
+        [strongSelf updatePlaceHolderWithFailedBlock:downloadFailed];
+        [strongSelf updateContentImageWithFailedBlock:downloadFailed];
         
-        if (!weakSelf.imageSrc && !weakSelf.placeholdSrc) {
+        if (!strongSelf.imageSrc && !strongSelf.placeholdSrc) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.layer.contents = nil;
-                weakSelf.imageDownloadFinish = YES;
-                [weakSelf readyToRender];
+               
+                strongSelf.layer.contents = nil;
+                strongSelf.imageDownloadFinish = YES;
+                [strongSelf readyToRender];
             });
         }
     });
@@ -334,90 +343,97 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     NSString *placeholderSrc = self.placeholdSrc;
     
-    if (placeholderSrc) {
-        WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-        NSString *newURL = [_placeholdSrc copy];
-        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance)
-        
-        __weak typeof(self) weakSelf = self;
-        self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof(self) strongSelf = weakSelf;
-                UIImage *viewImage = ((UIImageView *)strongSelf.view).image;
-                if (error) {
-                    downloadFailedBlock(placeholderSrc,error);
-                    if ([strongSelf isViewLoaded] && !viewImage) {
-                        ((UIImageView *)(strongSelf.view)).image = nil;
-                        [self readyToRender];
-                    }
-                    return;
-                }
-                if (![placeholderSrc isEqualToString:strongSelf.placeholdSrc]) {
-                    return;
-                }
-                
-                if ([strongSelf isViewLoaded] && !viewImage) {
-                    ((UIImageView *)strongSelf.view).image = image;
-                    weakSelf.imageDownloadFinish = YES;
-                    [self readyToRender];
-                } else if (strongSelf->_isCompositingChild) {
-                    strongSelf->_image = image;
-                    weakSelf.imageDownloadFinish = YES;
-                }
-            });
-        }];
+    if ([WXUtility isBlankString:placeholderSrc]) {
+        WXLogError(@"image placeholder src is empty");
+        return;
     }
+    
+    WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
+    NSString *newURL = [_placeholdSrc copy];
+    WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance)
+    
+    __weak typeof(self) weakSelf = self;
+    self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(self) strongSelf = weakSelf;
+            UIImage *viewImage = ((UIImageView *)strongSelf.view).image;
+            if (error) {
+                downloadFailedBlock(placeholderSrc,error);
+                if ([strongSelf isViewLoaded] && !viewImage) {
+                    ((UIImageView *)(strongSelf.view)).image = nil;
+                    [strongSelf readyToRender];
+                }
+                return;
+            }
+            if (![placeholderSrc isEqualToString:strongSelf.placeholdSrc]) {
+                return;
+            }
+            
+            if ([strongSelf isViewLoaded] && !viewImage) {
+                ((UIImageView *)strongSelf.view).image = image;
+                strongSelf.imageDownloadFinish = YES;
+                [strongSelf readyToRender];
+            } else if (strongSelf->_isCompositingChild) {
+                strongSelf->_image = image;
+                strongSelf.imageDownloadFinish = YES;
+            }
+        });
+    }];
 }
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
     NSString *imageSrc = self.imageSrc;
-    if (imageSrc) {
-        WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
-        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
-        NSString * newURL = [imageSrc copy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
-        __weak typeof(self) weakSelf = self;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    __strong typeof(self) strongSelf = weakSelf;
-                    
-                    if (strongSelf.imageLoadEvent) {
-                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
-                        sizeDict[@"naturalWidth"] = @0;
-                        sizeDict[@"naturalHeight"] = @0;
-                        if (!error) {
-                            sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
-                            sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
-                        } else {
-                            [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
-                        }
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
-                    }
-                    if (error) {
-                        downloadFailedBlock(imageSrc, error);
-                        [strongSelf readyToRender];
-                        return ;
-                    }
-                    
-                    if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
-                        return ;
-                    }
-                    
-                    if ([strongSelf isViewLoaded]) {
-                        strongSelf.imageDownloadFinish = YES;
-                        ((UIImageView *)strongSelf.view).image = image;
-                        [strongSelf readyToRender];
-                    } else if (strongSelf->_isCompositingChild) {
-                        strongSelf.imageDownloadFinish = YES;
-                        strongSelf->_image = image;
-                        [strongSelf setNeedsDisplay];
-                    }
-                });
-            }];
-        });
+    
+    if ([WXUtility isBlankString:imageSrc]) {
+        WXLogError(@"image src is empty");
+        return;
     }
+    
+    WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
+    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
+    NSString * newURL = [imageSrc copy];
+    WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                __strong typeof(self) strongSelf = weakSelf;
+                
+                if (strongSelf.imageLoadEvent) {
+                    NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                    sizeDict[@"naturalWidth"] = @0;
+                    sizeDict[@"naturalHeight"] = @0;
+                    if (!error) {
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                    } else {
+                        [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
+                    }
+                    [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+                }
+                if (error) {
+                    downloadFailedBlock(imageSrc, error);
+                    [strongSelf readyToRender];
+                    return ;
+                }
+                
+                if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
+                    return ;
+                }
+                
+                if ([strongSelf isViewLoaded]) {
+                    strongSelf.imageDownloadFinish = YES;
+                    ((UIImageView *)strongSelf.view).image = image;
+                    [strongSelf readyToRender];
+                } else if (strongSelf->_isCompositingChild) {
+                    strongSelf.imageDownloadFinish = YES;
+                    strongSelf->_image = image;
+                    [strongSelf setNeedsDisplay];
+                }
+            });
+        }];
+    });
 }
 
 - (void)readyToRender

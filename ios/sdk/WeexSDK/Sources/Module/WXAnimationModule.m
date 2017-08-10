@@ -365,6 +365,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             [delegate applyTransform];
         }
     } else {
+        CATransform3D transform = layer.transform;
+        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) {
+            transform.m34 = -1.0/info.target->_transform.perspective*[UIScreen mainScreen].scale;
+            layer.transform = transform;
+        }
         [layer addAnimation:animation forKey:info.propertyName];
     }
 }
