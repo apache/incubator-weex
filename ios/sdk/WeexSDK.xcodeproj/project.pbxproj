@@ -37,6 +37,8 @@
 		2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AFEB1791C747139000507FA /* WXInstanceWrap.h */; };
 		2AFEB17C1C747139000507FA /* WXInstanceWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFEB17A1C747139000507FA /* WXInstanceWrap.m */; };
+		2C2572CC1F3C227100F57E94 /* WXRecyclerDragController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2572CA1F3C227100F57E94 /* WXRecyclerDragController.h */; };
+		2C2572CD1F3C227100F57E94 /* WXRecyclerDragController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C2572CB1F3C227100F57E94 /* WXRecyclerDragController.m */; };
 		375A228F1EC440A600BC2086 /* WXAnimationLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 375A228D1EC440A600BC2086 /* WXAnimationLayout.m */; };
 		375A22901EC440A600BC2086 /* WXAnimationLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 375A228E1EC440A600BC2086 /* WXAnimationLayout.h */; };
 		37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */; };
@@ -597,6 +599,8 @@
 		2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEventModuleProtocol.h; sourceTree = "<group>"; };
 		2AFEB1791C747139000507FA /* WXInstanceWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInstanceWrap.h; sourceTree = "<group>"; };
 		2AFEB17A1C747139000507FA /* WXInstanceWrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceWrap.m; sourceTree = "<group>"; };
+		2C2572CA1F3C227100F57E94 /* WXRecyclerDragController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WXRecyclerDragController.h; path = WeexSDK/Sources/Component/Recycler/WXRecyclerDragController.h; sourceTree = SOURCE_ROOT; };
+		2C2572CB1F3C227100F57E94 /* WXRecyclerDragController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WXRecyclerDragController.m; path = WeexSDK/Sources/Component/Recycler/WXRecyclerDragController.m; sourceTree = SOURCE_ROOT; };
 		375A228D1EC440A600BC2086 /* WXAnimationLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAnimationLayout.m; sourceTree = "<group>"; };
 		375A228E1EC440A600BC2086 /* WXAnimationLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAnimationLayout.h; sourceTree = "<group>"; };
 		37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCycleSliderComponent.h; sourceTree = "<group>"; };
@@ -1091,6 +1095,8 @@
 				745B2D651E5A8E1E0092D38A /* WXRecyclerUpdateController.m */,
 				745B2D661E5A8E1E0092D38A /* WXSectionDataController.h */,
 				745B2D671E5A8E1E0092D38A /* WXSectionDataController.m */,
+				2C2572CA1F3C227100F57E94 /* WXRecyclerDragController.h */,
+				2C2572CB1F3C227100F57E94 /* WXRecyclerDragController.m */,
 			);
 			name = Recycler;
 			path = Grid;
@@ -1500,6 +1506,7 @@
 				59597F981D2A041700EE9317 /* WXDebugLoggerBridge.h in Headers */,
 				77D161241C02DDD10010B15B /* WXSDKInstance.h in Headers */,
 				DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */,
+				2C2572CC1F3C227100F57E94 /* WXRecyclerDragController.h in Headers */,
 				74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */,
 				740451EA1E14BB26004157CB /* WXServiceFactory.h in Headers */,
 				744BEA591D0520F300452B5D /* WXComponent+Layout.h in Headers */,
@@ -2056,6 +2063,7 @@
 				2A919DA71E321F1F006EB6B5 /* WXBridgeMethod.m in Sources */,
 				DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */,
 				77D161251C02DDD10010B15B /* WXSDKInstance.m in Sources */,
+				2C2572CD1F3C227100F57E94 /* WXRecyclerDragController.m in Sources */,
 				744D61151E4AF23E00B624B3 /* WXDiffUtil.m in Sources */,
 				74EF31AE1DE58BE200667A07 /* WXURLRewriteDefaultImpl.m in Sources */,
 				C4B3D6D51E6954300013F38D /* WXEditComponent.m in Sources */,
