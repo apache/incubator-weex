@@ -102,6 +102,9 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
 
 
 module.exports = {
+    isIos:function(){
+      return isIOS;
+    },
     getConfig:function(){
         if(browser){
             return androidChromeOpts;

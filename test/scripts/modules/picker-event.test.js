@@ -26,10 +26,16 @@ describe('weex '+goal+' test', function () {
 
   it('#1 '+goal + ' event', () => {
     //TODO ：截图比对
-    return driver.waitForElementByName('showPicker', timeout, 2000)
-      .click()
-      .waitForElementByName('Done', timeout, 2000)
+    var self = driver.waitForElementByName('showPicker', timeout, 2000)
+      .click();
+    if(util.isIos()){
+      return self.waitForElementByName('Done', timeout, 2000)
       .click()
       .waitForElementByName('2018-01-01') 
+    }else{
+      return self.waitForElementByName('OK', timeout, 2000)
+      .click()
+      .waitForElementByName('2018-01-1') 
+    }
   })
 });
