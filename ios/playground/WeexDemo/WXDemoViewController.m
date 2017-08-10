@@ -129,7 +129,6 @@
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, weakSelf.weexView);
     };
     _instance.onFailed = ^(NSError *error) {
-        #ifdef UITEST
         if ([[error domain] isEqualToString:@"1"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSMutableString *errMsg=[NSMutableString new];
@@ -141,7 +140,6 @@
                 [alertView show];
             });
         }
-        #endif
     };
     
     _instance.renderFinish = ^(UIView *view) {
