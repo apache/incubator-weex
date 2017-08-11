@@ -18,8 +18,7 @@
  */
 package com.taobao.weex.dom;
 
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
+import com.facebook.yoga.YogaNode;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -29,29 +28,21 @@ import com.taobao.weex.utils.WXLogUtils;
 
 public class WXCellDomObject extends WXDomObject {
 
-  /** package **/ static final CSSNode.MeasureFunction CELL_MEASURE_FUNCTION = new MeasureFunction() {
-    @Override
-    public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
-      if (node != null) {
-        CSSNode parent = node.getParent();
-        if (parent != null && parent instanceof WXRecyclerDomObject) {
-          WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
-          parentDom.preCalculateCellWidth();
-          WXDomObject domObject = (WXDomObject) node;
-          if (WXBasicComponentType.CELL.equals(domObject.getType())) {
-            float w = ((WXRecyclerDomObject) parent).getColumnWidth();
-            node.setLayoutWidth(w);
-          } else if (WXBasicComponentType.HEADER.equals(domObject.getType())){
-            float w = parentDom.getAvailableWidth();
-            WXLogUtils.d("getAvailableWidth:"+w);
-            node.setLayoutWidth(w);
-          }
-        }
+  @Override
+  void applyStyleToNode() {
+    super.applyStyleToNode();
+    YogaNode parent = this.getParent();
+    if (parent != null && parent instanceof WXRecyclerDomObject) {
+      WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
+      parentDom.preCalculateCellWidth();
+      if (WXBasicComponentType.CELL.equals(this.getType())) {
+        float w = ((WXRecyclerDomObject) parent).getColumnWidth();
+        setWidth(w);
+      } else if (WXBasicComponentType.HEADER.equals(this.getType())){
+        float w = parentDom.getAvailableWidth();
+        WXLogUtils.d("getAvailableWidth:"+w);
+        this.setWidth(w);
       }
     }
-  };
-
-  public WXCellDomObject() {
-    setMeasureFunction(CELL_MEASURE_FUNCTION);
   }
 }

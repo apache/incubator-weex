@@ -21,7 +21,7 @@ package com.taobao.weex.ui.view.border;
 
 import android.support.annotation.IntDef;
 
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

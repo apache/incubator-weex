@@ -3,7 +3,25 @@
  * the BSD-style license found in the LICENSE file in the root directory of this source tree. An
  * additional grant of patent rights can be found in the PATENTS file in the same directory.
  */
-package com.taobao.weex.dom.flex;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package com.taobao.weex.dom;
 
 //import javax.annotation.Nullable;
 
@@ -14,6 +32,7 @@ import java.util.Arrays;
  * properly implement interactions and updates for properties like margin, marginLeft, and
  * marginHorizontal.
  */
+@Deprecated
 public class Spacing /**implements Cloneable**/
 {
 
@@ -74,15 +93,15 @@ public class Spacing /**implements Cloneable**/
 
   private static float[] newFullSpacingArray() {
     return new float[]{
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
     };
   }
 
@@ -96,10 +115,10 @@ public class Spacing /**implements Cloneable**/
    *         set
    */
   public boolean set(int spacingType, float value) {
-    if (!FloatUtil.floatsEqual(mSpacing[spacingType], value)) {
+    if (!LayoutUtility.floatsEqual(mSpacing[spacingType], value)) {
       mSpacing[spacingType] = value;
 
-      if (CSSConstants.isUndefined(value)) {
+      if (LayoutUtility.isUndefined(value)) {
         mValueFlags &= ~sFlagsMap[spacingType];
       } else {
         mValueFlags |= sFlagsMap[spacingType];
@@ -127,7 +146,7 @@ public class Spacing /**implements Cloneable**/
     if (mDefaultSpacing == null) {
       mDefaultSpacing = newSpacingResultArray();
     }
-    if (!FloatUtil.floatsEqual(mDefaultSpacing[spacingType], value)) {
+    if (!LayoutUtility.floatsEqual(mDefaultSpacing[spacingType], value)) {
       mDefaultSpacing[spacingType] = value;
       return true;
     }
@@ -146,8 +165,8 @@ public class Spacing /**implements Cloneable**/
         defaultValue,
         defaultValue,
         defaultValue,
-        CSSConstants.UNDEFINED,
-        CSSConstants.UNDEFINED,
+        LayoutUtility.UNDEFINED,
+        LayoutUtility.UNDEFINED,
         defaultValue,
     };
   }
@@ -168,7 +187,7 @@ public class Spacing /**implements Cloneable**/
    * recycling {@link Spacing} instances.
    */
   void reset() {
-    Arrays.fill(mSpacing, CSSConstants.UNDEFINED);
+    Arrays.fill(mSpacing, LayoutUtility.UNDEFINED);
     mDefaultSpacing = null;
     mHasAliasesSet = false;
     mValueFlags = 0;
@@ -194,7 +213,7 @@ public class Spacing /**implements Cloneable**/
   public float get(int spacingType) {
     float defaultValue = (mDefaultSpacing != null)
                          ? mDefaultSpacing[spacingType]
-                         : (spacingType == START || spacingType == END ? CSSConstants.UNDEFINED : 0);
+                         : (spacingType == START || spacingType == END ? LayoutUtility.UNDEFINED : 0);
 
     if (mValueFlags == 0) {
       return defaultValue;
@@ -217,21 +236,10 @@ public class Spacing /**implements Cloneable**/
   }
 
   public boolean equal(Spacing spacing) {
-    return FloatUtil.floatsEqual(get(LEFT), spacing.get(LEFT))
-           && FloatUtil.floatsEqual(get(TOP), spacing.get(TOP))
-           && FloatUtil.floatsEqual(get(RIGHT), spacing.get(RIGHT))
-           && FloatUtil.floatsEqual(get(BOTTOM), spacing.get(BOTTOM));
+    return LayoutUtility.floatsEqual(get(LEFT), spacing.get(LEFT))
+           && LayoutUtility.floatsEqual(get(TOP), spacing.get(TOP))
+           && LayoutUtility.floatsEqual(get(RIGHT), spacing.get(RIGHT))
+           && LayoutUtility.floatsEqual(get(BOTTOM), spacing.get(BOTTOM));
   }
-
-  //	@Override
-  //	public Spacing clone(){
-  //
-  //		try {
-  //			return (Spacing) super.clone();
-  //		} catch (CloneNotSupportedException e) {
-  //			e.printStackTrace();
-  //		}
-  //		return null;
-  //	}
 
 }

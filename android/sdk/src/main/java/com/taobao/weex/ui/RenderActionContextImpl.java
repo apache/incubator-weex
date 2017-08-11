@@ -18,24 +18,10 @@
  */
 package com.taobao.weex.ui;
 
-import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.RenderActionContext;
-import com.taobao.weex.ui.animation.WXAnimationBean;
-import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +60,7 @@ class RenderActionContextImpl implements RenderActionContext {
   /**
    * set layout information of View
    */
-  void setLayout(String ref, WXDomObject domObject) {
+  void setLayout(String ref, ImmutableDomObject domObject) {
     WXComponent component = mRegistry.get(ref);
     if (component == null) {
       return;

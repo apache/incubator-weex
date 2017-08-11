@@ -24,7 +24,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
 
 /**
  * Edge for border. Every border has four edges, and each edge has a previous corner and a post

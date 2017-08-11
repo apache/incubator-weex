@@ -20,9 +20,8 @@
 package com.taobao.weex.utils;
 
 import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.CSSConstants;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
+import com.taobao.weex.dom.LayoutUtility;
 
 public class WXDomUtils {
 
@@ -37,17 +36,17 @@ public class WXDomUtils {
     Spacing padding = domObject.getPadding();
     Spacing border = domObject.getBorder();
 
-    if (!CSSConstants.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
+    if (!LayoutUtility.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
       rawWidth -= leftPadding;
     }
-    if (!CSSConstants.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
+    if (!LayoutUtility.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
       rawWidth -= rightPadding;
     }
 
-    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
+    if (!LayoutUtility.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
       rawWidth -= leftBorder;
     }
-    if (!CSSConstants.isUndefined(rightBorder = border.get(Spacing.RIGHT))) {
+    if (!LayoutUtility.isUndefined(rightBorder = border.get(Spacing.RIGHT))) {
       rawWidth -= rightBorder;
     }
     return rawWidth;
@@ -64,17 +63,17 @@ public class WXDomUtils {
     Spacing padding = domObject.getPadding();
     Spacing border = domObject.getBorder();
 
-    if (!CSSConstants.isUndefined((topPadding = padding.get(Spacing.TOP)))) {
+    if (!LayoutUtility.isUndefined((topPadding = padding.get(Spacing.TOP)))) {
       rawHeight -= topPadding;
     }
-    if (!CSSConstants.isUndefined((bottomPadding = padding.get(Spacing.BOTTOM)))) {
+    if (!LayoutUtility.isUndefined((bottomPadding = padding.get(Spacing.BOTTOM)))) {
       rawHeight -= bottomPadding;
     }
 
-    if (!CSSConstants.isUndefined(topBorder = border.get(Spacing.TOP))) {
+    if (!LayoutUtility.isUndefined(topBorder = border.get(Spacing.TOP))) {
       rawHeight -= topBorder;
     }
-    if (!CSSConstants.isUndefined(bottomBorder = border.get(Spacing.BOTTOM))) {
+    if (!LayoutUtility.isUndefined(bottomBorder = border.get(Spacing.BOTTOM))) {
       rawHeight -= bottomBorder;
     }
     return rawHeight;

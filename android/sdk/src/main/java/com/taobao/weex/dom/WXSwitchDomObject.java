@@ -20,16 +20,38 @@ package com.taobao.weex.dom;
 
 import android.content.Context;
 import android.view.View.MeasureSpec;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
+
+import com.facebook.yoga.YogaMeasureFunction;
+import com.facebook.yoga.YogaMeasureMode;
+import com.facebook.yoga.YogaMeasureOutput;
+import com.facebook.yoga.YogaNode;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXLogUtils;
 
 public class WXSwitchDomObject extends WXDomObject {
 
-  private static final MeasureFunction SWITCH_MEASURE_FUNCTION = new MeasureFunction() {
-
+  private static final YogaMeasureFunction SWITCH_MEASURE_FUNCTION = new YogaMeasureFunction() {
     @Override
+    public long measure(YogaNode yogaNode, float width, YogaMeasureMode widthMeasureMode, float height, YogaMeasureMode heightMeasureMode) {
+      try {
+        Context context=((WXDomObject) yogaNode).getDomContext().getUIContext();
+        WXSwitchView wxSwitchView = new WXSwitchView(context);
+        int widthSpec, heightSpec;
+        heightSpec = MeasureSpec.makeMeasureSpec((int)height, LayoutUtility.viewMeasureSpec(widthMeasureMode));
+        if (Float.isNaN(width)) {
+          widthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        } else {
+          widthSpec = MeasureSpec.makeMeasureSpec((int) width, MeasureSpec.AT_MOST);
+        }
+        wxSwitchView.measure(widthSpec, heightSpec);
+        return YogaMeasureOutput.make(wxSwitchView.getMeasuredWidth(),wxSwitchView.getMeasuredHeight());
+      } catch (RuntimeException e) {
+        WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+      }
+      return YogaMeasureOutput.make(0,0);
+    }
+
+    /*@Override
     public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
       try {
         Context context=((WXDomObject) node).getDomContext().getUIContext();
@@ -47,7 +69,7 @@ public class WXSwitchDomObject extends WXDomObject {
       } catch (RuntimeException e) {
         WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
       }
-    }
+    }*/
   };
 
   public WXSwitchDomObject() {

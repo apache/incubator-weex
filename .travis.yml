@@ -85,7 +85,7 @@ script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       cd android
-      ./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
+      ./gradlew clean assembleDebug --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
       cd $TRAVIS_BUILD_DIR
     fi
   - |

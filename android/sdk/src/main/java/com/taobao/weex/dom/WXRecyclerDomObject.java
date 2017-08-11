@@ -20,7 +20,6 @@ package com.taobao.weex.dom;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -80,7 +79,7 @@ public class WXRecyclerDomObject extends WXDomObject{
             mColumnWidth = getAttrs().getColumnWidth();
             mColumnGap =  getAttrs().getColumnGap();
 
-            mAvailableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
+            mAvailableWidth = getLayoutWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
             mAvailableWidth = WXViewUtils.getWebPxByWidth(mAvailableWidth,getViewPortWidth());
 
             if (Constants.Value.AUTO == mColumnCount && Constants.Value.AUTO == mColumnWidth) {

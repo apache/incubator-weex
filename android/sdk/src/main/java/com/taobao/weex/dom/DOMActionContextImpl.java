@@ -21,11 +21,11 @@ package com.taobao.weex.dom;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.facebook.yoga.YogaConstants;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
@@ -67,7 +67,6 @@ class DOMActionContextImpl implements DOMActionContext {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set <Pair<String, Map<String, Object>>> animations;
-  private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
   private Map<String, AddDomInfo> mAddDom = new HashMap<>();
@@ -84,7 +83,6 @@ class DOMActionContextImpl implements DOMActionContext {
   public DOMActionContextImpl(String instanceId, WXRenderManager renderManager) {
     mDestroy = false;
     mInstanceId = instanceId;
-    mLayoutContext = new CSSLayoutContext();
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     animations = new LinkedHashSet<>();
@@ -129,7 +127,6 @@ class DOMActionContextImpl implements DOMActionContext {
     mAddDOMConsumer = null;
     mNormalTasks.clear();
     mAddDom.clear();
-    mLayoutContext = null;
     mWXRenderManager = null;
     animations.clear();
   }
@@ -159,7 +156,7 @@ class DOMActionContextImpl implements DOMActionContext {
    * Batch the execution of command objects and execute all the command objects created other
    * places, e.g. call {@link IWXRenderTask#execute()}.
    * First, it will rebuild the dom tree and do pre layout staff.
-   * Then call {@link com.taobao.weex.dom.flex.CSSNode#calculateLayout(CSSLayoutContext)} to
+   * Then call {@link com.facebook.yoga.YogaNode#calculateLayout(float, float)} to
    * start calculate layout.
    * Next, call {@link ApplyUpdateConsumer} to get changed dom and creating
    * corresponding command object.
@@ -196,7 +193,7 @@ class DOMActionContextImpl implements DOMActionContext {
     long start = System.currentTimeMillis();
 
 
-    rootDom.calculateLayout(mLayoutContext);
+    rootDom.calculateLayout(YogaConstants.UNDEFINED,YogaConstants.UNDEFINED);
 
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
@@ -254,7 +251,7 @@ class DOMActionContextImpl implements DOMActionContext {
       if (dom.hasUpdate()) {
         dom.markUpdateSeen();
         if (!dom.isYoung()) {
-          final WXDomObject copy = dom.clone();
+          final ImmutableDomObject copy = dom.asResult();
           if (copy == null) {
             return;
           }
@@ -320,7 +317,7 @@ class DOMActionContextImpl implements DOMActionContext {
       return;
     }
     domObject.old();
-    component.updateDom(domObject);
+    component.updateDom(domObject.asResult());
     if (component instanceof WXVContainer) {
       WXVContainer container = (WXVContainer) component;
       int count = container.childCount();

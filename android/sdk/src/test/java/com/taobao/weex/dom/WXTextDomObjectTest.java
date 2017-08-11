@@ -18,11 +18,12 @@
  */
 package com.taobao.weex.dom;
 
+import com.facebook.yoga.YogaMeasureMode;
+import com.facebook.yoga.YogaMeasureOutput;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.Constants;
 import static com.taobao.weex.common.Constants.Name.*;
 
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXComponent;
 import org.junit.After;
 import org.junit.Before;
@@ -63,12 +64,10 @@ public class WXTextDomObjectTest {
   @Test
   public void testMeasure() throws Exception {
     testLayoutBefore();
-    MeasureOutput output = new MeasureOutput();
     WXTextDomObject mock = PowerMockito.spy(dom);
     PowerMockito.when(mock,"getTextWidth",dom.getTextPaint(),100f,false).thenReturn(10f);
-    WXTextDomObject.TEXT_MEASURE_FUNCTION.measure(mock,100,output);
-
-    assertEquals(output.width,10f,0.1f);
+    long result = WXTextDomObject.TEXT_MEASURE_FUNCTION.measure(mock,100, YogaMeasureMode.UNDEFINED,10,YogaMeasureMode.UNDEFINED);
+    assertEquals(YogaMeasureOutput.getWidth(result),10f,0.1f);
   }
 
   @Test
