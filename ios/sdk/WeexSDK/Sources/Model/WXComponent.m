@@ -129,7 +129,6 @@
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
         
-        [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:WXTRender options:nil];
     }
     
     return self;

@@ -24,7 +24,10 @@ const config = {
   Document, Element, Comment, Listener,
   TaskCenter,
   sendTasks (...args) {
-    return global.callNative(...args)
+    if (typeof callNative === 'function') {
+      return callNative(...args)
+    }
+    return (global.callNative || (() => {}))(...args)
   }
 }
 

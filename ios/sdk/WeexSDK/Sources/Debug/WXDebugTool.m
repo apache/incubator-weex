@@ -30,6 +30,7 @@
 
 static BOOL WXIsDebug;
 static BOOL WXIsDevToolDebug;
+static BOOL WXIsRemoteTracing;
 static NSString* WXDebugrepBundleJS;
 static NSString* WXDebugrepJSFramework;
 
@@ -79,6 +80,15 @@ static NSString* WXDebugrepJSFramework;
 
 + (void)setDevToolDebug:(BOOL)isDevToolDebug {
     WXIsDevToolDebug = isDevToolDebug;
+}
+
++ (BOOL)isRemoteTracing
+{
+    return WXIsRemoteTracing;
+}
+
++ (void)setRemoteTracing:(BOOL)isRemoteTracing {
+    WXIsRemoteTracing = isRemoteTracing;
 }
 
 + (BOOL)isDevToolDebug {

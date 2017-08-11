@@ -37,6 +37,7 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXUtility.h"
+#import "WXExtendCallNativeManager.h"
 
 @implementation WXSDKEngine
 
@@ -113,6 +114,11 @@
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
 {
     [self registerComponent:name withClass:clazz withProperties: @{@"append":@"tree"}];
+}
+
++ (void)registerExtendCallNative:(NSString *)name withClass:(Class)clazz
+{
+    [WXExtendCallNativeManager registerExtendCallNative:name withClass:clazz];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary *)properties

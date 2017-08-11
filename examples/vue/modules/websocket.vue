@@ -8,6 +8,7 @@
       <div style="flex-direction: row; justify-content: center;">
         <text class="button" @click="connect">connect</text>
         <text class="button" @click="send">send</text>
+        <text class="button" @click="sendArrayBuffer">sendArrayBuffer</text>
         <text class="button" @click="close">close</text>
       </div>
       <div style="background-color: lightgray">
@@ -80,6 +81,7 @@
       }
     },
     methods: {
+
       connect: function() {
         websocket.WebSocket('ws://echo.websocket.org', '');
         var self = this;
@@ -88,7 +90,14 @@
           self.onopeninfo = 'websocket open';
         }
         websocket.onmessage = function(e) {
-          self.onmessage = e.data;
+          console.log(typeof(e.data));
+          if(typeof(e.data) === 'string'){
+            self.onmessage = e.data;
+          }else
+          {
+            var str = 'receive array buffer show with string:' +  String.fromCharCode.apply(null, new Float32Array(e.data));
+            self.onmessage = str;
+          }
         }
         websocket.onerror = function(e) {
           self.onerrorinfo = e.data;
@@ -103,6 +112,17 @@
         input.blur();
         websocket.send(this.txtInput);
         this.sendinfo = this.txtInput;
+      },
+      sendArrayBuffer: function(e) {
+        var input = this.$refs.input;
+        input.blur();
+        var buffer = new ArrayBuffer(16)
+        var view = new Float32Array(buffer)
+        view.set([4,89,36.9,0.765])
+        console.log(buffer);
+        var str = 'send array buffer show with string:' +  String.fromCharCode.apply(null, new Float32Array(buffer));
+        this.sendinfo = str;
+        websocket.send(buffer);
       },
       oninput: function(event) {
         this.txtInput = event.value;
