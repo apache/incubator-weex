@@ -460,12 +460,26 @@
     BOOL yesOrNo = false;
     NSString *property = _styles[@"transitionProperty"];
     if (property) {
-        if ([property containsString:@"width"]||[property containsString:@"height"]||[property containsString:@"top"]||[property containsString:@"left"]||[property containsString:@"bottom"]||[property containsString:@"transform"]) {
+        if ([property containsString:@"width"]||[property containsString:@"height"]||[property containsString:@"top"]||[property containsString:@"bottom"]||[property containsString:@"right"]||[property containsString:@"left"]||[property containsString:@"transform"]||[property containsString:@"backgroundColor"]||[property containsString:@"opacity"]) {
             yesOrNo = true;
         }
     }
     return yesOrNo;
 }
+
+
+- (BOOL)_isPropertyAnimation
+{
+    BOOL yesOrNo = false;
+    NSString *property = _styles[@"transitionProperty"];
+    if (property) {
+        if ([property containsString:@"transform"]||[property containsString:@"backgroundColor"]||[property containsString:@"opacity"]) {
+            yesOrNo = true;
+        }
+    }
+    return yesOrNo;
+}
+
 
 - (void)_modifyStyles:(NSDictionary *)styles
 {
@@ -498,7 +512,9 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    [self _updateViewStyles:styles];
+    if (![self _isPropertyAnimation]) {
+        [self _updateViewStyles:styles];
+    }
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     
