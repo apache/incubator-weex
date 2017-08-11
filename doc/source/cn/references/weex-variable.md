@@ -46,3 +46,51 @@ has_chapter_content: true
 ## `weex.document: Document`
 
 返回当前 Weex 页面的文档对象。
+
+## `weex.supports`
+
+<span class="weex-version">v0.15+</span>
+
+`weex.supports` 可以用来检测当前环境中是否支持某个特性。
+
+> 目前仅在 Weex DSL 2.0 (.vue) 中支持。
+
+### API
+
+```js
+weex.supports(condition : String) : Boolean | Null
+```
+
+#### 参数
+
++ 特定格式的字符串：`@{type}/{name}`。
+
+`type` 必须是 "component" 或者 "module"。`name` 可以是标签名、模块名，也可以指定模块中的某个方法名（和模块名用 `.` 隔开）。
+
+#### 返回值
+
++ 支持，则返回 `true`。
++ 不支持，则返回 `false`。
++ 参数格式错误或无法确定是否支持，则返回 `null`。
+
+### 例子
+
+```js
+// 检测是否支持某个组件
+weex.supports('@component/slider') // true
+weex.supports('@component/my-tab') // false
+
+// 检测是否支持某个模块
+weex.supports('@module/stream')  // true
+weex.supports('@module/abcdef')  // false
+
+// 检测是否支持模块中的某个方法
+weex.supports('@module/dom.getComponentRect') // true
+weex.supports('@module/navigator.jumpToPage') // false
+
+// 无效的输入
+weex.supports('div') // null
+weex.supports('module/*') // null
+weex.supports('@stream/fetch') // null
+weex.supports('getComponentRect') // null
+```

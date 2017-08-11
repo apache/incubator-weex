@@ -9,7 +9,7 @@ version: 2.1
 
 Each Weex page has a separate weex variable, which exists in the JS context. They hold a single instance or method of the current Weex page.   
 
-`weex.config`
+## `weex.config`
 
 This variable contains all the environment information for the current Weex page, including not only:       
 
@@ -43,6 +43,54 @@ Get all the methods of a native module, such as:
 ```   
 
 
-`weex.document: Document` 
+## `weex.document: Document`
 
 Returns the document object of the current Weex page.
+
+## `weex.supports`
+
+<span class="weex-version">v0.15+</span>
+
+`weex.supports` is a method used to detect whether a feature is supported in the current environment.
+
+> Only supported in Weex DSL 2.0 (.vue).
+
+### API
+
+```js
+weex.supports(condition : String) : Boolean | Null
+```
+
+#### Parameter
+
++ a formatted string: `@{type}/{name}`.
+
+The `type` must be "component" or "module", the `name` can be tag name, module name or the method name in specific module.
+
+#### Return Value
+
++ if supported, returns `true`.
++ if unsupported, returns `false`.
++ if unclear, returns `null`.
+
+### Example
+
+```js
+// Detects whether the specific component is supported
+weex.supports('@component/slider') // true
+weex.supports('@component/my-tab') // false
+
+// Detects whether the specific module is supported
+weex.supports('@module/stream')  // true
+weex.supports('@module/abcdef')  // false
+
+// Detects whether the method in specific module is supported
+weex.supports('@module/dom.getComponentRect') // true
+weex.supports('@module/navigator.jumpToPage') // false
+
+// invalid input
+weex.supports('div') // null
+weex.supports('module/*') // null
+weex.supports('@stream/fetch') // null
+weex.supports('getComponentRect') // null
+```
