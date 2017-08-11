@@ -188,7 +188,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       mViewPager.setCurrentItem(initIndex);
       initIndex = -1;
     } else {
-      mViewPager.setCurrentItem(0);
+      if (mViewPager.getCurrentItem() == 0) {
+        mViewPager.setCurrentItem(0);
+      }
     }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
