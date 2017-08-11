@@ -114,6 +114,11 @@
     return [[self sharedInstance] _componentMethodMapsWithName:name];
 }
 
++ (NSMutableDictionary *)componentSelectorMapsWithName:(NSString *)name
+{
+    return [[self sharedInstance] _componentSelectorMapsWithName:name];
+}
+
 #pragma mark Private
 
 - (NSMutableDictionary *)_componentMethodMapsWithName:(NSString *)name
@@ -127,6 +132,24 @@
     WXComponentConfig *config = _componentConfigs[name];
     void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         [methods addObject:mKey];
+    };
+    [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [_configLock unlock];
+    
+    return dict;
+}
+
+- (NSMutableDictionary *)_componentSelectorMapsWithName:(NSString *)name
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSMutableArray *methods = [NSMutableArray array];
+    
+    [_configLock lock];
+    [dict setValue:methods forKey:@"methods"];
+    
+    WXComponentConfig *config = _componentConfigs[name];
+    void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        [methods addObject:mObj];
     };
     [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
     [_configLock unlock];

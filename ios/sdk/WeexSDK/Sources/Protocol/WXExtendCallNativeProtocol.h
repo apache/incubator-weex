@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,39 +17,31 @@
  * under the License.
  */
 
+
 #import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
 
-@interface WXDebugTool : NSObject<WXModuleProtocol>
+@protocol WXExtendCallNativeProtocol <NSObject>
 
-+ (instancetype)sharedInstance;
+@required
 
-//+ (void)showFPS;
+/**
+ * @abstract check parameters
+ *
+ * @param parameters the checked parameters.
+ *
+ * @return YES or NO.
+ *
+ */
++ (BOOL)checkParameters:(NSDictionary *)parameters;
 
-+ (void)setDebug:(BOOL)isDebug;
-
-+ (BOOL)isDebug;
-
-+ (void)setDevToolDebug:(BOOL)isDevToolDebug;
-
-+ (BOOL)isDevToolDebug;
-
-+ (void)setReplacedBundleJS:(NSURL*)url;
-
-+ (NSString*)getReplacedBundleJS;
-
-+ (void)setReplacedJSFramework:(NSURL*)url;
-
-+ (NSString*)getReplacedJSFramework;
-
-+ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options;
-
-+ (BOOL) removeCacheJsService: (NSString *)name;
-
-+ (NSDictionary *) jsServiceCache;
-
-+ (BOOL)isRemoteTracing;
-
-+ (void)setRemoteTracing:(BOOL)isRemoteTracing;
+/**
+ * @abstract excuteCallNative
+ *
+ * @param parameters the checked parameters.
+ *
+ * @return A value.
+ *
+ */
++ (id)excuteCallNative:(NSDictionary *)parameters;
 
 @end

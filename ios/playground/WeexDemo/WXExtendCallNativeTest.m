@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,39 +17,31 @@
  * under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import "WXExtendCallNativeTest.h"
 
-@interface WXDebugTool : NSObject<WXModuleProtocol>
+@implementation WXExtendCallNativeTest
 
-+ (instancetype)sharedInstance;
+#pragma mark -
+#pragma WXExtendCallNativeProtocol
 
-//+ (void)showFPS;
++ (BOOL)checkParameters:(NSDictionary *)parameters
+{
+    if(!parameters || ![parameters isKindOfClass:[NSDictionary class]]){
+        return NO;
+    }
+    
+    if(!parameters[@"className"]){
+        return NO;
+    }
+    
+    return YES;
+}
 
-+ (void)setDebug:(BOOL)isDebug;
 
-+ (BOOL)isDebug;
-
-+ (void)setDevToolDebug:(BOOL)isDevToolDebug;
-
-+ (BOOL)isDevToolDebug;
-
-+ (void)setReplacedBundleJS:(NSURL*)url;
-
-+ (NSString*)getReplacedBundleJS;
-
-+ (void)setReplacedJSFramework:(NSURL*)url;
-
-+ (NSString*)getReplacedJSFramework;
-
-+ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options;
-
-+ (BOOL) removeCacheJsService: (NSString *)name;
-
-+ (NSDictionary *) jsServiceCache;
-
-+ (BOOL)isRemoteTracing;
-
-+ (void)setRemoteTracing:(BOOL)isRemoteTracing;
++ (id)excuteCallNative:(NSDictionary *)parameters
+{
+    NSLog(@"weex test");
+    return @{@"value":@"test"};
+}
 
 @end
