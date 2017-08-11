@@ -49,15 +49,6 @@ function buildiOS {
 
 }
 
-function coverageGenerate {
-    current_dir=$PWD
-    xcodeCover="${current_dir}/ios/playground/XcodeCoverage"
-    if [ -d $xcodeCover ]; then
-        cd $xcodeCover
-        ./getcov -o . -p WeexSDK -x
-    fi
-}
-
 function runiOS {
     echo 'Run in iOS...'
     echo $1
@@ -68,9 +59,6 @@ function runiOS {
     startMacacaServer
     startWeexServer
     platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
-    if [ $needCoverage = "cover" ]; then
-        coverageGenerate
-    fi
 }
 
 function runWeb {
