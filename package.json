@@ -141,6 +141,7 @@
     "karma-webpack": "^1.8.0",
     "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
+    "mocha-simple-html-reporter": "^1.0.1",
     "nightwatch": "^0.9.4",
     "parse-diff": "^0.4.0",
     "phantomjs-prebuilt": "^2.1.7",

@@ -25,7 +25,7 @@ function runAndroid {
     buildAndroid
     startMacacaServer
     startWeexServer
-    platform=android ./node_modules/mocha/bin/mocha  $1 -f '@ignore-android' -i --recursive --bail
+    platform=android ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-android' -i --recursive --bail
 }
 
 function buildiOS {
@@ -58,14 +58,14 @@ function runiOS {
     # ps -ef
     startMacacaServer
     startWeexServer
-    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
+    platform=ios ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-ios' -i --recursive --bail --verbose
 }
 
 function runWeb {
     echo 'run web'
     startMacacaServer
     startWeexServer
-    browser=chrome ./node_modules/mocha/bin/mocha  $1 -f '@ignore-web' -i --recursive --bail
+    browser=chrome ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-web' -i --recursive --bail
 }
 
 function killserver {
