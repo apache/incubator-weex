@@ -6,6 +6,7 @@
 
 <script>
   var navigator = weex.requireModule('navigator')
+  var modal = weex.requireModule('modal')
   export default {
     methods: {
       jump_back(event) {
