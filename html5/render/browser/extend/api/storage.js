@@ -41,7 +41,7 @@ const storage = {
       return
     }
     const sender = this.sender
-    if (!key || (!value && value != 0)) {
+    if (!key || (!value && value !== 0)) {
       sender.performCallback(callbackId, {
         result: 'failed',
         data: INVALID_PARAM
