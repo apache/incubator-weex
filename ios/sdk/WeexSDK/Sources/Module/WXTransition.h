@@ -19,6 +19,11 @@
 
 #import <Foundation/Foundation.h>
 
+#define kWXTransitionDuration                   @"transitionDuration"
+#define kWXTransitionProperty                   @"transitionProperty"
+#define kWXTransitionDelay                      @"transitionDelay"
+#define kWXTransitionTimingFunction             @"transitionTimingFunction"
+
 @interface WXLayoutAnimationInfo : NSObject
 @property (nonatomic, strong) id fromValue;
 @property (nonatomic, strong) id toValue;

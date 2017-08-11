@@ -75,15 +75,14 @@
     {
         [_addStyles addEntriesFromDictionary:styles];
     }
-    
     _toStyles = [NSMutableDictionary dictionaryWithDictionary:_fromStyles];
     [_toStyles addEntriesFromDictionary:_addStyles];
     
-    _layoutAnimationDuration = _fromStyles[@"transitionDuration"] ? [WXConvert CGFloat:_fromStyles[@"transitionDuration"]] : 0;
-    _layoutAnimationDelay = _fromStyles[@"transitionDelay"] ? [WXConvert CGFloat:_fromStyles[@"transitionDelay"]] : 0;
-    _layoutAnimationTimingFunction = [WXConvert CAMediaTimingFunction:_fromStyles[@"transitionTimingFunction"]];
+    _layoutAnimationDuration = _fromStyles[kWXTransitionDuration] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDuration]] : 0;
+    _layoutAnimationDelay = _fromStyles[kWXTransitionDelay] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDelay]] : 0;
+    _layoutAnimationTimingFunction = [WXConvert CAMediaTimingFunction:_fromStyles[kWXTransitionTimingFunction]];
     
-    if (_layoutAnimationDuration == 0) {
+    if (_layoutAnimationDuration == 0 ) {
         [targetComponent _updateCSSNodeStyles:styles];
         WXPerformBlockOnMainThread(^{
             [targetComponent _updateViewStyles:styles];
@@ -98,42 +97,54 @@
         [self unitBezierp1x:vec[0] p1y:vec[1] p2x:vec[2] p2y:vec[3]];
     }
     
-    NSString *layoutAnimationProperty = _fromStyles[@"transitionProperty"];
+    NSString *layoutAnimationProperty = _fromStyles[kWXTransitionProperty];
     [self _resloveTransitionProperty:layoutAnimationProperty withStyles:styles];
     [self performSelector:@selector(_startLayoutAnimationDisplayLink) withObject:self afterDelay:_layoutAnimationDelay/1000];
 }
 
 - (void)_resloveTransitionProperty:(NSString *)propertyNames withStyles:(NSDictionary *)styles
 {
-    NSArray *array = @[@"width",@"height",@"top",@"bottom",@"right",@"left",@"transform",@"backgroundColor",@"opacity"];
+    NSArray *array = @[@"width",@"height",@"top",@"bottom",@"right",@"left"];
     for (NSString *propertyName in array) {
         if ([propertyNames containsString:propertyName]) {
-            [self _judgeProperty:propertyName withStyles:styles];
+            [self _judgeProperty:propertyName ];
+        }
+    }
+    NSArray *animationModuleArray = @[@"transform",@"backgroundColor",@"opacity"];
+    for (NSString *propertyName in animationModuleArray) {
+        if ([propertyNames containsString:propertyName]) {
+            [self _dealWithAnimationModuleProperty:propertyName styles:styles];
         }
     }
 }
 
-- (void)_judgeProperty:(NSString *)singleProperty withStyles:(NSDictionary *)styles
+- (void)_judgeProperty:(NSString *)singleProperty
 {
-    if (([singleProperty isEqualToString:@"transform"]&&styles[@"transform"]) || ([singleProperty containsString:@"backgroundColor"]&&styles[@"backgroundColor"]) || ([singleProperty containsString:@"opacity"]&&styles[@"opacity"])) {
-        NSDictionary *args = @{@"delay":@(_layoutAnimationDelay),@"duration":@(_layoutAnimationDuration),@"styles":styles,@"timingFunction":_fromStyles[@"transitionTimingFunction"]};
-        [self _animationModuleHandleTransition:args];
+    WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+    info.fromValue = @(_fromStyles[singleProperty] ? [WXConvert CGFloat:_fromStyles[singleProperty]] : 0);
+    info.toValue = @(_toStyles[singleProperty] ? [WXConvert CGFloat:_toStyles[singleProperty]] : 0 );
+    info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+    info.propertyName = singleProperty;
+    if (!_propertyArray) {
+        _propertyArray = [NSMutableArray new];
     }
-    else{
-        WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
-        info.fromValue = @(_fromStyles[singleProperty] ? [WXConvert CGFloat:_fromStyles[singleProperty]] : 0);
-        info.toValue = @(_toStyles[singleProperty] ? [WXConvert CGFloat:_toStyles[singleProperty]] : 0 );
-        info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
-        info.propertyName = singleProperty;
-        if (!_propertyArray) {
-            _propertyArray = [NSMutableArray new];
-        }
-        [_propertyArray addObject:info];
+    [_propertyArray addObject:info];
+}
+
+- (void)_dealWithAnimationModuleProperty:(NSString *)singleProperty styles:(NSDictionary *)styles
+{
+    if ([singleProperty isEqualToString:singleProperty]&&styles[singleProperty])
+    {
+        NSDictionary *args = @{@"delay":@(_layoutAnimationDelay),@"duration":@(_layoutAnimationDuration),@"styles":styles,@"timingFunction":_fromStyles[kWXTransitionTimingFunction]};
+        [self _animationModuleHandleTransition:args];
     }
 }
 
 - (void)_calculateLayoutAnimationProcessingStyle
 {
+    if (_propertyArray.count == 0) {
+        return;
+    }
     double per = 1000 * (_layoutAnimationCount + 1 ) / (60 * _layoutAnimationDuration);//linear
     if (![[NSString stringWithFormat:@"%@",_layoutAnimationTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
         per = [self solveWithx:((_layoutAnimationCount+2)*16)/_layoutAnimationDuration epsilon:SOLVE_EPS(_layoutAnimationDuration)];
@@ -204,6 +215,7 @@
 {
     _layoutAnimationCount = 0;
     _layoutAnimationDuration = 0;
+    _propertyArray = nil;
 
 }
 

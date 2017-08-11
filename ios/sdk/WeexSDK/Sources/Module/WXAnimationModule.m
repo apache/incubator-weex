@@ -313,9 +313,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     NSDictionary *styles = args[@"styles"];
     _transition.addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
     _transition.fromStyles =_transition.fromStyles ? :[NSMutableDictionary dictionaryWithDictionary:target.styles] ;
-    [_transition.fromStyles setObject:@([args[@"duration"] doubleValue]) forKey:@"transitionDuration"];
-    [_transition.fromStyles setObject:@([args[@"delay"] doubleValue]) forKey:@"transitionDelay"];
-    NSString *oldProperty = _transition.fromStyles[@"transitionProperty"];
+    [_transition.fromStyles setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
+    [_transition.fromStyles setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
+    NSString *oldProperty = _transition.fromStyles[kWXTransitionProperty];
     NSString *newProperty;
     if (oldProperty) {
         if ([oldProperty containsString:property]) {
@@ -330,8 +330,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     {
         newProperty = property;
     }
-    [_transition.fromStyles setObject:newProperty forKey:@"transitionProperty"];
-    [_transition.fromStyles setObject:args[@"timingFunction"] forKey:@"transitionTimingFunction"];
+    [_transition.fromStyles setObject:newProperty forKey:kWXTransitionProperty];
+    [_transition.fromStyles setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
     [target _modifyStyles:styles];
     
 }
