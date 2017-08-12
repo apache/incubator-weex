@@ -157,8 +157,16 @@ console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${no
   }
 }
 
-function getConfig (name, minify) {
+function getConfig (name, minify, params) {
   const opt = configs[name]
+  let isProd
+  if (params) {
+    isProd = params._isProd
+    delete params._isProd
+    for (const k in params) {
+      opt[k] = params[k]
+    }
+  }
   const config = {
     moduleName: opt.moduleName,
     entry: opt.entry,
@@ -169,7 +177,7 @@ function getConfig (name, minify) {
       json(),
       replace({
         'process.env.VIEWPORT_WIDTH': 750,
-        'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
+        'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
         'process.env.NODE_DEBUG': false
       }),

@@ -207,9 +207,20 @@ function build (name) {
   else {
     console.log(`\n => start to build ${name} (${pkgName})\n`)
     return new Promise((resolve, reject) => {
-      runRollup(config).then(() => {
-        runRollup(minifyConfig).then(() => {
-          zip(minifyConfig.dest, resolve)
+      return runRollup(config).then(() => {
+        let p = Promise.resolve()
+        if (name === 'vue') {
+          const esConfig = getConfig(pkgName, false, {
+            format: 'es',
+            _isProd: true
+          })
+          esConfig.dest = esConfig.dest.replace(/\.js$/, '.es.js')
+          p = runRollup(esConfig)
+        }
+        return p.then(function () {
+          return runRollup(minifyConfig).then(() => {
+            zip(minifyConfig.dest, resolve)
+          })
         })
       })
     })

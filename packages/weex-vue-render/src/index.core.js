@@ -5,9 +5,18 @@ import text from '../../../html5/render/vue/components/text'
 import image from '../../../html5/render/vue/components/image'
 import scrollable from '../../../html5/render/vue/components/scrollable'
 
-weex.install(div)
-weex.install(text)
-weex.install(image)
-weex.install(scrollable)
+const preInit = weex.init
+
+weex.init = function () {
+  preInit.apply(weex, arguments)
+  weex.install(div)
+  weex.install(text)
+  weex.install(image)
+  weex.install(scrollable)
+}
+
+if (global.Vue) {
+  weex.init(global.Vue)
+}
 
 export default weex
