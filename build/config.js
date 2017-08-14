@@ -92,7 +92,7 @@ const configs = {
   'weex-web-render': {
     moduleName: 'Weex',
     entry: absolute('html5/render/browser/index.js'),
-    dest: absolute('dist/browser.js'),
+    dest: absolute('packages/weex-html5/index.js'),
     banner: `(this.nativeLog || function(s) {console.log(s)})`
       + `('START WEEX HTML5: ${subversion.browser}, Build ${now()}.');\n`
       + frameworkBanner,
