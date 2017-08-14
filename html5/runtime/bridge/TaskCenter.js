@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import CallbackManager from './CallbackManager'
 import Element from '../vdom/Element'
 import { typof } from '../utils'
