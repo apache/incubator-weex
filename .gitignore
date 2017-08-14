@@ -1,5 +1,6 @@
 # Created by IDE
 .idea/
+.svn/
 *.iml
 .DS_Store
 .vscode
