@@ -19,7 +19,7 @@ Weex Devtools 能够方便调试 Weex 页面，但此功能离不开 Native 的�
 
   ```gradle
   dependencies {
-    compile 'com.taobao.android:weex_inspector:0.8.0.0'
+    compile 'com.taobao.android:weex_inspector:${version}'
   }
   ```
 
@@ -29,7 +29,7 @@ Weex Devtools 能够方便调试 Weex 页面，但此功能离不开 Native 的�
   <dependency>
     <groupId>com.taobao.android</groupId>
     <artifactId>weex_inspector</artifactId>
-    <version>0.8.0.0</version>
+    <version>${version}</version>
     <type>pom</type>
   </dependency>
   ```
@@ -82,6 +82,7 @@ Weex Devtools 能够方便调试 Weex 页面，但此功能离不开 Native 的�
 
 | weex sdk | weex inspector | Debugger Server |
 |----------|----------------|-----------------|
+| 0.13+    | 0.12+          | 0.2.39+         |
 | 0.8.0.1+ | 0.0.8.1+       | 0.2.39+         |
 | 0.7.0+   | 0.0.7.13       | 0.2.38          |
 | 0.6.0+   | 0.0.2.2        | -               |
@@ -269,3 +270,84 @@ Devtools 扩展了 [Chrome Debugging Protocol](https://developer.chrome.com/devt
   已知的原因如下：
 
   * 多线程操作网络连接引起，在频繁的即断即连时容易触发。在 0.0.7.1 版本已修复。
+
+## 注入自定义WebSocket Client
+目前Inspector以反射的方式动态调用了okhttp-ws库中的相关代码，可以兼容的okhttp与okhttp-ws版本为：
+- okhttp, okhttp-ws 2.7.5版本以下
+- okhttp3, okhttp3-ws 3.5版本以下
+
+如果客户端中集成的版本与上述版本不匹配，则可以使用`WeexInspector.overrideWebSocketClient`方法来注入自定义的WebSocket实现，示例：
+```java
+
+    public class CustomWebSocketClient implements IWebSocketClient {
+
+      private WebSocket ws;
+
+      @Override
+      public boolean isOpen() {
+        return ws != null;
+      }
+
+      @Override
+      public void connect(String wsAddress, final WSListener listener) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setConnectTimeout(5, TimeUnit.SECONDS);
+        okHttpClient.setReadTimeout(5, TimeUnit.SECONDS);
+        okHttpClient.setWriteTimeout(5, TimeUnit.SECONDS);
+
+        Request request = new Request.Builder().url(wsAddress).build();
+        WebSocketCall webSocketCall = WebSocketCall.create(okHttpClient, request);
+        webSocketCall.enqueue(new WebSocketListener() {
+          @Override
+          public void onOpen(WebSocket webSocket, Request request, Response response) throws IOException {
+            ws = webSocket;
+            listener.onOpen();
+          }
+
+          @Override
+          public void onMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
+            if (WebSocket.PayloadType.TEXT == type) {
+              listener.onMessage(payload.readUtf8());
+            }
+          }
+
+          @Override
+          public void onPong(Buffer payload) {
+            //ignore
+          }
+
+          @Override
+          public void onClose(int code, String reason) {
+            listener.onClose();
+          }
+
+          @Override
+          public void onFailure(IOException e) {
+            listener.onFailure(e);
+          }
+        });
+      }
+
+      @Override
+      public void close() {
+        if (ws != null) {
+          try {
+            ws.close(CloseCodes.NORMAL_CLOSURE, "Normal closure");
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+
+      @Override
+      public void sendMessage(int requestId, String message) {
+        if (ws != null) {
+          try {
+            ws.sendMessage(WebSocket.PayloadType.TEXT, new Buffer().writeString(message, Charset.defaultCharset()));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }
+```

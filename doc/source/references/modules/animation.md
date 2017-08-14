@@ -52,7 +52,7 @@ properties of `transform`:
 | name | description | value type | default value |
 | :--- | :--- | :--- | :--- |
 |translate/translateX/translateY|Specifies the location of which the element will be translated to.|pixel or percent|none|
-|rotate|Specifies the angle of which the element will be rotated, the unit is degree.|number|none|
+|rotate/rotateX <span class="api-version">v0.14+</span> /rotateY <span class="api-version">v0.14+</span> |Specifies the angle of which the element will be rotated, the unit is degree.|number|none|
 |scale/scaleX/scaleY|Stretch or shrink the element.|number|none|  
 
 ##### callback
