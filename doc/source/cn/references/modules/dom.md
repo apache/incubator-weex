@@ -38,8 +38,8 @@ version: 2.1
 <template>
   <div class="wrapper">
     <scroller class="scroller">
-      <div class="row" v-for="(name, index) in rows" :ref="'item'+index">
-        <text class="text" :ref="'text'+index">{{name}}</text>
+      <div class="row" v-for="(name, index) in rows" ref="'item'+index">
+        <text class="text" ref="'text'+index">{{name}}</text>
       </div>
     </scroller>
     <div class="group">
