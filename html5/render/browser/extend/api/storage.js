@@ -32,7 +32,7 @@ const storage = {
    * When passed a key name and value, will add that key to the storage,
    * or update that key's value if it already exists.
    * @param {string} key
-   * @param {string} value
+   * @param {string} value not null nor undifined，but 0 works
    * @param {function} callbackId
    */
   setItem: function (key, value, callbackId) {
