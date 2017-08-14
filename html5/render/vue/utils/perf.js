@@ -1,4 +1,4 @@
-/*
+ /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -22,10 +22,9 @@
  * @fileOverview: perf data recorder.
  */
 
-import { debounce, depress } from './func'
-
+import { debounce, depress, extend } from './func'
 // performance tracker for weex.
-const perf: {
+export const perf: {
   earliestBeforeCreates: Array<number>,
   latestMounts: Array<number>,
   earliestBeforeUpdates: Array<number>,
@@ -39,7 +38,25 @@ const perf: {
   renderTime: Array<{ start: number, end: number, duration: number }>,
   entries: Array<{ requestStart: number, responseEnd: number }>,
   time: {},
-  firstAllMountedTime: ?number
+  firstAllMountedTime: ?number,
+  stat: {
+    // info stat.
+    connectionType: string,
+    requestType: string,
+    pageName: string,
+    templateUrl: string,
+    WXSDKVersion: string,
+    bizType: string,
+    JSLibVersion: string,
+
+    // performance stat.
+    screenRenderTime: number,
+    JSTemplateSize: number,
+    componentCount: number,
+    networkTime: number,
+    JSLibInitTime: number,
+    totalTime: number
+  }
 } = window._weex_perf = {
   earliestBeforeCreates: [],
   latestMounts: [],
@@ -51,25 +68,94 @@ const perf: {
   renderTime: [],
   entries: [],
   time: {},
-  firstAllMountedTime: null
+  firstAllMountedTime: null,
+  stat: {
+    // info stat.
+    connectionType: '',
+    requestType: '',
+    pageName: '',
+    templateUrl: '',
+    WXSDKVersion: '',
+    bizType: '',
+    JSLibVersion: '',
+    // performance stat.
+    screenRenderTime: 0,
+    JSTemplateSize: 0,
+    componentCount: 0,
+    networkTime: 0,
+    JSLibInitTime: 0,
+    totalTime: 0
+  }
 }
 
 const tmp = {}
 
 const IMG_REC_INDENT: number = 500  // record loading events after 500ms towards last recording.
+const REGEXP_IMG_TYPE = /(.png|.jpg|.jpeg|.webp|.gif)$/  // image file type regexp.
 
 let earliestBeforeUpdateTime: number = 0
 let earliestBeforeCreateTime: number = 0
 
-let isFirstScreenDetected = false
+let statCollected = false
+function collectStat (): void {
+  if (statCollected) {
+    return
+  }
+  statCollected = true
+  const version = window.weex.config.env.weexVersion
+  const protocol = location.protocol
+  extend(perf.stat, {
+    connectionType: protocol.substring(0, protocol.length - 1),
+    requestType: 'network',
+    pageName: location.href,
+    WXSDKVersion: version,
+    bizType: 'weex',
+    JSLibVersion: version
+  })
+  const performance = window.performance
+  // get templateUrl && JSTemplateSize
+  const entries = performance && performance.getEntries && performance.getEntries()
+  if (entries) {
+    const params = window.lib.httpurl(location.href).params
+    const bundle = params.page || params._wx_tpl
+    if (bundle) {
+      const len = entries.length
+      let i = 0
+      while (i < len) {
+        const entry = entries[i]
+        if (entry.entryType === 'resource'
+          && entry.name.indexOf(bundle.replace(/^[./]+/, '')) > -1) {
+          const res: any = extend({}, entry)
+          extend(perf.stat, {
+            templateUrl: res.name,
+            JSTemplateSize: (res.transferSize / 1024).toFixed(2),
+            networkTime: parseInt(res.duration)
+          })
+          break
+        }
+        i++
+      }
+    }
+  }
+}
+
+export function collectStatPerf (name: string, val: string | number): void {
+  if (!name) { return }
+  perf.stat[name] = val
+}
 
 function getNow (): number {
-  return performance.now ? performance.now() : new Date().getTime()
+  const performance = window.performance
+  return performance && performance.now ? performance.now() : new Date().getTime()
 }
 
 function getEntries (): Array<any> {
-  return performance.getEntries
+  const performance = window.performance
+  return performance && performance.getEntries
     ? performance.getEntries()
+      .filter(function (entry) {
+        return REGEXP_IMG_TYPE.test(entry.name)
+      })
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }
 
@@ -101,15 +187,23 @@ export function tagFirstScreen (time?: number): void {
 
   const num = perf.renderTime.length
   perf[`screenTime${num}`] = time
-  window.weex.emit('renderfinish', time)
-  if (!isFirstScreenDetected) {
-    isFirstScreenDetected = true
+
+  if (!window._first_screen_detected) {
+    window._first_screen_detected = true
+    collectStat()
+    extend(perf.stat, {
+      screenRenderTime: parseInt(time),
+      componentCount: window._component_count
+    })
     window.weex.emit('firstscreenfinish', time)
   }
+
   if (process.env.NODE_ENV === 'development') {
     console.log(`screenTime[${num}]: ${time} ms.`)
     console.log('_weex_perf:', window._weex_perf)
   }
+
+  window.weex.emit('renderfinish', time)
 }
 
 /**
@@ -118,6 +212,13 @@ export function tagFirstScreen (time?: number): void {
 const debouncedTagImg = debounce(function () {
   const entries = getEntries()
   const len = entries.length
+  if (!len) {
+    /**
+     * no image loaded. This probably happened because of the disabling of images' loading
+     * events. So just tag now as the first screen time.
+     */
+    return tagFirstScreen()
+  }
   let i = 0
   let end = 0
   while (i < len) {
@@ -158,6 +259,7 @@ export function tagRootMounted (): void {
       console.log(`first all mounted time: ${now} ms.`)
     }
   }
+  collectStatPerf('totalTime', parseInt(now))
 }
 
 /**

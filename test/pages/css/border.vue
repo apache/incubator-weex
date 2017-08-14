@@ -14,7 +14,7 @@
         <text class="topright box dotted"></text>
         <text class="bottomleft box dotted"></text>
         <text class="bottomright box dotted"></text>
-        <text class="box dotted dottedLarge"></text>
+        <text class="dotted dottedLarge"></text>
         <text>dotted</text>
     </div>
     <div class="container">
@@ -23,7 +23,7 @@
         <text class="topright box dashed"></text>
         <text class="bottomleft box dashed"></text>
         <text class="bottomright box dashed"></text>
-        <text class="box dashed dashedLarge"></text>
+        <text class="dashed dashedLarge"></text>
         <text>dashed</text>
     </div>
     <div class="container">
@@ -36,17 +36,17 @@
         <text>constrained</text>
     </div>
     <div class="container">
-        <text class="box radius differentWidth1"></text>
-        <text class="box radius differentWidth2"></text>
-        <text class="box radius differentWidth3"></text>
-        <text class="box radius differentWidth4" ></text>
-        <text class="box radius differentWidth5" ></text>
+        <text class="radius differentWidth1"></text>
+        <text class="radius differentWidth2"></text>
+        <text class="radius differentWidth3"></text>
+        <text class="radius differentWidth4" ></text>
+        <text class="radius differentWidth5" ></text>
         <text>different width</text>
     </div>
      <div class="container">
-        <text class="box borderClipping1"></text>
-        <text class="box borderClipping2"></text>
-        <text class="box borderClipping3"></text>
+        <text class="borderClipping1"></text>
+        <text class="borderClipping2"></text>
+        <text class="borderClipping3"></text>
         <text>border clipping</text>
     </div>
     <div class="container">
@@ -55,19 +55,19 @@
         <text test-id="test-text">box shadow</text>
     </div>
     <div class="container">
-        <text class="circle transparent1"></text>
-        <text class="circle transparent2"></text>
-        <text class="circle transparent3"></text>
-        <text class="circle transparent4"></text>
+        <text class="transparent1"></text>
+        <text class="transparent2"></text>
+        <text class="transparent3"></text>
+        <text class="transparent4"></text>
         <text>transparent</text>
     </div>
     <div class="container">
-        <image class="box topleft" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box topright" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box bottomleft" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box bottomright" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="circle" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
+        <image class="box topleft" :src="img" @load="onload"></image>
+        <image class="box topright" :src="img" @load="onload"></image>
+        <image class="box bottomleft" :src="img" @load="onload"></image>
+        <image class="box bottomright" :src="img" @load="onload"></image>
+        <image class="box" :src="img" @load="onload"></image>
+        <image class="circle" :src="img" @load="onload"></image>
         <text>image</text>
     </div>
   </scroller>
@@ -102,13 +102,22 @@
   border-bottom-left-radius: 20px; 
 }
 .dottedLarge {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  background-color: #ccc;
   border-width: 21px;
   border-radius: 40px;
   border-left-color: rgba(0,0,255,1);
   border-bottom-color: rgba(0,128,0,0.5);
   border-right-color: rgba(0,128,0,0.5);
+  border-top-color: #f00;
 }
 .dashedLarge {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  background-color: #ccc;
   border-top-width: 19px;
   border-bottom-width: 19px;
   border-left-width: 38px;
@@ -118,6 +127,9 @@
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
   border-left-color: rgba(0,0,255,1);
+  border-right-color: #f00;
+  border-top-color: #f00;
+  border-bottom-color: #f00;
 }
 
 /* the different border styles defined in CSS3 */
@@ -156,6 +168,11 @@
 
 .differentWidth1
 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  border-color: #f00;
+  background-color: #ccc;
   border-top-width: 10px;
   border-right-width: 15px;
   border-bottom-width: 20px;
@@ -163,6 +180,11 @@
 }
 .differentWidth2
 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  border-color: #f00;
+  background-color: #ccc;
   border-top-width: 10px;
   border-right-width: 25px;
   border-bottom-width: 40px;
@@ -170,6 +192,11 @@
 }
 .differentWidth3
 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  border-color: #f00;
+  background-color: #ccc;
   border-top-width: 10px;
   border-right-width: 25px;
   border-bottom-width: 10px;
@@ -177,6 +204,11 @@
 }
 .differentWidth4
 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  border-color: #f00;
+  background-color: #ccc;
   border-top-width: 16px;
   border-right-width: 4px;
   border-bottom-width: 110px;
@@ -184,10 +216,22 @@
 }
 .differentWidth5
 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  border-color: #f00;
+  background-color: #ccc;
   border-right-width: 50px;
+  border-top-width: 6px;
+  border-left-width: 6px;
+  border-bottom-width: 6px;
 }
 
 .borderClipping1 {
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  background-color: #ccc;
   border-radius: 30px;
   border-top-color: red;
   border-top-width: 10px;
@@ -199,7 +243,10 @@
   border-bottom-width: 30px;
 }
 .borderClipping2 {
-  border: solid rgba(255,0,0,1);
+  width: 100px;
+  height: 100px;
+  margin: 2px;
+  background-color: #ccc;
   border-top-width: 20px;
   border-bottom-width: 20px;
   border-left-width: 40px;
@@ -211,8 +258,13 @@
   border-left-color: rgba(0,0,255,1);
   border-bottom-color: rgba(0,128,0,0.5);
   border-right-color: rgba(0,128,0,0.5);
+  border-top-color: #f00;
 }   
 .borderClipping3 {
+  background-color: #ccc;
+  width: 100px;
+  height: 100px;
+  margin: 2px;
   border-width:10px;
   border-radius: 50px;
   border-top-right-radius: 0px;
@@ -223,6 +275,8 @@
   border-bottom-width: 5px;
   border-left-width: 18px;
   border-right-width: 0px;
+  border-top-color: #f00;
+  border-bottom-color: #f00;
 }
 
 .boxShadow1 {
@@ -252,19 +306,52 @@
   border-radius:50px;
 }
 .transparent1 {
+  width: 100px;
+  height: 100px;
+  border-width: 33px;
+  border-top-color: rgba(255, 0, 0, 0.5);
+  border-left-color: rgba(255, 0, 0, 0.5);
+  border-bottom-color: rgba(255, 0, 0, 0.5);
+  border-style: solid;
+  border-radius:50px;
   border-right-color: transparent;
 }
 .transparent2 {
+  width: 100px;
+  height: 100px;
+  border-width: 33px;
+  border-top-color: rgba(255, 0, 0, 0.5);
+  border-left-color: rgba(255, 0, 0, 0.5);
+  border-bottom-color: rgba(255, 0, 0, 0.5);
+  border-style: solid;
+  border-radius:50px;
   border-right-color: transparent; 
-  border-right-width: 33px;
 }
 .transparent3 {
+  width: 100px;
+  height: 100px;
+  border-top-width: 33px;
+  border-left-width: 33px;
+  border-right-width: 33px;
+  border-top-color: rgba(255, 0, 0, 0.5);
+  border-left-color: rgba(255, 0, 0, 0.5);
+  border-style: solid;
+  border-radius:50px;
   border-right-color: transparent; 
   border-right-width: 0;
   border-bottom-color: transparent;
   border-bottom-width: 0;
 }
 .transparent4 {
+  width: 100px;
+  height: 100px;
+  border-top-width: 33px;
+  border-left-width: 33px;
+  border-bottom-width: 33px;
+  border-top-color: rgba(255, 0, 0, 0.5);
+  border-left-color: rgba(255, 0, 0, 0.5);
+  border-style: solid;
+  border-radius:50px;
   border-right-color: transparent; 
   border-right-width: 0;
   border-bottom-color: transparent;
@@ -275,9 +362,13 @@
   module.exports = {
     data : function(){
       return {
+        img: 'http://gw.alicdn.com/tfs/TB1bg8SQFXXXXcHXXXXXXXXXXXX-85-170.png'
       }
     },
     methods : {
+      onload: function(){
+        console.log("image onload")
+      }
     }
   }
 </script>

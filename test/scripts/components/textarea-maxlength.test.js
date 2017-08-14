@@ -25,7 +25,7 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('textarea maxlength vue test2 ', function () {
+describe('@ignore-android textarea maxlength vue test2 ', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
@@ -43,11 +43,13 @@ describe('textarea maxlength vue test2 ', function () {
     return driver
       .elementById('textarea')
       .sendKeys('12345678')
-      .sleep(2000)
+      .sleep(3000)
+      .source()
       .elementById('status')
       .text()
       .then((text)=>{
-      assert.equal(text,'1234')
+        console.log(text)
+        assert.equal(text,'1234')
      })
   })
 

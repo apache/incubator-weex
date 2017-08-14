@@ -61,6 +61,7 @@
     UIAccessibilityTraits _role; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
     BOOL _ariaHidden; // accessibilityElementsHidden
+    NSString * _testId;// just for auto-test
     
     /**
      *  PseudoClass
@@ -165,8 +166,6 @@
 - (void)_frameDidCalculated:(BOOL)isChanged;
 
 - (NSUInteger)_childrenCountForLayout;
-
-- (void)_fillAbsolutePositions;
 
 ///--------------------------------------
 /// @name Private Methods

@@ -64,12 +64,13 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    this._renderHook()
     return createElement('html:header', {
       attrs: { 'weex-type': 'header' },
       on: createEventMap(this),
       ref: 'header',
       staticClass: 'weex-header weex-ct',
-      class: { sticky: this.sticky, iossticky: this.supportSticky },
+      class: { 'weex-sticky': this.sticky, 'weex-ios-sticky': this.supportSticky },
       staticStyle: extractComponentStyle(this)
     }, this.$slots.default)
   }

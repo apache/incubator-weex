@@ -36,8 +36,5 @@
     "stream",
     "webview",
     "webSocket"
-  ],
-  "npm": [
-    "weex-picker"
   ]
 }

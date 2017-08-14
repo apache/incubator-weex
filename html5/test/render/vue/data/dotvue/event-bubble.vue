@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="ct">
     <bar @click="click"></bar>
-    <text>{{tracker}}</text>
+    <text class="txt">{{tracker}}</text>
   </div>
 </template>
 

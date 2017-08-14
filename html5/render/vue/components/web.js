@@ -68,6 +68,7 @@ export default {
     //   validateStyles('web', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
 
+    this._renderHook()
     return createElement('iframe', {
       attrs: {
         'weex-type': 'web',

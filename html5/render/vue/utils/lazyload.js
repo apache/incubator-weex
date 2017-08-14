@@ -39,9 +39,7 @@ function preLoadImg (src: string,
 export function applySrc (item: any, src: ?string, placeholderSrc: ?string): void {
   if (!src) { return }
   function finallCb () {
-    item.removeAttribute('img-src')
     delete item._src_loading
-    item._src_loaded = true
     if (doRecord) {
       if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
         tagImg() // tag lastest img onload time.
@@ -51,7 +49,17 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
       }
     }
   }
-  if (item._src_loading || item._src_loaded) {
+  /**
+   * 1. apply src immediately in case javscript blocks the image loading
+   *  before next tick.
+   */
+  item.style.backgroundImage = `url(${src || ''})`
+  item.removeAttribute('img-src')
+  /**
+   * 2. then load the img src with Image constructor (but would not post
+   *  a request again), just to trigger the load event.
+   */
+  if (item._src_loading) {
     return
   }
   item._src_loading = true
@@ -85,7 +93,8 @@ export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?bo
   }
   el = el || document.body
   if (!el) { return }
-  const imgs: NodeList = (el || document.body).querySelectorAll('[img-src]')
+  let imgs: NodeList | Array<any> = (el || document.body).querySelectorAll('[img-src]')
+  if (el.getAttribute('img-src')) { imgs = [el] }
   for (let i: number = 0; i < imgs.length; i++) {
     const img = imgs[i]
     if (typeof ignoreVisibility === 'boolean' && ignoreVisibility) {

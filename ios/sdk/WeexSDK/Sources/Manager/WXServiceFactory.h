@@ -28,7 +28,7 @@
  *
  * @param options The service options to register
  *
- * @param code service js code to invoke
+ * @param serviceScript service js code to invoke
  *
  * @return script
  *

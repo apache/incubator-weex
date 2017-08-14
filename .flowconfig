@@ -7,6 +7,7 @@
 .*/android/.*
 .*/ios/.*
 .*/bin/.*
+.*/scripts/.*
 .*/dist/.*
 .*/flow-typed/.*
 

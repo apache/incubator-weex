@@ -1,10 +1,12 @@
 <template>
-  <scroller ref="container" class="container" @scroll="onscroll">
-      <div><text>{{vp}}|{{p1}}|{{p2}}</text></div>
-    <div v-for="item in items" style="background-color:yellow;height:300"><text >row</text></div>
-    <div ref="panel" class="fixed-panel"></div>
-    <div ref="panel2" class="fixed-panel2"></div>
-  </scroller>
+  <div>
+    <scroller ref="container" class="container" @scroll="onscroll">
+      <div test-id='div_1' style="position:fixed; top: 0; left: 100px;"><text test-id='text_1'>{{vp}}|{{p1}}|{{p2}}</text></div>
+      <div v-for="item in items" style="background-color:yellow;height:300"><text >row</text></div>
+      <div ref="panel" class="fixed-panel"></div>
+      <div ref="panel2" class="fixed-panel2"></div>
+    </scroller>
+  </div>
 </template>
 <style>
   .container {

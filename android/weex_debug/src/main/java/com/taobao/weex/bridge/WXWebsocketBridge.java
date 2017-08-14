@@ -93,10 +93,98 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public int callCreateBody(String instanceId, String tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateBody(instanceId, tasks, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
     public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
         mJsManager.callAddElement(instanceId, ref,dom, index,callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callUpdateFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callCreateFinish(String instanceId,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRefreshFinish(String instanceId,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRefreshFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        if (tasks != null) {
+            mJsManager.callUpdateAttrs(instanceId, ref, new String(tasks), callback);
+        }
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        if (tasks != null) {
+            mJsManager.callUpdateStyle(instanceId, ref, new String(tasks), callback);
+        }
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRemoveElement(String instanceId, String ref, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRemoveElement(instanceId, ref, callback);
+
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callMoveElement(instanceId, ref, parentref, index, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callAddEvent(String instanceId, String ref, String event, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callAddEvent(instanceId, ref, event, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRemoveEvent(instanceId, ref, event, callback);
         return IWXBridge.INSTANCE_RENDERING;
     }
 

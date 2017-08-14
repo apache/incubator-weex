@@ -19,10 +19,11 @@ This variable contains all the environment information for the current Weex page
 + `AppName: string`: application name.
 + `AppVersion: string`: app version.
 + `Platform: string`: platform information, that is iOS, Android or Web.
++ `osName: string`: OS name information, that is iOS, Android.
 + `OsVersion: string`: system version.
 + `DeviceModel: string`: device model (native application only).
-+ `DeviceWidth: number`: device width, default 750.
-+ `DeviceHeight: number`: device height.    
++ `DeviceWidth: number`: device width
++ `DeviceHeight: number`: device height.  In Weex, the default width of viewport is 750px, thus you can obtain the height of screen by `height = 750/deviceWidth*deviceHeight` if the width of viewport remains its default value.
 
 `weex.requireModule(module: string): Object`     
 

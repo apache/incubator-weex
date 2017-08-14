@@ -37,6 +37,7 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXTracingManager.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -90,6 +91,7 @@
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
+        _ariaHidden = NO;
         
         _async = NO;
         
@@ -104,11 +106,27 @@
             }
         }
         
+        if (attributes[@"role"]){
+            _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        }
+        if (attributes[@"ariaHidden"]) {
+            _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        }
+        if (attributes[@"ariaLabel"]) {
+            _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        }
+        
+        if (attributes[@"testId"]) {
+            _testId = [WXConvert NSString:attributes[@"testId"]];
+        }
+        
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
+        
+        [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:WXTRender options:nil];
     }
     
     return self;
@@ -234,7 +252,19 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        [self _configWXComponentA11yWithAttributes:_attributes];
+        if (_role) {
+            _view.accessibilityTraits |= _role;
+        }
+        
+        if (_testId) {
+            _view.accessibilityIdentifier = _testId;
+        }
+        
+        if (_ariaLabel) {
+            _view.accessibilityLabel = _ariaLabel;
+        }
+        
+        _view.accessibilityElementsHidden = _ariaHidden;
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -248,6 +278,7 @@
         }
         
         [self setNeedsDisplay];
+        [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
         
         if (_lazyCreateView) {
@@ -280,7 +311,7 @@
 
 - (void)_resetNativeBorderRadius
 {
-    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopRightRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     _layer.cornerRadius = borderRect.radii.topLeft;
 }
 
@@ -336,6 +367,10 @@
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssert(subcomponent, @"The subcomponent to insert to %@ at index %d must not be nil", self, index);
+    if (index > [_subcomponents count]) {
+        WXLogError(@"the index of inserted %ld is out of range as the current is %lu", (long)index, (unsigned long)[_subcomponents count]);
+        return;
+    }
     
     subcomponent->_supercomponent = self;
     
@@ -406,6 +441,7 @@
         [_styles addEntriesFromDictionary:styles];
         pthread_mutex_unlock(&_propertyMutex);
     }
+    styles = [self parseStyles:styles];
     [self _updateCSSNodeStyles:styles];
     [self _resetCSSNodeStyles:resetStyles];
 }
@@ -457,6 +493,22 @@
     WXAssertMainThread();
 }
 
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+- (void)setNativeTransform:(CGAffineTransform)transform
+{
+    WXAssertMainThread();
+    
+    _transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
+    if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
+        [_transform applyTransformForView:_view];
+        [_layer setNeedsDisplay];
+    }
+}
+
 - (void)readyToRender
 {
     if (self.weexInstance.trackComponent) {
@@ -464,11 +516,6 @@
     }
 }
 
-- (void)updateAttributes:(NSDictionary *)attributes
-{
-    WXAssertMainThread();
-    
-}
 
 - (void)setGradientLayer
 {
@@ -498,6 +545,7 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
+    
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
@@ -514,11 +562,7 @@
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
     }
-    
-    // set accessibilityFrame for view which has no subview
-    if (0 == [self.subcomponents count]) {
-        self.view.isAccessibilityElement = YES;
-    }
+
 }
 
 - (UIImage *)imageFromLayer:(CALayer *)layer

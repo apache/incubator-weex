@@ -32,7 +32,7 @@ describe('scroller fixed position item ', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/components/scroller-fixed.js'))
-      .waitForElementByXPath('//scroller[1]/div[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('div_1',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -42,11 +42,9 @@ describe('scroller fixed position item ', function () {
 
   it('#1 position:fixed items', () => {
     return driver
-    .touch('drag', {fromX:200, fromY:500, toX:200, toY: 400})
-    .sleep(2000)
-    .touch('drag', {fromX:200, fromY:400, toX:200, toY: 500})
-    .sleep(2000)
-    .elementByXPath('//scroller[1]/div[1]/text[1]')
+    .dragUpAndDown()
+    .sleep(1000)
+    .elementById('text_1')
     .text()
     .then((text)=>{
         var parts = text.split("|");

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent+Layout.h"
@@ -13,6 +24,7 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXLayoutDefine.h"
 
 @implementation WXComponent (Layout)
 
@@ -119,6 +131,7 @@
             
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
+                strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
                 [strongSelf configBoxShadow:_boxShadow];
             } else {
                 if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
@@ -136,7 +149,6 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
-            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }
@@ -181,20 +193,7 @@
 - (CGPoint)computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
 {
     // Not need absolutePosition any more
- //   [self _computeNewAbsolutePosition:superAbsolutePosition];
     return superAbsolutePosition;
-}
-
-- (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
-{
-    CGPoint newAbsolutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
-                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
-    
-    if(!CGPointEqualToPoint(_absolutePosition, newAbsolutePosition)){
-        _absolutePosition = newAbsolutePosition;
-    }
-    
-    return newAbsolutePosition;
 }
 
 - (void)_layoutDidFinish
@@ -245,7 +244,7 @@ do {\
     return [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];
 }
 
-- (void)_fillCSSNode:(NSDictionary *)styles;
+- (void)_fillCSSNode:(NSDictionary *)styles
 {
     // flex
     WX_STYLE_FILL_CSS_NODE(flex, flex, CGFloat)
@@ -353,16 +352,6 @@ do {\
     WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], 0.0)
     WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], 0.0)
     WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
-}
-
-- (void)_fillAbsolutePositions
-{
-    CGPoint absolutePosition = _absolutePosition;
-    NSArray *subcomponents = self.subcomponents;
-    for (WXComponent *subcomponent in subcomponents) {
-        subcomponent->_absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
-        [subcomponent _fillAbsolutePositions];
-    }
 }
 
 #pragma mark CSS Node Override

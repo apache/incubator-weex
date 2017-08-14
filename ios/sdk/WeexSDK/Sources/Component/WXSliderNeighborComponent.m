@@ -432,7 +432,10 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 - (CGFloat)valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
 {
-    return _delegate? [_delegate sliderNeighbor:self valueForOption:option withDefault:value]: value;
+    if (_delegate && [_delegate respondsToSelector:@selector(sliderNeighbor:valueForOption:withDefault:)]) {
+        return [_delegate sliderNeighbor:self valueForOption:option withDefault:value];
+    }
+    return value;
 }
 
 #pragma mark -
@@ -665,7 +668,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     //get number of items and placeholders
     _numberOfVisibleItems = 0;
     _numberOfItems = [_dataSource numberOfItemsInSliderNeighbor:self];
-    _numberOfPlaceholders = [_dataSource numberOfPlaceholdersInsliderNeighbor:self];
+    if ([_dataSource respondsToSelector:@selector(numberOfPlaceholdersInsliderNeighbor:)]) {
+        _numberOfPlaceholders = [_dataSource numberOfPlaceholdersInsliderNeighbor:self];
+    }
     
     //reset view pools
     self.itemViews = [NSMutableDictionary dictionary];

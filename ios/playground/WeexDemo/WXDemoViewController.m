@@ -25,7 +25,9 @@
 #import <WeexSDK/WXSDKManager.h>
 #import "UIViewController+WXDemoNaviBar.h"
 #import "DemoDefine.h"
-
+#import "WXPrerenderManager.h"
+#import "WXMonitor.h"
+#import "WXTracingManager.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -70,7 +72,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
     [self updateInstanceState:WeexInstanceAppear];
 }
 
@@ -86,11 +87,6 @@
     self.navigationController.navigationBarHidden = NO;
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [_instance fireGlobalEvent:WX_APPLICATION_WILL_RESIGN_ACTIVE params:nil];
-}
-
 //TODO get height
 - (void)viewDidLayoutSubviews
 {
@@ -104,8 +100,8 @@
 
 - (void)dealloc
 {
-    [_instance destroyInstance];
     
+    [_instance destroyInstance];
 #ifdef DEBUG
     [_instance forceGarbageCollection];
 #endif
@@ -118,6 +114,10 @@
     CGFloat width = self.view.frame.size.width;
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
+    }
+    
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
     
@@ -154,6 +154,14 @@
     };
     if (!self.url) {
         WXLogError(@"error: render url is nil");
+        return;
+    }
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        [WXPrerenderManager renderFromCache:[self.url absoluteString]];
         return;
     }
     NSURL *URL = [self testURL: [self.url absoluteString]];

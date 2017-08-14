@@ -1,14 +1,9 @@
-\---
-
+---
 title: <waterfall>
-
 type: references
-
 order: 2.5
-
 version: 2.1
-
-\---
+---
 
 # waterfall
 
@@ -18,7 +13,7 @@ version: 2.1
 
 ### 子组件
 
-注意:  和list一样, waterfall 只支持特定类型的组件: cell, header, refresh, loading 和 fixed-position 组件. 
+注意:  和list一样, waterfall 只支持特定类型的组件: cell, header, refresh, loading 和 fixed-position 组件.
 
 - `cell`: 瀑布流中的每个元素
 - `header`: 主要用于表示横跨多列的元素，可以通过css的position属性设置为sticky
@@ -33,7 +28,7 @@ version: 2.1
   - `<integer>`: 最佳列数，column-width 和  column-count 都指定非0值， 则 column-count 代表最大列数。
 - **column-gap**: 列与列的间隙. 如果指定了 `normal` ，则对应 `32`.
 
-其他支持的属性参见 [List Component Attributes](./list.html) 
+其他支持的属性参见 [List Component Attributes](./list.html)
 
 ### 样式
 

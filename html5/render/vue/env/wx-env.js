@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import 'envd'
+import '../lib/envd'
 
 import { init as initViewport } from './viewport'
 import { extend } from '../utils'
@@ -27,14 +27,24 @@ import { extend } from '../utils'
  * @param  {object} envInfo: info parsed from lib.env.
  */
 export function initEnv (viewportInfo, envInfo) {
+  const browserName = envInfo.browser ? envInfo.browser.name : navigator.appName
+  const browserVersion = envInfo.browser ? envInfo.browser.version.val : null
+  let osName = envInfo.os.name
+  if (osName.match(/(iPhone|iPad|iPod)/i)) {
+    osName = 'iOS'
+  }
+  else if (osName.match(/Android/i)) {
+    osName = 'android'
+  }
+  const osVersion = envInfo.os.version.val
   const env = {
     platform: 'Web',
     weexVersion: 'process.env.WEEX_VERSION',
     userAgent: navigator.userAgent,
-    appName: envInfo.aliapp ? envInfo.aliapp.appname : navigator.appName,
-    appVersion: envInfo.aliapp ? envInfo.aliapp.version.val : null,
-    osName: envInfo.browser ? envInfo.browser.name : null,
-    osVersion: envInfo.browser ? envInfo.browser.version.val : null,
+    appName: browserName,
+    appVersion: browserVersion,
+    osName,
+    osVersion,
     deviceModel: envInfo.os.name || null
   }
   /**

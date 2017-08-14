@@ -126,8 +126,8 @@ Flexbox 包含 flex 容器和 flex 成员项。如果一个 Weex 元素可以容
 
   定义了 flex 容器中 flex 成员项的排列方向。可选值为 `row` | `column`，默认值为 `column`
 
-   - `column`：从上到下排列。
-   - `row`：从左到右排列。
+  - `column`：从上到下排列。
+  - `row`：从左到右排列。
 
 - `justify-content`：
 
@@ -140,7 +140,7 @@ Flexbox 包含 flex 容器和 flex 成员项。如果一个 Weex 元素可以容
 
   ![justify-content @400*](./images/css-flexbox-justify.svg)
 
--  `align-items`：
+- `align-items`：
 
   定义了 flex 容器中 flex 成员项在纵轴方向上如何排列以处理空白部分。可选值为 `stretch` | `flex-start` | `center` | `flex-end`，默认值为 `stretch`。
 
@@ -301,15 +301,53 @@ Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 
 </style>
 ```
 
+## transform
+
+transform 属性向元素应用 2D 转换。该属性允许我们对元素进行旋转、缩放、移动或倾斜。
+
+目前支持的 transform 声明格式:
+
+- translate( <number/percentage> [, <number/percentage>]?)
+- translateX( <number/percentage> )
+- translateY( <number/percentage> )
+- scale( <number>)
+- scaleX( <number> )
+- scaleY( <number> )
+- rotate( <angle/degree> )
+- transform-origin: number/percentage/keyword(top/left/right/bottom)
+
+### 示例
+
+```HTML
+<template>
+  <div class="wrapper">
+    <div class="transform">
+     <text class="title">Transformed element</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .transform {
+    align-items: center; 
+    transform: translate(150px,200px) rotate(20deg);
+    transform-origin: 0 -250px;
+    border-color:red;
+    border-width:2px;
+  }
+  .title {font-size: 48px;}
+</style>
+```
+
 ## 伪类 <span class="api-version">v0.9.5+</span>
 
 Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
 
-所有组件都支持 `active`, 但只有 `input` 组件和 `textarea` 组件支持 `focus`, `enabled`, `diabled`。
+所有组件都支持 `active`, 但只有 `input` 组件和 `textarea` 组件支持 `focus`, `enabled`, `disabled`。
 
 ### 规则
 
-- 同时生效生效的时候，优先级高覆盖优先级低
+- 同时生效的时候，优先级高覆盖优先级低
 
    - 例如：`input:active:enabled` 和 `input:active` 同时生效，前者覆盖后者
 

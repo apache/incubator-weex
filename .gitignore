@@ -33,6 +33,7 @@ html5/test/e2e/logs
 
 # render test
 html5/test/render/vue/data/build
+examples/vue/test/
 
 # Created by Weex Web Packer
 html5/browser/extend/packer.js
@@ -50,3 +51,6 @@ doc/db.json
 doc/node_modules/
 doc/public/
 doc/.deploy*/
+
+# release
+apache_release_temp

@@ -53,7 +53,7 @@ public class StickyHeaderHelper {
     mHeaderComps.put(component.getRef(),component);
     if(mCurrentStickyRef != null){
       WXCell cell = mHeaderComps.get(mCurrentStickyRef);
-      if(component.getScrollPositon() > cell.getScrollPositon()){
+      if(cell ==null || component.getScrollPositon() > cell.getScrollPositon()){
         mCurrentStickyRef = component.getRef();
       }
     }else{
@@ -87,19 +87,19 @@ public class StickyHeaderHelper {
       final float translationX = headerView.getTranslationX();
       final float translationY = headerView.getTranslationY();
       headComponent.removeSticky();
-      mParent.post(WXThread.secure(new Runnable() {
-        @Override
-        public void run() {
-          ViewGroup existedParent;
-          if ((existedParent = (ViewGroup) headerView.getParent()) != null) {
-            existedParent.removeView(headerView);
-          }
-          mParent.addView(headerView);
-          //recover translation, sometimes it will be changed on fling
-          headerView.setTranslationX(translationX);
-          headerView.setTranslationY(translationY);
-        }
-      }));
+
+      ViewGroup existedParent;
+      if ((existedParent = (ViewGroup) headerView.getParent()) != null) {
+        existedParent.removeView(headerView);
+      }
+      mParent.addView(headerView);
+      //recover translation, sometimes it will be changed on fling
+      headerView.setTranslationX(translationX);
+      headerView.setTranslationY(translationY);
+
+    }
+    if (headComponent.getDomObject().getEvents().contains("sticky")) {
+      headComponent.fireEvent("sticky");
     }
   }
 
@@ -124,6 +124,9 @@ public class StickyHeaderHelper {
         component.recoverySticky();
       }
     }));
+    if (component.getDomObject().getEvents().contains("unsticky")) {
+      component.fireEvent("unsticky");
+    }
   }
 
 

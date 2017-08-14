@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#import "WXType.h"
+
 @class WXComponent;
 @protocol WXScrollerProtocol <NSObject>
 
@@ -64,6 +66,11 @@
 - (void)setContentInset:(UIEdgeInsets)contentInset;
 
 - (void)resetLoadmore;
+
+- (void)addScrollDelegate:(id<UIScrollViewDelegate>)delegate;
+- (void)removeScrollDelegate:(id<UIScrollViewDelegate>)delegate;
+
+- (WXScrollDirection)scrollDirection;
 
 @end
 

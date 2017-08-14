@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import <WeexSDK/WeexSDK.h>
+#import "WXComponent.h"
 #import "WXCanvasModule.h"
 #import <GLKit/GLKit.h>
 

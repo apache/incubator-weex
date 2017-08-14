@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#import <CoreGraphics/CoreGraphics.h>
+#import <Foundation/Foundation.h>
+
 @class WXBridgeMethod;
 @class WXSDKInstance;
 @class WXComponent;
@@ -177,5 +180,5 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 
 - (void)_addUITask:(void (^)())block;
 
-
+- (void)excutePrerenderUITask:(NSString *)url;
 @end

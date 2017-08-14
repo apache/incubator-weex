@@ -15,3 +15,5 @@ version: 2.1
 - [颜色名称](./color-names.html)
 - [手势](./gesture.html)
 - [路径](./path.html)
+- [事件冒泡](./bubble.html)
+- [降级方案](./downgrade.html)

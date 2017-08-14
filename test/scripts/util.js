@@ -24,6 +24,7 @@ var fs = require('fs')
 const BlinkDiff = require('blink-diff');
 
 var platform = process.env.platform || 'android';
+const servePort = process.env.serport || 12581
 platform = platform.toLowerCase();
 var browser = process.env.browser || '';
 
@@ -42,7 +43,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
-  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground.apk`)
+  app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
 };
 
 var androidChromeOpts = {
@@ -83,8 +84,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:{y : (isIOS ? 128 : 0)},
-      cropImageB:{y : (isIOS ? 128 : 0)}
+      cropImageA:isIOS?{y:128}:{y:242,height:1530},//android: 242 - status bar(72)+navigator bar(170)
+      cropImageB:isIOS?{y:128}:{y:242,height:1530}
     });
 
     diff.run((err, result) => {
@@ -113,9 +114,9 @@ module.exports = {
     getPage:function(name){
         let url
         if(browser){
-             url = 'http://'+ getIpAddress()+':12581/vue.html?page=/test/build-web'+name
+             url = 'http://'+ getIpAddress()+':'+servePort+'/vue.html?page=/test/build-web'+name
         }else{
-            url = 'wxpage://' + getIpAddress()+":12581/test/build"+name;
+            url = 'wxpage://' + getIpAddress()+":"+servePort+"/test/build"+name;
         }
         console.log(url)
         return url
@@ -131,7 +132,55 @@ module.exports = {
         var driver = global._wxDriver;
         if(!driver){
             console.log('Create new driver');
-            driver = wd(this.getConfig()).initPromiseChain();
+            let driverFactory = wd(this.getConfig())
+            driverFactory.addPromiseChainMethod('dragUpAndDown',function(){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.7, toX:middleX, toY: size.height*0.3, duration: 1})
+                    .sleep(1000)
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.3, toX:middleX, toY: size.height*0.7, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driverFactory.addPromiseChainMethod('dragUp',function(distance){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    let startY = size.height * 0.3
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
+                    .sleep(1000)
+                })
+            })
+          driverFactory.addPromiseChainMethod('swipeLeft', function (distanceRatio, yRatio) {
+                return this
+                  .getWindowSize()
+                  .then(size => {
+                    let y = yRatio * size.height;
+                    let startX = size.width * 0.8;
+                    let endX = startX - size.width * distanceRatio;
+                    return this
+                      .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                      .sleep(1000)
+                  })
+          })
+          driverFactory.addPromiseChainMethod('swipeRight', function (distanceRatio, yRatio) {
+            return this
+              .getWindowSize()
+              .then(size => {
+                let y = yRatio * size.height;
+                let startX = size.width * 0.2;
+                let endX = startX + size.width * distanceRatio;
+                return this
+                  .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                  .sleep(1000)
+              })
+          })
+            driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000
             });
@@ -145,7 +194,7 @@ module.exports = {
             return driver.status()
         else{
             driver._isInit = true;
-            return driver.initDriver()
+            return driver.initDriver().sleep(20000) //ios cannot detect at once
         }
     },
     quit:function(driver){

@@ -1,0 +1,68 @@
+#
+# Use this with rsync
+# 'rsync -rvv  --include-from=test.rules  ./ dest_dir/
+#       * watch out the space after every line.
+#       * include folder before include anything in it
+#
+- .git*
+- .DS_Store
+# This line only include folder itself, not files or subfolder under it.
++ /scripts/
++ /scripts/rat-ant-build.xml
++ /scripts/build_from_source.sh
++ /scripts/dist-*.sh
++ /scripts/install-hooks.sh
++ /scripts/pre-commit.sh
++ /scripts/pre-push.sh
++ /scripts/commit-msg.sh
++ /LICENSE
++ /NOTICE
++ /POSSIBLE-NOTICES-FOR-BIN-DIST
++ /DISCLAIMER
++ /README.MD
++ /HOW-TO-BUILD.md
++ /RUN-RAT.md
++ /package.json
++ /.wwprc
++ /.flowconfig
++ /.eslintrc
++ /.eslintignore
++ /.babelrc
++ /src
+- /src/h5-render/dist/index.js
+- /src/h5-render/node_modules
+- /src/js-framework/node_modules
++ /src/**
++ /html5
+- /html5/**.output.js
+- /html5/render/browser/extend/packer.js
+- /html5/test/render/**
++ /html5/**
++ /packages
++ /packages/weex-html5
++ /packages/weex-html5/package.json
++ /packages/weex-vue-render
++ /packages/weex-vue-render/package.json
++ /build
++ /build/**
+
+###### android #######
++ /android
++ /android/build.gradle
++ /android/sdk/
+- /android/sdk/assets/main.js
+- /android/sdk/.gradle
+- /android/sdk/build
+- /android/sdk/NOTICE
+- /android/sdk/libs/*/*.so
++ /android/sdk/**
+
+###### ios ###########
++ /ios
++ /ios/sdk/
+- /ios/sdk/LICENSE
+- /ios/sdk/NOTICE
+- /ios/sdk/WeexSDK/Resources/main.js
++ /ios/sdk/**
+
+- *
