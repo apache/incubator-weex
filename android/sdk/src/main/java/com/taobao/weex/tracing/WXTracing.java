@@ -26,9 +26,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.utils.WXLogUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,9 +47,6 @@ public class WXTracing {
   public static synchronized void submit(TraceEvent event) {
     ITracingAdapter tracingAdapter = WXSDKManager.getInstance().getTracingAdapter();
     if (tracingAdapter != null) {
-      if (event.iid == null) {
-        WXLogUtils.w("WXTracing", "Event " + event.fname + " missing instance id");
-      }
       tracingAdapter.submitTracingEvent(event);
     }
   }
@@ -87,27 +81,6 @@ public class WXTracing {
       ts = System.currentTimeMillis();
       traceId = nextId();
       tname = currentThreadName();
-    }
-
-    public JSONObject toJSONObject() {
-      JSONObject object = new JSONObject();
-      try {
-        object.put("parentId", parentId);
-        object.put("ref", ref);
-        object.put("parentRef", parentRef);
-        object.put("className", classname);
-        object.put("ts", ts);
-        object.put("traceId", traceId);
-        object.put("iid", iid);
-        object.put("duration", duration);
-        object.put("fName", fname);
-        object.put("ph", ph);
-        object.put("name", name);
-        object.put("tName", tname);
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-      return object;
     }
 
     public void submit() {

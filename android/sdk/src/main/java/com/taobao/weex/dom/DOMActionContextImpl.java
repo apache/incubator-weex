@@ -180,7 +180,7 @@ class DOMActionContextImpl implements DOMActionContext {
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent batchEvent = WXTracing.newEvent("domBatch", mInstanceId, -1);
-      batchEvent.duration = Stopwatch.nanosToMillis(System.nanoTime() - startNanos);
+      batchEvent.duration = Stopwatch.millisUntilNow(startNanos);
       batchEvent.ts = start;
       batchEvent.ph = "X";
       WXTracing.submit(batchEvent);
