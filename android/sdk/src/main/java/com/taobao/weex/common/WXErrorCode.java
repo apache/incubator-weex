@@ -139,7 +139,9 @@ public enum WXErrorCode {
   /**
    * JS Framework run error
    */
-  WX_ERR_JS_FRAMEWORK("-1002", "js framework error");
+  WX_ERR_JS_FRAMEWORK("-1002", "js framework error"),
+
+  WX_ERR_JS_REINIT_FRAMEWORK("-1003", "js reinit framework error");
 
   private String errorCode;
   private String errorMsg;

@@ -1473,16 +1473,32 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
-          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, "success");
+          String reinitInfo = "";
+          if (reInitCount > 1) {
+            reinitInfo = "reinit Framework:";
+          }
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, reinitInfo + "success");
         }else{
-          WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
-          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+          if (reInitCount > 1) {
+            WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+            String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail reinit FrameWork";
+            commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK, err);
+          } else {
+            WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+            String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
+            commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+          }
         }
       } catch (Throwable e) {
-        WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-        String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
-        commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+        if (reInitCount > 1) {
+          WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+          String err="[WXBridgeManager] invokeInitFramework reinit FrameWork exception!#"+e.toString();
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK, err);
+        } else {
+          WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+          String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+        }
       }
 
     }
