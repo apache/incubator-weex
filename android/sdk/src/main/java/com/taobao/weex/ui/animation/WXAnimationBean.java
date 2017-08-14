@@ -26,7 +26,9 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.util.Property;
 import android.view.View;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXUtils;
@@ -39,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class WXAnimationBean {
 
@@ -51,7 +54,7 @@ public class WXAnimationBean {
   public long delay;
   public long duration;
   public String timingFunction;
-  public Style styles;
+  public @Nullable Style styles;
   public boolean needLayout;
 
   public static class Style {
@@ -78,7 +81,9 @@ public class WXAnimationBean {
     private static final String ZERO = "0%";
     private static final String PX = "px";
     private static final String DEG = "deg";
-    public static Map<String, List<Property<View,Float>>> wxToAndroidMap = new HashMap<>();
+    public static Map<String, List<Property<View,Float>>> wxToAndroidMap = new ArrayMap<>();
+    private static Map<Property<View, Float>, Float> defaultMap= new ArrayMap<>();
+
 
     static {
       wxToAndroidMap.put(WX_TRANSLATE, Arrays.asList
@@ -91,7 +96,15 @@ public class WXAnimationBean {
       wxToAndroidMap.put(WX_SCALE, Arrays.asList(View.SCALE_X, View.SCALE_Y));
       wxToAndroidMap.put(WX_SCALE_X, Collections.singletonList(View.SCALE_X));
       wxToAndroidMap.put(WX_SCALE_Y, Collections.singletonList(View.SCALE_Y));
+      wxToAndroidMap.put(Name.PERSPECTIVE, Collections.singletonList(CameraDistanceProperty.getInstance()));
       wxToAndroidMap = Collections.unmodifiableMap(wxToAndroidMap);
+      defaultMap.put(View.TRANSLATION_X, 0f);
+      defaultMap.put(View.TRANSLATION_Y, 0f);
+      defaultMap.put(View.SCALE_X, 1f);
+      defaultMap.put(View.SCALE_Y, 1f);
+      defaultMap.put(View.ROTATION, 0f);
+      defaultMap.put(View.ROTATION_X, 0f);
+      defaultMap.put(View.ROTATION_Y, 0f);
     }
 
     public String opacity;
@@ -100,9 +113,10 @@ public class WXAnimationBean {
     public String height;
     public String transform;
     public String transformOrigin;
-    private Map<Property<View, Float>, Float> transformMap = new HashMap<>();
+    private Map<Property<View, Float>, Float> transformMap = new LinkedHashMap<>();
     private Pair<Float, Float> pivot;
     private List<PropertyValuesHolder> holders=new LinkedList<>();
+    private float cameraDistance = Float.MAX_VALUE;
 
     private static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
                                                 final int height,final int viewportW) {
@@ -124,18 +138,19 @@ public class WXAnimationBean {
                                                       @NonNull List<String> rawValue) {
                 Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(propertyList.size());
                 List<Float> convertedList = new ArrayList<>(propertyList.size());
-                if (propertyList.contains(View.ROTATION)) {
+                if (propertyList.contains(View.ROTATION) ||
+                    propertyList.contains(View.ROTATION_X) ||
+                    propertyList.contains(View.ROTATION_Y)) {
                   convertedList.addAll(parseRotationZ(rawValue));
-                }else if(propertyList.contains(View.ROTATION_X)) {
-                  convertedList.addAll(parseRotationXY(rawValue));
-                }else if(propertyList.contains(View.ROTATION_Y)) {
-                  convertedList.addAll(parseRotationXY(rawValue));
                 }else if (propertyList.contains(View.TRANSLATION_X) ||
                            propertyList.contains(View.TRANSLATION_Y)) {
                   convertedList.addAll(parseTranslation(propertyList, width, height, rawValue,viewportW));
                 } else if (propertyList.contains(View.SCALE_X) ||
                            propertyList.contains(View.SCALE_Y)) {
                   convertedList.addAll(parseScale(propertyList.size(), rawValue));
+                }
+                else if(propertyList.contains(CameraDistanceProperty.getInstance())){
+                  convertedList.add(parseCameraDistance(rawValue));
                 }
                 if (propertyList.size() == convertedList.size()) {
                   for (int i = 0; i < propertyList.size(); i++) {
@@ -156,14 +171,6 @@ public class WXAnimationBean {
                   convertedList.addAll(rawFloat);
                 }
                 return convertedList;
-              }
-
-              private List<Float> parseRotationXY(@NonNull List<String> rawValue) {
-                List<Float> intermediate = parseRotationZ(rawValue);
-                for (int i = 0; i < intermediate.size(); i++) {
-                  intermediate.set(i, -intermediate.get(i));
-                }
-                return intermediate;
               }
 
               private @NonNull List<Float> parseRotationZ(@NonNull List<String> rawValue) {
@@ -218,6 +225,18 @@ public class WXAnimationBean {
                 }
                 convertedList.add(parsePercentOrPx(first, width,viewportW));
                 convertedList.add(parsePercentOrPx(second, height,viewportW));
+              }
+
+              private Float parseCameraDistance(List<String> rawValue){
+                float ret=Float.MAX_VALUE;
+                if(rawValue.size() == 1){
+                  float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(rawValue.get(0)), viewportW);
+                  float scale = WXEnvironment.getApplication().getResources().getDisplayMetrics().density;
+                  if (!Float.isNaN(value) && value > 0) {
+                    ret = value * scale;
+                  }
+                }
+                return ret;
               }
             });
         return parser.parse();
@@ -291,14 +310,12 @@ public class WXAnimationBean {
       return WXUtils.fastGetFloat(percent, precision) / 100 * unit;
     }
 
-    private static @NonNull Map<Property<View, Float>, Float> createDefaultTransform(){
-      Map<Property<View, Float>, Float> defaultMap= new ArrayMap<>(5);
-      defaultMap.put(View.TRANSLATION_X, 0f);
-      defaultMap.put(View.TRANSLATION_Y, 0f);
-      defaultMap.put(View.SCALE_X, 1f);
-      defaultMap.put(View.SCALE_Y, 1f);
-      defaultMap.put(View.ROTATION, 0f);
-      return defaultMap;
+    private void resetToDefaultIfAbsent() {
+      for (Entry<Property<View, Float>, Float> entry : defaultMap.entrySet()) {
+        if (!transformMap.containsKey(entry.getKey())) {
+          transformMap.put(entry.getKey(), entry.getValue());
+        }
+      }
     }
 
     public @Nullable Pair<Float, Float> getPivot() {
@@ -308,9 +325,24 @@ public class WXAnimationBean {
     public void init(@Nullable String transformOrigin,@Nullable String rawTransform,
                      final int width, final int height,int viewportW){
       pivot = parsePivot(transformOrigin,width,height,viewportW);
-      transformMap = createDefaultTransform();
       transformMap.putAll(parseTransForm(rawTransform,width,height,viewportW));
+      resetToDefaultIfAbsent();
+      if (transformMap.containsKey(CameraDistanceProperty.getInstance())) {
+        cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());
+      }
       initHolders();
+    }
+
+    /**
+     * Use this method to init if you already have a list of Property
+     * The key is something like {@link View#TRANSLATION_X} and the value is a {@link Pair},
+     * of which the first is beginning value and the second is ending value.
+     * @param styles a list of Property
+     */
+    public void init(@NonNull Map<Property<View, Float>, Pair<Float, Float>> styles){
+      for(Entry<Property<View, Float>, Pair<Float, Float>> entry:styles.entrySet()){
+        holders.add(PropertyValuesHolder.ofFloat(entry.getKey(), entry.getValue().first, entry.getValue().second));
+      }
     }
 
     private void initHolders(){
@@ -324,6 +356,10 @@ public class WXAnimationBean {
 
     public List<PropertyValuesHolder> getHolders(){
       return holders;
+    }
+
+    public float getCameraDistance(){
+      return cameraDistance;
     }
   }
 }

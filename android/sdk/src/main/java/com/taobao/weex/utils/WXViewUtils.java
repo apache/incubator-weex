@@ -28,6 +28,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -404,10 +405,9 @@ public class WXViewUtils {
    * clipPath doesn't work with rotation nor scale when API level is 24.
    * As animation will not cause redraw if hardware-acceleration enabled, clipCanvas feature has
    * to be disabled when API level is 24 without considering the animation property.
-   * As the compile version of weex_sdk is 23, so API level 24 has to be hard-code.
    */
   private static boolean clipCanvasIfAnimationExist() {
-    return Build.VERSION.SDK_INT != 24;
+    return Build.VERSION.SDK_INT != VERSION_CODES.N;
   }
 
   /**

@@ -182,7 +182,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if (_needsRemoveObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
-    _ctAttributedString = nil;
     pthread_mutex_destroy(&_ctAttributedStringMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
 }
@@ -251,7 +250,11 @@ do {\
 - (void)setNeedsRepaint
 {
     _textStorage = nil;
+    
+    pthread_mutex_lock(&(_ctAttributedStringMutex));
     _ctAttributedString = nil;
+    pthread_mutex_unlock(&(_ctAttributedStringMutex));
+    
 }
 
 #pragma mark - Subclass
