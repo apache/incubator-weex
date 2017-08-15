@@ -20,6 +20,8 @@ package com.taobao.weex.ui.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -46,6 +48,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean needLoop = true;
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
+  private Handler mAutoScrollHandler;
 
   private Runnable scrollAction = new ScrollAction(this);
 
@@ -56,6 +59,8 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   private void init() {
+    mAutoScrollHandler = new Handler(Looper.getMainLooper());
+
     setOverScrollMode(View.OVER_SCROLL_NEVER);
 
     addOnPageChangeListener(new OnPageChangeListener() {
@@ -149,12 +154,12 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void startAutoScroll() {
     isAutoScroll = true;
-    removeCallbacks(scrollAction);
-    postDelayed(scrollAction, intervalTime);
+    mAutoScrollHandler.removeCallbacks(scrollAction);
+    mAutoScrollHandler.postDelayed(scrollAction, intervalTime);
   }
 
   public void pauseAutoScroll(){
-    removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacks(scrollAction);
   }
 
   /**
@@ -162,7 +167,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void stopAutoScroll() {
     isAutoScroll = false;
-    removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacks(scrollAction);
   }
 
   public boolean isAutoScroll() {
