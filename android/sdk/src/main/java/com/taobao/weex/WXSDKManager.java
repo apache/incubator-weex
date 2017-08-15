@@ -322,7 +322,7 @@ public class WXSDKManager {
     return mIWXJSExceptionAdapter;
   }
 
-  void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+  public void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
     mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
   }
 
