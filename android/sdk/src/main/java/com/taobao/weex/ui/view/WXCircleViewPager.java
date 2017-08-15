@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -41,6 +42,7 @@ import java.lang.reflect.Field;
 @SuppressLint("HandlerLeak")
 public class WXCircleViewPager extends ViewPager implements WXGestureObservable {
 
+  private final int SCROLL_TO_NEXT = 1;
   private WXGesture wxGesture;
   private boolean isAutoScroll;
   private long intervalTime = 3 * 1000;
@@ -48,7 +50,17 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean needLoop = true;
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
-  private Handler mAutoScrollHandler;
+  private Handler mAutoScrollHandler = new Handler(Looper.getMainLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+      if (msg.what == SCROLL_TO_NEXT) {
+        showNextItem();
+        this.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
+        return;
+      }
+      super.handleMessage(msg);
+    }
+  };
 
   private Runnable scrollAction = new ScrollAction(this);
 
@@ -59,7 +71,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   private void init() {
-    mAutoScrollHandler = new Handler(Looper.getMainLooper());
     setOverScrollMode(View.OVER_SCROLL_NEVER);
 
     addOnPageChangeListener(new OnPageChangeListener() {
@@ -153,12 +164,14 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void startAutoScroll() {
     isAutoScroll = true;
-    mAutoScrollHandler.removeCallbacks(scrollAction);
-    mAutoScrollHandler.postDelayed(scrollAction, intervalTime);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
+    mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
+//    mAutoScrollHandler.removeCallbacksAndMessages(scrollAction);
+//    mAutoScrollHandler.postDelayed(scrollAction, intervalTime);
   }
 
   public void pauseAutoScroll(){
-    mAutoScrollHandler.removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   /**
@@ -166,7 +179,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void stopAutoScroll() {
     isAutoScroll = false;
-    mAutoScrollHandler.removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   public boolean isAutoScroll() {
@@ -219,12 +232,13 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     switch (ev.getAction()) {
       case MotionEvent.ACTION_DOWN:
       case MotionEvent.ACTION_MOVE:
-        mAutoScrollHandler.removeCallbacks(scrollAction);
+        mAutoScrollHandler.removeCallbacksAndMessages(null);
         break;
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
         if (isAutoScroll()) {
-          mAutoScrollHandler.postDelayed(scrollAction, intervalTime);
+          mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
+          //postDelayed(scrollAction, intervalTime);
         }
         break;
     }
@@ -300,7 +314,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   @Override
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    mAutoScrollHandler.removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   private static final class ScrollAction implements Runnable {
@@ -315,8 +329,8 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       WXCircleViewPager target;
       if ((target = targetRef.get()) != null) {
         target.showNextItem();
-        target.mAutoScrollHandler.removeCallbacks(this);
-        target.mAutoScrollHandler.postDelayed(this, target.getIntervalTime());
+        target.removeCallbacks(this);
+        target.postDelayed(this, target.getIntervalTime());
       }
     }
   }
