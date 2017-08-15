@@ -3,7 +3,7 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.21.8",
+    "framework": "0.21.9",
     "vue-render": "0.12.3",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -105,7 +105,6 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.7",
-    "weex-styler": "0.1.9",
     "weex-vue-framework": "2.4.2-weex.3"
   },
   "devDependencies": {
@@ -141,6 +140,7 @@
     "karma-webpack": "^1.8.0",
     "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
+    "mocha-simple-html-reporter": "^1.0.1",
     "nightwatch": "^0.9.4",
     "parse-diff": "^0.4.0",
     "phantomjs-prebuilt": "^2.1.7",

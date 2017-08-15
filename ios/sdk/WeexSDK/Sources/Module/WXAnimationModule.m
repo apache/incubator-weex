@@ -24,7 +24,7 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 #import "WXLength.h"
-#import "WXAnimationLayout.h"
+#import "WXTransition.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -36,7 +36,6 @@
 @property (nonatomic, assign) double delay;
 @property (nonatomic, strong) CAMediaTimingFunction *timingFunction;
 @property (nonatomic, assign) CGPoint originAnchorPoint;
-
 @end
 
 @implementation WXAnimationInfo
@@ -137,8 +136,9 @@
 
 @interface WXAnimationModule ()
 
-@property (nonatomic,strong) WXAnimationLayout *animationLayout;
 @property (nonatomic,assign) BOOL needLayout;
+@property (nonatomic, strong) WXTransition *transition;
+
 @end
 
 @implementation WXAnimationModule
@@ -150,8 +150,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
     _needLayout = NO;
-    _animationLayout = [[WXAnimationLayout alloc] init];
-    _animationLayout.weexInstance = self.weexInstance;
     WXPerformBlockOnComponentThread(^{
         WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
         if (!targetComponent) {
@@ -177,9 +175,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     double delay = [args[@"delay"] doubleValue] / 1000;
     if (args[@"needLayout"]) {
         _needLayout = [WXConvert BOOL:args[@"needLayout"]];
+        _transition = [WXTransition new];
     }
-    _animationLayout.animationDuration = duration * 1000;
-    _animationLayout.animationDelay = delay * 1000;
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
     for (NSString *property in styles) {
@@ -274,30 +271,30 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @([value floatValue]);
             [infos addObject:info];
         } else if ([property isEqualToString:@"width"]) {
-            info.propertyName = @"bounds.size.width";
-            info.fromValue = @(layer.bounds.size.width);
-            CGRect newBounds = layer.bounds;
-            newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
-            info.toValue = @(newBounds.size.width);
-            [infos addObject:info];
             if (_needLayout) {
-                _animationLayout.widthInfo = [[WXAnimationLayoutInfo alloc] init];
-                _animationLayout.widthInfo.toValue = info.toValue;
-                _animationLayout.widthInfo.fromValue = info.fromValue;
-                _animationLayout.widthInfo.propertyName = info.propertyName;
+                [self animationWithLayoutAnimationTarget:target handleProperty:property withDic:args];
+            }
+            else
+            {
+                info.propertyName = @"bounds.size.width";
+                info.fromValue = @(layer.bounds.size.width);
+                CGRect newBounds = layer.bounds;
+                newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
+                info.toValue = @(newBounds.size.width);
+                [infos addObject:info];
             }
         } else if ([property isEqualToString:@"height"]) {
-            info.propertyName = @"bounds.size.height";
-            info.fromValue = @(layer.bounds.size.height);
-            CGRect newBounds = layer.bounds;
-            newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
-            info.toValue = @(newBounds.size.height);
-            [infos addObject:info];
             if (_needLayout) {
-                _animationLayout.heightInfo = [[WXAnimationLayoutInfo alloc] init];
-                _animationLayout.heightInfo.toValue = info.toValue;
-                _animationLayout.heightInfo.fromValue = info.fromValue;
-                _animationLayout.heightInfo.propertyName = info.propertyName;
+                [self animationWithLayoutAnimationTarget:target handleProperty:property withDic:args];
+            }
+            else
+            {
+                info.propertyName = @"bounds.size.height";
+                info.fromValue = @(layer.bounds.size.height);
+                CGRect newBounds = layer.bounds;
+                newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
+                info.toValue = @(newBounds.size.height);
+                [infos addObject:info];
             }
         }
     }
@@ -305,7 +302,39 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     return infos;
 }
 
+- (void)animationModuleProcessAnimationWithArgs:(NSDictionary *)args withWeexInstance:(WXSDKInstance *)instance targetComponent:(WXComponent *)target
+{
+    self.weexInstance = instance;
+    [self animation:target args:args callback:nil];
+}
 
+- (void)animationWithLayoutAnimationTarget:(WXComponent *)target handleProperty:(NSString *)property withDic:(NSDictionary *)args
+{
+    NSDictionary *styles = args[@"styles"];
+    _transition.addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
+    _transition.fromStyles =_transition.fromStyles ? :[NSMutableDictionary dictionaryWithDictionary:target.styles] ;
+    [_transition.fromStyles setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
+    [_transition.fromStyles setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
+    NSString *oldProperty = _transition.fromStyles[kWXTransitionProperty];
+    NSString *newProperty;
+    if (oldProperty) {
+        if ([oldProperty containsString:property]) {
+            newProperty = oldProperty;
+        }
+        else
+        {
+            newProperty = [NSString stringWithFormat:@"%@,%@",oldProperty,property];
+        }
+    }
+    else
+    {
+        newProperty = property;
+    }
+    [_transition.fromStyles setObject:newProperty forKey:kWXTransitionProperty];
+    [_transition.fromStyles setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
+    [target _modifyStyles:styles];
+    
+}
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
     /**
@@ -327,8 +356,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
     [CATransaction commit];
     if (_needLayout) {
-        _animationLayout.targetComponent = targetComponent;
-        [_animationLayout layoutForAnimation];
+        WXPerformBlockOnComponentThread(^{
+            [_transition _handleTransitionWithStyles:_transition.addStyles withTarget:targetComponent];
+        });
     }
 }
 
