@@ -23,7 +23,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -52,7 +51,6 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
-import com.taobao.weex.ui.component.ContentMeasurable;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
@@ -87,7 +85,7 @@ import java.util.regex.Pattern;
  */
 
 public abstract class BasicListComponent<T extends ViewGroup & ListComponentView> extends WXVContainer<T> implements
-    IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable, ContentMeasurable {
+    IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable {
   public static final String TRANSFORM = "transform";
   public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "BasicListComponent";
@@ -1332,19 +1330,5 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     return false;
-  }
-
-  @Override
-  public Rect getContentFrame() {
-    T wrapper = getHostView();
-    if (wrapper != null) {
-      RecyclerView recyclerView = wrapper.getInnerView();
-      if (recyclerView != null) {
-        int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-        int contentHeight = recyclerView.getMeasuredHeight() + recyclerView.computeVerticalScrollRange();
-        return new Rect(0, 0, contentWidth, contentHeight);
-      }
-    }
-    return null;
   }
 }
