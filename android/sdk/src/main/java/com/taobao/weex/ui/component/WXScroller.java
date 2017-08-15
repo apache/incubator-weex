@@ -69,7 +69,7 @@ import java.util.Map.Entry;
  */
 @Component(lazyload = false)
 
-public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewListener,Scrollable {
+public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewListener,Scrollable,ContentMeasurable {
 
   public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
@@ -718,5 +718,19 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @JSMethod
   public void resetLoadmore() {
     mForceLoadmoreNextTime = true;
+  }
+
+
+  @Override
+  public Rect getContentFrame() {
+    View innerView = getInnerView();
+    if (innerView != null) {
+      if (innerView instanceof WXScrollView) {
+        return ((WXScrollView) innerView).getContentFrame();
+      } else if (innerView instanceof WXHorizontalScrollView) {
+        return ((WXHorizontalScrollView) innerView).getContentFrame();
+      }
+    }
+    return null;
   }
 }

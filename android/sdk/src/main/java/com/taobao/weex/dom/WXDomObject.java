@@ -29,6 +29,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.Spacing;
@@ -54,8 +55,18 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
-  public static final String TRANSFORM = "transform";
-  public static final String TRANSFORM_ORIGIN = "transformOrigin";
+
+  /**
+   * Use {@link Name#TRANSFORM} instead.
+   */
+  @Deprecated
+  public static final String TRANSFORM = Name.TRANSFORM;
+
+  /**
+   * Use {@link Name#TRANSFORM_ORIGIN} instead.
+   */
+  @Deprecated
+  public static final String TRANSFORM_ORIGIN = Name.TRANSFORM_ORIGIN;
   static final WXDomObject DESTROYED = new WXDomObject();
   static{
     DESTROYED.mRef = "_destroyed";

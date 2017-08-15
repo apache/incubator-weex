@@ -28,6 +28,7 @@ import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.ui.component.ContentMeasurable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -74,6 +75,17 @@ class GetComponentRectAction implements RenderAction {
         size.put("top", getWebPxValue(sizes.top,viewPort));
         options.put("size", size);
         options.put("result", true);
+
+        if (component instanceof ContentMeasurable) {
+          Rect contentFrame = ((ContentMeasurable) component).getContentFrame();
+          if (contentFrame != null) {
+            Map<String, Float> contentSize = new HashMap<>(2);
+            contentSize.put("width", getWebPxValue(contentFrame.width(), viewPort));
+            contentSize.put("height", getWebPxValue(contentFrame.height(), viewPort));
+            options.put("contentSize", contentSize);
+          }
+        }
+
       } else {
         options.put("errMsg", "Component does not exist");
       }

@@ -22,6 +22,8 @@
 
 @interface WXAnimationModule : NSObject <WXModuleProtocol>
 
+
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleCallback)callback;
+- (void)animationModuleProcessAnimationWithArgs:(NSDictionary *)args withWeexInstance:(WXSDKInstance *)instance targetComponent:(WXComponent *)target;
 
 @end

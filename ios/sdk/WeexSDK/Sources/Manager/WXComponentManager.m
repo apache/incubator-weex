@@ -206,9 +206,11 @@ static NSThread *WXComponentThread;
     [self _initRootCSSNode];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
         __strong typeof(self) strongSelf = weakSelf;
         strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
         [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -257,9 +259,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         component->_lazyCreateView = YES;
     }
 
+    __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
-        
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
         [supercomponent insertSubview:component atIndex:index];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
     }];
 
     NSArray *subcomponentsData = [componentData valueForKey:@"children"];
@@ -293,9 +297,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     }
     
     [component _moveToSupercomponent:newSupercomponent atIndex:index];
-    
+    __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
         [component moveToSuperview:newSupercomponent atIndex:index];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -311,11 +317,14 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     [_indexDict removeObjectForKey:ref];
     
+    __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
         if (component.supercomponent) {
             [component.supercomponent willRemoveSubview:component];
         }
         [component removeFromSuperview];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
     }];
     
     [self _checkFixedSubcomponentToRemove:component];
@@ -444,9 +453,12 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssertComponentExist(component);
     
     [component _updateAttributesOnComponentThread:attributes];
+    __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
         [component _updateAttributesOnMainThread:attributes];
         [component readyToRender];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -522,7 +534,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
-            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
         }
     }];
