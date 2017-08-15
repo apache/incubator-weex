@@ -41,9 +41,6 @@ do{\
 #define WXAssertParam(name) WXAssert(name, \
 @"the parameter '%s' is required", #name)
 
-#define WXAssertCondition(condition, param) WXAssert(condition, \
-@"the parameter '%s' is required", #param)
-
 /**
  *  @abstract macro for asserting if the handler conforms to the protocol
  */

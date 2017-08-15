@@ -43,6 +43,7 @@
 #import "WXConvert.h"
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
+#import "WXJSExceptionProtocol.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -175,7 +176,12 @@ typedef enum : NSUInteger {
         WXLog(@"Start rendering page:%@", self.pageName);
     } else {
         WXLogWarning(@"WXSDKInstance's pageName should be specified.");
-        WXAssertCondition(![WXUtility isBlankString:_pageName], WXSDKInstance.pageName);
+        id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
+        if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
+            WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
+            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n call WXSDKInstance * instance = [WXSDKInstance new]; instance.page = @\"your page name\" to fix it";
+            [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
+        }
     }
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
