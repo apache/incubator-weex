@@ -34,7 +34,6 @@ import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
 /**
@@ -54,6 +53,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     @Override
     public void handleMessage(Message msg) {
       if (msg.what == SCROLL_TO_NEXT) {
+        WXLogUtils.d("[CircleViewPager] trigger auto play action");
         showNextItem();
         this.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
         return;
@@ -61,8 +61,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       super.handleMessage(msg);
     }
   };
-
-  private Runnable scrollAction = new ScrollAction(this);
 
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context) {
@@ -166,8 +164,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     isAutoScroll = true;
     mAutoScrollHandler.removeCallbacksAndMessages(null);
     mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
-//    mAutoScrollHandler.removeCallbacksAndMessages(scrollAction);
-//    mAutoScrollHandler.postDelayed(scrollAction, intervalTime);
   }
 
   public void pauseAutoScroll(){
@@ -238,7 +234,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       case MotionEvent.ACTION_CANCEL:
         if (isAutoScroll()) {
           mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
-          //postDelayed(scrollAction, intervalTime);
         }
         break;
     }
@@ -246,7 +241,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   public void destory() {
-
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   @Override
@@ -308,30 +303,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       superSetCurrentItem(0, true);
     } else {
       superSetCurrentItem(superGetCurrentItem() + 1, true);
-    }
-  }
-
-  @Override
-  protected void onDetachedFromWindow() {
-    super.onDetachedFromWindow();
-    mAutoScrollHandler.removeCallbacksAndMessages(null);
-  }
-
-  private static final class ScrollAction implements Runnable {
-    private WeakReference<WXCircleViewPager> targetRef;
-    private ScrollAction(WXCircleViewPager target) {
-      this.targetRef = new WeakReference<>(target);
-    }
-
-    @Override
-    public void run() {
-      WXLogUtils.d("[CircleViewPager] trigger auto play action");
-      WXCircleViewPager target;
-      if ((target = targetRef.get()) != null) {
-        target.showNextItem();
-        target.removeCallbacks(this);
-        target.postDelayed(this, target.getIntervalTime());
-      }
     }
   }
 }
