@@ -47,18 +47,9 @@ export function normalizePrimitive (v) {
     case 'Number':
     case 'String':
     case 'Boolean':
-      return v
-
     case 'Array':
-      return v.map(normalizePrimitive)
-
-    case 'Object': {
-      const obj = {}
-      for (const k in v) {
-        obj[k] = normalizePrimitive(v[k])
-      }
-      return obj
-    }
+    case 'Object':
+      return v
 
     case 'ArrayBuffer':
       return {

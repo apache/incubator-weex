@@ -21,8 +21,10 @@
 #import "WXComponent.h"
 #import "WXConvert.h"
 #import "WXTransform.h"
+#import "WXTransition.h"
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
+
 
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
@@ -41,6 +43,10 @@
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
+    
+    
+    //Transition
+    WXTransition *_transition;
     
     /**
      *  View
@@ -171,6 +177,10 @@
 /// @name Private Methods
 ///--------------------------------------
 
+- (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles;
+
+- (void)_modifyStyles:(NSDictionary *)styles;
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
@@ -214,3 +224,5 @@
 - (void)setGradientLayer;
 
 @end
+
+
