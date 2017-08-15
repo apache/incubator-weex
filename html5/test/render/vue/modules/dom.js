@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as dom from '../../../../render/vue/modules/dom'
+import dom from '../../../../render/vue/modules/dom'
 describe('dom module', () => {
   const callback = sinon.spy()
+  weex.install(dom)
+  const domModule = weex.requireModule('dom')
   it('should scrollToElement be worked', (done) => {
     const {
       scrollToElement
-    } = dom.default
+    } = domModule
     const node = document.createElement('div')
     const vnode = {
       $el: node
@@ -48,10 +50,11 @@ describe('dom module', () => {
   it('should getComponentRect be worked', () => {
     const {
       getComponentRect
-    } = dom.default
+    } = domModule
     const node = document.createElement('div')
     const vnode = {
-      $el: node
+      $el: node,
+      $refs: {}
     }
     const rectKeys = ['width', 'height', 'top', 'bottom', 'left', 'right']
     let message
@@ -67,6 +70,7 @@ describe('dom module', () => {
     node.style.width = '100px'
     document.body.appendChild(node)
     expect(getComponentRect).to.be.a('function')
+    // while node is an element
     message = getComponentRect([vnode], callback)
     expect(message.result).to.be.true
     expect(message.size.width).to.be.equal(recalc({
@@ -75,7 +79,14 @@ describe('dom module', () => {
     expect(message.size.height).to.be.equal(recalc({
       height: 100
     }).height)
+    expect(message.contentSize.width).to.be.equal(recalc({
+      width: 100
+    }).width)
+    expect(message.contentSize.height).to.be.equal(recalc({
+      height: 100
+    }).height)
     expect(callback.callCount).to.be.equal(1)
+    // while node is a viewport
     message = getComponentRect('viewport', callback)
     expect(message.result).to.be.true
     expect(message.size.width).to.be.equal(recalc({
@@ -90,13 +101,19 @@ describe('dom module', () => {
     expect(message.size.bottom).to.be.equal(recalc({
       bottom: document.documentElement.clientHeight
     }).bottom)
+    expect(message.contentSize.width).to.be.equal(recalc({
+      bottom: document.documentElement.offsetWidth
+    }).bottom)
+    expect(message.contentSize.height).to.be.equal(recalc({
+      bottom: document.documentElement.offsetHeight
+    }).bottom)
     expect(callback.callCount).to.be.equal(2)
     document.body.removeChild(node)
   })
   it('should addRule be worked', () => {
     const {
       addRule
-    } = dom.default
+    } = domModule
     const key = 'font-face'
     const styles = {
       'font-family': 'iconfont'

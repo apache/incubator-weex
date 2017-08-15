@@ -49,6 +49,16 @@
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz;
 
 /**
+ * @abstract Registers a extendCallNative Class for a given name
+ *
+ * @param name The extendCallNative name to register
+ *
+ * @param clazz The extendCallNative subclass to register
+ *
+ **/
++ (void)registerExtendCallNative:(NSString *)name withClass:(Class)clazz;
+
+/**
  * @abstract Registers a component for a given name and specific properties
  *
  * @param name The component name to register

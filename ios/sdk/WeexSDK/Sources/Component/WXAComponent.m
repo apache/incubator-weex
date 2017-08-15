@@ -23,6 +23,7 @@
 #import "WXLog.h"
 #import "WXComponent+Events.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXSDKEngine.h"
 
 @interface WXAComponent()
 

@@ -36,7 +36,7 @@ this.text = textComponent.attr.value;
   * support 'text-align' style.
   * support 'text-decoration' style.
   * support 'text-overflow' style.
-  * support 'line-height'(available from v0.6.1) style. line-height in iOS is different from h5 and Android, text value will be placed at bottom of line box.
+  * support 'line-height'(available from v0.6.1) style.
   * not support 'flex-direction, 'justify-content', 'align-items' which is active for child nodes, and text has no child nodes.
 
 ### common styles
@@ -59,7 +59,7 @@ check out [common events](../common-event.html)
 
 `support:v0.12.0`
 
-support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`
+support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`, we suggest that you call `addRule` in `mounted`
 
 ```html
 <template>

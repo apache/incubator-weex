@@ -25,6 +25,83 @@ If you perfer cdn way, and use script tag to import a script link, just import i
 <script>{{your js bundle}}</script>
 ```
 
+## use render-core and plugins
+
+You can juse use a **render-core** in your page, and define your needs for the plugins (components and API modules) in your entry file, so that your would save a lot of bundle size and bandwidth. On the other hand, The full version contains all the built-in components and API modules, which will waste a lot of bundle size and bandwidth if you haven't use most of them.
+
+To use the render-core and the plugins, just install the plugins in your entry file.
+
+```javascript
+import Vue from 'vue'
+
+// import render-core.
+import weex from 'weex-vue-render/dist/index.core'
+
+// import the plugins (components and modules) you want to use.
+import slider from 'weex-vue-slider'
+import stream from 'weex-vue-stream'
+
+// init weex.
+weex.init(Vue)
+
+// install the plugins.
+weex.install(slider)
+weex.install(stream)
+
+import App from 'App.vue'
+new Vue(App)
+```
+
+#### built-in components in render-core
+
+These components have already integrated into render-core. You don't have to import and install them:
+
+* div
+* text
+* image
+* scrollable components (scroller, list, waterfall)
+
+#### available built-in components for you to install
+
+| npm module name | component name |
+| --- | --- |
+| weex-vue-a | a |
+| weex-vue-input | input |
+| weex-vue-slider | slider / slider-neighbor |
+| weex-vue-switch | switch |
+| weex-vue-textarea | textarea |
+| weex-vue-video | video |
+| weex-vue-web | web |
+
+#### available API modules for you to install
+
+| npm module name | API module name |
+| --- | --- |
+| weex-vue-animation | animation |
+| weex-vue-clipboard | clipboard |
+| weex-vue-dom | dom |
+| weex-vue-event | event |
+| weex-vue-geolocation | geolocation |
+| weex-vue-global-event | globalEvent |
+| weex-vue-modal | modal |
+| weex-vue-nav | navigator |
+| weex-vue-storage | storage |
+| weex-vue-stream | stream |
+| weex-vue-websocket | websocket |
+| weex-vue-webview | webview |
+
+Some of the above plugins may not be mentioned in weex documents. Just ignore them if you have no idear about what they are and how to use them.
+
+You can develop more plugins for your app. Accordingly the same plugin for other two platforms (iOS and Android) should also be built and intergrated in your app if you want it run on all three platforms.
+
+#### scan your code
+
+Use `weex-vue-bundle-util` to scan you code, which will return a promise with a object to tell which components and modules you have used in your project, so that can generate a entry file accordingly to import those plugins.
+
+https://github.com/weexteam/weex-vue-bundle-util
+
+You can see the examples of weex built in this way by running the script `npm run build:vue:examples`, and use the `<script src="./dist/render.vue.js"></script>` as the render in the `vue.html` file.
+
 ## use vue-loader to bundle .vue file
 
 NOTE: you should inject `$processStyle` to preprocess vnode's style in vue-loader's postTransformNode hook.
@@ -45,6 +122,21 @@ vue: {
   ],
 }
 ```
+
+## changelog
+
+#### 0.12.1
+
+* pack a core sdk for weex-vue-render into `weex-vue-render/dist/index.core.js`.
+* pack modules and components into npm packages, and make them able to install.
+
+#### 0.12.3
+
+* support component method `image.save` for `<image>` component.
+* distinguish gesture events with the same named events generated elsewhere.
+* fix fast click event.
+* fix `modal.toast` on android.
+* fix css prefixer for gradients.
 
 ## component -> dom map
 

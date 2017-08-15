@@ -34,6 +34,7 @@
 #import "JSValue+Weex.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXSDKManager.h"
+#import "WXExtendCallNativeManager.h"
 #import "WXTracingManager.h"
 
 #import <dlfcn.h>
@@ -103,6 +104,9 @@
             NSString *base64Decoded = [[NSString alloc]
                                        initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
             return base64Decoded;
+        };
+        _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
+            return [weakSelf extendCallNative:[value toDictionary]];
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -207,7 +211,7 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread,@"componentData":componentData}];
          WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
         
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
@@ -224,7 +228,7 @@
         NSDictionary *bodyData = [body toDictionary];
         
         WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callCreateBody(instanceIdString, bodyData) inContext:[JSContext currentContext]];
     };
     
@@ -272,7 +276,7 @@
         NSDictionary *attrsData = [attrs toDictionary];
         
         WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceIdString, refString,attrsData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callUpdateAttrs(instanceIdString, refString,attrsData) inContext:[JSContext currentContext]];
     };
     
@@ -288,7 +292,7 @@
         NSDictionary *stylessData = [styles toDictionary];
         
         WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceIdString, refString,stylessData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callUpdateStyle(instanceIdString, refString,stylessData) inContext:[JSContext currentContext]];
     };
     
@@ -334,7 +338,7 @@
         NSString *instanceIdString = [instanceId toString];
         
         WXLogDebug(@"callRCreateFinish...%@", instanceIdString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callCreateFinish(instanceIdString) inContext:[JSContext currentContext]];
     };
         
@@ -511,4 +515,13 @@
         [_timers removeObject:ret];
     }
 }
+
+-(id)extendCallNative:(NSDictionary *)dict
+{
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
+    }
+    return @(-1);
+}
+
 @end
