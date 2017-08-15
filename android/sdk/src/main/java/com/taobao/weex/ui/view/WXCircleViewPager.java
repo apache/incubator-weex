@@ -48,7 +48,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean needLoop = true;
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
-  private Handler mAutoScrollHandler = new Handler(Looper.getMainLooper());
+  private Handler mAutoScrollHandler;
 
   private Runnable scrollAction = new ScrollAction(this);
 
@@ -59,6 +59,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   private void init() {
+    mAutoScrollHandler = new Handler(Looper.getMainLooper());
     setOverScrollMode(View.OVER_SCROLL_NEVER);
 
     addOnPageChangeListener(new OnPageChangeListener() {
