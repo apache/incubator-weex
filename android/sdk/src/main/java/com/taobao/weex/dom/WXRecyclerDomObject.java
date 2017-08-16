@@ -27,6 +27,8 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Map;
 
+import static com.taobao.weex.dom.flex.CSSLayout.DIMENSION_WIDTH;
+
 /**
  * Created by zhengshihan on 2017/2/21.
  */
@@ -71,6 +73,13 @@ public class WXRecyclerDomObject extends WXDomObject{
                 child.getStyles().put(Constants.Name.WIDTH, mColumnWidth);
             }
         }
+    }
+
+    @Override
+    public float getStyleWidth() {
+        if (Float.isNaN(cssstyle.dimensions[DIMENSION_WIDTH]))
+            return getParent().getLayoutWidth();
+        return super.getStyleWidth();
     }
 
     public void preCalculateCellWidth(){
