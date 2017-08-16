@@ -104,7 +104,7 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.4.7",
+    "weex-rax-framework": "0.4.10",
     "weex-vue-framework": "2.4.2-weex.3"
   },
   "devDependencies": {
