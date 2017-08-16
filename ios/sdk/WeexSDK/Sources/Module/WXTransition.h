@@ -19,31 +19,25 @@
 
 #import <Foundation/Foundation.h>
 
-#import "WXComponent.h"
-#import "WXComponent_internal.h"
-#import "NSTimer+Weex.h"
+#define kWXTransitionDuration                   @"transitionDuration"
+#define kWXTransitionProperty                   @"transitionProperty"
+#define kWXTransitionDelay                      @"transitionDelay"
+#define kWXTransitionTimingFunction             @"transitionTimingFunction"
 
-@interface WXAnimationLayoutInfo : NSObject
-
-@property (nonatomic, strong) NSString *propertyName;
+@interface WXLayoutAnimationInfo : NSObject
 @property (nonatomic, strong) id fromValue;
 @property (nonatomic, strong) id toValue;
+@property (nonatomic, strong) id perValue;
+@property (nonatomic, strong) NSString *propertyName;
+
+@end
+
+@interface WXTransition : NSObject
+@property(nonatomic,strong) NSMutableDictionary *fromStyles;
+@property(nonatomic,strong) NSMutableDictionary *addStyles;
+@property(nonatomic,strong) NSMutableArray *propertyArray;
+- (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent;
 
 @end
 
 
-@interface WXAnimationLayout : NSObject
-
-@property (nonatomic,strong) NSTimer *updateStyleTimer;
-@property (nonatomic,strong) WXComponent *targetComponent;
-@property (nonatomic,strong) NSDate *animationStartDate;
-@property (nonatomic,strong) WXAnimationLayoutInfo *widthInfo;
-@property (nonatomic,strong) WXAnimationLayoutInfo *heightInfo;
-@property (nonatomic,assign) double animationDuration;
-@property (nonatomic,assign) double animationDelay;
-@property (nonatomic,strong) NSDictionary *needUpdateStyles;
-@property (nonatomic, weak) WXSDKInstance *weexInstance;
-
-- (void)layoutForAnimation;
-
-@end

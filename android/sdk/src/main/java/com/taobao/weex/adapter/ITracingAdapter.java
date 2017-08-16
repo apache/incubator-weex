@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.adapter;
 
-import com.taobao.weex.common.IWXTask;
-
-import java.util.List;
+import com.taobao.weex.tracing.WXTracing;
 
 /**
- * Wrapper class for storing info about dom operation. Used when {@link WXDomModule} communicate
- * with handler.
+ * Created by moxun on 2017/7/6.
  */
-public class WXDomTask implements IWXTask {
 
-  public String instanceId;
-  public List<Object> args;
-  public long startTime = System.nanoTime();
+public interface ITracingAdapter {
+  void enable();
+  void disable();
+  void submitTracingEvent(WXTracing.TraceEvent event);
 }

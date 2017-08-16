@@ -28,23 +28,30 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.List;
+
 /**
  * Created by sospartan on 22/02/2017.
  */
 
-abstract class AbstractAddElementAction implements DOMAction, RenderAction {
-
+public abstract class AbstractAddElementAction extends TraceableAction implements DOMAction, RenderAction {
 
   protected WXComponent generateComponentTree(DOMActionContext context, WXDomObject dom, WXVContainer parent) {
     if (dom == null) {
       return null;
     }
+    long startNanos = System.nanoTime();
     WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
+    component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
+    component.mTraceInfo.rootEventId = mTracingEventId;
+    component.mTraceInfo.domQueueTime = mDomQueueTime;
 
     context.registerComponent(dom.getRef(), component);
     if (component instanceof WXVContainer) {
@@ -58,7 +65,7 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
         }
       }
     }
-
+    component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
     return component;
   }
 
@@ -80,7 +87,9 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
     }
 
     //only non-root has parent.
+    Stopwatch.tick();
     WXDomObject domObject = WXDomObject.parse(dom, instance, null);
+    Stopwatch.split("parseDomObject");
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
       if (WXEnvironment.isApkDebugable()) {
@@ -90,11 +99,14 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
       return;
     }
     appendDomToTree(context, domObject);
+    Stopwatch.split("appendDomToTree");
 
     domObject.traverseTree(
         context.getAddDOMConsumer(),
         context.getApplyStyleConsumer()
     );
+    Stopwatch.split("traverseTree");
+
 
     //Create component in dom thread
     WXComponent component = createComponent(context, domObject);
@@ -103,11 +115,19 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
       //stop redner, some fatal happened.
       return;
     }
+    Stopwatch.split("createComponent");
+
     context.addDomInfo(domObject.getRef(), component);
     context.postRenderTask(this);
     addAnimationForDomTree(context, domObject);
 
     instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    if (WXTracing.isAvailable()) {
+      List<Stopwatch.ProcessEvent> events = Stopwatch.getProcessEvents();
+      for (Stopwatch.ProcessEvent event : events) {
+        submitPerformance(event.fname, "X", context.getInstanceId(), event.duration, event.startMillis, true);
+      }
+    }
   }
 
   public void addAnimationForDomTree(DOMActionContext context, WXDomObject domObject) {
