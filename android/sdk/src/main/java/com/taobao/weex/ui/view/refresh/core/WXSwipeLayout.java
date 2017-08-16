@@ -157,10 +157,21 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
   @Override
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-    mTargetView = getChildAt(0);
-    setRefreshView();
+    if(mTargetView == null && getChildCount() > 0){
+      mTargetView = getChildAt(0);
+    }
+    if(mTargetView != null){
+      if(headerView == null || footerView == null){
+        setRefreshView();
+      }
+    }
   }
 
+
+  public void addTargetView(View mInnerView){
+    this.addView(mInnerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+    setRefreshView();
+  }
   /**
    * Init refresh view or loading view
    */
