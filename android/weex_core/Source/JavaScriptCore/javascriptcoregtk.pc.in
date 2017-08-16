@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=@LIB_INSTALL_DIR@
+includedir=${prefix}/include
+
+Name: JavaScriptCoreGTK+
+Description: GTK+ version of the JavaScriptCore engine
+Version: @PROJECT_VERSION@
+Requires: glib-2.0
+Libs: -L${libdir} -ljavascriptcoregtk-@WEBKITGTK_API_VERSION@
+Cflags: -I${includedir}/webkitgtk-@WEBKITGTK_API_VERSION@

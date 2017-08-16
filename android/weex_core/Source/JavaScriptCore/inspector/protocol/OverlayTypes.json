@@ -1,0 +1,130 @@
+{
+    "domain": "OverlayTypes",
+    "description": "Exposes types to be used by the inspector overlay.",
+    "types": [
+        {
+            "id": "Point",
+            "type": "object",
+            "properties": [
+                { "name": "x", "type": "number" },
+                { "name": "y", "type": "number" }
+            ]
+        },
+        {
+            "id": "Size",
+            "type": "object",
+            "properties": [
+                { "name": "width", "type": "integer" },
+                { "name": "height", "type": "integer" }
+            ]
+        },
+        {
+            "id": "Quad",
+            "description": "A quad is a collection of 4 points. When initialized from a rect, the points are in clockwise order from top left.",
+            "type": "array",
+            "items": { "$ref": "Point" }
+        },
+        {
+            "id": "Rect",
+            "description": "A rectangle specified by a reference coordinate and width/height offsets.",
+            "type": "object",
+            "properties": [
+                { "name": "x", "type": "number" },
+                { "name": "y", "type": "number" },
+                { "name": "width", "type": "number" },
+                { "name": "height", "type": "number" }
+            ]
+        },
+        {
+            "id": "Region",
+            "description": "A single region in a flow thread.",
+            "type": "object",
+            "properties": [
+                { "name": "borderQuad", "$ref": "Quad" },
+                { "name": "incomingQuad", "$ref": "Quad" },
+                { "name": "outgoingQuad", "$ref": "Quad" },
+                { "name": "isHighlighted", "type": "boolean", "optional": true }
+            ]
+        },
+        {
+            "id": "DisplayPath",
+            "description": "A vector path described using SVG path syntax.",
+            "type": "array",
+            "items": { "type": "any" }
+        },
+        {
+            "id": "RegionFlowData",
+            "type": "object",
+            "properties": [
+                { "name": "regions", "type": "array", "items": { "$ref": "Region"} },
+                { "name": "name", "type": "string" }
+            ]
+        },
+        {
+            "id": "ContentFlowData",
+            "type": "object",
+            "properties": [
+                { "name": "name", "type": "string" }
+            ]
+        },
+        {
+            "id": "ShapeOutsideData",
+            "type": "object",
+            "properties": [
+                { "name": "bounds", "$ref": "Quad", "description": "Bounds for the shape-outside paths." },
+                { "name": "shape", "$ref": "DisplayPath", "description": "Path for the element's shape.", "optional": true },
+                { "name": "marginShape", "$ref": "DisplayPath", "description": "Path for the element's margin shape.", "optional": true }
+            ]
+        },
+        {
+            "id": "ElementData",
+            "description": "Data that describes an element to be highlighted.",
+            "type": "object",
+            "properties": [
+                { "name": "tagName", "type": "string" },
+                { "name": "idValue", "type": "string", "description": "The value of the element's 'id' attribute." },
+                { "name": "classes", "type": "array", "items": { "type": "string" }, "optional": true },
+                { "name": "size", "$ref": "Size", "optional": true },
+                { "name": "role", "type": "string", "description": "Computed accessibility role for the element.", "optional": true },
+                { "name": "pseudoElement", "type": "string", "optional": true },
+                { "name": "regionFlowData", "$ref": "RegionFlowData", "optional": true },
+                { "name": "contentFlowData", "$ref": "ContentFlowData", "optional": true },
+                { "name": "shapeOutsideData", "$ref": "ShapeOutsideData", "optional": true }
+            ]
+        },
+        {
+            "id": "FragmentHighlightData",
+            "description": "Data required to highlight multiple quads.",
+            "type": "object",
+            "properties": [
+                { "name": "quads", "type": "array", "items": { "$ref": "Quad" }, "description": "Quads for which the highlight should be applied."},
+                { "name": "contentColor", "type": "string" },
+                { "name": "contentOutlineColor", "type": "string" },
+                { "name": "paddingColor", "type": "string" },
+                { "name": "borderColor", "type": "string" },
+                { "name": "marginColor", "type": "string" },
+                { "name": "regionClippingArea", "$ref": "Quad", "optional": true }
+            ]
+        },
+        {
+            "id": "NodeHighlightData",
+            "description": "Data required to highlight a DOM node.",
+            "type": "object",
+            "properties": [
+                { "name": "scrollOffset", "$ref": "Point", "description": "Scroll offset for the MainFrame's FrameView that is shared across all quads." },
+                { "name": "fragments", "type": "array", "items": { "$ref": "FragmentHighlightData" } },
+                { "name": "elementData", "$ref": "ElementData", "optional": true }
+            ]
+        },
+        {
+            "id": "OverlayConfiguration",
+            "description": "Data required to configure the overlay's size and scaling behavior.",
+            "type": "object",
+            "properties": [
+                { "name": "deviceScaleFactor", "type": "number" },
+                { "name": "viewportSize", "$ref": "Size" },
+                { "name": "frameViewFullSize", "$ref": "Size" }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+[
+{
+    "domain": "Fantasy",
+    "types": [
+        {
+            "id": "DragonEgg",
+            "type": "object",
+            "description": "A dragon egg.",
+            "properties": [
+                { "name": "color", "$ref": "Color" }
+            ]
+        }
+    ]
+}
+]

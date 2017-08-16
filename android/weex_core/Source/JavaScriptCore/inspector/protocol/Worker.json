@@ -1,0 +1,52 @@
+{
+    "domain": "Worker",
+    "availability": "web",
+    "types": [],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enable Worker domain events."
+        },
+        {
+            "name": "disable",
+            "description": "Disable Worker domain events."
+        },
+        {
+            "name": "initialized",
+            "description": "Sent after the frontend has sent all initialization messages and can resume this worker. This command is required to allow execution in the worker.",
+            "parameters": [
+                { "name": "workerId", "type": "string" }
+            ]            
+        },
+        {
+            "name": "sendMessageToWorker",
+            "description": "Send an Inspector Protocol message to be dispatched to a Worker's agents.",
+            "parameters": [
+                { "name": "workerId", "type": "string" },
+                { "name": "message", "type": "string", "description": "JSON Inspector Protocol message (command) to be dispatched on the backend." }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "workerCreated",
+            "parameters": [
+                { "name": "workerId", "type": "string" },
+                { "name": "url", "type": "string" }
+            ]
+        },
+        {
+            "name": "workerTerminated",
+            "parameters": [
+                { "name": "workerId", "type": "string" }
+            ]
+        },
+        {
+            "name": "dispatchMessageFromWorker",
+            "parameters": [
+                { "name": "workerId", "type": "string" },
+                { "name": "message", "type": "string", "description": "JSON Inspector Protocol message (response or event) to be dispatched on the frontend." }
+            ]
+        }
+    ]
+}

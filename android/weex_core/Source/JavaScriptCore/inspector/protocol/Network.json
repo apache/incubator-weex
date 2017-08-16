@@ -1,0 +1,326 @@
+{
+    "domain": "Network",
+    "description": "Network domain allows tracking network activities of the page. It exposes information about http, file, data and other requests and responses, their headers, bodies, timing, etc.",
+    "availability": "web",
+    "types": [
+        {
+            "id": "LoaderId",
+            "type": "string",
+            "description": "Unique loader identifier."
+        },
+        {
+            "id": "FrameId",
+            "type": "string",
+            "description": "Unique frame identifier."
+        },
+        {
+            "id": "RequestId",
+            "type": "string",
+            "description": "Unique request identifier."
+        },
+        {
+            "id": "Timestamp",
+            "type": "number",
+            "description": "Elapsed seconds since frontend connected."
+        },
+        {
+            "id": "Walltime",
+            "type": "number",
+            "description": "Number of seconds since epoch."
+        },
+        {
+            "id": "Headers",
+            "type": "object",
+            "description": "Request / response headers as keys / values of JSON object."
+        },
+        {
+            "id": "ResourceTiming",
+            "type": "object",
+            "description": "Timing information for the request.",
+            "properties": [
+                { "name": "startTime", "type": "number", "description": "Timing's startTime is a baseline in seconds, while the other numbers are ticks in milliseconds relatively to this." },
+                { "name": "domainLookupStart", "type": "number", "description": "Started DNS address resolve." },
+                { "name": "domainLookupEnd", "type": "number", "description": "Finished DNS address resolve." },
+                { "name": "connectStart", "type": "number", "description": "Started connecting to the remote host." },
+                { "name": "connectEnd", "type": "number", "description": "Connected to the remote host." },
+                { "name": "secureConnectionStart", "type": "number", "description": "Started SSL handshake." },
+                { "name": "requestStart", "type": "number", "description": "Started sending request." },
+                { "name": "responseStart", "type": "number", "description": "Started receiving response headers." }
+            ]
+        },
+        {
+            "id": "Request",
+            "type": "object",
+            "description": "HTTP request data.",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Request URL." },
+                { "name": "method", "type": "string", "description": "HTTP request method." },
+                { "name": "headers", "$ref": "Headers", "description": "HTTP request headers." },
+                { "name": "postData", "type": "string", "optional": true, "description": "HTTP POST request data." }
+            ]
+        },
+        {
+            "id": "Response",
+            "type": "object",
+            "description": "HTTP response data.",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Response URL. This URL can be different from CachedResource.url in case of redirect." },
+                { "name": "status", "type": "number", "description": "HTTP response status code." },
+                { "name": "statusText", "type": "string", "description": "HTTP response status text." },
+                { "name": "headers", "$ref": "Headers", "description": "HTTP response headers." },
+                { "name": "headersText", "type": "string", "optional": true, "description": "HTTP response headers text." },
+                { "name": "mimeType", "type": "string", "description": "Resource mimeType as determined by the browser." },
+                { "name": "source", "type": "string", "enum": ["unknown", "network", "memory-cache", "disk-cache"], "description": "Specifies where the response came from." },
+                { "name": "requestHeaders", "$ref": "Headers", "optional": true, "description": "Refined HTTP request headers that were actually transmitted over the network." },
+                { "name": "requestHeadersText", "type": "string", "optional": true, "description": "HTTP request headers text." },
+                { "name": "timing", "$ref": "ResourceTiming", "optional": true, "description": "Timing information for the given request." }
+            ]
+        },
+        {
+            "id": "Metrics",
+            "type": "object",
+            "description": "Network load metrics.",
+            "properties": [
+                { "name": "protocol", "type": "string", "optional": true, "description": "Network protocol. ALPN Protocol ID Identification Sequence, as per RFC 7301 (for example, http/2, http/1.1, spdy/3.1)" },
+                { "name": "priority", "type": "string", "enum": ["low", "medium", "high"], "optional": true, "description": "Network priority." },
+                { "name": "connectionIdentifier", "type": "string", "optional": true, "description": "Connection identifier." },
+                { "name": "remoteAddress", "type": "string", "optional": true, "description": "Remote IP address." }
+            ]
+        },
+        {
+            "id": "WebSocketRequest",
+            "type": "object",
+            "description": "WebSocket request data.",
+            "properties": [
+                { "name": "headers", "$ref": "Headers", "description": "HTTP response headers." }
+            ]
+        },
+        {
+            "id": "WebSocketResponse",
+            "type": "object",
+            "description": "WebSocket response data.",
+            "properties": [
+                { "name": "status", "type": "number", "description": "HTTP response status code." },
+                { "name": "statusText", "type": "string", "description": "HTTP response status text." },
+                { "name": "headers", "$ref": "Headers", "description": "HTTP response headers." }
+            ]
+        },
+        {
+            "id": "WebSocketFrame",
+            "type": "object",
+            "description": "WebSocket frame data.",
+            "properties": [
+                { "name": "opcode", "type": "number", "description": "WebSocket frame opcode." },
+                { "name": "mask", "type": "boolean", "description": "WebSocket frame mask." },
+                { "name": "payloadData", "type": "string", "description": "WebSocket frame payload data." }
+            ]
+        },
+        {
+            "id": "CachedResource",
+            "type": "object",
+            "description": "Information about the cached resource.",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Resource URL. This is the url of the original network request." },
+                { "name": "type", "$ref": "Page.ResourceType", "description": "Type of this resource." },
+                { "name": "response", "$ref": "Response", "optional": true, "description": "Cached response data." },
+                { "name": "bodySize", "type": "number", "description": "Cached response body size." },
+                { "name": "sourceMapURL", "type": "string", "optional": true, "description": "URL of source map associated with this resource (if any)." }
+            ]
+        },
+        {
+            "id": "Initiator",
+            "type": "object",
+            "description": "Information about the request initiator.",
+            "properties": [
+                { "name": "type", "type": "string", "enum": ["parser", "script", "other"], "description": "Type of this initiator." },
+                { "name": "stackTrace", "type": "array", "items": { "$ref": "Console.CallFrame" }, "optional": true, "description": "Initiator JavaScript stack trace, set for Script only." },
+                { "name": "url", "type": "string", "optional": true, "description": "Initiator URL, set for Parser type only." },
+                { "name": "lineNumber", "type": "number", "optional": true, "description": "Initiator line number, set for Parser type only." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables network tracking, network events will now be delivered to the client."
+        },
+        {
+            "name": "disable",
+            "description": "Disables network tracking, prevents network events from being sent to the client."
+        },
+        {
+            "name": "setExtraHTTPHeaders",
+            "description": "Specifies whether to always send extra HTTP headers with the requests from this page.",
+            "parameters": [
+                { "name": "headers", "$ref": "Headers", "description": "Map with extra HTTP headers." }
+            ]
+        },
+        {
+            "name": "getResponseBody",
+            "description": "Returns content served for the given request.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Identifier of the network request to get content for." }
+            ],
+            "returns": [
+                { "name": "body", "type": "string", "description": "Response body." },
+                { "name": "base64Encoded", "type": "boolean", "description": "True, if content was sent as base64." }
+            ]
+        },
+        {
+            "name": "setCacheDisabled",
+            "parameters": [
+                { "name": "cacheDisabled", "type": "boolean", "description": "Cache disabled state." }
+            ],
+            "description": "Toggles ignoring cache for each request. If <code>true</code>, cache will not be used."
+        },
+        {
+            "name": "loadResource",
+            "async": true,
+            "parameters": [
+                { "name": "frameId", "$ref": "FrameId", "description": "Frame to load the resource from." },
+                { "name": "url", "type": "string", "description": "URL of the resource to load." }
+            ],
+            "returns": [
+                { "name": "content", "type": "string", "description": "Resource content." },
+                { "name": "mimeType", "type": "string", "description": "Resource mimeType." },
+                { "name": "status", "type": "number", "description": "HTTP response status code." }
+            ],
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        }
+    ],
+    "events": [
+        {
+            "name": "requestWillBeSent",
+            "description": "Fired when page is about to send HTTP request.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "frameId", "$ref": "FrameId", "description": "Frame identifier." },
+                { "name": "loaderId", "$ref": "LoaderId", "description": "Loader identifier." },
+                { "name": "documentURL", "type": "string", "description": "URL of the document this request is loaded for." },
+                { "name": "request", "$ref": "Request", "description": "Request data." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "initiator", "$ref": "Initiator", "description": "Request initiator." },
+                { "name": "redirectResponse", "optional": true, "$ref": "Response", "description": "Redirect response data." },
+                { "name": "type", "$ref": "Page.ResourceType", "optional": true, "description": "Resource type." },
+                { "name": "targetId", "type": "string", "optional": true, "description": "Identifier for the context of where the load originated. In general this is the target identifier. For Workers this will be the workerId." }
+            ]
+        },
+        {
+            "name": "responseReceived",
+            "description": "Fired when HTTP response is available.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "frameId", "$ref": "FrameId", "description": "Frame identifier." },
+                { "name": "loaderId", "$ref": "LoaderId", "description": "Loader identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "type", "$ref": "Page.ResourceType", "description": "Resource type." },
+                { "name": "response", "$ref": "Response", "description": "Response data." }
+            ]
+        },
+        {
+            "name": "dataReceived",
+            "description": "Fired when data chunk was received over the network.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "dataLength", "type": "integer", "description": "Data chunk length." },
+                { "name": "encodedDataLength", "type": "integer", "description": "Actual bytes received (might be less than dataLength for compressed encodings)." }
+            ]
+        },
+        {
+            "name": "loadingFinished",
+            "description": "Fired when HTTP request has finished loading.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "sourceMapURL", "type": "string", "optional": true, "description": "URL of source map associated with this resource (if any)." },
+                { "name": "metrics", "$ref": "Metrics", "optional": true, "description": "Network metrics." }
+            ]
+        },
+        {
+            "name": "loadingFailed",
+            "description": "Fired when HTTP request has failed to load.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "errorText", "type": "string", "description": "User friendly error message." },
+                { "name": "canceled", "type": "boolean", "optional": true, "description": "True if loading was canceled." }
+            ]
+        },
+        {
+            "name": "requestServedFromMemoryCache",
+            "description": "Fired when HTTP request has been served from memory cache.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "frameId", "$ref": "FrameId", "description": "Frame identifier." },
+                { "name": "loaderId", "$ref": "LoaderId", "description": "Loader identifier." },
+                { "name": "documentURL", "type": "string", "description": "URL of the document this request is loaded for." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "initiator", "$ref": "Initiator", "description": "Request initiator." },
+                { "name": "resource", "$ref": "CachedResource", "description": "Cached resource data." }
+            ]
+        },
+        {
+            "name": "webSocketWillSendHandshakeRequest",
+            "description": "Fired when WebSocket is about to initiate handshake.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp" },
+                { "name": "walltime", "$ref": "Walltime" },
+                { "name": "request", "$ref": "WebSocketRequest", "description": "WebSocket request data." }
+            ]
+        },
+        {
+            "name": "webSocketHandshakeResponseReceived",
+            "description": "Fired when WebSocket handshake response becomes available.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp" },
+                { "name": "response", "$ref": "WebSocketResponse", "description": "WebSocket response data." }
+            ]
+        },
+        {
+            "name": "webSocketCreated",
+            "description": "Fired upon WebSocket creation.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "url", "type": "string", "description": "WebSocket request URL." }
+            ]
+        },
+        {
+            "name": "webSocketClosed",
+            "description": "Fired when WebSocket is closed.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." }
+            ]
+        },
+        {
+            "name": "webSocketFrameReceived",
+            "description": "Fired when WebSocket frame is received.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "response", "$ref": "WebSocketFrame", "description": "WebSocket response data." }
+            ]
+        },
+        {
+            "name": "webSocketFrameError",
+            "description": "Fired when WebSocket frame error occurs.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "errorMessage", "type": "string", "description": "WebSocket frame error message." }
+            ]
+        },
+        {
+            "name": "webSocketFrameSent",
+            "description": "Fired when WebSocket frame is sent.",
+            "parameters": [
+                { "name": "requestId", "$ref": "RequestId", "description": "Request identifier." },
+                { "name": "timestamp", "$ref": "Timestamp", "description": "Timestamp." },
+                { "name": "response", "$ref": "WebSocketFrame", "description": "WebSocket response data." }
+            ]
+        }
+    ]
+}

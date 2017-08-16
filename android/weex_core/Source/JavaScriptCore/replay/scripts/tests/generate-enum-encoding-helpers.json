@@ -1,0 +1,45 @@
+{
+    "types": {
+        "Test": [
+            {
+                "name": "InputQueue", "mode": "SCALAR",
+                "flags": ["ENUM_CLASS"],
+                "values": ["EventLoopInput", "LoaderMemoizedData", "ScriptMemoizedData"],
+                "header": "replay/NondeterministicInput.h"
+            },
+            {
+                "name": "MouseButton", "mode": "SCALAR", "storage": "unsigned",
+                "flags": ["ENUM"],
+                "values": ["NoButton", "LeftButton", "MiddleButton", "RightButton"],
+                "header": "platform/PlatformMouseEvent.h"
+            },
+            {
+                "name": "Type", "mode": "SCALAR",
+                "flags": ["ENUM"],
+                "enclosing_class": "PlatformEvent",
+                "values": ["Mouse", "Key", "Touch", "Wheel"],
+                "header": "platform/PlatformEvent.h"
+            },
+            {
+                "name": "OtherType", "mode": "SCALAR",
+                "flags": ["OPTION_SET"],
+                "enclosing_class": "PlatformEvent",
+                "values": ["Mouse", "Key", "Touch", "Wheel"],
+                "header": "platform/PlatformEvent.h"
+            }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "SavedMouseButton",
+                "description": "Supplies a mouse button enum value.",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "button", "type": "MouseButton" }
+                ]
+            }
+        ]
+    }
+}

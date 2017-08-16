@@ -1,0 +1,88 @@
+{
+    "domain": "DOMStorage",
+    "description": "Query and modify DOM storage.",
+    "availability": "web",
+    "types": [
+        {
+            "id": "StorageId",
+            "type": "object",
+            "description": "DOM Storage identifier.",
+            "properties": [
+                { "name": "securityOrigin", "type": "string", "description": "Security origin for the storage." },
+                { "name": "isLocalStorage", "type": "boolean", "description": "Whether the storage is local storage (not session storage)." }
+            ]
+        },
+        {
+            "id": "Item",
+            "type": "array",
+            "description": "DOM Storage item.",
+            "items": { "type": "string" }
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables storage tracking, storage events will now be delivered to the client."
+        },
+        {
+            "name": "disable",
+            "description": "Disables storage tracking, prevents storage events from being sent to the client."
+        },
+        {
+            "name": "getDOMStorageItems",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" }
+            ],
+            "returns": [
+                { "name": "entries", "type": "array", "items": { "$ref": "Item" } }
+            ]
+        },
+        {
+            "name": "setDOMStorageItem",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" },
+                { "name": "key", "type": "string" },
+                { "name": "value", "type": "string" }
+            ]
+        },
+        {
+            "name": "removeDOMStorageItem",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" },
+                { "name": "key", "type": "string" }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "domStorageItemsCleared",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" }
+            ]
+        },
+        {
+            "name": "domStorageItemRemoved",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" },
+                { "name": "key", "type": "string" }
+            ]
+        },
+        {
+            "name": "domStorageItemAdded",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" },
+                { "name": "key", "type": "string" },
+                { "name": "newValue", "type": "string" }
+            ]
+        },
+        {
+            "name": "domStorageItemUpdated",
+            "parameters": [
+                { "name": "storageId", "$ref": "StorageId" },
+                { "name": "key", "type": "string" },
+                { "name": "oldValue", "type": "string" },
+                { "name": "newValue", "type": "string" }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,305 @@
+{
+    "domain": "Page",
+    "description": "Actions and events related to the inspected page belong to the page domain.",
+    "availability": "web",
+    "types": [
+        {
+            "id": "ResourceType",
+            "type": "string",
+            "enum": ["Document", "Stylesheet", "Image", "Font", "Script", "XHR", "Fetch", "WebSocket", "Other"],
+            "description": "Resource type as it was perceived by the rendering engine."
+        },
+        {
+            "id": "CoordinateSystem",
+            "type": "string",
+            "enum": ["Viewport", "Page"],
+            "description": "Coordinate system used by supplied coordinates."
+        },
+        {
+            "id": "Frame",
+            "type": "object",
+            "description": "Information about the Frame on the page.",
+            "properties": [
+                { "name": "id", "type": "string", "description": "Frame unique identifier." },
+                { "name": "parentId", "type": "string", "optional": true, "description": "Parent frame identifier." },
+                { "name": "loaderId", "$ref": "Network.LoaderId", "description": "Identifier of the loader associated with this frame." },
+                { "name": "name", "type": "string", "optional": true, "description": "Frame's name as specified in the tag." },
+                { "name": "url", "type": "string", "description": "Frame document's URL." },
+                { "name": "securityOrigin", "type": "string", "description": "Frame document's security origin." },
+                { "name": "mimeType", "type": "string", "description": "Frame document's mimeType as determined by the browser." }
+            ]
+        },
+        {
+            "id": "FrameResource",
+            "type": "object",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Resource URL." },
+                { "name": "type", "$ref": "ResourceType", "description": "Type of this resource." },
+                { "name": "mimeType", "type": "string", "description": "Resource mimeType as determined by the browser." },
+                { "name": "failed", "type": "boolean", "optional": true, "description": "True if the resource failed to load." },
+                { "name": "canceled", "type": "boolean", "optional": true, "description": "True if the resource was canceled during loading." },
+                { "name": "sourceMapURL", "type": "string", "optional": true, "description": "URL of source map associated with this resource (if any)." },
+                { "name": "targetId", "type": "string", "optional": true, "description": "Identifier for the context of where the load originated. In general this is the target identifier. For Workers this will be the workerId." }
+            ]
+        },
+        {
+            "id": "FrameResourceTree",
+            "type": "object",
+            "description": "Information about the Frame hierarchy along with their cached resources.",
+            "properties": [
+                { "name": "frame", "$ref": "Frame", "description": "Frame information for this tree item." },
+                { "name": "childFrames", "type": "array", "optional": true, "items": { "$ref": "FrameResourceTree" }, "description": "Child frames." },
+                { "name": "resources", "type": "array", "items": { "$ref": "FrameResource" }, "description": "Information about frame resources." }
+            ]
+        },
+        {
+            "id": "SearchResult",
+            "type": "object",
+            "description": "Search result for resource.",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Resource URL." },
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Resource frame id." },
+                { "name": "matchesCount", "type": "number", "description": "Number of matches in the resource content." },
+                { "name": "requestId", "$ref": "Network.RequestId", "optional": true, "description": "Network request id." }
+            ]
+        },
+        {
+            "id": "Cookie",
+            "type": "object",
+            "description": "Cookie object",
+            "properties": [
+                { "name": "name", "type": "string", "description": "Cookie name." },
+                { "name": "value", "type": "string", "description": "Cookie value." },
+                { "name": "domain", "type": "string", "description": "Cookie domain." },
+                { "name": "path", "type": "string", "description": "Cookie path." },
+                { "name": "expires", "type": "number", "description": "Cookie expires." },
+                { "name": "size", "type": "integer", "description": "Cookie size." },
+                { "name": "httpOnly", "type": "boolean", "description": "True if cookie is http-only." },
+                { "name": "secure", "type": "boolean", "description": "True if cookie is secure." },
+                { "name": "session", "type": "boolean", "description": "True in case of session cookie." }
+            ]
+        },
+        {
+            "id": "ScriptIdentifier",
+            "type": "string",
+            "description": "Unique script identifier."
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables page domain notifications."
+        },
+        {
+            "name": "disable",
+            "description": "Disables page domain notifications."
+        },
+        {
+            "name": "addScriptToEvaluateOnLoad",
+            "parameters": [
+                { "name": "scriptSource", "type": "string" }
+            ],
+            "returns": [
+                { "name": "identifier", "$ref": "ScriptIdentifier", "description": "Identifier of the added script." }
+            ]
+        },
+        {
+            "name": "removeScriptToEvaluateOnLoad",
+            "parameters": [
+                { "name": "identifier", "$ref": "ScriptIdentifier" }
+            ]
+        },
+        {
+            "name": "reload",
+            "parameters": [
+                { "name": "ignoreCache", "type": "boolean", "optional": true, "description": "If true, browser cache is ignored (as if the user pressed Shift+refresh)." },
+                { "name": "scriptToEvaluateOnLoad", "type": "string", "optional": true, "description": "If set, the script will be injected into all frames of the inspected page after reload." }
+            ],
+            "description": "Reloads given page optionally ignoring the cache."
+        },
+        {
+            "name": "navigate",
+            "parameters": [
+                { "name": "url", "type": "string", "description": "URL to navigate the page to." }
+            ],
+            "description": "Navigates current page to the given URL."
+        },
+        {
+            "name": "getCookies",
+            "returns": [
+                { "name": "cookies", "type": "array", "items": { "$ref": "Cookie"}, "description": "Array of cookie objects." }
+            ],
+            "description": "Returns all browser cookies. Depending on the backend support, will return detailed cookie information in the <code>cookies</code> field."
+        },
+        {
+            "name": "deleteCookie",
+            "parameters": [
+                { "name": "cookieName", "type": "string", "description": "Name of the cookie to remove." },
+                { "name": "url", "type": "string", "description": "URL to match cooke domain and path." }
+            ],
+            "description": "Deletes browser cookie with given name, domain and path."
+        },
+        {
+            "name": "getResourceTree",
+            "description": "Returns present frame / resource tree structure.",
+            "returns": [
+                { "name": "frameTree", "$ref": "FrameResourceTree", "description": "Present frame / resource tree structure." }
+            ]
+        },
+        {
+            "name": "getResourceContent",
+            "description": "Returns content of the given resource.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Frame id to get resource for." },
+                { "name": "url", "type": "string", "description": "URL of the resource to get content for." }
+            ],
+            "returns": [
+                { "name": "content", "type": "string", "description": "Resource content." },
+                { "name": "base64Encoded", "type": "boolean", "description": "True, if content was served as base64." }
+            ]
+        },
+        {
+            "name": "searchInResource",
+            "description": "Searches for given string in resource content.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Frame id for resource to search in." },
+                { "name": "url", "type": "string", "description": "URL of the resource to search in." },
+                { "name": "query", "type": "string", "description": "String to search for." },
+                { "name": "caseSensitive", "type": "boolean", "optional": true, "description": "If true, search is case sensitive." },
+                { "name": "isRegex", "type": "boolean", "optional": true, "description": "If true, treats string parameter as regex." },
+                { "name": "requestId", "$ref": "Network.RequestId", "optional": true, "description": "Request id for resource to search in." }
+            ],
+            "returns": [
+                { "name": "result", "type": "array", "items": { "$ref": "GenericTypes.SearchMatch" }, "description": "List of search matches." }
+            ]
+        },
+        {
+            "name": "searchInResources",
+            "description": "Searches for given string in frame / resource tree structure.",
+            "parameters": [
+                { "name": "text", "type": "string", "description": "String to search for." },
+                { "name": "caseSensitive", "type": "boolean", "optional": true, "description": "If true, search is case sensitive." },
+                { "name": "isRegex", "type": "boolean", "optional": true, "description": "If true, treats string parameter as regex." }
+            ],
+            "returns": [
+                { "name": "result", "type": "array", "items": { "$ref": "SearchResult" }, "description": "List of search results." }
+            ]
+        },
+        {
+            "name": "setShowPaintRects",
+            "description": "Requests that backend shows paint rectangles",
+            "parameters": [
+                { "name": "result", "type": "boolean", "description": "True for showing paint rectangles" }
+            ]
+        },
+        {
+            "name": "setEmulatedMedia",
+            "description": "Emulates the given media for CSS media queries.",
+            "parameters": [
+                { "name": "media", "type": "string", "description": "Media type to emulate. Empty string disables the override." }
+            ]
+        },
+        {
+            "name": "getCompositingBordersVisible",
+            "description": "Indicates the visibility of compositing borders.",
+            "returns": [
+                { "name": "result", "type": "boolean", "description": "If true, compositing borders are visible." }
+            ]
+        },
+        {
+            "name": "setCompositingBordersVisible",
+            "description": "Controls the visibility of compositing borders.",
+            "parameters": [
+                { "name": "visible", "type": "boolean", "description": "True for showing compositing borders." }
+            ]
+        },
+        {
+            "name": "snapshotNode",
+            "description": "Capture a snapshot of the specified node that does not include unrelated layers.",
+            "parameters": [
+                { "name": "nodeId", "$ref": "DOM.NodeId", "description": "Id of the node to snapshot." }
+            ],
+            "returns": [
+                { "name": "dataURL", "type": "string", "description": "Base64-encoded image data (PNG)." }
+            ]
+        },
+        {
+            "name": "snapshotRect",
+            "description": "Capture a snapshot of the page within the specified rectangle and coordinate system.",
+            "parameters": [
+                { "name": "x", "type": "integer", "description": "X coordinate" },
+                { "name": "y", "type": "integer", "description": "Y coordinate" },
+                { "name": "width", "type": "integer", "description": "Rectangle width" },
+                { "name": "height", "type": "integer", "description": "Rectangle height" },
+                { "name": "coordinateSystem", "$ref": "CoordinateSystem", "description": "Indicates the coordinate system of the supplied rectangle." }
+            ],
+            "returns": [
+                { "name": "dataURL", "type": "string", "description": "Base64-encoded image data (PNG)." }
+            ]
+        },
+        {
+            "name": "archive",
+            "description": "Grab an archive of the page.",
+            "returns": [
+                { "name": "data", "type": "string", "description": "Base64-encoded web archive." }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "domContentEventFired",
+            "parameters": [
+                { "name": "timestamp", "type": "number" }
+            ]
+        },
+        {
+            "name": "loadEventFired",
+            "parameters": [
+                { "name": "timestamp", "type": "number" }
+            ]
+        },
+        {
+            "name": "frameNavigated",
+            "description": "Fired once navigation of the frame has completed. Frame is now associated with the new loader.",
+            "parameters": [
+                { "name": "frame", "$ref": "Frame", "description": "Frame object." }
+            ]
+        },
+        {
+            "name": "frameDetached",
+            "description": "Fired when frame has been detached from its parent.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Id of the frame that has been detached." }
+            ]
+        },
+        {
+            "name": "frameStartedLoading",
+            "description": "Fired when frame has started loading.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Id of the frame that has started loading." }
+            ]
+        },
+        {
+            "name": "frameStoppedLoading",
+            "description": "Fired when frame has stopped loading.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Id of the frame that has stopped loading." }
+            ]
+        },
+        {
+            "name": "frameScheduledNavigation",
+            "description": "Fired when frame schedules a potential navigation.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Id of the frame that has scheduled a navigation." },
+                { "name": "delay", "type": "number", "description": "Delay (in seconds) until the navigation is scheduled to begin. The navigation is not guaranteed to start." }
+            ]
+        },
+        {
+            "name": "frameClearedScheduledNavigation",
+            "description": "Fired when frame no longer has a scheduled navigation.",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Id of the frame that has cleared its scheduled navigation." }
+            ]
+        }
+    ]
+}

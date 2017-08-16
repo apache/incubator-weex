@@ -1,0 +1,12 @@
+[
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "RemoteObjectId",
+            "type": "dragon",
+            "description": "Unique object identifier."
+        }
+    ]
+}
+]

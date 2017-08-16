@@ -1,0 +1,105 @@
+{
+    "domain": "Console",
+    "description": "Console domain defines methods and events for interaction with the JavaScript console. Console collects messages created by means of the <a href='http://getfirebug.com/wiki/index.php/Console_API'>JavaScript Console API</a>. One needs to enable this domain using <code>enable</code> command in order to start receiving the console messages. Browser collects messages issued while console domain is not enabled as well and reports them using <code>messageAdded</code> notification upon enabling.",
+    "workerSupported": true,
+    "types": [
+        {
+            "id": "ConsoleMessage",
+            "type": "object",
+            "description": "Console message.",
+            "properties": [
+                { "name": "source", "type": "string", "enum": ["xml", "javascript", "network", "console-api", "storage", "appcache", "rendering", "css", "security", "content-blocker", "other"], "description": "Message source." },
+                { "name": "level", "type": "string", "enum": ["log", "info", "warning", "error", "debug"], "description": "Message severity." },
+                { "name": "text", "type": "string", "description": "Message text." },
+                { "name": "type", "type": "string", "optional": true, "enum": ["log", "dir", "dirxml", "table", "trace", "clear", "startGroup", "startGroupCollapsed", "endGroup", "assert", "timing", "profile", "profileEnd"], "description": "Console message type." },
+                { "name": "url", "type": "string", "optional": true, "description": "URL of the message origin." },
+                { "name": "line", "type": "integer", "optional": true, "description": "Line number in the resource that generated this message." },
+                { "name": "column", "type": "integer", "optional": true, "description": "Column number on the line in the resource that generated this message." },
+                { "name": "repeatCount", "type": "integer", "optional": true, "description": "Repeat count for repeated messages." },
+                { "name": "parameters", "type": "array", "items": { "$ref": "Runtime.RemoteObject" }, "optional": true, "description": "Message parameters in case of the formatted message." },
+                { "name": "stackTrace", "type": "array", "items": { "$ref": "CallFrame" }, "optional": true, "description": "JavaScript stack trace for assertions and error messages." },
+                { "name": "networkRequestId", "$ref": "Network.RequestId", "optional": true, "description": "Identifier of the network request associated with this message." }
+            ]
+        },
+        {
+            "id": "CallFrame",
+            "type": "object",
+            "description": "Stack entry for console errors and assertions.",
+            "properties": [
+                { "name": "functionName", "type": "string", "description": "JavaScript function name." },
+                { "name": "url", "type": "string", "description": "JavaScript script name or url." },
+                { "name": "scriptId", "$ref": "Debugger.ScriptId", "description": "Script identifier." },
+                { "name": "lineNumber", "type": "integer", "description": "JavaScript script line number." },
+                { "name": "columnNumber", "type": "integer", "description": "JavaScript script column number." }
+            ]
+        },
+        {
+            "id": "StackTrace",
+            "description": "Call frames for async function calls, console assertions, and error messages.",
+            "type": "object",
+            "properties": [
+                { "name": "callFrames", "type": "array", "items": { "$ref": "CallFrame" } },
+                { "name": "topCallFrameIsBoundary", "type": "boolean", "optional": true, "description": "Whether the first item in <code>callFrames</code> is the native function that scheduled the asynchronous operation (e.g. setTimeout)." },
+                { "name": "truncated", "type": "boolean", "optional": true, "description": "Whether one or more frames have been truncated from the bottom of the stack." },
+                { "name": "parentStackTrace", "$ref": "StackTrace", "optional": true, "description": "Parent StackTrace." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables console domain, sends the messages collected so far to the client by means of the <code>messageAdded</code> notification."
+        },
+        {
+            "name": "disable",
+            "description": "Disables console domain, prevents further console messages from being reported to the client."
+        },
+        {
+            "name": "clearMessages",
+            "description": "Clears console messages collected in the browser."
+        },
+        {
+            "name": "setMonitoringXHREnabled",
+            "parameters": [
+                { "name": "enabled", "type": "boolean", "description": "Monitoring enabled state." }
+            ],
+            "description": "Toggles monitoring of XMLHttpRequest. If <code>true</code>, console will receive messages upon each XHR issued."
+        },
+        {
+            "name": "addInspectedNode",
+            "parameters": [
+                { "name": "nodeId", "$ref": "DOM.NodeId", "description": "DOM node id to be accessible by means of $0 command line API." }
+            ],
+            "description": "Enables console to refer to the node with given id via $0 (see Command Line API for more details)."
+        }
+    ],
+    "events": [
+        {
+            "name": "messageAdded",
+            "parameters": [
+                { "name": "message", "$ref": "ConsoleMessage", "description": "Console message that has been added." }
+            ],
+            "description": "Issued when new console message is added."
+        },
+        {
+            "name": "messageRepeatCountUpdated",
+            "parameters": [
+                { "name": "count", "type": "integer", "description": "New repeat count value." }
+            ],
+            "description": "Issued when subsequent message(s) are equal to the previous one(s)."
+        },
+        {
+            "name": "messagesCleared",
+            "description": "Issued when console is cleared. This happens either upon <code>clearMessages</code> command or after page navigation."
+        },
+        {
+            "name": "heapSnapshot",
+            "description": "Issued from console.takeHeapSnapshot.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "snapshotData", "$ref": "Heap.HeapSnapshotData", "description": "Snapshot at the end of tracking." },
+                { "name": "title", "type": "string", "optional": true, "description": "Optional title provided to console.takeHeapSnapshot." }
+            ]
+        }
+    ]
+}

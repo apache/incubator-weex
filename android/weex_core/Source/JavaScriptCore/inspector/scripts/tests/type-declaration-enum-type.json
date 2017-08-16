@@ -1,0 +1,15 @@
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "FarmAnimals",
+            "type": "string",
+            "enum": ["Pigs", "Cows", "Cats", "Hens"]
+        },
+        {
+            "id": "TwoLeggedAnimals",
+            "type": "string",
+            "enum": ["Ducks", "Hens", "Crows", "Flamingos"]
+        }
+    ]
+}

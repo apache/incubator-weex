@@ -1,0 +1,15 @@
+{
+    "domain": "GenericTypes",
+    "description": "Exposes generic types to be used by any domain.",
+    "types": [
+        {
+            "id": "SearchMatch",
+            "type": "object",
+            "description": "Search match in a resource.",
+            "properties": [
+                { "name": "lineNumber", "type": "number", "description": "Line number in resource content." },
+                { "name": "lineContent", "type": "string", "description": "Line with match content." }
+            ]
+        }
+    ]
+}

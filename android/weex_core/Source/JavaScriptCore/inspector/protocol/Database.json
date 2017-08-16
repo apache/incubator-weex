@@ -1,0 +1,71 @@
+{
+    "domain": "Database",
+    "availability": "web",
+    "types": [
+        {
+            "id": "DatabaseId",
+            "type": "string",
+            "description": "Unique identifier of Database object."
+        },
+        {
+            "id": "Database",
+            "type": "object",
+            "description": "Database object.",
+            "properties": [
+                { "name": "id", "$ref": "DatabaseId", "description": "Database ID." },
+                { "name": "domain", "type": "string", "description": "Database domain." },
+                { "name": "name", "type": "string", "description": "Database name." },
+                { "name": "version", "type": "string", "description": "Database version." }
+            ]
+        },
+        {
+            "id": "Error",
+            "type": "object",
+            "description": "Database error.",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables database tracking, database events will now be delivered to the client."
+        },
+        {
+            "name": "disable",
+            "description": "Disables database tracking, prevents database events from being sent to the client."
+        },
+        {
+            "name": "getDatabaseTableNames",
+            "parameters": [
+                { "name": "databaseId", "$ref": "DatabaseId" }
+            ],
+            "returns": [
+                { "name": "tableNames", "type": "array", "items": { "type": "string" } }
+            ]
+        },
+        {
+            "name": "executeSQL",
+            "async": true,
+            "parameters": [
+                { "name": "databaseId", "$ref": "DatabaseId" },
+                { "name": "query", "type": "string" }
+            ],
+            "returns": [
+                { "name": "columnNames", "type": "array", "optional": true, "items": { "type": "string" } },
+                { "name": "values", "type": "array", "optional": true, "items": { "type": "any" }},
+                { "name": "sqlError", "$ref": "Error", "optional": true }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "addDatabase",
+            "parameters": [
+                { "name": "database", "$ref": "Database" }
+            ]
+        }
+    ]
+}

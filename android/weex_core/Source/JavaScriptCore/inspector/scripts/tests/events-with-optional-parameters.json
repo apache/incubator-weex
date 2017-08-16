@@ -1,0 +1,59 @@
+{
+    "domain": "Database",
+    "types": [
+        {
+            "id": "DatabaseId",
+            "type": "string",
+            "description": "Unique identifier of Database object."
+        },
+        {
+            "id": "PrimaryColors",
+            "type": "string",
+            "values": ["red", "green", "blue"]
+        },
+        {
+            "id": "ColorList",
+            "type": "array",
+            "items": { "$ref": "PrimaryColors" }
+        },
+        {
+            "id": "Error",
+            "type": "object",
+            "description": "Database error.",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code." }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "didExecuteOptionalParameters",
+            "parameters": [
+                { "name": "columnNames", "type": "array", "optional": true, "items": { "type": "string" } },
+                { "name": "notes", "type": "string", "optional": true },
+                { "name": "timestamp", "type": "number", "optional": true },
+                { "name": "values", "type": "object", "optional": true },
+                { "name": "payload", "type": "any", "optional": true },
+                { "name": "sqlError", "$ref": "Error", "optional": true },
+                { "name": "screenColor", "$ref": "PrimaryColors", "optional": true },
+                { "name": "alternateColors", "$ref": "ColorList", "optional": true },
+                { "name": "printColor", "type": "string", "values": ["cyan", "magenta", "yellow", "black"], "optional": true }
+            ]
+        },
+        {
+            "name": "didExecuteNoOptionalParameters",
+            "parameters": [
+                { "name": "columnNames", "type": "array", "items": { "type": "string" } },
+                { "name": "notes", "type": "string" },
+                { "name": "timestamp", "type": "number" },
+                { "name": "values", "type": "object" },
+                { "name": "payload", "type": "any" },
+                { "name": "sqlError", "$ref": "Error" },
+                { "name": "screenColor", "$ref": "PrimaryColors" },
+                { "name": "alternateColors", "$ref": "ColorList" },
+                { "name": "printColor", "type": "string", "values": ["cyan", "magenta", "yellow", "black"] }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "domain": "Database",
+    "types": [
+        {
+            "id": "DatabaseId",
+            "type": "string",
+            "description": "Unique identifier of Database object."
+        }
+    ],
+    "events": [
+        {
+            "name": "didExecuteOptionalParameters",
+            "parameters": [
+                { "name": "columnNames", "type": "DatabaseId" }
+            ]
+        }
+    ]
+}

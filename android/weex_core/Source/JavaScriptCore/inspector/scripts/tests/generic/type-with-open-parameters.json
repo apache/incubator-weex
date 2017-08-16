@@ -1,0 +1,21 @@
+{
+    "domain": "Test",
+    "types": [
+        {
+            "id": "NoOpenParameters",
+            "type": "object",
+            "properties": [
+                { "name": "one", "type": "number" },
+                { "name": "two", "type": "number" }
+            ]
+        },
+        {
+            "id": "OpenParameters",
+            "type": "object",
+            "properties": [
+                { "name": "alpha", "type": "number" },
+                { "name": "beta", "type": "number" }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "domain": "Overlay",
+    "events": [
+        {
+            "name": "processedPoints",
+            "parameters": [
+                { "name": "point", "type": "number" },
+                { "name": "point", "type": "number" }
+            ]
+        }
+    ]
+}

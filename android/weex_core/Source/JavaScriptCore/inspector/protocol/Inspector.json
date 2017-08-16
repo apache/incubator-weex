@@ -1,0 +1,51 @@
+{
+    "domain": "Inspector",
+    "types": [],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables inspector domain notifications."
+        },
+        {
+            "name": "disable",
+            "description": "Disables inspector domain notifications."
+        },
+        {
+            "name": "initialized",
+            "description": "Sent by the frontend after all initialization messages have been sent."
+        }
+    ],
+    "events": [
+        {
+            "name": "evaluateForTestInFrontend",
+            "parameters": [
+                { "name": "script", "type": "string" }
+            ]
+        },
+        {
+            "name": "inspect",
+            "parameters": [
+                { "name": "object", "$ref": "Runtime.RemoteObject" },
+                { "name": "hints", "type": "object" }
+            ]
+        },
+        {
+            "name": "detached",
+            "description": "Fired when remote debugging connection is about to be terminated. Contains detach reason.",
+            "parameters": [
+                { "name": "reason", "type": "string", "description": "The reason why connection has been terminated." }
+            ]
+        },
+        {
+            "name": "activateExtraDomains",
+            "description": "Fired when the backend has alternate domains that need to be activated.",
+            "parameters": [
+                { "name": "domains", "type": "array", "items": { "type": "string" }, "description": "Domain names that need activation" }
+            ]
+        },
+        {
+            "name": "targetCrashed",
+            "description": "Fired when debugging target has crashed"
+        }
+    ]
+}

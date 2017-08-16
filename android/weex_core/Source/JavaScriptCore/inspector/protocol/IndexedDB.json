@@ -1,0 +1,143 @@
+{
+    "domain": "IndexedDB",
+    "featureGuard": "ENABLE(INDEXED_DATABASE)",
+    "availability": "web",
+    "types": [
+        {
+            "id": "DatabaseWithObjectStores",
+            "type": "object",
+            "description": "Database with an array of object stores.",
+            "properties": [
+                { "name": "name", "type": "string", "description": "Database name." },
+                { "name": "version", "type": "number", "description": "Database version." },
+                { "name": "objectStores", "type": "array", "items": { "$ref": "ObjectStore" }, "description": "Object stores in this database." }
+            ]
+        },
+        {
+            "id": "ObjectStore",
+            "type": "object",
+            "description": "Object store.",
+            "properties": [
+                { "name": "name", "type": "string", "description": "Object store name." },
+                { "name": "keyPath", "$ref": "KeyPath", "description": "Object store key path." },
+                { "name": "autoIncrement", "type": "boolean", "description": "If true, object store has auto increment flag set." },
+                { "name": "indexes", "type": "array", "items": { "$ref": "ObjectStoreIndex" }, "description": "Indexes in this object store." }
+            ]
+        },
+        {
+            "id": "ObjectStoreIndex",
+            "type": "object",
+            "description": "Object store index.",
+            "properties": [
+                { "name": "name", "type": "string", "description": "Index name." },
+                { "name": "keyPath", "$ref": "KeyPath", "description": "Index key path." },
+                { "name": "unique", "type": "boolean", "description": "If true, index is unique." },
+                { "name": "multiEntry", "type": "boolean", "description": "If true, index allows multiple entries for a key." }
+            ]
+        },
+        {
+            "id": "Key",
+            "type": "object",
+            "description": "Key.",
+            "properties": [
+                { "name": "type", "type": "string", "enum": ["number", "string", "date", "array"], "description": "Key type." },
+                { "name": "number", "type": "number", "optional": true, "description": "Number value." },
+                { "name": "string", "type": "string", "optional": true, "description": "String value." },
+                { "name": "date", "type": "number", "optional": true, "description": "Date value." },
+                { "name": "array", "type": "array", "optional": true, "items": { "$ref": "Key" }, "description": "Array value." }
+            ]
+        },
+        {
+            "id": "KeyRange",
+            "type": "object",
+            "description": "Key range.",
+            "properties": [
+                { "name": "lower", "$ref": "Key", "optional": true, "description": "Lower bound." },
+                { "name": "upper", "$ref": "Key", "optional": true, "description": "Upper bound." },
+                { "name": "lowerOpen", "type": "boolean", "description": "If true lower bound is open." },
+                { "name": "upperOpen", "type": "boolean", "description": "If true upper bound is open." }
+            ]
+        },
+        {
+            "id": "DataEntry",
+            "type": "object",
+            "description": "Data entry.",
+            "properties": [
+                { "name": "key", "$ref": "Runtime.RemoteObject", "description": "Key." },
+                { "name": "primaryKey", "$ref": "Runtime.RemoteObject", "description": "Primary key." },
+                { "name": "value", "$ref": "Runtime.RemoteObject", "description": "Value." }
+            ]
+        },
+        {
+            "id": "KeyPath",
+            "type": "object",
+            "description": "Key path.",
+            "properties": [
+                { "name": "type", "type": "string", "enum": ["null", "string", "array"], "description": "Key path type." },
+                { "name": "string", "type": "string", "optional": true, "description": "String value." },
+                { "name": "array", "type": "array", "optional": true, "items": { "type": "string" }, "description": "Array value." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables events from backend."
+        },
+        {
+            "name": "disable",
+            "description": "Disables events from backend."
+        },
+        {
+            "name": "requestDatabaseNames",
+            "description": "Requests database names for given security origin.",
+            "async": true,
+            "parameters": [
+                { "name": "securityOrigin", "type": "string", "description": "Security origin." }
+            ],
+            "returns": [
+                { "name": "databaseNames", "type": "array", "items": { "type": "string" }, "description": "Database names for origin." }
+            ]
+        },
+        {
+            "name": "requestDatabase",
+            "description": "Requests database with given name in given frame.",
+            "async": true,
+            "parameters": [
+                { "name": "securityOrigin", "type": "string", "description": "Security origin." },
+                { "name": "databaseName", "type": "string", "description": "Database name." }
+            ],
+            "returns": [
+                { "name": "databaseWithObjectStores", "$ref": "DatabaseWithObjectStores", "description": "Database with an array of object stores." }
+            ]
+        },
+        {
+            "name": "requestData",
+            "description": "Requests data from object store or index.",
+            "async": true,
+            "parameters": [
+                { "name": "securityOrigin", "type": "string", "description": "Security origin." },
+                { "name": "databaseName", "type": "string", "description": "Database name." },
+                { "name": "objectStoreName", "type": "string", "description": "Object store name." },
+                { "name": "indexName", "type": "string", "description": "Index name, empty string for object store data requests." },
+                { "name": "skipCount", "type": "integer", "description": "Number of records to skip." },
+                { "name": "pageSize", "type": "integer", "description": "Number of records to fetch." },
+                { "name": "keyRange", "$ref": "KeyRange", "optional": true, "description": "Key range." }
+            ],
+            "returns": [
+                { "name": "objectStoreDataEntries", "type": "array", "items": { "$ref": "DataEntry" }, "description": "Array of object store data entries." },
+                { "name": "hasMore", "type": "boolean", "description": "If true, there are more entries to fetch in the given range." }
+            ]
+        },
+        {
+            "name": "clearObjectStore",
+            "description": "Clears all entries from an object store.",
+            "async": true,
+            "parameters": [
+                { "name": "securityOrigin", "type": "string", "description": "Security origin." },
+                { "name": "databaseName", "type": "string", "description": "Database name." },
+                { "name": "objectStoreName", "type": "string", "description": "Object store name." }
+            ]
+        }
+    ]
+}

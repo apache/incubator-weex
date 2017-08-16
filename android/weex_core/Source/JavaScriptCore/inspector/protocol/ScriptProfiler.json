@@ -1,0 +1,99 @@
+{
+    "domain": "ScriptProfiler",
+    "description": "Profiler domain exposes JavaScript evaluation timing and profiling.",
+    "types": [
+        {
+            "id": "EventType",
+            "type": "string",
+            "enum": ["API", "Microtask", "Other"]
+        },
+        {
+            "id": "Event",
+            "type": "object",
+            "properties": [
+                { "name": "startTime", "type": "number" },
+                { "name": "endTime", "type": "number" },
+                { "name": "type", "$ref": "EventType" }
+            ]
+        },
+        {
+            "id": "ExpressionLocation",
+            "type": "object",
+            "properties": [
+                { "name": "line", "type": "integer", "description": "1-based." },
+                { "name": "column", "type": "integer", "description": "1-based." }
+            ]
+        },
+        {
+            "id": "StackFrame",
+            "type": "object",
+            "properties": [
+                { "name": "sourceID", "$ref": "Debugger.ScriptId", "description": "Unique script identifier." },
+                { "name": "name", "type": "string", "description": "A displayable name for the stack frame. i.e function name, (program), etc." },
+                { "name": "line", "type": "integer", "description": "-1 if unavailable. 1-based if available." },
+                { "name": "column", "type": "integer", "description": "-1 if unavailable. 1-based if available." },
+                { "name": "url", "type": "string" },
+                { "name": "expressionLocation", "$ref": "ExpressionLocation", "optional": true }
+            ]
+        },
+        {
+            "id": "StackTrace",
+            "type": "object",
+            "properties": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "stackFrames", "type": "array", "items": { "$ref": "StackFrame" }, "description": "First array item is the bottom of the call stack and last array item is the top of the call stack." }
+            ]
+        },
+        {
+            "id": "Samples",
+            "type": "object",
+            "properties": [
+                { "name": "stackTraces", "type": "array", "items": { "$ref": "StackTrace" } }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "startTracking",
+            "description": "Start tracking script evaluations.",
+            "parameters": [
+                { "name": "includeSamples", "type": "boolean", "optional": true, "description": "Start the sampling profiler, defaults to false." }
+            ]
+        },
+        {
+            "name": "stopTracking",
+            "description": "Stop tracking script evaluations. This will produce a `trackingComplete` event."
+        }
+    ],
+    "events": [
+        {
+            "name": "trackingStart",
+            "description": "Tracking started.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" }
+            ]
+        },
+        {
+            "name": "trackingUpdate",
+            "description": "Periodic tracking updates with event data.",
+            "parameters": [
+                { "name": "event", "$ref": "Event" }
+            ]
+        },
+        {
+            "name": "trackingComplete",
+            "description": "Tracking stopped. Includes any buffered data during tracking, such as profiling information.",
+            "parameters": [
+                { "name": "samples", "$ref": "Samples", "optional": true, "description": "Stack traces." }
+            ]
+        },
+        {
+            "name": "programmaticCaptureStarted",
+            "description": "Fired when programmatic capture starts (console.profile). JSContext inspection only."
+        },
+        {
+            "name": "programmaticCaptureStopped",
+            "description": "Fired when programmatic capture stops (console.profileEnd). JSContext inspection only."
+        }
+    ]
+}

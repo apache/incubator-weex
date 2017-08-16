@@ -1,0 +1,70 @@
+{
+    "domain": "Memory",
+    "description": "Memory domain exposes page memory tracking.",
+    "featureGuard": "ENABLE(RESOURCE_USAGE)",
+    "availability": "web",
+    "types": [
+        {
+            "id": "Event",
+            "type": "object",
+            "properties": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "categories", "type": "array", "items": { "$ref": "CategoryData" }, "description": "Breakdown of memory in categories." }
+            ]
+        },
+        {
+            "id": "CategoryData",
+            "type": "object",
+            "properties": [
+                { "name": "type", "type": "string", "enum": ["javascript", "jit", "images", "layers", "page", "other"], "description": "Category type." },
+                { "name": "size", "type": "number", "description": "Category size in bytes." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables Memory domain events."
+        },
+        {
+            "name": "disable",
+            "description": "Disables Memory domain events."
+        },
+        {
+            "name": "startTracking",
+            "description": "Start tracking memory. This will produce a `trackingStart` event."
+        },
+        {
+            "name": "stopTracking",
+            "description": "Stop tracking memory. This will produce a `trackingComplete` event."
+        }
+    ],
+    "events": [
+        {
+            "name": "memoryPressure",
+            "description": "Memory pressure was encountered.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "severity", "type": "string", "enum": ["critical", "non-critical"], "description": "The severity of the memory pressure event." }
+            ]
+        },
+        {
+            "name": "trackingStart",
+            "description": "Tracking started.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" }
+            ]
+        },
+        {
+            "name": "trackingUpdate",
+            "description": "Periodic tracking updates with event data.",
+            "parameters": [
+                { "name": "event", "$ref": "Event" }
+            ]
+        },
+        {
+            "name": "trackingComplete",
+            "description": "Tracking stopped."
+        }
+    ]
+}

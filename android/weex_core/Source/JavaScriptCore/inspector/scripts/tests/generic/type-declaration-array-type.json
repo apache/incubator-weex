@@ -1,0 +1,50 @@
+[
+{
+    "domain": "Debugger",
+    "types": [
+        {
+            "id": "BreakpointId",
+            "type": "integer"
+        },
+        {
+            "id": "Reason",
+            "type": "string",
+            "enum": ["Died", "Fainted", "Hungry"]
+        }
+    ]
+},
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "ObjectId",
+            "type": "integer"
+        },
+        {
+            "id": "LuckyNumbers",
+            "type": "array",
+            "items": { "type": "integer" }
+        },
+        {
+            "id": "BabyNames",
+            "type": "array",
+            "items": { "type": "string" }
+        },
+        {
+            "id": "NewObjects",
+            "type": "array",
+            "items": { "$ref": "ObjectId" }
+        },
+        {
+            "id": "OldObjects",
+            "type": "array",
+            "items": { "$ref": "Debugger.BreakpointId" }
+        },
+        {
+            "id": "StopReasons",
+            "type": "array",
+            "items": { "$ref": "Debugger.Reason" }
+        }
+    ]
+}
+]

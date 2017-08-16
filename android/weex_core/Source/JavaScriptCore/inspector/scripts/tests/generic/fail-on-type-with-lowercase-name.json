@@ -1,0 +1,10 @@
+{
+    "domain": "Database",
+    "types": [
+        {
+            "id": "databaseId",
+            "type": "integer",
+            "description": "Unique identifier of Database object."
+        }
+    ]
+}

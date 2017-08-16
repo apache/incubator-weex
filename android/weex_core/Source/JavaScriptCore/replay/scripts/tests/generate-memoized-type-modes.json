@@ -1,0 +1,29 @@
+{
+    "types": {
+        "Global": [
+            { "name": "ScalarType", "mode": "SCALAR" },
+            { "name": "MapType", "mode": "OWNED" }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "ScalarInput",
+                "description": "",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "data", "type": "ScalarType" }
+                ]
+            },
+            {
+                "name": "MapInput",
+                "description": "",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "data", "type": "MapType" }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "RemoteObjectId",
+            "type": "string",
+            "description": "Unique object identifier."
+        },
+        {
+            "id": "RemoteObjectId",
+            "type": "string",
+            "description": "Unique object identifier."
+        }
+    ]
+}

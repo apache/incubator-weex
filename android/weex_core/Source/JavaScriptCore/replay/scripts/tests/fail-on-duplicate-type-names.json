@@ -1,0 +1,24 @@
+{
+    "types": {
+        "Global": [
+            { "name": "uint64_t", "mode": "SCALAR" },
+            { "name": "uint64_t", "mode": "SCALAR" }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "SetRandomSeed",
+                "description": "Sets the PRNG seed used by Math.random().",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    {
+                        "name": "randomSeed",
+                        "type": "uint64_t"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "KeyPath",
+            "type": "object",
+            "description": "Key path.",
+            "properties": [
+                {
+                    "name": "type",
+                    "type": "string",
+                    "enum": ["null", "string", "array"],
+                    "description": "Key path type."
+                },
+                {
+                    "name": "string",
+                    "type": "string",
+                    "optional": true,
+                    "description": "String value."
+                },
+                {
+                    "name": "array",
+                    "type": "array",
+                    "optional": true,
+                    "items": { "type": "string" },
+                    "description": "Array value."
+                }
+            ]
+        }
+    ]
+}

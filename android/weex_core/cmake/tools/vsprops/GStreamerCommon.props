@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="GStreamer32.props" Condition="$(Platform)=='Win32'" />
+    <Import Project="GStreamer64.props" Condition="$(Platform)=='x64'" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <ENABLE_GSTREAMER_WINCAIRO></ENABLE_GSTREAMER_WINCAIRO>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>$(ENABLE_GSTREAMER_WINCAIRO);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link Condition="$(ENABLE_GSTREAMER_WINCAIRO)=='ENABLE_GSTREAMER_WINCAIRO'">
+      <AdditionalDependencies>gstpbutils-1.0.lib;gstaudio-1.0.lib;gstbase-1.0.lib;gstvideo-1.0.lib;gobject-2.0.lib;gstapp-1.0.lib;glib-2.0.lib;gstreamer-1.0.lib;gsttag-1.0.lib;gio-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ENABLE_GSTREAMER_WINCAIRO">
+      <Value>$(ENABLE_GSTREAMER_WINCAIRO)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

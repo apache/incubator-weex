@@ -1,0 +1,9 @@
+This documents the differences between the stock version of udis86 and the one found
+here:
+
+- All files not named "udis86" were prefixed with "udis86".
+
+- assert() has been changed to ASSERT()
+
+- Fixed udis86_syn-att.c's jump destination printing to work correctly in 64-bit mode.
+

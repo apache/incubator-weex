@@ -1,0 +1,52 @@
+{
+    "types": {
+        "JavaScriptCore": [
+            {
+                "name": "Type", "mode": "SCALAR", "storage": "uint64_t",
+                "enclosing_class": "PlatformEvent1",
+                "flags": ["ENUM"],
+                "values": ["Mouse", "Keyboard"],
+                "header": "replay/PlatformEvent.h"
+            },
+            {
+                "name": "Type", "mode": "SCALAR",
+                "enclosing_class": "PlatformEvent2",
+                "flags": ["ENUM_CLASS"],
+                "values": ["Mouse", "Keyboard"],
+                "header": "replay/PlatformEvent.h"
+            }
+        ],
+        "Test": [
+            {
+                "name": "Type", "mode": "SCALAR", "storage": "uint64_t",
+                "enclosing_class": "FormData1",
+                "flags": ["ENUM"],
+                "values": ["Text", "Blob"],
+                "header": "replay/FormData1.h"
+            },
+            {
+                "name": "Type", "mode": "SCALAR",
+                "enclosing_class": "FormData2",
+                "flags": ["ENUM_CLASS"],
+                "values": ["Text", "Blob"],
+                "header": "replay/FormData2.h"
+            }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "FormCombo",
+                "description": "Combines an event type and form data type.",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "eventType1", "type": "PlatformEvent1::Type" },
+                    { "name": "eventType2", "type": "PlatformEvent2::Type" },
+                    { "name": "formType1", "type": "FormData1::Type" },
+                    { "name": "formType2", "type": "FormData2::Type" }
+                ]
+            }
+        ]
+    }
+}

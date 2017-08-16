@@ -1,0 +1,35 @@
+{"domains":[
+{
+    "domain": "TypeDomain",
+    "types": [
+        {
+            "id": "TypeDomainEnum",
+            "type": "string",
+            "enum": ["shared", "red", "green", "blue"]
+        }
+    ]
+},
+{
+    "domain": "CommandDomain",
+    "commands": [
+        {
+            "name": "commandWithEnumReturnValue",
+            "parameters": [],
+            "returns": [
+                { "name": "returnValue", "type": "string", "enum": ["shared", "cyan", "magenta", "yellow"] }
+            ]
+        }
+    ]
+},
+{
+    "domain": "EventDomain",
+    "events": [
+        {
+            "name": "eventWithEnumParameter",
+            "parameters": [
+                { "name": "parameter", "type": "string", "enum": ["shared", "black", "white"] }
+            ]
+        }
+    ]
+}
+]}

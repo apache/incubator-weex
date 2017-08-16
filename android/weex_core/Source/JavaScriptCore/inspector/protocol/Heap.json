@@ -1,0 +1,100 @@
+{
+    "domain": "Heap",
+    "description": "Heap domain exposes JavaScript heap attributes and capabilities.",
+    "workerSupported": true,
+    "types": [
+        {
+            "id": "GarbageCollection",
+            "description": "Information about a garbage collection.",
+            "type": "object",
+            "properties": [
+                { "name": "type", "type": "string", "enum": ["full", "partial"], "description": "The type of garbage collection." },
+                { "name": "startTime", "type": "number" },
+                { "name": "endTime", "type": "number" }
+            ]
+        },
+        {
+            "id": "HeapSnapshotData",
+            "description": "JavaScriptCore HeapSnapshot JSON data.",
+            "type": "string"
+        }
+    ],
+    "commands": [
+        {
+            "name": "enable",
+            "description": "Enables Heap domain events."
+        },
+        {
+            "name": "disable",
+            "description": "Disables Heap domain events."
+        },
+        {
+            "name": "gc",
+            "description": "Trigger a full garbage collection."
+        },
+        {
+            "name": "snapshot",
+            "description": "Take a heap snapshot.",
+            "returns": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "snapshotData", "$ref": "HeapSnapshotData" }
+            ]
+        },
+        {
+            "name": "startTracking",
+            "description": "Start tracking heap changes. This will produce a `trackingStart` event."
+        },
+        {
+            "name": "stopTracking",
+            "description": "Stop tracking heap changes. This will produce a `trackingComplete` event."
+        },
+        {
+            "name": "getPreview",
+            "description": "Returns a preview (string, Debugger.FunctionDetails, or Runtime.ObjectPreview) for a Heap.HeapObjectId.",
+            "parameters": [
+                { "name": "heapObjectId", "type": "integer", "description": "Identifier of the heap object within the snapshot." }
+            ],
+            "returns": [
+                { "name": "string", "type": "string", "optional": true, "description": "String value." },
+                { "name": "functionDetails", "$ref": "Debugger.FunctionDetails", "optional": true, "description": "Function details." },
+                { "name": "preview", "$ref": "Runtime.ObjectPreview", "optional": true, "description": "Object preview." }
+            ]
+        },
+        {
+            "name": "getRemoteObject",
+            "description": "Returns the strongly referenced Runtime.RemoteObject for a Heap.HeapObjectId.",
+            "parameters": [
+                { "name": "heapObjectId", "type": "integer", "description": "Identifier of the heap object within the snapshot." },
+                { "name": "objectGroup", "type": "string", "optional": true, "description": "Symbolic group name that can be used to release multiple objects." }
+            ],
+            "returns": [
+                { "name": "result", "$ref": "Runtime.RemoteObject", "description": "Resulting object." }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "garbageCollected",
+            "description": "Information about the garbage collection.",
+            "parameters": [
+                { "name": "collection", "$ref": "GarbageCollection" }
+            ]
+        },
+        {
+            "name": "trackingStart",
+            "description": "Tracking started.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "snapshotData", "$ref": "HeapSnapshotData", "description": "Snapshot at the start of tracking." }
+            ]
+        },
+        {
+            "name": "trackingComplete",
+            "description": "Tracking stopped.",
+            "parameters": [
+                { "name": "timestamp", "type": "number" },
+                { "name": "snapshotData", "$ref": "HeapSnapshotData", "description": "Snapshot at the end of tracking." }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+[
+{
+    "domain": "OverlayTypes",
+    "types": [
+        {
+            "id": "Point",
+            "type": "object",
+            "properties": [
+                { "name": "x", "type": "integer" },
+                { "name": "x", "type": "integer" }
+            ]
+        }
+    ]
+}
+]

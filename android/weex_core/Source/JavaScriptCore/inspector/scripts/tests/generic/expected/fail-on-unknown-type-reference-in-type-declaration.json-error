@@ -1,0 +1,1 @@
+ERROR: Type reference 'dragon' is not a primitive type. Allowed values: integer, number, string, boolean, enum, object, array, any

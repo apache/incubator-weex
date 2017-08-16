@@ -1,0 +1,29 @@
+{
+    "types": {
+        "WebCore": [
+            {
+                "name": "MouseButton", "mode": "SCALAR", "storage": "unsigned",
+                "flags": ["ENUM"],
+                "values": ["NoButton", "LeftButton", "MiddleButton", "RightButton"],
+                "guarded_values": {
+                    "ENABLE(SIDE_BUTTONS)": ["LeftSideButton", "RightSideButton"],
+                    "PLATFORM(WINDOWS)": ["WindowsButton"]
+                },
+                "header": "platform/PlatformMouseEvent.h"
+            }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "SavedMouseButton",
+                "description": "Supplies a mouse button enum value.",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "button", "type": "MouseButton" }
+                ]
+            }
+        ]
+    }
+}

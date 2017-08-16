@@ -1,0 +1,29 @@
+{
+    "types": {
+        "Global": [
+            { "name": "ScalarType", "mode": "SCALAR" }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "ScalarInput1",
+                "description": "",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "data", "type": "ScalarType" }
+                ]
+            },
+            {
+                "name": "ScalarInput2",
+                "description": "",
+                "queue": "SCRIPT_MEMOIZED",
+                "flags": ["CREATE_FROM_PAGE"],
+                "members": [
+                    { "name": "data", "type": "ScalarType" }
+                ]
+            }
+        ]
+    }
+}

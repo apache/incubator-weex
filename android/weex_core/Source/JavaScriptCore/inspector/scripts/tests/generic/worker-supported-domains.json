@@ -1,0 +1,11 @@
+[
+{
+    "domain": "DomainA",
+    "workerSupported": true,
+    "commands": [{"name": "enable"}]
+},
+{
+    "domain": "DomainB",
+    "commands": [{"name": "enable"}]
+}
+]

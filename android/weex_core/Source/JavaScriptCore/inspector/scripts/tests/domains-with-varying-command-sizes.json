@@ -1,0 +1,54 @@
+[
+{
+    "domain": "Network1",
+    "commands": [
+        {
+            "name": "loadResource1",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        }
+    ]
+},
+{
+    "domain": "Network2",
+    "types": [
+        {
+            "id": "LoaderId",
+            "type": "string",
+            "description": "Unique loader identifier."
+        }
+    ]
+},
+{
+    "domain": "Network3",
+    "commands": [
+        {
+            "name": "loadResource1",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource2",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource3",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource4",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource5",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource6",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        },
+        {
+            "name": "loadResource7",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        }
+    ]
+}
+]

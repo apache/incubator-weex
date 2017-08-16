@@ -1,0 +1,36 @@
+[
+{
+    "domain": "Network1",
+    "featureGuard": "PLATFORM(WEB_COMMANDS)",
+    "commands": [
+        {
+            "name": "loadResource",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        }
+    ]
+},
+{
+    "domain": "Network2",
+    "featureGuard": "PLATFORM(WEB_TYPES)",
+    "types": [
+        {
+            "id": "NetworkError",
+            "type": "object",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code." }
+            ]
+        }
+    ]
+},
+{
+    "domain": "Network3",
+    "featureGuard": "PLATFORM(WEB_EVENTS)",
+    "events": [
+        {
+            "name": "resourceLoaded",
+            "description": "A resource was loaded."
+        }
+    ]
+}
+]

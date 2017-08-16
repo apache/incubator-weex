@@ -1,0 +1,404 @@
+{
+    "specification": [
+    {
+        "name": "ES6",
+        "url": "http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts",
+        "keywords": ["es6", "es2015", "ecmascript"],
+        "status": {
+            "status": "Done"
+        },
+        "contact": [
+            {
+                "name": "Saam Barati",
+                "email": "sbarati@apple.com",
+                "twitter": "@saambarati"
+            },
+            {
+                "name": "Keith Miller",
+                "email": "keith_miller@apple.com"
+            }
+        ]
+    },
+    {
+        "name": "ES7",
+        "url": "https://github.com/tc39/ecma262",
+        "keywords": ["es7", "ecmascript"]
+    },
+    {
+        "name": "Internationalization API",
+        "status": {
+            "status": "Done"
+        },
+        "url": "http://ecma-international.org/publications/standards/Ecma-402.htm",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=90906",
+        "description": "The Internationalization API provides language sensitive operations for  string, number, and date.",
+        "keywords": ["Intl", "Collator", "ECMA-402"]
+    },
+    {
+        "name": "WebAssembly",
+        "status": {
+            "status": "In Development"
+        },
+        "url": "http://webassembly.github.io",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=146064",
+        "description": "WebAssembly is a new format for native programs on the web. It aims to support everything that asm.js supports, but allows the VM to sidestep the JS parsing and profiling pipeline entirely.",
+        "keywords": ["webassembly", "wasm", "webassy"],
+        "contact": {
+            "name": "Jon Davis",
+            "email": "web-evangelist@apple.com",
+            "twitter": "@jonathandavis"
+        }
+    }
+    ],
+
+    "features": [
+    {
+        "name": "ASM.js",
+        "status": {
+            "status": "In Development",
+            "enabled-by-default": true
+        },
+        "url": "http://asmjs.org",
+        "description": "ASM.js defines a subset of JavaScript that enforce stronger typing and has specific patterns of memory access. ASM.js is rarely hand-written, it is typically generated from other languages by compiler such as Emscripten.",
+        "comment": "There is no \"use asm\" mode in JavaScriptCore. Instead WebKit integrates ASM.js optimizations directly in the optimizer. As a result, it is possible to mix ASM-style typing with regular code and still get great performance and power efficiency."
+    },
+    {
+        "name": "Array.prototype.copyWithin",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.prototype.copywithin",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=145107",
+        "specification": "ES6",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "Array.prototype.includes",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://github.com/tc39/Array.prototype.includes",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=142707",
+        "specification": "ES7"
+    },
+    {
+        "name": "Arrow Functions",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-arrow-function-definitions",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions",
+        "description": "Arrow functions are a new type of function expression in ES6 that lexically binds this, new.target, arguments, and super.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Block Scoping",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-let-and-const-declarations",
+        "documentation-url": "http://www.2ality.com/2015/02/es6-scoping.html",
+        "description": "Block Scoping let/const/class variables are a new way of declaring variables that are local to the block they're defined in. They have clearer scoping semantics than var variables.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Classes",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-class-definitions",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes",
+        "description": "Classes are a way to write object oriented code in JavaScript with standard syntax and semantics.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Default Parameter Values",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-function-definitions",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters",
+        "description": "Default parameter values are a convenient way to specify expressions that parameters should evaluate to when undefined (or nothing) is passed in as a function argument.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Destructuring Syntax",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-destructuring-assignment",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment",
+        "description": "Destructuring syntax is a shorthand form that allows you to easily assign local variables to the values of an object or array's properties.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Exponentiation Syntax",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://tc39.github.io/ecma262/#prod-ExponentiationExpression",
+        "specification": "ES7",
+        "description": "Exponentiation syntax (like x ** y) provides the syntax suger for exponentiation.",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=159969",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators#Exponentiation_(**)",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "twitter": "@Constellation",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "Generators",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-generator-objects",
+        "specification": "ES6",
+        "description": "An iterative function object that is interruptible and resumable. Generators are currently spec compliant, however, we're still actively working on improving their performance.",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=150290",
+        "documentation-url": "https://hacks.mozilla.org/2015/05/es6-in-depth-generators/",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "twitter": "@Constellation",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "Map Data Structure",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-constructor",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=120333",
+        "description": "Map provides an <a href=\"https://en.wikipedia.org/wiki/Associative_array\">associative array data</a> structure that maps keys to values.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Modules",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-modules",
+        "documentation-url": "https://hacks.mozilla.org/2015/08/es6-in-depth-modules/",
+        "description": "Modules make modularizing code and splitting it across different files easy because the syntax and semantics are now standard in the JavaScript langauge.",
+        "specification": "ES6",
+        "comment": "Modules can be loaded through script type=\"module\" tags. It is also possible to use Modules with the jsc command line tool by passing the -m flag."
+    },
+    {
+        "name": "Number Object Extensions",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-number-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=131707",
+        "specification": "ES6",
+        "description": "Extend Number with the methods Number.isFinite(), Number.isInteger(), Number.isSafeInteger(), Number.isNaN() and the attributes Number.EPSILON, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER."
+    },
+    {
+        "name": "Octal and Binary Literals",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://people.mozilla.org/~jorendorff/es6-draft.html#sec-literals-numeric-literals",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=142681",
+        "specification": "ES6",
+        "description": "New syntax for number literals. Numbers can be provided as binary (e.g. 0b001001) or octal (e.g. 0o24)."
+    },
+    {
+        "name": "Promise Objects",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true,
+            "shipped": ["ios8-safari", "osx-safari-7.1"]
+        },
+        "url": "https://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=120260",
+        "specification": "ES6"
+    },
+    {
+        "name": "Proxy Objects",
+        "status": {
+            "status": "Done"
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-proxy-objects",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=35731",
+        "specification": "ES6",
+        "description": "An intermediary object that defines custom basic behaviors of another object such as property lookup, assignment, enumeration.",
+        "contact": {
+            "name": "Jon Davis",
+            "twitter": "@jonathandavis",
+            "email": "web-evangelist@apple.com"
+        }
+    },
+    {
+        "name": "Reflect API",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-reflect-object",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+        "description": "The Reflect API is a way to set properties and call methods on certain objects that can be intercepted by ES6 Proxies.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Rest Parameter",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-function-definitions",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters",
+        "description": "Rest parameters allow you to collect the arguments, or the arguments after some offset, of a function into a JS array.",
+        "specification": "ES6",
+        "contact": {
+            "name": "Saam Barati",
+            "email": "sbarati@apple.com",
+            "twitter": "@saambarati"
+        }
+    },
+    {
+        "name": "Set Data Structure",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://people.mozilla.org/~jorendorff/es6-draft.html#sec-set-constructor",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=120549",
+        "description": "Set is a collection of unique objects.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Symbol Objects",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "https://people.mozilla.org/~jorendorff/es6-draft.html#sec-symbol-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=140435",
+        "specification": "ES6",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "Tagged Templates",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tagged-templates",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/template_strings",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=143183",
+        "description": "The tagged-templates (like String.raw`Hello ${World}`) provides a way to modify the produced string from a given template-literals with a function.",
+        "specification": "ES6",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "Tail Calls",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-tail-position-calls",
+        "documentation-url": "http://www.2ality.com/2015/06/tail-call-optimization.html",
+        "description": "Tail Calls allow you to make function calls that are in tail position without growing the stack. It is commonly used to write loops using function calls instead of for or while syntax.",
+        "specification": "ES6"
+    },
+    {
+        "name": "Template Literals",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-template-literals",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/template_strings",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=142691",
+        "description": "The template-literals (like `Hello ${World}`) provides string interpolation feature. Line terminators are also allowed in the template-literals.",
+        "specification": "ES6",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "WeakMap",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-weakmap-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=120912",
+        "description": "WeakMap provides an <a href=\"https://en.wikipedia.org/wiki/Associative_array\">associative array data</a> structure that maps keys to values. WeakMap's keys must be objects.",
+        "specification": "ES6"
+    },
+    {
+        "name": "WeakSet",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-weakset-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+        "webkit-url": "https://bugs.webkit.org/show_bug.cgi?id=142408",
+        "description": "WeakSet is a collection of unique objects. Keys stored in WeakSet are referenced weakly.",
+        "specification": "ES6",
+        "contact": {
+            "name": "Yusuke Suzuki",
+            "email": "utatane.tea@gmail.com"
+        }
+    },
+    {
+        "name": "for...of Loops",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://people.mozilla.org/~jorendorff/es6-draft.html#sec-for-in-and-for-of-statements",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of",
+        "description": "The for...of loops iterate over the values provided by the iterator of the target object.",
+        "specification": "ES6",
+        "comment": "Older versions of WebKit only supported iterating JavaScript arrays."
+    },
+    {
+        "name": "new.target",
+        "status": {
+            "status": "Done",
+            "enabled-by-default": true
+        },
+        "url": "http://www.ecma-international.org/ecma-262/6.0/#sec-built-in-function-objects",
+        "documentation-url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new.target",
+        "description": "new.target allows you to detect if a function or constructor was instantiated with the new operator, or if instead it was called using normal function calling syntax.",
+        "specification": "ES6"
+    }
+    ]
+}

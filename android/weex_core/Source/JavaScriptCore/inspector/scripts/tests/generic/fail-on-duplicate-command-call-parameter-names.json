@@ -1,0 +1,16 @@
+{
+    "domain": "Overlay",
+    "commands": [
+        {
+            "name": "processPoints",
+            "parameters": [
+                { "name": "point", "type": "number" },
+                { "name": "point", "type": "number" }
+            ],
+            "returns": [
+                { "name": "result1", "type": "string" },
+                { "name": "result2", "type": "string" }
+            ]
+        }
+    ]
+}

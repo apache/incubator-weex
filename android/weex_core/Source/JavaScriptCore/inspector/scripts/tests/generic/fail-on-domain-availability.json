@@ -1,0 +1,9 @@
+{
+    "domain": "WebOnly",
+    "availability": "webb",
+    "commands": [
+        {
+            "name": "enable"
+        }
+    ]
+}

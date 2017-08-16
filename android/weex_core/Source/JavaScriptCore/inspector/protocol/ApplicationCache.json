@@ -1,0 +1,87 @@
+{
+    "domain": "ApplicationCache",
+    "availability": "web",
+    "types": [
+        {
+            "id": "ApplicationCacheResource",
+            "type": "object",
+            "description": "Detailed application cache resource information.",
+            "properties": [
+                { "name": "url", "type": "string", "description": "Resource url." },
+                { "name": "size", "type": "integer", "description": "Resource size." },
+                { "name": "type", "type": "string", "description": "Resource type." }
+            ]
+        },
+        {
+            "id": "ApplicationCache",
+            "type": "object",
+            "description": "Detailed application cache information.",
+            "properties": [
+                { "name": "manifestURL", "type": "string", "description": "Manifest URL." },
+                { "name": "size", "type": "number", "description": "Application cache size." },
+                { "name": "creationTime", "type": "number", "description": "Application cache creation time." },
+                { "name": "updateTime", "type": "number", "description": "Application cache update time." },
+                { "name": "resources", "type": "array", "items": { "$ref": "ApplicationCacheResource" }, "description": "Application cache resources." }
+            ]
+        },
+        {
+            "id": "FrameWithManifest",
+            "type": "object",
+            "description": "Frame identifier - manifest URL pair.",
+            "properties": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Frame identifier." },
+                { "name": "manifestURL", "type": "string", "description": "Manifest URL." },
+                { "name": "status", "type": "integer", "description": "Application cache status." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "getFramesWithManifests",
+            "returns": [
+                { "name": "frameIds", "type": "array", "items": { "$ref": "FrameWithManifest" }, "description": "Array of frame identifiers with manifest urls for each frame containing a document associated with some application cache." }
+            ],
+            "description": "Returns array of frame identifiers with manifest urls for each frame containing a document associated with some application cache."
+        },
+        {
+            "name": "enable",
+            "description": "Enables application cache domain notifications."
+        },
+        {
+            "name": "getManifestForFrame",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Identifier of the frame containing document whose manifest is retrieved." }
+            ],
+            "returns": [
+                { "name": "manifestURL", "type": "string", "description": "Manifest URL for document in the given frame." }
+            ],
+            "description": "Returns manifest URL for document in the given frame."
+        },
+        {
+            "name": "getApplicationCacheForFrame",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Identifier of the frame containing document whose application cache is retrieved." }
+            ],
+            "returns": [
+                { "name": "applicationCache", "$ref": "ApplicationCache", "description": "Relevant application cache data for the document in given frame." }
+            ],
+            "description": "Returns relevant application cache data for the document in given frame."
+        }
+    ],
+    "events": [
+        {
+            "name": "applicationCacheStatusUpdated",
+            "parameters": [
+                { "name": "frameId", "$ref": "Network.FrameId", "description": "Identifier of the frame containing document whose application cache updated status." },
+                { "name": "manifestURL", "type": "string", "description": "Manifest URL." },
+                { "name": "status", "type": "integer", "description": "Updated application cache status." }
+            ]
+        },
+        {
+            "name": "networkStateUpdated",
+            "parameters": [
+                { "name": "isNowOnline", "type": "boolean" }
+            ]
+        }
+    ]
+}

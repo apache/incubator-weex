@@ -1,0 +1,28 @@
+{
+    "domain": "Network",
+    "types": [
+        {
+            "id": "NetworkError",
+            "type": "object",
+            "platform": "macos",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code." }
+            ]
+        }
+    ],
+    "commands": [
+        {
+            "name": "loadResource",
+            "platform": "macos",
+            "description": "Loads a resource in the context of a frame on the inspected page without cross origin checks."
+        }
+    ],
+    "events": [
+        {
+            "name": "resourceLoaded",
+            "platform": "macos",
+            "description": "A resource was loaded."
+        }
+    ]
+}

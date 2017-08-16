@@ -1,0 +1,100 @@
+[
+{
+    "domain": "Database",
+    "description": "Test type builder generation of various object types.",
+    "types": [
+        {
+            "id": "Error",
+            "type": "object",
+            "description": "Database error.",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code." }
+            ]
+        },
+        {
+            "id": "ErrorList",
+            "type": "array",
+            "items": { "$ref": "Error" }
+        },
+        {
+            "id": "MouseButton",
+            "type": "string",
+            "description": "Enumerates different mouse buttons that can be used.",
+            "enum": [
+                "None",
+                "Left",
+                "Middle",
+                "Right"
+            ]
+        },
+        {
+            "id": "OptionalParameterBundle",
+            "type": "object",
+            "properties": [
+                { "name": "columnNames", "type": "array", "optional": true, "items": { "type": "string" } },
+                { "name": "buttons", "type": "array", "optional": true, "items": { "$ref": "MouseButton" } },
+                { "name": "directionality", "type": "string", "enum": ["LTR", "RTL"], "optional": true },
+                { "name": "notes", "type": "string", "optional": true },
+                { "name": "timestamp", "type": "number", "optional": true },
+                { "name": "values", "type": "object", "optional": true },
+                { "name": "payload", "type": "any", "optional": true },
+                { "name": "error", "$ref": "Error", "optional": true },
+                { "name": "errorList", "$ref": "ErrorList", "optional": true }
+            ]
+        },
+        {
+            "id": "ParameterBundle",
+            "type": "object",
+            "properties": [
+                { "name": "columnNames", "type": "array", "items": { "type": "string" } },
+                { "name": "buttons", "type": "array", "items": { "$ref": "MouseButton" } },
+                { "name": "directionality", "type": "string", "enum": ["LTR", "RTL"] },
+                { "name": "notes", "type": "string" },
+                { "name": "timestamp", "type": "number" },
+                { "name": "values", "type": "object" },
+                { "name": "payload", "type": "any" },
+                { "name": "error", "$ref": "Error" },
+                { "name": "errorList", "$ref": "ErrorList" }
+            ]
+        },
+        {
+            "id": "ObjectWithPropertyNameConflicts",
+            "description": "Conflicted names may cause generated getters/setters to clash with built-in InspectorObject methods.",
+            "type": "object",
+            "properties": [
+                { "name": "integer", "type": "string" },
+                { "name": "array", "type": "string" },
+                { "name": "string", "type": "string" },
+                { "name": "value", "type": "string" },
+                { "name": "object", "type": "string" }
+            ]
+        },
+        {
+            "id": "DummyObject",
+            "description": "An open object that doesn't have any predefined fields.",
+            "type": "object"
+        }
+    ]
+},
+{
+    "domain": "Test",
+    "description": "Test the generation of special behaviors that only apply to specific classes.",
+    "types": [
+        {
+            "id": "ParameterBundle",
+            "type": "object",
+            "properties": [
+                { "name": "directionality", "type": "string", "enum": ["LTR", "RTL"] },
+                { "name": "buttons", "type": "array", "items": { "$ref": "Database.MouseButton" } },
+                { "name": "columnNames", "type": "array", "items": { "type": "string" } },
+                { "name": "notes", "type": "string" },
+                { "name": "timestamp", "type": "number" },
+                { "name": "values", "type": "object" },
+                { "name": "payload", "type": "any" },
+                { "name": "error", "$ref": "Database.Error" }
+            ]
+        }
+    ]
+}
+]

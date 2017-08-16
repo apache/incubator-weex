@@ -1,0 +1,23 @@
+{
+    "types": {
+        "Global": [
+            {
+                "name": "MouseButton", "mode": "SCALAR",
+                "flags": ["ENUM"]
+            }
+        ]
+    },
+
+    "inputs": {
+        "Test": [
+            {
+                "name": "SavedMouseButton",
+                "description": "Supplies a mouse button enum value.",
+                "queue": "SCRIPT_MEMOIZED",
+                "members": [
+                    { "name": "currentTime", "type": "MouseButton" }
+                ]
+            }
+        ]
+    }
+}

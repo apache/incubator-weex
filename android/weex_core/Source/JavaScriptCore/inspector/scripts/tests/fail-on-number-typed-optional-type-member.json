@@ -1,0 +1,16 @@
+[
+{
+    "domain": "Database",
+    "types": [
+        {
+            "id": "Error",
+            "type": "object",
+            "description": "Database error.",
+            "properties": [
+                { "name": "message", "type": "string", "description": "Error message." },
+                { "name": "code", "type": "integer", "description": "Error code.", "optional": 0 }
+            ]
+        }
+    ]
+}
+]

@@ -1,0 +1,13 @@
+[
+{
+    "domain": "Runtime",
+    "types": [
+        {
+            "id": "RemoteObjectId",
+            "type": "object",
+            "$ref": "SomeType",
+            "description": "Unique object identifier."
+        }
+    ]
+}
+]

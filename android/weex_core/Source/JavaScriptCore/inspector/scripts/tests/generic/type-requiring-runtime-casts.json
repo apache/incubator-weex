@@ -1,0 +1,51 @@
+[
+{
+    "domain": "Test",
+    "types": [
+        {
+            "id": "TypeNeedingCast",
+            "type": "object",
+            "description": "A dummy type that requires runtime casts, and forces non-primitive referenced types to also emit runtime cast helpers.",
+            "properties": [
+                { "name": "string", "type": "string", "description": "String member." },
+                { "name": "number", "type": "integer", "description": "Number member." },
+                { "name": "animals", "$ref": "CastedAnimals", "description": "Enum member." },
+                { "name": "id", "$ref": "CastedObjectId", "description": "Aliased member." },
+                { "name": "tree", "$ref": "RecursiveObject1", "description": "Recursive object member." }
+            ]
+        },
+        {
+            "id": "CastedObjectId",
+            "type": "integer"
+        },
+        {
+            "id": "UncastedObjectId",
+            "type": "integer"
+        },
+        {
+            "id": "UncastedAnimals",
+            "type": "string",
+            "enum": ["Pigs", "Cows", "Cats", "Hens"]
+        },
+        {
+            "id": "CastedAnimals",
+            "type": "string",
+            "enum": ["Ducks", "Hens", "Crows", "Flamingos"]
+        },
+        {
+            "id": "RecursiveObject1",
+            "type": "object",
+            "properties": [
+                { "name": "obj", "$ref": "RecursiveObject2", "optional": true }
+            ]
+        },
+        {
+            "id": "RecursiveObject2",
+            "type": "object",
+            "properties": [
+                { "name": "obj", "$ref": "RecursiveObject1", "optional": true }
+            ]
+        }
+    ]
+}
+]
