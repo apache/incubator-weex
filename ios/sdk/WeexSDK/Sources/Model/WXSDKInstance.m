@@ -179,7 +179,7 @@ typedef enum : NSUInteger {
         id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
         if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
             WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
-            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n call WXSDKInstance * instance = [WXSDKInstance new]; instance.page = @\"your page name\" to fix it";
+            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n Using WXSDKInstance * instance = [WXSDKInstance new]; instance.pageName = @\"your page name\" to fix it";
             [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
         }
     }
