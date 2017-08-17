@@ -31,8 +31,9 @@ For example: If you want to implement an address jumping function, you can achie
 
 ```objective-c
 @implementation WXEventModule
+
 @synthesize weexInstance;
-    WX_EXPORT_METHOD(@selector(openURL:callback))
+WX_EXPORT_METHOD(@selector(openURL:callback:))
 
 - (void)openURL:(NSString *)url callback:(WXModuleCallback)callback
 {

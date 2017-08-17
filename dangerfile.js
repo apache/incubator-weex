@@ -236,6 +236,7 @@ const copyright_header_components = [
 //path prefix
 const ignoreCopyrightVerifyPath = [
   'test',
+  'packages',
   'pre-build',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
@@ -366,7 +367,7 @@ function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormal
           }
         })
       })
-    }) 
+    })
   } catch (error) {
     console.log(error)
   }
@@ -428,7 +429,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
   console.log('blame point:', reviewers)
   var names = Object.keys(reviewers)
   names.sort((name1, name2) => {
-    return reviewers[name1] > reviewers[name2] ? -1 : 1 
+    return reviewers[name1] > reviewers[name2] ? -1 : 1
   })
 
   var prUser = danger.github.pr.user.login

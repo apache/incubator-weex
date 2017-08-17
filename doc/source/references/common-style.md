@@ -203,6 +203,8 @@ Currently supported format:
 * scaleX( <number> )
 * scaleY( <number> )
 * rotate( <angle/degree> )
+* rotateX( <angle/degree> ) <span class="api-version">v0.14+</span>
+* rotateY( <angle/degree> ) <span class="api-version">v0.14+</span>
 * transform-origin: number/percentage/keyword(top/left/right/bottom)
 
 ### Example

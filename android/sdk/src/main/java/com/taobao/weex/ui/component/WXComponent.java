@@ -31,6 +31,7 @@ import android.os.Build;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -39,6 +40,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.ComponentObserver;
@@ -57,6 +59,8 @@ import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
@@ -72,6 +76,11 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,6 +131,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
+
+  public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
@@ -286,6 +297,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void applyLayoutAndEvent(WXComponent component) {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -293,8 +305,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       setLayout(component.getDomObject());
       setPadding(component.getDomObject().getPadding(), component.getDomObject().getBorder());
       addEvents();
-
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   protected final void addFocusChangeListener(OnFocusChangeListener l){
@@ -348,6 +360,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void bindData(WXComponent component){
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -357,6 +370,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       updateAttrs(component);
       updateExtra(component.getDomObject().getExtra());
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   public void updateStyle(WXComponent component){
@@ -888,9 +902,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    *
    */
   public final void createView() {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       createViewImpl();
     }
+    mTraceInfo.uiThreadStart = System.currentTimeMillis();
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   protected void createViewImpl() {
@@ -1536,5 +1553,51 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     message.obj = task;
     message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
     WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+  }
+
+  public static final int STATE_DOM_FINISH = 0;
+  public static final int STATE_UI_FINISH = 1;
+  public static final int STATE_ALL_FINISH = 2;
+  @IntDef({STATE_DOM_FINISH, STATE_UI_FINISH, STATE_ALL_FINISH})
+  @Retention(RetentionPolicy.SOURCE)
+  @Target(ElementType.PARAMETER)
+  public @interface RenderState {}
+
+  @CallSuper
+  public void onRenderFinish(@RenderState int state) {
+    if (WXTracing.isAvailable()) {
+      double domTime = Stopwatch.nanosToMillis(((WXDomObject) mDomObj).mDomThreadNanos + mTraceInfo.domThreadNanos);
+      double uiTime = Stopwatch.nanosToMillis(mTraceInfo.uiThreadNanos);
+      if (state == STATE_ALL_FINISH || state == STATE_DOM_FINISH) {
+        WXTracing.TraceEvent domEvent = WXTracing.newEvent("DomExecute", getInstanceId(), mTraceInfo.rootEventId);
+        domEvent.ph = "X";
+        domEvent.duration = domTime;
+        domEvent.ts = mTraceInfo.domThreadStart;
+        domEvent.tname = "DOMThread";
+        domEvent.name = getDomObject().getType();
+        domEvent.classname = getClass().getSimpleName();
+        if (getParent() != null) {
+          domEvent.parentRef = getParent().getRef();
+        }
+        domEvent.submit();
+      }
+
+      if (state == STATE_ALL_FINISH || state == STATE_UI_FINISH) {
+        if (mTraceInfo.uiThreadStart != -1) {
+          WXTracing.TraceEvent uiEvent = WXTracing.newEvent("UIExecute", getInstanceId(), mTraceInfo.rootEventId);
+          uiEvent.ph = "X";
+          uiEvent.duration = uiTime;
+          uiEvent.ts = mTraceInfo.uiThreadStart;
+          uiEvent.name = getDomObject().getType();
+          uiEvent.classname = getClass().getSimpleName();
+          if (getParent() != null) {
+            uiEvent.parentRef = getParent().getRef();
+          }
+          uiEvent.submit();
+        } else {
+          WXLogUtils.w("onRenderFinish", "createView() not called");
+        }
+      }
+    }
   }
 }

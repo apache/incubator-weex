@@ -27,17 +27,10 @@ export function init (cfg) {
   config.sendTasks = cfg.sendTasks
 }
 
-export function registerComponents (components) {}
-
-export function registerModules (modules) {}
-
-export function registerMethods (apis) {}
-
-export function prepareInstance (id, options, data) {}
-
-export function createInstance (id, code, options, data, serviceObjects) {
+export function createInstance (id, code, options = {}, data = {}, serviceObjects = {}) {
   const document = new config.Document(id, options.bundleUrl)
   const callbacks = {}
+  const instance = { id, data, document, callbacks }
 
   let lastCallbackId = 0
   document.addCallback = func => {
@@ -52,14 +45,15 @@ export function createInstance (id, code, options, data, serviceObjects) {
     }
     return callback(data)
   }
-  instanceMap[id] = document
+  instanceMap[id] = instance
 
   const globalObjects = Object.assign({
     Document: config.Document,
     Element: config.Element,
     Comment: config.Comment,
-    sendTasks: config.sendTasks,
-    id, options, data, document
+    sendTasks: tasks => config.sendTasks(id, tasks, -1),
+    options,
+    document
   }, serviceObjects)
 
   const globalKeys = []
@@ -73,34 +67,34 @@ export function createInstance (id, code, options, data, serviceObjects) {
   const result = new Function(...globalKeys)
   result(...globalValues)
 
-  return { document }
-}
+  config.sendTasks(id, [{ module: 'dom', method: 'createFinish', args: [] }], -1)
 
-export function refreshInstance (id, data) {}
+  return instance
+}
 
 export function destroyInstance (id) {
   delete instanceMap[id]
 }
 
 export function getRoot (id) {
-  return instanceMap[id].body.toJSON()
+  return instanceMap[id].document.body.toJSON()
 }
 
 export function receiveTasks (id, tasks) {
   const jsHandlers = {
     fireEvent: (id, ref, type, data, domChanges) => {
-      const document = instanceMap[id]
+      const { document } = instanceMap[id]
       const el = document.getRef(ref)
       return document.fireEvent(el, type, data, domChanges)
     },
 
     callback: (id, funcId, data, ifLast) => {
-      const document = instanceMap[id]
+      const { document } = instanceMap[id]
       return document.handleCallback(funcId, data, ifLast)
     }
   }
 
-  const document = instanceMap[id]
+  const { document } = instanceMap[id] || {}
   if (document && Array.isArray(tasks)) {
     const results = []
     tasks.forEach((task) => {

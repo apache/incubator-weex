@@ -28,7 +28,7 @@ import {
   removeTarget
 } from '../../../../frameworks/legacy/vm/dom-helper'
 import { Document } from '../../../../runtime/vdom'
-import Listener from '../../../../runtime/listener'
+import Listener from '../../../../runtime/bridge/Listener'
 
 describe('help create body', () => {
   let vm
