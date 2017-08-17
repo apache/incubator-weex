@@ -175,12 +175,16 @@ typedef enum : NSUInteger {
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
     } else {
-        WXLogWarning(@"WXSDKInstance's pageName should be specified.");
-        id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
-        if ([jsExceptionHandler respondsToSelector:@selector(onRuntimeCheckException:)]) {
-            WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
-            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n Using WXSDKInstance * instance = [WXSDKInstance new]; instance.pageName = @\"your page name\" to fix it";
-            [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
+        if (self.viewController) {
+            self.pageName = NSStringFromClass([self.viewController class]);
+        } else {
+            WXLogWarning(@"WXSDKInstance's pageName should be specified.");
+            id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
+            if ([jsExceptionHandler respondsToSelector:@selector(onRuntimeCheckException:)]) {
+                WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
+                runtimeCheckException.exception = @"We highly recommend you to set pageName.\n Using WXSDKInstance * instance = [WXSDKInstance new]; instance.pageName = @\"your page name\" to fix it";
+                [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
+            }
         }
     }
     
