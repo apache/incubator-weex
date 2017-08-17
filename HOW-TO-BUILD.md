@@ -75,6 +75,6 @@ You can now import the aar file to your android project.
 
 ## Build iOS SDK 
 Execute command below to compile iOS SDK:   
-> `$ xcodebuild -project ios_sdk/WeexSDK.xcodeproj -target WeexSDK_MTL`
+> `$ xcodebuild -project ios/sdk/WeexSDK.xcodeproj -target WeexSDK_MTL`
 
-Then you'll found iOS library(Framework file) under `ios_sdk/Products`.
+Then you'll found iOS library(Framework file) under `ios/sdk/Products`.
