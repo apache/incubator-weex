@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { isArray, createEvent, extend } from '../utils'
+import { isArray, createEvent, createBubblesEvent } from '../utils'
 import config from '../config'
 
 // The space used to store the tap event queue
@@ -61,25 +61,6 @@ const supportedEvents = [
   'touchstart', 'touchmove', 'touchend',
   'panstart', 'panmove', 'panend', 'swipe', 'longpress'
 ]
-
-/**
- * Create Bubbles Event.
- * @param {DOMString} type
- * @param {Object} props
- */
-export function createBubblesEvent (target, type, props) {
-  const event = new Event(type, { bubbles: true })
-  try {
-    Object.defineProperty(event, 'target', {
-      enumerable: true,
-      value: target || null
-    })
-  }
-  catch (err) {
-    return extend({}, event, { target: target || null })
-  }
-  return event
-}
 
 /**
  * emit native events to enable v-on.
