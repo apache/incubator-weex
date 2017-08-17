@@ -71,11 +71,23 @@ if (unFlowedFiles.length > 0) {
 
 // Error or Warn when delete public interface
 var isNotDanger = false;
-for (let c of danger.git.commits) {
-  // console.log("msg:" + c.message);
-  if (c.message && c.message.match(/@notdanger/i)) {
-    isNotDanger = true;
-    break;
+console.log('pr_title:'+danger.github.pr_title)
+if(!isNotDanger && danger.github.pr_title 
+  && danger.github.pr_title.match(/@notdanger/i)){
+  isNotDanger = true;
+}
+console.log('pr_body:'+danger.github.pr_body)
+if(!isNotDanger && danger.github.pr_body 
+  && danger.github.pr_body.match(/@notdanger/i)){
+  isNotDanger = true;
+}
+if(!isNotDanger){
+  for (let c of danger.git.commits) {
+    // console.log("msg:" + c.message);
+    if (c.message && c.message.match(/@notdanger/i)) {
+      isNotDanger = true;
+      break;
+    }
   }
 }
 
