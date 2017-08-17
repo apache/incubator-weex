@@ -85,10 +85,7 @@
     flex: 1;
     text-align: center;
   }
-
-  .div {
-  }
-
+  
   .fixed {
     position: fixed;
     bottom: 50px;
