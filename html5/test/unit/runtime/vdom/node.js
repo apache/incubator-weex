@@ -16,21 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Document, Element, Comment } from './vdom'
-import Listener from './listener'
-import { TaskCenter } from './task-center'
+import chai from 'chai'
+const { expect } = chai
 
-const config = {
-  Document, Element, Comment, Listener,
-  TaskCenter,
-  sendTasks (...args) {
-    if (typeof callNative === 'function') {
-      return callNative(...args)
-    }
-    return (global.callNative || (() => {}))(...args)
-  }
-}
+import {
+  Node
+} from '../../../../runtime/vdom'
 
-Document.handler = config.sendTasks
-
-export default config
+describe('Node', () => {
+  it('create node', () => {
+    const node = new Node()
+    expect(node).is.an.object
+    expect(node.nodeId).to.be.a('string')
+    expect(node.ref).eql(node.nodeId)
+    expect(node.children).eql([])
+    expect(node.pureChildren).eql([])
+    expect(node.parentNode).to.be.null
+    expect(node.nextSibling).to.be.null
+    expect(node.previousSibling).to.be.null
+    node.destroy()
+  })
+})

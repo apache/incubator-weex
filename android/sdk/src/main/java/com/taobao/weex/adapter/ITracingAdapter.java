@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,34 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.adapter;
+
+import com.taobao.weex.tracing.WXTracing;
 
 /**
- * @fileOverview
- * Virtual-DOM Node. It's the supper class of Element and Comment.
+ * Created by moxun on 2017/7/6.
  */
 
-import { getDoc, uniqueId } from './operation'
-
-export default function Node () {
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.children = []
-  this.pureChildren = []
-  this.parentNode = null
-  this.nextSibling = null
-  this.previousSibling = null
-}
-
-/**
- * Destroy current node, and remove itself form nodeMap.
- */
-Node.prototype.destroy = function () {
-  const doc = getDoc(this.docId)
-  if (doc) {
-    delete this.docId
-    delete doc.nodeMap[this.nodeId]
-  }
-  this.children.forEach(child => {
-    child.destroy()
-  })
+public interface ITracingAdapter {
+  void enable();
+  void disable();
+  void submitTracingEvent(WXTracing.TraceEvent event);
 }

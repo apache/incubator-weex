@@ -28,7 +28,7 @@ export function setElement (El) {
  * A map which stores all type of elements.
  * @type {Object}
  */
-export const elementTypes = {}
+const registeredElements = {}
 
 /**
  * Register an extended element type with component methods.
@@ -42,22 +42,11 @@ export function registerElement (type, methods) {
   }
 
   // Init constructor.
-  const XElement = function (props) {
-    Element.call(this, type, props, true)
-  }
-
-  // Init prototype.
-  XElement.prototype = Object.create(Element.prototype)
-  Object.defineProperty(XElement.prototype, 'constructor', {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: Element
-  })
+  class WeexElement extends Element {}
 
   // Add methods to prototype.
   methods.forEach(methodName => {
-    XElement.prototype[methodName] = function (...args) {
+    WeexElement.prototype[methodName] = function (...args) {
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
         return taskCenter.send('component', {
@@ -70,14 +59,26 @@ export function registerElement (type, methods) {
   })
 
   // Add to element type map.
-  elementTypes[type] = XElement
+  registeredElements[type] = WeexElement
+}
+
+export function unregisterElement (type) {
+  delete registeredElements[type]
+}
+
+export function getWeexElement (type) {
+  return registeredElements[type]
+}
+
+export function isWeexElement (type) {
+  return !!registeredElements[type]
 }
 
 /**
  * Clear all element types. Only for testing.
  */
-export function clearElementTypes () {
-  for (const type in elementTypes) {
-    delete elementTypes[type]
+export function clearWeexElements () {
+  for (const type in registeredElements) {
+    unregisterElement(type)
   }
 }

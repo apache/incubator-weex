@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import CallbackManager from './callback-manager'
-import Element from './vdom/element'
-import { typof, normalizePrimitive } from './normalize'
+
+import CallbackManager from './CallbackManager'
+import Element from '../vdom/Element'
+import { typof } from '../utils'
+import { normalizePrimitive } from './normalize'
 
 let fallback = function () {}
 
@@ -52,7 +54,6 @@ export class TaskCenter {
    */
   normalize (v) {
     const type = typof(v)
-
     if (v && v instanceof Element) {
       return v.ref
     }
@@ -62,7 +63,6 @@ export class TaskCenter {
     if (type === 'Function') {
       return this.callbackManager.add(v).toString()
     }
-
     return normalizePrimitive(v)
   }
 

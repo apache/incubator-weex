@@ -17,31 +17,31 @@
  * under the License.
  */
 
-/**
- * @fileOverview
- * Virtual-DOM Comment.
- */
+import { uniqueId } from '../utils'
+import { getDoc } from './operation'
 
-import Node from './node'
-import { uniqueId } from './operation'
+export default class Node {
+  constructor () {
+    this.nodeId = uniqueId()
+    this.ref = this.nodeId
+    this.children = []
+    this.pureChildren = []
+    this.parentNode = null
+    this.nextSibling = null
+    this.previousSibling = null
+  }
 
-export default function Comment (value) {
-  this.nodeType = 8
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.type = 'comment'
-  this.value = value
-  this.children = []
-  this.pureChildren = []
-}
-
-Comment.prototype = Object.create(Node.prototype)
-Comment.prototype.constructor = Comment
-
-/**
- * Convert to HTML comment string.
- * @return {stirng} html
- */
-Comment.prototype.toString = function () {
-  return '<!-- ' + this.value + ' -->'
+  /**
+  * Destroy current node, and remove itself form nodeMap.
+  */
+  destroy () {
+    const doc = getDoc(this.docId)
+    if (doc) {
+      delete this.docId
+      delete doc.nodeMap[this.nodeId]
+    }
+    this.children.forEach(child => {
+      child.destroy()
+    })
+  }
 }

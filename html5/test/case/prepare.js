@@ -28,8 +28,8 @@ import {
 // load env
 import shared from '../../shared'
 import { Document, Element, Comment } from '../../runtime/vdom'
-import Listener from '../../runtime/listener'
-import { TaskCenter, init } from '../../runtime/task-center'
+import Listener from '../../runtime/bridge/Listener'
+import { TaskCenter, init } from '../../runtime/bridge/TaskCenter'
 
 // load framework
 import * as defaultFramework from '../../frameworks/legacy'
