@@ -22,13 +22,13 @@
 #include <string>
 #include <unistd.h>
 
-extern  jclass jBridgeClazz;
-extern  jclass jWXJSObject;
-extern  jclass jWXLogUtils;
-extern  jmethodID jDoubleValueMethodId;
-extern  jobject jThis;
+extern jclass jBridgeClazz;
+extern jclass jWXJSObject;
+extern jclass jWXLogUtils;
+extern jmethodID jDoubleValueMethodId;
+extern jobject jThis;
 
-extern JNIEnv* getJNIEnv();
+extern JNIEnv *getJNIEnv();
 
 
 #endif //_WEEX_CORE_H_

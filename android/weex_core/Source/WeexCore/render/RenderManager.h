@@ -8,43 +8,38 @@
 #include "../../rapidjson/weexjsontools.h"
 
 
-namespace WeexCore
-{
+namespace WeexCore {
 
-class RenderManager
-{
+class RenderManager {
 
-  private:
+private:
     RenderManager();
+
     ~RenderManager();
 
     static RenderManager *m_pInstance;
 
     //just to release singleton object
-    class Garbo
-    {
-      public:
-        ~Garbo()
-        {
-            if (RenderManager::m_pInstance)
-            {
-                delete RenderManager::m_pInstance;
-            }
+    class Garbo {
+    public:
+        ~Garbo() {
+          if (RenderManager::m_pInstance) {
+            delete RenderManager::m_pInstance;
+          }
         }
     };
+
     static Garbo garbo;
 
     // save all pages info with RenderPage;
     HashMap<String, RenderPage *> *mPages = nullptr;
 
-  public:
-    static RenderManager *getInstance()
-    {
-        if (m_pInstance == NULL)
-        {
-            m_pInstance = new RenderManager();
-        }
-        return m_pInstance;
+public:
+    static RenderManager *getInstance() {
+      if (m_pInstance == NULL) {
+        m_pInstance = new RenderManager();
+      }
+      return m_pInstance;
     }
 
     //TODO: how to triggle a Frame event

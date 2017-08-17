@@ -13,28 +13,41 @@
 #include <sys/types.h>
 #include <sys/ucontext.h>
 #include <unistd.h>
+
 #if defined(__arm__)
 #include "Backtrace.h"
 #else
+
 #include <unwind.h>
+
 #endif
 
 namespace crash_handler {
 class CrashHandlerInfo {
 public:
     ~CrashHandlerInfo();
-    bool initializeCrashHandler(const char* base);
-    void handleSignal(int signum, siginfo_t* siginfo, void* ucontext);
-    bool printIP(void* addr);
+
+    bool initializeCrashHandler(const char *base);
+
+    void handleSignal(int signum, siginfo_t *siginfo, void *ucontext);
+
+    bool printIP(void *addr);
 
 private:
     void printContext();
+
     void printMaps();
-    void printRegContent(void* addr, const char* name);
+
+    void printRegContent(void *addr, const char *name);
+
     void printUnwind();
-    bool ensureDirectory(const char* base);
-    void printf(const char* fmt, ...);
+
+    bool ensureDirectory(const char *base);
+
+    void printf(const char *fmt, ...);
+
     void saveFileContent();
+
     int m_logfile = -1;
     int m_mapsfile = -1;
     struct sigaction m_sigaction[16];
@@ -47,100 +60,95 @@ private:
     mcontext_t m_mcontext;
     struct SignalInfo {
         int signum;
-        const char* signame;
+        const char *signame;
     };
     static SignalInfo s_hookSignals[];
 };
 
-static std::unique_ptr<CrashHandlerInfo> cinfo;
+static std::unique_ptr <CrashHandlerInfo> cinfo;
 CrashHandlerInfo::SignalInfo CrashHandlerInfo::s_hookSignals[] = {
 #define DECLARE_SIGNAL(sig) { sig, #sig },
-DECLARE_SIGNAL(SIGFPE)
-DECLARE_SIGNAL(SIGBUS)
-DECLARE_SIGNAL(SIGSEGV)
-DECLARE_SIGNAL(SIGABRT)
-DECLARE_SIGNAL(SIGILL)
-{ 0, nullptr }
+        DECLARE_SIGNAL(SIGFPE)
+        DECLARE_SIGNAL(SIGBUS)
+        DECLARE_SIGNAL(SIGSEGV)
+        DECLARE_SIGNAL(SIGABRT)
+        DECLARE_SIGNAL(SIGILL)
+        {0, nullptr}
 };
 
-CrashHandlerInfo::~CrashHandlerInfo()
-{
-    if (m_logfile != -1)
-        close(m_logfile);
-    if (m_mapsfile != -1)
-        close(m_mapsfile);
+CrashHandlerInfo::~CrashHandlerInfo() {
+  if (m_logfile != -1)
+    close(m_logfile);
+  if (m_mapsfile != -1)
+    close(m_mapsfile);
 }
 
-static void crashSigAction(int num, siginfo_t* info, void* ucontext)
-{
-    if (cinfo) {
-        cinfo->handleSignal(num, info, ucontext);
-    }
+static void crashSigAction(int num, siginfo_t *info, void *ucontext) {
+  if (cinfo) {
+    cinfo->handleSignal(num, info, ucontext);
+  }
 }
 
-bool CrashHandlerInfo::initializeCrashHandler(const char* base)
-{
-    if (!ensureDirectory(base))
-        return false;
-    m_crashFilePath = base;
+bool CrashHandlerInfo::initializeCrashHandler(const char *base) {
+  if (!ensureDirectory(base))
+    return false;
+  m_crashFilePath = base;
 
-    m_crashFilePath += "/jsserver_crash_info.log";
-    m_logfile = ::open(m_crashFilePath.c_str(), O_TRUNC | O_CREAT | O_WRONLY, 0666);
-    if (-1 == m_logfile)
-        return false;
-    m_mapsfile = ::open("/proc/self/maps", O_RDONLY);
-    if (-1 == m_mapsfile)
-        return false;
-    for (int i = 0; s_hookSignals[i].signum; ++i) {
-        struct sigaction mysigaction = { 0 };
-        mysigaction.sa_sigaction = crashSigAction;
-        mysigaction.sa_flags = SA_SIGINFO;
-        if (-1 == sigaction(s_hookSignals[i].signum, &mysigaction, &m_sigaction[i]))
-            return false;
-    }
-    return true;
+  m_crashFilePath += "/jsserver_crash_info.log";
+  m_logfile = ::open(m_crashFilePath.c_str(), O_TRUNC | O_CREAT | O_WRONLY, 0666);
+  if (-1 == m_logfile)
+    return false;
+  m_mapsfile = ::open("/proc/self/maps", O_RDONLY);
+  if (-1 == m_mapsfile)
+    return false;
+  for (int i = 0; s_hookSignals[i].signum; ++i) {
+    struct sigaction mysigaction = {0};
+    mysigaction.sa_sigaction = crashSigAction;
+    mysigaction.sa_flags = SA_SIGINFO;
+    if (-1 == sigaction(s_hookSignals[i].signum, &mysigaction, &m_sigaction[i]))
+      return false;
+  }
+  return true;
 }
 
-void CrashHandlerInfo::handleSignal(int signum, siginfo_t* siginfo, void* ucontext)
-{
-    const char* signalName = nullptr;
-    for (int i = 0; s_hookSignals[i].signum; ++i) {
-        if (s_hookSignals[i].signum == signum) {
-            signalName = s_hookSignals[i].signame;
-        }
+void CrashHandlerInfo::handleSignal(int signum, siginfo_t *siginfo, void *ucontext) {
+  const char *signalName = nullptr;
+  for (int i = 0; s_hookSignals[i].signum; ++i) {
+    if (s_hookSignals[i].signum == signum) {
+      signalName = s_hookSignals[i].signame;
     }
-    if (!signalName)
-        signalName = "unknown signal";
-    printf("SIG: %s (%d), fault addr: %p\n", signalName, signum, siginfo->si_addr);
-    if (siginfo->si_code == SI_USER) {
-        printf("Killed by pid: %d, uid: %d\n", siginfo->si_pid, siginfo->si_uid);
-    }
-    m_mcontext = static_cast<ucontext_t*>(ucontext)->uc_mcontext;
-    printMaps();
-    printUnwind();
-    printContext();
-    saveFileContent();
-    _exit(0);
+  }
+  if (!signalName)
+    signalName = "unknown signal";
+  printf("SIG: %s (%d), fault addr: %p\n", signalName, signum, siginfo->si_addr);
+  if (siginfo->si_code == SI_USER) {
+    printf("Killed by pid: %d, uid: %d\n", siginfo->si_pid, siginfo->si_uid);
+  }
+  m_mcontext = static_cast<ucontext_t *>(ucontext)->uc_mcontext;
+  printMaps();
+  printUnwind();
+  printContext();
+  saveFileContent();
+  _exit(0);
 }
 
-void CrashHandlerInfo::printMaps()
-{
-    printf("\nmaps:\n");
-    static const size_t BUF_SIZE = 1024;
-    std::unique_ptr<char[]> buf(new char[BUF_SIZE]);
-    const char* line;
-    while (true) {
-        ssize_t byteRead = ::read(m_mapsfile, buf.get(), BUF_SIZE);
-        // check error.
-        if (byteRead == -1 && errno != EINTR)
-            return;
-        // check eof.
-        if (byteRead == 0)
-            return;
-        size_t fileContentOldSize = m_fileContent.size();
-        m_fileContent.resize(fileContentOldSize + byteRead);
-        memcpy(const_cast<char*>(m_fileContent.data()) + fileContentOldSize, buf.get(), byteRead);
-    }
+void CrashHandlerInfo::printMaps() {
+  printf("\nmaps:\n");
+  static const size_t BUF_SIZE = 1024;
+  std::unique_ptr<char[]> buf(new char[BUF_SIZE]);
+  const char *line;
+  while (true) {
+    ssize_t byteRead = ::read(m_mapsfile, buf.get(), BUF_SIZE);
+    // check error.
+    if (byteRead == -1 && errno != EINTR)
+      return;
+    // check eof.
+    if (byteRead == 0)
+      return;
+    size_t fileContentOldSize = m_fileContent.size();
+    m_fileContent.resize(fileContentOldSize + byteRead);
+    memcpy(const_cast<char *>(m_fileContent.data()) + fileContentOldSize, buf.get(), byteRead);
+  }
 }
 
 #if defined(__arm__)
@@ -233,37 +241,36 @@ void CrashHandlerInfo::printContext()
 #error unsupported arch
 #endif
 
-void CrashHandlerInfo::printRegContent(void* addr, const char* name)
-{
+void CrashHandlerInfo::printRegContent(void *addr, const char *name) {
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
 #endif
 #define PAGE_START(addr) reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(addr) & ~(PAGE_SIZE - 1))
 #define IS_PAGE_START(addr) !(reinterpret_cast<uintptr_t>(addr) & (PAGE_SIZE - 1))
-    void* printStart = reinterpret_cast<void*>((reinterpret_cast<uintptr_t>(addr) - 0x20) & ~7);
-    unsigned char vec;
-    bool printZero = false;
-    if (!IS_PAGE_START(printStart))
-        printZero = mincore(PAGE_START(printStart), PAGE_SIZE, &vec);
-    printf("\n%s:\n", name);
-    for (int i = 0; i < 4 * 40; ++i) {
-        if (!(i & 3)) {
-            printf("%08lx: ", reinterpret_cast<unsigned long>(printStart));
-        }
-        if (IS_PAGE_START(printStart)) {
-            printZero = mincore(printStart, PAGE_SIZE, &vec);
-        }
-        if (printZero)
-            printf("%08lx", 0L);
-        else
-            printf("%08lx", *reinterpret_cast<unsigned long*>(printStart));
-        if ((i & 3) == 3)
-            printf("\n");
-        else
-            printf(" ");
-        printStart = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(printStart) + sizeof(void*));
+  void *printStart = reinterpret_cast<void *>((reinterpret_cast<uintptr_t>(addr) - 0x20) & ~7);
+  unsigned char vec;
+  bool printZero = false;
+  if (!IS_PAGE_START(printStart))
+    printZero = mincore(PAGE_START(printStart), PAGE_SIZE, &vec);
+  printf("\n%s:\n", name);
+  for (int i = 0; i < 4 * 40; ++i) {
+    if (!(i & 3)) {
+      printf("%08lx: ", reinterpret_cast<unsigned long>(printStart));
     }
-    printf("\n");
+    if (IS_PAGE_START(printStart)) {
+      printZero = mincore(printStart, PAGE_SIZE, &vec);
+    }
+    if (printZero)
+      printf("%08lx", 0L);
+    else
+      printf("%08lx", *reinterpret_cast<unsigned long *>(printStart));
+    if ((i & 3) == 3)
+      printf("\n");
+    else
+      printf(" ");
+    printStart = reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(printStart) + sizeof(void *));
+  }
+  printf("\n");
 }
 
 #if defined(__arm__)
@@ -274,99 +281,94 @@ static int traceFunction(uintptr_t ip, void* arg)
     return BACKTRACE_ABORT;
 }
 #else
-static _Unwind_Reason_Code traceFunction(_Unwind_Context* context, void* arg)
-{
-    void* ip = (void*)_Unwind_GetIP(context);
-    if (cinfo->printIP(ip))
-        return _URC_NO_REASON;
-    return _URC_NORMAL_STOP;
+
+static _Unwind_Reason_Code traceFunction(_Unwind_Context *context, void *arg) {
+  void *ip = (void *) _Unwind_GetIP(context);
+  if (cinfo->printIP(ip))
+    return _URC_NO_REASON;
+  return _URC_NORMAL_STOP;
 }
+
 #endif
 
-void CrashHandlerInfo::printUnwind()
-{
-    printf("\nbacktrace:\n");
+void CrashHandlerInfo::printUnwind() {
+  printf("\nbacktrace:\n");
 #if defined(__arm__)
-    printIP(reinterpret_cast<void*>(m_mcontext.arm_pc));
-    mybacktrace(traceFunction, nullptr, &m_mcontext);
+  printIP(reinterpret_cast<void*>(m_mcontext.arm_pc));
+  mybacktrace(traceFunction, nullptr, &m_mcontext);
 #else
-    _Unwind_Backtrace(traceFunction, nullptr);
+  _Unwind_Backtrace(traceFunction, nullptr);
 #endif
-    printf("\n");
+  printf("\n");
 }
 
-bool CrashHandlerInfo::printIP(void* ip)
-{
-    Dl_info info;
-    if (dladdr(ip, &info)) {
-        printf("%s + %08lx\n", info.dli_fname,
-            reinterpret_cast<unsigned long>(ip) - reinterpret_cast<unsigned long>(info.dli_fbase));
-    } else {
-        printf("unknown dso: %p\n", ip);
-    }
-    if (m_unwinded > maxUnwindCount)
-        return false;
-    return true;
-}
-
-bool CrashHandlerInfo::ensureDirectory(const char* base)
-{
-    int ret;
-    struct stat mystat;
-
-    ret = stat(base, &mystat);
-    if (ret == -1) {
-        int myerrno = errno;
-        if (myerrno == ENOENT) {
-            ret = mkdir(base, 0755);
-            if (ret == -1)
-                return false;
-            return true;
-        } else {
-            return false;
-        }
-    }
-    return true;
-}
-
-void CrashHandlerInfo::printf(const char* fmt, ...)
-{
-    va_list arg_list;
-    int size;
-    va_start(arg_list, fmt);
-    size = vsnprintf(nullptr, 0, fmt, arg_list);
-    va_end(arg_list);
-    if (size > 0) {
-        size_t oldSize = m_fileContent.size();
-        m_fileContent.reserve(oldSize + size + 1);
-        m_fileContent.resize(oldSize + size);
-        va_start(arg_list, fmt);
-        vsnprintf(const_cast<char*>(m_fileContent.data()) + oldSize, size + 1, fmt, arg_list);
-        va_end(arg_list);
-    }
-}
-
-void CrashHandlerInfo::saveFileContent()
-{
-    const char* str = m_fileContent.data();
-    size_t size = m_fileContent.size();
-    while (size) {
-        ssize_t byteWritten = write(m_logfile, str, size);
-        if (byteWritten == -1 && errno != EINTR)
-            return;
-        str += byteWritten;
-        size -= byteWritten;
-    }
-}
-
-bool initializeCrashHandler(const char* base)
-{
-    std::unique_ptr<CrashHandlerInfo> cinfoTmp;
-    cinfoTmp.reset(new CrashHandlerInfo);
-    if (cinfoTmp->initializeCrashHandler(base)) {
-        cinfo = std::move(cinfoTmp);
-        return true;
-    }
+bool CrashHandlerInfo::printIP(void *ip) {
+  Dl_info info;
+  if (dladdr(ip, &info)) {
+    printf("%s + %08lx\n", info.dli_fname,
+           reinterpret_cast<unsigned long>(ip) - reinterpret_cast<unsigned long>(info.dli_fbase));
+  } else {
+    printf("unknown dso: %p\n", ip);
+  }
+  if (m_unwinded > maxUnwindCount)
     return false;
+  return true;
+}
+
+bool CrashHandlerInfo::ensureDirectory(const char *base) {
+  int ret;
+  struct stat mystat;
+
+  ret = stat(base, &mystat);
+  if (ret == -1) {
+    int myerrno = errno;
+    if (myerrno == ENOENT) {
+      ret = mkdir(base, 0755);
+      if (ret == -1)
+        return false;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+void CrashHandlerInfo::printf(const char *fmt, ...) {
+  va_list arg_list;
+  int size;
+  va_start(arg_list, fmt);
+  size = vsnprintf(nullptr, 0, fmt, arg_list);
+  va_end(arg_list);
+  if (size > 0) {
+    size_t oldSize = m_fileContent.size();
+    m_fileContent.reserve(oldSize + size + 1);
+    m_fileContent.resize(oldSize + size);
+    va_start(arg_list, fmt);
+    vsnprintf(const_cast<char *>(m_fileContent.data()) + oldSize, size + 1, fmt, arg_list);
+    va_end(arg_list);
+  }
+}
+
+void CrashHandlerInfo::saveFileContent() {
+  const char *str = m_fileContent.data();
+  size_t size = m_fileContent.size();
+  while (size) {
+    ssize_t byteWritten = write(m_logfile, str, size);
+    if (byteWritten == -1 && errno != EINTR)
+      return;
+    str += byteWritten;
+    size -= byteWritten;
+  }
+}
+
+bool initializeCrashHandler(const char *base) {
+  std::unique_ptr <CrashHandlerInfo> cinfoTmp;
+  cinfoTmp.reset(new CrashHandlerInfo);
+  if (cinfoTmp->initializeCrashHandler(base)) {
+    cinfo = std::move(cinfoTmp);
+    return true;
+  }
+  return false;
 }
 }

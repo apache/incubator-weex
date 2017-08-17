@@ -14,78 +14,77 @@
 
 using namespace WTF;
 
-namespace WeexCore
-{
+namespace WeexCore {
 class RenderPage;
 
-class RenderObject
-{
+class RenderObject {
 public:
-  typedef Vector<RenderObject *> ChildrenList;
+    typedef Vector<RenderObject *> ChildrenList;
 
 private:
-  String mRef = "";
+    String mRef = "";
 
-  String mType = "";
+    String mType = "";
 
-  RenderPage *mPage;
+    RenderPage *mPage;
 
-  RenderObject *mParentRender;
+    RenderObject *mParentRender;
 
-  HashMap<String, String> *mStyle;
+    HashMap <String, String> *mStyle;
 
-  HashMap<String, String> *mAtrributes;
+    HashMap <String, String> *mAtrributes;
 
-  HashSet<String> *mEvents;
+    HashSet <String> *mEvents;
 
-  ChildrenList mChildren;
+    ChildrenList mChildren;
 
-  YGNodeRef mYGNode;
+    YGNodeRef mYGNode;
 
-  int mLeft, mTop, mWidth, mHeight;
+    int mLeft, mTop, mWidth, mHeight;
 
 public:
-  RenderObject(RenderPage *page);
-  ~RenderObject();
+    RenderObject(RenderPage *page);
 
-  void addRenderObject(int index, RenderObject *child);
+    ~RenderObject();
 
-  void removeRenderObject(RenderObject* child);
+    void addRenderObject(int index, RenderObject *child);
 
-  void updateAttr(String key, String value);
+    void removeRenderObject(RenderObject *child);
 
-  void updateStyle(String key, String value);
+    void updateAttr(String key, String value);
 
-  void addEvent(String event);
+    void updateStyle(String key, String value);
 
-  void removeEvent(String event);
+    void addEvent(String event);
 
-  RenderObject *getChild(int index);
+    void removeEvent(String event);
 
-  int getChildCount();
+    RenderObject *getChild(int index);
 
-  void setRef(String ref);
+    int getChildCount();
 
-  String getRef();
+    void setRef(String ref);
 
-  void setType(String type);
+    String getRef();
 
-  String getType();
+    void setType(String type);
 
-  YGNodeRef getYGNode();
+    String getType();
 
-  void applyStyleToYGNode(String key, String value);
+    YGNodeRef getYGNode();
 
-  void printRenderMsg();
+    void applyStyleToYGNode(String key, String value);
 
-  void printYGNodeMsg();
+    void printRenderMsg();
 
-  void setParentRender(RenderObject* render);
+    void printYGNodeMsg();
 
-  RenderObject* getParentRender();
+    void setParentRender(RenderObject *render);
+
+    RenderObject *getParentRender();
 
 private:
-  void setLayout(int, int, int, int);
+    void setLayout(int, int, int, int);
 };
 } //end WeexCore
 #endif //RenderObject_h

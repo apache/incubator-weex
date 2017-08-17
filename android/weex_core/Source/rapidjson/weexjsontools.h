@@ -124,7 +124,7 @@ protected:
  * @param page : {@link RenderPage*}
  * @return {@link RenderObject*}
  */
-RenderObject* json2RenderObject(char *data, RenderPage *page);
+RenderObject *json2RenderObject(char *data, RenderPage *page);
 
 void json2SingleKeyValue(char *data, String &key, String &value);
 

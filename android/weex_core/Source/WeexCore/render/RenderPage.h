@@ -12,43 +12,48 @@
 #include "action/RenderAction.h"
 
 using namespace WTF;
-namespace WeexCore
-{
+namespace WeexCore {
 
 class RenderObject;
+
 class RenderAction;
 
-class RenderPage
-{
+class RenderPage {
 
-  private:
+private:
     RenderObject *pRoot;
     int mPageId;
     Vector<RenderAction *> mRenderActions;
-    HashMap<String, RenderObject*> *mRenderObjectMap;
+    HashMap<String, RenderObject *> *mRenderObjectMap;
 
-  public:
+public:
     RenderPage(String pageID, String data);
+
     ~RenderPage();
 
     void addRenderObject(String parentRef, int insertPosiotn, String data);
+
     void removeRenderObject(String ref);
+
     void moveRenderObject(String ref, String parentRef, String index);
 
     void updateStyle(String ref, String key, String value);
+
     void updateAttr(String ref, String key, String value);
+
     void addEvent(String ref, String event);
+
     void removeEvent(String ref, String event);
 
     void addRenderAction(RenderAction *action);
 
     void batch();
 
-    RenderObject* getRenderObject(String ref);
+    RenderObject *getRenderObject(String ref);
 
     void setRootRenderObject(RenderObject *root);
 
-    RenderObject* getRootRenderObject();
+    RenderObject *getRootRenderObject();
 };
 }
 

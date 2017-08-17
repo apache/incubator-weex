@@ -40,90 +40,80 @@
 #include <string.h>
 #include <unistd.h>
 
-int sigemptyset(sigset_t* set)
-{
-    if (set == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-    memset(set, 0, sizeof(sigset_t));
-    return 0;
+int sigemptyset(sigset_t *set) {
+  if (set == NULL) {
+    errno = EINVAL;
+    return -1;
+  }
+  memset(set, 0, sizeof(sigset_t));
+  return 0;
 }
 
-int sigfillset(sigset_t* set)
-{
-    if (set == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-    memset(set, ~0, sizeof(sigset_t));
-    return 0;
+int sigfillset(sigset_t *set) {
+  if (set == NULL) {
+    errno = EINVAL;
+    return -1;
+  }
+  memset(set, ~0, sizeof(sigset_t));
+  return 0;
 }
 
-int sigaddset(sigset_t* set, int signum)
-{
-    int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
-    unsigned long* local_set = reinterpret_cast<unsigned long*>(set);
-    if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
-        errno = EINVAL;
-        return -1;
-    }
-    local_set[bit / LONG_BIT] |= 1UL << (bit % LONG_BIT);
-    return 0;
+int sigaddset(sigset_t *set, int signum) {
+  int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
+  unsigned long *local_set = reinterpret_cast<unsigned long *>(set);
+  if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
+    errno = EINVAL;
+    return -1;
+  }
+  local_set[bit / LONG_BIT] |= 1UL << (bit % LONG_BIT);
+  return 0;
 }
 
-int sigdelset(sigset_t* set, int signum)
-{
-    int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
-    unsigned long* local_set = reinterpret_cast<unsigned long*>(set);
-    if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
-        errno = EINVAL;
-        return -1;
-    }
-    local_set[bit / LONG_BIT] &= ~(1UL << (bit % LONG_BIT));
-    return 0;
+int sigdelset(sigset_t *set, int signum) {
+  int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
+  unsigned long *local_set = reinterpret_cast<unsigned long *>(set);
+  if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
+    errno = EINVAL;
+    return -1;
+  }
+  local_set[bit / LONG_BIT] &= ~(1UL << (bit % LONG_BIT));
+  return 0;
 }
 
-int getpagesize()
-{
-    // We dont use sysconf(3) here because that drags in stdio, which makes static binaries fat.
-    return PAGE_SIZE;
+int getpagesize() {
+  // We dont use sysconf(3) here because that drags in stdio, which makes static binaries fat.
+  return PAGE_SIZE;
 }
 
 void srandom(unsigned int __s) { srand48(__s); }
 
-int isinf(double n)
-{
-    return __builtin_isinf(n);
+int isinf(double n) {
+  return __builtin_isinf(n);
 }
 
-int posix_memalign(void** memptr, size_t alignment, size_t bytes)
-{
-    if (!memptr)
-        return EINVAL;
-    *memptr = memalign(alignment, bytes);
-    if (!*memptr)
-        return ENOMEM;
-    return 0;
+int posix_memalign(void **memptr, size_t alignment, size_t bytes) {
+  if (!memptr)
+    return EINVAL;
+  *memptr = memalign(alignment, bytes);
+  if (!*memptr)
+    return ENOMEM;
+  return 0;
 }
 
-int sigismember(const sigset_t* set, int signum)
-{
-    int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
-    const unsigned long* local_set = reinterpret_cast<const unsigned long*>(set);
-    if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
-        errno = EINVAL;
-        return -1;
-    }
-    return static_cast<int>((local_set[bit / LONG_BIT] >> (bit % LONG_BIT)) & 1);
+int sigismember(const sigset_t *set, int signum) {
+  int bit = signum - 1; // Signal numbers start at 1, but bit positions start at 0.
+  const unsigned long *local_set = reinterpret_cast<const unsigned long *>(set);
+  if (set == NULL || bit < 0 || bit >= static_cast<int>(8 * sizeof(sigset_t))) {
+    errno = EINVAL;
+    return -1;
+  }
+  return static_cast<int>((local_set[bit / LONG_BIT] >> (bit % LONG_BIT)) & 1);
 }
 
-int abs(int j)
-{
-	return(j < 0 ? -j : j);
+int abs(int j) {
+  return (j < 0 ? -j : j);
 }
 
-long labs(long j)
-{
-	return(j < 0 ? -j : j);
+long labs(long j) {
+  return (j < 0 ? -j : j);
 }

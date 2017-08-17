@@ -11,6 +11,7 @@ using namespace WTF;
 namespace WeexCore {
 
 class Position;
+
 class RenderSize;
 
 class RenderAction {
@@ -29,6 +30,7 @@ protected:
 
 public:
     RenderAction();
+
     ~RenderAction();
 
     void ExecuteAction();

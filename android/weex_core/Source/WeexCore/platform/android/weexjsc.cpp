@@ -22,17 +22,16 @@
 #include "weexjsc.h"
 
 namespace WEEXJSC {
-extern "C" void soLoad(JavaVM *vm, 
-    jclass* jBridgeClazz,
-    jclass* jWXJSObject,
-    jclass* jWXLogUtils)
-{
-    sVm = vm;
-    // for android bridge
-    // if (mBridgeAndroid.get())
-    // {
-    //     mBridgeAndroid->init(sVm, *jBridgeClazz, *jWXJSObject, *jWXLogUtils);
-    // }
-    __android_log_print(ANDROID_LOG_ERROR, "shiwentao", "weexjsc soLoad");
+extern "C" void soLoad(JavaVM *vm,
+                       jclass *jBridgeClazz,
+                       jclass *jWXJSObject,
+                       jclass *jWXLogUtils) {
+  sVm = vm;
+  // for android bridge
+  // if (mBridgeAndroid.get())
+  // {
+  //     mBridgeAndroid->init(sVm, *jBridgeClazz, *jWXJSObject, *jWXLogUtils);
+  // }
+  __android_log_print(ANDROID_LOG_ERROR, "shiwentao", "weexjsc soLoad");
 }
 }
