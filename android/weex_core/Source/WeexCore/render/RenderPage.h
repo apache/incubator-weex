@@ -5,8 +5,8 @@
 
 #include <wtf/text/WTFString.h>
 #include <wtf/HashSet.h>
-#include "./base/LogUtils.h"
-#include "./base/weexjsontools.h"
+#include "../../base/LogUtils.h"
+#include "../../rapidjson/weexjsontools.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
 #include "action/RenderAction.h"

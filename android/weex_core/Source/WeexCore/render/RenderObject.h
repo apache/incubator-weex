@@ -5,11 +5,11 @@
 #include <wtf/text/StringHash.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
-#include "./base/LogUtils.h"
+#include "../../base/LogUtils.h"
 #include "../../yoga/Yoga.h"
 #include "../layout/ConstantsName.h"
 #include "../layout/WXStyleUtil.h"
-#include "./base/StringUtils.h"
+#include "../../base/StringUtils.h"
 #include "action/RenderAction.h"
 
 using namespace WTF;

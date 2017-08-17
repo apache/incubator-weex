@@ -10,7 +10,6 @@ RenderPage::RenderPage(String pageID, String data)
     RenderObject* render = json2RenderObject(wtfString2cstr(data), this);
     mRenderObjectMap->set(render->getRef(),render);
     setRootRenderObject(render);
-
     // layout by YogaNode Tree
     YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
 }

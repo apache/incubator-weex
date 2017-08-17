@@ -1,15 +1,15 @@
 #ifndef _EXTEND_JSAPI_H_
 #define _EXTEND_JSAPI_H_
 #include "../../../base/LogUtils.h"
-// #include "./base/weexjsontools.h"
 #include "IPCHandler.h"
 #include "IPCMessageJS.h"
 #include "IPCResult.h"
 #include "IPCSender.h"
 #include "IPCString.h"
 #include "Serializing/IPCSerializer.h"
+#include "../../render/RenderManager.h"
+#include "../../../rapidjson/weexjsontools.h"
 
-// #include "weexjsc.h"
 
 static std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments* arguments);
 static std::unique_ptr<IPCResult> handleReportException(IPCArguments* arguments);

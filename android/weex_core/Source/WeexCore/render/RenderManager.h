@@ -4,8 +4,8 @@
 #include "RenderObject.h"
 #include "RenderPage.h"
 #include <wtf/HashMap.h>
-#include "./base/LogUtils.h"
-#include "./base/weexjsontools.h"
+#include "../../base/LogUtils.h"
+#include "../../rapidjson/weexjsontools.h"
 
 
 namespace WeexCore
@@ -35,7 +35,7 @@ class RenderManager
     static Garbo garbo;
 
     // save all pages info with RenderPage;
-    HashMap<String, RenderPage *> *mPages;
+    HashMap<String, RenderPage *> *mPages = nullptr;
 
   public:
     static RenderManager *getInstance()

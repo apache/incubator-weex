@@ -1,26 +1,23 @@
 #include "ExtendJSApi.h"
 #include "BridgeAndroid.h"
 #include "WeexCore.h"
-// #include "./WeexCore/render/RenderManager.h"
 
 using namespace WeexCore;
 
-static std::unique_ptr<BridgeAndroid> mBridgeAndroid(new BridgeAndroid());
+static std::unique_ptr <BridgeAndroid> mBridgeAndroid(new BridgeAndroid());
 
 static bool isWeexCore = false;
 
 /**
 * This class aim to extend JS Api
 **/
-ExtendJSApi::ExtendJSApi(jobject& jThis)
-{
+ExtendJSApi::ExtendJSApi(jobject &jThis) {
     if (mBridgeAndroid.get()) {
         mBridgeAndroid->setGlobalRef(jThis);
     }
 }
 
-void ExtendJSApi::initFunction(IPCHandler* handler)
-{
+void ExtendJSApi::initFunction(IPCHandler *handler) {
     handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION), handleSetJSVersion);
     handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION), handleReportException);
     handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE), handleCallNative);
@@ -41,10 +38,9 @@ void ExtendJSApi::initFunction(IPCHandler* handler)
     handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEEVENT), functionCallRemoveEvent);
 }
 
-std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments* arguments)
-{
-    JNIEnv* env = getJNIEnv();
-    const IPCByteArray* ba = arguments->getByteArray(0);
+std::unique_ptr <IPCResult> handleSetJSVersion(IPCArguments *arguments) {
+    JNIEnv *env = getJNIEnv();
+    const IPCByteArray *ba = arguments->getByteArray(0);
     LOGA("init JSFrm version %s", ba->content);
     jstring jversion = env->NewStringUTF(ba->content);
     if (mBridgeAndroid.get()) {
@@ -53,9 +49,8 @@ std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments* arguments)
     return createVoidResult();
 }
 
-void reportException(const char* instanceID, const char* func, const char* exception_string)
-{
-    JNIEnv* env = getJNIEnv();
+void reportException(const char *instanceID, const char *func, const char *exception_string) {
+    JNIEnv *env = getJNIEnv();
     jstring jExceptionString = env->NewStringUTF(exception_string);
     jstring jInstanceId = env->NewStringUTF(instanceID);
     jstring jFunc = env->NewStringUTF(func);
@@ -64,21 +59,20 @@ void reportException(const char* instanceID, const char* func, const char* excep
     }
 }
 
-std::unique_ptr<IPCResult> handleReportException(IPCArguments* arguments)
-{
-    const char* instanceID = nullptr;
-    const char* func = nullptr;
-    const char* exceptionInfo = nullptr;
+std::unique_ptr <IPCResult> handleReportException(IPCArguments *arguments) {
+    const char *instanceID = nullptr;
+    const char *func = nullptr;
+    const char *exceptionInfo = nullptr;
     if (arguments->getType(0) == IPCType::BYTEARRAY) {
-        const IPCByteArray* instanceIDBA = arguments->getByteArray(0);
+        const IPCByteArray *instanceIDBA = arguments->getByteArray(0);
         instanceID = instanceIDBA->content;
     }
     if (arguments->getType(1) == IPCType::BYTEARRAY) {
-        const IPCByteArray* funcBA = arguments->getByteArray(1);
+        const IPCByteArray *funcBA = arguments->getByteArray(1);
         func = funcBA->content;
     }
     if (arguments->getType(2) == IPCType::BYTEARRAY) {
-        const IPCByteArray* exceptionInfoBA = arguments->getByteArray(2);
+        const IPCByteArray *exceptionInfoBA = arguments->getByteArray(2);
         exceptionInfo = exceptionInfoBA->content;
     }
     LOGE(" ReportException : %s", exceptionInfo);
@@ -86,11 +80,11 @@ std::unique_ptr<IPCResult> handleReportException(IPCArguments* arguments)
     return createVoidResult();
 }
 
-std::unique_ptr<IPCResult> handleCallNative(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> handleCallNative(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callNative");
+    LOGD("[ExtendJSApi] functionCallNative");
 
-    JNIEnv* env = getJNIEnv();
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //task args[1]
@@ -106,16 +100,23 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallCreateBody(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callCreateBody");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallCreateBody");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //task args[1]
     jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 2);
+
+    String pageId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    String taskString((char *) env->GetByteArrayElements(jTaskString, 0));
+
+    RenderManager::getInstance()->createPage(pageId, taskString);
+    RenderManager::getInstance()->printRenderAndLayoutTree(pageId);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -124,10 +125,11 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callUpdateFinish");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallUpdateFinish");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //task args[1]
@@ -142,16 +144,19 @@ std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallCreateFinish");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallCreateFinish");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //task args[1]
     jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 2);
+
+    RenderManager::getInstance()->printRenderAndLayoutTree(jString2String(env, jInstanceId));
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -160,10 +165,11 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallRefreshFinish");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallRefreshFinish");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //task args[1]
@@ -178,21 +184,33 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallUpdateAttrs");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallUpdateAttrs");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //task args[2]
     jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
-
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 3);
+
+
+    //instacneID args[0]
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    // jref args[1]
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+    //task args[1]
+//    String taskString((char*)env->GetByteArrayElements(jTaskString, 0));
+
+//    LOGD("[ExtendJSApi] functionCallUpdateAttrs, pageid: %s, ref: %s, taskString: %s", wtfString2cstr(instanceId), wtfString2cstr(ref), wtfString2cstr(taskString));
+//    String key;
+//    String value;
+//    json2SingleKeyValue(wtfString2cstr(taskString), key, value);
+//    RenderManager::getInstance()->updateAttr(instanceId, ref, key, value);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -201,21 +219,32 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallUpdateStyle");
-    JNIEnv* env = getJNIEnv();
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //task args[2]
     jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
-
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 3);
+
+
+    //instacneID args[0]
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    // jref args[1]
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+    //task args[1]
+//    String taskString((char*)env->GetByteArrayElements(jTaskString, 0));
+
+//    LOGD("[ExtendJSApi] functionCallUpdateStyle, pageid: %s, ref: %s, taskString: %s", wtfString2cstr(instanceId), wtfString2cstr(ref), wtfString2cstr(taskString));
+//    String key;
+//    String value;
+//    json2SingleKeyValue(wtfString2cstr(taskString), key, value);
+//    RenderManager::getInstance()->updateStyle(instanceId, ref, key, value);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -224,18 +253,25 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallRemoveElement");
-    JNIEnv* env = getJNIEnv();
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 2);
+
+
+    //instacneID args[0]
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    // jref args[1]
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+
+//    LOGD("[ExtendJSApi] functionCallRemoveElement, pageId: %s, ref: %s", instanceId.utf8().data(), ref.utf8().data());
+//    RenderManager::getInstance()->removeRenderObject(instanceId, ref);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -244,24 +280,29 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallMoveElement(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallMoveElement");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallMoveElement");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //callback args[2]
     jstring jParentRef = getArgumentAsJString(env, arguments, 2);
-
     //callback args[3]
     jstring jIndex = getArgumentAsJString(env, arguments, 3);
-
     //callback args[4]
     jstring jCallback = getArgumentAsJString(env, arguments, 4);
+
+
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+//    String parentref = jString2String(env, getArgumentAsJString(env, arguments, 2));
+//    String index = jString2String(env, getArgumentAsJString(env ,arguments, 3));
+
+//    RenderManager::getInstance()->moveRenderObject(instanceId, ref, parentref, index);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -270,22 +311,28 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallAddEvent(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallAddEvent");
-    LOGE("functionCallAddEvent");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallAddEvent");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //callback args[2]
     jstring jEvent = getArgumentAsJString(env, arguments, 2);
-
     //callback args[3]
     jstring jCallback = getArgumentAsJString(env, arguments, 3);
+
+    //instacneID args[0]
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    // jref args[1]
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+    //jevent args[2]
+//    String event = jString2String(env, getArgumentAsJString(env, arguments, 2));
+
+//    RenderManager::getInstance()->addEvent(instanceId, ref, event);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -294,22 +341,28 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "functionCallRemoveEvent");
-    LOGE("functionCallRemoveEvent");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] functionCallRemoveEvent");
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
     //instacneID args[1]
     jstring jRef = getArgumentAsJString(env, arguments, 1);
-
     //callback args[2]
     jstring jEvent = getArgumentAsJString(env, arguments, 2);
-
     //callback args[3]
     jstring jCallback = getArgumentAsJString(env, arguments, 3);
+
+    //instacneID args[0]
+//    String instanceId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    // jref args[1]
+//    String ref = jString2String(env, getArgumentAsJString(env, arguments, 1));
+    //jevent args[2]
+//    String event = jString2String(env, getArgumentAsJString(env, arguments, 2));
+
+//    RenderManager::getInstance()->removeEvent(instanceId, ref, event);
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -318,11 +371,11 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> handleCallNativeModule(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callNativeModule");
+    LOGD("[ExtendJSApi] handleCallNativeModule");
 
-    JNIEnv* env = getJNIEnv();
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
 
@@ -343,7 +396,7 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments* arguments)
         result = mBridgeAndroid->callNativeModule(jInstanceId, jmodule, jmethod, jArgString, jOptString);
     }
 
-    std::unique_ptr<IPCResult> ret;
+    std::unique_ptr <IPCResult> ret;
     jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
     jint jTypeInt = env->GetIntField(result, jTypeId);
     jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
@@ -358,10 +411,10 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments* arguments)
         ret = std::move(createDoubleResult(jDoubleObj));
 
     } else if (jTypeInt == 2) {
-        jstring jDataStr = (jstring)jDataObj;
+        jstring jDataStr = (jstring) jDataObj;
         ret = std::move(createStringResult(env, jDataStr));
     } else if (jTypeInt == 3) {
-        jstring jDataStr = (jstring)jDataObj;
+        jstring jDataStr = (jstring) jDataObj;
         ret = std::move(createJSONStringResult(env, jDataStr));
     }
     env->DeleteLocalRef(jDataObj);
@@ -369,10 +422,11 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments* arguments)
     return ret;
 }
 
-std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callNativeComponent");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] handleCallNativeComponent");
+
+    JNIEnv *env = getJNIEnv();
 
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
@@ -395,10 +449,10 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments* arguments)
     return createInt32Result(static_cast<int32_t>(true));
 }
 
-std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> handleCallAddElement(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "callAddElement");
-    JNIEnv* env = getJNIEnv();
+
+    JNIEnv *env = getJNIEnv();
     //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
     //instacneID args[1]
@@ -409,6 +463,16 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments* arguments)
     jstring jindex = getArgumentAsJString(env, arguments, 3);
     //callback  args[4]
     jstring jCallback = getArgumentAsJString(env, arguments, 4);
+
+    String pageId = jString2String(env, getArgumentAsJString(env, arguments, 0));
+    String parentRef = jString2String(env, getArgumentAsJString(env, arguments, 1));
+    String data((char *) env->GetByteArrayElements(jdomString, 0));
+    String index = jString2String(env, getArgumentAsJString(env, arguments, 3));
+
+    LOGD("[ExtendJSApi] handleCallAddElement parentRef: %s, data: %s", parentRef.utf8().data(), data.utf8().data());
+
+    RenderManager::getInstance()->addRenderObject(pageId, parentRef, index.toInt(), data);
+
     int flag = 0;
     if (mBridgeAndroid.get()) {
         mBridgeAndroid->callAddElement(jInstanceId, jref, jdomString, jindex, jCallback);
@@ -416,10 +480,11 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments* arguments)
     return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments* arguments)
-{
+std::unique_ptr <IPCResult> handleSetTimeout(IPCArguments *arguments) {
     base::debug::TraceScope traceScope("weex", "setTimeoutNative");
-    JNIEnv* env = getJNIEnv();
+    LOGD("[ExtendJSApi] handleSetTimeout");
+
+    JNIEnv *env = getJNIEnv();
     //callbackId
     jstring jCallbackID = getArgumentAsJString(env, arguments, 0);
 
@@ -427,14 +492,13 @@ std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments* arguments)
     jstring jTime = getArgumentAsJString(env, arguments, 1);
 
     if (mBridgeAndroid.get()) {
-        mBridgeAndroid->setTimeout(jCallbackID, jTime);
+//        mBridgeAndroid->setTimeout(jCallbackID, jTime);
     }
     return createInt32Result(static_cast<int32_t>(true));
 }
 
-std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments* arguments)
-{
-    JNIEnv* env = getJNIEnv();
+std::unique_ptr <IPCResult> handleCallNativeLog(IPCArguments *arguments) {
+    JNIEnv *env = getJNIEnv();
     jstring str_msg = getArgumentAsJString(env, arguments, 0);
     if (mBridgeAndroid.get()) {
         mBridgeAndroid->callNativeLog(str_msg);
