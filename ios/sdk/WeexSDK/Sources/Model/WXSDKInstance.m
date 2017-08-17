@@ -43,6 +43,7 @@
 #import "WXConvert.h"
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
+#import "WXJSExceptionProtocol.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -147,7 +148,7 @@ typedef enum : NSUInteger {
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@""}];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@"",@"threadName":WXTMainThread}];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
@@ -171,10 +172,16 @@ typedef enum : NSUInteger {
         return;
     }
     
-    if (self.pageName && ![self.pageName isEqualToString:@""]) {
+    if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
     } else {
         WXLogWarning(@"WXSDKInstance's pageName should be specified.");
+        id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
+        if ([jsExceptionHandler respondsToSelector:@selector(onRuntimeCheckException:)]) {
+            WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
+            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n Using WXSDKInstance * instance = [WXSDKInstance new]; instance.pageName = @\"your page name\" to fix it";
+            [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
+        }
     }
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
@@ -203,9 +210,9 @@ typedef enum : NSUInteger {
     
     [self _handleConfigCenter];
     
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
-    
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"bundleUrl":self.scriptURL?[self.scriptURL absoluteString]:@""}];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }

@@ -32,23 +32,10 @@ function clearRefs (json) {
 describe('vanilla test', () => {
   it('standard APIs', () => {
     expect(vanilla.init).to.be.a('function')
-    expect(vanilla.registerComponents).to.be.a('function')
-    expect(vanilla.registerModules).to.be.a('function')
-    expect(vanilla.registerMethods).to.be.a('function')
-    expect(vanilla.prepareInstance).to.be.a('function')
     expect(vanilla.createInstance).to.be.a('function')
-    expect(vanilla.refreshInstance).to.be.a('function')
     expect(vanilla.destroyInstance).to.be.a('function')
     expect(vanilla.getRoot).to.be.a('function')
     expect(vanilla.receiveTasks).to.be.a('function')
-  })
-
-  it('empty functions', () => {
-    expect(vanilla.registerComponents()).to.be.undefined
-    expect(vanilla.registerModules()).to.be.undefined
-    expect(vanilla.registerMethods()).to.be.undefined
-    expect(vanilla.prepareInstance()).to.be.undefined
-    expect(vanilla.refreshInstance()).to.be.undefined
   })
 
   it('create & destroy instance', () => {

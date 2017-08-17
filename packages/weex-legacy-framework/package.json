@@ -1,6 +1,6 @@
 {
   "name": "weex-legacy-framework",
-  "version": "0.21.5",
+  "version": "0.21.6",
   "description": "Weex Legacy Framework",
   "main": "index.js",
   "engines": {

@@ -22,11 +22,11 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -202,7 +202,11 @@ class WXBridge implements IWXBridge {
   public Object callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
 
     JSONArray argArray = JSON.parseArray(new String(arguments));
-    Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,options);
+    JSONObject optionsObj = null;
+    if (options != null) {
+      optionsObj = JSON.parseObject(new String(options));
+    }
+    Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,optionsObj);
     return new WXJSObject(object);
   }
 

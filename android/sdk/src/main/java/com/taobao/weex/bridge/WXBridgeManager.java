@@ -51,6 +51,8 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.action.TraceableAction;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -114,6 +116,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String MODULE = "module";
   public static final String METHOD = "method";
   public static final String ARGS = "args";
+  public static final String OPTIONS = "options";
   private static final String NON_CALLBACK = "-1";
   private static final String UNDEFINED = "undefined";
 
@@ -156,6 +159,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private StringBuilder mLodBuilder = new StringBuilder(50);
 
   private Interceptor mInterceptor;
+
+  private WXParams mInitParams;
 
   private WXBridgeManager() {
     initWXBridge(WXEnvironment.sRemoteDebugMode);
@@ -219,6 +224,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
     public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
+      return  callModuleMethod(instanceId, moduleStr, methodStr, args, null);
+  }
+
+    public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args, JSONObject options) {
       WXSDKInstance wxsdkInstance = WXSDKManager.getInstance()
               .getSDKInstance(instanceId);
       if (wxsdkInstance == null) {
@@ -228,7 +237,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               && WXSDKManager.getInstance().getValidateProcessor() != null) {
           WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
                   .getInstance().getValidateProcessor()
-                  .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args);
+                  .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args, options);
           if (validateResult == null) {
               return null;
           }
@@ -237,7 +246,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                       args);
           } else {
               JSONObject validateInfo = validateResult.validateInfo;
+            if (validateInfo != null) {
               WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
+            }
               return validateInfo;
           }
       }
@@ -345,6 +356,30 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
         return null;
     }
+    public Object callNativeModule(String instanceId, String module,String method, JSONArray arguments, JSONObject options) {
+
+        if (WXEnvironment.isApkDebugable()) {
+            mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+                    .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+            WXLogUtils.d(mLodBuilder.substring(0));
+            mLodBuilder.setLength(0);
+        }
+
+        try {
+            if(WXDomModule.WXDOM.equals(module)){
+              WXDomModule dom = getDomModule(instanceId);
+              return dom.callDomMethod(method,arguments);
+            }else {
+              return callModuleMethod(instanceId, module,
+                      method, arguments, options);
+            }
+        } catch (Exception e) {
+            WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+            commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
+        }
+
+        return null;
+    }
 
     public Object callNativeComponent(String instanceId, String componentRef, String method, JSONArray arguments, Object options) {
         if (WXEnvironment.isApkDebugable()) {
@@ -394,7 +429,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
 
     long start = System.currentTimeMillis();
+    long parseNanos = System.nanoTime();
     JSONArray array = JSON.parseArray(tasks);
+    parseNanos = System.nanoTime() - parseNanos;
 
     if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
       WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
@@ -411,10 +448,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
             if(target != null){
               if(WXDomModule.WXDOM.equals(target)){
                 WXDomModule dom = getDomModule(instanceId);
-                dom.callDomMethod(task);
+                dom.callDomMethod(task,parseNanos);
               }else {
+                JSONObject optionObj = task.getJSONObject(OPTIONS);
                 callModuleMethod(instanceId, (String) target,
-                    (String) task.get(METHOD), (JSONArray) task.get(ARGS));
+                        (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
               }
             }else if(task.get(COMPONENT) != null){
               //call component
@@ -463,10 +501,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        long start = System.currentTimeMillis();
+        long nanosTemp = System.nanoTime();
         JSONObject domObject = JSON.parseObject(tasks);
+        nanosTemp = System.nanoTime() - nanosTemp;
+
         WXDomModule domModule = getDomModule(instanceId);
         Action action = Actions.getCreateBody(domObject);
         domModule.postAction((DOMAction)action, true);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).mParseJsonNanos = nanosTemp;
+          ((TraceableAction) action).mStartMillis = start;
+          ((TraceableAction) action).onStartDomExecute(instanceId, "createBody", "_root", domObject.getString("type"), tasks);
+        }
       }
     } catch (Exception e) {
         WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
@@ -605,9 +653,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
+        long start = System.currentTimeMillis();
+        long parseNanos = System.nanoTime();
         JSONObject domObject = JSON.parseObject(task);
+        parseNanos = System.nanoTime() - parseNanos;
+
         Action action = Actions.getUpdateAttrs(ref, domObject);
         domModule.postAction((DOMAction)action, false);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).mStartMillis = start;
+          ((TraceableAction) action).mParseJsonNanos = parseNanos;
+          ((TraceableAction) action).onStartDomExecute(instanceId, "updateAttrs", domObject.getString("ref"), domObject.getString("type"), task);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateAttrs exception: ", e);
@@ -648,9 +706,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
+        long start = System.currentTimeMillis();
+        long nanosTemp = System.nanoTime();
         JSONObject domObject = JSON.parseObject(task);
+        nanosTemp = System.nanoTime() - nanosTemp;
+
         Action action = Actions.getUpdateStyle(ref, domObject, false);
         domModule.postAction((DOMAction)action, false);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).mParseJsonNanos = nanosTemp;
+          ((TraceableAction) action).mStartMillis = start;
+          ((TraceableAction) action).onStartDomExecute(instanceId, "updateStyle", ref, domObject.getString("type"), domObject.toJSONString());
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyle exception: ", e);
@@ -684,6 +752,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXDomModule domModule = getDomModule(instanceId);
         Action action = Actions.getRemoveElement(ref);
         domModule.postAction((DOMAction)action, false);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).onStartDomExecute(instanceId, "removeElement", ref, null, ref);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
@@ -752,6 +824,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXDomModule domModule = getDomModule(instanceId);
         Action action = Actions.getAddEvent(ref, event);
         domModule.postAction((DOMAction)action, false);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).onStartDomExecute(instanceId, "addEvent", ref, null, event);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
@@ -785,6 +861,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXDomModule domModule = getDomModule(instanceId);
         Action action = Actions.getRemoveEvent(ref, event);
         domModule.postAction((DOMAction)action, false);
+
+        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+          ((TraceableAction) action).onStartDomExecute(instanceId, "removeEvent", ref, null, event);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
@@ -815,13 +895,22 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
       long start = System.currentTimeMillis();
+      long nanosTemp = System.nanoTime();
       JSONObject domObject = JSON.parseObject(dom);
+      nanosTemp = System.nanoTime() - nanosTemp;
 
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
       }
       WXDomModule domModule = getDomModule(instanceId);
-      domModule.postAction(Actions.getAddElement(domObject, ref,Integer.parseInt(index)),false);
+      DOMAction addElementAction = Actions.getAddElement(domObject, ref,Integer.parseInt(index));
+      domModule.postAction(addElementAction, false);
+
+      if (WXTracing.isAvailable() && addElementAction instanceof TraceableAction) {
+        ((TraceableAction) addElementAction).mParseJsonNanos = nanosTemp;
+        ((TraceableAction) addElementAction).mStartMillis = start;
+        ((TraceableAction) addElementAction).onStartDomExecute(instanceId, "addElement", domObject.getString("ref"), domObject.getString("type"), dom);
+      }
     }
 
     if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
@@ -1368,7 +1457,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
     wxParams.setOptions(WXEnvironment.getCustomOptions());
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
+    mInitParams = wxParams;
     return wxParams;
+  }
+
+  public WXParams getInitParams() {
+    return mInitParams;
   }
 
   private void execRegisterFailTask() {

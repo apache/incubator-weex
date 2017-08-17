@@ -74,7 +74,7 @@
     }
 }
 
-- (void)send:(NSString *)data
+- (void)send:(id)data
 {
     id<WXWebSocketHandler> requestHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXWebSocketHandler)];
     if (requestHandler) {
