@@ -1,8 +1,8 @@
 {
-  "name": "weex-legacy-framework",
-  "version": "0.21.6",
-  "description": "Weex Legacy Framework",
+  "name": "weex-vanilla-framework",
   "main": "index.js",
+  "description": "Weex Vanilla Framework",
+  "version": "0.21.7",
   "engines": {
     "node": ">=4"
   },
@@ -11,12 +11,11 @@
     "weex",
     "hybrid",
     "mvvm",
-    "javascript",
-    "runtime"
+    "javascript"
   ],
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/apache/incubator-weex.git"
-  },
-  "license": "Apache-2.0"
+  }
 }

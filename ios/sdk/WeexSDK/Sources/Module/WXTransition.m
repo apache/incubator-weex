@@ -133,7 +133,7 @@
 
 - (void)_dealWithAnimationModuleProperty:(NSString *)singleProperty styles:(NSDictionary *)styles
 {
-    if ([singleProperty isEqualToString:singleProperty]&&styles[singleProperty])
+    if (styles[singleProperty])
     {
         NSDictionary *args = @{@"delay":@(_layoutAnimationDelay),@"duration":@(_layoutAnimationDuration),@"styles":styles,@"timingFunction":_fromStyles[kWXTransitionTimingFunction]};
         [self _animationModuleHandleTransition:args];

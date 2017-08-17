@@ -53,7 +53,7 @@ const configs = {
     moduleName: 'WeexRuntime',
     entry: absolute('html5/runtime/index.js'),
     dest: absolute('packages/weex-js-runtime/index.js'),
-    banner: `/* 'WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
+    banner: `/* WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
       + frameworkBanner,
     format: 'umd',
     plugins: [
@@ -64,10 +64,23 @@ const configs = {
     ]
   },
   'weex-legacy-framework': {
-    moduleName: 'WeexVanillaFramework',
+    moduleName: 'WeexLegacyFramework',
     entry: absolute('html5/frameworks/legacy/index.js'),
     dest: absolute('packages/weex-legacy-framework/index.js'),
-    banner: `/* 'WEEX VANILLA FRAMEWORK ${subversion.framework}, Build ${now()}. */\n`,
+    banner: `/* Weex Legacy Framework ${subversion.framework}, Build ${now()}. */\n`,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
+  'weex-vanilla-framework': {
+    moduleName: 'WeexVanillaFramework',
+    entry: absolute('html5/frameworks/vanilla/index.js'),
+    dest: absolute('packages/weex-vanilla-framework/index.js'),
+    banner: `/* Weex Vanilla Framework ${subversion.framework}, Build ${now()}. */\n`,
     format: 'umd',
     plugins: [
       nodeResolve({
@@ -79,7 +92,7 @@ const configs = {
   'weex-web-render': {
     moduleName: 'Weex',
     entry: absolute('html5/render/browser/index.js'),
-    dest: absolute('dist/browser.js'),
+    dest: absolute('packages/weex-html5/index.js'),
     banner: `(this.nativeLog || function(s) {console.log(s)})`
       + `('START WEEX HTML5: ${subversion.browser}, Build ${now()}.');\n`
       + frameworkBanner,
