@@ -24,7 +24,7 @@ chai.use(sinonChai)
 
 import Vm from '../../../../frameworks/legacy/vm'
 import { Document } from '../../../../runtime/vdom'
-import { init as resetTaskHandler } from '../../../../runtime/task-center'
+import { init as resetTaskHandler } from '../../../../runtime/bridge/TaskCenter'
 import Differ from '../../../../frameworks/legacy/app/differ'
 
 const oriCallNative = global.callNative

@@ -18,40 +18,33 @@
  */
 
 /**
- * @fileOverview
- * Listen virtual-dom operations and create corresponding actions.
- */
-
-import '../shared/objectAssign'
-
-export default function Listener (id, handler) {
-  this.id = id
-  this.batched = false
-  this.updates = []
-  if (typeof handler === 'function') {
-    Object.defineProperty(this, 'handler', {
-      configurable: true,
-      enumerable: true,
-      writable: true,
-      value: handler
-    })
-  }
-  else {
-    console.error('[JS Runtime] invalid parameter, handler must be a function')
-  }
-}
-
-/**
- * Create the action object.
- * @param {string} name
- * @param {array} arguments
- * @return {object} action
- */
-export function createAction (name, args = []) {
+* Create the action object.
+* @param {string} name
+* @param {array} arguments
+* @return {object} action
+*/
+function createAction (name, args = []) {
   return { module: 'dom', method: name, args: args }
 }
 
-Object.assign(Listener.prototype, {
+export default class Listener {
+  constructor (id, handler) {
+    this.id = id
+    this.batched = false
+    this.updates = []
+    if (typeof handler === 'function') {
+      Object.defineProperty(this, 'handler', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: handler
+      })
+    }
+    else {
+      console.error('[JS Runtime] invalid parameter, handler must be a function')
+    }
+  }
+
   /**
    * Send the "createFinish" signal.
    * @param {function} callback
@@ -60,7 +53,7 @@ Object.assign(Listener.prototype, {
   createFinish (callback) {
     const handler = this.handler
     return handler([createAction('createFinish')], callback)
-  },
+  }
 
   /**
    * Send the "updateFinish" signal.
@@ -70,7 +63,7 @@ Object.assign(Listener.prototype, {
   updateFinish (callback) {
     const handler = this.handler
     return handler([createAction('updateFinish')], callback)
-  },
+  }
 
   /**
    * Send the "refreshFinish" signal.
@@ -80,7 +73,7 @@ Object.assign(Listener.prototype, {
   refreshFinish (callback) {
     const handler = this.handler
     return handler([createAction('refreshFinish')], callback)
-  },
+  }
 
   /**
    * Send the "createBody" signal.
@@ -98,7 +91,7 @@ Object.assign(Listener.prototype, {
       }))
     }
     return this.addActions(actions)
-  },
+  }
 
   /**
    * Send the "addElement" signal.
@@ -112,7 +105,7 @@ Object.assign(Listener.prototype, {
       index = -1
     }
     return this.addActions(createAction('addElement', [ref, element.toJSON(), index]))
-  },
+  }
 
   /**
    * Send the "removeElement" signal.
@@ -125,7 +118,7 @@ Object.assign(Listener.prototype, {
       return this.addActions(actions)
     }
     return this.addActions(createAction('removeElement', [ref]))
-  },
+  }
 
   /**
    * Send the "moveElement" signal.
@@ -136,7 +129,7 @@ Object.assign(Listener.prototype, {
    */
   moveElement (targetRef, parentRef, index) {
     return this.addActions(createAction('moveElement', [targetRef, parentRef, index]))
-  },
+  }
 
   /**
    * Send the "updateAttrs" signal.
@@ -149,7 +142,7 @@ Object.assign(Listener.prototype, {
     const result = {}
     result[key] = value
     return this.addActions(createAction('updateAttrs', [ref, result]))
-  },
+  }
 
   /**
    * Send the "updateStyle" signal, update a sole style.
@@ -162,7 +155,7 @@ Object.assign(Listener.prototype, {
     const result = {}
     result[key] = value
     return this.addActions(createAction('updateStyle', [ref, result]))
-  },
+  }
 
   /**
    * Send the "updateStyle" signal.
@@ -172,7 +165,7 @@ Object.assign(Listener.prototype, {
    */
   setStyles (ref, style) {
     return this.addActions(createAction('updateStyle', [ref, style]))
-  },
+  }
 
   /**
    * Send the "addEvent" signal.
@@ -182,7 +175,7 @@ Object.assign(Listener.prototype, {
    */
   addEvent (ref, type) {
     return this.addActions(createAction('addEvent', [ref, type]))
-  },
+  }
 
   /**
    * Send the "removeEvent" signal.
@@ -192,7 +185,7 @@ Object.assign(Listener.prototype, {
    */
   removeEvent (ref, type) {
     return this.addActions(createAction('removeEvent', [ref, type]))
-  },
+  }
 
   /**
    * Default handler.
@@ -202,7 +195,7 @@ Object.assign(Listener.prototype, {
    */
   handler (actions, cb) {
     return cb && cb()
-  },
+  }
 
   /**
    * Add actions into updates.
@@ -224,4 +217,4 @@ Object.assign(Listener.prototype, {
       return handler(actions)
     }
   }
-})
+}
