@@ -450,7 +450,6 @@
     if (isUpdateStyles) {
         [self _modifyStyles:styles];
     }
-    
     [self _resetCSSNodeStyles:resetStyles];
 }
 
@@ -522,6 +521,11 @@
     if (![self _isPropertyAnimationStyles:styles]) {
         [self _updateViewStyles:styles];
     }
+    else
+    {
+        [self _transitionUpdateViewProperty:styles];
+    }
+    
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     [self updateStyles:styles];

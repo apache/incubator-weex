@@ -13,6 +13,8 @@
           {name: root + '/hello', title: 'Hello World'},
           {name: root + '/style/index', title: 'Common Style'},
           {name: root + '/animation', title: 'Animation'},
+          {name: root + '/transition', title: 'Transition'},
+
 
           // component
           {name: root + '/components/text', title: 'Text'},
