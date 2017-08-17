@@ -23,14 +23,20 @@
 #import "WXComponentManager.h"
 
 @implementation WXVoiceOverModule
+{
+    BOOL _voiceOverStatus;
+}
 @synthesize weexInstance;
 
 WX_EXPORT_METHOD(@selector(read:param:))
 WX_EXPORT_METHOD(@selector(focusToElement:))
 WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
-- (instancetype)init {
+WX_EXPORT_METHOD(@selector(focusToNavigationBack))
+- (instancetype)init
+{
     if ([super init]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voiceOverStatusListener) name:UIAccessibilityVoiceOverStatusChanged object:nil];
+        _voiceOverStatus = UIAccessibilityIsVoiceOverRunning();
     }
     return self;
 }
@@ -64,13 +70,23 @@ WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
 
 - (void)voiceOverStatusListener
 {
-    if ([weexInstance checkModuleEventRegistered:@"WXVoiceOverStatusChanged" moduleClassName:NSStringFromClass([self class])]) {
-        [weexInstance fireModuleEvent:[self class] eventName:@"WXVoiceOverStatusChanged" params:nil];
+    if (_voiceOverStatus != [self isVoiceOverOn]) {
+        _voiceOverStatus = [self isVoiceOverOn];
+        if ([weexInstance checkModuleEventRegistered:@"WXVoiceOverStatusChanged" moduleClassName:NSStringFromClass([self class])]) {
+            
+            [weexInstance fireModuleEvent:[self class] eventName:@"WXVoiceOverStatusChanged" params:@{@"status":[self isVoiceOverOn]?@"on":@"off"}];
+        }
     }
 }
 
+// just for test case
+- (void)focusToNavigationBack
+{
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.weexInstance.viewController.navigationController.navigationItem.backBarButtonItem);
+}
+
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIAccessibilityVoiceOverStatusChanged object:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIAccessibilityVoiceOverStatusChanged object:nil];
 }
 
 @end
