@@ -17,9 +17,11 @@
  * under the License.
  */
 
-import { isArray, createEvent } from '../utils'
+import { isArray, createEvent, extend } from '../utils'
 import config from '../config'
 
+// The space used to store the tap event queue
+const _tapQueue = []
 /**
  * remove text nodes in the nodes array.
  * @param  {Array} nodes
@@ -61,17 +63,22 @@ const supportedEvents = [
 ]
 
 /**
- * is a element in a '<a>' tag?
- * @param {HTMLElement} el
+ * Create Bubbles Event.
+ * @param {DOMString} type
+ * @param {Object} props
  */
-function isInANode (el) {
-  let parent = el.parentNode
-  while (parent && parent !== document.body) {
-    if (parent.tagName.toLowerCase() === 'a') {
-      return true
-    }
-    parent = parent.parentNode
+export function createBubblesEvent (target, type, props) {
+  const event = new Event(type, { bubbles: true })
+  try {
+    Object.defineProperty(event, 'target', {
+      enumerable: true,
+      value: target || null
+    })
   }
+  catch (err) {
+    return extend({}, event, { target: target || null })
+  }
+  return event
 }
 
 /**
@@ -106,7 +113,6 @@ export function createEventMap (context, ...extras) {
             && e._for !== 'weex') {
             return
           }
-
           // but should trigger the closest parent which has bound the
           // event handler.
           let vm = context
@@ -115,6 +121,8 @@ export function createEventMap (context, ...extras) {
             const len = ons.length
             if (len > 0) {
               let idx = 0
+              // dispatch real target click event befor calling listeners
+              e.target.dispatchEvent(createBubblesEvent(e.target, 'click', { _triggered: { el: e.target }}))
               while (idx < len) {
                 let on = ons[idx]
                 if (on && on.fn) {
@@ -131,6 +139,15 @@ export function createEventMap (context, ...extras) {
               // it stops bubbling immediately, and a '_triggered' object is set.
               e._triggered = {
                 el: vm.$el
+              }
+              // when originalType is tap, push a tapEvent to _tapQueue
+              // el is uesed to store a real target which dispach this event
+              if (originalType === 'tap') {
+                const tapEvent = {
+                  el: e.target,
+                  event: e
+                }
+                _tapQueue.push(tapEvent)
               }
               return
             }
@@ -189,18 +206,14 @@ export function createEventMap (context, ...extras) {
     if (e._triggered) {
       return
     }
-    let vm = context
-    while (vm) {
-      const ons = getListeners(vm.$vnode, 'click')
-      const len = ons.length
-      if (len > 0 && vm.$el) {
-        e.stopPropagation()
-        e._triggered = { el: vm.$el }
-        return isInANode(vm.$el) && e.preventDefault()
+    if (_tapQueue.length > 0) {
+      const _tapEvent = _tapQueue.shift()
+      if (e.target !== _tapEvent.el) {
+        e.preventDefault()
       }
-      vm = vm.$parent
+      // prevent click events from bubbling,because event bubbling has been handled in the tap event
+      e.stopPropagation()
     }
   })
-
   return eventMap
 }
