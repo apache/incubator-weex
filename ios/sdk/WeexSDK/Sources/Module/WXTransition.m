@@ -63,11 +63,19 @@
 
 @implementation WXTransition
 
+#pragma mark - HandleStyle
 - (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent
 {
-    [self _suspendLayoutAnimationDisplayLink];
+    if ([self _isLayoutAnimationRunning]) {
+        [self _rollBackTransitionWithStyles:styles];
+    }
+    else
+    {
+        [self _suspendLayoutAnimationDisplayLink];
+    }
+    
     _targetComponent = targetComponent;
-    if (!_addStyles) {
+    if (!_fromStyles) {
         _fromStyles = [NSMutableDictionary dictionaryWithDictionary:targetComponent.styles];
         _addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
     }
@@ -75,6 +83,7 @@
     {
         [_addStyles addEntriesFromDictionary:styles];
     }
+    
     _toStyles = [NSMutableDictionary dictionaryWithDictionary:_fromStyles];
     [_toStyles addEntriesFromDictionary:_addStyles];
     
@@ -100,6 +109,13 @@
     NSString *layoutAnimationProperty = _fromStyles[kWXTransitionProperty];
     [self _resloveTransitionProperty:layoutAnimationProperty withStyles:styles];
     [self performSelector:@selector(_startLayoutAnimationDisplayLink) withObject:self afterDelay:_layoutAnimationDelay/1000];
+}
+
+- (void)_rollBackTransitionWithStyles:(NSDictionary *)styles
+{
+    _layoutAnimationDuration = _layoutAnimationCount * 1000 / 60;
+    _layoutAnimationCount = 0;
+    _propertyArray = nil;
 }
 
 - (void)_resloveTransitionProperty:(NSString *)propertyNames withStyles:(NSDictionary *)styles
@@ -153,10 +169,12 @@
         double currentValue = [info.fromValue doubleValue] + [info.perValue doubleValue] * per;
         [_fromStyles setObject:@(currentValue) forKey:info.propertyName];
     }
+    [_targetComponent _modifyStyles:_fromStyles];
     [_targetComponent _updateCSSNodeStyles:_fromStyles];
     [_targetComponent.weexInstance.componentManager startComponentTasks];
 }
 
+#pragma mark CADisplayLink
 - (void)_startLayoutAnimationDisplayLink
 {
     WXAssertComponentThread();
@@ -176,6 +194,16 @@
         [_layoutAnimationDisplayLink invalidate];
         _layoutAnimationDisplayLink = nil;
     }
+}
+
+- (BOOL)_isLayoutAnimationRunning
+{
+    WXAssertComponentThread();
+    BOOL yesOrNo = NO;
+    if (!_layoutAnimationDisplayLink.paused && _layoutAnimationCount >= 5) {
+        yesOrNo = YES;
+    }
+    return yesOrNo;
 }
 
 - (void)_suspendLayoutAnimationDisplayLink
@@ -217,6 +245,9 @@
     _layoutAnimationDuration = 0;
     _propertyArray = nil;
 
+    _addStyles = nil;
+    _fromStyles = nil;
+    _toStyles = nil;
 }
 
 - (void)_animationModuleHandleTransition:(NSDictionary *)args
@@ -237,6 +268,7 @@
     return self.fromStyles;
 }
 
+#pragma mark UnitBezierp
 - (void)unitBezierp1x:(double)p1x p1y:(double)p1y p2x:(double)p2x p2y:(double)p2y
 {
     cx = 3.0 * p1x;
