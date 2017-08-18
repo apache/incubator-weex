@@ -35,6 +35,20 @@ export function trimTextVNodes (vnodes) {
 }
 
 /**
+ * is a element in a '<a>' tag?
+ * @param {HTMLElement} el
+ */
+function isInANode (el) {
+  let parent = el.parentNode
+  while (parent && parent !== document.body) {
+    if (parent.tagName.toLowerCase() === 'a') {
+      return true
+    }
+    parent = parent.parentNode
+  }
+}
+
+/**
  * get listeners from on config and v-on binding.
  * v-on binding has a priority over on config.
  * @param {vnode} vnode
@@ -102,8 +116,6 @@ export function createEventMap (context, ...extras) {
             const len = ons.length
             if (len > 0) {
               let idx = 0
-              // dispatch real target click event befor calling listeners
-              e.target.dispatchEvent(createBubblesEvent(e.target, 'click', { _triggered: { el: e.target }}))
               while (idx < len) {
                 let on = ons[idx]
                 if (on && on.fn) {
@@ -111,7 +123,14 @@ export function createEventMap (context, ...extras) {
                 }
                 let evt = e
                 if (originalType && evtName !== listenTo) {
-                  evt = createEvent(e.target, listenTo)
+                  if (listenTo === 'click') {
+                    // dispatch real target click event befor calling listeners
+                    evt = createBubblesEvent(e.target, 'click', { _triggered: { el: e.target }})
+                    e.target.dispatchEvent(evt)
+                  }
+                  else {
+                    evt = createEvent(e.target, listenTo)
+                  }
                 }
                 on && on.call(vm, evt)
                 idx++
@@ -184,6 +203,7 @@ export function createEventMap (context, ...extras) {
    * This means the click event should always be swallowed in silence.
    */
   bindFunc('click')(function (e) {
+    let vm = context
     if (e._triggered) {
       return
     }
@@ -194,6 +214,16 @@ export function createEventMap (context, ...extras) {
       }
       // prevent click events from bubbling,because event bubbling has been handled in the tap event
       e.stopPropagation()
+    }
+    // if an element(not <a>) handler click event in <a> element,call stopPropagation and preventDefault on event
+    while (vm) {
+      const ons = getListeners(vm.$vnode, 'click')
+      const len = ons.length
+      if (len > 0 && vm.$el) {
+        e._triggered = { el: vm.$el }
+        return isInANode(vm.$el) && e.preventDefault()
+      }
+      vm = vm.$parent
     }
   })
   return eventMap
