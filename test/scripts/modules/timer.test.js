@@ -16,13 +16,13 @@ function do_test(test_title, url) {
     this.timeout(util.getTimeoutMills());
     var driver = util.createDriver(wd);
 
-    before(function () {
+    beforeEach(function () {
       return util.init(driver)
         .get(util.getPage(url))
         .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
     });
 
-    after(function () {
+    afterEach(function () {
       return util.quit(driver);
     })
 

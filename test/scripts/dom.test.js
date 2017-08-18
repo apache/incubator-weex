@@ -29,13 +29,13 @@ describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/dom-operation.js'))
       .waitForElementById('status',util.getGETActionWaitTimeMills(),1000);
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver)
   })
 
