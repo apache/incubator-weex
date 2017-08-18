@@ -25,7 +25,7 @@ var path = require('path');
 var os = require('os');
 var util = require("./util.js");
 
-describe('weex mobile index', function () {
+describe('dom-operation', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
@@ -83,6 +83,9 @@ describe('weex mobile index', function () {
 
   it('#4 Update DOM attr', ()=>{
       return driver
+      .elementById("status")
+      .click()
+      .sleep(2000)
       .elementById("status2")
       .text()
       .then((text)=>{

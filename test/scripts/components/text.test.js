@@ -11,26 +11,22 @@ describe('weex text @ignore-ios', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
+  let scaleFactor = 0
+  let screenWidth = 0
+
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/text-layout.js'))
       .waitForElementById("lines", util.getGETActionWaitTimeMills(), 1000)
-  });
-
-  afterEach(function () {
-    return util.quit(driver);
-  })
-
-
-  let scaleFactor = 0
-  let screenWidth = 0
-  it('#1 Window size', () => {
-    return driver
       .getWindowSize()
       .then(size => {
         screenWidth = size.width
         scaleFactor = screenWidth / 750
       })
+  });
+
+  afterEach(function () {
+    return util.quit(driver);
   })
 
   it('#2 Text Content', () => {
@@ -99,6 +95,7 @@ describe('weex text @ignore-ios', function () {
 
   it('#8 flex:1; align-Items: stretch; flex-direction:column', () => {
     return driver
+      .sleep(2000)
       .elementById('flexgrow-alignitems-coloumn')
       .getRect()
       .then(rect => {
