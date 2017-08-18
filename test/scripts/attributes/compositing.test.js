@@ -32,13 +32,13 @@ describe('compositing test', function () {
     return;
   }
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/attributes/compositing.js'))
       .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 

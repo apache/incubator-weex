@@ -14,12 +14,12 @@ describe('weex '+goal+' test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/'+goal+'.js'))
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 

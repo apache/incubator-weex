@@ -36,13 +36,13 @@ describe('recycler @ignore-android @ignore-ios', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
       .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver);
   })
 

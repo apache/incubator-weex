@@ -11,13 +11,13 @@ describe('weex text @ignore-ios', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/text-layout.js'))
       .waitForElementById("lines", util.getGETActionWaitTimeMills(), 1000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 
