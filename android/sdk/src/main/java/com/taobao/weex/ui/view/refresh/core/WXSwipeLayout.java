@@ -248,7 +248,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       if (dy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;
         isConfirm = true;
-      } else if (dy > 0 && !canChildScrollDown()) {
+      } else if (dy > 0 && !canChildScrollDown() && (!mRefreshing)) {
+        //当前正在刷新时不响应"上拉加载更多"
         mCurrentAction = LOAD_MORE;
         isConfirm = true;
       }
