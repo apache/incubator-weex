@@ -259,9 +259,11 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 
 + (void)removePrerenderTaskforUrl:(NSString *)url
 {
-    if (url) {
+    if (url.length > 0) {
         WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-        [manager.prerenderTasks removeObjectForKey:url];
+        if(manager.prerenderTasks && [manager.prerenderTasks count]>0){
+            [manager.prerenderTasks removeObjectForKey:url];
+        }
     }
 }
 
@@ -308,7 +310,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 - (void)removeTask:(WXPrerenderTask *)task
 {
     [task.instance destroyInstance];
-    [self.prerenderTasks removeObjectForKey:task.url];
+    if(self.prerenderTasks && [self.prerenderTasks count] > 0 && task.url.length > 0){
+        [self.prerenderTasks removeObjectForKey:task.url];
+    }
 }
 
 @end
