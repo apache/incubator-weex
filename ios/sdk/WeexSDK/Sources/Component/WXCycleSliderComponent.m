@@ -95,12 +95,30 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)accessibilityDecrement
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(false)];
+#pragma clang diagnostic pop
+    
     [self nextPage];
 }
 
 - (void)accessibilityIncrement
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(false)];
+#pragma clang diagnostic pop
+    
     [self lastPage];
+}
+
+- (void)accessibilityElementDidLoseFocus
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(true)];
+#pragma clang diagnostic pop
 }
 
 #pragma mark Private Methods
@@ -426,13 +444,11 @@ typedef NS_ENUM(NSInteger, Direction) {
     UIAccessibilityTraits traits = UIAccessibilityTraitAdjustable;
     if (_autoPlay) {
         traits |= UIAccessibilityTraitUpdatesFrequently;
-    }
-    _recycleSliderView.accessibilityTraits = traits;
-    if (_autoPlay) {
         [self _startAutoPlayTimer];
     } else {
         [self _stopAutoPlayTimer];
     }
+     _recycleSliderView.accessibilityTraits = traits;
 }
 
 - (void)layoutDidFinish
@@ -578,6 +594,17 @@ typedef NS_ENUM(NSInteger, Direction) {
 {
     NSAssert(_recycleSliderView, @"");
     [_recycleSliderView setIndicator:indicatorView];
+}
+
+- (void)resumeAutoPlay:(id)resume
+{
+    if (_autoPlay) {
+        if ([resume boolValue]) {
+            [self _startAutoPlayTimer];
+        } else {
+            [self _stopAutoPlayTimer];
+        }
+    }
 }
 
 #pragma mark Private Methods
