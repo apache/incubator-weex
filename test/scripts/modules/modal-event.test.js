@@ -27,7 +27,7 @@ describe('weex '+goal+' test', function () {
     //TODO ：截图比对
     return driver.waitForElementByName('alertClick', timeout, 2000)
       .click()
-      .sleep(1000)
+      .waitForElementByName('OK', timeout, 2000)
       .dismissAlert()
       .waitForElementByName(goal, timeout, 2000)
       .click()
