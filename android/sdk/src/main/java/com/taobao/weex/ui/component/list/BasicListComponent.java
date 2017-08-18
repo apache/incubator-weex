@@ -1287,6 +1287,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             return;
           }
 
+          RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+          if (!layoutManager.canScrollVertically()) {
+            return;
+          }
+
           if (shouldReport(offsetX, offsetY)) {
             fireScrollEvent(recyclerView, offsetX, offsetY);
           }
