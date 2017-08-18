@@ -93,6 +93,16 @@ typedef NS_ENUM(NSInteger, Direction) {
     [self resetAllViewsFrame];
 }
 
+- (void)accessibilityDecrement
+{
+    [self nextPage];
+}
+
+- (void)accessibilityIncrement
+{
+    [self lastPage];
+}
+
 #pragma mark Private Methods
 - (CGFloat)height {
     return self.frame.size.height;
@@ -222,6 +232,20 @@ typedef NS_ENUM(NSInteger, Direction) {
                 [self.scrollView setContentOffset:CGPointMake(nextIndex * self.width, 0) animated:YES];
             }
         }
+    }
+}
+
+- (void)lastPage
+{
+    
+    NSInteger lastIndex = [self currentIndex]-1;
+    if (_itemViews.count > 1) {
+        if (_infinite) {
+            if (lastIndex < 0) {
+                lastIndex = [_itemViews count]-1;
+            }
+        }
+        [self setCurrentIndex:lastIndex];
     }
 }
 
@@ -399,6 +423,11 @@ typedef NS_ENUM(NSInteger, Direction) {
     _recycleSliderView.exclusiveTouch = YES;
     _recycleSliderView.scrollView.scrollEnabled = _scrollable;
     _recycleSliderView.infinite = _infinite;
+    UIAccessibilityTraits traits = UIAccessibilityTraitAdjustable;
+    if (_autoPlay) {
+        traits |= UIAccessibilityTraitUpdatesFrequently;
+    }
+    _recycleSliderView.accessibilityTraits = traits;
     if (_autoPlay) {
         [self _startAutoPlayTimer];
     } else {
