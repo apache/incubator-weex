@@ -15,7 +15,7 @@ version: 2.1
 
 ## Handler (对应于 Android 的 Adapter) 介绍
   
-- WXImgLoaderDefaultImpl 图片下载 handler。Weex 会把需要设置图片的 View 和 URL 透露出来，Native 端需要实现这个接口进行图片下载。WeexSDK kernel 本身没有提供图片下载的默认实现。
+- `WXImgLoaderDefaultImpl` 图片下载 handler。Weex 会把需要设置图片的 View 和 URL 透露出来，Native 端需要实现这个接口进行图片下载。WeexSDK kernel 本身没有提供图片下载的默认实现。
 
   接口定义如下：
 
@@ -86,6 +86,6 @@ Weex 处于发展阶段会增加一些新的特性和功能，但是这些新的
 
 所谓降级功能就是 Weex 无法运行的版本或者手机，可以用 Weex h5 来代替。
 
-Native 端可以通过接口 WXSDKInstance 中的 onFailed 回调进行处理，如果是主动降级则返回的错误 domain 为 TemplateErrorType 表示主动降级，Native 端可以跳转到对应的 H5 页面，或者用其他的方式提示用户当前环境不支持 Weex。
+Native 端可以通过接口 WXSDKInstance 中的 onFailed 回调进行处理，如果是主动降级则返回的错误 domain 为 `TemplateErrorType`，Native 端可以跳转到对应的 H5 页面，或者用其他的方式提示用户当前环境不支持 Weex。
 
 	  

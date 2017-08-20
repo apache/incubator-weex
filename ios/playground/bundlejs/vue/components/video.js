@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(456)
+	__vue_styles__.push(__webpack_require__(474)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(457)
+	__vue_exports__ = __webpack_require__(475)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(458)
+	var __vue_template__ = __webpack_require__(476)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/video.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/video.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-a9b90eec"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,21 +91,21 @@
 
 /***/ },
 
-/***/ 385:
+/***/ 403:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(386)
+	__vue_styles__.push(__webpack_require__(404)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(387)
+	__vue_exports__ = __webpack_require__(405)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(388)
+	var __vue_template__ = __webpack_require__(406)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,22 +117,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/button.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/button.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-4c6be341"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 386:
+/***/ 404:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -228,7 +236,7 @@
 
 /***/ },
 
-/***/ 387:
+/***/ 405:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -251,21 +259,21 @@
 
 /***/ },
 
-/***/ 388:
+/***/ 406:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['btn', 'btn-' + _vm.type, 'btn-sz-' + _vm.size]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['btn-txt', 'btn-txt-' + _vm.type, 'btn-txt-sz-' + _vm.size]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 456:
+/***/ 474:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -278,7 +286,7 @@
 
 /***/ },
 
-/***/ 457:
+/***/ 475:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -305,7 +313,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -313,7 +321,7 @@
 	    };
 	  },
 	  components: {
-	    button: __webpack_require__(385)
+	    button: __webpack_require__(403)
 	  },
 	  methods: {
 	    pause: function pause() {
@@ -345,11 +353,11 @@
 
 /***/ },
 
-/***/ 458:
+/***/ 476:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', [_h('video', {
+	  return _c('scroller', [_c('video', {
 	    staticClass: ["video"],
 	    attrs: {
 	      "onpause": "onpause",
@@ -357,15 +365,15 @@
 	      "onfinish": "onfinish",
 	      "onfail": "onfail",
 	      "src": "http://g.tbcdn.cn/ali-wireless-h5/res/0.0.6/toy.mp4",
-	      "auto-play": "true",
+	      "autoPlay": "true",
 	      "playStatus": _vm.playStatus
 	    }
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticStyle: {
 	      flexDirection: "row",
 	      justifyContent: "center"
 	    }
-	  }, [_h('button', {
+	  }, [_c('button', {
 	    attrs: {
 	      "value": "Pause"
 	    },
@@ -374,7 +382,7 @@
 	        _vm.pause($event)
 	      }
 	    }
-	  }), _h('button', {
+	  }), _c('button', {
 	    staticStyle: {
 	      marginLeft: "20px"
 	    },
@@ -387,7 +395,7 @@
 	        _vm.play($event)
 	      }
 	    }
-	  })])])
+	  })], 1)], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

@@ -1,3 +1,30 @@
+<script>
+  ;(function(){
+    var currentOrigin = location.origin || 'https://weex-project.io',
+        currentPathname = location.pathname,
+        currentLang = navigator.language || navigator.browserLanguage || 'en',
+        selectedLang = '';
+
+    if (window.localStorage) {
+      selectedLang = window.localStorage.getItem('lang')
+      currentLang = selectedLang ? selectedLang : currentLang
+    }
+
+    if (/zh|cn/i.test(currentLang)) { // Chinese
+      if (currentPathname.indexOf('/cn/') != 0) {
+        location.href = currentOrigin + '/cn/'
+      }
+    } else if (/en/i.test(currentLang)) { // English
+      if (!/^\/$|^\/index/.test(currentPathname)) {
+        location.href = currentOrigin
+      }
+    } else { // Other
+      if (!/^\/$|^\/index/.test(currentPathname)) {
+        location.href = currentOrigin
+      }
+    }
+  })();
+</script>
 <div class="scene header" style="background: #00BDFF;">
   <div class="scene-container">
     <div class="galaxy left">
@@ -157,6 +184,34 @@
           <p><%= _p('index.users.youku.content') %></p>
         </div>
       </div>
+      <div class="user-logo taopiaopiao-logo">
+        <h3><%= _p('index.users.taopiaopiao.title') %></h3>
+        <div class="user-info">
+          <h4><%= _p('index.users.taopiaopiao.title') %></h4>
+          <p><%= _p('index.users.taopiaopiao.content') %></p>
+        </div>
+      </div>
+      <div class="user-logo fliggy-logo">
+        <h3><%= _p('index.users.fliggy.title') %></h3>
+        <div class="user-info">
+          <h4><%= _p('index.users.fliggy.title') %></h4>
+          <p><%= _p('index.users.fliggy.content') %></p>
+        </div>
+      </div>
+      <div class="user-logo juhuasuan-logo">
+        <h3><%= _p('index.users.juhuasuan.title') %></h3>
+        <div class="user-info">
+          <h4><%= _p('index.users.juhuasuan.title') %></h4>
+          <p><%= _p('index.users.juhuasuan.content') %></p>
+        </div>
+      </div>
+      <div class="user-logo qianniu-logo">
+        <h3><%= _p('index.users.qianniu.title') %></h3>
+        <div class="user-info">
+          <h4><%= _p('index.users.qianniu.title') %></h4>
+          <p><%= _p('index.users.qianniu.content') %></p>
+        </div>
+      </div>
     </div>
     <!--<div class="more">
       <a class="more" href="">More</a>
@@ -206,6 +261,6 @@ var swiper = new Swiper('.swiper-container', {
   loop: false,
   autoplay: false,
   autoplayDisableOnInteraction: false
-})
+});
 </script>
     

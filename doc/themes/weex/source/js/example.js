@@ -16,7 +16,7 @@
                 '}' +
               '</style>' +
               '<script src="https://unpkg.com/vue/dist/vue.runtime.js"></script>' +
-              '<script src="https://unpkg.com/weex-vue-render/index.js"></script>' +
+              '<script src="https://unpkg.com/weex-vue-render@0.10.0/dist/index.min.js"></script>' +
             '</head>' +
             '<body>' +
               '<div id="root"></div>' +

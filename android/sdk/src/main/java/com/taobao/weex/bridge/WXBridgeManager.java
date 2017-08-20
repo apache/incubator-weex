@@ -1,206 +1,20 @@
-/**
- *
- *                                  Apache License
- *                            Version 2.0, January 2004
- *                         http://www.apache.org/licenses/
- *
- *    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
- *
- *    1. Definitions.
- *
- *       "License" shall mean the terms and conditions for use, reproduction,
- *       and distribution as defined by Sections 1 through 9 of this document.
- *
- *       "Licensor" shall mean the copyright owner or entity authorized by
- *       the copyright owner that is granting the License.
- *
- *       "Legal Entity" shall mean the union of the acting entity and all
- *       other entities that control, are controlled by, or are under common
- *       control with that entity. For the purposes of this definition,
- *       "control" means (i) the power, direct or indirect, to cause the
- *       direction or management of such entity, whether by contract or
- *       otherwise, or (ii) ownership of fifty percent (50%) or more of the
- *       outstanding shares, or (iii) beneficial ownership of such entity.
- *
- *       "You" (or "Your") shall mean an individual or Legal Entity
- *       exercising permissions granted by this License.
- *
- *       "Source" form shall mean the preferred form for making modifications,
- *       including but not limited to software source code, documentation
- *       source, and configuration files.
- *
- *       "Object" form shall mean any form resulting from mechanical
- *       transformation or translation of a Source form, including but
- *       not limited to compiled object code, generated documentation,
- *       and conversions to other media types.
- *
- *       "Work" shall mean the work of authorship, whether in Source or
- *       Object form, made available under the License, as indicated by a
- *       copyright notice that is included in or attached to the work
- *       (an example is provided in the Appendix below).
- *
- *       "Derivative Works" shall mean any work, whether in Source or Object
- *       form, that is based on (or derived from) the Work and for which the
- *       editorial revisions, annotations, elaborations, or other modifications
- *       represent, as a whole, an original work of authorship. For the purposes
- *       of this License, Derivative Works shall not include works that remain
- *       separable from, or merely link (or bind by name) to the interfaces of,
- *       the Work and Derivative Works thereof.
- *
- *       "Contribution" shall mean any work of authorship, including
- *       the original version of the Work and any modifications or additions
- *       to that Work or Derivative Works thereof, that is intentionally
- *       submitted to Licensor for inclusion in the Work by the copyright owner
- *       or by an individual or Legal Entity authorized to submit on behalf of
- *       the copyright owner. For the purposes of this definition, "submitted"
- *       means any form of electronic, verbal, or written communication sent
- *       to the Licensor or its representatives, including but not limited to
- *       communication on electronic mailing lists, source code control systems,
- *       and issue tracking systems that are managed by, or on behalf of, the
- *       Licensor for the purpose of discussing and improving the Work, but
- *       excluding communication that is conspicuously marked or otherwise
- *       designated in writing by the copyright owner as "Not a Contribution."
- *
- *       "Contributor" shall mean Licensor and any individual or Legal Entity
- *       on behalf of whom a Contribution has been received by Licensor and
- *       subsequently incorporated within the Work.
- *
- *    2. Grant of Copyright License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       copyright license to reproduce, prepare Derivative Works of,
- *       publicly display, publicly perform, sublicense, and distribute the
- *       Work and such Derivative Works in Source or Object form.
- *
- *    3. Grant of Patent License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       (except as stated in this section) patent license to make, have made,
- *       use, offer to sell, sell, import, and otherwise transfer the Work,
- *       where such license applies only to those patent claims licensable
- *       by such Contributor that are necessarily infringed by their
- *       Contribution(s) alone or by combination of their Contribution(s)
- *       with the Work to which such Contribution(s) was submitted. If You
- *       institute patent litigation against any entity (including a
- *       cross-claim or counterclaim in a lawsuit) alleging that the Work
- *       or a Contribution incorporated within the Work constitutes direct
- *       or contributory patent infringement, then any patent licenses
- *       granted to You under this License for that Work shall terminate
- *       as of the date such litigation is filed.
- *
- *    4. Redistribution. You may reproduce and distribute copies of the
- *       Work or Derivative Works thereof in any medium, with or without
- *       modifications, and in Source or Object form, provided that You
- *       meet the following conditions:
- *
- *       (a) You must give any other recipients of the Work or
- *           Derivative Works a copy of this License; and
- *
- *       (b) You must cause any modified files to carry prominent notices
- *           stating that You changed the files; and
- *
- *       (c) You must retain, in the Source form of any Derivative Works
- *           that You distribute, all copyright, patent, trademark, and
- *           attribution notices from the Source form of the Work,
- *           excluding those notices that do not pertain to any part of
- *           the Derivative Works; and
- *
- *       (d) If the Work includes a "NOTICE" text file as part of its
- *           distribution, then any Derivative Works that You distribute must
- *           include a readable copy of the attribution notices contained
- *           within such NOTICE file, excluding those notices that do not
- *           pertain to any part of the Derivative Works, in at least one
- *           of the following places: within a NOTICE text file distributed
- *           as part of the Derivative Works; within the Source form or
- *           documentation, if provided along with the Derivative Works; or,
- *           within a display generated by the Derivative Works, if and
- *           wherever such third-party notices normally appear. The contents
- *           of the NOTICE file are for informational purposes only and
- *           do not modify the License. You may add Your own attribution
- *           notices within Derivative Works that You distribute, alongside
- *           or as an addendum to the NOTICE text from the Work, provided
- *           that such additional attribution notices cannot be construed
- *           as modifying the License.
- *
- *       You may add Your own copyright statement to Your modifications and
- *       may provide additional or different license terms and conditions
- *       for use, reproduction, or distribution of Your modifications, or
- *       for any such Derivative Works as a whole, provided Your use,
- *       reproduction, and distribution of the Work otherwise complies with
- *       the conditions stated in this License.
- *
- *    5. Submission of Contributions. Unless You explicitly state otherwise,
- *       any Contribution intentionally submitted for inclusion in the Work
- *       by You to the Licensor shall be under the terms and conditions of
- *       this License, without any additional terms or conditions.
- *       Notwithstanding the above, nothing herein shall supersede or modify
- *       the terms of any separate license agreement you may have executed
- *       with Licensor regarding such Contributions.
- *
- *    6. Trademarks. This License does not grant permission to use the trade
- *       names, trademarks, service marks, or product names of the Licensor,
- *       except as required for reasonable and customary use in describing the
- *       origin of the Work and reproducing the content of the NOTICE file.
- *
- *    7. Disclaimer of Warranty. Unless required by applicable law or
- *       agreed to in writing, Licensor provides the Work (and each
- *       Contributor provides its Contributions) on an "AS IS" BASIS,
- *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *       implied, including, without limitation, any warranties or conditions
- *       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
- *       PARTICULAR PURPOSE. You are solely responsible for determining the
- *       appropriateness of using or redistributing the Work and assume any
- *       risks associated with Your exercise of permissions under this License.
- *
- *    8. Limitation of Liability. In no event and under no legal theory,
- *       whether in tort (including negligence), contract, or otherwise,
- *       unless required by applicable law (such as deliberate and grossly
- *       negligent acts) or agreed to in writing, shall any Contributor be
- *       liable to You for damages, including any direct, indirect, special,
- *       incidental, or consequential damages of any character arising as a
- *       result of this License or out of the use or inability to use the
- *       Work (including but not limited to damages for loss of goodwill,
- *       work stoppage, computer failure or malfunction, or any and all
- *       other commercial damages or losses), even if such Contributor
- *       has been advised of the possibility of such damages.
- *
- *    9. Accepting Warranty or Additional Liability. While redistributing
- *       the Work or Derivative Works thereof, You may choose to offer,
- *       and charge a fee for, acceptance of support, warranty, indemnity,
- *       or other liability obligations and/or rights consistent with this
- *       License. However, in accepting such obligations, You may act only
- *       on Your own behalf and on Your sole responsibility, not on behalf
- *       of any other Contributor, and only if You agree to indemnify,
- *       defend, and hold each Contributor harmless for any liability
- *       incurred by, or claims asserted against, such Contributor by reason
- *       of your accepting any such warranty or additional liability.
- *
- *    END OF TERMS AND CONDITIONS
- *
- *    APPENDIX: How to apply the Apache License to your work.
- *
- *       To apply the Apache License to your work, attach the following
- *       boilerplate notice, with the fields enclosed by brackets "[]"
- *       replaced with your own identifying information. (Don't include
- *       the brackets!)  The text should be enclosed in the appropriate
- *       comment syntax for the file format. We also recommend that a
- *       file or class name and description of purpose be included on the
- *       same "printed page" as the copyright notice for easier
- *       identification within third-party archives.
- *
- *    Copyright 2016 Alibaba Group
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.taobao.weex.bridge;
 
@@ -210,6 +24,7 @@ import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -232,12 +47,11 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.ui.module.WXTimerModule;
+import com.taobao.weex.dom.action.Action;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXHack;
-import com.taobao.weex.utils.WXHack.HackDeclaration.HackAssertionException;
-import com.taobao.weex.utils.WXHack.HackedClass;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -245,6 +59,7 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -287,6 +102,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String METHOD_CALLBACK = "callback";
   public static final String METHOD_REFRESH_INSTANCE = "refreshInstance";
   public static final String METHOD_NOTIFY_TRIM_MEMORY = "notifyTrimMemory";
+  public static final String METHOD_NOTIFY_SERIALIZE_CODE_CACHE =
+      "notifySerializeCodeCache";
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
@@ -302,7 +119,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static final int INIT_FRAMEWORK_OK = 1;
 
-  private static long LOW_MEM_VALUE = 80;
+  private static long LOW_MEM_VALUE = 120;
 
   static volatile WXBridgeManager mBridgeManager;
 
@@ -358,25 +175,34 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void initWXBridge(boolean remoteDebug) {
-    if (WXEnvironment.isApkDebugable()) {
-      if (remoteDebug) {
-        WXEnvironment.sDebugServerConnectable = true;
-      }
+    if (remoteDebug && WXEnvironment.isApkDebugable()) {
+      WXEnvironment.sDebugServerConnectable = true;
+    }
 
-      if (mWxDebugProxy != null) {
-        mWxDebugProxy.stop(false);
-      }
-      if (WXEnvironment.sDebugServerConnectable) {
+    if (mWxDebugProxy != null) {
+      mWxDebugProxy.stop(false);
+    }
+    if (WXEnvironment.sDebugServerConnectable && WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.getApplication() != null) {
         try {
-          HackedClass<Object> debugProxyClass = WXHack.into("com.taobao.weex.devtools.debug.DebugServerProxy");
-          mWxDebugProxy = (IWXDebugProxy) debugProxyClass.constructor(Context.class, WXBridgeManager.class)
-              .getInstance(WXEnvironment.getApplication(), WXBridgeManager.this);
-          if (mWxDebugProxy != null) {
-            mWxDebugProxy.start();
+          Class clazz = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+          if (clazz != null) {
+            Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
+            if (constructor != null) {
+              mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
+                      WXEnvironment.getApplication(), WXBridgeManager.this);
+              if (mWxDebugProxy != null) {
+                mWxDebugProxy.start();
+              }
+            }
           }
-        } catch (HackAssertionException e) {
-          WXLogUtils.e("initWXBridge HackAssertionException ", e);
+        } catch (Throwable e) {
+          //Ignore, It will throw Exception on Release environment
         }
+        WXServiceManager.execAllCacheJsService();
+      } else {
+        WXLogUtils.e("WXBridgeManager", "WXEnvironment.sApplication is null, skip init Inspector");
+        WXLogUtils.w("WXBridgeManager", new Throwable("WXEnvironment.sApplication is null when init Inspector"));
       }
     }
     if (remoteDebug && mWxDebugProxy != null) {
@@ -393,7 +219,29 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
     public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
-    return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+      WXSDKInstance wxsdkInstance = WXSDKManager.getInstance()
+              .getSDKInstance(instanceId);
+      if (wxsdkInstance == null) {
+        return null;
+      }
+      if (wxsdkInstance.isNeedValidate()
+              && WXSDKManager.getInstance().getValidateProcessor() != null) {
+          WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
+                  .getInstance().getValidateProcessor()
+                  .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args);
+          if (validateResult == null) {
+              return null;
+          }
+          if (validateResult.isSuccess) {
+              return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
+                      args);
+          } else {
+              JSONObject validateInfo = validateResult.validateInfo;
+              WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
+              return validateInfo;
+          }
+      }
+      return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
   }
 
   /**
@@ -487,7 +335,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               WXDomModule dom = getDomModule(instanceId);
               return dom.callDomMethod(method,arguments);
             }else {
-              return WXModuleManager.callModuleMethod(instanceId, module,
+              return callModuleMethod(instanceId, module,
                       method, arguments);
             }
         } catch (Exception e) {
@@ -565,7 +413,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                 WXDomModule dom = getDomModule(instanceId);
                 dom.callDomMethod(task);
               }else {
-                WXModuleManager.callModuleMethod(instanceId, (String) target,
+                callModuleMethod(instanceId, (String) target,
                     (String) task.get(METHOD), (JSONArray) task.get(ARGS));
               }
             }else if(task.get(COMPONENT) != null){
@@ -581,6 +429,366 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
         commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,"[WXBridgeManager] callNative exception "+e.getCause());
       }
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callCreateBody
+  public int callCreateBody(String instanceId, String tasks, String callback) {
+    if (TextUtils.isEmpty(tasks)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> instanceId:").append(instanceId)
+              .append(", tasks:").append(tasks).append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        JSONObject domObject = JSON.parseObject(tasks);
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getCreateBody(domObject);
+        domModule.postAction((DOMAction)action, true);
+      }
+    } catch (Exception e) {
+        WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
+        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody exception "+e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateFinish
+  public int callUpdateFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getUpdateFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,"[WXBridgeManager] callUpdateFinish exception "+e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callCreateFinish
+  public int callCreateFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getCreateFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_CREATEFINISH,"[WXBridgeManager] callCreateFinish exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callRefreshFinish
+  public int callRefreshFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRefreshFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRefreshFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRefreshFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_REFRESHFINISH,"[WXBridgeManager] callRefreshFinish exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateAttrs
+  public int callUpdateAttrs(String instanceId, String ref, String task, String callback) {
+    if (TextUtils.isEmpty(task)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callUpdateAttrs: call UpdateAttrs tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATEATTRS,"[WXBridgeManager] callUpdateAttrs: call UpdateAttrs tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateAttrs >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", task:").append(task)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        JSONObject domObject = JSON.parseObject(task);
+        Action action = Actions.getUpdateAttrs(ref, domObject);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateAttrs exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATEATTRS,"[WXBridgeManager] callUpdateAttrs exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateStyle
+  public int callUpdateStyle(String instanceId, String ref, String task, String callback) {
+    if (TextUtils.isEmpty(task)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", task:").append(task)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        JSONObject domObject = JSON.parseObject(task);
+        Action action = Actions.getUpdateStyle(ref, domObject, false);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateStyle exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyle exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callUpdateStyle
+  public int callRemoveElement(String instanceId, String ref, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRemoveElement(ref);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT,"[WXBridgeManager] callRemoveElement exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callMoveElement
+  public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
+              .append(", parentref:").append(parentref)
+              .append(", index:").append(index)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getMoveElement(ref, parentref, Integer.parseInt(index));
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callMoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_MOVEELEMENT,"[WXBridgeManager] callMoveElement exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddEvent(String instanceId, String ref, String event, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", event:").append(event);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getAddEvent(ref, event);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_ADDEVENT,"[WXBridgeManager] callAddEvent exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveEvent >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", event:").append(event);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge .DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRemoveEvent(ref, event);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEEVENT,"[WXBridgeManager] callRemoveEvent exception " + e.getCause());
     }
 
     if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
@@ -613,7 +821,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
       }
       WXDomModule domModule = getDomModule(instanceId);
-      domModule.addElement(ref, domObject, Integer.parseInt(index));
+      domModule.postAction(Actions.getAddElement(domObject, ref,Integer.parseInt(index)),false);
     }
 
     if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
@@ -822,8 +1030,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public void commitJSBridgeAlarmMonitor(String instanceId, WXErrorCode errCode, String errMsg) {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance == null || errCode == null) {
+      return;
+    }
+    // TODO: We should move WXPerformance and IWXUserTrackAdapter
+    // into a adapter level.
+    // comment out the line below to prevent commiting twice.
+    //instance.commitUTStab(WXConst.JS_BRIDGE, errCode, errMsg);
+
     IWXUserTrackAdapter adapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (instance == null || adapter == null || errCode == null) {
+    if (adapter == null) {
       return;
     }
     WXPerformance performance = new WXPerformance();
@@ -837,8 +1053,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public void commitJSFrameworkAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {
+    if (TextUtils.isEmpty(type) || errorCode == null) {
+      return;
+    }
+    if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+      WXSDKManager.getInstance().getWXStatisticsListener().onException("0",
+          errorCode.getErrorCode(),
+          TextUtils.isEmpty(errMsg) ? errorCode.getErrorMsg() : errMsg);
+    }
+
     final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (userTrackAdapter == null || TextUtils.isEmpty(type) || errorCode == null) {
+    if (userTrackAdapter == null) {
       return;
     }
     WXPerformance performance = new WXPerformance();
@@ -995,20 +1220,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXJSObject[] args = {obj};
         invokeExecJS("", null, METHOD_SET_TIMEOUT, args);
         break;
-      case WXJSBridgeMsgType.MODULE_TIMEOUT:
-        if(msg.obj == null){
-          break;
+      case WXJSBridgeMsgType.TAKE_HEAP_SNAPSHOT:
+        if (msg.obj != null) {
+          String filename = (String) msg.obj;
+          mWXBridge.takeHeapSnapshot(filename);
         }
-        args = createTimerArgs(msg.arg1, (Integer) msg.obj, false);
-        invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
-        break;
-      case WXJSBridgeMsgType.MODULE_INTERVAL:
-        if(msg.obj == null){
-          break;
-        }
-        WXTimerModule.setInterval((Integer) msg.obj, msg.arg2, msg.arg1);
-        args = createTimerArgs(msg.arg1, (Integer) msg.obj, true);
-        invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
         break;
       default:
         break;
@@ -1020,7 +1236,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     invokeExecJS(instanceId, namespace, function, args, true);
   }
 
-  private void invokeExecJS(String instanceId, String namespace, String function,
+  public void invokeExecJS(String instanceId, String namespace, String function,
                             WXJSObject[] args,boolean logTaskDetail){
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
@@ -1033,22 +1249,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     mWXBridge.execJS(instanceId, namespace, function, args);
   }
 
-  private WXJSObject[] createTimerArgs(int instanceId, int funcId, boolean keepAlive) {
-    ArrayList<Object> argsList = new ArrayList<>();
-    argsList.add(funcId);
-    argsList.add(new HashMap<>());
-    argsList.add(keepAlive);
-    WXHashMap<String, Object> task = new WXHashMap<>();
-    task.put(KEY_METHOD, METHOD_CALLBACK);
-    task.put(KEY_ARGS, argsList);
-    Object[] tasks={task};
-    return new WXJSObject[]{
-        new WXJSObject(WXJSObject.String, String.valueOf(instanceId)),
-        new WXJSObject(WXJSObject.JSON,
-                       WXJsonUtils.fromObjectToJSONString(tasks))};
-  }
-
-  private void invokeInitFramework(Message msg) {   
+  private void invokeInitFramework(Message msg) {
     String framework = "";
     if (msg.obj != null) {
       framework = (String) msg.obj;
@@ -1073,6 +1274,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         return;
       }
       try {
+        if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+          WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkStart();
+        }
+
         long start = System.currentTimeMillis();
         if(mWXBridge.initFramework(framework, assembleDefaultOptions())==INIT_FRAMEWORK_OK){
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
@@ -1080,6 +1285,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
           WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
           mInit = true;
+
+          if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+            WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkReady();
+          }
+
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
@@ -1101,7 +1311,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private void invokeCallJSBatch(Message message) {
     if (mNextTickTasks.isEmpty() || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized!!  message:"+message.toString());
       }
       return;
     }
@@ -1143,36 +1353,54 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private WXParams assembleDefaultOptions() {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
-    wxParams.setPlatform(config.get("os"));
-    wxParams.setOsVersion(config.get("sysVersion"));
-    wxParams.setAppVersion(config.get("appVersion"));
-    wxParams.setWeexVersion(config.get("weexVersion"));
-    wxParams.setDeviceModel(config.get("sysModel"));
+    wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setOsVersion(config.get(WXConfig.sysVersion));
+    wxParams.setAppVersion(config.get(WXConfig.appVersion));
+    wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
+    wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
-    String appName = config.get("appName");
+    String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
     }
     wxParams.setDeviceWidth(TextUtils.isEmpty(config.get("deviceWidth")) ? String.valueOf(WXViewUtils.getScreenWidth(WXEnvironment.sApplication)) : config.get("deviceWidth"));
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
     wxParams.setOptions(WXEnvironment.getCustomOptions());
+    wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
     return wxParams;
   }
 
   private void execRegisterFailTask() {
-    int moduleCount = mRegisterModuleFailList.size();
-    if (moduleCount > 0) {
-      for (int i = 0; i < moduleCount; ++i) {
-        invokeRegisterModules(mRegisterModuleFailList.get(i));
+
+    if (mRegisterModuleFailList.size() > 0) {
+      List<Map<String, Object>> moduleReceiver = new ArrayList<>();
+      for (int i = 0, moduleCount = mRegisterModuleFailList.size(); i < moduleCount; ++i) {
+        invokeRegisterModules(mRegisterModuleFailList.get(i), moduleReceiver);
+      }
+      mRegisterModuleFailList.clear();
+      if (moduleReceiver.size() > 0) {
+        mRegisterModuleFailList.addAll(moduleReceiver);
       }
     }
+
     if (mRegisterComponentFailList.size() > 0) {
-      invokeRegisterComponents(mRegisterComponentFailList);
+      List<Map<String, Object>> receiver = new ArrayList<>();
+      invokeRegisterComponents(mRegisterComponentFailList, receiver);
+      mRegisterComponentFailList.clear();
+      if (receiver.size() > 0) {
+        mRegisterComponentFailList.addAll(receiver);
+      }
     }
+
     if (mRegisterServiceFailList.size() > 0) {
+      List<String> receiver = new ArrayList<>();
       for (String service : mRegisterServiceFailList) {
-        invokeExecJSService(service);
+        invokeExecJSService(service, receiver);
+      }
+      mRegisterServiceFailList.clear();
+      if (receiver.size() > 0) {
+        mRegisterServiceFailList.addAll(receiver);
       }
     }
   }
@@ -1186,13 +1414,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public void registerModules(final Map<String, Object> modules) {
     if (modules != null && modules.size() != 0) {
       if(isJSThread()){
-        invokeRegisterModules(modules);
+        invokeRegisterModules(modules, mRegisterModuleFailList);
       }
       else{
         post(new Runnable() {
           @Override
           public void run() {
-            invokeRegisterModules(modules);
+            invokeRegisterModules(modules, mRegisterComponentFailList);
           }
         }, null);
       }
@@ -1210,7 +1438,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
-        invokeRegisterComponents(components);
+        invokeRegisterComponents(components, mRegisterComponentFailList);
       }
     }, null);
   }
@@ -1219,16 +1447,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
-        invokeExecJSService(service);
+        invokeExecJSService(service, mRegisterServiceFailList);
       }
     });
   }
 
-  private void invokeExecJSService(String service) {
+  private void invokeExecJSService(String service, List<String> receiver) {
     try {
       if (!isJSFrameworkInit()) {
         WXLogUtils.e("[WXBridgeManager] invoke execJSService: framework.js uninitialized.");
-        mRegisterServiceFailList.add(service);
+        receiver.add(service);
         return;
       }
       mWXBridge.execJSService(service);
@@ -1242,12 +1470,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mJSThread != null && mJSThread.getId() == Thread.currentThread().getId();
   }
 
-  private void invokeRegisterModules(Map<String, Object> modules) {
+  private void invokeRegisterModules(Map<String, Object> modules, List<Map<String, Object>> failReceiver) {
     if (modules == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+        WXLogUtils.e("[WXBridgeManager] invokeRegisterModules: framework.js uninitialized.");
       }
-      mRegisterModuleFailList.add(modules);
+      failReceiver.add(modules);
       return;
     }
 
@@ -1261,11 +1489,15 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  private void invokeRegisterComponents(List<Map<String, Object>> components) {
+  private void invokeRegisterComponents(List<Map<String, Object>> components, List<Map<String, Object>> failReceiver) {
+    if(components == failReceiver){
+      throw new RuntimeException("Fail receiver should not use source.");
+    }
     if (!isJSFrameworkInit()) {
-      WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents: framework.js uninitialized.");
+
       for (Map<String,Object> comp:components){
-        mRegisterComponentFailList.add(comp);
+        failReceiver.add(comp);
       }
       return;
     }
@@ -1336,16 +1568,40 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     registerModules(domMap);
   }
 
+  //This method is deprecated because of performance issue.
+  @Deprecated
   public void notifyTrimMemory() {
+
+  }
+
+  public
+  @Nullable
+  Looper getJSLooper() {
+    Looper ret = null;
+    if (mJSThread != null) {
+      ret = mJSThread.getLooper();
+    }
+    return ret;
+  }
+
+  public void notifySerializeCodeCache() {
     post(new Runnable() {
       @Override
       public void run() {
         if (!isJSFrameworkInit())
           return;
-
-        invokeExecJS("", null, METHOD_NOTIFY_TRIM_MEMORY, new WXJSObject[0]);
+        
+        invokeExecJS("", null, METHOD_NOTIFY_SERIALIZE_CODE_CACHE, new WXJSObject[0]);
       }
     });
+  }
+
+  public void takeJSHeapSnapshot(String filename) {
+    Message msg = mJSHandler.obtainMessage();
+    msg.obj = filename;
+    msg.what = WXJSBridgeMsgType.TAKE_HEAP_SNAPSHOT;
+    msg.setTarget(mJSHandler);
+    msg.sendToTarget();
   }
 
 }

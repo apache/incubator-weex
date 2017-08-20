@@ -11,7 +11,7 @@ version: 2.1
 
 这部分API是通过把 virtual-dom 的消息发送到 native 渲染器来做到的。
 
-开发者在日常开发中，唯一可在 `.we` 文件中使用的是 `scrollToElement`。
+开发者在日常开发中，唯一可在 `.vue` 文件中使用的是 `scrollToElement`。
 ~~你也可以调用 `$scrollTo` 方法来使用它~~
 
 这个页面提及的其他的 API，只在 `callNative` 进程中的 native 渲染器用。
@@ -24,12 +24,13 @@ version: 2.1
 
 ~~这个API也能通过调用VM的方法 `$scrollTo` 来使用（已弃用）~~
 
-要在你的 `.we` 文件中使用这个 API，可以使用 `require('@weex-module/dom').scrollToElement`。
+要在你的 `.vue` 文件中使用这个 API，可以使用 `weex.requireModule('dom').scrollToElement`。
 
 #### 参数
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
-  - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
+- `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
+- `animated {boolean}` <sup class="wx-v">0.10+</sup>：是否需要附带滚动动画，默认是`true`
 
 #### 示例
 
@@ -120,9 +121,9 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/dom-scroll.html)
+[try it](http://dotwe.org/vue/56e0d256cbb26facd958dbd6424f42b2)
 
-### getComponentRect(ref, callback)<sup>v0.9.4+</sup>
+### getComponentRect(ref, callback) <span class="api-version">v0.9.4+</span>
 
 通过标签的 `ref` 获得其布局信息，返回的信息在 `callBack` 中，格式参考如下：
 
@@ -144,8 +145,8 @@ version: 2.1
 
 ```html
 <template>
-  <div class="wrapper">
-    <div ref="box" class="box">
+  <div class="wrapper" style='margin-top:200px'>
+    <div ref="box"  class="box">
       <text class="info">Width: {{size.width}}</text>
       <text class="info">Height: {{size.height}}</text>
       <text class="info">Top: {{size.top}}</text>
@@ -153,11 +154,26 @@ version: 2.1
       <text class="info">Left: {{size.left}}</text>
       <text class="info">Right: {{size.right}}</text>
     </div>
+    
+    <text class="info btn"  @click='click()'>{{this.tip}}</text>
+      
   </div>
-</template>
+</template> 
 
 <script>
   const dom = weex.requireModule('dom')
+  
+ function round(size) {
+      var roundSize = {
+        'width': Math.round(size.width),
+        'height': Math.round(size.height),
+        'top': Math.round(size.top),
+        'bottom': Math.round(size.bottom),
+        'left': Math.round(size.left),
+        'right': Math.round(size.right)
+      }
+      return roundSize
+  }
 
   export default {
     data () {
@@ -169,26 +185,60 @@ version: 2.1
           bottom: 0,
           left: 0,
           right: 0
-        }
+        },
+        ref:"viewport",
+        tip:"get box rect"
       }
     },
     mounted () {
-      const result = dom.getComponentRect(this.$refs.box, option => {
+      const result = dom.getComponentRect(this.ref, option => {
         console.log('getComponentRect:', option)
-        this.size = option.size
+        this.size = round.call(this,option.size);
       })
-      console.log('return value:', result)
-      console.log('viewport:', dom.getComponentRect('viewport'))
+    },
+    
+    methods:{
+      click:function() {
+        if (this.ref === 'viewport') {
+          this.ref = this.$refs.box;
+          this.tip = "get viewport rect"
+        } else {
+          this.ref = 'viewport'
+          this.tip = "get box rect"
+        }
+          
+         const result = dom.getComponentRect(this.ref, option => {
+          console.log('getComponentRect:', option)
+          this.size = round.call(this,option.size);
+        })
+      }
     }
+    
   }
 </script>
 
 <style scoped>
+  .btn {
+    margin-top:20px;
+    border-width:2px;
+    border-style: solid;
+    border-radius:10px;
+    width:300px;
+    margin-left:170px;
+    padding-left:35px;
+    border-color: rgb(162, 217, 192);
+    
+  }
+  .btn:active {
+    background-color: #8fbc8f;
+		border-color: gray;
+  }
+  
   .box {
-    margin-top: 200px;
+    align-items:center;
     margin-left: 150px;
-    width: 450px;
-    height: 450px;
+    width: 350px;
+    height: 400px;
     background-color: #DDD;
     border-width: 2px;
     border-style: solid;
@@ -197,13 +247,34 @@ version: 2.1
   }
   .info {
     font-size: 40px;
+    top:30px;
+    margin-left:20px;
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
     color: #41B883;
   }
 </style>
 ```
 
-[try it](../../../examples/dom-rect.html)
+[try it](http://dotwe.org/vue/d069a9bf0f0781b914f12a9a7b9a1447)
+
+
+### addRule
+`支持版本:v0.12.0`
+
+addRule是可以为dom 添加一条规则，目前支持自定义字体fontFace规则，构建自定义的font-family，可以在[text](../components/text.html#iconfont)使用
+
+#### fontFace
+
+```html
+var domModule = weex.requireModule('dom');
+domModule.addRule('fontFace', {
+    'fontFamily': "iconfont2",
+    'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+});
+
+```
+
+[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
 
 ## 其他
 

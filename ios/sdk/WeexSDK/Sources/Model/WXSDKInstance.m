@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXSDKInstance.h"
@@ -26,6 +37,12 @@
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXValidateProtocol.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXTextComponent.h"
+#import "WXConvert.h"
+#import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -126,8 +143,11 @@ typedef enum : NSUInteger {
         return;
     }
     
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
+    
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@""}];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
@@ -138,6 +158,8 @@ typedef enum : NSUInteger {
     _jsData = data;
     
     [self _renderWithMainBundleString:source];
+    
+    [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
@@ -173,21 +195,42 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
-    
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
     
+    [self _handleConfigCenter];
+    
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"bundleUrl":self.scriptURL?[self.scriptURL absoluteString]:@""}];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
+- (void)_handleConfigCenter
+{
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
+        [WXTextComponent setRenderUsingCoreText:useCoreText];
+        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXCycleSliderComponent" isDefault:NULL];
+        if(sliderConfig){
+            NSString *sliderClassName = [WXConvert NSString:sliderConfig];
+            if(sliderClassName.length>0){
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
+            }else{
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
+            }
+        }else{
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
+        }
+    }
+}
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
     NSURL *url = request.URL;
     _scriptURL = url;
-    _options = options;
     _jsData = data;
     NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
     
@@ -199,9 +242,10 @@ typedef enum : NSUInteger {
         WXLogWarning(@"Error type in options with key:bundleUrl, should be of type NSString, not NSURL!");
         newOptions[bundleUrlOptionKey] = ((NSURL*)newOptions[bundleUrlOptionKey]).absoluteString;
     }
-    
+    _options = [newOptions copy];
+  
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
+        self.pageName = url.absoluteString ? : @"";
     }
     
     request.userAgent = [WXUtility userAgent];
@@ -211,15 +255,23 @@ typedef enum : NSUInteger {
     _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        
+        NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+            error = [NSError errorWithDomain:WX_ERROR_DOMAIN
                                         code:((NSHTTPURLResponse *)response).statusCode
                                     userInfo:@{@"message":@"status code error."}];
             if (strongSelf.onFailed) {
                 strongSelf.onFailed(error);
             }
-            return ;
+        }
+        
+        if (strongSelf.onJSDownloadedFinish) {
+            strongSelf.onJSDownloadedFinish(response, request, data, error);
+        }
+        
+        if (error) {
+            // if an error occurs, just return.
+            return;
         }
 
         if (!data) {
@@ -240,16 +292,18 @@ typedef enum : NSUInteger {
 
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
-
+        
         [strongSelf _renderWithMainBundleString:jsBundleString];
+        [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@", request.URL, loadError.localizedDescription];
-        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+        
+        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(loadError);
+            weakSelf.onFailed(error);
         }
     };
     
@@ -283,13 +337,21 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
+        return;
+    }
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
     }
     
+    [WXPrerenderManager destroyTask:self.instanceId];
+    
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
 
+    if (_componentManager) {
+        [_componentManager invalidate];
+    }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
@@ -298,6 +360,11 @@ typedef enum : NSUInteger {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         });
     });
+}
+
+- (void)forceGarbageCollection
+{
+    [[WXSDKManager bridgeMgr] forceGarbageCollection];
 }
 
 - (void)updateState:(WXState)state
@@ -434,7 +501,11 @@ typedef enum : NSUInteger {
         //had not registered yet
         observer = [NSMutableDictionary new];
         [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
-        [_moduleEventObservers addEntriesFromDictionary:observer];
+        if (_moduleEventObservers[moduleClassName]) { //support multi event
+            [_moduleEventObservers[moduleClassName] addEntriesFromDictionary:observer[moduleClassName]];
+        }else {
+            [_moduleEventObservers addEntriesFromDictionary:observer];
+        }
     } else {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];

@@ -1,18 +1,32 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXModuleMethod.h"
 #import "WXModuleFactory.h"
 #import "WXMonitor.h"
 #import "WXModuleProtocol.h"
+#import "WXAppMonitorProtocol.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
+#import "WXHandlerFactory.h"
+#import "WXValidateProtocol.h"
 
 @implementation WXModuleMethod
 
@@ -30,6 +44,26 @@
 
 - (NSInvocation *)invoke
 {
+    
+    if (self.instance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            WXModuleValidateResult* result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
+            if (result && !result.isSuccess) {
+                NSString *errorMessage = [result.error.userInfo  objectForKey:@"errorMsg"];
+                WXLogError(@"%@", errorMessage);
+                WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
+                if ([result.error respondsToSelector:@selector(userInfo)]) {
+                    NSInvocation *invocation = [self invocationWithTarget:result.error selector:@selector(userInfo)];
+                    [invocation invoke];
+                    return invocation;
+                }else{
+                    return nil;
+                }
+            }
+        }
+    }
+    
     Class moduleClass =  [WXModuleFactory classWithModuleName:_moduleName];
     if (!moduleClass) {
         NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist, maybe it has not been registered", _moduleName];
@@ -54,7 +88,8 @@
         }
         return nil;
     }
-    
+	
+    [self commitModuleInvoke];
     NSInvocation *invocation = [self invocationWithTarget:moduleInstance selector:selector];
     
     if (isSync) {
@@ -63,6 +98,15 @@
     } else {
         [self _dispatchInvocation:invocation moduleInstance:moduleInstance];
         return nil;
+    }
+}
+
+- (void)commitModuleInvoke
+{
+    id<WXAppMonitorProtocol> appMonitorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
+    if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
+        NSString * arg = [NSString stringWithFormat:@"%@.%@", self.moduleName, self.methodName];
+        [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"invokeModule" success:NO errorCode:@"101" errorMsg:self.instance.pageName arg:arg];
     }
 }
 

@@ -5,7 +5,7 @@
 # Site
 title: Weex
 subtitle:
-description:
+description: A framework for building Mobile cross-platform UIs. Different from a "web app", "HTML5 app", or "hybrid app", you can use Weex to build a real mobile app. The code that you write is relatively simple, because you can build native applications just using HTML, CSS, Javascript. But underneath, the core of the application is Objective-C or Java. At the same time, Weex will provide a lot of native components or modules for developers to use.
 author: Jinjiang
 language: 
   - en
@@ -24,6 +24,7 @@ jsonContent:
   ignore:
     - index.html
     - faq.html
+    - releasenote.html
     - download.html
     - playground.html
     - cn/index.html
@@ -54,12 +55,13 @@ jsonContent:
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:DoranYun/weex.git
-  branch: gh-pages
+  repo: http://git-wip-us.apache.org/repos/asf/incubator-weex-site.git
+  branch: asf-site
+  target_dir: content
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://weex-project.io
+url: https://weex.apache.org
 root: /
 permalink_defaults:
   lang: en
@@ -119,6 +121,14 @@ autoprefixer:
   exclude:
   browsers:
     - 'last 5 versions'
+
+# docsearch
+docsearch:
+  enable: true
+  index_name_en: weex
+  index_name_cn: weex_cn
+  api_key_en: a6896fe3619315a7f04e9a76bbbbbfcb
+  api_key_cn: db5b2379e5ffbc33509585c35ccabba8
 
 alias:
   doc/index.html: index.html
@@ -321,3 +331,7 @@ alias:
   cn/doc/references/events/blur.html: cn/references/index.html
   cn/doc/references/events/input.html: cn/references/index.html
   cn/doc/references/events/focus.html: cn/references/index.html
+  cn/guide/tools/devtools.html: cn/guide/tools/toolkit.html
+  cn/guide/tools/weexpack.html: cn/guide/tools/toolkit.html
+  guide/tools/devtools.html: guide/tools/toolkit.html
+  guide/tools/weexpack.html: guide/tools/toolkit.html

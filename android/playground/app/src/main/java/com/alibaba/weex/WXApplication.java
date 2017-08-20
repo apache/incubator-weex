@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package com.alibaba.weex;
 
 import android.app.Activity;
@@ -8,8 +26,12 @@ import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
+import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
+import com.alibaba.weex.extend.component.WXMask;
+import com.alibaba.weex.extend.component.WXParallax;
+import com.alibaba.weex.extend.component.dom.WXMaskDomObject;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
@@ -47,17 +69,22 @@ public class WXApplication extends Application {
                                .setDebugAdapter(new PlayDebugAdapter())
                                .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
                                .setJSExceptionAdapter(new JSExceptionAdapter())
+                               .setHttpAdapter(new InterceptWXHttpAdapter())
                                .build()
                           );
 
     try {
       Fresco.initialize(this);
       WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
+      WXSDKEngine.registerComponent(WXParallax.PARALLAX, WXParallax.class);
 
       WXSDKEngine.registerComponent("richtext", RichText.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
+
+      WXSDKEngine.registerComponent("mask",WXMask.class);
+      WXSDKEngine.registerDomObject("mask", WXMaskDomObject.class);
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);
@@ -108,6 +135,10 @@ public class WXApplication extends Application {
         if (false) {
           // We assume that the application is on an idle time.
           WXSDKManager.getInstance().notifyTrimMemory();
+        }
+        // The demo code of calling 'notifySerializeCodeCache()'
+        if (false) {
+          WXSDKManager.getInstance().notifySerializeCodeCache();
         }
       }
     });

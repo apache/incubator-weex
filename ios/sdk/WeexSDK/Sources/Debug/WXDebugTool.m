@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXDebugTool.h"
@@ -22,7 +33,31 @@ static BOOL WXIsDevToolDebug;
 static NSString* WXDebugrepBundleJS;
 static NSString* WXDebugrepJSFramework;
 
+
+@interface WXDebugTool ()
+// store service
+@property (nonatomic, strong) NSMutableDictionary *jsServiceDic;
+
+@end
+
 @implementation WXDebugTool
+
++ (instancetype)sharedInstance {
+    static id _sharedInstance = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&oncePredicate, ^{
+        _sharedInstance = [[self alloc] init];
+    });
+    return _sharedInstance;
+}
+
+- (instancetype)init
+{
+    if(self = [super init]){
+        _jsServiceDic = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
 
 //+ (void)showFPS
 //{
@@ -71,8 +106,7 @@ static NSString* WXDebugrepJSFramework;
     void(^scriptLoadFinish)(NSString*, NSString*) = ^(NSString* key, NSString* script){
         if ([key isEqualToString:@"jsframework"]) {
             WXDebugrepJSFramework = script;
-            [WXSDKManager unload];
-            [WXSDKEngine initSDKEnvironment:script];
+            [WXSDKEngine restartWithScript:script];
         }else {
             WXDebugrepBundleJS = script;
         }
@@ -110,6 +144,31 @@ static NSString* WXDebugrepJSFramework;
         
         [loader start];
     }
+}
+
++ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] setObject:@{ @"name": name, @"script": script, @"options": options } forKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
++ (BOOL) removeCacheJsService: (NSString *)name
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] removeObjectForKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
++ (NSDictionary *) jsServiceCache
+{
+    return [NSDictionary dictionaryWithDictionary:[[self sharedInstance] jsServiceDic]];
 }
 
 @end

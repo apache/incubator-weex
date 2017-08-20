@@ -20,6 +20,7 @@
 
         // component
         {name: 'component/text-demo', title: 'Text'},
+        {name: 'iconfont', title: 'iconfont'},
         {name: 'component/image-demo', title: 'Image'},
         {name: 'component/input-demo', title: 'Input'},
         {name: 'component/scroller-demo', title: 'Scroller'},
@@ -27,6 +28,7 @@
         {name: 'component/list/list-demo', title: 'List (Advanced)'},
         {name: 'component/slider/index', title: 'Slider'},
         {name: 'component/slider-neighbor/index', title: 'Slider Neighbor'},
+        {name: 'component/slider-tab', title: 'Slider Tab'},
         {name: 'component/a-demo', title: 'A'},
         {name: 'component/video-demo', title: 'Video'},
         {name: 'component/countdown-demo', title: 'Countdown'},
@@ -52,7 +54,11 @@
         {name: 'showcase/minesweeper', title: 'Minesweeper'},
         {name: 'showcase/ui', title: 'UI Gallery'},
         {name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown'},
-        {name: 'showcase/pseudo-class', title: 'PseudoClass'}
+        {name: 'showcase/pseudo-class', title: 'PseudoClass'},
+        {name: 'showcase/boxshadow', title: 'boxshadow'},
+
+        // market
+        {name: 'market/gcanvas', title: 'Gcanvas'},
       ]
     }
   }

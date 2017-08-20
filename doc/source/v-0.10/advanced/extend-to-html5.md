@@ -78,7 +78,7 @@ This demo has overrided the `create` method of the base class `Component`. You c
 * `appendChild` to append a child in the children list.
 * `removeChild` to remove a child in the children list.
 
-**Advanced**: Need more code demonstrations about overriding the component's methods ? Just take a look at the [weex repo's code](https://github.com/alibaba/weex/tree/dev/html5/browser/extend/components). Basically the most of the built-in components are defined this way.
+**Advanced**: Need more code demonstrations about overriding the component's methods ? Just take a look at the [weex repo's code](https://github.com/apache/incubator-weex/tree/dev/html5/). Basically the most of the built-in components are defined this way.
 
 Important! To register your component in the `init` method, use `Weex.registerComponent`. Here's the demo code:
 

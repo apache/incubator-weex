@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package com.alibaba.weex;
 
 import android.app.Activity;
@@ -13,10 +31,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +45,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
@@ -39,7 +60,10 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.NestedContainer;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -48,6 +72,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
@@ -75,6 +100,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_wxpage);
     setCurrentWxPageActivity(this);
+
+
     WXSDKEngine.setActivityNavBarSetter(new NavigatorAdapter());
     getWindow().setFormat(PixelFormat.TRANSLUCENT);
     mUri = getIntent().getData();
@@ -105,10 +132,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     Log.e("TestScript_Guide mUri==", mUri.toString());
     initUIAndData();
 
-    if(WXPAGE.equals(mUri.getScheme())) {
+    if(WXPAGE.equals(mUri.getScheme())||
+       TextUtils.equals("true",mUri.getQueryParameter("_wxpage"))) {
       mUri = mUri.buildUpon().scheme("http").build();
       loadWXfromService(mUri.toString());
       startHotRefresh();
+      mWXHandler.removeCallbacks(mCollectIDMap);
+      mWXHandler.postDelayed(mCollectIDMap,2000);
     }else if (TextUtils.equals("http", mUri.getScheme()) || TextUtils.equals("https", mUri.getScheme())) {
       // if url has key "_wx_tpl" then get weex bundle js
       String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
@@ -154,7 +184,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         Rect outRect = new Rect();
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
         mConfigMap.put("bundleUrl", mUri.toString());
-        String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
+        String path = "file".equals(mUri.getScheme()) ? assembleFilePath(mUri) : mUri.toString();
         mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
             mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
@@ -243,6 +273,47 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   private void addOnListener() {
 
+  }
+
+  private Map<String,String> mIDMap = new ArrayMap<>();
+  private final Runnable mCollectIDMap = new Runnable() {
+    @Override
+    public void run() {
+      View container = findViewById(R.id.container);
+
+      collectId(mInstance.getRootComponent(),mIDMap);
+      container.setContentDescription(JSON.toJSONString(mIDMap));
+
+      mWXHandler.removeCallbacks(this);
+      mWXHandler.postDelayed(this,2000);
+    }
+  };
+
+  /**
+   *
+   * @param map <weexid,viewId>
+   */
+  private static void collectId(WXComponent comp, Map<String,String> map){
+    if(comp == null){
+      return;
+    }
+    ImmutableDomObject dom;
+    String id;
+    View view;
+    if((view = comp.getHostView())!=null &&
+        (dom = comp.getDomObject()) != null &&
+        (id = (String) dom.getAttrs().get("testId"))!=null &&
+        !map.containsKey(id)){
+      Pair<String,Integer> pair = Utility.nextID();
+      view.setId(pair.second);
+      map.put(id,pair.first);
+    }
+    if(comp instanceof WXVContainer){
+      WXVContainer container = (WXVContainer) comp;
+      for(int i = container.getChildCount()-1;i>=0;i--){
+        collectId(container.getChild(i),map);
+      }
+    }
   }
 
   @Override

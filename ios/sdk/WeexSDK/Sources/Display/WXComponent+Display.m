@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent+Display.h"
@@ -28,10 +39,10 @@
 {
     WXAssertMainThread();
     
-    if (_compositingChild) {
+    if (_isCompositingChild) {
         WXComponent *supercomponent = self.supercomponent;
         while (supercomponent) {
-            if (supercomponent->_composite) {
+            if (supercomponent->_useCompositing) {
                 break;
             }
             supercomponent = supercomponent.supercomponent;
@@ -44,54 +55,99 @@
     }
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
+{
+    if (_useCompositing || _isCompositingChild) {
+        return YES;
+    }
+    
+    if (![self _needsDrawBorder]) {
+        WXLogDebug(@"No need to draw border for %@", self.ref);
+        WXPerformBlockOnMainThread(^{
+            [self _resetNativeBorderRadius];
+        });
+        
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (UIImage *)drawRect:(CGRect)rect
+{
+    CGSize size = rect.size;
+    if (size.width <= 0 || size.height <= 0) {
+        WXLogDebug(@"No need to draw border for %@, because width or height is zero", self.ref);
+        return nil;
+    }
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [self _drawBorderWithContext:context size:size];
+
+    return nil;
+}
+
+- (void)didFinishDrawingLayer:(BOOL)success
+{
+    WXAssertMainThread();
+}
+
+#pragma mark Private
+
+- (WXDisplayBlock)_displayBlock
 {
     WXDisplayBlock displayBlock = ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
         if (isCancelled()) {
             return nil;
         }
         
-        if (![self _needsDrawBorder]) {
-            WXLogDebug(@"No need to draw border for %@", self.ref);
-            WXPerformBlockOnMainThread(^{
-                [self _resetNativeBorderRadius];
-            });
-            return nil;
+        UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size] , 0.0);
+        UIImage *image = [self drawRect:bounds];
+        if (!image) {
+            image = UIGraphicsGetImageFromCurrentImageContext();
         }
+        UIGraphicsEndImageContext();
         
-        return [self _borderImage];
+        return image;
     };
     
     return displayBlock;
 }
 
-- (WXDisplayCompletionBlock)displayCompletionBlock
+- (WXDisplayCompletionBlock)_displayCompletionBlock
 {
-    return nil;
+    __weak typeof(self) weakSelf = self;
+    return ^(CALayer *layer, BOOL finished) {
+        [weakSelf didFinishDrawingLayer:finished];
+    };
 }
 
-#pragma mark Private
+- (void)_initCompositingAttribute:(NSDictionary *)attributes
+{
+    _useCompositing = attributes[@"compositing"] ? [WXConvert BOOL:attributes[@"compositing"]] : NO;
+}
 
 - (void)_willDisplayLayer:(CALayer *)layer
 {
     WXAssertMainThread();
     
-    if (_compositingChild) {
-        // compsiting children need not draw layer
+    if (_isCompositingChild) {
+        // compsiting children do not have own layers, so return here.
         return;
     }
     
     CGRect displayBounds = CGRectMake(0, 0, self.calculatedFrame.size.width, self.calculatedFrame.size.height);
     
+    BOOL needsDrawRect = [self needsDrawRect];
     WXDisplayBlock displayBlock;
-    if (_composite) {
+    if (_useCompositing) {
         displayBlock = [self _compositeDisplayBlock];
     } else {
-        displayBlock = [self displayBlock];
+        displayBlock = [self _displayBlock];
     }
-    WXDisplayCompletionBlock completionBlock = [self displayCompletionBlock];
+    WXDisplayCompletionBlock completionBlock = [self _displayCompletionBlock];
     
-    if (!displayBlock) {
+    if (!displayBlock || !needsDrawRect) {
         if (completionBlock) {
             completionBlock(layer, NO);
         }
@@ -146,6 +202,45 @@
     }
 }
 
+- (void)triggerDisplay
+{
+    WXPerformBlockOnMainThread(^{
+        [self _willDisplayLayer:_layer];
+    });
+}
+
+- (CGContextRef)beginDrawContext:(CGRect)bounds
+{
+    UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+//    float scaleFactor = [[UIScreen mainScreen] scale];
+//    CGColorSpaceRef	colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGContextRef context = CGBitmapContextCreate(NULL, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, 8, 4 * bounds.size.width * scaleFactor, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+//    CGContextScaleCTM(context, scaleFactor, scaleFactor);
+//
+//    // Adjusts position and invert the image.
+//    // The OpenGL uses the image data upside-down compared commom image files.
+//    CGContextTranslateCTM(context, 0, bounds.size.height);
+//    CGContextScaleCTM(context, 1.0, -1.0);
+//    
+//    CGColorSpaceRelease(colorSpace);
+    
+    return context;
+}
+
+- (UIImage *)endDrawContext:(CGContextRef)context
+{
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+//    CGImageRef imageRef= CGBitmapContextCreateImage(context);
+//    UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
+//    CGContextRelease(context);
+    
+    return image;
+}
+
 - (WXDisplayBlock)_compositeDisplayBlock
 {
     return ^UIImage* (CGRect bounds, BOOL(^isCancelled)(void)) {
@@ -153,72 +248,60 @@
             return nil;
         }
         NSMutableArray *displayBlocks = [NSMutableArray array];
-        [self _collectDisplayBlocks:displayBlocks isCancelled:isCancelled];
         
-        BOOL opaque = _layer.opaque && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0f;
+        CGContextRef context = [self beginDrawContext:bounds];
         
-        UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, 0.0);
+        UIGraphicsPushContext(context);
+        
+        [self _collectCompositingDisplayBlocks:displayBlocks context:context isCancelled:isCancelled];
         
         for (dispatch_block_t block in displayBlocks) {
             if (isCancelled()) {
-                UIGraphicsEndImageContext();
+                [self endDrawContext:context];
                 return nil;
             }
             block();
         }
         
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+        UIGraphicsPopContext();
         
+        UIImage *image = [self endDrawContext:context];
         return image;
     };
 }
 
-- (void)_collectDisplayBlocks:(NSMutableArray *)displayBlocks isCancelled:(BOOL(^)(void))isCancelled
+- (void)_collectCompositingDisplayBlocks:(NSMutableArray *)displayBlocks context:(CGContextRef)context isCancelled:(BOOL(^)(void))isCancelled
 {
-    // compositingChild has no chance to applyPropertiesToView, so force updateNode
-    //    if (_compositingChild) {
-    //        if (_data) {
-    //            dispatch_async(dispatch_get_main_queue(), ^{
-    //                [self updateNode:_data];
-    //            });
-    //        }
-    //    }
-    
+    // TODO: compositingChild has no chance to applyPropertiesToView, need update here?
     UIColor *backgroundColor = _backgroundColor;
     BOOL clipsToBounds = _clipToBounds;
     CGRect frame = self.calculatedFrame;
     CGRect bounds = CGRectMake(0, 0, frame.size.width, frame.size.height);
     
-    if (_composite) {
+    if (_useCompositing) {
         frame.origin = CGPointMake(0, 0);
     }
     
-    WXDisplayBlock displayBlock = [self displayBlock];
+    BOOL needsDrawRect = [self needsDrawRect];
     
-    BOOL shouldDisplay = displayBlock || backgroundColor || CGPointEqualToPoint(CGPointZero, frame.origin) == NO || clipsToBounds;
+    BOOL shouldDisplay = needsDrawRect && (backgroundColor || CGPointEqualToPoint(CGPointZero, frame.origin) == NO || clipsToBounds);
     
     if (shouldDisplay) {
         dispatch_block_t displayBlockToPush = ^{
-            CGContextRef context = UIGraphicsGetCurrentContext();
             CGContextSaveGState(context);
             CGContextTranslateCTM(context, frame.origin.x, frame.origin.y);
             
-            if (_compositingChild && clipsToBounds) {
+            if (isCancelled && isCancelled()) {
+                return ;
+            }
+            
+            if (_isCompositingChild && clipsToBounds) {
                 [[UIBezierPath bezierPathWithRect:bounds] addClip];
             }
             
-            CGColorRef backgroundCGColor = backgroundColor.CGColor;
-            if (backgroundColor && CGColorGetAlpha(backgroundCGColor) > 0.0) {
-                CGContextSetFillColorWithColor(context, backgroundCGColor);
-                CGContextFillRect(context, bounds);
-            }
-            
-            if (displayBlock) {
-                UIImage *image = displayBlock(bounds, isCancelled);
-                if (image) {
-                    [image drawInRect:bounds];
-                }
+            UIImage *image = [self drawRect:bounds];
+            if (image) {
+                [image drawInRect:bounds];
             }
         };
         [displayBlocks addObject:[displayBlockToPush copy]];
@@ -226,13 +309,12 @@
     
     for (WXComponent *component in self.subcomponents) {
         if (!isCancelled()) {
-            [component _collectDisplayBlocks:displayBlocks isCancelled:isCancelled];
+            [component _collectCompositingDisplayBlocks:displayBlocks context:context isCancelled:isCancelled];
         }
     }
     
     if (shouldDisplay) {
         dispatch_block_t blockToPop = ^{
-            CGContextRef context = UIGraphicsGetCurrentContext();
             CGContextRestoreGState(context);
         };
         [displayBlocks addObject:[blockToPop copy]];
@@ -240,26 +322,6 @@
 }
 
 #pragma mark Border Drawing
-
-- (UIImage *)_borderImage
-{
-    CGSize size = self.calculatedFrame.size;
-    if (size.width <= 0 || size.height <= 0) {
-        WXLogDebug(@"No need to draw border for %@, because width or height is zero", self.ref);
-        return nil;
-    }
-    
-    WXLogDebug(@"Begin to draw border for %@", self.ref);
-    UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    [self _drawBorderWithContext:context size:size];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return image;
-}
 
 - (void)_drawBorderWithContext:(CGContextRef)context size:(CGSize)size
 {
@@ -353,6 +415,10 @@
 
 - (BOOL)_needsDrawBorder
 {
+    if (_isCompositingChild) {
+        return YES;
+    }
+    
     if (![_layer isKindOfClass:[WXLayer class]]) {
         // Only support WXLayer
         return NO;
@@ -477,6 +543,7 @@ do {\
     WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
     if (updating) {
+        WX_CHECK_COMPONENT_TYPE(self.componentType)
         BOOL nowNeedsDrawBorder = [self _needsDrawBorder];
         if (nowNeedsDrawBorder && !previousNeedsDrawBorder) {
             _layer.cornerRadius = 0;
@@ -489,6 +556,27 @@ do {\
             _layer.backgroundColor = _backgroundColor.CGColor;
         }
     }
+}
+
+- (BOOL)_bitmapOpaqueWithSize:(CGSize)size
+{
+    CGRect rect = CGRectMake(0, 0, size.width, size.height);
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    WXRadii *radii = borderRect.radii;
+    BOOL hasBorderRadius = [radii hasBorderRadius];
+    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
+}
+
+#pragma mark - Deprecated
+
+- (WXDisplayBlock)displayBlock
+{
+    return [self _displayBlock];
+}
+
+- (WXDisplayCompletionBlock)displayCompletionBlock
+{
+    return [self _displayCompletionBlock];
 }
 
 @end

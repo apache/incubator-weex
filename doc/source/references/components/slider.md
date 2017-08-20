@@ -19,13 +19,12 @@ It supports all kinds of weex components as its slides, especially the `indicato
 
 - `auto-play`: &lt;boolean&gt; `true` | `false`. This value determines whether the slides plays automatically after the page rendering finished. The default value is `false`.
 - `interval`: &lt;number&gt; millisecond. This value determines time interval for each page displayed in slider.
-- `index`: &lt;number&gt; . This value determines the  index of current shown slide. The default value is `0`.
-
-Other attributes please check out the [common attributes](../references/common-attrs.html).
+- `index`: <number> . This value determines the  index of current shown slide. The default value is `0`.
+- `offset-x-accuracy {float}`：set the scroll event trigger precision, precision value represents the rolling distance of a page width ratio.
 
 ## Styles
 
-**common styles**: check out [common styles for components](../references/common-style.html)
+**common styles**: check out [common styles for components](../common-style.html)
 
 - support flexbox related styles
 - support box model related styles
@@ -35,11 +34,12 @@ Other attributes please check out the [common attributes](../references/common-a
 ## Events
 
 - `change`: triggerd when the slide's index is changed. The event object contains the attribute of `index`, which is the index number of the currently shown slide.
+- `scroll` <sup class="wx-v">0.11+</sup>：this event is fired when scrolling. The current offsetXRatio value is given in this event callback.
 
-**common events**: check out the [common events](../references/common-event.html)
+**common events**: check out the [common events](../common-event.html)
 
-- support `click` event. Check out [common events](../references/common-event.html)
-- support `appear` / `disappear` event. Check out [common events](../references/common-event.html)
+- support `click` event. Check out [common events](../common-event.html)
+- support `appear` / `disappear` event. Check out [common events](../common-event.html)
 
 ### Example
 
@@ -90,4 +90,4 @@ Other attributes please check out the [common attributes](../references/common-a
 </script>
 ```
 
-[try it](../../examples/slider.html)
+[try it](http://dotwe.org/vue/0c43ffd743c90b3bd9f5371062652e60)

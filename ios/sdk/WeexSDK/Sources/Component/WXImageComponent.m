@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXImageComponent.h"
@@ -14,6 +25,8 @@
 #import "WXType.h"
 #import "WXConvert.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXRoundedRect.h"
+#import "UIBezierPath+Weex.h"
 
 @interface WXImageView : UIImageView
 
@@ -63,7 +76,12 @@ static dispatch_queue_t WXImageUpdateQueue;
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         [self configFilter:styles];
-        _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        if (styles[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        }
+        if (attributes[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        }
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;
@@ -94,6 +112,7 @@ static dispatch_queue_t WXImageUpdateQueue;
             NSString *matchString = [filter substringWithRange:matchRange];
             if (matchString && matchString.length > 0) {
                 _blurRadius = [matchString doubleValue];
+                [self updateImage];
             }
         }
     }
@@ -136,6 +155,10 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
+    if (attributes[@"quality"]) {
+        _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        [self updateImage];
+    }
     
     [self configPlaceHolder:attributes];
     
@@ -147,48 +170,49 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     UIImageView *imageView = (UIImageView *)self.view;
     imageView.contentMode = _resizeMode;
     imageView.userInteractionEnabled = YES;
     imageView.clipsToBounds = YES;
     imageView.exclusiveTouch = YES;
     
+    [self _clipsToBounds];
+    
     [self updateImage];
     
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)_needsDrawBorder
 {
-    if ([self isViewLoaded]) {
-        // if has a image view, image is setted by image view, displayBlock is not needed
+    return NO;
+}
+
+- (BOOL)needsDrawRect
+{
+    if (_isCompositingChild) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+- (UIImage *)drawRect:(CGRect)rect;
+{
+    if (!self.image) {
+        [self updateImage];
         return nil;
     }
     
-    __weak typeof(self) weakSelf = self;
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        
-        if (!weakSelf.image) {
-            [weakSelf updateImage];
-            return nil;
-        }
-        
-        if (isCancelled && isCancelled()) {
-            return nil;
-        }
-        
-        UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, 1.0);
-        
-        [weakSelf.image drawInRect:bounds];
-        
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        
-        UIGraphicsEndImageContext();
-        
-        return image;
-    };
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+
+    WXRadii *radii = borderRect.radii;    
+    if ([radii hasBorderRadius]) {
+        CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+        [bezierPath addClip];
+    }
+    return self.image;
 }
 
 - (void)viewWillUnload
@@ -196,6 +220,15 @@ static dispatch_queue_t WXImageUpdateQueue;
     [super viewWillUnload];
     [self cancelImage];
     _image = nil;
+}
+
+- (void)_frameDidCalculated:(BOOL)isChanged
+{
+    [super _frameDidCalculated:isChanged];
+    
+    if ([self isViewLoaded] && isChanged) {
+        [self _clipsToBounds];
+    }
 }
 
 - (void)setImageSrc:(NSString*)src
@@ -215,7 +248,7 @@ static dispatch_queue_t WXImageUpdateQueue;
        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
             weakSelf.imageDownloadFinish = YES;
-            WXLogError(@"Error downloading image:%@, detail:%@", url, [error localizedDescription]);
+            WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
         };
         
         [self updatePlaceHolderWithFailedBlock:downloadFailed];
@@ -237,8 +270,8 @@ static dispatch_queue_t WXImageUpdateQueue;
     
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-        NSMutableString *newURL = [_placeholdSrc mutableCopy];
-        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance, &newURL)
+        NSString *newURL = [_placeholdSrc copy];
+        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance)
         
         __weak typeof(self) weakSelf = self;
         self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
@@ -261,6 +294,9 @@ static dispatch_queue_t WXImageUpdateQueue;
                     ((UIImageView *)strongSelf.view).image = image;
                     weakSelf.imageDownloadFinish = YES;
                     [self readyToRender];
+                } else if (strongSelf->_isCompositingChild) {
+                    strongSelf->_image = image;
+                    weakSelf.imageDownloadFinish = YES;
                 }
             });
         }];
@@ -273,20 +309,14 @@ static dispatch_queue_t WXImageUpdateQueue;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
-        NSMutableString * newURL = [imageSrc mutableCopy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance, &newURL)
+        NSString * newURL = [imageSrc copy];
+        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(self) strongSelf = weakSelf;
                     
-                    if (weakSelf.imageLoadEvent) {
-                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
-                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
-                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
-                    }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
                         [strongSelf readyToRender];
@@ -301,6 +331,17 @@ static dispatch_queue_t WXImageUpdateQueue;
                         strongSelf.imageDownloadFinish = YES;
                         ((UIImageView *)strongSelf.view).image = image;
                         [strongSelf readyToRender];
+                    } else if (strongSelf->_isCompositingChild) {
+                        strongSelf.imageDownloadFinish = YES;
+                        strongSelf->_image = image;
+                        [strongSelf setNeedsDisplay];
+                    }
+                    
+                    if (strongSelf.imageLoadEvent) {
+                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
                 });
             }];
@@ -334,9 +375,25 @@ static dispatch_queue_t WXImageUpdateQueue;
     return imageLoader;
 }
 
-- (BOOL)_needsDrawBorder
+- (void)_clipsToBounds
 {
-    return NO;
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.view.bounds topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    // here is computed radii, do not use original style
+    WXRadii *radii = borderRect.radii;
+    
+    if ([radii radiusesAreEqual]) {
+        return;
+    }
+    
+    CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
+    
+    // clip to border radius
+    UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:self.view.bounds topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+    
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.path = bezierPath.CGPath;
+    self.layer.mask = shapeLayer;
+    self.layer.cornerRadius = 0;
 }
 
 #ifdef UITEST

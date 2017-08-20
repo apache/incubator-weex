@@ -1,0 +1,102 @@
+Apache Weex
+Copyright 2017 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+This product contains software semver(http://semver.org/) developed
+by Tom Preston-Werner , licensed under the Creative Commons - CC BY 3.0 License.
+
+This product contains software core-js(https://github.com/zloirock/core-js) developed
+by Denis Pushkarev , licensed under the MIT License.
+
+This product contains software animaitonjs(https://github.com/MrRaindrop/animationjs) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software cubicbezier(https://github.com/MrRaindrop/cubicbezier) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software envd(https://github.com/MrRaindrop/envd) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software httpurl(https://github.com/MrRaindrop/httpurl) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software lazyimg(https://github.com/MrRaindrop/lazyimg) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software modals(https://github.com/MrRaindrop/modals) developed
+by mr.raindrop  , licensed under the MIT License.
+
+This product contains software autoprefixer(https://github.com/postcss/autoprefixer) developed
+by postcss , licensed under the MIT License.
+
+This product contains software query-string(https://github.com/sindresorhus/query-string) developed
+by sindresorhus  , licensed under the MIT License.
+
+This product contains software weex-picker(https://github.com/weexteam/weex-picker) developed
+by abigtree  , licensed under the Apache 2.0 License.
+
+This product contains software weex-rax-framework(https://github.com/alibaba/rax) developed
+by yuanyan  , licensed under the BSD-3-Clause License.
+
+This product contains software weex-vue-framework(https://github.com/vuejs/vue) developed
+by fkysly  , licensed under the MIT License.
+
+This product contains software weex-styler(https://github.com/weexteam/weex-styler) developed
+by songsiqi  , licensed under the MIT License.
+
+This product contains software vuejs(https://github.com/vuejs/vue) developed
+by Yuxi Evan You , licensed under the MIT License.
+
+This product contains software scroll-to (https://github.com/component/scroll-to) developed
+by TooTallNate , licensed under the MIT License.
+
+This product contains software inline-style-prefixer
+(https://github.com/rofrischmann/inline-style-prefixer) developed by
+rofrischmann , licensed under the MIT License.
+
+This product contains software fastjson(https://github.com/alibaba/fastjson) developed
+by alibaba inc.  , licensed under the Apache 2.0 License.
+
+This product contains software dexposed(https://github.com/alibaba/dexposed) developed
+by alibaba inc.  , licensed under the Apache 2.0 License.
+
+This product contains software loopj(https://github.com/loopj/android-async-http) developed
+by loopj , licensed under the Apache 2.0 License.
+
+This product contains software fresco(https://github.com/facebook/fresco) developed
+by facebook , licensed under the BSD-3-Clause License.
+
+This product contains software animated-gif(https://github.com/facebook/fresco) developed
+by facebook , licensed under the BSD-3-Clause License.
+
+This product contains software yoga(https://github.com/facebook/yoga) developed
+by facebook , licensed under the BSD-3-Clause License.
+
+This product contains software SocketRocket(https://github.com/facebook/SocketRocket) developed
+by facebook , licensed under the BSD-3-Clause License.
+
+This product contains software zxing(https://github.com/zxing/zxing) developed
+by zxing , licensed under the Apache 2.0 License.
+
+This product contains software okhttp(https://github.com/square/okhttp) developed
+by square , licensed under the Apache 2.0 License.
+
+This product contains software okio(https://github.com/square/okio) developed
+by square , licensed under the Apache 2.0 License.
+
+This product contains software scalpel(https://github.com/JakeWharton/scalpel) developed
+by Jake Wharton , licensed under the Apache 2.0 License.
+
+This product contains software espresso-idling-resource(https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/) developed
+by google , licensed under the Apache 2.0 License.
+
+This product contains software AOSP(https://source.android.com/) developed
+by The Android Open Source Project , licensed under the Apache 2.0 License.
+
+This product contains software SDWebImage(https://github.com/rs/SDWebImage) developed
+by Olivier Poitrey  , licensed under the MIT License.
+
+This product contains software Guava(https://github.com/google/guava) developed
+by google  , licensed under the Apache License.

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXRuleManager.h"
@@ -13,6 +24,7 @@
 #import "WXHandlerFactory.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXComponentManager.h"
+#import "WXDefine.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
@@ -62,14 +74,14 @@ static WXRuleManager *_sharedInstance = nil;
             }
             
             NSString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
-            NSMutableString *newFontSrc = [fontSrc mutableCopy];
-            WX_REWRITE_URL(fontSrc, WXResourceTypeFont, self.instance, &newFontSrc)
+            NSString *newURL = [fontSrc copy];
+            WX_REWRITE_URL(fontSrc, WXResourceTypeFont, self.instance)
             
-            if (!newFontSrc) {
+            if (!newURL) {
                 return;
             }
             
-            fontSrc = newFontSrc;
+            fontSrc = newURL;
             NSMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
             if (fontFamily && [fontFamily[@"src"] isEqualToString:fontSrc]) {
                 // if the new src is same as src in dictionary , ignore it, or update it
@@ -103,8 +115,13 @@ static WXRuleManager *_sharedInstance = nil;
                     // load success
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     NSString *fontSrc = [dictForFontFamily objectForKey:@"tempSrc"];
-                    [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    if (fontSrc) {
+                        // only remote font will be mark as tempSrc
+                        [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    }
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil userInfo:@{@"fontFamily":rule[@"fontFamily"]}];
                 } else {
                     //there was some errors during loading
                     WXLogError(@"load font failed %@",error.description);
@@ -114,8 +131,8 @@ static WXRuleManager *_sharedInstance = nil;
     }
 }
 
-- (WXThreadSafeMutableDictionary *)getRule:(NSString *)type {
-    
+- (WXThreadSafeMutableDictionary *)getRule:(NSString *)type
+{
     if ([type isEqualToString:@"fontFace"]) {
         return _fontStorage;
     }

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXDemoViewController.h"
@@ -14,7 +25,9 @@
 #import <WeexSDK/WXSDKManager.h>
 #import "UIViewController+WXDemoNaviBar.h"
 #import "DemoDefine.h"
-
+#import "WXPrerenderManager.h"
+#import "WXMonitor.h"
+#import "WXTracingManager.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -47,6 +60,7 @@
     [self setupNaviBar];
     [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
+    [self.view setClipsToBounds:YES];
     
     _weexHeight = self.view.frame.size.height - 64;
     
@@ -58,7 +72,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
     [self updateInstanceState:WeexInstanceAppear];
 }
 
@@ -74,11 +87,6 @@
     self.navigationController.navigationBarHidden = NO;
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [_instance fireGlobalEvent:WX_APPLICATION_WILL_RESIGN_ACTIVE params:nil];
-}
-
 //TODO get height
 - (void)viewDidLayoutSubviews
 {
@@ -92,7 +100,12 @@
 
 - (void)dealloc
 {
+    
     [_instance destroyInstance];
+#ifdef DEBUG
+    [_instance forceGarbageCollection];
+#endif
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -101,6 +114,10 @@
     CGFloat width = self.view.frame.size.width;
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
+    }
+    
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
     
@@ -139,6 +156,14 @@
         WXLogError(@"error: render url is nil");
         return;
     }
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        [WXPrerenderManager renderFromCache:[self.url absoluteString]];
+        return;
+    }
     NSURL *URL = [self testURL: [self.url absoluteString]];
     NSString *randomURL = [NSString stringWithFormat:@"%@%@random=%d",URL.absoluteString,URL.query?@"&":@"?",arc4random()];
     [_instance renderWithURL:[NSURL URLWithString:randomURL] options:@{@"bundleUrl":URL.absoluteString} data:nil];
@@ -168,7 +193,7 @@
 
 - (void)setupRightBarItem
 {
-    if ([self.url.scheme isEqualToString:@"http"]) {
+    if ([self.url.scheme hasPrefix:@"http"]) {
         [self loadRefreshCtl];
     }
 }

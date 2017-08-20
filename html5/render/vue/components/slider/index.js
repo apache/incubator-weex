@@ -1,12 +1,32 @@
-import { base, event } from '../../mixins'
-import { validateStyles } from '../../validator'
-import { throttle, bind, extend } from '../../utils'
-import indicator from './indicator'
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+// import { validateStyles } from '../../validator'
+// import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 export default {
-  mixins: [base, event, slideMixin],
+  mixins: [slideMixin],
   props: {
+    index: {
+      type: [String, Number],
+      default: 0
+    },
     'auto-play': {
       type: [String, Boolean],
       default: false
@@ -14,124 +34,35 @@ export default {
     interval: {
       type: [String, Number],
       default: 3000
+    },
+    infinite: {
+      type: [String, Boolean],
+      default: true
+    }
+  },
+
+  watch: {
+    index () {
+      this.currentIndex = this._normalizeIndex(this.index)
     }
   },
 
   data () {
     return {
-      currentIndex: 0,
-      frameCount: 0
+      frameCount: 0,
+      currentIndex: this.index
     }
   },
 
-  methods: {
-    computeWrapperSize () {
-      const wrapper = this.$refs.wrapper
-      if (wrapper) {
-        const rect = wrapper.getBoundingClientRect()
-        this.wrapperWidth = rect.width
-        this.wrapperHeight = rect.height
-      }
-    },
-
-    updateLayout () {
-      this.computeWrapperSize()
-      const inner = this.$refs.inner
-      if (inner) {
-        inner.style.width = this.wrapperWidth * this.frameCount + 'px'
-      }
-    },
-
-    formatChildren (createElement) {
-      const children = this.$slots.default || []
-      return children.filter(vnode => {
-        if (!vnode.tag) return false
-        if (vnode.componentOptions && vnode.componentOptions.tag === 'indicator') {
-          this._indicator = createElement(indicator, {
-            staticClass: vnode.data.staticClass,
-            staticStyle: vnode.data.staticStyle,
-            attrs: {
-              count: this.frameCount,
-              active: this.currentIndex
-            }
-          })
-          return false
-        }
-        return true
-      }).map(vnode => {
-        return createElement('li', {
-          ref: 'cells',
-          staticClass: 'weex-slider-cell'
-        }, [vnode])
-      })
-    }
-  },
-
-  created () {
+  beforeCreate () {
     this.weexType = 'slider'
-    this.currentIndex = 0
-    this.innerOffset = 0
-    this._indicator = null
-    this.$nextTick(() => {
-      this.updateLayout()
-    })
-  },
-
-  beforeUpdate () {
-    this.updateLayout()
-    this.reorder()
-  },
-
-  mounted () {
-    if (this.autoPlay) {
-      const interval = Number(this.interval)
-      this._lastSlideTime = Date.now()
-
-      const autoPlayFn = bind(function () {
-        clearTimeout(this._autoPlayTimer)
-        const now = Date.now()
-        let nextTick = interval - now + this._lastSlideTime
-        nextTick = nextTick > 100 ? nextTick : interval
-
-        this.next()
-        this._lastSlideTime = now
-        this._autoPlayTimer = setTimeout(autoPlayFn, nextTick)
-      }, this)
-
-      this._autoPlayTimer = setTimeout(autoPlayFn, interval)
-    }
-
-    this.reorder()
   },
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
-    this._cells = this.formatChildren(createElement)
-    this.frameCount = this._cells.length
-
-    return createElement(
-      'nav',
-      {
-        ref: 'wrapper',
-        attrs: { 'weex-type': 'slider' },
-        staticClass: 'weex-slider weex-slider-wrapper',
-        on: extend(this.createEventMap(), {
-          touchstart: this.handleTouchStart,
-          touchmove: throttle(bind(this.handleTouchMove, this), 25),
-          touchend: this.handleTouchEnd
-        })
-      },
-      [
-        createElement('ul', {
-          ref: 'inner',
-          staticClass: 'weex-slider-inner'
-        }, this._cells),
-        this._indicator
-      ]
-    )
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
+    return this._renderSlides(createElement)
   }
 }

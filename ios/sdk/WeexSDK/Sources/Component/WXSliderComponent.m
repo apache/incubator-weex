@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXSliderComponent.h"
@@ -21,6 +32,9 @@
 - (void)sliderView:(WXSliderView *)sliderView sliderViewDidScroll:(UIScrollView *)scrollView;
 - (void)sliderView:(WXSliderView *)sliderView didScrollToItemAtIndex:(NSInteger)index;
 
+@optional
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView;
+
 @end
 
 @interface WXSliderView : UIView <UIScrollViewDelegate>
@@ -36,6 +50,7 @@
 - (void)insertItemView:(UIView *)view atIndex:(NSInteger)index;
 - (void)removeItemView:(UIView *)view;
 - (void)scroll2ItemView:(NSInteger)index animated:(BOOL)animated;
+- (void)layoutItemViews;
 - (void)loadData;
 
 @end
@@ -69,6 +84,7 @@
     if (_scrollView) {
         _scrollView.delegate = nil;
     }
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void)setIndicator:(WXIndicatorView *)indicator
@@ -153,6 +169,11 @@
     }
 }
 
+- (void)layoutItemViews {
+    [self _resortItemViews];
+    [self _resetItemFrames];
+}
+
 - (void)loadData
 {
     self.scrollView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
@@ -164,8 +185,7 @@
 #pragma mark Private Methods
 
 - (void)_configSubViews {
-    [self _resortItemViews];
-    [self _resetItemFrames];
+    [self layoutItemViews];
     [self _scroll2Center];
     [self _resetItemCountLessThanOrEqualToTwo];
     [self setNeedsLayout];
@@ -229,7 +249,8 @@
 {
     if (self.itemViews.count > 2) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
-        [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        //[self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        [self.scrollView setContentOffset:CGPointMake(itemView.frame.origin.x, itemView.frame.origin.y) animated:NO];
     }
 }
 
@@ -303,9 +324,18 @@
     }
 }
 
+// called when setContentOffset/scrollRectVisible:animated: finishes. called from the performselector in scrollViewDidScroll if not animating.
+-(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:scrollViewDidEndScrollingAnimation:)]) {
+        [self.delegate sliderView:self scrollViewDidEndScrollingAnimation:scrollView];
+    }
+}
+
+
 @end
 
-@interface WXSliderComponent ()<WXSliderViewDelegate>
+@interface WXSliderComponent () <WXSliderViewDelegate,WXIndicatorComponentDelegate>
 
 @property (nonatomic, strong) WXSliderView *sliderView;
 @property (nonatomic, strong) NSTimer *autoTimer;
@@ -351,7 +381,7 @@
         }
         
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
-
+        
         if (attributes[@"offsetXAccuracy"]) {
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
@@ -417,7 +447,9 @@
         
         WXSliderView *sliderView = (WXSliderView *)self.view;
         if ([view isKindOfClass:[WXIndicatorView class]]) {
+            ((WXIndicatorComponent *)subcomponent).delegate = self;
             [sliderView addSubview:view];
+            [self setIndicatorView:(WXIndicatorView *)view];
             return;
         }
         
@@ -472,14 +504,15 @@
         
         if (_autoPlay) {
             [self _startAutoPlayTimer];
-        } 
+        }
     }
     
     if (attributes[@"index"]) {
         _index = [attributes[@"index"] integerValue];
         
         self.currentIndex = _index;
-        [_sliderView scroll2ItemView:self.currentIndex animated:YES];
+        self.sliderView.currentIndex = _index;
+        [self.sliderView layoutItemViews];
     }
     
     if (attributes[@"scrollable"]) {
@@ -512,7 +545,7 @@
     }
 }
 
-#pragma mark Public Methods
+#pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
@@ -544,7 +577,7 @@
 - (void)_autoPlayOnTimer
 {
     WXSliderView *sliderView = (WXSliderView *)self.view;
-
+    
     int indicatorCnt = 0;
     for (int i = 0; i < [self.childrenView count]; ++i) {
         if ([self.childrenView[i] isKindOfClass:[WXIndicatorView class]]) {
@@ -569,7 +602,7 @@
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
         CGFloat offsetXRatio = (XDeviation / width);
-        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+        if (fabs(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
             _lastOffsetXRatio = offsetXRatio;
             [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }

@@ -9,7 +9,7 @@ version: 2.1
 
 ## Summary
 
-A series of dom apis that sending virtual-dom's messages to the native renderer to update the dom tree. The only API for developers to use in a `.we` file is `scrollToElement` <del>which you can use by calling the `$scrollTo` method</del>. Other APIs mentioned on this page should only be used through the native renderer in the `callNative` process.
+A series of dom apis that sending virtual-dom's messages to the native renderer to update the dom tree. The only API for developers to use in a `.vue` file is `scrollToElement` <del>which you can use by calling the `$scrollTo` method</del>. Other APIs mentioned on this page should only be used through the native renderer in the `callNative` process.
 
 ## API
 
@@ -17,13 +17,14 @@ A series of dom apis that sending virtual-dom's messages to the native renderer 
 
 Scroll the page to the specified node. This API should only be used on the element in the `scroller` or `list` component.
 
-<del>This API can be used by calling the VM's method `$scrollTo` **(deprecated)**.</del> You can use `require('@weex-module/dom').scrollToElement` to call this API in your `.we` file.
+<del>This API can be used by calling the VM's method `$scrollTo` **(deprecated)**.</del> You can use `weex.requireModule('dom').scrollToElement` to call this API in your `.we` file.
 
 #### Arguments
 
 * `node`*(Node)*: an element that scrolled into the view.
 * `options`*(object)*: some options.
   * `offset`*(number)*: An offset to the visible position, default is `0`.
+  * `animated` *(bool)* :set element animation, default true
 
 #### Example
 
@@ -114,9 +115,9 @@ Scroll the page to the specified node. This API should only be used on the eleme
 </style>
 ```
 
-[try it](../../examples/dom-scroll.html)
+[try it](http://dotwe.org/vue/56e0d256cbb26facd958dbd6424f42b2)
 
-### getComponentRect(ref,callback)<sup>v0.9.4+</sup>
+### getComponentRect(ref,callback) <span class="api-version">v0.9.4+</span>
 
 You can get the view rectangle information of named element.
 
@@ -142,8 +143,8 @@ Example Useage:
 
 ```html
 <template>
-  <div class="wrapper">
-    <div ref="box" class="box">
+  <div class="wrapper" style='margin-top:200px'>
+    <div ref="box"  class="box">
       <text class="info">Width: {{size.width}}</text>
       <text class="info">Height: {{size.height}}</text>
       <text class="info">Top: {{size.top}}</text>
@@ -151,11 +152,26 @@ Example Useage:
       <text class="info">Left: {{size.left}}</text>
       <text class="info">Right: {{size.right}}</text>
     </div>
+    
+    <text class="info btn"  @click='click()'>{{this.tip}}</text>
+      
   </div>
-</template>
+</template> 
 
 <script>
   const dom = weex.requireModule('dom')
+  
+ function round(size) {
+      var roundSize = {
+        'width': Math.round(size.width),
+        'height': Math.round(size.height),
+        'top': Math.round(size.top),
+        'bottom': Math.round(size.bottom),
+        'left': Math.round(size.left),
+        'right': Math.round(size.right)
+      }
+      return roundSize
+  }
 
   export default {
     data () {
@@ -167,26 +183,60 @@ Example Useage:
           bottom: 0,
           left: 0,
           right: 0
-        }
+        },
+        ref:"viewport",
+        tip:"get box rect"
       }
     },
     mounted () {
-      const result = dom.getComponentRect(this.$refs.box, option => {
+      const result = dom.getComponentRect(this.ref, option => {
         console.log('getComponentRect:', option)
-        this.size = option.size
+        this.size = round.call(this,option.size);
       })
-      console.log('return value:', result)
-      console.log('viewport:', dom.getComponentRect('viewport'))
+    },
+    
+    methods:{
+      click:function() {
+        if (this.ref === 'viewport') {
+          this.ref = this.$refs.box;
+          this.tip = "get viewport rect"
+        } else {
+          this.ref = 'viewport'
+          this.tip = "get box rect"
+        }
+          
+         const result = dom.getComponentRect(this.ref, option => {
+          console.log('getComponentRect:', option)
+          this.size = round.call(this,option.size);
+        })
+      }
     }
+    
   }
 </script>
 
 <style scoped>
+  .btn {
+    margin-top:20px;
+    border-width:2px;
+    border-style: solid;
+    border-radius:10px;
+    width:300px;
+    margin-left:170px;
+    padding-left:35px;
+    border-color: rgb(162, 217, 192);
+    
+  }
+  .btn:active {
+    background-color: #8fbc8f;
+		border-color: gray;
+  }
+  
   .box {
-    margin-top: 200px;
+    align-items:center;
     margin-left: 150px;
-    width: 450px;
-    height: 450px;
+    width: 350px;
+    height: 400px;
     background-color: #DDD;
     border-width: 2px;
     border-style: solid;
@@ -195,10 +245,32 @@ Example Useage:
   }
   .info {
     font-size: 40px;
+    top:30px;
+    margin-left:20px;
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
     color: #41B883;
   }
 </style>
 ```
 
-[try it](../../examples/dom-rect.html)
+[try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
+
+
+### addRule
+`support:v0.12.0`
+
+you can add your rule for dom by this, now we support `fontFace` only for building your custom `font-family`, use it on [text](../components/text.html#iconfont) directly.
+
+#### fontFace
+
+```html
+var domModule = weex.requireModule('dom');
+domModule.addRule('fontFace', {
+    'fontFamily': "iconfont2",
+    'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+});
+
+```
+[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
+
+

@@ -31,6 +31,9 @@
   <% if (config.highlight.enable){ %>
     <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
   <% } %>
+  <% if (config.docsearch.enable){ %>
+    <%- css('css/docsearch.min') %>
+  <% } %>
   <%- css('css/style') %>
   <%- css('css/swiper.min') %>
 </head>

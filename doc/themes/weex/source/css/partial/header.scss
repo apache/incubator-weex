@@ -3,7 +3,7 @@
 #header {
   width: 100%;
   height: 72px; 
-  padding: 0 65px;
+  padding: 0 40px;
   position: fixed;
   background-color: rgba(255, 255, 255, .95);
   box-shadow: 3px 2px 4px 0 rgba(0,0,0,0.12);
@@ -74,17 +74,22 @@
     }
 
     > li + li {
-      margin-left: 40px;
+      margin-left: 30px;
     }
   }
 
   .info li {
-    margin-left: 50px;
+    margin-left: 30px;
   }
 
-  .tools li {
-    position: relative;
-    margin-left: 4em;
+  .tools {
+    > li {
+      margin-left: 30px;
+      position: relative;
+    }
+    .search-form {
+      width: 120px;
+    }
   }
 
   .dropdown {
@@ -100,5 +105,24 @@
         padding: 5px 10px;
       }
     }
+  }
+
+  .select-lang {
+    width: 90px;
+  }
+
+  .select-lang .dropdown-toggle {
+    color: #00293D;
+  }
+
+  .select-lang .dropdown-menu {
+    width: 105px;
+    left: 0;
+  }
+
+  .caret {
+    display: inline-block;
+    margin-left: 2px;
+    @include triangle-down($border-gray, 4px);
   }
 }

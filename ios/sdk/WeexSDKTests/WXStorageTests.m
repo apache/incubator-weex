@@ -1,10 +1,21 @@
-//
-//  WXStorageTests.m
-//  WeexSDK
-//
-//  Created by Jun Shi on 7/22/16.
-//  Copyright © 2016 taobao. All rights reserved.
-//
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 #import <XCTest/XCTest.h>
 #import "WeexSDK.h"
@@ -120,16 +131,11 @@
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
                 
-                NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-                NSTimeInterval ts = [infoDic[@"key1"][@"ts"] doubleValue];
-                NSLog(@"ts:%f",ts);
-                
                 XCTAssert([@"success" isEqualToString:result[@"result"]]);
                 XCTAssert([@"shortValue12" isEqualToString:dic[@"key1"]]);
                 XCTAssertEqual(infoDic[@"key1"][@"persistent"], @(NO));
                 XCTAssertEqual(infoDic[@"key1"][@"size"], @([@"shortValue12" length]));
                 XCTAssertTrue([indexArray containsObject:@"key1"]);
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
             }];
         }];
     });
@@ -144,17 +150,19 @@
     dispatch_async(self.storageQueue, ^{
         [self.storage setItem:@"key2" value:@"shortValue2" callback:^(id result) {
             NSDictionary *infoDic1 = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
-            
+            __strong typeof(weakSelf) self = weakSelf;
             XCTAssertEqual(result[@"result"], @"success");
             XCTAssertEqual(infoDic1[@"key2"][@"persistent"], @(NO));
             
             [self.storage setItemPersistent:@"key2" value:@"shortValue22" callback:^(id result) {
+                __strong typeof(weakSelf) self = weakSelf;
                 NSDictionary *infoDic2 = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
 
                 XCTAssertEqual(result[@"result"], @"success");
                 XCTAssertEqual(infoDic2[@"key2"][@"persistent"], @(YES));
                 
                 [self.storage setItem:@"key2" value:@"shortValue23" callback:^(id result) {
+                    __strong typeof(weakSelf) self = weakSelf;
                     [expectation fulfill];
 
                     NSDictionary *infoDic3 = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
@@ -175,18 +183,20 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(self.storageQueue, ^{
         [self.storage setItem:@"key3" value:@"shortValue3" callback:^(id result) {
+            __strong typeof(weakSelf) self = weakSelf;
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
             NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+            XCTAssertTrue(ABS(tsNow - ts) <= 1);
 
             [NSThread sleepForTimeInterval:2];
             
             [self.storage setItem:@"key3" value:@"shortValue32" callback:^(id result) {
+                __strong typeof(weakSelf) self = weakSelf;
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
                 NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+                XCTAssertTrue(ABS(tsNow - ts) <= 1);
 
                 [NSThread sleepForTimeInterval:2];
                 
@@ -196,7 +206,7 @@
                     NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                     NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
                     NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-                    XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+                    XCTAssertTrue(ABS(tsNow - ts) <= 1);
                     
                     [NSThread sleepForTimeInterval:2];
                 }];
@@ -216,13 +226,10 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(self.storageQueue, ^{
         [self.storage setItem:@"key4" value:longValue callback:^(id result) {
-            
+            __strong typeof(weakSelf) self = weakSelf;
             NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.filePath];
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
-            
-            NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-            NSTimeInterval ts = [infoDic[@"key4"][@"ts"] doubleValue];
             
             XCTAssertEqual(result[@"result"], @"success");
             XCTAssertNotEqual(dic[@"key4"], longValue);
@@ -230,7 +237,6 @@
             XCTAssertFalse([infoDic[@"key4"][@"persistent"] boolValue]);
             XCTAssertTrue([infoDic[@"key4"][@"size"] integerValue] == [longValue length]);
             XCTAssertTrue([indexArray containsObject:@"key4"]);
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.5);
             
             [self.storage getItem:@"key4" callback:^(id result) {
                 [expectation fulfill];
@@ -251,6 +257,7 @@
     dispatch_async(self.storageQueue, ^{
         [self.storage setItem:@"key5" value:@"shortValue5" callback:^(id result) {
             [weakSelf.storage getItem:@"key5" callback:^(id result) {
+                __strong typeof(weakSelf) self = weakSelf;
                 NSString *data = result[@"data"];
                 
                 XCTAssertEqual(result[@"result"], @"success");
@@ -281,6 +288,7 @@
         NSString *longValue = [@"longvalue6" stringByAppendingString:self.longValue];
         [self.storage setItem:@"key6" value:@"shortValue6" callback:^(id result) {
             [weakSelf.storage getItem:@"key6" callback:^(id result) {
+                __strong typeof(weakSelf) self = weakSelf;
                 NSString *value = result[@"data"];
                 XCTAssertEqual(value, @"shortValue6");
                 

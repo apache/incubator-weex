@@ -72,10 +72,65 @@
 
   initSidebar()
 
+
+  /**
+   * Switch language
+   */
+  function initPickLang () {
+    document.addEventListener('DOMContentLoaded', function (e) {
+      var pickers = document.querySelectorAll('.pick-lang')
+      var elements = document.querySelectorAll('.pick-lang a')
+      var pickersArr = Array.prototype.slice.call(pickers)
+
+      pickersArr.forEach(function (picker) {
+        picker.addEventListener('click', function (e) {
+          e.preventDefault()
+          e.stopPropagation()
+
+          var target = e.target;
+
+          if (picker.contains(target)) {
+            var lang = target.getAttribute('data-lang')
+
+            if (window.localStorage) {
+              window.localStorage.setItem('lang', lang)
+            }
+
+            location.href = target.href
+          }
+        })
+      })
+    })
+  }
+
+  initPickLang()
+
+ /**
+   * color name
+   */
+
+  function colorname(){
+    if(location.pathname.indexOf('references/color-names.html')>0){
+      var t = document.querySelectorAll("table");
+      Array.prototype.forEach.call(t, function (table) {
+          var d = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+          Array.prototype.forEach.call(d, function (tr) {
+            var r = tr.getElementsByTagName("td")[1];
+            r.innerHTML ='<span style="background:'+ r.innerHTML +';color:'+ r.innerHTML +'"> yy </span>  ' + r.innerHTML
+          });
+
+      });
+    }
+  }
+
+  colorname();
+
+
+
   /**
    *  Search
    */
-  function initSearch() {
+  function initSearch () {
     var form = document.querySelector('.search-form')
     var inputElements = document.querySelectorAll('.search-input')
 
@@ -101,9 +156,10 @@
         input.addEventListener('input', function (e) {
           var target = e.target,
               panel = target.parentElement && target.parentElement.nextElementSibling,
-              keywords = target.value.trim().split(/[\s\-\，\\/]+/)
+              value = target.value.trim()
+              keywords = value.split(/[\s\-\，\\/]+/)
 
-          if (target.value.trim() !== '') {
+          if (value !== '') {
             var matchingPosts = searchFromJSON(resp.pages, keywords)
             var html = ''
 
@@ -149,7 +205,7 @@
 
       if(postTitle !== '' && postContent !== '') {
         keywords.forEach(function(keyword, i) {
-          var regEx = new RegExp(keyword, "gi")
+          var regEx = new RegExp('(' + escapeReg(keyword) + ')', 'gi')
           var indexTitle = -1,
               indexContent = -1,
               indexTitle = postTitle.search(regEx),
@@ -176,7 +232,7 @@
             var matchContent = '...' + 
               postContent
                 .substring(start, end)
-                .replace(regEx, "<em class=\"search-keyword\">" + keyword + "</em>") + 
+                .replace(regEx, '<em class="search-keyword">$1</em>') + 
                 '...'
 
             resultStr += matchContent
@@ -203,14 +259,14 @@
     return matchingResults
   }
 
-  function escapeHtml(string) {
+  function escapeHtml (string) {
     var entityMap = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': '&quot;',
-      "'": '&#39;',
-      "/": '&#x2F;'
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '': '&quot;',
+      '': '&#39;',
+      '/': '&#x2F;'
     }
 
     return String(string).replace(/[&<>"'\/]/g, function (s) {
@@ -218,7 +274,43 @@
     })
   }
 
+  function escapeReg (string) {
+    var entityMap = {
+      '.': '\\.',
+      '^': '\\^',
+      '$': '\\$',
+      '*': '\\*',
+      '?': '\\?',
+      '|': '\\|',
+      '(': '\\(',
+      ')': '\\)',
+      '[': '\\[',
+      ']': '\\]',
+      '+': '\\+'
+    }
+
+    return String(string).replace(/[\.\^\$\*\?\|\(\)\[\]\+]/g, function (s) {
+      return entityMap[s];
+    })
+  }
+
   initSearch()
+
+
+  function hostbyaliyun(){
+    if(location.hostname === "weex-project.io" || location.hostname === 'localhost'){
+      var hosts = document.querySelectorAll('.hostbyaliyun');
+       hosts.forEach(function (i) {
+          i.style.display = 'block'
+        })
+      
+    }
+  }
+
+  hostbyaliyun()
+
+
+
   /*
    * LANDINGPAGE 
    */
@@ -519,4 +611,33 @@
 
     initBack2Top()
   } else {}
+
+function initVersionChange(){
+    var btns = document.querySelectorAll('.versionBtn')
+    btns.forEach(function (btn) {
+      btn.addEventListener('change', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        var target = e.target
+        var url = location.protocol + '//' + location.host
+        var stype = target.getAttribute('stype')
+        var iscn = location.href.indexOf('/cn/')? '/cn/' : '/'
+        if(target.value === '2v' ){
+          url += stype + '/index.html' 
+        }else{
+          if( stype.indexOf('/cn/') != -1 ){
+            url += stype.replace('/cn/','/cn/v-0.10/') + '/index.html'
+          }else{
+            url += '/v-0.10' + stype + '/index.html'
+          }
+        }
+        location.href = url
+      })
+    })
+  }
+  initVersionChange()
+
+
 })();
+
+  

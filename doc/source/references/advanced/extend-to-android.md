@@ -37,6 +37,24 @@ public class WXEventModule extends WXModule{
 }
 ```
 
+#### Support synchronous/asynchronous callback
+
+You can add  `@JSMethod (uiThread = false or true)` annotation to choose the callback mode of moudle. See the follow example.
+
+```java
+  // as sync-callback mode
+@JSMethod (uiThread = false)
+public void testSyncCall(){
+    WXLogUtils.d("WXComponentSyncTest : Thread.currentThread().getName());
+}
+
+// as async-callback mode
+@JSMethod (uiThread = true)
+public void testAsyncCall(){
+    WXLogUtils.e("WXComponentASynTest : Thread.currentThread().getName() );
+}
+```
+
 ### Register the moulde
 
 ```java
@@ -47,7 +65,7 @@ WXSDKEngine.registerModule("event", WXEventModule.class);
 Now `event` moudle is avaiable in weex, use the module like this:
 
 ```javascript
-var event = require('@weex-module/event');
+var event = weex.requireModule('event');
 event.openURL("http://www.github.com");
 ```
 
@@ -185,3 +203,17 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   }
 </script>
 ``` 
+
+#### Proguard Rules
+
+If you want to using proguard to protect your source code, please add the following rules to your profile:
+
+```java
+-keep class com.taobao.weex.WXDebugTool{*;}
+-keep class com.taobao.weex.devtools.common.LogUtil{*;}
+-keep public class * extends com.taobao.weex.ui.component.WXComponent{*;}
+-keep public class * extends com.taobao.weex.common.WXModule{*;}
+-keepclassmembers class ** {
+  @com.taobao.weex.ui.component.WXComponentProp public *;
+}
+```

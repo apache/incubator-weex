@@ -36,7 +36,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .img {
     margin-bottom: 20px;
   }

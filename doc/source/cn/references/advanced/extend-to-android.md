@@ -1,7 +1,7 @@
 ---
 title: Android 扩展
 type: references
-order: 10.2
+order: 11.2
 version: 2.1
 ---
 
@@ -48,11 +48,29 @@ JS 调用如下：
   module.exports = {
     methods: {
       click: function() {
-        require('@weex-module/myModule').printLog("我是一个测试!");
+        weex.requireModule('myModule').printLog("我是一个测试!");
       }
     }
   }
 </script>
+```
+
+#### 支持 synchronous/asynchronous 回调
+
+你可以添加 `@JSMethod(uiThread = false或true)` 注释来选择 moudle 的回调模式。请参见以下示例：
+
+```java
+  // as sync-callback mode
+@JSMethod (uiThread = false)
+public void testSyncCall(){
+    WXLogUtils.d("WXComponentSyncTest : Thread.currentThread().getName());
+}
+
+// as async-callback mode
+@JSMethod (uiThread = true)
+public void testAsyncCall(){
+    WXLogUtils.e("WXComponentASynTest : Thread.currentThread().getName() );
+}
 ```
 
 ## Component 扩展
@@ -168,3 +186,16 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
 	```
 
 注:工程要添加依赖 `compile 'com.squareup.picasso:picasso:2.5.2'`
+
+#### SDK混淆规则
+若要在APP中使用混淆，请在相应的配置文件中添加如下规则：
+
+```java
+-keep class com.taobao.weex.WXDebugTool{*;}
+-keep class com.taobao.weex.devtools.common.LogUtil{*;}
+-keep public class * extends com.taobao.weex.ui.component.WXComponent{*;}
+-keep public class * extends com.taobao.weex.common.WXModule{*;}
+-keepclassmembers class ** {
+  @com.taobao.weex.ui.component.WXComponentProp public *;
+}
+```

@@ -18,8 +18,6 @@ This component supports no child components.
 
 **src**(string): this attribute specifies the page source to load.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 
 **width**(float): the width of the component, default value is 0. This style must be specified.
@@ -29,7 +27,7 @@ Other attributes please check out the [common attributes](../common-attrs.html)
 
 ### common styles
 
-check out the [common styles](../common-attrs.html).
+check out the [common styles](../common-style.html).
 
 support flexbox related styles
 support box model related styles
@@ -48,7 +46,7 @@ support `appear` / `disappear` event.
 Check out [common events](../common-event.html)
 
 ### Notes
-not support `click` event. 
+not support `click` event.
 
 ## Example
 
@@ -59,7 +57,7 @@ We use a simple Browser Demo to show how to use web component and webview module
 <template>
   <div class="wrapper">
     <div class="group">
-      <input class="input" ref="input" type="url" autofocus="false" value="https://m.taobao.com"></input>
+      <input class="input" v-model="value" ref="input" type="url" autofocus="false"></input>
     </div>
     <div class="group">
       <text class="button" @click="loadURL">LoadURL</text>
@@ -76,12 +74,13 @@ We use a simple Browser Demo to show how to use web component and webview module
   export default {
     data () {
       return {
-        url : 'https://m.alibaba.com'
+        url : 'https://m.alibaba.com',
+        value: 'https://m.alibaba.com'
       }
     },
     methods: {
       loadURL (event) {
-        this.url = this.$refs.input.value
+        this.url = this.value
         modal.toast({ message: 'load url:' + this.url })
         setTimeout(() => {
           console.log('will go back.')
@@ -102,7 +101,7 @@ We use a simple Browser Demo to show how to use web component and webview module
         console.log('pagefinish', event)
         modal.toast({ message: 'pagefinish' })
       },
-      finish (event) {
+      error (event) {
         console.log('error', event)
         modal.toast({ message: 'error' })
       }
@@ -146,4 +145,4 @@ We use a simple Browser Demo to show how to use web component and webview module
 </style>
 ```
 
-[try it](../../examples/web.html)
+[try it](http://dotwe.org/vue/221ff37113a12d692a7a92a100f20162)

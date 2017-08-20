@@ -6,16 +6,16 @@ layout: post
 
 # FAQ
 
-## where are legacy docs?
+## Where are legacy docs?
 
 - [Guide](./v-0.10/guide/index.html)
 - [References](./v-0.10/references/index.html)
 - [Advanced](./v-0.10/advanced/index.html)
 - [Tools](./v-0.10/tools/index.html)
 
-## Command errors in Windows
+## Command errors in MS Windows
 
-Please install [Git for Windows](https://git-scm.com/download/win) first, see [For Windows](https://github.com/alibaba/weex/tree/dev#for-windows) for more information.
+Please install [Git for Windows](https://git-scm.com/download/win) first, see [For Windows](https://github.com/apache/incubator-weex/tree/dev#for-windows) for more information.
 
 
 ## Gradle errors in Android Studio
@@ -74,9 +74,6 @@ We will bring a better syntax design in the future.
 
 ## Android only support `overflow:hidden`
 The `overflow` style in android is `hidden` and cannot be changed. This is the result of Android View framework. This only happens on Android, iOS will work as expected.
-
-## Android do not support emoji
-As Android NDK only supports Modified UTF-8, emoji is not support yet. Any attemp to use emoji may cause crash in case of lower than Android 6.0, and unexpected behavior when it is higher than 6.0. Only use Modified UTF-8, **do not** use emoji.
 
 ## How to get rid of 750 adaption and calculate width/height in real pixels？
 

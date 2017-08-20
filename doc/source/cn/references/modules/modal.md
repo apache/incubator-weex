@@ -20,6 +20,8 @@ version: 2.1
 - `options {Object}`：相关选项
   - `message {string}`：展示的内容
   - `duration {number}`：展示的持续时间（以秒为单位）
+    - Android: 如果时间长度大于3s，将使用一个被称为**LONG**的系统变量, 否则使用**SHORT**这个系统变量
+    - iOS: 持续的时间同Duration相同。
 
 ### `alert(options, callback)`
 
@@ -136,4 +138,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/modal.html)
+[try it](http://dotwe.org/vue/a7dddfb24edb72be947fc4eec3803f1d)

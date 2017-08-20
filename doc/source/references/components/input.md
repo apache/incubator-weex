@@ -17,7 +17,7 @@ This component supports no child components.
 
 ## Attributes
 
-* `type`: the type of controls to display. The default value is `text`, if this attribute is not specified. Possible values are `text`, `password`, `tel`, `email`, `url` etc. each of which has the same meaning with W3C standard.
+* `type`: the type of controls to display. The default value is `text`, if this attribute is not specified. Possible values are `text`, `password`, `tel`, `email`, `url` , `number` etc. each of which has the same meaning with W3C standard.
 
 * `value`: the value(text) of the control.
 
@@ -29,7 +29,7 @@ This component supports no child components.
 
 * `maxlength`: <span class="api-version">v0.7+</span> a number value to specify maxlength of input.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
+* `return-key-type {string}`：<sup class="wx-v">v0.11</sup>the keybord returen key type support defalut;go;next;search;send,done.
 
 ## Styles
 
@@ -64,14 +64,20 @@ check out [common styles for components](../common-style.html)
 * change: the change event is fired when a change to the component's value is commited by the user. It always come after a 'blur' event.
 * focus: a component has received focus.
 * blur: a component has lost focus.
+* `return`:the return key click.
+
+     the object property of event:
+
+    - `returnKeyType`: return key Type  of component
+    - `value`: component text value
 
 ### common events
 check out [common events](../common-event.html)
 
-* support 'appear' / 'disappear' event. 
+* support 'appear' / 'disappear' event.
 
 
-### Methoads 
+### Methoads
 
  - `focus()` <span class="api-version">v0.9+</span>
 
@@ -80,6 +86,15 @@ check out [common events](../common-event.html)
  - `blur()`<span class="api-version">v0.9+</span>
 
   The `blur()` method is used to remove focus from an input component and close soft keybord(if it has focus).
+
+- `setSelectionRange(selectionStart,selectionEnd)`  <span class="api-version">v0.11+</span>set text selection range of input or textarea
+
+  - `selectionStart {number}`:set starting location text selection range
+  - `selectionEnd {number}`:set end location text selection range
+
+- `getEditSelectionRange(callback[selectionStart,selectionEnd])`  <span class="api-version">v0.11+</span>get text selection range of input or textarea
+    - `selectionStart {number}`:get starting location text selection range
+    - `selectionEnd {number}`: get end location text selection range
 
 ### Notes
 does not support the common-event 'click'. Please listen to the 'input' or 'change' event instead.
@@ -93,64 +108,215 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 
 ```html
 <template>
-  <div class="wrapper">
-    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur">
+  <div>
+    <div>
+      <text style="font-size: 40px">oninput: {{txtInput}}</text>
+      <text style="font-size: 40px">onchange: {{txtChange}}</text>
+      <text style="font-size: 40px">onreturntype: {{txtReturnType}}</text>
+      <text style="font-size: 40px">selection: {{txtSelection}}</text>
+
+    </div>
+    <scroller>
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = text</text>
+        </div>
+        <input type="text" placeholder="Input Text" class="input" :autofocus=true value="" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = password</text>
+        </div>
+        <input type="password" placeholder="Input Password" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = url</text>
+        </div>
+        <input type="url" placeholder="Input URL" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = email</text>
+        </div>
+        <input type="email" placeholder="Input Email" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = tel</text>
+        </div>
+        <input type="tel" placeholder="Input Tel" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = time</text>
+        </div>
+        <input type="time" placeholder="Input Time" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = number</text>
+        </div>
+        <input type="number" placeholder="Input number" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = date</text>
+        </div>
+        <input type="date" placeholder="Input Date" class="input" @change="onchange" @input="oninput" max="2017-12-12" min="2015-01-01"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = default</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="default" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = go</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="go" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = next</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="next" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = search</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="search" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = send</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="send" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = done</text>
+        </div>
+        <input type="text" placeholder="please input" return-key-type="done" class="input" @change="onchange" @return = "onreturn" @input="oninput" />
+      </div>
+
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">function focus() & blur()</text>
+        </div>
+        <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
+          <text class="button" value="Focus" type="primary" @click="focus"></text>
+          <text class="button" value="Blur" type="primary" @click="blur"></text>
+        </div>
+
+        <input type="text" placeholder="Input1" class="input" value="" ref="input1"/>
+      </div>
+
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input selection</text>
+        </div>
+        <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
+          <text class="button" value="setRange" type="primary" @click="setRange"></text>
+          <text class="button" value="getSelectionRange" type="primary" @click="getSelectionRange"></text>
+        </div>
+        <input type="text"  ref="inputselection" placeholder="please input" value="123456789"  class="input" @change="onchange" @return = "onreturn" @input="oninput"/>
+      </div>
+
+
+
+    </scroller>
   </div>
 </template>
 
-<script>
-  const modal = weex.requireModule('modal')
-
-  export default {
-    methods: {
-      oninput (event) {
-        console.log('oninput:', event.value)
-        modal.toast({
-          message: `oninput: ${event.value}`,
-          duration: 0.8
-        })
-      },
-      onchange (event) {
-        console.log('onchange:', event.value)
-        modal.toast({
-          message: `onchange: ${event.value}`,
-          duration: 0.8
-        })
-      },
-      onfocus (event) {
-        console.log('onfocus:', event.value)
-        modal.toast({
-          message: `onfocus: ${event.value}`,
-          duration: 0.8
-        })
-      },
-      onblur (event) {
-        console.log('onblur:', event.value)
-        modal.toast({
-          message: `input blur: ${event.value}`,
-          duration: 0.8
-        })
-      }
-    }
-  }
-</script>
-
-<style>
+<style scoped>
   .input {
-    font-size: 50px;
-    width: 650px;
-    margin-top: 50px;
-    margin-left: 50px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    color: #666666;
-    border-width: 2px;
+    font-size: 60px;
+    height: 80px;
+    width: 750px;
+  }
+  .button {
+    font-size: 36;
+    width: 200;
+    color: #41B883;
+    text-align: center;
+    padding-top: 10;
+    padding-bottom: 10;
+    border-width: 2;
     border-style: solid;
-    border-color: #41B883;
+    margin-right: 20;
+    border-color: rgb(162, 217, 192);
+    background-color: rgba(162, 217, 192, 0.2);
   }
 </style>
+
+<script>
+  module.exports = {
+    data: function () {
+      return {
+        txtInput: '',
+        txtChange: '',
+        txtReturnType: '',
+        txtSelection:'',
+        autofocus: false
+      };
+    },
+    methods: {
+      ready: function () {
+        var self = this;
+        setTimeout(function () {
+          self.autofocus = true;
+        }, 1000);
+      },
+      onchange: function (event) {
+        this.txtChange = event.value;
+        console.log('onchange', event.value);
+      },
+      onreturn: function (event) {
+        this.txtReturnType = event.returnKeyType;
+        console.log('onreturn', event.type);
+      },
+      oninput: function (event) {
+        this.txtInput = event.value;
+        console.log('oninput', event.value);
+      },
+      focus: function () {
+        this.$refs['input1'].focus();
+      },
+      blur: function () {
+        this.$refs['input1'].blur();
+      },
+      setRange: function() {
+        console.log(this.$refs["inputselection"]);
+        this.$refs["inputselection"].setSelectionRange(2, 6);
+      },
+      getSelectionRange: function() {
+        console.log(this.$refs["inputselection"]);
+        var self = this;
+        this.$refs["inputselection"].getSelectionRange(function(e) {
+          self.txtSelection = e.selectionStart +'-' + e.selectionEnd;
+        });
+      }
+    }
+  };
+</script>
 ```
 
-[try it](../../examples/input.html)
+[try it](http://dotwe.org/vue/3470e4d0194f3879a72d38e2ab02cc9f)
