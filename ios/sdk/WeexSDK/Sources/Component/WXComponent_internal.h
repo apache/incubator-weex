@@ -181,6 +181,8 @@
 
 - (void)_modifyStyles:(NSDictionary *)styles;
 
+- (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;

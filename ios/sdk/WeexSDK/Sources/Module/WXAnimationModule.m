@@ -158,7 +158,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
             return;
         }
-        
         WXPerformBlockOnMainThread(^{
             [self animation:targetComponent args:args callback:callback];
         });

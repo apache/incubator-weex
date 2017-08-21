@@ -25,6 +25,7 @@ WX_EXPORT_METHOD(@selector(generateCover:))
 
 - (void)generateCover:(WXModuleCallback)callback
 {
+#if DEBUG
 #if !TARGET_IPHONE_SIMULATOR
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -38,6 +39,12 @@ WX_EXPORT_METHOD(@selector(generateCover:))
         NSDictionary * result = @{@"ok": @true};
         callback(result);
     }
+#else
+    if (callback) {
+        NSDictionary * result = @{@"ok": @false,@"msg":@"only debug mode support"};
+        callback(result);
+    }
+#endif
 }
 
 @end

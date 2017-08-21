@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Document, Element, Comment } from './vdom'
-import Listener from './listener'
-import { TaskCenter } from './task-center'
+
+import { Document, Element, Comment } from '../vdom'
+import Listener from '../bridge/Listener'
+import { TaskCenter } from '../bridge/TaskCenter'
 
 const config = {
   Document, Element, Comment, Listener,

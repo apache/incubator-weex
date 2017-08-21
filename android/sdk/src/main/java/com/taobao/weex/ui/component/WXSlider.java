@@ -63,6 +63,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
   private int initIndex = -1;
+  private boolean keepIndex = false;
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -188,7 +189,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       mViewPager.setCurrentItem(initIndex);
       initIndex = -1;
     } else {
-      mViewPager.setCurrentItem(0);
+      if (!keepIndex) {
+        mViewPager.setCurrentItem(0);
+      }
     }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
@@ -288,6 +291,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       case Constants.Name.SCROLLABLE:
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
+        return true;
+      case Constants.Name.KEEP_INDEX:
+        this.keepIndex = WXUtils.getBoolean(param, false);
         return true;
     }
     return super.setProperty(key, param);

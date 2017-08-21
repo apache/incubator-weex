@@ -23,7 +23,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -52,7 +51,6 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
-import com.taobao.weex.ui.component.ContentMeasurable;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
@@ -87,7 +85,7 @@ import java.util.regex.Pattern;
  */
 
 public abstract class BasicListComponent<T extends ViewGroup & ListComponentView> extends WXVContainer<T> implements
-    IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable, ContentMeasurable {
+    IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable {
   public static final String TRANSFORM = "transform";
   public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "BasicListComponent";
@@ -1289,6 +1287,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             return;
           }
 
+          RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+          if (!layoutManager.canScrollVertically()) {
+            return;
+          }
+
           if (shouldReport(offsetX, offsetY)) {
             fireScrollEvent(recyclerView, offsetX, offsetY);
           }
@@ -1298,8 +1301,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+    offsetY = calcContentOffset(recyclerView);
     int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-    int contentHeight = recyclerView.computeVerticalScrollRange();
+    int contentHeight = calcContentSize();
 
     Map<String, Object> event = new HashMap<>(2);
     Map<String, Object> contentSize = new HashMap<>(2);
@@ -1335,17 +1339,54 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return false;
   }
 
-  @Override
-  public Rect getContentFrame() {
-    T wrapper = getHostView();
-    if (wrapper != null) {
-      RecyclerView recyclerView = wrapper.getInnerView();
-      if (recyclerView != null) {
-        int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-        int contentHeight = recyclerView.getMeasuredHeight() + recyclerView.computeVerticalScrollRange();
-        return new Rect(0, 0, contentWidth, contentHeight);
+  private int calcContentSize() {
+    int totalHeight = 0;
+    for (int i = 0; i < getChildCount(); i++) {
+      WXComponent child = getChild(i);
+      if (child != null) {
+        totalHeight += child.getLayoutHeight();
       }
     }
-    return null;
+    return totalHeight;
+  }
+
+  private int calcContentOffset(RecyclerView recyclerView) {
+    RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+    if (layoutManager instanceof LinearLayoutManager) {
+      int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+      int offset = 0;
+      for (int i=0;i<firstVisibleItemPosition;i++) {
+        WXComponent child = getChild(i);
+        if (child != null) {
+          offset -= child.getLayoutHeight();
+        }
+      }
+
+      if (layoutManager instanceof GridLayoutManager) {
+        int spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
+        offset = offset / spanCount;
+      }
+
+      offset += firstVisibleView.getTop();
+      return offset;
+    } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+      int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+      int firstVisibleItemPosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+
+      int offset = 0;
+      for (int i=0;i<firstVisibleItemPosition;i++) {
+        WXComponent child = getChild(i);
+        if (child != null) {
+          offset -= child.getLayoutHeight();
+        }
+      }
+
+      offset = offset / spanCount;
+      offset += firstVisibleView.getTop();
+      return offset;
+    }
+    return -1;
   }
 }

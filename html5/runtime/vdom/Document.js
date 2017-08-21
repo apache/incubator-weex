@@ -17,34 +17,12 @@
  * under the License.
  */
 
-/**
- * @fileOverview
- * Virtual-DOM Document.
- */
-
-import '../../shared/objectAssign'
-import Comment from './comment'
-import Element from './element'
-import Listener from '../listener'
-import { TaskCenter } from '../task-center'
-import { createHandler } from '../handler'
+import Comment from './Comment'
+import Element from './Element'
+import Listener from '../bridge/Listener'
+import { TaskCenter } from '../bridge/TaskCenter'
+import { createHandler } from '../bridge/Handler'
 import { addDoc, removeDoc, appendBody, setBody } from './operation'
-
-export default function Document (id, url, handler) {
-  id = id ? id.toString() : ''
-  this.id = id
-  this.URL = url
-
-  addDoc(id, this)
-  this.nodeMap = {}
-  const L = Document.Listener || Listener
-  this.listener = new L(id, handler || createHandler(id, Document.handler)) // deprecated
-  this.taskCenter = new TaskCenter(id, handler ? (id, ...args) => handler(...args) : Document.handler)
-  this.createDocumentElement()
-}
-
-// default task handler
-Document.handler = null
 
 /**
  * Update all changes for an element.
@@ -62,34 +40,47 @@ function updateElement (el, changes) {
   }
 }
 
-Object.assign(Document.prototype, {
+export default class Document {
+  constructor (id, url, handler) {
+    id = id ? id.toString() : ''
+    this.id = id
+    this.URL = url
+
+    addDoc(id, this)
+    this.nodeMap = {}
+    const L = Document.Listener || Listener
+    this.listener = new L(id, handler || createHandler(id, Document.handler)) // deprecated
+    this.taskCenter = new TaskCenter(id, handler ? (id, ...args) => handler(...args) : Document.handler)
+    this.createDocumentElement()
+  }
+
   /**
-   * Get the node from nodeMap.
-   * @param {string} reference id
-   * @return {object} node
-   */
+  * Get the node from nodeMap.
+  * @param {string} reference id
+  * @return {object} node
+  */
   getRef (ref) {
     return this.nodeMap[ref]
-  },
+  }
 
   /**
-   * Turn on batched updates.
-   */
+  * Turn on batched updates.
+  */
   open () {
     this.listener.batched = false
-  },
+  }
 
   /**
-   * Turn off batched updates.
-   */
+  * Turn off batched updates.
+  */
   close () {
     this.listener.batched = true
-  },
+  }
 
   /**
-   * Create the document element.
-   * @return {object} documentElement
-   */
+  * Create the document element.
+  * @return {object} documentElement
+  */
   createDocumentElement () {
     if (!this.documentElement) {
       const el = new Element('document')
@@ -121,14 +112,14 @@ Object.assign(Document.prototype, {
     }
 
     return this.documentElement
-  },
+  }
 
   /**
-   * Create the body element.
-   * @param {string} type
-   * @param {objct} props
-   * @return {object} body element
-   */
+  * Create the body element.
+  * @param {string} type
+  * @param {objct} props
+  * @return {object} body element
+  */
   createBody (type, props) {
     if (!this.body) {
       const el = new Element(type, props)
@@ -136,35 +127,35 @@ Object.assign(Document.prototype, {
     }
 
     return this.body
-  },
+  }
 
   /**
-   * Create an element.
-   * @param {string} tagName
-   * @param {objct} props
-   * @return {object} element
-   */
+  * Create an element.
+  * @param {string} tagName
+  * @param {objct} props
+  * @return {object} element
+  */
   createElement (tagName, props) {
     return new Element(tagName, props)
-  },
+  }
 
   /**
-   * Create an comment.
-   * @param {string} text
-   * @return {object} comment
-   */
+  * Create an comment.
+  * @param {string} text
+  * @return {object} comment
+  */
   createComment (text) {
     return new Comment(text)
-  },
+  }
 
   /**
-   * Fire an event on specified element manually.
-   * @param {object} element
-   * @param {string} event type
-   * @param {object} event object
-   * @param {object} dom changes
-   * @return {} anything returned by handler function
-   */
+  * Fire an event on specified element manually.
+  * @param {object} element
+  * @param {string} event type
+  * @param {object} event object
+  * @param {object} dom changes
+  * @return {} anything returned by handler function
+  */
   fireEvent (el, type, e, domChanges) {
     if (!el) {
       return
@@ -179,11 +170,11 @@ Object.assign(Document.prototype, {
     }
     const isBubble = this.getRef('_root').attr['bubble'] === 'true'
     return el.fireEvent(type, e, isBubble)
-  },
+  }
 
   /**
-   * Destroy current document, and remove itself form docMap.
-   */
+  * Destroy current document, and remove itself form docMap.
+  */
   destroy () {
     this.taskCenter.destroyCallback()
     delete this.listener
@@ -191,4 +182,7 @@ Object.assign(Document.prototype, {
     delete this.taskCenter
     removeDoc(this.id)
   }
-})
+}
+
+// default task handler
+Document.handler = null

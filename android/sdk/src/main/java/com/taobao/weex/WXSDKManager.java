@@ -277,6 +277,11 @@ public class WXSDKManager {
   void createInstance(WXSDKInstance instance, String code, Map<String, Object> options, String jsonInitData) {
     mWXRenderManager.registerInstance(instance);
     mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);
+    if (mLifeCycleCallbacks != null) {
+      for (InstanceLifeCycleCallbacks callbacks : mLifeCycleCallbacks) {
+        callbacks.onInstanceCreated(instance.getInstanceId());
+      }
+    }
   }
 
   void refreshInstance(String instanceId, WXRefreshData jsonData) {
@@ -447,5 +452,6 @@ public class WXSDKManager {
 
   public interface InstanceLifeCycleCallbacks {
     void onInstanceDestroyed(String instanceId);
+    void onInstanceCreated(String instanceId);
   }
 }
