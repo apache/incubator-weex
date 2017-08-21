@@ -1301,7 +1301,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
-    offsetY = calcContentOffset(recyclerView);
+    offsetY = - calcContentOffset(recyclerView);
     int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
     int contentHeight = calcContentSize();
 
