@@ -514,11 +514,21 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public float getLayoutWidth(){
-    return mDomObj == null ? 0 : mDomObj.getLayoutWidth();
+    float w = 0f;
+    if (mDomObj != null) {
+      w = mDomObj.getLayoutWidth();
+      w = Float.isNaN(w) ? 0f : w;
+    }
+    return w;
   }
 
   public float getLayoutHeight(){
-    return mDomObj == null ? 0 : mDomObj.getLayoutHeight();
+    float h = 0f;
+    if (mDomObj != null) {
+      h = mDomObj.getLayoutHeight();
+      h = Float.isNaN(h) ? 0f : h;
+    }
+    return h;
   }
 
   public void setPadding(Spacing padding, Spacing border) {
