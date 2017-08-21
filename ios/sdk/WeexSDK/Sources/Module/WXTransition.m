@@ -21,7 +21,6 @@
 
 #import <QuartzCore/CATransaction.h>
 #import <QuartzCore/CADisplayLink.h>
-#import "WXAnimationModule.h"
 #import "WXComponentManager.h"
 #import "WXSDKInstance.h"
 #import "WXComponent+Layout.h"
@@ -419,14 +418,6 @@
     _addStyles = nil;
     _fromStyles = nil;
     _toStyles = nil;
-}
-
-- (void)_animationModuleHandleTransition:(NSDictionary *)args
-{
-    WXAnimationModule *animation = [WXAnimationModule new];
-    WXPerformBlockOnMainThread(^{
-        [animation animationModuleProcessAnimationWithArgs:args withWeexInstance:_targetComponent.weexInstance targetComponent:_targetComponent];
-    });
 }
 
 - (NSMutableDictionary *)_addStyles
