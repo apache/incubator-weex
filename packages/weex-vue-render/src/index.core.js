@@ -5,6 +5,8 @@ import text from '../../../html5/render/vue/components/text'
 import image from '../../../html5/render/vue/components/image'
 import scrollable from '../../../html5/render/vue/components/scrollable'
 
+import meta from '../../../html5/render/vue/modules/meta'
+
 const preInit = weex.init
 
 weex.init = function () {
@@ -13,6 +15,7 @@ weex.init = function () {
   weex.install(text)
   weex.install(image)
   weex.install(scrollable)
+  weex.install(meta)
 }
 
 if (global.Vue) {
