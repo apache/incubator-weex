@@ -315,7 +315,7 @@
                 transformString = [NSString stringWithFormat:@"rotateY(%lfdeg)",currentValue * 180.0 / M_PI];
             }
             if ([info.propertyName isEqualToString:@"transform.rotation.z"]) {
-                transformString = [NSString stringWithFormat:@"rotateZ(%lfdeg)",currentValue];
+                transformString = [NSString stringWithFormat:@"rotateZ(%lfdeg)",currentValue * 180.0 / M_PI];
             }
             if ([info.propertyName isEqualToString:@"transform.scale.x"]) {
                 transformString = [NSString stringWithFormat:@"scaleX(%lf)",currentValue];
