@@ -30,6 +30,7 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 #import "WXSDKInstance_private.h"
+#import "WXLength.h"
 
 @implementation WXLayoutAnimationInfo
 
@@ -83,9 +84,9 @@
     {
         [_addStyles addEntriesFromDictionary:styles];
     }
-    
     _toStyles = [NSMutableDictionary dictionaryWithDictionary:_fromStyles];
     [_toStyles addEntriesFromDictionary:_addStyles];
+    
     
     _layoutAnimationDuration = _fromStyles[kWXTransitionDuration] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDuration]] : 0;
     _layoutAnimationDelay = _fromStyles[kWXTransitionDelay] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDelay]] : 0;
@@ -120,13 +121,13 @@
 
 - (void)_resloveTransitionProperty:(NSString *)propertyNames withStyles:(NSDictionary *)styles
 {
-    NSArray *array = @[@"width",@"height",@"top",@"bottom",@"right",@"left"];
+    NSArray *array = @[@"width",@"height",@"top",@"bottom",@"right",@"left",@"opacity"];
     for (NSString *propertyName in array) {
         if ([propertyNames containsString:propertyName]) {
             [self _judgeProperty:propertyName ];
         }
     }
-    NSArray *animationModuleArray = @[@"transform",@"backgroundColor",@"opacity"];
+    NSArray *animationModuleArray = @[@"transform",@"backgroundColor"];
     for (NSString *propertyName in animationModuleArray) {
         if ([propertyNames containsString:propertyName]) {
             [self _dealWithAnimationModuleProperty:propertyName styles:styles];
@@ -151,9 +152,129 @@
 {
     if (styles[singleProperty])
     {
-        NSDictionary *args = @{@"delay":@(_layoutAnimationDelay),@"duration":@(_layoutAnimationDuration),@"styles":styles,@"timingFunction":_fromStyles[kWXTransitionTimingFunction]};
-        [self _animationModuleHandleTransition:args];
+        if (!_propertyArray) {
+            _propertyArray = [NSMutableArray new];
+        }
+        
+        if ([singleProperty isEqualToString:@"backgroundColor"]) {
+            WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+            info.fromValue = [self _dealWithColor:[WXConvert UIColor:_fromStyles[singleProperty]]];
+            info.toValue = [self _dealWithColor:[WXConvert UIColor:_toStyles[singleProperty]]];
+            info.perValue = [self _calculatePerColorRGB1:info.toValue RGB2:info.fromValue];
+            info.propertyName = singleProperty;
+            [_propertyArray addObject:info];
+        }
+        if ([singleProperty isEqualToString:@"transform"]) {
+            NSString *transformOrigin = styles[@"transformOrigin"];
+            WXTransform *wxTransform = [[WXTransform alloc] initWithCSSValue:styles[singleProperty] origin:transformOrigin instance:_targetComponent.weexInstance];
+            WXTransform *oldTransform = _targetComponent->_transform;
+            if (wxTransform.rotateAngle != oldTransform.rotateAngle) {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.rotation";
+                info.fromValue = @(oldTransform.rotateAngle);
+                info.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            if (wxTransform.rotateX != oldTransform.rotateX)
+            {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.rotation.x";
+                info.fromValue = @(oldTransform.rotateX);
+                info.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            if (wxTransform.rotateY != oldTransform.rotateY)
+            {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.rotation.y";
+                info.fromValue = @(oldTransform.rotateY);
+                info.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            if (wxTransform.rotateZ != oldTransform.rotateZ)
+            {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.rotation.z";
+                info.fromValue = @(oldTransform.rotateZ);
+                info.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            
+            if (wxTransform.scaleX != oldTransform.scaleX) {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.scale.x";
+                info.fromValue = @(oldTransform.scaleX);
+                info.toValue = @(wxTransform.scaleX);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            
+            if (wxTransform.scaleY != oldTransform.scaleY) {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.scale.y";
+                info.fromValue = @(oldTransform.scaleY);
+                info.toValue = @(wxTransform.scaleX);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            
+            if ((wxTransform.translateX && ![wxTransform.translateX isEqualToLength:oldTransform.translateX]) || (!wxTransform.translateX && oldTransform.translateX)) {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.translation.x";
+                info.fromValue = @([oldTransform.translateX valueForMaximum:_targetComponent.view.bounds.size.width]);
+                info.toValue = @([wxTransform.translateX valueForMaximum:_targetComponent.view.bounds.size.width]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            
+            if ((wxTransform.translateY && ![wxTransform.translateY isEqualToLength:oldTransform.translateY]) || (!wxTransform.translateY && oldTransform.translateY)) {
+                WXLayoutAnimationInfo *info = [WXLayoutAnimationInfo new];
+                info.propertyName = @"transform.translation.y";
+                info.fromValue = @([oldTransform.translateY valueForMaximum:_targetComponent.view.bounds.size.height]);
+                info.toValue = @([wxTransform.translateY valueForMaximum:_targetComponent.view.bounds.size.height]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+                [_propertyArray addObject:info];
+            }
+            _targetComponent->_transform = wxTransform;
+        }
     }
+}
+
+- (NSArray *)_dealWithColor:(UIColor *)color
+{
+    CGFloat R, G, B, A;
+    [color getRed:&R green:&G blue:&B alpha:&A];
+    return @[@(R),@(G),@(B),@(A)];
+}
+
+- (NSArray *)_calculatePerColorRGB1:(NSArray *)RGB1 RGB2:(NSArray *)RGB2
+{
+    CGFloat R = [RGB1[0] doubleValue] - [RGB2[0] doubleValue];
+    CGFloat G = [RGB1[1] doubleValue] - [RGB2[1] doubleValue];
+    CGFloat B = [RGB1[2] doubleValue] - [RGB2[2] doubleValue];
+    CGFloat A = [RGB1[3] doubleValue] - [RGB2[3] doubleValue];
+    return @[@(R),@(G),@(B),@(A)];
+}
+
+- (NSString *)_hexWithColor:(UIColor *)color
+{
+    uint hex;
+    CGFloat red, green, blue, alpha;
+    if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+        [color getWhite:&red alpha:&alpha];
+        green = red;
+        blue = red;
+    }
+    red = roundf(red * 255.f);
+    green = roundf(green * 255.f);
+    blue = roundf(blue * 255.f);
+    alpha = roundf(alpha * 255.f);
+    hex =  ((uint)red << 16) | ((uint)green << 8) | ((uint)blue);
+    return [NSString stringWithFormat:@"#%02x", hex];
 }
 
 - (void)_calculateLayoutAnimationProcessingStyle
@@ -166,10 +287,60 @@
         per = [self solveWithx:((_layoutAnimationCount+2)*16)/_layoutAnimationDuration epsilon:SOLVE_EPS(_layoutAnimationDuration)];
     }
     for (WXLayoutAnimationInfo *info in _propertyArray) {
-        double currentValue = [info.fromValue doubleValue] + [info.perValue doubleValue] * per;
-        [_fromStyles setObject:@(currentValue) forKey:info.propertyName];
+        if ([info.propertyName isEqualToString:@"backgroundColor"]) {
+            NSArray *array = @[
+                               @([info.fromValue[0] floatValue] + [info.perValue[0] floatValue] * per),
+                               @([info.fromValue[1] floatValue] + [info.perValue[1] floatValue] * per),
+                               @([info.fromValue[2] floatValue] + [info.perValue[2] floatValue] * per),
+                               @([info.fromValue[3] floatValue] + [info.perValue[3] floatValue] * per)];
+            UIColor *color = [UIColor colorWithRed:[array[0] floatValue] green:[array[1] floatValue] blue:[array[2] floatValue] alpha:[array[3] floatValue]];
+            WXPerformBlockOnMainThread(^{
+                _targetComponent.view.backgroundColor = color;
+                [_targetComponent.view setNeedsDisplay];
+            });
+            NSString *colorString = [self _hexWithColor:color];
+            [_fromStyles setObject:colorString forKey:info.propertyName];
+        }
+        else if ([info.propertyName hasPrefix:@"transform"])
+        {
+            double currentValue = [info.fromValue doubleValue] + [info.perValue doubleValue] * per;
+            NSString *transformString;
+            if ([info.propertyName isEqualToString:@"transfrom.rotation"]) {
+                transformString = [NSString stringWithFormat:@"rotate(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transfrom.rotation.x"]) {
+                transformString = [NSString stringWithFormat:@"rotateX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.rotation.y"]) {
+                transformString = [NSString stringWithFormat:@"rotateY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.rotation.z"]) {
+                transformString = [NSString stringWithFormat:@"rotateZ(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.scale.x"]) {
+                transformString = [NSString stringWithFormat:@"scaleX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.scale.y"]) {
+                transformString = [NSString stringWithFormat:@"scaleY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.translation.x"]) {
+                transformString = [NSString stringWithFormat:@"translateX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            if ([info.propertyName isEqualToString:@"transform.translation.y"]) {
+                transformString = [NSString stringWithFormat:@"translateY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            }
+            [_fromStyles setObject:transformString forKey:@"transform"];
+        }
+        else
+        {
+            double currentValue = [info.fromValue doubleValue] + [info.perValue doubleValue] * per;
+            [_fromStyles setObject:@(currentValue) forKey:info.propertyName];
+        }
     }
-    [_targetComponent _modifyStyles:_fromStyles];
+    WXPerformBlockOnMainThread(^{
+        [_targetComponent _updateViewStyles:_fromStyles];
+    });
+
     [_targetComponent _updateCSSNodeStyles:_fromStyles];
     [_targetComponent.weexInstance.componentManager startComponentTasks];
 }
