@@ -11,6 +11,7 @@ android {
         versionCode 13
         versionName "0.5.2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         ndk{
             abiFilters "x86"
             abiFilters "armeabi"
@@ -36,6 +37,8 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled false
+            jniDebuggable true
+            debuggable true
         }
     }
     sourceSets {
@@ -59,6 +62,7 @@ android {
     dexOptions {
         preDexLibraries false
     }
+
 }
 
 
@@ -81,6 +85,9 @@ dependencies {
     /*source dependency*/
     compile project(':weex_sdk')
     debugCompile project(':weex_debug')
+    // debugCompile project(path: ':weex_sdk', configuration: 'debug')
+
+    // releaseCompile project(path: ':weex_sdk', configuration: 'release')
 
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor

@@ -1,5 +1,6 @@
 buildscript {
     dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
@@ -37,6 +38,8 @@ checkstyle {
 version = "0.9.4"
 
 android {
+
+    publishNonDefault true
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
@@ -81,22 +84,44 @@ android {
         buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion 14
         targetSdkVersion project.targetSdkVersion
+
+        multiDexEnabled true
+
         versionCode 1
         versionName "1.0"
         ndk {
             abiFilters "armeabi","x86"
         }
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=gcc',
+                        '-DANDROID_STL=gnustl_static'
+            }
+        }
+
+
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
+
         }
 
         debug {
             testCoverageEnabled true
             buildConfigField "boolean", "ENABLE_TRACE", "true"
+            jniDebuggable true
+            debuggable true
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path '../weex_core_debug/CMakeLists.txt'
         }
     }
 

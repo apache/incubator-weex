@@ -196,30 +196,30 @@ public class WXSoInstallMgrSdk {
    * @return true for valid  ; false for InValid
    */
   static boolean checkSoIsValid(String libName, long size) {
-    Context context = mContext;
-    if (null == context) {
-      return false;
-    }
-    try{
-      long start=System.currentTimeMillis();
-      if(WXSoInstallMgrSdk.class.getClassLoader() instanceof PathClassLoader ) {
-
-        String path = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(libName);
-        if(TextUtils.isEmpty(path) ){
-          return false;
-        }
-        File file = new File(path);
-
-        if (!file.exists() || size == file.length()) {
-          WXLogUtils.w("weex so size check path :" + path+"   "+(System.currentTimeMillis() - start));
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }catch(Throwable e ){
-      WXLogUtils.e("weex so size check fail exception :"+e.getMessage());
-    }
+//    Context context = mContext;
+//    if (null == context) {
+//      return false;
+//    }
+//    try{
+//      long start=System.currentTimeMillis();
+//      if(WXSoInstallMgrSdk.class.getClassLoader() instanceof PathClassLoader ) {
+//
+//        String path = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(libName);
+//        if(TextUtils.isEmpty(path) ){
+//          return false;
+//        }
+//        File file = new File(path);
+//
+//        if (!file.exists() || size == file.length()) {
+//          WXLogUtils.w("weex so size check path :" + path+"   "+(System.currentTimeMillis() - start));
+//          return true;
+//        } else {
+//          return false;
+//        }
+//      }
+//    }catch(Throwable e ){
+//      WXLogUtils.e("weex so size check fail exception :"+e.getMessage());
+//    }
 
     return true;
   }
