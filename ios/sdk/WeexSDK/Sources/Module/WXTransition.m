@@ -304,24 +304,24 @@
         else if ([info.propertyName hasPrefix:@"transform"])
         {
             double currentValue = [info.fromValue doubleValue] + [info.perValue doubleValue] * per;
-            NSString *transformString;
-            if ([info.propertyName isEqualToString:@"transfrom.rotation"]) {
-                transformString = [NSString stringWithFormat:@"rotate(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            NSString *transformString = [NSString string];
+            if ([info.propertyName isEqualToString:@"transform.rotation"]) {
+                transformString = [NSString stringWithFormat:@"rotate(%lfdeg)",currentValue * 180.0 / M_PI];
             }
-            if ([info.propertyName isEqualToString:@"transfrom.rotation.x"]) {
-                transformString = [NSString stringWithFormat:@"rotateX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+            if ([info.propertyName isEqualToString:@"transform.rotation.x"]) {
+                transformString = [NSString stringWithFormat:@"rotateX(%lfdeg)",currentValue * 180.0 / M_PI];
             }
             if ([info.propertyName isEqualToString:@"transform.rotation.y"]) {
-                transformString = [NSString stringWithFormat:@"rotateY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                transformString = [NSString stringWithFormat:@"rotateY(%lfdeg)",currentValue * 180.0 / M_PI];
             }
             if ([info.propertyName isEqualToString:@"transform.rotation.z"]) {
-                transformString = [NSString stringWithFormat:@"rotateZ(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                transformString = [NSString stringWithFormat:@"rotateZ(%lfdeg)",currentValue];
             }
             if ([info.propertyName isEqualToString:@"transform.scale.x"]) {
-                transformString = [NSString stringWithFormat:@"scaleX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                transformString = [NSString stringWithFormat:@"scaleX(%lf)",currentValue];
             }
             if ([info.propertyName isEqualToString:@"transform.scale.y"]) {
-                transformString = [NSString stringWithFormat:@"scaleY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                transformString = [NSString stringWithFormat:@"scaleY(%lf)",currentValue];
             }
             if ([info.propertyName isEqualToString:@"transform.translation.x"]) {
                 transformString = [NSString stringWithFormat:@"translateX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
