@@ -8,7 +8,7 @@
       var root = typeof window === 'object' ? 'vue-web/vue' : 'vue'
 
       return {
-        items: [ 
+        items: [           
           // common
           {name: root + '/hello', title: 'Hello World'},
           {name: root + '/style/index', title: 'Common Style'},
@@ -47,6 +47,8 @@
           {name: root + '/showcase/progress', title: 'Progress Bar'},
           {name: root + '/showcase/itemlist', title: 'List (Advanced)'},
           {name: root + '/showcase/calculator', title: 'Calculator'},
+          {name: root + '/showcase/tap-penetrate', title: 'TapPenetrate'},
+          {name: root + '/showcase/a-node-click', title: 'ANodeClick'},
           // {name: root + '/showcase/minesweeper', title: 'Minesweeper'},
           // {name: root + '/showcase/ui', title: 'UI Gallery'},
           // {name: root + '/showcase/dropdown/dropdown-demo', title: 'Dropdown'}
