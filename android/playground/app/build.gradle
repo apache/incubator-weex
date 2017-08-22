@@ -12,10 +12,18 @@ android {
         versionName "0.5.2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=gcc',
+                        '-DANDROID_STL=gnustl_static'
+            }
+        }
         ndk{
             abiFilters "x86"
             abiFilters "armeabi"
         }
+
     }
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -83,9 +91,9 @@ dependencies {
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     /*source dependency*/
-    compile project(':weex_sdk')
-    debugCompile project(':weex_debug')
-    // debugCompile project(path: ':weex_sdk', configuration: 'debug')
+//    debugCompile project(':weex_sdk')
+//    debugCompile project(':weex_debug')
+//     debugCompile project(path: ':weex_sdk', configuration: 'debug')
 
     // releaseCompile project(path: ':weex_sdk', configuration: 'release')
 

@@ -35,5 +35,5 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     //compile 'com.taobao.android:weex_sdk:0.4.+'
-    provided project(':weex_sdk')
+    debugCompile project(':weex_sdk')
 }
