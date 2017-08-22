@@ -259,23 +259,6 @@
     return @[@(R),@(G),@(B),@(A)];
 }
 
-- (NSString *)_hexWithColor:(UIColor *)color
-{
-    uint hex;
-    CGFloat red, green, blue, alpha;
-    if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
-        [color getWhite:&red alpha:&alpha];
-        green = red;
-        blue = red;
-    }
-    red = roundf(red * 255.f);
-    green = roundf(green * 255.f);
-    blue = roundf(blue * 255.f);
-    alpha = roundf(alpha * 255.f);
-    hex =  ((uint)red << 16) | ((uint)green << 8) | ((uint)blue);
-    return [NSString stringWithFormat:@"#%02x", hex];
-}
-
 - (void)_calculateLayoutAnimationProcessingStyle
 {
     if (_propertyArray.count == 0) {
@@ -297,7 +280,7 @@
                 _targetComponent.view.backgroundColor = color;
                 [_targetComponent.view setNeedsDisplay];
             });
-            NSString *colorString = [self _hexWithColor:color];
+            NSString *colorString = [WXConvert HexWithColor:color];
             [_fromStyles setObject:colorString forKey:info.propertyName];
         }
         else if ([info.propertyName hasPrefix:@"transform"])
@@ -313,7 +296,7 @@
             if ([info.propertyName isEqualToString:@"transform.rotation.y"]) {
                 transformString = [NSString stringWithFormat:@"rotateY(%lfdeg)",currentValue * 180.0 / M_PI];
             }
-            if ([info.propertyName isEqualToString:@"transform.rotation.z"]) {
+            if ([info.propertyName isEqualToString:@"transform.rotation.z"]) {
                 transformString = [NSString stringWithFormat:@"rotateZ(%lfdeg)",currentValue * 180.0 / M_PI];
             }
             if ([info.propertyName isEqualToString:@"transform.scale.x"]) {
@@ -379,8 +362,7 @@
 - (void)_suspendLayoutAnimationDisplayLink
 {
     WXAssertComponentThread();
-    if(_layoutAnimationDisplayLink && !_layoutAnimationDisplayLink.paused)
-    {
+    if(_layoutAnimationDisplayLink && !_layoutAnimationDisplayLink.paused){
         _layoutAnimationDisplayLink.paused = YES;
     }
 }
