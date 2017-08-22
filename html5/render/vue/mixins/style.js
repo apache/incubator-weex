@@ -67,16 +67,14 @@ function getIdentifiedBeforeCreate () {
       for (; thisHookIdx < len; thisHookIdx++) {
         if (hooks[thisHookIdx]._styleMixin) { break }
       }
-      for (let i = thisHookIdx + 1; i < len; i++) {
-        const func = hooks[i]
-        if (func.name === 'injectStyle') {
-          hooks[i] = function () {
-            // call the original injectStyle hook.
-            func.call(this)
-            // scan the new appended styleSheet.
-            extend(weex._styleMap, getHeadStyleMap())
-            hooks[i] = func
-          }
+      if (thisHookIdx !== len - 1) {
+        const func = hooks[len - 1]
+        hooks[len - 1] = function () {
+          // call the original injectStyle hook.
+          func.call(this)
+          // scan the new appended styleSheet.
+          extend(weex._styleMap, getHeadStyleMap())
+          hooks[len - 1] = func
         }
       }
     }
