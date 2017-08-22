@@ -71,18 +71,22 @@
 
 }
 
-- (void) testColor{
+- (void) testHex2Color{
     
     UIColor *redColor = [UIColor redColor];
     NSString *redString = @"#ff0000";
-    
-    //color2hex
-    NSString *hexString = [WXConvert HexWithColor:redColor];
-    XCTAssertTrue([redString isEqualToString:hexString]);
-    
     //hex2color
     UIColor *redTestColor = [WXConvert UIColor:redString];
     XCTAssertTrue(CGColorEqualToColor(redTestColor.CGColor, redColor.CGColor));
+}
+
+- (void) testColor2Hex{
+    
+    UIColor *redColor = [UIColor redColor];
+    NSString *redString = @"#ff0000";
+    //color2hex
+    NSString *hexString = [WXConvert HexWithColor:redColor];
+    XCTAssertTrue([redString isEqualToString:hexString]);
 }
 
 @end
