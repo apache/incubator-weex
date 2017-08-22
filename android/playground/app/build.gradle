@@ -13,7 +13,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
-            abiFilters "x86"
             abiFilters "armeabi"
         }
     }

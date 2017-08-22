@@ -7,11 +7,9 @@ add_definitions(-DOS_ANDROID=1)
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 
-#add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Source/CrashHandler)
 
 include_directories(${CMAKE_SOURCE_DIR}/Source/IPC)
-#                    ${CMAKE_SOURCE_DIR}/Source/CrashHandler)
 
 add_library(weexjsc SHARED
     ./IPC/Serializing/IPCSerializer.cpp
@@ -61,7 +59,8 @@ add_library(weexjsc SHARED
     target_link_libraries(weexjsc 
                                 android 
                                 log
-                                z)
-#                                ${CMAKE_SOURCE_DIR}/libyogacore.so)
+                                z
+                                ${CMAKE_SOURCE_DIR}/libyogacore.so)
+
 #    target_link_libraries(weexjsc ${CMAKE_SOURCE_DIR}/libyogacore.so)
     
