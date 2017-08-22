@@ -13,3 +13,4 @@ gen
 lint.xml
 project.properties
 assets/main.js
+.externalNativeBuild
