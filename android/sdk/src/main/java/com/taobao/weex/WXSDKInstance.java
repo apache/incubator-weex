@@ -47,6 +47,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
+import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -74,6 +75,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.WXSDKEngine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -581,6 +583,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return "";
   }
 
+  public void reloadPage() {
+    WXSDKEngine.reload();
+
+    // 可以发送广播吗？
+    Intent intent = new Intent();
+    intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
+    intent.putExtra("url", mBundleUrl);
+    mContext.sendBroadcast(intent);
+
+    // mRendered = false;
+    //    destroy();
+    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+    // refreshInstance("{}");
+
+  }
   /**
    * Refresh instance asynchronously.
    * @param data the new data
