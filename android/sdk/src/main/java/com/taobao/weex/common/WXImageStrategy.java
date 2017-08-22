@@ -19,7 +19,7 @@
 package com.taobao.weex.common;
 
 import android.widget.ImageView;
-
+import com.taobao.weex.adapter.IDrawableLoader.DrawableTarget;
 import java.util.Map;
 
 public class WXImageStrategy {
@@ -57,6 +57,12 @@ public class WXImageStrategy {
   }
 
   ImageListener imageListener;
+
+  WidgetListener widgetListener;
+
+  public interface WidgetListener{
+    public void onImageFinish(String url,DrawableTarget drawableTarget,boolean  result,Map extra);
+  }
 
   public interface ImageListener{
     public void onImageFinish(String url,ImageView imageView,boolean  result,Map extra);

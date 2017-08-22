@@ -1,0 +1,113 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package com.taobao.weex.ui.flat;
+
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.support.v4.util.ArrayMap;
+import android.text.TextUtils;
+import com.taobao.weex.common.Constants.Name;
+import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.WXAttr;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
+import java.util.Map;
+
+//TODO when Weex instance is destroyed, there is a work of garbage collection.
+//TODO !!!!The index of weex playground show empty cell sometimes.
+//TODO The constructor of FlatGUIContext should have a flag decide whether to enable flagGUI.
+
+@RestrictTo(Scope.LIBRARY)
+public class FlatGUIIContext {
+
+  private boolean mFlatUIEnabled;
+  private Map<WXComponent, WidgetContainer> mWidgetRegistry = new ArrayMap<>();
+  private Map<WXComponent, AndroidViewWidget> mViewWidgetRegistry = new ArrayMap<>();
+
+  @RestrictTo(Scope.LIBRARY)
+  public void setFlatUIEnabled(boolean flag){
+    mFlatUIEnabled = flag;
+  }
+
+  public boolean isFlatUIEnabled() {
+    return mFlatUIEnabled;
+  }
+
+  public void register(@NonNull WXComponent descendant, @NonNull WidgetContainer ancestor) {
+    if (!(ancestor instanceof FlatComponent) ||
+        ((FlatComponent) ancestor).promoteToView(true)) {
+      mWidgetRegistry.put(descendant, ancestor);
+    }
+  }
+
+  public void register(@NonNull WXComponent component, @NonNull AndroidViewWidget viewWidget){
+    mViewWidgetRegistry.put(component, viewWidget);
+  }
+
+  public
+  @Nullable
+  WidgetContainer getFlatComponentAncestor(@NonNull WXComponent flatWidget) {
+    return mWidgetRegistry.get(flatWidget);
+  }
+
+  public
+  @Nullable
+  AndroidViewWidget getAndroidViewWidget(@NonNull WXComponent component) {
+    return mViewWidgetRegistry.get(component);
+  }
+
+  public boolean promoteToView(@NonNull WXComponent component, boolean checkAncestor,
+      @NonNull Class<? extends WXComponent<?>> expectedClass) {
+    return !isFlatUIEnabled() ||
+        !expectedClass.equals(component.getClass()) ||
+        TextUtils.equals(component.getRef(), WXDomObject.ROOT) ||
+        (checkAncestor && getFlatComponentAncestor(component) == null) ||
+        checkComponent(component);
+  }
+
+  private boolean checkComponent(@NonNull WXComponent component) {
+    boolean ret = false;
+    ImmutableDomObject domObject = component.getDomObject();
+    if (domObject != null) {
+      WXStyle style = domObject.getStyles();
+      WXAttr attr = domObject.getAttrs();
+      //disabled && pro_fixed_size, attr or style
+      if (style.containsKey(Name.OPACITY) ||
+          style.containsKey(Name.TRANSFORM) ||
+          attr.containsKey(Name.ELEVATION) ||
+          attr.containsKey(Name.ARIA_HIDDEN) ||
+          attr.containsKey(Name.ARIA_LABEL) ||
+          attr.containsKey(WXComponent.PROP_FIXED_SIZE) ||
+          style.containsKey(Name.VISIBILITY) ||
+          style.containsKey(Name.POSITION) ||
+          attr.containsKey(Name.DISABLED) ||
+          attr.containsKey(Name.PREVENT_MOVE_EVENT) ||
+          !style.getPesudoStyles().isEmpty() ||
+          domObject.getEvents().size() > 0) {
+        ret = true;
+      }
+    }
+    return ret;
+  }
+}

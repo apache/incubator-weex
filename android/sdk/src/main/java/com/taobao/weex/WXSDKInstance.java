@@ -28,6 +28,8 @@ import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -68,6 +70,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.flat.FlatGUIIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
@@ -87,7 +90,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -120,6 +122,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedReLoad = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
+  private final  @NonNull
+  FlatGUIIContext mUIImp =new FlatGUIIContext();
 
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
@@ -200,6 +204,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     enableLayerType = enable;
   }
 
+  public @NonNull
+  FlatGUIIContext getFlatUIContext(){
+    return mUIImp;
+  }
+
   public boolean isNeedValidate() {
     return mNeedValidate;
   }
@@ -251,6 +260,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /**
    * For unittest only.
    */
+  @RestrictTo(Scope.TESTS)
   WXSDKInstance(Context context,String id) {
     mInstanceId = id;
     init(context);

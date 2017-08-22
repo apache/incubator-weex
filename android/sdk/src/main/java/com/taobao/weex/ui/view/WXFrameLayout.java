@@ -20,26 +20,31 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-
 import com.taobao.weex.ui.component.WXDiv;
+import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * FrameLayout wrapper
  *
  */
+//TODO Read the code of View.draw, and override the correct method.
 public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv> {
 
   private WXGesture wxGesture;
 
   private WeakReference<WXDiv> mWeakReference;
+
+  private List<Widget> mWidgets;
 
   public WXFrameLayout(Context context) {
     super(context);
@@ -60,12 +65,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
   }
 
   @Override
-  protected void onDraw(Canvas canvas) {
-    WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
-    super.onDraw(canvas);
-  }
-
-  @Override
   public void holdComponent(WXDiv component) {
     mWeakReference = new WeakReference<WXDiv>(component);
   }
@@ -74,5 +73,40 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
   @Override
   public WXDiv getComponent() {
     return null != mWeakReference ? mWeakReference.get() : null;
+  }
+
+  public void mountFlatGUI(List<Widget> widgets){
+    this.mWidgets = widgets;
+    if (mWidgets != null) {
+      setWillNotDraw(true);
+    }
+    invalidate();
+  }
+
+  public void unmountFlatGUI(){
+    mWidgets = null;
+    setWillNotDraw(false);
+    invalidate();
+  }
+
+  @Override
+  protected boolean verifyDrawable(@NonNull Drawable who) {
+    return mWidgets != null || super.verifyDrawable(who);
+  }
+
+  @Override
+  protected void dispatchDraw(Canvas canvas) {
+    if (mWidgets != null) {
+      canvas.save();
+      //TODO need clip here
+      canvas.translate(getPaddingLeft(), getPaddingTop());
+      for (Widget widget : mWidgets) {
+        widget.draw(canvas);
+      }
+      canvas.restore();
+    } else {
+      WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
+      super.dispatchDraw(canvas);
+    }
   }
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,17 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.ui.flat.widget;
 
-package com.taobao.weex.adapter;
 
+import android.graphics.Canvas;
+import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.text.Layout;
+import android.view.View;
 
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.WXImageQuality;
+@RestrictTo(Scope.LIBRARY)
+public class TextWidget extends BaseWidget {
 
-public class DrawableStrategy {
+  private Layout mLayout;
 
-  public int width;
-  public int height;
-  public WXImageStrategy imageStrategy;
-  public WXImageQuality imageQuality;
+  public TextWidget(@NonNull View flatContainer) {
+    super(flatContainer);
+  }
+
+  @Override
+  public void onDraw(@NonNull Canvas canvas) {
+    if (mLayout != null) {
+      mLayout.draw(canvas);
+    }
+  }
+
+  public void updateTextDrawable(Layout layout) {
+    this.mLayout = layout;
+    invalidate();
+  }
 }
