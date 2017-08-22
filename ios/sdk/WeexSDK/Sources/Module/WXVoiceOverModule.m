@@ -21,36 +21,94 @@
 #import "WXUtility.h"
 #import "WXComponent_internal.h"
 #import "WXComponentManager.h"
+#import "WXThreadSafeMutableDictionary.h"
 
 @implementation WXVoiceOverModule
 {
     BOOL _voiceOverStatus;
+    WXThreadSafeMutableDictionary * _announcementCallback;
 }
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD(@selector(read:param:))
+WX_EXPORT_METHOD(@selector(read:callback:))
 WX_EXPORT_METHOD(@selector(focusToElement:))
 WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
 - (instancetype)init
 {
     if ([super init]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voiceOverStatusListener) name:UIAccessibilityVoiceOverStatusChanged object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voiceOverAnnounceFinish:) name:UIAccessibilityAnnouncementDidFinishNotification object:nil];
         _voiceOverStatus = UIAccessibilityIsVoiceOverRunning();
+        _announcementCallback = [WXThreadSafeMutableDictionary new];
     }
     return self;
 }
-- (void)read:(NSString *)string param:(NSDictionary*)param
+- (void)read:(NSDictionary*)param callback:(WXCallback)callback
 {
+    NSString * string = nil;
+    if (param[@"value"]) {
+        string = [WXConvert NSString:param[@"value"]];
+    }
+    
+    if (!string ) {
+        NSString * errorDesc = @"you didn't specify any value to read";
+        WXLogError(@"%@", errorDesc);
+        if (callback) {
+            callback(@{@"success":@false,@"errorDesc": errorDesc});
+        }
+        return;
+    }
+    
+    if (![self isVoiceOverOn]) {
+        NSString * errorDesc = @"please check the voice status";
+        WXLogInfo(@"%@",errorDesc);
+        if (callback) {
+            callback(@{@"success":@false, @"errorDesc":errorDesc});
+        }
+        return;
+    }
+    
     float delay = 0.5;
     if (param[@"delay"]) {
         delay = [param[@"delay"] floatValue];
     }
+    if (callback) {
+        NSMutableArray * callbacks = (NSMutableArray*)_announcementCallback[string];
+        if (callbacks) {
+            [callbacks addObject:callback];
+        } else {
+            callbacks = [NSMutableArray arrayWithObject:callback];
+        }
+        [_announcementCallback setObject:callbacks forKey:string];
+    }
+    
     if ([string isKindOfClass:[NSString class]]) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, string);
         });
     }
 }
+
+- (void)voiceOverAnnounceFinish:(NSNotification*)notification
+{
+    NSString * string = notification.userInfo[UIAccessibilityAnnouncementKeyStringValue];
+    if (!_announcementCallback[string]) {
+        return;
+    }
+    BOOL announcementResult = [notification.userInfo[UIAccessibilityAnnouncementKeyWasSuccessful] boolValue];
+    
+    
+    NSMutableArray * callbacks = (NSMutableArray*)_announcementCallback[string];
+    if(![callbacks count]) {
+        return;
+    }
+    
+    for (WXCallback callback in callbacks) {
+        callback(@{@"success":@(announcementResult),
+                   @"value":string});
+    }
+}
+
 - (void)focusToElement:(NSString *)ref {
     WXPerformBlockOnComponentThread(^{
         WXComponent * compoent = [weexInstance componentForRef:ref];
@@ -80,6 +138,7 @@ WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIAccessibilityVoiceOverStatusChanged object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIAccessibilityAnnouncementDidFinishNotification object:nil];
 }
 
 @end
