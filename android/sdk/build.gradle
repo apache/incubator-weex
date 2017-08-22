@@ -108,18 +108,15 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
-            jniDebuggable true
-            debuggable true
+
         }
 
         debug {
-
             testCoverageEnabled true
             buildConfigField "boolean", "ENABLE_TRACE", "true"
             jniDebuggable true
             debuggable true
         }
-
     }
 
     externalNativeBuild {
