@@ -36,7 +36,6 @@ android {
     }
     buildTypes {
         debug {
-            testCoverageEnabled false
             jniDebuggable true
             debuggable true
         }
@@ -83,11 +82,16 @@ dependencies {
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     /*source dependency*/
-    compile project(':weex_sdk')
-    debugCompile project(':weex_debug')
-    // debugCompile project(path: ':weex_sdk', configuration: 'debug')
 
-    // releaseCompile project(path: ':weex_sdk', configuration: 'release')
+    debugCompile project(path: ':weex_debug', configuration: 'debug')
+    releaseCompile project(path: ':weex_debug', configuration: 'release')
+
+    debugCompile project(path: ':commons', configuration: 'debug')
+    releaseCompile project(path: ':commons', configuration: 'release')
+
+    // compile project(':weex_sdk')
+    // debugCompile project(':weex_debug')
+    // compile project(':commons')
 
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor
@@ -95,7 +99,7 @@ dependencies {
     // set WXAnalyzerDelegate#DEBUG==true to enable it
     debugCompile 'com.taobao.android:weex_analyzer:0.1.0.5'
 
-    compile project(':commons')
+
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.facebook.fresco:fresco:0.12.0+'

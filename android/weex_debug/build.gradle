@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
+    publishNonDefault  true
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
 
@@ -9,6 +10,7 @@ android {
         targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
     }
 
     lintOptions {
@@ -21,7 +23,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            testCoverageEnabled true
+            jniDebuggable true
+            debuggable true
+
         }
     }
 }
@@ -35,5 +39,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     //compile 'com.taobao.android:weex_sdk:0.4.+'
-    provided project(':weex_sdk')
+    // provided project(':weex_sdk')
+
+    debugCompile project(path: ':weex_sdk', configuration: 'debug')
+    releaseCompile project(path: ':weex_sdk', configuration: 'release')
 }
