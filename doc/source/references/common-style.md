@@ -236,17 +236,17 @@ Now you can use the transition attribute in CSS to enhance the interactivity and
 
 - ``transition-property``:Allows the name of the transitional animation to set the value of the different styles transition effect, the default value is empty, that does not perform any transition, the following table lists all the legitimate parameters of the property:
 
-  | Property        | Description                              |
-  | --------------- | ---------------------------------------- |
-  | width           | The transition is performed when the width of the component is involved in the animation |
-  | height          | The transition is performed when the height of the component is involved in the animation |
-  | top             | The transition is performed when the top of the component is involved in the animation |
-  | bottom          | The transition is performed when the bottom of the component is involved in the animation |
-  | left            | The transition is performed when the left of the component is involved in the animation |
-  | right           | The transition is performed when the right of the component is involved in the animation |
-  | backgroundColor | The transition is performed when the backgroundColor of the component is involved in the animation |
-  | opacity         | The transition is performed when the opacity of the component is involved in the animation |
-  | transform       | The transition is performed when the transform of the component is involved in the animation |
+| Property        | Description                              |
+| --------------- | ---------------------------------------- |
+| width           | The transition is performed when the width of the component is involved in the animation |
+| height          | The transition is performed when the height of the component is involved in the animation |
+| top             | The transition is performed when the top of the component is involved in the animation |
+| bottom          | The transition is performed when the bottom of the component is involved in the animation |
+| left            | The transition is performed when the left of the component is involved in the animation |
+| right           | The transition is performed when the right of the component is involved in the animation |
+| backgroundColor | The transition is performed when the backgroundColor of the component is involved in the animation |
+| opacity         | The transition is performed when the opacity of the component is involved in the animation |
+| transform       | The transition is performed when the transform of the component is involved in the animation |
 
 - ``transition-duration``:Specifies the duration of the transition transition (in milliseconds). The default value is 0, indicating that there is no animation.
 
@@ -254,18 +254,18 @@ Now you can use the transition attribute in CSS to enhance the interactivity and
 
 - ``transition-timing-function``:Describes the velocity curve of the transition transition, which is used to make the transition transition smoother. The default is ease. The following table lists all the valid attributes:
 
-  | Property                       | Description                              |
-  | ------------------------------ | ---------------------------------------- |
-  | ``ease``                       | The transition gradually slow down the transition effect |
-| `ease-in`                      | The transition starts slowly and then becomes faster for the transition effect |
-| `ease-out`                     | The transition starts quickly and then slows the transition effect |
-| `ease-in-out`                  | The transition starts slowly, then goes fast and then slowly ends the transition effect |
-| `linear`                       | The transition changes at constant speed |
-| `cubic-bezier(x1, y1, x2, y2)` | Using the custom transition in the third-order Bessel function, the parameter values of the function must be between 0 and 1. For more information on three times Bessel, see [cubic-bezier](http://cubic-bezier.com/) and [Bézier curve](https://en.wikipedia.org/wiki/B%C3%A9zier_curve). |
+| Property                       | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| ease                         | The transition gradually slow down the transition effect |
+| ease-in                      | The transition starts slowly and then becomes faster for the transition effect |
+| ease-out                     | The transition starts quickly and then slows the transition effect |
+| ease-in-out                  | The transition starts slowly, then goes fast and then slowly ends the transition effect |
+| linear                       | The transition changes at constant speed |
+| cubic-bezier(x1, y1, x2, y2) | Using the custom transition in the third-order Bessel function, the parameter values of the function must be between 0 and 1. For more information on three times Bessel, see [cubic-bezier](http://cubic-bezier.com/) and [Bézier curve](https://en.wikipedia.org/wiki/B%C3%A9zier_curve). |
 
 ### Example
 
-```
+```html
 <style scoped>
     .panel {
         margin: 10px;
