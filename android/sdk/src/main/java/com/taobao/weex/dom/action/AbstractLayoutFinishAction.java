@@ -21,7 +21,6 @@ package com.taobao.weex.dom.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
@@ -30,7 +29,7 @@ import com.taobao.weex.dom.WXDomObject;
 /**
  * Created by sospartan on 02/03/2017.
  */
-abstract class AbstractLayoutFinishAction implements DOMAction, RenderAction {
+abstract class AbstractLayoutFinishAction extends TraceableAction implements DOMAction, RenderAction {
 
   protected int mLayoutWidth;
   protected int mLayoutHeight;

@@ -672,7 +672,8 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             @"ease-in":kCAMediaTimingFunctionEaseIn,
             @"ease-out":kCAMediaTimingFunctionEaseOut,
             @"ease-in-out":kCAMediaTimingFunctionEaseInEaseOut,
-            @"linear":kCAMediaTimingFunctionLinear
+            @"linear":kCAMediaTimingFunctionLinear,
+            @"ease":kCAMediaTimingFunctionDefault
         };
     });
     

@@ -26,6 +26,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
@@ -171,9 +173,18 @@ class DOMActionContextImpl implements DOMActionContext {
     if (!mDirty || mDestroy) {
       return;
     }
-
+    long start = System.currentTimeMillis();
+    long startNanos = System.nanoTime();
     WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
     layout(rootDom);
+
+    if (WXTracing.isAvailable()) {
+      WXTracing.TraceEvent batchEvent = WXTracing.newEvent("domBatch", mInstanceId, -1);
+      batchEvent.duration = Stopwatch.millisUntilNow(startNanos);
+      batchEvent.ts = start;
+      batchEvent.ph = "X";
+      WXTracing.submit(batchEvent);
+    }
   }
 
   void layout(WXDomObject rootDom) {
@@ -181,7 +192,6 @@ class DOMActionContextImpl implements DOMActionContext {
       return;
     }
     long start0 = System.currentTimeMillis();
-
     rebuildingFixedDomTree(rootDom);
 
     rootDom.traverseTree( new WXDomObject.Consumer() {
@@ -194,7 +204,6 @@ class DOMActionContextImpl implements DOMActionContext {
       }
     });
     long start = System.currentTimeMillis();
-
 
     rootDom.calculateLayout(mLayoutContext);
 

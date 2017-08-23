@@ -64,11 +64,6 @@ describe('Array.from', () => {
     expect(Array.from('x\uD834\uDF06Y')).to.deep.equal(['x', '\uD834\uDF06', 'Y'])
 	})
 
-  it.skip('works with emoji', () => {
-    expect(Array.from('👨‍👩‍👧‍👦')).to.deep.equal(['👨', '‍', '👩', '‍', '👧', '‍', '👦'])
-    expect(Array.from('🎅🏾')).to.deep.equal(['🎅', '🏾'])
-	})
-
   it('works with objects', () => {
     expect(Array.from({})).to.deep.equal([])
     expect(Array.from({ name: 'abc' })).to.deep.equal([])

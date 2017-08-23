@@ -432,17 +432,66 @@
 }
 
 #pragma mark Updating
-
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    if (isUpdateStyles) {
-        pthread_mutex_lock(&_propertyMutex);
-        [_styles addEntriesFromDictionary:styles];
-        pthread_mutex_unlock(&_propertyMutex);
+    if ([self _isPropertyTransitionStyles:styles]) {
+        if (!_transition) {
+            _transition = [WXTransition new];
+        }
+        [_transition _handleTransitionWithStyles:styles withTarget:self];
     }
-    styles = [self parseStyles:styles];
-    [self _updateCSSNodeStyles:styles];
+    else
+    {
+        styles = [self parseStyles:styles];
+        [self _updateCSSNodeStyles:styles];
+    }
+    
+    if (isUpdateStyles) {
+        [self _modifyStyles:styles];
+    }
+    
     [self _resetCSSNodeStyles:resetStyles];
+}
+
+- (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
+{
+    BOOL yesOrNo = false;
+    NSString *property = _styles[kWXTransitionProperty];
+    if (property) {
+        if (([property containsString:@"width"]&&styles[@"width"])
+            ||([property containsString:@"height"]&&styles[@"height"])
+            ||([property containsString:@"right"]&&styles[@"right"])
+            ||([property containsString:@"left"]&&styles[@"left"])
+            ||([property containsString:@"bottom"]&&styles[@"bottom"])
+            ||([property containsString:@"top"]&&styles[@"top"])
+            ||([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
+            ||([property containsString:@"transform"]&&styles[@"transform"])
+            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+            yesOrNo = true;
+        }
+    }
+    return yesOrNo;
+}
+
+- (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
+{
+    BOOL yesOrNo = false;
+    NSString *property = _styles[kWXTransitionProperty];
+    if (property) {
+        if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
+            ||([property containsString:@"transform"]&&styles[@"transform"])
+            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+            yesOrNo = true;
+        }
+    }
+    return yesOrNo;
+}
+
+- (void)_modifyStyles:(NSDictionary *)styles
+{
+    pthread_mutex_lock(&_propertyMutex);
+    [_styles addEntriesFromDictionary:styles];
+    pthread_mutex_unlock(&_propertyMutex);
 }
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
@@ -469,10 +518,11 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    [self _updateViewStyles:styles];
+    if (![self _isPropertyAnimationStyles:styles]) {
+        [self _updateViewStyles:styles];
+    }
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
-    
     [self updateStyles:styles];
     [self resetStyles:resetStyles];
 }
@@ -649,4 +699,3 @@
 }
 
 @end
-

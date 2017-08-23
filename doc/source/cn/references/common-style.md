@@ -314,6 +314,8 @@ transform 属性向元素应用 2D 转换。该属性允许我们对元素进行
 - scaleX( <number> )
 - scaleY( <number> )
 - rotate( <angle/degree> )
+- rotateX( <angle/degree> ) <span class="api-version">v0.14+</span>
+- rotateY( <angle/degree> ) <span class="api-version">v0.14+</span>
 - transform-origin: number/percentage/keyword(top/left/right/bottom)
 
 ### 示例

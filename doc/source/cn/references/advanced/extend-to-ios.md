@@ -28,8 +28,10 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
 
     ```object-c
     @implementation WXEventModule
+    
     @synthesize weexInstance;
-        WX_EXPORT_METHOD(@selector(openURL:callback))
+    WX_EXPORT_METHOD(@selector(openURL:callback:))
+    
     - (void)openURL:(NSString *)url callback:(WXModuleCallback)callback
     {
         NSString *newURL = url;

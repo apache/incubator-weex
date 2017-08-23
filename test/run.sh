@@ -25,7 +25,7 @@ function runAndroid {
     buildAndroid
     startMacacaServer
     startWeexServer
-    platform=android ./node_modules/mocha/bin/mocha  $1 -f '@ignore-android' -i --recursive --bail
+    platform=android ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-android' -i --recursive --bail --verbose --retries 3
 }
 
 function buildiOS {
@@ -49,15 +49,6 @@ function buildiOS {
 
 }
 
-function coverageGenerate {
-    current_dir=$PWD
-    xcodeCover="${current_dir}/ios/playground/XcodeCoverage"
-    if [ -d $xcodeCover ]; then
-        cd $xcodeCover
-        ./getcov -o . -p WeexSDK -x
-    fi
-}
-
 function runiOS {
     echo 'Run in iOS...'
     echo $1
@@ -67,17 +58,14 @@ function runiOS {
     # ps -ef
     startMacacaServer
     startWeexServer
-    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
-    if [ $needCoverage = "cover" ]; then
-        coverageGenerate
-    fi
+    platform=ios ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-ios' -i --recursive --bail --verbose --retries 3
 }
 
 function runWeb {
     echo 'run web'
     startMacacaServer
     startWeexServer
-    browser=chrome ./node_modules/mocha/bin/mocha  $1 -f '@ignore-web' -i --recursive --bail
+    browser=chrome ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-web' -i --recursive --bail --verbose --retries 3
 }
 
 function killserver {

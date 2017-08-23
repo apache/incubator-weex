@@ -20,6 +20,7 @@ package com.taobao.weex.dom.action;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.tracing.WXTracing;
 
 /**
  * Created by sospartan on 02/03/2017.
@@ -31,5 +32,8 @@ class RefreshFinishAction extends AbstractLayoutFinishAction {
   public void executeRender(RenderActionContext context) {
     WXSDKInstance instance = context.getInstance();
     instance.onRefreshSuccess(mLayoutWidth, mLayoutHeight);
+    if (WXTracing.isAvailable()) {
+      submitPerformance("refreshFinish", "I", context.getInstance().getInstanceId(), 0, 0);
+    }
   }
 }
