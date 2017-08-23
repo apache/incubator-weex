@@ -67,6 +67,7 @@ import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -858,6 +859,16 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
       }
+      if(component instanceof  WXBaseRefresh
+              && holder.getView() != null
+              && component.getDomObject() != null
+              && (component.getDomObject().getAttrs().get("holderBackground") != null)){
+         Object holderBackground = component.getDomObject().getAttrs().get("holderBackground");
+        int color = WXResourceUtils.getColor(holderBackground.toString(), Color.WHITE);
+         holder.getView().setBackgroundColor(color);
+         holder.getView().setVisibility(View.VISIBLE);
+         holder.getView().postInvalidate();
+      }
       return;
     }
 
@@ -1239,9 +1250,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private ListBaseViewHolder createVHForRefreshComponent(int viewType) {
     FrameLayout view = new FrameLayout(getContext());
-    view.setBackgroundColor(Color.WHITE);
-    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
-    view.setVisibility(View.GONE);
+    view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
     return new ListBaseViewHolder(view, viewType);
   }
 
@@ -1301,7 +1310,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
-    offsetY = - calcContentOffset(recyclerView);
+    if(getOrientation() == Constants.Orientation.VERTICAL){
+      offsetY = - calcContentOffset(recyclerView);
+    }
     int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
     int contentHeight = calcContentSize();
 
