@@ -1,3 +1,10 @@
+---
+title: Weex语法支持插件
+type: guide
+order: 5.1
+version: 2.1
+---
+
 # Weex语法支持插件 
 
 [Weex Language Support](https://plugins.jetbrains.com/plugin/9189-weex-language-support) 插件是官方提供的一个工具，你可以使用它在IntelliJ IDEA，WebStorm等一系列IDE上对Weex DSL进行语法高亮，自动补全和错误检查等操作。

@@ -1,3 +1,10 @@
+---
+title: Weex Language Support Plugin
+type: guide
+order: 5.1
+version: 2.1
+---
+
 # Weex Language Support Plugin
 
 [Weex Language Support](https://plugins.jetbrains.com/plugin/9189-weex-language-support) is a official tools to code highlight, automatic completion，lint and other functions in IDEA, WebStorm or the others IDEs.
