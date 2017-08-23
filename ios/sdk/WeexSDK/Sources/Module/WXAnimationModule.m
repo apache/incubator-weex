@@ -158,7 +158,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
             return;
         }
-        
         WXPerformBlockOnMainThread(^{
             [self animation:targetComponent args:args callback:callback];
         });
@@ -258,7 +257,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 newInfo.toValue = @([wxTransform.translateY valueForMaximum:view.bounds.size.height]);
                 [infos addObject:newInfo];
             }
-            
             target->_transform = wxTransform;
         } else if ([property isEqualToString:@"backgroundColor"]) {
             info.propertyName = @"backgroundColor";
@@ -300,12 +298,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     }
 
     return infos;
-}
-
-- (void)animationModuleProcessAnimationWithArgs:(NSDictionary *)args withWeexInstance:(WXSDKInstance *)instance targetComponent:(WXComponent *)target
-{
-    self.weexInstance = instance;
-    [self animation:target args:args callback:nil];
 }
 
 - (void)animationWithLayoutAnimationTarget:(WXComponent *)target handleProperty:(NSString *)property withDic:(NSDictionary *)args

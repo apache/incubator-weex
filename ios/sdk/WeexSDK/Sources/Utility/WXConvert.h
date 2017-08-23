@@ -53,6 +53,7 @@ typedef CGFloat WXPixelType;
 
 + (UIColor *)UIColor:(id)value;
 + (CGColorRef)CGColor:(id)value;
++ (NSString *)HexWithColor:(UIColor *)color;
 + (WXBorderStyle)WXBorderStyle:(id)value;
 typedef BOOL WXClipType;
 + (WXClipType)WXClipType:(id)value;

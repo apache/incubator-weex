@@ -13,13 +13,13 @@ describe('weex '+goal+' test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/'+goal+'.js'))
       .waitForElementByName(goal, timeout, 2000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 
@@ -27,6 +27,7 @@ describe('weex '+goal+' test', function () {
     //TODO ：截图比对
     return driver.waitForElementByName('alertClick', timeout, 2000)
       .click()
+      .sleep(1000)
       .dismissAlert()
       .waitForElementByName(goal, timeout, 2000)
       .click()

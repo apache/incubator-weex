@@ -1564,7 +1564,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         event.tname = "Network";
         event.ph = "E";
         event.extParams = new HashMap<>();
-        event.extParams.put("BundleSize", response.originalData.length);
+        if (response != null && response.originalData != null) {
+          event.extParams.put("BundleSize", response.originalData.length);
+        }
         event.submit();
       }
 

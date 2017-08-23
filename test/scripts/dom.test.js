@@ -25,17 +25,17 @@ var path = require('path');
 var os = require('os');
 var util = require("./util.js");
 
-describe('weex mobile index', function () {
+describe('dom-operation', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/dom-operation.js'))
       .waitForElementById('status',util.getGETActionWaitTimeMills(),1000);
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver)
   })
 
@@ -83,6 +83,9 @@ describe('weex mobile index', function () {
 
   it('#4 Update DOM attr', ()=>{
       return driver
+      .elementById("status")
+      .click()
+      .sleep(2000)
       .elementById("status2")
       .text()
       .then((text)=>{
