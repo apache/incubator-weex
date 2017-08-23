@@ -210,12 +210,12 @@ function build (name) {
       return runRollup(config).then(() => {
         let p = Promise.resolve()
         if (name === 'vue') {
-          const esConfig = getConfig(pkgName, false, {
-            format: 'es',
+          const cjsConfig = getConfig(pkgName, false, {
+            format: 'cjs',
             _isProd: true
           })
-          esConfig.dest = esConfig.dest.replace(/\.js$/, '.es.js')
-          p = runRollup(esConfig)
+          cjsConfig.dest = cjsConfig.dest.replace(/\.js$/, '.common.js')
+          p = runRollup(cjsConfig)
         }
         return p.then(function () {
           return runRollup(minifyConfig).then(() => {
