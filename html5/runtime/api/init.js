@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { init as initTaskHandler } from './task-center'
-import { registerElement } from './vdom/element-types'
+
+import { init as initTaskHandler } from '../bridge/TaskCenter'
+import { registerElement } from '../vdom/WeexElement'
 import { services, register, unregister } from './service'
 
 let frameworks
@@ -32,16 +33,18 @@ const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
  * @param  {string} code
  * @return {object}
  */
-function checkVersion (code) {
-  let info
+function getBundleType (code) {
   const result = versionRegExp.exec(code)
   if (result) {
     try {
-      info = JSON.parse(result[1])
+      const info = JSON.parse(result[1])
+      return info.framework
     }
     catch (e) {}
   }
-  return info
+
+  // default bundle type
+  return 'Weex'
 }
 
 function createServices (id, env, config) {
@@ -66,6 +69,12 @@ function createServices (id, env, config) {
 
 const instanceMap = {}
 
+function getFrameworkType (id) {
+  if (instanceMap[id]) {
+    return instanceMap[id].framework
+  }
+}
+
 /**
  * Check which framework a certain JS Bundle code based to. And create instance
  * by this framework.
@@ -75,33 +84,35 @@ const instanceMap = {}
  * @param {object} data
  */
 function createInstance (id, code, config, data) {
-  let info = instanceMap[id]
-
-  if (!info) {
-    // Init instance info.
-    info = checkVersion(code) || {}
-    if (!frameworks[info.framework]) {
-      info.framework = 'Weex'
-    }
-
-    // Init instance config.
-    config = JSON.parse(JSON.stringify(config || {}))
-    config.bundleVersion = info.version
-    config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
-    console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
-
-    const env = {
-      info,
-      config,
-      created: Date.now(),
-      framework: info.framework
-    }
-    env.services = createServices(id, env, runtimeConfig)
-    instanceMap[id] = env
-
-    return frameworks[info.framework].createInstance(id, code, config, data, env)
+  if (instanceMap[id]) {
+    return new Error(`invalid instance id "${id}"`)
   }
-  return new Error(`invalid instance id "${id}"`)
+
+  // Init instance info.
+  const bundleType = getBundleType(code)
+
+  // Init instance config.
+  config = JSON.parse(JSON.stringify(config || {}))
+  config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
+
+  const context = {
+    config,
+    created: Date.now(),
+    framework: bundleType
+  }
+  context.services = createServices(id, context, runtimeConfig)
+  instanceMap[id] = context
+
+  if (process.env.NODE_ENV === 'development') {
+    console.debug(`[JS Framework] create an ${bundleType} instance`)
+  }
+
+  const fm = frameworks[bundleType]
+  if (!fm) {
+    return new Error(`invalid bundle type "${bundleType}".`)
+  }
+
+  return fm.createInstance(id, code, config, data, context)
 }
 
 const methods = {
@@ -145,9 +156,10 @@ function checkComponentMethods (components) {
 function genInstance (methodName) {
   methods[methodName] = function (...args) {
     const id = args[0]
-    const info = instanceMap[id]
-    if (info && frameworks[info.framework]) {
-      const result = frameworks[info.framework][methodName](...args)
+    const type = getFrameworkType(id)
+    if (type && frameworks[type]) {
+      const result = frameworks[type][methodName](...args)
+      const info = { framework: type }
 
       // Lifecycle methods
       if (methodName === 'refreshInstance') {
@@ -183,9 +195,9 @@ function genInstance (methodName) {
 function adaptInstance (methodName, nativeMethodName) {
   methods[nativeMethodName] = function (...args) {
     const id = args[0]
-    const info = instanceMap[id]
-    if (info && frameworks[info.framework]) {
-      return frameworks[info.framework][methodName](...args)
+    const type = getFrameworkType(id)
+    if (type && frameworks[type]) {
+      return frameworks[type][methodName](...args)
     }
     return new Error(`invalid instance id "${id}"`)
   }

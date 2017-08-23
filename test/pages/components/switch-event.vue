@@ -11,11 +11,12 @@
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 
+  * switch组件change回调事件是否正常
 
 测试方式：
-  * 
-  * 
+  * 默认switch组件为关闭状态，
+  * 点击switch组件，判断回调事件中组件状态
+  * 再次点击switch组件，判断回调事件中组件状态
       </text>
     </wxc-desc>
   </div>

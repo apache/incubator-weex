@@ -553,9 +553,23 @@ do {\
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
             _layer.borderColor = _borderTopColor.CGColor;
-            _layer.backgroundColor = _backgroundColor.CGColor;
+            if (![self _isTransitionBackgroundColorStyles:styles]) {
+                _layer.backgroundColor = _backgroundColor.CGColor;
+            }
         }
     }
+}
+
+- (BOOL)_isTransitionBackgroundColorStyles:(NSDictionary *)styles
+{
+    BOOL yesOrNo = false;
+    NSString *property = self.styles[kWXTransitionProperty];
+    if (property) {
+        if (([property containsString:@"backgroundColor"])) {
+            yesOrNo = true;
+        }
+    }
+    return yesOrNo;
 }
 
 - (BOOL)_bitmapOpaqueWithSize:(CGSize)size

@@ -11,13 +11,13 @@ describe('weex a test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/hyperlink.js'))
       .waitForElementById("content-inside-a", util.getGETActionWaitTimeMills(), 2000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 

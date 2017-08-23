@@ -74,14 +74,6 @@ export function getTaskCenter (id) {
 }
 
 /**
- * Get a unique id.
- */
-let nextNodeRef = 1
-export function uniqueId () {
-  return (nextNodeRef++).toString()
-}
-
-/**
  * Append body node to documentElement.
  * @param {object} document
  * @param {object} node

@@ -4,8 +4,8 @@ There are several scripts for end-user and developer.
 
 **For end users you can only know `npm run build` and `npm run serve` to start and `npm run dev:examples` to write or modify a demo.**
 
-* `npm run build:browser`: build HTML5 renderer to `dist/browser.js`.
-* `npm run build:native`: build JS framework for native renderer to `dist/native.js`.
+* `npm run build:browser`: build HTML5 renderer to `packages/weex-html5/index.js`.
+* `npm run build:native`: build JS framework for native renderer to `packages/weex-js-framework/index.js`.
 * `npm run build:examples`: build all js bundles from `examples/` to `examples/build/`.
 * `npm run build:test`: build all js bundles from `test/` to `test/build/`.
 * `npm run build`: build all above.

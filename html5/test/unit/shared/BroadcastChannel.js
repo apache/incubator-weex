@@ -42,13 +42,6 @@ describe('BroadcastChannel', () => {
     JamesBond.close()
   })
 
-  it.skip('inherit APIs', () => {
-    const ProfessorX = new BroadcastChannel('Charles')
-    expect(ProfessorX.addEventListener).is.an('function')
-    expect(ProfessorX.removeEventListener).is.an('function')
-    expect(ProfessorX.dispatchEvent).is.an('function')
-  })
-
   it('name attribute is readonly', () => {
     const Wolverine = new BroadcastChannel('Logan')
     expect(Wolverine.name).to.equal('Logan')

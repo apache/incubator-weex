@@ -344,7 +344,7 @@ WX_EXPORT_METHOD(@selector(save:))
     NSString *placeholderSrc = self.placeholdSrc;
     
     if ([WXUtility isBlankString:placeholderSrc]) {
-        WXLogError(@"image placeholder src is empty");
+//        WXLogError(@"image placeholder src is empty");
         return;
     }
     

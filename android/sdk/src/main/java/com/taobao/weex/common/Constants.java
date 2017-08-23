@@ -170,6 +170,9 @@ public class Constants {
     String OFFSET = "offset";
     String ANIMATED = "animated";
     String STABLE = "stable";
+    String TRANSFORM = "transform";
+    String TRANSFORM_ORIGIN = "transformOrigin";
+    String KEEP_INDEX = "keepIndex";
 
     String INSERT_CELL_ANIMATION = "insertAnimation";
     String DELETE_CELL_ANIMATION = "deleteAnimation";

@@ -169,6 +169,16 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
 }
+- (void)_transitionUpdateViewProperty:(NSDictionary *)styles
+{
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
+    if (styles[@"backgroundColor"]) {
+        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+    }
+    if (styles[@"opacity"]) {
+        _opacity = [WXConvert CGFloat:styles[@"opacity"]];
+    }
+}
 
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
@@ -187,7 +197,6 @@ do {\
     
     if (styles[@"backgroundImage"]) {
         _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
-        
         if (_backgroundImage) {
             [self setGradientLayer];
         }

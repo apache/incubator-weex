@@ -61,6 +61,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -115,6 +116,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
+
+  public long mRenderStartNanos;
+  public int mExecJSTraceId = WXTracing.nextId();
 
   /**
    * Render strategy.
@@ -419,6 +423,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
+    if (WXTracing.isAvailable()) {
+      WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
+      traceEvent.traceId = mExecJSTraceId;
+      traceEvent.iid = mInstanceId;
+      traceEvent.tname = "JSThread";
+      traceEvent.ph = "B";
+      traceEvent.submit();
+      mRenderStartNanos = System.nanoTime();
+    }
+
     ensureRenderArchor();
 
     Map<String, Object> renderOptions = options;
@@ -433,7 +447,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     mWXPerformance.pageName = pageName;
-    mWXPerformance.JSTemplateSize = template.length() / 1024;
+    mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
@@ -1487,6 +1501,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     private WXRenderStrategy flag;
     private WXSDKInstance instance;
     private long startRequestTime;
+    private int traceId;
 
     private WXHttpListener(String pageName, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag, long startRequestTime) {
       this.pageName = pageName;
@@ -1494,6 +1509,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       this.jsonInitData = jsonInitData;
       this.flag = flag;
       this.startRequestTime = startRequestTime;
+      this.traceId = WXTracing.nextId();
+
+      if (WXTracing.isAvailable()) {
+        WXTracing.TraceEvent event = WXTracing.newEvent("downloadBundleJS", mInstanceId, -1);
+        event.iid = mInstanceId;
+        event.tname = "Network";
+        event.ph = "B";
+        event.traceId = traceId;
+        event.submit();
+      }
     }
     
     public void setSDKInstance(WXSDKInstance instance) {
@@ -1531,6 +1556,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (this.instance != null
           && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpFinish();
+      }
+
+      if (WXTracing.isAvailable()) {
+        WXTracing.TraceEvent event = WXTracing.newEvent("downloadBundleJS", mInstanceId, -1);
+        event.traceId = traceId;
+        event.tname = "Network";
+        event.ph = "E";
+        event.extParams = new HashMap<>();
+        event.extParams.put("BundleSize", response.originalData.length);
+        event.submit();
       }
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;

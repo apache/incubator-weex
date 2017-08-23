@@ -29,13 +29,13 @@ describe('@ignore-android textarea maxlength vue test2 ', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/textarea-maxlength.js'))
       .waitForElementById('textarea',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver)
   })
 
