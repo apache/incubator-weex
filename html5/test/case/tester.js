@@ -196,7 +196,7 @@ describe('test input and output', function () {
       app.$destroy()
     })
 
-    it.skip('use append tree and sub components', (done) => {
+    it('use append tree and sub components', (done) => {
       const name = 'component-append-tree'
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
