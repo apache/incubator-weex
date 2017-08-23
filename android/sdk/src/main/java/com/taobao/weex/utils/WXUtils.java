@@ -471,4 +471,17 @@ private static String[] splitLineBreak(String str) {
     return items;
 }
 
+
+  public static int getNumberInt(Object value, int defaultValue){
+    if(value == null){
+      return  defaultValue;
+    }
+    if(value instanceof  Number){
+      return  ((Number) value).intValue();
+    }
+    try{
+      return (int)Float.parseFloat(value.toString());
+    }catch (Exception e){return  defaultValue;}
+  }
+
 }

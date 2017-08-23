@@ -180,6 +180,12 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+
+
+    String LIST_DATA = "listData";
+    String LIST_TEMPLATE_ID = "templateId";
+    String LIST_TEMPLATE_ID_KEY = "templateKey";
+    String LIST_WX_DATA_ITEM_KEY = "key";
   }
 
   public interface Value {

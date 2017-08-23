@@ -137,6 +137,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
 
+  private boolean waste = false;
+
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
     this.mAnimationHolder = holder;
@@ -1606,6 +1608,28 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           uiEvent.submit();
         } else {
           WXLogUtils.w("onRenderFinish", "createView() not called");
+        }
+      }
+    }
+  }
+
+  public boolean isWaste() {
+    return waste;
+  }
+
+  public void setWaste(boolean waste) {
+    if(this.waste != waste){
+      this.waste = waste;
+      WXDomObject domObject = (WXDomObject) getDomObject();
+      if(waste){
+        domObject.setVisible(false);
+        if(getHostView() != null){
+          getHostView().setVisibility(View.GONE);
+        }
+      }else{
+        domObject.setVisible(true);
+        if(getHostView() != null){
+          getHostView().setVisibility(View.VISIBLE);
         }
       }
     }
