@@ -233,12 +233,16 @@ public class WXEnvironment {
     if (context == null) {
       return null;
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
+    String cachePath = null;
+    try {
+      if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+              || !Environment.isExternalStorageRemovable()) {
+        cachePath = context.getExternalCacheDir().getPath();
+      } else {
+        cachePath = context.getCacheDir().getPath();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     return cachePath;
   }
