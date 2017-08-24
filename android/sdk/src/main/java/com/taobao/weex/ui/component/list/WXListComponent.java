@@ -84,12 +84,31 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   @Override
-  public void addChild(WXComponent child, int index) {
+  public void addChild(final WXComponent child, int index) {
     super.addChild(child, index);
     if (child == null || index < -1) {
       return;
     }
-    setRefreshOrLoading(child);
+
+    if (child instanceof WXRefresh && getHostView() != null) {
+        getHostView().setOnRefreshListener((WXRefresh) child);
+        getHostView().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          getHostView().setHeaderView(child);
+        }
+      }, 100);
+    }
+
+    if (child instanceof WXLoading && getHostView() != null) {
+        getHostView().setOnLoadingListener((WXLoading) child);
+        getHostView().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          getHostView().setFooterView(child);
+        }
+      }, 100);
+    }
 
     // Synchronize DomObject's attr to Component and Native View
     if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
@@ -100,40 +119,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
   }
 
-  /**
-   * Setting refresh view and loading view
-   *
-   * @param child the refresh_view or loading_view
-   */
-  private boolean setRefreshOrLoading(final WXComponent child) {
 
-    if (getHostView() == null) {
-      WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
-      return true;
-    }
-    if (child instanceof WXRefresh) {
-      getHostView().setOnRefreshListener((WXRefresh) child);
-      getHostView().postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          getHostView().setHeaderView(child);
-        }
-      }, 100);
-      return true;
-    }
-
-    if (child instanceof WXLoading) {
-      getHostView().setOnLoadingListener((WXLoading) child);
-      getHostView().postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          getHostView().setFooterView(child);
-        }
-      }, 100);
-      return true;
-    }
-    return false;
-  }
 
   private void updateRecyclerAttr(){
     mColumnCount = mDomObject.getColumnCount();
@@ -234,10 +220,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   public void remove(WXComponent child, boolean destroy) {
     super.remove(child, destroy);
-    removeFooterOrHeader(child);
-  }
-
-  private void removeFooterOrHeader(WXComponent child) {
     if (child instanceof WXLoading) {
       getHostView().removeFooterView(child);
     } else if (child instanceof WXRefresh) {
