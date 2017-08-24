@@ -45,6 +45,10 @@ WX_EXPORT_METHOD_SYNC(@selector(isVoiceOverOn))
 }
 - (void)read:(NSDictionary*)param callback:(WXCallback)callback
 {
+    if (![param isKindOfClass:[NSDictionary class]]) {
+        WXLogError(@"first param must be json type");
+        return;
+    }
     NSString * string = nil;
     if (param[@"value"]) {
         string = [WXConvert NSString:param[@"value"]];
