@@ -24,6 +24,7 @@
 #import "WXComponent+Events.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXComponent_internal.h"
 
 @interface WXAComponent()
 
@@ -57,7 +58,9 @@
 - (void)viewDidLoad
 {
     [self.view addGestureRecognizer:_tap];
-    self.view.isAccessibilityElement = YES;
+    if (!_testId) {
+          self.view.isAccessibilityElement = YES;
+    }
 }
 
 - (void)openURL
