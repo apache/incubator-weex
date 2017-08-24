@@ -142,6 +142,10 @@ vue: {
 
 * fix scanning style in production with uglified code.
 
+#### 0.12.6
+
+* optimize event binding.
+
 ## component -> dom map
 
 | component | dom element | children | note |
