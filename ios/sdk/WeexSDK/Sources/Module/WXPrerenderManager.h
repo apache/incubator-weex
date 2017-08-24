@@ -45,6 +45,12 @@
 + (BOOL) isTaskExist:(NSString *)url;
 
 /**
+ *  @abstract Returns key from url .
+ *
+ **/
++ (NSString *)getTaskKeyFromUrl:(NSString *)url;
+
+/**
  *  @abstract Returns error if url is prerender fail .
  *
  **/

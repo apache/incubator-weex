@@ -347,8 +347,10 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    NSString *url = @"";
     if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
-        return;
+        [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
+        url = [self.scriptURL absoluteString];
     }
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -370,6 +372,9 @@ typedef enum : NSUInteger {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         });
     });
+    if(url.length > 0){
+        [WXPrerenderManager addTask:url instanceId:@"" callback:nil];
+    }
 }
 
 - (void)forceGarbageCollection
