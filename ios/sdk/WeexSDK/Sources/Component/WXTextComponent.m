@@ -37,7 +37,6 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame])) {
-        self.isAccessibilityElement = YES;
         self.accessibilityTraits |= UIAccessibilityTraitStaticText;
         
         self.opaque = NO;
@@ -282,7 +281,10 @@ do {\
     if (!useCoreText) {
         ((WXText *)self.view).textStorage = _textStorage;
     }
-    self.view.isAccessibilityElement = YES;
+    
+    if (!_testId) {
+        self.view.isAccessibilityElement = YES;
+    }
     
     [self setNeedsDisplay];
 }
