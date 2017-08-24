@@ -93,7 +93,7 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         mLastLocationY = l;
     }
 
-    void setScrollPositon(int pos){
+    public void setScrollPositon(int pos){
         mScrollPositon = pos;
     }
 

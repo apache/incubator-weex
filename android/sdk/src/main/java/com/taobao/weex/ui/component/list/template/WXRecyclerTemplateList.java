@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component.list.template;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
@@ -37,6 +38,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -77,6 +79,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -140,6 +143,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
      **/
     private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
     private WXStickyHelper stickyHelper;
+    private List<WXComponent>  stickyTemplateList;
+    private WXCell currentSticky;
 
 
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
@@ -329,6 +334,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void bindStickStyle(WXComponent component) {
+        if(stickyTemplateList == null){
+            stickyTemplateList = new ArrayList<>();
+        }
+        stickyTemplateList.add(component);
         stickyHelper.bindStickStyle(component, mStickyMap);
     }
 
@@ -915,6 +924,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     public void onViewRecycled(ListBaseViewHolder holder) {
         Log.e("Weex", "onViewRecycled " +  holder);
+        if(holder.getComponent().getDomObject().getAttrs().containsKey("sticky")){
+            if(holder.itemView.getVisibility() != View.VISIBLE){
+                holder.itemView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
@@ -925,6 +939,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         WXComponent component = holder.getComponent();
         if(component == null){
             return;
+        }
+        if(holder.itemView.getVisibility() != View.VISIBLE){
+            holder.itemView.setVisibility(View.VISIBLE);
         }
         long start = System.currentTimeMillis();
         WXCell cell = (WXCell) holder.getComponent();
@@ -1080,76 +1097,104 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void onBeforeScroll(int dx, int dy) {
-        //FIXME STICKY 适配
-        /**
         BounceRecyclerView bounceRecyclerView = getHostView();
-        if (mStickyMap == null || bounceRecyclerView == null) {
+        RecyclerView recyclerView = getHostView().getInnerView();
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        int position = -1;
+        if (layoutManager instanceof LinearLayoutManager) {
+             position = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+        }else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int [] firstVisibleItemPositions = new int[Math.max(3, mColumnCount)];
+            position = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstVisibleItemPositions)[0];
+        }
+        if(position < 0){
             return;
         }
-        Map<String, WXComponent> stickyMap = mStickyMap.get(getRef());
-        if (stickyMap == null) {
-            return;
-        }
-        Iterator<Map.Entry<String, WXComponent>> iterator = stickyMap.entrySet().iterator();
-        Map.Entry<String, WXComponent> entry;
-        WXComponent stickyComponent;
-        int currentStickyPos = -1;
-        while (iterator.hasNext()) {
-            entry = iterator.next();
-            stickyComponent = entry.getValue();
 
-            if (stickyComponent != null && stickyComponent.getDomObject() != null
-                    && stickyComponent instanceof WXCell) {
 
-                WXCell cell = (WXCell) stickyComponent;
-                if (cell.getHostView() == null) {
-                    return;
+         ListBaseViewHolder firstItemHolder = (ListBaseViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+         if(firstItemHolder == null){
+             return;
+         }
+        View  transView = firstItemHolder.itemView;
+
+        Log.e("weex", "weex " + firstItemHolder.getComponent());
+
+        if(firstItemHolder.getComponent().isSticky()){
+            View stickyView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() -1);
+            if(stickyView.getTag() instanceof  ListBaseViewHolder){
+                if(transView.getTop() < 0){
+                    transView.setVisibility(View.INVISIBLE);
+                    stickyView.setVisibility(View.VISIBLE);
+                    stickyView.bringToFront();
+                }else{
+                    transView.setVisibility(View.VISIBLE);
+                    stickyView.setVisibility(View.INVISIBLE);
                 }
-
-                RecyclerView.LayoutManager layoutManager;
-                boolean beforeFirstVisibleItem = false;
-                layoutManager = getHostView().getInnerView().getLayoutManager();
-                if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
-                    int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-                    int pos = mChildren.indexOf(cell);
-                    cell.setScrollPositon(pos);
-
-                    if (pos <= fVisible) {
-                        beforeFirstVisibleItem = true;
-                        if(pos > currentStickyPos) {
-                            currentStickyPos = pos;
+                Log.e("weex", "sticky " + stickyView.getTop()  + " " + stickyView.getTranslationY());
+            }else {
+                ListBaseViewHolder fakeHolder = onCreateViewHolder(recyclerView, getItemViewType(position));
+                onBindViewHolder(fakeHolder, position);
+                fakeHolder.itemView.setTag(fakeHolder);
+                bounceRecyclerView.addView(fakeHolder.itemView);
+                transView.setVisibility(View.INVISIBLE);
+                Log.e("weex", "sticky faked");
+            }
+        }else{
+            View stickyView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() -1);
+            if(stickyView  != null && stickyView.getTag() instanceof  ListBaseViewHolder) {
+                ListBaseViewHolder fakeHolder = (ListBaseViewHolder) stickyView.getTag();
+                if(position < fakeHolder.getAdapterPosition()){
+                    bounceRecyclerView.removeView(stickyView);
+                    for(int i=0; i<recyclerView.getChildCount(); i++){
+                        View itemView = recyclerView.getChildAt(i);
+                        if(itemView.getVisibility() != View.VISIBLE){
+                            ListBaseViewHolder itemHolder = (ListBaseViewHolder) recyclerView.getChildViewHolder(itemView);
+                            if(itemHolder.getAdapterPosition() == fakeHolder.getAdapterPosition()){
+                                itemView.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
-                } else if(layoutManager instanceof StaggeredGridLayoutManager){
-                    int [] firstItems= new int[3];
-                    int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
-                    int pos = mChildren.indexOf(cell);
+                }else{
+                    int nextPosition = position + 1;
+                    ListBaseViewHolder nextItemHolder = (ListBaseViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+                    if(nextItemHolder == null || nextItemHolder.getComponent() == null){
+                        return;
+                    }
+                    if(nextItemHolder.getComponent().isSticky()){
 
-                    if (pos <= fVisible) {
-                        beforeFirstVisibleItem = true;
+                    }else{
+
                     }
                 }
+            }
+            Log.e("weex", "sticky faked11");
+        }
+    }
 
-                int[] location = new int[2];
-                stickyComponent.getHostView().getLocationOnScreen(location);
-                int[] parentLocation = new int[2];
-                stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
 
-                int top = location[1] - parentLocation[1];
-
-                boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
-                boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
-                if (showSticky) {
-                    bounceRecyclerView.notifyStickyShow(cell);
-                } else if (removeSticky) {
-                    bounceRecyclerView.notifyStickyRemove(cell);
-                }
-                cell.setLocationFromStart(top);
+    private int findHeaderPosition(WXCell header){
+        Object templateId = header.getDomObject().getAttrs().get(Constants.Name.LIST_TEMPLATE_ID);
+        String key = WXUtils.getString(templateId, null);
+        if(key == null){
+           return  -1;
+        }
+        if(listData == null){
+            return  -1;
+        }
+        for(int i=0; i<listData.size(); i++){
+            JSONObject data = safeGetListData(i);
+            String template = data.getString(listDataTemplateKey);
+            if(key.equals(template)){
+                return  i;
             }
         }
+        return  -1;
+    }
 
-        if(currentStickyPos>=0){
-            bounceRecyclerView.updateStickyView(currentStickyPos);
-        }*/
+    private JSONObject safeGetListData(int position){
+        try{
+            return listData.getJSONObject(position);
+        }catch (Exception e){return  JSONObject.parseObject("{}");}
     }
 }

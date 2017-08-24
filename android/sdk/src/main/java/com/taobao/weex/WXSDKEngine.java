@@ -88,6 +88,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
@@ -269,6 +270,7 @@ public class WXSDKEngine {
       String simpleList = "simplelist";
       registerComponent(SimpleListComponent.class,false,simpleList);
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
+      registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
@@ -308,6 +310,7 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
       registerDomObject(WXBasicComponentType.LIST, WXListDomObject.class);
+      registerDomObject(WXBasicComponentType.RECYCLE_LIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);

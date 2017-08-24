@@ -37,7 +37,9 @@ public class WXHeader extends WXCell {
 
   public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
-    if(WXBasicComponentType.LIST.equals((parent.getDomObject().getType()))){
+    String parantType = parent.getDomObject().getType();
+    if(WXBasicComponentType.LIST.equals(parantType)
+            || WXBasicComponentType.RECYCLE_LIST.equals(parantType)){
       setSticky(Constants.Value.STICKY);
     }
   }
