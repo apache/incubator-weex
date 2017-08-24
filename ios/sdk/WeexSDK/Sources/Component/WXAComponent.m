@@ -57,6 +57,7 @@
 - (void)viewDidLoad
 {
     [self.view addGestureRecognizer:_tap];
+    self.view.isAccessibilityElement = YES;
 }
 
 - (void)openURL

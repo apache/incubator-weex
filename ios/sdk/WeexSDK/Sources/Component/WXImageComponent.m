@@ -249,6 +249,7 @@ WX_EXPORT_METHOD(@selector(save:))
     imageView.userInteractionEnabled = YES;
     imageView.clipsToBounds = YES;
     imageView.exclusiveTouch = YES;
+    imageView.isAccessibilityElement = YES;
     
     [self _clipsToBounds];
     
@@ -344,7 +345,7 @@ WX_EXPORT_METHOD(@selector(save:))
     NSString *placeholderSrc = self.placeholdSrc;
     
     if ([WXUtility isBlankString:placeholderSrc]) {
-        WXLogError(@"image placeholder src is empty");
+//        WXLogError(@"image placeholder src is empty");
         return;
     }
     

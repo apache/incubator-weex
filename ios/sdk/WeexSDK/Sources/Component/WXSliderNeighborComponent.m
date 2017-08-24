@@ -138,6 +138,16 @@
     [self stopAnimation];
 }
 
+- (void)accessibilityIncrement
+{
+    [self setCurrentItemIndex: [self lastItemIndex]];
+}
+
+- (void)accessibilityDecrement
+{
+    [self setCurrentItemIndex:[self nextItemIndex]];
+}
+
 - (void)setDataSource:(id<WXSliderNeighborDataSource>)dataSource
 {
     if (_dataSource != dataSource) {
@@ -1474,11 +1484,15 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     _sliderView.dataSource = self;
     _sliderView.contentView.clipsToBounds = YES;
     _sliderView.scrollEnabled = _scrollable;
+    UIAccessibilityTraits traits = UIAccessibilityTraitAdjustable;
+    
     if (_autoPlay) {
+        traits |= UIAccessibilityTraitUpdatesFrequently;
         [self _startAutoPlayTimer];
     } else {
         [self _stopAutoPlayTimer];
     }
+    _sliderView.accessibilityTraits = traits;
 }
 
 - (void)layoutDidFinish {

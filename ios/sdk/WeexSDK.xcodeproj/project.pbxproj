@@ -136,7 +136,7 @@
 		745B2D6F1E5A8E1E0092D38A /* WXRecyclerUpdateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D651E5A8E1E0092D38A /* WXRecyclerUpdateController.m */; };
 		745B2D701E5A8E1E0092D38A /* WXSectionDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D661E5A8E1E0092D38A /* WXSectionDataController.h */; };
 		745B2D711E5A8E1E0092D38A /* WXSectionDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D671E5A8E1E0092D38A /* WXSectionDataController.m */; };
-		745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */ = {isa = PBXBuildFile; fileRef = 745ED2D61C5F2C7E002DB5A8 /* WXView.h */; };
+		745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */ = {isa = PBXBuildFile; fileRef = 745ED2D61C5F2C7E002DB5A8 /* WXView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		745ED2DB1C5F2C7E002DB5A8 /* WXView.m in Sources */ = {isa = PBXBuildFile; fileRef = 745ED2D71C5F2C7E002DB5A8 /* WXView.m */; };
 		7461F8901CFB373100F62D44 /* WXDisplayQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 7461F88C1CFB373100F62D44 /* WXDisplayQueue.h */; };
 		7461F8911CFB373100F62D44 /* WXDisplayQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7461F88D1CFB373100F62D44 /* WXDisplayQueue.m */; };
@@ -238,13 +238,13 @@
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
+		C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C42E8FAA1F3C7AA1001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C42E8FAB1F3C7C09001EBE9D /* WXExtendCallNativeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C42E8FAC1F3C7C3B001EBE9D /* WXExtendCallNativeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78CD1F2998EE001D3B0C /* WXExtendCallNativeManager.m */; };
 		C42E8FAD1F3C7C3F001EBE9D /* WXExtendCallNativeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C47B78CC1F2998EE001D3B0C /* WXExtendCallNativeManager.h */; };
 		C42E8FAE1F3C7C49001EBE9D /* WXRecyclerDragController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC7764911F3C2CA300B5727E /* WXRecyclerDragController.m */; };
 		C42E8FAF1F3C7C4B001EBE9D /* WXRecyclerDragController.h in Headers */ = {isa = PBXBuildFile; fileRef = DC7764921F3C2CA300B5727E /* WXRecyclerDragController.h */; };
-		C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C42E8FAA1F3C7AA1001EBE9D /* WXTracingProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C42E8F991F39DF07001EBE9D /* WXTracingProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */; };
 		C4424E5B1F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -461,7 +461,7 @@
 		DCA445D31EFA594A00D0CFA8 /* WXRoundedRect.h in Headers */ = {isa = PBXBuildFile; fileRef = 741DFE001DDD7D18009B020F /* WXRoundedRect.h */; };
 		DCA445D41EFA594E00D0CFA8 /* UIBezierPath+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = 741DFE041DDD9B2F009B020F /* UIBezierPath+Weex.h */; };
 		DCA445D51EFA598200D0CFA8 /* WXComponent+PseudoClassManagement.h in Headers */ = {isa = PBXBuildFile; fileRef = C4C30DE71E1B833D00786B6C /* WXComponent+PseudoClassManagement.h */; };
-		DCA445D61EFA598600D0CFA8 /* WXView.h in Headers */ = {isa = PBXBuildFile; fileRef = 745ED2D61C5F2C7E002DB5A8 /* WXView.h */; };
+		DCA445D61EFA598600D0CFA8 /* WXView.h in Headers */ = {isa = PBXBuildFile; fileRef = 745ED2D61C5F2C7E002DB5A8 /* WXView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445D71EFA598D00D0CFA8 /* WXComponent+ViewManagement.h in Headers */ = {isa = PBXBuildFile; fileRef = 747A787A1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h */; };
 		DCA445D81EFA599400D0CFA8 /* WXRootView.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B8BEFC1DC47B72004A6027 /* WXRootView.h */; };
 		DCA445D91EFA59A100D0CFA8 /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
@@ -544,6 +544,10 @@
 		DCC77C131D770AE300CE7288 /* WXSliderNeighborComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC77C111D770AE300CE7288 /* WXSliderNeighborComponent.m */; };
 		DCC77C141D770AE300CE7288 /* WXSliderNeighborComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */; };
 		DCDFED011E68238F00C228D7 /* WXJSExceptionProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DCE2CF9A1F46D4220021BDC4 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */; };
+		DCE2CF9B1F46D4220021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DCE2CF9C1F46D4310021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DCE2CF9D1F46D4370021BDC4 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */; };
 		DCEA54621F2B7DB4000ECB23 /* WXTracingManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCEA54631F2B7DBA000ECB23 /* WXTracingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */; };
 		DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */; };
@@ -874,6 +878,8 @@
 		DCC77C111D770AE300CE7288 /* WXSliderNeighborComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSliderNeighborComponent.m; sourceTree = "<group>"; };
 		DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSliderNeighborComponent.h; sourceTree = "<group>"; };
 		DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionProtocol.h; sourceTree = "<group>"; };
+		DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVoiceOverModule.m; sourceTree = "<group>"; };
+		DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXVoiceOverModule.h; sourceTree = "<group>"; };
 		DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInvocationConfig.h; sourceTree = "<group>"; };
 		DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInvocationConfig.m; sourceTree = "<group>"; };
 		DCF0CD9D1EAF3A6B0062CA8F /* native-bundle-main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "native-bundle-main.js"; path = "../../../../pre-build/native-bundle-main.js"; sourceTree = "<group>"; };
@@ -1349,6 +1355,8 @@
 		77E659D71C07F585008B8775 /* Module */ = {
 			isa = PBXGroup;
 			children = (
+				DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */,
+				DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */,
 				333D9A251F41507A007CED39 /* WXTransition.h */,
 				333D9A261F41507A007CED39 /* WXTransition.m */,
 				C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */,
@@ -1547,6 +1555,7 @@
 				37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */,
 				77D161281C02DE1A0010B15B /* WXSDKManager.h in Headers */,
 				59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */,
+				DCE2CF9B1F46D4220021BDC4 /* WXVoiceOverModule.h in Headers */,
 				74BB5FB91DFEE81A004FC3DF /* WXMetaModule.h in Headers */,
 				DCA0EF641D6EED6F00CB18B9 /* WXGlobalEventModule.h in Headers */,
 				2A837AB21CD9DE9200AEDF03 /* WXLoadingComponent.h in Headers */,
@@ -1766,6 +1775,7 @@
 				DCA446061EFA5A5B00D0CFA8 /* NSTimer+Weex.h in Headers */,
 				DCA445D61EFA598600D0CFA8 /* WXView.h in Headers */,
 				DCA445FF1EFA5A4600D0CFA8 /* WXInstanceWrap.h in Headers */,
+				DCE2CF9C1F46D4310021BDC4 /* WXVoiceOverModule.h in Headers */,
 				C42E8FAB1F3C7C09001EBE9D /* WXExtendCallNativeProtocol.h in Headers */,
 				DCA445F31EFA5A2500D0CFA8 /* WXFooterComponent.h in Headers */,
 				DCA446151EFA5A9000D0CFA8 /* WXBridgeContext.h in Headers */,
@@ -2105,6 +2115,7 @@
 				741081241CED6756001BC6E5 /* WXComponentFactory.m in Sources */,
 				D362F9501C83EDA20003F546 /* WXWebViewModule.m in Sources */,
 				745B2D711E5A8E1E0092D38A /* WXSectionDataController.m in Sources */,
+				DCE2CF9A1F46D4220021BDC4 /* WXVoiceOverModule.m in Sources */,
 				2A1F57B81C75C6A600B58017 /* WXTextInputComponent.m in Sources */,
 				74CC7A1D1C2BC5F800829368 /* WXCellComponent.m in Sources */,
 				74862F821E03A24500B7A041 /* WXComponentMethod.m in Sources */,
@@ -2188,6 +2199,7 @@
 				DCA4454F1EFA55B300D0CFA8 /* WXTextComponent.m in Sources */,
 				DCA445501EFA55B300D0CFA8 /* WXScrollerComponent.m in Sources */,
 				DCA445511EFA55B300D0CFA8 /* WXCycleSliderComponent.m in Sources */,
+				DCE2CF9D1F46D4370021BDC4 /* WXVoiceOverModule.m in Sources */,
 				DCA445521EFA55B300D0CFA8 /* WXSliderComponent.m in Sources */,
 				DCA445531EFA55B300D0CFA8 /* WXCellComponent.m in Sources */,
 				DCA445541EFA55B300D0CFA8 /* WXListComponent.m in Sources */,

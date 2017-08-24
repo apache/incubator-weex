@@ -36,6 +36,7 @@ var iOSOpts = {
   target: 'ios',
   platformName: 'iOS',
   slowEnv: isRunInCI,
+  autoAcceptAlerts:false,
   app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
 };
 
@@ -43,6 +44,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
+  autoAcceptAlerts:false,
   app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
 };
 

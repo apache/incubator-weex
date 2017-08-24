@@ -20,7 +20,6 @@
 
 import { init } from '../helper/runtime'
 import div from '../../../../render/vue/components/div'
-
 import eventBubbleBundle from '../data/build/dotvue/event-bubble.js'
 
 init('core node', (Vue, helper) => {

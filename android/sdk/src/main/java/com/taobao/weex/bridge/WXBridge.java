@@ -498,4 +498,18 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  public void reportServerCrash(String instanceId, String crashFile) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile);
+
+      // upload crash log
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"reloadPageNative throw exception:"+e.getMessage());
+      }
+    }
+  }
+
 }
