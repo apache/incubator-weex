@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 
@@ -64,4 +65,17 @@ public class RenderContainer extends FrameLayout {
       instance.setSize(w, h);
     }
   }
+
+  @Override
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
+
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+
+  }
+
 }

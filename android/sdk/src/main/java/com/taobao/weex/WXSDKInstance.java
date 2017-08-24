@@ -250,7 +250,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     init(context);
   }
 
-
   public WXComponent getRootComponent() {
     return mRootComp;
   }

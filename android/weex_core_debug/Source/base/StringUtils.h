@@ -30,25 +30,15 @@ static std::string jString2Str(JNIEnv *env, jstring jstr)
         rtn[alen] = 0;
     }
     env->ReleaseByteArrayElements(barr, ba, 0);
+
+    env->DeleteLocalRef(clsstring);
+    env->DeleteLocalRef(strencode);
+    env->DeleteLocalRef(barr);
+
     std::string stemp(rtn);
     free(rtn);
     return stemp;
 }
-
-// static String jString2String(JNIEnv *env, jstring str)
-// {
-//     if (str != NULL)
-//     {
-//         ScopedJString scopedstr(env, str);
-//         size_t length = scopedstr.getCharsLength();
-//         const jchar *str = scopedstr.getChars();
-//         UChar *dst;
-//         String s = String::createUninitialized(length, dst);
-//         memcpy(dst, str, length * sizeof(UChar));
-//         return s;
-//     }
-//     return String("");
-// }
 
 static const char* GetUTFChars(JNIEnv* env, jstring str)
 {
@@ -60,25 +50,33 @@ static const char* GetUTFChars(JNIEnv* env, jstring str)
     return c_str;
 }
 
-static jstring Char2JString(JNIEnv* env, const char* pat) {
-    //定义java String类 strClass
-    jclass strClass = (env)->FindClass("Ljava/lang/String;");
-    //获取String(byte[],String)的构造器,用于将本地byte[]数组转换为一个新String
-    jmethodID ctorID = (env)->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
-    //建立byte数组
-    jbyteArray bytes = (env)->NewByteArray(strlen(pat));
-    //将char* 转换为byte数组
-    (env)->SetByteArrayRegion(bytes, 0, strlen(pat), (jbyte*) pat);
-    // 设置String, 保存语言类型,用于byte数组转换至String时的参数
-    jstring encoding = (env)->NewStringUTF("GB2312");
-    //将byte数组转换为java String,并输出
-    return (jstring) (env)->NewObject(strClass, ctorID, bytes, encoding);
-}
+//static jstring Char2JString(JNIEnv* env, const char* pat) {
+//    //定义java String类 strClass
+//    jclass strClass = (env)->FindClass("Ljava/lang/String;");
+//    //获取String(byte[],String)的构造器,用于将本地byte[]数组转换为一个新String
+//    jmethodID ctorID = (env)->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+//    //建立byte数组
+//    jbyteArray bytes = (env)->NewByteArray(strlen(pat));
+//    //将char* 转换为byte数组
+//    (env)->SetByteArrayRegion(bytes, 0, strlen(pat), (jbyte*) pat);
+//    // 设置String, 保存语言类型,用于byte数组转换至String时的参数
+//    jstring encoding = (env)->NewStringUTF("GB2312");
+//    //将byte数组转换为java String,并输出
+//
+//    jstring ret = (jstring) (env)->NewObject(strClass, ctorID, bytes, encoding);
+//
+//    env->DeleteLocalRef(strClass);
+//    env->DeleteLocalRef(bytes);
+//    env->DeleteLocalRef(encoding);
+//
+//    return ret;
+//}
 
-static jstring Str2JString(JNIEnv* env, std::string& str)  
-{  
-    const char* data = str.c_str();
-    return Char2JString(env, data);
+
+
+static jstring& Str2JString(JNIEnv* env, const std::string& nativeString) {
+    jstring str = env->NewStringUTF(nativeString.c_str());
+    return str;
 }
 
 static jbyteArray String2JByteArray(JNIEnv *env, std::string &str)
@@ -90,16 +88,6 @@ static jbyteArray String2JByteArray(JNIEnv *env, std::string &str)
     // env->SetByteArrayRegion(ba, 0, strLen, reinterpret_cast<const jbyte *>(strData.data()));
     return ba;
 }
-
-/**
- * WTFString to char*
- */
-// static char* wtfString2cstr(const String str_temp)
-// {
-//     char* result = (char*)malloc(str_temp.length()+1);
-//     strcpy(result,str_temp.utf8().data());
-//     return result;
-// }
 
 static jstring getArgumentAsJString(JNIEnv* env, IPCArguments* arguments, int argument)
 {
