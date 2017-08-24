@@ -88,7 +88,7 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
     }
 
     /**
-     * Init wipelayout
+     * Init swipelayout
      */
     private WXSwipeLayout createBounceView(Context context) {
         swipeLayout = new WXSwipeLayout(context);

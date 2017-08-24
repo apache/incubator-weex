@@ -149,9 +149,6 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
   /**
    * Set the overall size for the progress spinner. This updates the radius
    * and stroke width of the ring.
-   *
-   * @param size One of {@link MaterialProgressDrawable.LARGE} or
-   *            {@link MaterialProgressDrawable.DEFAULT}
    */
   public void updateSizes(@ProgressDrawableSize int size) {
     if (size == LARGE) {
@@ -304,11 +301,6 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
     mRing.resetOriginals();
   }
 
-  private float getMinProgressArc(Ring ring) {
-    return (float) Math.toRadians(
-        ring.getStrokeWidth() / (2 * Math.PI * ring.getCenterRadius()));
-  }
-
   // Adapted from ArgbEvaluator.java
   private int evaluateColorChange(float fraction, int startValue, int endValue) {
     int startInt = (Integer) startValue;
@@ -352,7 +344,7 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
     updateRingColor(interpolatedTime, ring);
     float targetRotation = (float) (Math.floor(ring.getStartingRotation() / MAX_PROGRESS_ARC)
                                     + 1f);
-    final float minProgressArc = getMinProgressArc(ring);
+    final float minProgressArc = (float) Math.toRadians(ring.getStrokeWidth() / (2 * Math.PI * ring.getCenterRadius()));
     final float startTrim = ring.getStartingStartTrim()
                             + (ring.getStartingEndTrim() - minProgressArc - ring.getStartingStartTrim())
                               * interpolatedTime;
@@ -373,7 +365,7 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
         } else {
           // The minProgressArc is calculated from 0 to create an
           // angle that matches the stroke width.
-          final float minProgressArc = getMinProgressArc(ring);
+          final float minProgressArc = (float) Math.toRadians(ring.getStrokeWidth() / (2 * Math.PI * ring.getCenterRadius()));
           final float startingEndTrim = ring.getStartingEndTrim();
           final float startingTrim = ring.getStartingStartTrim();
           final float startingRotation = ring.getStartingRotation();
@@ -620,11 +612,7 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
      * @return int describing the next color the progress spinner should use when drawing.
      */
     public int getNextColor() {
-      return mColors[getNextColorIndex()];
-    }
-
-    private int getNextColorIndex() {
-      return (mColorIndex + 1) % (mColors.length);
+      return mColors[(mColorIndex + 1) % (mColors.length)];
     }
 
     /**
@@ -632,7 +620,7 @@ class MaterialProgressDrawable extends Drawable implements Animatable {
      * wrap back to the beginning of colors.
      */
     public void goToNextColor() {
-      setColorIndex(getNextColorIndex());
+      setColorIndex((mColorIndex + 1) % (mColors.length));
     }
 
     public void setColorFilter(ColorFilter filter) {

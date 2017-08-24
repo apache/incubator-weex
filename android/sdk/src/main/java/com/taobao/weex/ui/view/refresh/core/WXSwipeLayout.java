@@ -262,11 +262,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
   }
 
   @Override
-  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-
-  }
-
-  @Override
   public int getNestedScrollAxes() {
     return parentHelper.getNestedScrollAxes();
   }
@@ -365,7 +360,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       } else if (lp.height > 0) {
         resetHeaderView(lp.height);
       } else {
-        resetRefreshState();
+        resetState();
       }
     }
 
@@ -376,7 +371,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       } else if (lp.height > 0) {
         resetFootView(lp.height);
       } else {
-        resetLoadmoreState();
+        resetState();
       }
     }
   }
@@ -431,19 +426,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.addListener(new WXRefreshAnimatorListener() {
       @Override
       public void onAnimationEnd(Animator animation) {
-        resetRefreshState();
+        resetState();
 
       }
     });
     animator.setDuration(300);
     animator.start();
-  }
-
-  private void resetRefreshState() {
-    mRefreshing = false;
-    isConfirm = false;
-    mCurrentAction = -1;
-    //TODO updateLoadText
   }
 
   /**
@@ -496,7 +484,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.addListener(new WXRefreshAnimatorListener() {
       @Override
       public void onAnimationEnd(Animator animation) {
-        resetLoadmoreState();
+        resetState();
 
       }
     });
@@ -504,7 +492,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.start();
   }
 
-  private void resetLoadmoreState() {
+  private void resetState() {
     mRefreshing = false;
     isConfirm = false;
     mCurrentAction = -1;
