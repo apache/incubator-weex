@@ -250,6 +250,7 @@ const ignoreCopyrightVerifyPath = [
   'test',
   'packages',
   'pre-build',
+  'html5/test/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',

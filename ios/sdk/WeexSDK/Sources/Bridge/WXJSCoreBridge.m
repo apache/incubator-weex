@@ -151,11 +151,14 @@
             id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
+            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_ERR_JS_EXECUTE] functionName:@"" exception:[NSString stringWithFormat:@"[%@:%@] %@\n%@",exception[@"line"], exception[@"column"],[exception toString], exception[@"stack"]] userInfo:nil];
             if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
-                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_ERR_JS_EXECUTE] functionName:@"" exception:[NSString stringWithFormat:@"[%@:%@] %@\n%@",exception[@"line"], exception[@"column"],[exception toString], exception[@"stack"]] userInfo:nil];
                 [jsExceptionHandler onJSException:jsExceptionInfo];
             }
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
+            if (instance.onJSRuntimeException) {
+                instance.onJSRuntimeException(jsExceptionInfo);
+            }
         };
         
         if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {

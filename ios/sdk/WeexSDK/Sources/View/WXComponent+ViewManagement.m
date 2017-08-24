@@ -197,7 +197,6 @@ do {\
     
     if (styles[@"backgroundImage"]) {
         _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
-        
         if (_backgroundImage) {
             [self setGradientLayer];
         }

@@ -29,7 +29,6 @@
 @property (nonatomic, strong) id toValue;
 @property (nonatomic, strong) id perValue;
 @property (nonatomic, strong) NSString *propertyName;
-
 @end
 
 @interface WXTransition : NSObject
@@ -37,7 +36,6 @@
 @property(nonatomic,strong) NSMutableDictionary *addStyles;
 @property(nonatomic,strong) NSMutableArray *propertyArray;
 - (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent;
-
 @end
 
 
