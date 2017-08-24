@@ -75,15 +75,23 @@
 
 - (NSString *)accessibilityValue
 {
-    if (self.wx_component) {
-        if (self.wx_component->_ariaLabel) {
-            return self.wx_component->_ariaLabel;
-        }
+    if (self.wx_component && self.wx_component->_ariaLabel) {
+        return [super accessibilityValue];
     }
     if (![(WXTextComponent*)self.wx_component useCoreText]) {
         return _textStorage.string;
     }
     return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+}
+
+- (NSString *)accessibilityLabel
+{
+    if (self.wx_component) {
+        if (self.wx_component->_ariaLabel) {
+            return self.wx_component->_ariaLabel;
+        }
+    }
+    return [super accessibilityLabel];
 }
 
 @end
@@ -275,6 +283,8 @@ do {\
     if (!useCoreText) {
         ((WXTextView *)self.view).textStorage = _textStorage;
     }
+    self.view.isAccessibilityElement = YES;
+    
     [self setNeedsDisplay];
 }
 
