@@ -2,18 +2,14 @@
 #define _STRING_UTILS_H_
 
 #include <jni.h>
+#include <IPC/IPCArguments.h>
+#include <IPC/Serializing/IPCSerializer.h>
+#include <IPC/IPCString.h>
+#include <IPC/IPCByteArray.h>
+#include <malloc.h>
+
 #include "ScopedJString.h"
-#include "../IPC/IPCArguments.h"
-#include "../IPC/Serializing/IPCSerializer.h"
-#include "../IPC/Buffering/IPCBuffer.h"
-#include "../IPC/IPCArguments.h"
-#include "../IPC/IPCByteArray.h"
-#include "../IPC/IPCException.h"
-#include "../IPC/IPCHandler.h"
-#include "../IPC/IPCMessageJS.h"
-#include "../IPC/IPCResult.h"
-#include "../IPC/IPCSender.h"
-#include "../IPC/IPCString.h"
+
 
 namespace WeexCore
 {

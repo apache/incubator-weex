@@ -1,7 +1,5 @@
 #include "ExtendJSApi.h"
 #include "BridgeAndroid.h"
-#include "WeexCore.h"
-// #include "./WeexCore/render/RenderManager.h"
 
 using namespace WeexCore;
 

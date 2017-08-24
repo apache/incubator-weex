@@ -1,8 +1,7 @@
 #include "WeexProxy.h"
-#include "../../../base/LogUtils.h"
-#include "../../../base/StringUtils.h"
+#include <base/LogUtils.h>
+#include <base/StringUtils.h>
 #include "WeexCore.h"
-#include "WeexJSConnection.h"
 #include "ExtendJSApi.h"
 
 const char* s_cacheDir;

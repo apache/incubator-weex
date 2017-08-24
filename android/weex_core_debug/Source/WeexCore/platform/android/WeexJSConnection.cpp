@@ -1,23 +1,16 @@
 #include "WeexJSConnection.h"
-#include "../../../IPC/IPCException.h"
-#include "../../../IPC/IPCLog.h"
-#include "../../../IPC/IPCSender.h"
-#include "../../../base/LogUtils.h"
 
-#include "../../../IPC/ashmem.h"
-#include "../../../IPC/IPCFutexPageQueue.h"
 #include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <string>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <sys/mman.h>
+#include <IPC/IPCFutexPageQueue.h>
+#include <IPC/IPCException.h>
+#include <IPC/IPCSender.h>
+#include <base/LogUtils.h>
+#include <IPC/ashmem.h>
+
 
 static void doExec(int fd, bool traceEnable);
 static void closeAllButThis(int fd);
