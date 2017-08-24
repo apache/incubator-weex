@@ -3,23 +3,36 @@
     <div class='desc'>
       <button type="info" size="middle" value="测试描述" @click.native="show"></button>
     </div>
-    <mask class="mask" v-if="shown"  @click="hide">
+    <div class="mask" :style='maskStyle' v-if="shown"  @click="hide">
       <div class="content" @click="divclick">
-        <text class='h3'>测试描述：</text>
+        <text class='h3'>测试描述：{{hello}}</text>
         <text class='tips'>点击遮罩层可关闭!</text>
         <slot></slot>
       </div>
-    </mask>
+    </div>
   </div>
 </template>
 
 <script>
   module.exports = {
+    mounted:function(){
+      var h = weex.config.env.deviceHeight;
+      this.maskStyle.height = (h-100) +'px'
+      this.maskStyle.top = (250 - h) +'px'
+    },
     components: {
       button: require('./button.vue')
     },
-    data : {
-      shown:false
+    data: function () {
+      return {
+        shown:false,
+        maskStyle:{
+          left:'-430px',
+          top:'-1100px',
+          height:'0px'
+        },
+        hello:''
+      }
     },
     methods : {
       show : function(e) {
@@ -38,8 +51,8 @@
   .mask{
     background-color: #cccccc;
     position:absolute;
-    left:20;
-    top:20;
+    left:-430;
+    top:-1100;
     width:710;
   }
   .content{

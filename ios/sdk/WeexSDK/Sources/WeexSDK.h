@@ -19,6 +19,8 @@
 
 #ifdef __OBJC__
 
+#import "WXVoiceOverModule.h"
+#import "WXView.h"
 #import "WXValidateProtocol.h"
 #import "WXUtility.h"
 #import "WXURLRewriteProtocol.h"

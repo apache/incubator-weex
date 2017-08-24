@@ -29,13 +29,13 @@ describe('scroller fixed position item ', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/scroller-fixed.js'))
       .waitForElementById('div_1',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver)
   })
 

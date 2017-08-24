@@ -29,13 +29,13 @@ describe('list scroll event', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/list-scroll.js'))
       .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver);
   })
 
@@ -57,13 +57,13 @@ describe('scroller scroll event', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/scroller-scroll.js'))
       .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
+  afterEach(function () {
       // return util.quit(driver)
   })
 

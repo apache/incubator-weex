@@ -71,11 +71,23 @@ if (unFlowedFiles.length > 0) {
 
 // Error or Warn when delete public interface
 var isNotDanger = false;
-for (let c of danger.git.commits) {
-  // console.log("msg:" + c.message);
-  if (c.message && c.message.match(/@notdanger/i)) {
-    isNotDanger = true;
-    break;
+console.log('pr.title:'+danger.github.pr.title)
+if(!isNotDanger && danger.github.pr.title 
+  && danger.github.pr.title.match(/@notdanger/i)){
+  isNotDanger = true;
+}
+console.log('pr.body:'+danger.github.pr.body)
+if(!isNotDanger && danger.github.pr.body 
+  && danger.github.pr.body.match(/@notdanger/i)){
+  isNotDanger = true;
+}
+if(!isNotDanger){
+  for (let c of danger.git.commits) {
+    // console.log("msg:" + c.message);
+    if (c.message && c.message.match(/@notdanger/i)) {
+      isNotDanger = true;
+      break;
+    }
   }
 }
 
@@ -238,6 +250,7 @@ const ignoreCopyrightVerifyPath = [
   'test',
   'packages',
   'pre-build',
+  'html5/test/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',

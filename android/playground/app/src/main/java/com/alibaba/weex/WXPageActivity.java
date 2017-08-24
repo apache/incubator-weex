@@ -575,11 +575,18 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     @Override
     public void onReceive(Context context, Intent intent) {
       if (IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+        // String myUrl = intent.getStringExtra("url");
+        // Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH mBundleUrl:" + myUrl + " mUri:" + mUri);
+
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
-            loadWXfromService(mUri.toString());
+            String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
+            String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
+            // Log.e("WXPageActivity", "loadWXfromService reload url:" + url);
+            loadWXfromService(url);
           } else {
+            // Log.e("WXPageActivity", "loadWXfromLocal reload from local url:" + mUri.toString());
             loadWXfromLocal(true);
           }
         }

@@ -29,13 +29,13 @@ describe('slider common', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/slider-common.js'))
       .waitForElementById('slider_1', util.getGETActionWaitTimeMills(), 1000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   });
 
