@@ -36,6 +36,12 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     private CSSLayoutContext layoutContext;
 
+    private int holderPosition;
+
+    /**
+     * header position
+     * */
+
     public TemplateViewHolder(WXComponent component, int viewType) {
         super(component, viewType);
         this.template = component;
@@ -50,5 +56,14 @@ public class TemplateViewHolder extends ListBaseViewHolder {
             layoutContext = new CSSLayoutContext();
         }
         return layoutContext;
+    }
+
+
+    public int getHolderPosition() {
+        return holderPosition;
+    }
+
+    public void setHolderPosition(int holderPosition) {
+        this.holderPosition = holderPosition;
     }
 }

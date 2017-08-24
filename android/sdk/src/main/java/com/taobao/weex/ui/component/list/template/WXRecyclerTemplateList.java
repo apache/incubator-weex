@@ -103,7 +103,7 @@ import java.util.regex.Pattern;
  */
 @Component(lazyload = false)
 public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> implements
-        IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable {
+        IRecyclerAdapterListener<TemplateViewHolder>, IOnLoadMoreListener, Scrollable {
     public static final String TRANSFORM = "transform";
     private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
@@ -145,7 +145,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private WXStickyHelper stickyHelper;
     private List<WXComponent>  stickyTemplateList;
     private WXCell currentSticky;
-
+    private StickyHelper mStickyHelper;
 
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
         super(instance, node, parent);
@@ -167,6 +167,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mTemplateViewTypes = new ArrayMap<>();
         mTemplateViewTypes.put("", 0); //empty view, when template was not sended
         mTemplates = new HashMap<>();
+        mStickyHelper = new StickyHelper(this);
 
     }
 
@@ -922,7 +923,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
 
     @Override
-    public void onViewRecycled(ListBaseViewHolder holder) {
+    public void onViewRecycled(TemplateViewHolder holder) {
         Log.e("Weex", "onViewRecycled " +  holder);
         if(holder.getComponent().getDomObject().getAttrs().containsKey("sticky")){
             if(holder.itemView.getVisibility() != View.VISIBLE){
@@ -932,7 +933,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @Override
-    public void onBindViewHolder(final ListBaseViewHolder holder, int position) {
+    public void onBindViewHolder(final TemplateViewHolder holder, int position) {
         if(holder == null){
             return;
         }
@@ -941,11 +942,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return;
         }
         if(holder.itemView.getVisibility() != View.VISIBLE){
-            holder.itemView.setVisibility(View.VISIBLE);
+            //holder.itemView.setVisibility(View.VISIBLE);
         }
         long start = System.currentTimeMillis();
         WXCell cell = (WXCell) holder.getComponent();
         TemplateViewHolder templateViewHolder = (TemplateViewHolder) holder;
+        templateViewHolder.setHolderPosition(position);
         cell.setData(listData.get(position));
         Statements.doRender(component, (Map) listData.get(position));
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
@@ -954,7 +956,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @Override
-    public ListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TemplateViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         long start = System.currentTimeMillis();
         String template = mTemplateViewTypes.keyAt(viewType);
         WXCell component = mTemplates.get(template);
@@ -970,8 +972,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         component.createView();
         Layouts.setLayout(component, true);
         component.bindData(component);
-        Log.e(TAG, "onCreateViewHolder used " + (System.currentTimeMillis() - start));
-        return new TemplateViewHolder(component, viewType);
+        Log.e(TAG, "onCreateViewHolder used " + (System.currentTimeMillis() - start)
+         + "  " + component.isSticky());
+        TemplateViewHolder viewHolder = new TemplateViewHolder(component, viewType);
+        if(component.isSticky()){
+            if(viewHolder.isRecyclable()){
+                viewHolder.setIsRecyclable(false);
+            }
+        }
+        return  viewHolder;
     }
 
     /**
@@ -1005,7 +1014,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @Override
-    public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
+    public boolean onFailedToRecycleView(TemplateViewHolder holder) {
         return false;
     }
 
@@ -1097,79 +1106,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void onBeforeScroll(int dx, int dy) {
-        BounceRecyclerView bounceRecyclerView = getHostView();
-        RecyclerView recyclerView = getHostView().getInnerView();
-        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        int position = -1;
-        if (layoutManager instanceof LinearLayoutManager) {
-             position = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-        }else if (layoutManager instanceof StaggeredGridLayoutManager) {
-            int [] firstVisibleItemPositions = new int[Math.max(3, mColumnCount)];
-            position = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstVisibleItemPositions)[0];
-        }
-        if(position < 0){
-            return;
-        }
-
-
-         ListBaseViewHolder firstItemHolder = (ListBaseViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-         if(firstItemHolder == null){
-             return;
-         }
-        View  transView = firstItemHolder.itemView;
-
-        Log.e("weex", "weex " + firstItemHolder.getComponent());
-
-        if(firstItemHolder.getComponent().isSticky()){
-            View stickyView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() -1);
-            if(stickyView.getTag() instanceof  ListBaseViewHolder){
-                if(transView.getTop() < 0){
-                    transView.setVisibility(View.INVISIBLE);
-                    stickyView.setVisibility(View.VISIBLE);
-                    stickyView.bringToFront();
-                }else{
-                    transView.setVisibility(View.VISIBLE);
-                    stickyView.setVisibility(View.INVISIBLE);
-                }
-                Log.e("weex", "sticky " + stickyView.getTop()  + " " + stickyView.getTranslationY());
-            }else {
-                ListBaseViewHolder fakeHolder = onCreateViewHolder(recyclerView, getItemViewType(position));
-                onBindViewHolder(fakeHolder, position);
-                fakeHolder.itemView.setTag(fakeHolder);
-                bounceRecyclerView.addView(fakeHolder.itemView);
-                transView.setVisibility(View.INVISIBLE);
-                Log.e("weex", "sticky faked");
-            }
-        }else{
-            View stickyView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() -1);
-            if(stickyView  != null && stickyView.getTag() instanceof  ListBaseViewHolder) {
-                ListBaseViewHolder fakeHolder = (ListBaseViewHolder) stickyView.getTag();
-                if(position < fakeHolder.getAdapterPosition()){
-                    bounceRecyclerView.removeView(stickyView);
-                    for(int i=0; i<recyclerView.getChildCount(); i++){
-                        View itemView = recyclerView.getChildAt(i);
-                        if(itemView.getVisibility() != View.VISIBLE){
-                            ListBaseViewHolder itemHolder = (ListBaseViewHolder) recyclerView.getChildViewHolder(itemView);
-                            if(itemHolder.getAdapterPosition() == fakeHolder.getAdapterPosition()){
-                                itemView.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    }
-                }else{
-                    int nextPosition = position + 1;
-                    ListBaseViewHolder nextItemHolder = (ListBaseViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-                    if(nextItemHolder == null || nextItemHolder.getComponent() == null){
-                        return;
-                    }
-                    if(nextItemHolder.getComponent().isSticky()){
-
-                    }else{
-
-                    }
-                }
-            }
-            Log.e("weex", "sticky faked11");
-        }
+         mStickyHelper.onBeforeScroll(dx, dy);
     }
 
 
