@@ -117,7 +117,9 @@ public class WXText extends WXComponent<WXTextView> {
       case Constants.Name.VALUE:
         return true;
       case Constants.Name.FONT_FAMILY:
-        registerTypefaceObserver(param.toString());
+        if (param != null) {
+          registerTypefaceObserver(param.toString());
+        }
         return true;
       default:
         return super.setProperty(key, param);
