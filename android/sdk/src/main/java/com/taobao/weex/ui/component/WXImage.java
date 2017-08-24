@@ -31,7 +31,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -51,12 +50,11 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.SingleFunctionParser;
-import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,6 +69,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   public static final String SUCCEED = "success";
   public static final String ERRORDESC = "errorDesc";
+  public final static ScaleType DEFAULT_SCALE_TYPE = ScaleType.FIT_XY;
 
   private String mSrc;
   private int mBlurRadius;
@@ -102,7 +101,7 @@ public class WXImage extends WXComponent<ImageView> {
   @Override
   protected ImageView initComponentHostView(@NonNull Context context) {
     WXImageView view = new WXImageView(context);
-    view.setScaleType(ScaleType.FIT_XY);
+    view.setScaleType(DEFAULT_SCALE_TYPE);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
       view.setCropToPadding(true);
     }
@@ -153,32 +152,23 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.RESIZE_MODE)
   public void setResizeMode(String resizeMode) {
-    (getHostView()).setScaleType(getResizeMode(resizeMode));
-  }
-
-  private ScaleType getResizeMode(String resizeMode) {
-    ScaleType scaleType = ScaleType.FIT_XY;
-    if (TextUtils.isEmpty(resizeMode)) {
-      return scaleType;
-    }
-
-    switch (resizeMode) {
-      case "cover":
-        scaleType = ScaleType.CENTER_CROP;
-        break;
-      case "contain":
-        scaleType = ScaleType.FIT_CENTER;
-        break;
-      case "stretch":
-        scaleType = ScaleType.FIT_XY;
-        break;
-    }
-    return scaleType;
+    setResize(resizeMode);
   }
 
   @WXComponentProp(name = Constants.Name.RESIZE)
   public void setResize(String resize) {
-    (getHostView()).setScaleType(getResizeMode(resize));
+    ScaleType scaleType = DEFAULT_SCALE_TYPE;
+    if (!TextUtils.isEmpty(resize)) {
+      switch (resize) {
+        case "cover":
+          scaleType = ScaleType.CENTER_CROP;
+          break;
+        case "contain":
+          scaleType = ScaleType.FIT_CENTER;
+          break;
+      }
+    }
+    getHostView().setScaleType(scaleType);
   }
 
   /**
@@ -321,25 +311,32 @@ public class WXImage extends WXComponent<ImageView> {
     if ((imageDom = getDomObject()) != null &&
         getHostView() instanceof WXImageView) {
       imageView = (WXImageView) getHostView();
-      BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
-      float[] borderRadius;
-      if (borderDrawable != null) {
-        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
-        borderRadius = borderDrawable.getBorderRadius(borderBox);
-      } else {
-        borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
-      }
+      BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(imageView);
+      float[] borderRadius = extractBorderRadius(imageDom, borderDrawable);
       imageView.setBorderRadius(borderRadius);
 
       if (imageView.getDrawable() instanceof ImageDrawable) {
-        ImageDrawable imageDrawable = (ImageDrawable) imageView.getDrawable();
-        float[] previousRadius = imageDrawable.getCornerRadii();
-        if (!Arrays.equals(previousRadius, borderRadius)) {
-          imageDrawable.setCornerRadii(borderRadius);
-        }
+        updateImageDrawable(borderRadius, (ImageDrawable) imageView.getDrawable());
       }
       readyToRender();
     }
+  }
+
+  private void updateImageDrawable(float[] borderRadius, ImageDrawable imageDrawable) {
+    if (!Arrays.equals(imageDrawable.getCornerRadii(), borderRadius)) {
+      imageDrawable.setCornerRadii(borderRadius);
+    }
+  }
+
+  private float[] extractBorderRadius(ImmutableDomObject imageDom, BorderDrawable borderDrawable) {
+    float[] borderRadius;
+    if (borderDrawable != null) {
+      RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
+      borderRadius = borderDrawable.getBorderRadius(borderBox);
+    } else {
+      borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
+    }
+    return borderRadius;
   }
 
   /**
