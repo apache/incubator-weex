@@ -23,6 +23,7 @@ export default {
     'panmove',
     'panend',
     'swipe',
-    'longpress'
+    'longpress',
+    'tap'
   ]
 }

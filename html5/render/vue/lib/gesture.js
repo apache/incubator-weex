@@ -384,7 +384,7 @@ function touchendHandler(event) {
     if (gesture.status === 'tapping') {
       gesture.timestamp = Date.now()
       // fire click, not tap.
-      fireEvent(gesture.element, 'click', /* 'tap',  */{
+      fireEvent(gesture.element, 'tap', {
         touch: touch,
         touchEvent: event
       })

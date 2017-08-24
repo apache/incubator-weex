@@ -21,10 +21,10 @@ import config from '../config'
 import { createEvent, supportsPassive } from '../utils'
 
 const gestureEvents = config.gestureEvents
-const touchEvents = ['touchstart', 'touchmove', 'touchend']
+const nativeEvents = ['click', 'touchstart', 'touchmove', 'touchend']
 const needPassive = ['touchmove']
 
-const events = gestureEvents.concat(touchEvents)
+const events = gestureEvents.concat(nativeEvents)
 
 // /**
 //  * is a element in a '<a>' tag?
@@ -94,6 +94,13 @@ function _init (doc) {
        */
       if (evt === 'click') {
         e.preventDefault()
+      }
+
+      if (evt === 'tap' && evt._for !== 'weex') {
+        return
+      }
+      else if (evt === 'tap') {
+        evt = 'click'
       }
 
       while (vm) {
