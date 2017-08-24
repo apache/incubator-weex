@@ -70,6 +70,7 @@ public class WXImage extends WXComponent<ImageView> {
   public static final String SUCCEED = "success";
   public static final String ERRORDESC = "errorDesc";
   public final static ScaleType DEFAULT_SCALE_TYPE = ScaleType.FIT_XY;
+  private final ImageView x= null;
 
   private String mSrc;
   private int mBlurRadius;
