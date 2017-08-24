@@ -85,7 +85,7 @@ export function createEventMap (context, ...events) {
            */
           let vm = context
           while (vm) {
-            const ons = getListeners(vm.$vnode, listenTo)
+            const ons = getListeners(vm._vnode || vm.$vnode, listenTo)
             const len = ons.length
             if (len > 0) {
               let idx = 0

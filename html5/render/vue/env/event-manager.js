@@ -88,25 +88,26 @@ function _init (doc) {
       const el = e.target
       let vm = el.__vue__
       let disposed = false
-
+      let evtName = e.type
       /**
        * take full control of redirection of <a> element.
        */
-      if (evt === 'click') {
+      if (evtName === 'click') {
         e.preventDefault()
-      }
-
-      if (evt === 'tap' && evt._for !== 'weex') {
         return
       }
-      else if (evt === 'tap') {
-        evt = 'click'
+
+      if (evtName === 'tap' && e._for !== 'weex') {
+        return
+      }
+      else if (evtName === 'tap') {
+        evtName = 'click'
       }
 
       while (vm) {
-        const vnode = vm.$vnode || vm._vnode
+        const vnode = vm._vnode || vm.$vnode
         const elm = vm.$el
-        const ons = getListeners(vnode, evt)
+        const ons = getListeners(vnode, evtName)
         const len = ons && ons.length
 
         if (len > 0) {
@@ -129,7 +130,7 @@ function _init (doc) {
          * NOTE: if target==='_blank' then do no jumping and dispatch the
          * click event to document.body for further disposing.
          */
-        if (evt === 'click' && isANode(elm)) {
+        if (evtName === 'click' && isANode(elm)) {
           const href = elm.getAttribute('href')
           const target = elm.getAttribute('target')
           disposed = true

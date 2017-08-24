@@ -74,6 +74,7 @@ module.exports = function (config) {
       '../html5/test/render/vue/!(utils|core)/*.js'
     ],
     exclude: [
+      '../html5/test/render/vue/core/node.js',
       '../html5/test/render/vue/helper/*.js',
       '../html5/test/render/vue/vender/**/*.js',
       '../html5/test/render/vue/data/**/*.js'

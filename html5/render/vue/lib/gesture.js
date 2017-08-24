@@ -70,7 +70,7 @@ function getCommonAncestor(el1, el2) {
  */
 function fireEvent(element, type, extra) {
   var event = doc.createEvent('HTMLEvents')
-  event.initEvent(type, false, true)
+  event.initEvent(type, true, true)
 
   if (typeof extra === 'object') {
     for (var p in extra) {
