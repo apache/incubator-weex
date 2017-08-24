@@ -208,7 +208,6 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
     
     if(task ){
-        [WXTracingManager switchTracing:NO];
         return YES;
     }
     return NO;
@@ -220,7 +219,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     if([manager isTaskExist:url])
     {
         WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
-        task.instance.needPrerender = NO;
+        
         UIView *view = [self viewFromUrl:url];
         NSError *error = [self errorFromUrl:url];
         if(task.instance.onCreate){
@@ -232,6 +231,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
         WXPerformBlockOnComponentThread(^{
             [task.instance.componentManager startComponentTasks];
             [task.instance.componentManager excutePrerenderUITask:url];
+            task.instance.needPrerender = NO;
         });
         WXPerformBlockOnBridgeThread(^(){
             [WXPrerenderManager excuteModuleTasksForUrl:url];
