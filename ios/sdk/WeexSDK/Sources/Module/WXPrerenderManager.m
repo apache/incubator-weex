@@ -208,7 +208,6 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
     
     if(task ){
-        [WXTracingManager switchTracing:NO];
         return YES;
     }
     return NO;
