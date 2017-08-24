@@ -18,9 +18,11 @@
  */
 package com.taobao.weex.utils;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
@@ -42,6 +44,8 @@ public class TypefaceUtil {
   public static final String FONT_CACHE_DIR_NAME = "font-family";
   private final static String TAG = "TypefaceUtil";
   private final static Map<String, FontDO> sCacheMap = new HashMap<>(); //Key: fontFamilyName
+
+  public static final String ACTION_TYPE_FACE_AVAILABLE = "type_face_available";
 
   public static void putFontDO(FontDO fontDO) {
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
@@ -223,6 +227,10 @@ public class TypefaceUtil {
           if(WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(TAG, "load local font file success");
           }
+
+          Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+          intent.putExtra("fontFamily", fontFamily);
+          LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
           return true;
         }
       } else {

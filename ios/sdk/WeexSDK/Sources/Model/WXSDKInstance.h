@@ -140,6 +140,13 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
 
 /**
+ *  The callback triggered when js occurs runtime error while executing.
+ *
+ *  @return A block that takes a WXJSExceptionInfo argument, which is the exception info
+ **/
+@property (nonatomic, copy) void (^onJSRuntimeException)(WXJSExceptionInfo * jsException);
+
+/**
  *  The callback triggered when the instacne executes scrolling .
  *
  *  @return A block that takes a CGPoint argument, which is content offset of the scroller
