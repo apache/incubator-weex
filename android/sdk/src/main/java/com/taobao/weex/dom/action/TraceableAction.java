@@ -67,6 +67,7 @@ public class TraceableAction {
       mBeginEvent.name = type;
       mBeginEvent.payload = payload;
       mBeginEvent.parseJsonTime = Stopwatch.nanosToMillis(mParseJsonNanos);
+      mBeginEvent.tname = "JSThread";
       mBeginEvent.submit();
     }
   }
