@@ -23,6 +23,7 @@ import static com.taobao.weex.dom.WXStyle.UNSET;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -180,8 +181,9 @@ public class WXTextDomObject extends WXDomObject {
     hasBeenMeasured = false;
     if (layout != null && !layout.equals(atomicReference.get()) &&
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      //TODO Warm up, a profile should be used to see the improvement.
-      warmUpTextLayoutCache(layout);
+      if(Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()){
+        warmUpTextLayoutCache(layout);
+      }
     }
     swap();
     super.layoutAfter();

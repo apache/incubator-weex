@@ -20,14 +20,12 @@ package com.taobao.weex.ui.component.list.template;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -38,7 +36,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -70,7 +67,6 @@ import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
-import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
@@ -79,7 +75,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +83,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * todo-list
+ * 1、appear事件
+ * 2、sticky事件
+ * 3、多列测试
  * weex template list supported
  * https://github.com/Hanks10100/weex-native-directive
  * demo address
@@ -132,25 +131,16 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Map<String, WXCell> mTemplates;
     private String listDataTemplateKey = Constants.Name.LIST_TEMPLATE_ID;
     private Runnable  notifyUpdate;
-
-
-
     private RecyclerView.ItemAnimator mItemAnimator;
 
-
     /**
-     * Map for storing component that is sticky.
-     **/
-    private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
-    private WXStickyHelper stickyHelper;
-    private List<WXComponent>  stickyTemplateList;
-    private WXCell currentSticky;
+     * sticky helper
+     * */
     private StickyHelper mStickyHelper;
 
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
         super(instance, node, parent);
         initRecyclerTemplateList(instance, node, parent);
-        stickyHelper = new WXStickyHelper(this);
     }
 
     private void initRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent){
@@ -247,9 +237,25 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         notifyUpdate = new Runnable() {
             @Override
             public void run() {
+                mStickyHelper.getStickyPositions().clear();
+                for(int i=0; i<listData.size(); i++){
+                    JSONObject data = listData.getJSONObject(i);
+                    String template = data.getString(listDataTemplateKey);
+                    if(template == null){
+                        continue;
+                    }
+                    WXCell cell = mTemplates.get(template);
+                    if(cell == null){
+                        continue;
+                    }
+                    if(cell.isSticky()){
+                        mStickyHelper.getStickyPositions().add(i);
+                    }
+                }
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
+                Log.e("weex", "weex notify update");
             }
         };
         return bounceRecyclerView;
@@ -335,31 +341,43 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void bindStickStyle(WXComponent component) {
-        if(stickyTemplateList == null){
-            stickyTemplateList = new ArrayList<>();
+        WXComponent  template = findCell(component);
+        if(template == null){
+            return;
         }
-        stickyTemplateList.add(component);
-        stickyHelper.bindStickStyle(component, mStickyMap);
+        if(listData == null){
+            return;
+        }
+        if(!template.isSticky()){
+            template.setSticky(Constants.Value.STICKY);
+            getHostView().removeCallbacks(notifyUpdate);
+            getHostView().post(notifyUpdate);
+        }
     }
 
     @Override
     public void unbindStickStyle(WXComponent component) {
-        stickyHelper.unbindStickStyle(component, mStickyMap);
+        WXComponent  template = findCell(component);
+        if(template == null){
+            return;
+        }
+        if(template.isSticky()){
+            template.removeStickyStyle();
+            getHostView().removeCallbacks(notifyUpdate);
+            getHostView().post(notifyUpdate);
+        }
     }
 
-    private
-    @Nullable
-    WXComponent findDirectListChild(WXComponent comp) {
+    private @Nullable WXComponent findCell(WXComponent component) {
         WXComponent parent;
-        if (comp == null || (parent = comp.getParent()) == null) {
+        if (component == null || (parent = component.getParent()) == null) {
             return null;
         }
 
         if (parent instanceof BasicListComponent) {
-            return comp;
+            return component;
         }
-
-        return findDirectListChild(parent);
+        return findCell(parent);
     }
 
     private void setAppearanceWatch(WXComponent component, int event, boolean enable) {
@@ -369,7 +387,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         } else if (!enable) {
             //Do nothing if disable target not exist.
         } else {
-            WXComponent dChild = findDirectListChild(component);
+            WXComponent dChild = findCell(component);
             int index = mChildren.indexOf(dChild);
             if (index != -1) {
                 item = new AppearanceHelper(component, index);
@@ -555,7 +573,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         while (iterator.hasNext()) {
             Map.Entry<String, AppearanceHelper> item = iterator.next();
             AppearanceHelper value = item.getValue();
-            WXComponent dChild = findDirectListChild(value.getAwareChild());
+            WXComponent dChild = findCell(value.getAwareChild());
             int index = mChildren.indexOf(dChild);
             value.setCellPosition(index);
         }
@@ -658,10 +676,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     protected boolean setProperty(String key, Object param) {
         switch (key) {
             case Constants.Name.LIST_DATA:{
-                     boolean update = listData != null;
-                     listData = (JSONArray) param;
-                     if(update){
-                         getHostView().post(notifyUpdate);
+                     if(param instanceof  JSONArray){
+                         boolean update = listData != null;
+                         listData = (JSONArray) param;
+                         if(update){
+                             getHostView().post(notifyUpdate);
+                         }
                      }
                 }
                 return true;
@@ -924,12 +944,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void onViewRecycled(TemplateViewHolder holder) {
-        Log.e("Weex", "onViewRecycled " +  holder);
-        if(holder.getComponent().getDomObject().getAttrs().containsKey("sticky")){
-            if(holder.itemView.getVisibility() != View.VISIBLE){
-                holder.itemView.setVisibility(View.VISIBLE);
-            }
-        }
+        Log.e("Weex", "onViewRecycled " +  holder.getItemViewType());
     }
 
     @Override
@@ -940,9 +955,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         WXComponent component = holder.getComponent();
         if(component == null){
             return;
-        }
-        if(holder.itemView.getVisibility() != View.VISIBLE){
-            //holder.itemView.setVisibility(View.VISIBLE);
         }
         long start = System.currentTimeMillis();
         WXCell cell = (WXCell) holder.getComponent();
