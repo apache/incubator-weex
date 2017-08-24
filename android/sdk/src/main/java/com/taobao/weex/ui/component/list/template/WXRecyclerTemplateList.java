@@ -238,18 +238,20 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             @Override
             public void run() {
                 mStickyHelper.getStickyPositions().clear();
-                for(int i=0; i<listData.size(); i++){
-                    JSONObject data = listData.getJSONObject(i);
-                    String template = data.getString(listDataTemplateKey);
-                    if(template == null){
-                        continue;
-                    }
-                    WXCell cell = mTemplates.get(template);
-                    if(cell == null){
-                        continue;
-                    }
-                    if(cell.isSticky()){
-                        mStickyHelper.getStickyPositions().add(i);
+                if(listData != null){
+                    for(int i=0; i<listData.size(); i++){
+                        JSONObject data = listData.getJSONObject(i);
+                        String template = data.getString(listDataTemplateKey);
+                        if(template == null){
+                            continue;
+                        }
+                        WXCell cell = mTemplates.get(template);
+                        if(cell == null){
+                            continue;
+                        }
+                        if(cell.isSticky()){
+                            mStickyHelper.getStickyPositions().add(i);
+                        }
                     }
                 }
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
@@ -345,11 +347,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(template == null){
             return;
         }
-        if(listData == null){
+        if(listData == null || mStickyHelper == null){
             return;
         }
         if(!template.isSticky()){
-            template.setSticky(Constants.Value.STICKY);
+            if(template.getDomObject() != null){
+                template.getDomObject().getStyles().put(Constants.Name.POSITION, Constants.Value.STICKY);
+            }
             getHostView().removeCallbacks(notifyUpdate);
             getHostView().post(notifyUpdate);
         }
@@ -358,11 +362,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     public void unbindStickStyle(WXComponent component) {
         WXComponent  template = findCell(component);
-        if(template == null){
+        if(template == null
+                || listData == null
+                || mStickyHelper == null){
             return;
         }
         if(template.isSticky()){
-            template.removeStickyStyle();
+            if(template.getDomObject() != null){
+                template.getDomObject().getStyles().remove(Constants.Name.POSITION);
+            }
             getHostView().removeCallbacks(notifyUpdate);
             getHostView().post(notifyUpdate);
         }
@@ -930,6 +938,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     public void destroy() {
         if(listData != null){
             listData = null;
+        }
+        
+        if(mStickyHelper != null){
+            mStickyHelper = null;
         }
         if(mTemplateViewTypes != null){
             mTemplateViewTypes.clear();
