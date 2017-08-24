@@ -224,8 +224,8 @@ In the AppDelegate.m file to do the initialization operation, usually in the did
 [WXAppConfiguration setAppGroup:@"AliApp"];
 [WXAppConfiguration setAppName:@"WeexDemo"];
 [WXAppConfiguration setAppVersion:@"1.0.0"];
-//init sdk enviroment   
-[WXSDKEngine initSDKEnviroment];
+//init sdk environment   
+[WXSDKEngine initSDKEnvironment];
 //register custom module and component，optional
 [WXSDKEngine registerComponent:@"MyView" withClass:[MyViewComponent class]];
 [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
@@ -259,7 +259,7 @@ Weex supports both full page rendering and partial rendering. What you need to d
     _instance.renderFinish = ^ (UIView *view) {
         //process renderFinish
     };
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"]
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"];
     [_instance renderWithURL:url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
 }
 ```
