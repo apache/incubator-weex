@@ -27,7 +27,7 @@ describe('a-src-test', function () {
   function click_a_tag(title, id) {
     it(title, () => {
       return driver
-        .elementById(id)
+        .waitForElementById(id, maxWt, 2000)
         .click()
         .waitForElementByName('a-support-href1', maxWt, 2000)
         .waitForElementByName('jump_back', maxWt, 2000)
@@ -40,7 +40,7 @@ describe('a-src-test', function () {
       .waitForElementByName('changeSrc', maxWt, 2000)
       .click()
       .sleep(500)
-      .elementById('a-itself')
+      .waitForElementById('a-itself', maxWt, 2000)
       .click()
       .waitForElementByName('a-support-href2', maxWt, 2000)
       .waitForElementByName('jump_back', maxWt, 2000)
