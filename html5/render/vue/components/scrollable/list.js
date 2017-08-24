@@ -44,7 +44,7 @@ function getList (weex) {
           return true
         })
         return [
-          h('html:div', {
+          h('article', {
             ref: 'inner',
             staticClass: 'weex-list-inner weex-ct'
           }, this._cells)

@@ -21,8 +21,7 @@
  * @fileOverview Input component.
  * Support v-model only if vue version is large than 2.2.0
  */
-let extractComponentStyle, createEventMap
-let extend, mapFormEvents, appendCss
+let extractComponentStyle, mapFormEvents, appendCss
 
 const ID_PREFIX_PLACEHOLDER_COLOR = 'wipt_plc_'
 const ID_PREFIX_INPUT = 'wipt_'
@@ -104,7 +103,7 @@ function getInput (weex) {
       if (!this._id) {
         this._id = idCount++
       }
-      const events = extend(createEventMap(this), mapFormEvents(this))
+      const events = mapFormEvents(this)
       return createElement('html:input', {
         attrs: {
           'weex-type': 'input',
@@ -132,8 +131,6 @@ function getInput (weex) {
 export default {
   init (weex) {
     extractComponentStyle = weex.extractComponentStyle
-    createEventMap = weex.createEventMap
-    extend = weex.utils.extend
     mapFormEvents = weex.utils.mapFormEvents
     appendCss = weex.utils.appendCss
 

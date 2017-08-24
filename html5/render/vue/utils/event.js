@@ -28,6 +28,22 @@ function extend (to, ...args) {
   return to
 }
 
+// if support passive event listeners.
+let _supportsPassive = false
+try {
+  document.createElement('div').addEventListener('test', _ => {}, {
+    get passive () {
+      _supportsPassive = true
+    }
+  })
+}
+catch (e) {
+  // do nothing.
+}
+export function supportsPassive () {
+  return _supportsPassive
+}
+
 /**
  * Create Event.
  * @param {DOMString} type

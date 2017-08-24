@@ -20,6 +20,8 @@ import weex from './env'
 import { setVue } from './env'
 import { base, style, sticky } from './mixins'
 
+import initEventMgr from './env/event-manager'
+
 /**
  * init weex.
  * @param  {Vue$2} Vue: Vue Constructor.
@@ -46,6 +48,8 @@ function init (Vue/*, options = {}*/) {
   Vue.mixin(base)
   Vue.mixin(style)
   Vue.mixin(sticky)
+
+  initEventMgr()
 }
 
 // auto init in dist mode.

@@ -26,8 +26,7 @@ body > .weex-div {
 function getDiv (weex) {
   const {
     extractComponentStyle,
-    trimTextVNodes,
-    createEventMap
+    trimTextVNodes
   } = weex
 
   return {
@@ -35,7 +34,6 @@ function getDiv (weex) {
     render (createElement) {
       return createElement('html:div', {
         attrs: { 'weex-type': 'div' },
-        on: createEventMap(this),
         staticClass: 'weex-div weex-ct',
         staticStyle: extractComponentStyle(this)
       }, trimTextVNodes(this.$slots.default))
