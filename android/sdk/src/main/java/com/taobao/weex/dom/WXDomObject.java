@@ -32,7 +32,6 @@ import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.dom.binding.BindingUtils;
-import com.taobao.weex.dom.binding.WXEventArgs;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -93,20 +92,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   /** package **/ WXEvent mEvents;
 
-  /**
-   * dynamic binding attrs, can be null
-   * */
-  WXAttr  mBindingAttrs;
 
-  /**
-   * dynamic binding statement for match, can be null
-   * */
-  WXStatement mStatement;
 
-  /**
-   * dynamic binding event args, can be null
-   * */
-  WXEventArgs mEventArgs;
 
 
   private List<WXDomObject> mDomChildren;
@@ -180,38 +167,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return mEvents;
   }
 
-  /**
-   * can by null, in most contion without template list, the value is null
-   * */
-  public WXAttr getBindingAttrs() {
-    return mBindingAttrs;
-  }
-
-  /**
-   * can by null, in most contion without template list, the value is null
-   * */
-  public WXStatement getStatement() {
-    return mStatement;
-  }
-
-  /**
-   * can by null, in most contion without template list, the value is null
-   * */
-  public WXEventArgs getEventArgs() {
-    return mEventArgs;
-  }
-
-  public void setBindingAttrs(WXAttr mBindingAttrs) {
-    this.mBindingAttrs = mBindingAttrs;
-  }
-
-  public void setStatement(WXStatement mStatement) {
-    this.mStatement = mStatement;
-  }
-
-  public void setEventArgs(WXEventArgs mEventArgs) {
-    this.mEventArgs = mEventArgs;
-  }
 
 
   public @NonNull DomContext getDomContext() {
@@ -221,9 +176,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public void clearEvents(){
     if(mEvents != null){
       mEvents.clear();
-    }
-    if(mEventArgs != null){
-       mEventArgs.clear();
     }
   }
 
@@ -276,80 +228,42 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     Object attr = map.get("attr");
     if (attr != null && attr instanceof JSONObject) {
       WXAttr attrs = new WXAttr((JSONObject) attr);
-      filterBindingStatement(attrs);
       //WXJsonUtils.putAll(attrs, (JSONObject) attr);
       this.mAttributes = attrs;
     }
     Object event = map.get("event");
     if (event != null && event instanceof JSONArray) {
-      JSONArray eventArray = (JSONArray) event;
-      int count = eventArray.size();
-      for (int i = 0; i < count; ++i) {
-        Object value = eventArray.get(i);
-        this.addEventSupportBindArgs(value);
-      }
+        WXEvent events = new WXEvent();
+        JSONArray eventArray = (JSONArray) event;
+        int count = eventArray.size();
+        for (int i = 0; i < count; ++i) {
+            Object value = eventArray.get(i);
+            if (value instanceof CharSequence) {
+              events.add(value.toString());
+              continue;
+            }
+            if (value instanceof JSONObject) {
+              JSONObject bindings = (JSONObject) value;
+              String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+              Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
+              if (eventName != null) {
+                events.add(eventName);
+              }
+              if (eventName != null && args != null) {
+                events.putEventBindingArgs(eventName, args);
+              }
+              continue;
+            }
+            events.add(value.toString());
+        }
+        this.mEvents = events;
     }
 
   }
 
 
-  public void addEventSupportBindArgs(Object value){
-    if(value instanceof  String){
-      addEvent((String) value);
-    }else if(value instanceof  JSONObject){
-      JSONObject bindingEvents = ((JSONObject) value);
-      String eventName = bindingEvents.getString("type");
-      if(!TextUtils.isEmpty(eventName)){
-        if(mEventArgs == null){
-          mEventArgs = new WXEventArgs();
-        }
-        addEvent(eventName);
-        mEventArgs.put(eventName, bindingEvents.get("args"));
-      }
-    }else {
-      addEvent(value.toString());
-    }
-  }
 
-  /**
-   * filter dynamic state ment
-   * */
-  private Map<String, Object>  filterBindingStatement(Map<String, Object> attrs) {
-    if(attrs == null || attrs.size() == 0){
-      return attrs;
-    }
-    Set<Map.Entry<String,Object>> entries = attrs.entrySet();
-    Iterator<Map.Entry<String,Object>> it =  entries.iterator();
-    while (it.hasNext()){
-      Map.Entry<String,Object> entry = it.next();
-      Object value = entry.getValue();
-      //FIXME REMOVE CODE
-      if(value instanceof  String){
-        if(((String) value).startsWith("{") && ((String) value).endsWith("}")
-                || (((String) value).startsWith("[") && ((String) value).endsWith("]"))){
-          value = JSON.parse((String) value);
-        }
-      }
-      if(BindingUtils.isBinding(value)){
-        if(mBindingAttrs == null){
-          mBindingAttrs = new WXAttr();
-        }
-        mBindingAttrs.put(entry.getKey(), value);
-        it.remove();
-        continue;
-      }
 
-      if(BindingUtils.isStatement(entry.getKey())){
-        if(mStatement == null){
-          mStatement = new WXStatement();
-        }
-        mStatement.put(entry.getKey(), value);
-        it.remove();
-        continue;
-      }
-    }
-    return attrs;
-  }
 
   /**
    * Do pre-staff before layout. Subclass may provide different implementation.

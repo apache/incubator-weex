@@ -18,8 +18,12 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.v4.util.ArrayMap;
+
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Store value of component event
@@ -28,8 +32,74 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
 
   private static final long serialVersionUID = -8186587029452440107L;
 
+  /**
+   * dynamic binding event args, can be null, only weex use
+   * */
+  private ArrayMap mEventBindingArgs;
+  private ArrayMap<String, List<Object>> mEventBindingArgsValues;
+
+
   @Override
   public WXEvent clone() {
-    return (WXEvent) super.clone();
+    WXEvent event = (WXEvent) super.clone();
+    event.mEventBindingArgs = mEventBindingArgs;
+    event.mEventBindingArgsValues = mEventBindingArgsValues;
+    return  event;
   }
+
+  @Override
+  public void clear() {
+    if(mEventBindingArgs != null){
+      mEventBindingArgs.clear();
+    }
+    if(mEventBindingArgsValues != null){
+      mEventBindingArgsValues.clear();
+    }
+    super.clear();
+  }
+
+  /**
+   * can by null
+   * */
+  public ArrayMap getEventBindingArgs() {
+    return mEventBindingArgs;
+  }
+
+
+  public ArrayMap<String, List<Object>> getEventBindingArgsValues() {
+    return mEventBindingArgsValues;
+  }
+
+  public void putEventBindingArgs(String event, Object value){
+      if(mEventBindingArgs == null){
+         mEventBindingArgs = new ArrayMap();
+      }
+      if(!contains(event)){
+          add(event);
+      }
+      mEventBindingArgs.put(event, value);
+  }
+
+  public void putEventBindingArgsValue(String event, List<Object> value){
+    if(mEventBindingArgsValues == null){
+      mEventBindingArgsValues = new ArrayMap();
+    }
+    mEventBindingArgsValues.put(event, value);
+  }
+
+
+  /**
+   *  event data format
+   *  {
+   *  type: 'appear',
+   *  args: [
+   *  { '@binding': 'index' },
+   *   'static',
+   *   { '@binding': 'item.name' },
+   *  { '@binding': '$event' }
+   *  ]
+   *  }
+   * */
+  public static final String EVENT_KEY_TYPE = "type";
+  public static final String EVENT_KEY_ARGS = "args";
 }

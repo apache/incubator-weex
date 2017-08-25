@@ -25,8 +25,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.binding.BindingUtils;
-import com.taobao.weex.dom.binding.WXEventArgs;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
@@ -108,7 +108,8 @@ public class Statements {
     static final int doRender(WXComponent component, Stack context){
         WXVContainer parent = component.getParent();
         WXDomObject domObject = (WXDomObject) component.getDomObject();
-        WXStatement statement = domObject.getStatement();
+        WXAttr attrs = domObject.getAttrs();
+        WXStatement statement =  attrs.getStatement();
         if(statement != null){
             WXDomObject parentDomObject = (WXDomObject) parent.getDomObject();
             JSONObject vfor = (JSONObject) statement.get(WXStatement.WX_FOR);
@@ -145,7 +146,7 @@ public class Statements {
                         if(renderNode == null){
                             renderNode = recursiveCopy(component, parent);
                             WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
-                            renderNodeDomObject.setStatement(null); // clear node's statement
+                            renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
                             parent.addChild(renderNode, renderIndex);
                             parent.createChildViewAt(renderIndex);
                             parentDomObject.add(renderNodeDomObject, renderIndex);
@@ -208,15 +209,24 @@ public class Statements {
      * */
     private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, Stack context){
         component.setWaste(false);
-        WXAttr bindAttrs = domObject.getBindingAttrs();
-        if(bindAttrs != null && bindAttrs.size() > 0){
+        if(domObject.getAttrs() != null
+                && domObject.getAttrs().getBindingAttrs() != null
+                && domObject.getAttrs().getBindingAttrs().size() > 0){
+            WXAttr bindAttrs = domObject.getAttrs().getBindingAttrs();
             Map<String, Object> dynamic =  getDynamicAttrs(bindAttrs, context);
             domObject.updateAttr(dynamic);
             component.updateProperties(dynamic);
         }
-        WXEventArgs eventArgs = domObject.getEventArgs();
-        if(eventArgs != null){
-
+        WXEvent event = domObject.getEvents();
+        if(event == null || event.getEventBindingArgs() == null){
+            return;
+        }
+        Set<Map.Entry<String, Object>> eventBindArgsEntrySet = event.getEventBindingArgs().entrySet();
+        for(Map.Entry<String, Object> eventBindArgsEntry : eventBindArgsEntrySet){
+             List<Object> values = getBindingEventArgsValue(context, eventBindArgsEntry.getValue());
+             if(values != null){
+                 event.putEventBindingArgsValue(eventBindArgsEntry.getKey(), values);
+             }
         }
     }
 
@@ -262,11 +272,7 @@ public class Statements {
         return  dynamic;
     }
 
-    public static List<Object> getEventParams(Object data, Object bindings){
-          Stack context = new Stack();
-          if(data != null){
-              context.push(data);
-          }
+    public static List<Object> getBindingEventArgsValue(Stack context, Object bindings){
           List<Object>  params = new ArrayList<>(4);
           if(bindings instanceof  JSONArray){
               JSONArray array = (JSONArray) bindings;
@@ -290,9 +296,9 @@ public class Statements {
                    params.add(bindings);
                }
           }else{
-              params.add(bindings);
+              params.add(bindings.toString());
           }
-         return  params;
+          return  params;
     }
 
 

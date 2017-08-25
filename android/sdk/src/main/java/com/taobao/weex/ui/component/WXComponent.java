@@ -288,27 +288,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
     if(mInstance != null && mDomObj != null) {
-        mInstance.fireEvent(mCurrentRef, type, params,domChanges, getEventBindingsArgs());
+        List<Object> eventArgsValues = null;
+        if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
+             eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
+        }
+        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues);
     }
   }
 
-  private List<Object> getEventBindingsArgs(String eventType){
-    WXDomObject domObject = (WXDomObject) getDomObject();
-    if(domObject.getEventArgs() == null){
-      return  null;
-    }
-    Object   binding =  domObject.getEventArgs().get(eventType);
-    if(binding == null){
-      return  null;
-    }
-    Object data = null;
-    WXCell cell = (WXCell) findTypeParent(this, WXCell.class);
-    if(cell != null){
-       data = cell.getData();
-    }
-    List<Object> params = Statements.getEventParams(data, binding);
-    return  params;
-  }
 
   /**
    * find certain class type parent
