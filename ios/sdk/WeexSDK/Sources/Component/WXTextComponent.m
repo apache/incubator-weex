@@ -282,10 +282,7 @@ do {\
     if (!useCoreText) {
         ((WXTextView *)self.view).textStorage = _textStorage;
     }
-    
-    if (!_testId) {
-        self.view.isAccessibilityElement = YES;
-    }
+    self.view.isAccessibilityElement = YES;
     
     [self setNeedsDisplay];
 }
