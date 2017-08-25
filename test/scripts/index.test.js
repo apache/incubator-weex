@@ -32,25 +32,15 @@ describe('weex mobile index', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/index.js'))
+      .waitForElementByName('hello world.',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
       return util.quit(driver);
   })
 
-
-  it('#1 Index', () => {
+  it('#1 Click Button', () => {
     return driver
-    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
-    .text()
-    .then((text)=>{
-      assert.equal(text,'hello world.')
-    })
-  })
-
-  it('#2 Click Button', () => {
-    return driver
-    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
     .elementById('button')
     .click()
     .elementById('status')
@@ -60,9 +50,8 @@ describe('weex mobile index', function () {
     })
   })
 
-  it('#3 Input Blur', () => {
+  it('#2 Input Blur', () => {
     return driver
-    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
     .elementById('input')
     .click()
     .elementById('button2')
@@ -73,6 +62,4 @@ describe('weex mobile index', function () {
       assert.equal(text,'input blur.')
     })
   })
-
-  
 });
