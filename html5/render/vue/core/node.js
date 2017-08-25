@@ -54,6 +54,30 @@ function getListeners (vnode, evt) {
 }
 
 /**
+ * Instead of vue's invoker, this function should check if the binding function
+ * has a _weex_hook flag. If there is one, the handler should not be triggered.
+ * @param {Array | Function} fns
+ */
+export function applyFns (fns, ...args) {
+  if (Array.isArray(fns)) {
+    const cloned = fns.slice()
+    const len = cloned.length
+    for (let i = 0; i < len; i++) {
+      const fn = cloned[i]
+      if (fn._weex_hook) {
+        continue
+      }
+      fn.apply(null, args)
+    }
+  }
+  else {
+    if (!fns._weex_hook) {
+      fns.apply(null, args)
+    }
+  }
+}
+
+/**
  * emit native events to enable v-on.
  * @param {VComponent} context: which one to emit a event on.
  * @param {array | object} events: extra events. You can pass in multiple arguments here.
@@ -90,11 +114,8 @@ export function createEventMap (context, ...events) {
             if (len > 0) {
               let idx = 0
               while (idx < len) {
-                let on = ons[idx]
-                if (on && on.fn) {
-                  on = on.fn
-                }
-                on && on.call(vm, e)
+                const on = ons[idx]
+                applyFns(on.fns, e)
                 idx++
               }
               // once a parent node (or self node) has triggered the handler, then
@@ -107,6 +128,8 @@ export function createEventMap (context, ...events) {
             vm = vm.$parent
           }
         }
+        // flag to distinguish from user-binding listeners.
+        handler._weex_hook = true
       }
       if (!eventMap[evtName]) {
         eventMap[evtName] = []

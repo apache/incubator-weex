@@ -142,7 +142,7 @@ vue: {
 
 * fix scanning style in production with uglified code.
 
-#### 0.12.6
+#### 0.12.8
 
 * optimize event binding.
 

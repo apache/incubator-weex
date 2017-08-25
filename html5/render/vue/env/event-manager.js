@@ -19,6 +19,7 @@
 
 import config from '../config'
 import { createEvent, supportsPassive } from '../utils'
+import { applyFns } from '../core'
 
 const gestureEvents = config.gestureEvents
 const nativeEvents = ['click', 'touchstart', 'touchmove', 'touchend']
@@ -112,13 +113,11 @@ function _init (doc) {
 
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let handler = ons[i]
-            if (handler && handler.fn) {
-              handler = handler.fn
-            }
-            // create a no bubble event.
-            const newEvt = createEvent(el, evt)
-            handler && handler.call(vm, newEvt)
+            const handler = ons[i]
+            const newEvt = evtName === 'click'
+              ? createEvent(el, evtName)
+              : e
+            applyFns(handler.fns, newEvt)
           }
           e._triggered = { target: vm.$el }
           disposed = true
@@ -127,8 +126,8 @@ function _init (doc) {
         /**
          * if the handler is binding on a <a> element, should trigger
          * the handler first and then jump to href.
-         * NOTE: if target==='_blank' then do no jumping and dispatch the
-         * click event to document.body for further disposing.
+         * NOTE: if target==='_blank' then do no jumping and leave it
+         * to users binding handlers for further disposing.
          */
         if (evtName === 'click' && isANode(elm)) {
           const href = elm.getAttribute('href')
@@ -138,7 +137,7 @@ function _init (doc) {
             location.href = href
           }
           else {
-            document.body.dispatchEvent(e)
+            // do nothing.
           }
         }
 
