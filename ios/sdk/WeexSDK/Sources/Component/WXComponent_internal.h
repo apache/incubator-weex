@@ -66,8 +66,8 @@
      */
     UIAccessibilityTraits _role; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
-    BOOL _ariaHidden; // accessibilityElementsHidden
-    BOOL _accessible; // accessible
+    NSString * _ariaHidden; // accessibilityElementsHidden
+    NSString * _accessible; // accessible
     NSString * _testId;// just for auto-test
     
     /**

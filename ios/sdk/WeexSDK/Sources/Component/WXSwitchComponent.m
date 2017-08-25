@@ -19,6 +19,7 @@
 
 #import "WXSwitchComponent.h"
 #import "WXConvert.h"
+#import "WXComponent_internal.h"
 
 @interface WXSwitchView : UISwitch
 
