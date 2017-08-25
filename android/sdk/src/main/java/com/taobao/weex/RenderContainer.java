@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference;
 
 public class RenderContainer extends FrameLayout {
   private WeakReference<WXSDKInstance> mSDKInstance;
+  private WeexFrameRateControl mFrameRateControl;
 
   public RenderContainer(Context context) {
     super(context);
@@ -54,6 +55,7 @@ public class RenderContainer extends FrameLayout {
 
   public void setSDKInstance(WXSDKInstance instance) {
     mSDKInstance = new WeakReference<>(instance);
+    mFrameRateControl = new WeexFrameRateControl(mSDKInstance.get());
   }
 
   @Override
@@ -68,14 +70,19 @@ public class RenderContainer extends FrameLayout {
 
   @Override
   public void onAttachedToWindow() {
-    super.onAttachedToWindow();
-
+      super.onAttachedToWindow();
+      if (mFrameRateControl != null) {
+          mFrameRateControl.start();
+      }
   }
 
   @Override
   protected void onDetachedFromWindow() {
-    super.onDetachedFromWindow();
-
+      super.onDetachedFromWindow();
+      if (mFrameRateControl != null) {
+          mFrameRateControl.stop();
+          mFrameRateControl = null;
+      }
   }
 
 }

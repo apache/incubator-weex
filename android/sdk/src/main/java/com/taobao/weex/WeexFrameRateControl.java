@@ -26,8 +26,10 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.view.Choreographer;
 
+import java.lang.ref.WeakReference;
+
 public class WeexFrameRateControl {
-    private VSyncListener mListener;
+    private WeakReference<VSyncListener> mListener;
     private final Choreographer mChoreographer;
     private final Choreographer.FrameCallback mVSyncFrameCallback;
 
@@ -37,13 +39,15 @@ public class WeexFrameRateControl {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public WeexFrameRateControl(VSyncListener listener) {
-        mListener = listener;
+        mListener = new WeakReference<>(listener);
         mChoreographer = Choreographer.getInstance();
         mVSyncFrameCallback = new Choreographer.FrameCallback() {
             @Override
             public void doFrame(long frameTimeNanos) {
                 mChoreographer.postFrameCallback(mVSyncFrameCallback);
-                mListener.OnVSync();
+                if (mListener != null && mListener.get() != null) {
+                    mListener.get().OnVSync();
+                }
             }
         };
 

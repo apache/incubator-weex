@@ -92,7 +92,7 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener {
+public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
 
   //Performance
   public boolean mEnd = false;
@@ -1630,5 +1630,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public interface NestedInstanceInterceptor {
     void onCreateNestInstance(WXSDKInstance instance, NestedContainer container);
+  }
+
+  @Override
+  public void OnVSync() {
+
+    // add vSync code for refresh
+    Log.e("networkTime", "shiwentao onvsync instanceId:" + getInstanceId());
   }
 }
