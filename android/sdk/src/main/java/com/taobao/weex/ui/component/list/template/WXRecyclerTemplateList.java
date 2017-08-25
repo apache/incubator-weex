@@ -939,7 +939,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(listData != null){
             listData = null;
         }
-        
+
         if(mStickyHelper != null){
             mStickyHelper = null;
         }

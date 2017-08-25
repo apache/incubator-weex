@@ -263,6 +263,10 @@ public class Constants {
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
     String KEYBOARD = "keyboard";
+
+    String UNSTICKY = "unsticky";
+    String STICKY = "sticky";
+
   }
 
   public interface PSEUDO {
