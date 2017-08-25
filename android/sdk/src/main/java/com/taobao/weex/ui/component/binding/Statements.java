@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.binding;
 
 import android.graphics.Color;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -212,7 +213,7 @@ public class Statements {
         if(domObject.getAttrs() != null
                 && domObject.getAttrs().getBindingAttrs() != null
                 && domObject.getAttrs().getBindingAttrs().size() > 0){
-            WXAttr bindAttrs = domObject.getAttrs().getBindingAttrs();
+            ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
             Map<String, Object> dynamic =  getDynamicAttrs(bindAttrs, context);
             domObject.updateAttr(dynamic);
             component.updateProperties(dynamic);
@@ -236,7 +237,7 @@ public class Statements {
      * @param  context  context
      * return binding attrs rended value in context
      * */
-    public static Map<String, Object> getDynamicAttrs(WXAttr bindAttrs, Stack context){
+    public static Map<String, Object> getDynamicAttrs(ArrayMap bindAttrs, Stack context){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){

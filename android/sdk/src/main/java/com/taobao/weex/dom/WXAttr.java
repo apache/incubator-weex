@@ -57,7 +57,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * dynamic binding attrs, can be null, only weex use
    * */
-  private WXAttr  mBindingAttrs;
+  private ArrayMap<String, Object>  mBindingAttrs;
 
   /**
    * dynamic binding statement for match, can be null, only weex use
@@ -70,6 +70,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
+    filterBindingAttrsStatement(standardMap);
     attr.putAll(standardMap);
   }
 
@@ -398,7 +399,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public Object put(String key, Object value) {
-    if(filterBindingAndStatement(key, value)){
+    if(filterBindingAttrsStatement(key, value)){
       return null;
     }
     return attr.put(key,value);
@@ -406,7 +407,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    filterBindingAndStatement(map);
+    filterBindingAttrsStatement(map);
     this.attr.putAll(map);
   }
 
@@ -430,7 +431,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * can by null, in most contion without template list, the value is null
    * */
-  public WXAttr getBindingAttrs() {
+  public ArrayMap<String, Object> getBindingAttrs() {
     return mBindingAttrs;
   }
 
@@ -442,7 +443,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   }
 
 
-  public void setBindingAttrs(WXAttr mBindingAttrs) {
+  public void setBindingAttrs(ArrayMap<String, Object> mBindingAttrs) {
     this.mBindingAttrs = mBindingAttrs;
   }
 
@@ -454,7 +455,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic state ment
    * */
-  private Map<String, Object> filterBindingAndStatement(Map attrs) {
+  private Map<String, Object> filterBindingAttrsStatement(Map attrs) {
     if(attrs == null || attrs.size() == 0){
       return attrs;
     }
@@ -462,14 +463,14 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
         Map.Entry<String,Object> entry = it.next();
-        if(filterBindingAndStatement(entry.getKey(), entry.getValue())){
+        if(filterBindingAttrsStatement(entry.getKey(), entry.getValue())){
            it.remove();
         }
     }
     return attrs;
   }
 
-  private boolean filterBindingAndStatement(String key, Object value) {
+  private boolean filterBindingAttrsStatement(String key, Object value) {
         //FIXME REMOVE CODE
         if(value instanceof  String){
           if(((String) value).startsWith("{") && ((String) value).endsWith("}")
@@ -479,7 +480,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
         }
         if(BindingUtils.isBinding(value)){
           if(mBindingAttrs == null){
-              mBindingAttrs = new WXAttr();
+              mBindingAttrs = new ArrayMap<String, Object>();
           }
           mBindingAttrs.put(key, value);
           return  true;

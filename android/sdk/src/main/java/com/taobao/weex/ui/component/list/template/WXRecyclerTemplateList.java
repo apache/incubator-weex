@@ -26,6 +26,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -793,11 +794,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-//          WXLogUtils.e("SCROLL", dx + ", " + dy + ", " + recyclerView.computeHorizontalScrollRange()
-//          + ", " + recyclerView.computeVerticalScrollRange()
-//          + ", " + recyclerView.computeHorizontalScrollOffset()
-//          + ", " + recyclerView.computeVerticalScrollOffset());
-
+                    RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+                    if (!layoutManager.canScrollVertically()) {
+                        return;
+                    }
                     int offsetX = recyclerView.computeHorizontalScrollOffset();
                     int offsetY = recyclerView.computeVerticalScrollOffset();
 
@@ -837,8 +837,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+        offsetY = -calcContentOffset(recyclerView);
         int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-        int contentHeight = recyclerView.computeVerticalScrollRange();
+        int contentHeight = calcContentSize();
 
         Map<String, Object> event = new HashMap<>(2);
         Map<String, Object> contentSize = new HashMap<>(2);
@@ -1026,6 +1027,26 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return type;
     }
 
+    /**
+     * return tepmlate key for position
+     * */
+    private String getTemplateKey(int position){
+        JSONObject data = listData.getJSONObject(position);
+        String template = data.getString(listDataTemplateKey);
+        if(TextUtils.isEmpty(template)){
+            template = "";
+        }
+        return  template;
+    }
+
+    /**
+     * get source template
+     * */
+    private WXCell getSourceTemplate(int position){
+        String template = getTemplateKey(position);
+        return mTemplates.get(template);
+    }
+
     @Override
     public int getItemCount() {
         if(listData == null){
@@ -1157,5 +1178,60 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         try{
             return listData.getJSONObject(position);
         }catch (Exception e){return  JSONObject.parseObject("{}");}
+    }
+
+    private int calcContentSize() {
+        int totalHeight = 0;
+        if(listData == null){
+            return totalHeight;
+        }
+        for (int i = 0; i < listData.size(); i++) {
+            WXCell child = getSourceTemplate(i);
+            if (child != null) {
+                totalHeight += child.getLayoutHeight();
+            }
+        }
+        return totalHeight;
+    }
+
+    private int calcContentOffset(RecyclerView recyclerView) {
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+            int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+            int offset = 0;
+            for (int i=0;i<firstVisibleItemPosition;i++) {
+                WXCell cell = getSourceTemplate(i);
+                if(cell == null){
+                    continue;
+                }
+                offset -= cell.getLayoutHeight();
+            }
+
+            if (layoutManager instanceof GridLayoutManager) {
+                int spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
+                offset = offset / spanCount;
+            }
+            offset += firstVisibleView.getTop();
+            return offset;
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+            int firstVisibleItemPosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+            View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+
+            int offset = 0;
+            for (int i=0;i<firstVisibleItemPosition;i++) {
+                WXCell cell = getSourceTemplate(i);
+                if(cell == null){
+                    continue;
+                }
+                offset -= cell.getLayoutHeight();
+            }
+
+            offset = offset / spanCount;
+            offset += firstVisibleView.getTop();
+            return offset;
+        }
+        return -1;
     }
 }
