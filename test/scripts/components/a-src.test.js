@@ -21,21 +21,25 @@ describe('a-src-test', function () {
     return util.quit(driver);
   })
 
-  click_a_tag('#1 Click A tag itself', 'a-itself')
-  click_a_tag('#2 Click some content inside a', 'content-inside-a')
+  it('#1 Click A tag itself', () => {
+    return driver
+      .waitForElementById('a-itself', maxWt, 2000)
+      .click()
+      .waitForElementByName('a-support-href1', maxWt, 2000)
+      .waitForElementByName('jump_back', maxWt, 2000)
+      .click();
+  })
 
-  function click_a_tag(title, id) {
-    it(title, () => {
-      return driver
-        .waitForElementById(id, maxWt, 2000)
-        .click()
-        .waitForElementByName('a-support-href1', maxWt, 2000)
-        .waitForElementByName('jump_back', maxWt, 2000)
-        .click();
-    })
-  }
+  it('#2 Click some content inside a', () => {
+    return driver
+      .waitForElementByName('Jump', maxWt, 2000)
+      .click()
+      .waitForElementByName('a-support-href1', maxWt, 2000)
+      .waitForElementByName('jump_back', maxWt, 2000)
+      .click();
+  })
 
-  it('change src', () => {
+  it('#3 change src', () => {
     return driver
       .waitForElementByName('changeSrc', maxWt, 2000)
       .click()
