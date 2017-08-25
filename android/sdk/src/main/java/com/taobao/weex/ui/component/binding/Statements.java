@@ -32,6 +32,7 @@ import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,15 +49,15 @@ public class Statements {
     /**
      * recursive copy component,
      * */
-    public static WXComponent recursiveCopy(WXComponent component){
-        WXComponent copy =  recursiveCopy(component, component.getParent());
+    public static WXComponent copyComponentTree(WXComponent component){
+        WXComponent copy =  copyComponentTree(component, component.getParent());
         return copy;
     }
 
     /**
      * recursive copy component,
      * */
-    private static final WXComponent recursiveCopy(WXComponent source, WXVContainer parent){
+    private static final WXComponent copyComponentTree(WXComponent source, WXVContainer parent){
         WXDomObject node = (WXDomObject) source.getDomObject();
         WXComponent component = WXComponentFactory.newInstance(source.getInstance(), node, parent);
         if(source instanceof WXVContainer){
@@ -67,7 +68,7 @@ public class Statements {
             for (int i = 0; i < count; ++i) {
                 WXComponent child = container.getChild(i);
                 if (child != null) {
-                    WXComponent targetChild = recursiveCopy(child,  childParent);
+                    WXComponent targetChild = copyComponentTree(child,  childParent);
                     childParent.addChild(targetChild);
                     childParentNode.add((WXDomObject) targetChild.getDomObject(), -1);
                 }
@@ -92,7 +93,9 @@ public class Statements {
             context.push(map);
             doRender(component, context);
             context = null;
-        }catch (Exception e){}
+        }catch (Exception e){
+            WXLogUtils.e("WeexStatementRender", e);
+        }
     }
 
 
@@ -145,12 +148,14 @@ public class Statements {
                         }
                         //none resuable render node, create node, add to parent, but clear node's statement
                         if(renderNode == null){
-                            renderNode = recursiveCopy(component, parent);
+                            renderNode = copyComponentTree(component, parent);
                             WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
                             renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
                             parent.addChild(renderNode, renderIndex);
                             parent.createChildViewAt(renderIndex);
                             parentDomObject.add(renderNodeDomObject, renderIndex);
+                            renderNode.applyLayoutAndEvent(component);
+                            //FIXME delete
                             renderNode.getHostView().setBackgroundColor(Color.RED);
                         }
                         doRenderBindingAttrs(component, domObject, context);
@@ -247,7 +252,7 @@ public class Statements {
             if(key.equals("text")){
                 key = "value";
             }
-            if(binding instanceof  JSONObject && ((JSONObject) binding).containsKey(BindingUtils.BINDING)){
+            if(entry.getValue() instanceof  JSONObject && ((JSONObject) binding).containsKey(BindingUtils.BINDING)){
                 Object bindingValue = getBindingValue(((JSONObject) binding).getString(BindingUtils.BINDING), context);
                 dynamic.put(key, bindingValue);
             }else if(binding instanceof JSONArray){
@@ -259,7 +264,7 @@ public class Statements {
                         builder.append(value);
                         continue;
                     }
-                    if(value instanceof JSONObject && ((JSONObject) binding).containsKey(BindingUtils.BINDING)){
+                    if(value instanceof JSONObject && ((JSONObject) value).containsKey(BindingUtils.BINDING)){
                         Object bindingValue = getBindingValue( ((JSONObject) value).getString(BindingUtils.BINDING), context);
                         if(bindingValue == null){
                             bindingValue = "";

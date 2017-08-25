@@ -70,8 +70,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
-    filterBindingAttrsStatement(standardMap);
-    attr.putAll(standardMap);
+    attr.putAll(filterBindingAttrsStatement(standardMap));
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -407,8 +406,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    filterBindingAttrsStatement(map);
-    this.attr.putAll(map);
+    this.attr.putAll(filterBindingAttrsStatement(map));
   }
 
   @Override
