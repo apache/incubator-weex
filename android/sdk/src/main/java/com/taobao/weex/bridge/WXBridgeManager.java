@@ -115,6 +115,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String REF = "ref";
   public static final String MODULE = "module";
   public static final String METHOD = "method";
+  public static final String KEY_PARAMS = "params";
   public static final String ARGS = "args";
   public static final String OPTIONS = "options";
   private static final String NON_CALLBACK = "-1";
@@ -928,7 +929,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
 
-  private void addJSTask(final String method, final String instanceId, final Object... args) {
+  private void addJSEventTask(final String method, final String instanceId, final List<Object> params, final Object... args) {
     post(new Runnable() {
       @Override
       public void run() {
@@ -944,6 +945,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXHashMap<String, Object> task = new WXHashMap<>();
         task.put(KEY_METHOD, method);
         task.put(KEY_ARGS, argsList);
+        if(params != null){
+           task.put(KEY_PARAMS, params);
+        }
 
         if (mNextTickTasks.get(instanceId) == null) {
           ArrayList<WXHashMap<String, Object>> list = new ArrayList<>();
@@ -954,6 +958,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
       }
     });
+  }
+
+  private void addJSTask(final String method, final String instanceId, final Object... args) {
+    addJSEventTask(method, instanceId, null, args);
   }
 
   private void sendMessage(String instanceId, int what) {
@@ -1000,15 +1008,24 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
   public void fireEventOnNode(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data,final Map<String, Object> domChanges) {
+      fireEventOnNode(instanceId, ref, type, data, domChanges, null);
+  }
+
+  /**
+   * Notify the JavaScript about the event happened on Android
+   */
+  public void fireEventOnNode(final String instanceId, final String ref,
+                              final String type, final Map<String, Object> data,
+                              final Map<String, Object> domChanges, List<Object> params) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)
-        || TextUtils.isEmpty(type) || mJSHandler == null) {
+            || TextUtils.isEmpty(type) || mJSHandler == null) {
       return;
     }
     if (!checkMainThread()) {
       throw new WXRuntimeException(
-          "fireEvent must be called by main thread");
+              "fireEvent must be called by main thread");
     }
-    addJSTask(METHOD_FIRE_EVENT, instanceId, ref, type, data,domChanges);
+    addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data,domChanges);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 

@@ -46,7 +46,7 @@ public class StickyHelper {
     }
 
     /**
-     * dispatch scroll event
+     * dispatch scroll event, sticky  header
      * */
     public void onBeforeScroll(int dx, int dy) {
         if(stickyPositions == null || stickyPositions.size() == 0){
@@ -84,7 +84,7 @@ public class StickyHelper {
             }
         }
         if(matchStickyPosition < 0){
-            //create holder for match position if not exist
+            //remove holder for match position not found
             View stickyFakeView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() - 1);
             if(stickyFakeView.getTag() instanceof TemplateViewHolder){
                 TemplateViewHolder stickyFakeViewHolder = (TemplateViewHolder) stickyFakeView.getTag();

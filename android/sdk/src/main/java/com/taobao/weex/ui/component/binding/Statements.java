@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.binding.BindingUtils;
+import com.taobao.weex.dom.binding.WXEventArgs;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
@@ -208,12 +209,15 @@ public class Statements {
     private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, Stack context){
         component.setWaste(false);
         WXAttr bindAttrs = domObject.getBindingAttrs();
-        if(bindAttrs == null){
-            return;
+        if(bindAttrs != null && bindAttrs.size() > 0){
+            Map<String, Object> dynamic =  getDynamicAttrs(bindAttrs, context);
+            domObject.updateAttr(dynamic);
+            component.updateProperties(dynamic);
         }
-        Map<String, Object> dynamic =  getDynamicAttrs(bindAttrs, context);
-        domObject.updateAttr(dynamic);
-        component.updateProperties(dynamic);
+        WXEventArgs eventArgs = domObject.getEventArgs();
+        if(eventArgs != null){
+
+        }
     }
 
 
@@ -615,7 +619,7 @@ public class Statements {
         if(statement.indexOf('+') > 0){
             String[] parts = splitTwoByOperator(statement, "+");
             Object partone = getStatementValue(context, parts[0]);
-            Object parttwo = getNumber(getStatementValue(context, parts[1]));
+            Object parttwo = getStatementValue(context, parts[1]);
             if(partone != null && parttwo != null){
                 if(isNumber(partone.toString().trim())
                         || isNumber(parttwo.toString().trim())){

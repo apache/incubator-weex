@@ -222,6 +222,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if(mEvents != null){
       mEvents.clear();
     }
+    if(mEventArgs != null){
+       mEventArgs.clear();
+    }
   }
 
   public static void prepareRoot(WXDomObject domObj,float defaultHeight,float defaultWidth) {
