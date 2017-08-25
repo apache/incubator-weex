@@ -41,9 +41,9 @@ describe('weex mobile index', function () {
 
   it('#1 Click Button', () => {
     return driver
-    .elementById('button')
+    .waitForElementById('button',util.getGETActionWaitTimeMills(),1000)
     .click()
-    .elementById('status')
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .text()
     .then((text)=>{
       assert.equal(text,'btn click.')
@@ -52,11 +52,11 @@ describe('weex mobile index', function () {
 
   it('#2 Input Blur', () => {
     return driver
-    .elementById('input')
+    .waitForElementById('input',util.getGETActionWaitTimeMills(),1000)
     .click()
-    .elementById('button2')
+    .waitForElementById('button2',util.getGETActionWaitTimeMills(),1000)
     .click()
-    .elementById('status')
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .text()
     .then((text)=>{
       assert.equal(text,'input blur.')
