@@ -8,7 +8,7 @@
         <a test-id='a-itself' class="button mr-base" :href="href">
           <text test-id='content-inside-a' class="text">Jump</text>
         </a>
-        <a test-id='a-itself' class="button mr-base" href="">
+        <a class="button mr-base" href="">
           <text class="text">JumpBlank</text>
         </a>
 
