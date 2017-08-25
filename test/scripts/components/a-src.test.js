@@ -50,4 +50,16 @@ describe('a-src-test', function () {
       .waitForElementByName('jump_back', maxWt, 2000)
       .click();
   })
+
+  it('#4 JumpBlank', () => {
+    return driver
+      .waitForElementByName('changeSrc', maxWt, 2000)
+      .click()
+      .sleep(500)
+      .waitForElementByName('JumpBlank', maxWt, 2000)
+      .click()
+      .waitForElementByName('a-support-href1.js?_wxpage=true', maxWt, 2000)
+      .waitForElementByName('jump_back', maxWt, 2000)
+      .click();
+  })
 });
