@@ -32,7 +32,6 @@ describe('weex mobile index', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/index.js'))
-      .waitForElementById('title',util.getGETActionWaitTimeMills(),1000);
   });
 
   afterEach(function () {
@@ -42,7 +41,7 @@ describe('weex mobile index', function () {
 
   it('#1 Index', () => {
     return driver
-    .elementById('title')
+    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
     .text()
     .then((text)=>{
       assert.equal(text,'hello world.')
@@ -51,6 +50,7 @@ describe('weex mobile index', function () {
 
   it('#2 Click Button', () => {
     return driver
+    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
     .elementById('button')
     .click()
     .elementById('status')
@@ -62,6 +62,7 @@ describe('weex mobile index', function () {
 
   it('#3 Input Blur', () => {
     return driver
+    .waitForElementById('title',util.getGETActionWaitTimeMills(),1000)
     .elementById('input')
     .click()
     .elementById('button2')

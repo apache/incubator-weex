@@ -32,7 +32,6 @@ describe('dom-operation', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/dom-operation.js'))
-      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000);
   });
 
   afterEach(function () {
@@ -41,6 +40,7 @@ describe('dom-operation', function () {
 
   it('#1 Repeat', ()=>{
     return driver
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .elementById("item5")
     .then((elem)=>{
         assert.notEqual(elem ,undefined)
@@ -53,6 +53,7 @@ describe('dom-operation', function () {
 
   it('#2 Add new item', ()=>{
     return driver
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .elementById("btn1")
     .click()
     .sleep(2000)
@@ -68,7 +69,7 @@ describe('dom-operation', function () {
 
   it('#3 Remove item', ()=>{
     return driver
-    .elementById("status")
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .click()
     .sleep(2000)
     .elementById("item6")
@@ -83,7 +84,7 @@ describe('dom-operation', function () {
 
   it('#4 Update DOM attr', ()=>{
       return driver
-      .elementById("status")
+      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
       .click()
       .sleep(2000)
       .elementById("status2")

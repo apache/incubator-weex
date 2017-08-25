@@ -17,6 +17,7 @@ describe('weex text @ignore-ios', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/text-layout.js'))
+      .sleep(2000)
       .waitForElementById("lines", util.getGETActionWaitTimeMills(), 1000)
       .getWindowSize()
       .then(size => {
