@@ -408,11 +408,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
-      mRenderContainer = new RenderContainer(getContext());
-      mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
-      mRenderContainer.setSDKInstance(this);
-      mRenderContainer.addOnLayoutChangeListener(this);
+      if (getContext() != null) {
+        mRenderContainer = new RenderContainer(getContext());
+        mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
+        mRenderContainer.setSDKInstance(this);
+        mRenderContainer.addOnLayoutChangeListener(this);
+      }
     }
   }
 
@@ -587,11 +589,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKEngine.reload();
 
     // 可以发送广播吗？
-    Intent intent = new Intent();
-    intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
-    intent.putExtra("url", mBundleUrl);
-    mContext.sendBroadcast(intent);
-
+    if (mContext != null) {
+      Intent intent = new Intent();
+      intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+      intent.putExtra("url", mBundleUrl);
+      mContext.sendBroadcast(intent);
+    }
     // mRendered = false;
     //    destroy();
     // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
