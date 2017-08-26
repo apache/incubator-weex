@@ -513,6 +513,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mReceiver = new RefreshBroadcastReceiver();
     IntentFilter filter = new IntentFilter();
     filter.addAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
+    filter.addAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+
     registerReceiver(mReceiver, filter);
   }
 
@@ -574,7 +576,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   public class RefreshBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+      if (IWXDebugProxy.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
+              IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
         // String myUrl = intent.getStringExtra("url");
         // Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH mBundleUrl:" + myUrl + " mUri:" + mUri);
 

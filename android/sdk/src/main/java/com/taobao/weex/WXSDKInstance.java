@@ -330,11 +330,13 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
 
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
-      mRenderContainer = new RenderContainer(getContext());
-      mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
-      mRenderContainer.setSDKInstance(this);
-      mRenderContainer.addOnLayoutChangeListener(this);
+      if (getContext() != null) {
+        mRenderContainer = new RenderContainer(getContext());
+        mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
+        mRenderContainer.setSDKInstance(this);
+        mRenderContainer.addOnLayoutChangeListener(this);
+      }
     }
   }
 
@@ -458,12 +460,19 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   }
 
   public void reloadPage() {
-    WXSDKEngine.reload(WXEnvironment.sApplication,null,WXEnvironment.sRemoteDebugMode);
+    WXSDKEngine.reload();
 
-    Intent intent = new Intent();
-    intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
-    intent.putExtra("url", mBundleUrl);
-    mContext.sendBroadcast(intent);
+    // 可以发送广播吗？
+    if (mContext != null) {
+      Intent intent = new Intent();
+      intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+      intent.putExtra("url", mBundleUrl);
+      mContext.sendBroadcast(intent);
+    }
+    // mRendered = false;
+    //    destroy();
+    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+    // refreshInstance("{}");
   }
   /**
    * Refresh instance asynchronously.

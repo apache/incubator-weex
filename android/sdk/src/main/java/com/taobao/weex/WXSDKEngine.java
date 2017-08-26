@@ -495,4 +495,12 @@ public class WXSDKEngine {
       }
     }, 0);
   }
+  public static void reload(final Context context, boolean remoteDebug) {
+    reload(context,null,remoteDebug);
+  }
+
+  public static void reload() {
+    reload(WXEnvironment.getApplication(), WXEnvironment.sRemoteDebugMode);
+  }
+
 }

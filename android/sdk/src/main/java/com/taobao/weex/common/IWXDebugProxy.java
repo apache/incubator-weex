@@ -24,6 +24,8 @@ package com.taobao.weex.common;
 public interface IWXDebugProxy {
     String ACTION_DEBUG_INSTANCE_REFRESH = "DEBUG_INSTANCE_REFRESH";
 
+    String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
+
     void start();
 
     void stop(boolean reload);
