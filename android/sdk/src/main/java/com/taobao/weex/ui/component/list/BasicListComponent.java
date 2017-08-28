@@ -1350,6 +1350,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (layoutManager instanceof LinearLayoutManager) {
       int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
       View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+      if (firstVisibleView == null) {
+        //Why null?
+        WXComponent firstVisibleComponent = getChild(firstVisibleItemPosition);
+        if (firstVisibleComponent != null) {
+          firstVisibleView = firstVisibleComponent.getHostView();
+        }
+      }
+
+      int firstVisibleViewOffset = 0;
+      if (firstVisibleView != null) {
+        firstVisibleViewOffset = firstVisibleView.getTop();
+      }
+
       int offset = 0;
       for (int i=0;i<firstVisibleItemPosition;i++) {
         WXComponent child = getChild(i);
@@ -1363,12 +1376,24 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         offset = offset / spanCount;
       }
 
-      offset += firstVisibleView.getTop();
+      offset += firstVisibleViewOffset;
       return offset;
     } else if (layoutManager instanceof StaggeredGridLayoutManager) {
       int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
       int firstVisibleItemPosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
       View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+
+      if (firstVisibleView == null) {
+        WXComponent firstVisibleComponent = getChild(firstVisibleItemPosition);
+        if (firstVisibleComponent != null) {
+          firstVisibleView = firstVisibleComponent.getHostView();
+        }
+      }
+
+      int firstVisibleViewOffset = 0;
+      if (firstVisibleView != null) {
+        firstVisibleViewOffset = firstVisibleView.getTop();
+      }
 
       int offset = 0;
       for (int i=0;i<firstVisibleItemPosition;i++) {
@@ -1379,7 +1404,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
 
       offset = offset / spanCount;
-      offset += firstVisibleView.getTop();
+      offset += firstVisibleViewOffset;
       return offset;
     }
     return -1;
