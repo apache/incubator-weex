@@ -35,7 +35,6 @@ describe('compositing test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/attributes/compositing.js'))
-      .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
   });
 
   afterEach(function () {
@@ -45,6 +44,7 @@ describe('compositing test', function () {
 
   it('#1 compositing screenshot diff', () => {
     return driver
+    .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
     .takeScreenshot()
     .then(imgData => {
       var newImg = new Buffer(imgData, 'base64');

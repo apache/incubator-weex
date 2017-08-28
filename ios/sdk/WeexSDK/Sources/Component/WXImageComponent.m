@@ -249,6 +249,7 @@ WX_EXPORT_METHOD(@selector(save:))
     imageView.userInteractionEnabled = YES;
     imageView.clipsToBounds = YES;
     imageView.exclusiveTouch = YES;
+    imageView.isAccessibilityElement = YES;
     
     [self _clipsToBounds];
     

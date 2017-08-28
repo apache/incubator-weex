@@ -38,12 +38,8 @@ public class SimpleListComponent extends BasicListComponent<SimpleRecyclerView>{
 
   @Override
   protected SimpleRecyclerView generateListView(Context context, int orientation) {
-    return generateListView(context,WXRecyclerView.TYPE_LINEAR_LAYOUT,orientation);
-  }
-
-  protected SimpleRecyclerView generateListView(Context context, int type,int orientation) {
     SimpleRecyclerView view = new SimpleRecyclerView(context);
-    view.initView(context, type, orientation);
+    view.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, orientation);
     return view;
   }
 }

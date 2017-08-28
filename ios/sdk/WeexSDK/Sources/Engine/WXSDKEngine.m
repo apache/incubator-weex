@@ -61,6 +61,7 @@
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
+    [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz

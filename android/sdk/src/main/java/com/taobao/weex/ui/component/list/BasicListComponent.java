@@ -67,6 +67,7 @@ import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -520,6 +521,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
     if (cell != null) {
       final int pos = mChildren.indexOf(cell);
+      if (pos == -1) {
+        //Invalid position
+        return;
+      }
+
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
 
       if (!smooth) {
@@ -580,6 +586,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
+          boolean removeOldSticky = false;
           layoutManager = getHostView().getInnerView().getLayoutManager();
           if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
@@ -592,6 +599,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
                 currentStickyPos = pos;
               }
             }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
+            }
           } else if(layoutManager instanceof StaggeredGridLayoutManager){
             int [] firstItems= new int[3];
             int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
@@ -599,6 +610,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+            }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
             }
           }
 
@@ -613,7 +628,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
-          } else if (removeSticky) {
+          } else if (removeSticky || removeOldSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
           }
           cell.setLocationFromStart(top);
@@ -674,13 +689,26 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
     T view = getHostView();
     if (view != null) {
-      boolean isAddAnimation = isAddAnimation(child);
+      boolean isAddAnimation = false;
+      ImmutableDomObject domObject = child.getDomObject();
+      if (domObject != null) {
+        Object attr = domObject.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
+        if (Constants.Value.DEFAULT.equals(attr)) {
+          isAddAnimation = true;
+        }
+      }
       if (isAddAnimation) {
         view.getInnerView().setItemAnimator(mItemAnimator);
       } else {
         view.getInnerView().setItemAnimator(null);
       }
-      boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
+      boolean isKeepScrollPosition =  false;
+      if (child.getDomObject() != null) {
+        Object attr = child.getDomObject().getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
+        if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
+            isKeepScrollPosition = true;
+        }
+      }
       if (isKeepScrollPosition) {
         int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
         view.getInnerView().getLayoutManager().scrollToPosition(last);
@@ -692,37 +720,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     relocateAppearanceHelper();
   }
 
-  /**
-   * To determine whether an animation is needed
-   * @param child
-   * @return
-   */
-  private boolean isAddAnimation(WXComponent child) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
-      if (Constants.Value.DEFAULT.equals(attr)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Determine if the component needs to be fixed at the time of insertion
-   * @param child Need to insert the component
-   * @return fixed=true
-   */
-  private boolean isKeepScrollPosition(WXComponent child,int index) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
-      if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
-        return true;
-      }
-    }
-    return false;
-  }
 
 
   private void relocateAppearanceHelper() {
@@ -768,7 +765,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       return;
     }
 
-    boolean isRemoveAnimation = isRemoveAnimation(child);
+    boolean isRemoveAnimation = false;
+    ImmutableDomObject domObject = child.getDomObject();
+    if (domObject != null) {
+      Object attr = domObject.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
+      if (Constants.Value.DEFAULT.equals(attr)) {
+        isRemoveAnimation = true;
+      }
+    }
     if (isRemoveAnimation) {
       view.getInnerView().setItemAnimator(mItemAnimator);
     } else {
@@ -782,21 +786,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     super.remove(child, destroy);
   }
 
-  /**
-   * To determine whether an animation is needed
-   * @param child
-   * @return
-   */
-  private boolean isRemoveAnimation(WXComponent child) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
-      if (Constants.Value.DEFAULT.equals(attr)) {
-        return true;
-      }
-    }
-    return false;
-  }
+
 
 
   @Override
@@ -858,6 +848,16 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
       }
+      if(component instanceof  WXBaseRefresh
+              && holder.getView() != null
+              && component.getDomObject() != null
+              && (component.getDomObject().getAttrs().get("holderBackground") != null)){
+         Object holderBackground = component.getDomObject().getAttrs().get("holderBackground");
+        int color = WXResourceUtils.getColor(holderBackground.toString(), Color.WHITE);
+         holder.getView().setBackgroundColor(color);
+         holder.getView().setVisibility(View.VISIBLE);
+         holder.getView().postInvalidate();
+      }
       return;
     }
 
@@ -872,7 +872,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       mTriggerType = (mTriggerType == null) ? DEFAULT_TRIGGER_TYPE : mTriggerType;
 
       WXCell cell = (WXCell) holder.getComponent();
-      boolean isExcluded = isDragExcluded(cell.getDomObject());
+      boolean isExcluded = DEFAULT_EXCLUDED;
+      if(cell.getDomObject() != null){
+         WXAttr cellAttrs = cell.getDomObject().getAttrs();
+         isExcluded = WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
+      }
+
       mDragHelper.setDragExcluded(holder, isExcluded);
 
       //NOTICE: event maybe consumed by other views
@@ -1062,13 +1067,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return triggerType;
   }
 
-  private boolean isDragExcluded(@Nullable ImmutableDomObject domObject) {
-    if (domObject == null) {
-      return DEFAULT_EXCLUDED;
-    }
-    WXAttr cellAttrs = domObject.getAttrs();
-    return WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
-  }
 
   /**
    * ViewType will be classified into {HashMap<Integer,ArrayList<Integer>> mViewTypes}
@@ -1173,7 +1171,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),getInstance().getInstanceViewPortWidth());
 
-      if (offScreenY < offsetParsed) {
+      if (offScreenY <= offsetParsed) {
 
         if (mListCellCount != mChildren.size()
             || mForceLoadmoreNextTime) {
@@ -1215,7 +1213,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         continue;
       }
 
-      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible(true);
 
       int result = item.setAppearStatus(visible);
       if (WXEnvironment.isApkDebugable()) {
@@ -1239,9 +1237,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private ListBaseViewHolder createVHForRefreshComponent(int viewType) {
     FrameLayout view = new FrameLayout(getContext());
-    view.setBackgroundColor(Color.WHITE);
-    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
-    view.setVisibility(View.GONE);
+    view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
     return new ListBaseViewHolder(view, viewType);
   }
 
@@ -1301,9 +1297,17 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
-    offsetY = - calcContentOffset(recyclerView);
+    if(getOrientation() == Constants.Orientation.VERTICAL){
+      offsetY = - calcContentOffset(recyclerView);
+    }
     int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-    int contentHeight = calcContentSize();
+    int contentHeight = 0;
+    for (int i = 0; i < getChildCount(); i++) {
+      WXComponent child = getChild(i);
+      if (child != null) {
+        contentHeight += child.getLayoutHeight();
+      }
+    }
 
     Map<String, Object> event = new HashMap<>(2);
     Map<String, Object> contentSize = new HashMap<>(2);
@@ -1339,16 +1343,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return false;
   }
 
-  private int calcContentSize() {
-    int totalHeight = 0;
-    for (int i = 0; i < getChildCount(); i++) {
-      WXComponent child = getChild(i);
-      if (child != null) {
-        totalHeight += child.getLayoutHeight();
-      }
-    }
-    return totalHeight;
-  }
+
 
   private int calcContentOffset(RecyclerView recyclerView) {
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();

@@ -52,7 +52,7 @@ function buildiOS {
 function runiOS {
     echo 'Run in iOS...'
     echo $1
-    # buildiOS $2
+    buildiOS $2
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     # ps -ef

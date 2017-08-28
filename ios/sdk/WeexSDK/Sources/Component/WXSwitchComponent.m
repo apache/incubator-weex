@@ -19,6 +19,7 @@
 
 #import "WXSwitchComponent.h"
 #import "WXConvert.h"
+#import "WXComponent_internal.h"
 
 @interface WXSwitchView : UISwitch
 
@@ -59,6 +60,7 @@
 - (void)viewDidLoad
 {
     _switchView = (WXSwitchView *)self.view;
+    _switchView.isAccessibilityElement = YES;
     [_switchView setOn:_checked animated:YES];
     [_switchView setEnabled:!_disabled];
     [_switchView addTarget:self action:@selector(checkChanged) forControlEvents:UIControlEventValueChanged];

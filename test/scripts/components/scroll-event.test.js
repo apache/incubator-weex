@@ -32,7 +32,6 @@ describe('list scroll event', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/list-scroll.js'))
-      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
@@ -42,6 +41,8 @@ describe('list scroll event', function () {
 
   it('#1 Drag list', () => {
     return driver
+    .sleep(1000)
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .dragUp(200)
     .dragUp(200)
     .elementById('status')
@@ -60,16 +61,16 @@ describe('scroller scroll event', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/scroller-scroll.js'))
-      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
-      // return util.quit(driver)
+      return util.quit(driver)
   })
 
 
   it('#1 Drag scroller', () => {
     return driver
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .dragUp(200)
     .dragUp(200)
     .elementById('status')

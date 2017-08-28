@@ -173,12 +173,12 @@ static NSThread *WXComponentThread;
         _uiPrerenderTaskQueue = [NSMutableDictionary new];
     }
     if(self.weexInstance.needPrerender){
-        NSMutableArray<dispatch_block_t> *tasks  = [_uiPrerenderTaskQueue objectForKey:self.weexInstance.scriptURL.absoluteString];
+        NSMutableArray<dispatch_block_t> *tasks  = [_uiPrerenderTaskQueue objectForKey:[WXPrerenderManager getTaskKeyFromUrl:self.weexInstance.scriptURL.absoluteString]];
         if(!tasks){
             tasks = [NSMutableArray new];
         }
         [tasks addObject:block];
-        [_uiPrerenderTaskQueue setObject:tasks forKey:self.weexInstance.scriptURL.absoluteString];
+        [_uiPrerenderTaskQueue setObject:tasks forKey:[WXPrerenderManager getTaskKeyFromUrl:self.weexInstance.scriptURL.absoluteString]];
     }else{
         [_uiTaskQueue addObject:block];
     }
@@ -186,12 +186,12 @@ static NSThread *WXComponentThread;
 
 - (void)excutePrerenderUITask:(NSString *)url
 {
-    NSMutableArray *tasks  = [_uiPrerenderTaskQueue objectForKey:self.weexInstance.scriptURL.absoluteString];
+    NSMutableArray *tasks  = [_uiPrerenderTaskQueue objectForKey:[WXPrerenderManager getTaskKeyFromUrl:self.weexInstance.scriptURL.absoluteString]];
     for (id block in tasks) {
         [_uiTaskQueue addObject:block];
     }
     tasks = [NSMutableArray new];
-    [_uiPrerenderTaskQueue setObject:tasks forKey:self.weexInstance.scriptURL.absoluteString];
+    [_uiPrerenderTaskQueue setObject:tasks forKey:[WXPrerenderManager getTaskKeyFromUrl:self.weexInstance.scriptURL.absoluteString]];
 }
 
 #pragma mark Component Tree Building

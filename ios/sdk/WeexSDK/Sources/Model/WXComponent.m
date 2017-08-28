@@ -91,7 +91,8 @@
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
-        _ariaHidden = NO;
+        _ariaHidden = nil;
+        _accessible = nil;
         
         _async = NO;
         
@@ -110,10 +111,14 @@
             _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         }
         if (attributes[@"ariaHidden"]) {
-            _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+            
+            _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        }
+        if (attributes[@"accessible"]) {
+            _accessible = [WXConvert NSString:attributes[@"accessible"]];
         }
         
         if (attributes[@"testId"]) {
@@ -223,10 +228,8 @@
         
         _layer = _view.layer;
         _view.frame = _calculatedFrame;
-        
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
-        
         if (![self _needsDrawBorder]) {
             _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
@@ -262,8 +265,13 @@
         if (_ariaLabel) {
             _view.accessibilityLabel = _ariaLabel;
         }
+        if (_accessible) {
+            [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
+        }
         
-        _view.accessibilityElementsHidden = _ariaHidden;
+        if (_ariaHidden) {
+            [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+        }
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -604,8 +612,12 @@
         self.view.accessibilityTraits = _role;
     }
     if (attributes[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
-        self.view.accessibilityElementsHidden = _ariaHidden;
+        _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        [self.view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+    }
+    if (attributes[@"accessible"]) {
+        _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        [self.view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
     }
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
