@@ -31,7 +31,7 @@ describe('slider infinite scroll', function () {
 
   beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/slider-infinite.js'))
+      .get(util.getPage('/components/slider-infinite.js'))
   });
 
   afterEach(function () {
