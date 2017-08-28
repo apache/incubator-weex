@@ -144,7 +144,9 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     @Override
     protected void mountFlatGUI() {
+      if(getHostView()!=null) {
         getHostView().mountFlatGUI(widgets);
+      }
     }
 
     @Override
@@ -155,6 +157,6 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     @Override
     public boolean intendToBeFlatContainer() {
         //TODO Is it possible to remove the cell class judge
-        return getInstance().getFlatUIContext().isFlatUIEnabled() && WXCell.class.equals(getClass());
+        return getInstance().getFlatUIContext().isFlatUIEnabled() && WXCell.class.equals(getClass()) && !isSticky();
     }
 }

@@ -494,8 +494,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   private void setWidgetParams(Widget widget, FlatGUIIContext UIImp, Point rawoffset,
       int width, int height, int left, int right, int top, int bottom) {
-    Point childOffset = new Point(rawoffset.x, rawoffset.y);
+    Point childOffset = new Point();
     if (mParent != null) {
+      if (mParent instanceof FlatComponent &&
+          UIImp.getFlatComponentAncestor(mParent) != null &&
+          UIImp.getAndroidViewWidget(mParent) == null) {
+        childOffset.set(rawoffset.x, rawoffset.y);
+      } else {
+        childOffset.set(left, top);
+      }
+
       if (mParent instanceof FlatComponent &&
           UIImp.getFlatComponentAncestor(mParent) != null &&
           UIImp.getAndroidViewWidget(mParent) == null) {
@@ -515,7 +523,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     widget.setLayout(width, height, left, right, top, bottom, childOffset);
 
-    if (widget instanceof AndroidViewWidget) {
+    if (widget instanceof AndroidViewWidget && ((AndroidViewWidget) widget).getView()!=null) {
       //TODO generic method if ever possible
       setHostLayoutParams((T) ((AndroidViewWidget) widget).getView(),
           width, height, childOffset.x, right, childOffset.y, bottom);

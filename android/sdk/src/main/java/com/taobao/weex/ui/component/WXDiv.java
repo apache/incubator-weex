@@ -90,7 +90,9 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   @Override
   protected void mountFlatGUI() {
     if (promoteToView(true)) {
-      getHostView().mountFlatGUI(widgets);
+      if(getHostView()!=null) {
+        getHostView().mountFlatGUI(widgets);
+      }
     } else {
       mWidgetGroup.replaceAll(widgets);
     }
