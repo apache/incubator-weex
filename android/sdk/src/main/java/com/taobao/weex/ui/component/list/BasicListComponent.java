@@ -586,6 +586,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
+          boolean removeOldSticky = false;
           layoutManager = getHostView().getInnerView().getLayoutManager();
           if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
@@ -598,6 +599,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
                 currentStickyPos = pos;
               }
             }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
+            }
           } else if(layoutManager instanceof StaggeredGridLayoutManager){
             int [] firstItems= new int[3];
             int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
@@ -605,6 +610,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+            }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
             }
           }
 
@@ -619,7 +628,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
-          } else if (removeSticky) {
+          } else if (removeSticky || removeOldSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
           }
           cell.setLocationFromStart(top);
@@ -1204,7 +1213,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         continue;
       }
 
-      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible(true);
 
       int result = item.setAppearStatus(visible);
       if (WXEnvironment.isApkDebugable()) {
