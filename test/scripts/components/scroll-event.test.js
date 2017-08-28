@@ -28,10 +28,10 @@ var util = require("../util.js");
 describe('list scroll event', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
+  var maxW = util.getGETActionWaitTimeMills();
   beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/list-scroll.js'))
+      .get(util.getPage('/components/list-scroll.js'))
   });
 
   afterEach(function () {
@@ -42,7 +42,7 @@ describe('list scroll event', function () {
   it('#1 Drag list', () => {
     return driver
     .sleep(1000)
-    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
+    .waitForElementById('status',maxW,1000)
     .dragUp(200)
     .dragUp(200)
     .elementById('status')
