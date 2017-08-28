@@ -225,7 +225,7 @@ if (danger.git.deleted_files) {
 
 if (has_sdk_changes && !has_test_changes) {
   if(isNotDanger) warn("This PR modify SDK code without add/modify testcases.")
-  else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
+  // else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
 }
 
 if (has_sdk_changes && !has_doc_changes) {

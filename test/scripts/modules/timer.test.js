@@ -17,7 +17,6 @@ function do_test(test_title, url) {
     beforeEach(function () {
       return util.init(driver)
         .get(util.getPage(url))
-        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
     });
 
     afterEach(function () {
@@ -26,6 +25,7 @@ function do_test(test_title, url) {
 
     it('#1 SetTimeOut', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setTimeout')
         .click()
         .sleep(4000)
@@ -40,6 +40,7 @@ function do_test(test_title, url) {
 
     it('#2 SetTimeOut Double click', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setTimeout')
         .click()
         .click()
@@ -53,6 +54,7 @@ function do_test(test_title, url) {
 
     it('#3 ClearTimeOut', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setTimeout')
         .click()
         .elementById('clearTimeout')
@@ -68,6 +70,7 @@ function do_test(test_title, url) {
     let previous = 0
     it('#4 SetInterval ClearInterval', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setInterval')
         .click()
         .sleep(7000)

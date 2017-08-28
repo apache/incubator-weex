@@ -17,7 +17,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/'+goal+'.js'))
-      .waitForElementByName(goal, interval, 2000)
   });
 
   afterEach(function () {
@@ -26,6 +25,7 @@ describe('weex '+goal+' test', function () {
 
   it('#1 '+goal + ' event', () => {
     return driver
+      .waitForElementByName(goal, interval, 2000)
       // .waitForElementByName("video-fail", interval, 2000) //android未触发
       .waitForElementByName("setSrc", interval, 2000)
       .click()

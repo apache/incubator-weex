@@ -3,10 +3,18 @@
     <panel title = 'a-src' :padding-body='0'>
       <div style='flex-direction:row'>
         <button class='mr-base' type="info" size="middle" value="changeSrc" @click.native="changeSrc"></button>
+      </div>
+      <div>
         <a test-id='a-itself' class="button mr-base" :href="href">
           <text test-id='content-inside-a' class="text">Jump</text>
         </a>
+        <a class="button mr-base" href="">
+          <text class="text">JumpBlank</text>
+        </a>
+
+        <button class='mr-base' type="info" test-id='just_text' size="middle" value="jump_back" @click.native="jump_back"></button>
       </div>
+
       <panel title='校验结果：'>
         <text test-id='href' style="font-size:30px">{{href}}</text>
       </panel>
@@ -25,6 +33,8 @@
   </div>
 </template>
 <script>
+  var navigator = weex.requireModule('navigator')
+  var modal = weex.requireModule('modal')
   module.exports = {
     data : {
       href:'a-support-href1.js?_wxpage=true'
@@ -38,6 +48,15 @@
       changeSrc : function(e) {
         this.href = 'a-support-href2.js?_wxpage=true'
       },
+      jump_back : function(event) {
+        navigator.pop({
+          animated: "true"
+        }, event => {
+          modal.toast({
+            message: 'callback: ' + event
+          })
+        })
+      }
     }
   }
 </script>
