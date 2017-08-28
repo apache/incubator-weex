@@ -581,6 +581,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
+          boolean removeOldSticky = false;
           layoutManager = getHostView().getInnerView().getLayoutManager();
           if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
@@ -593,6 +594,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
                 currentStickyPos = pos;
               }
             }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
+            }
           } else if(layoutManager instanceof StaggeredGridLayoutManager){
             int [] firstItems= new int[3];
             int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
@@ -600,6 +605,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+            }
+
+            if(pos > fVisible){
+              removeOldSticky = true;
             }
           }
 
