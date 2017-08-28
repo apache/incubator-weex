@@ -19,8 +19,11 @@
 package com.taobao.weex.ui.component.list.template;
 import android.view.View;
 
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 
 /**
@@ -65,5 +68,22 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     public void setHolderPosition(int holderPosition) {
         this.holderPosition = holderPosition;
+    }
+
+
+    public WXComponent findChildByRef(WXComponent parent, String ref){
+       if(ref.equals(parent.getRef())){
+            return parent;
+       }
+       if(parent instanceof WXVContainer){
+           WXVContainer container = (WXVContainer) parent;
+           for(int i=0; i<container.getChildCount(); i++){
+               WXComponent child = findChildByRef(container.getChild(i), ref);
+               if(child != null){
+                   return  child;
+               }
+           }
+       }
+       return  null;
     }
 }

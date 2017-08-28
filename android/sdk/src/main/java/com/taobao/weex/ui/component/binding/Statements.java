@@ -79,7 +79,7 @@ public class Statements {
 
     /**
      *  @param component component with v-for statement, v-if statement and bind attrs
-     *  @param map   execute context
+     *  @param context  execute context
      *  render component in context, the function do the following  work.
      *  execute component's v-for statement, v-if statement in context,
      *  and rebuild component's tree with the statement, v-for reuse component execute by pre render.
@@ -87,12 +87,9 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    public static final void doRender(WXComponent component, Map map){
+    public static final void doRender(WXComponent component, Stack context ){
         try{
-            Stack context = new Stack();
-            context.push(map);
-            doRender(component, context);
-            context = null;
+            doRenderComponent(component, context);
         }catch (Exception e){
             WXLogUtils.e("WeexStatementRender", e);
         }
@@ -109,7 +106,7 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    static final int doRender(WXComponent component, Stack context){
+    static final int doRenderComponent(WXComponent component, Stack context){
         WXVContainer parent = component.getParent();
         WXDomObject domObject = (WXDomObject) component.getDomObject();
         WXAttr attrs = domObject.getAttrs();
@@ -189,14 +186,14 @@ public class Statements {
     }
 
     /**
-     * bind attrs and doRender next
+     * bind attrs and doRenderComponent next
      * */
     private static void doRenderChildNode(WXComponent component, Stack context){
         if(component instanceof WXVContainer){
             WXVContainer container = (WXVContainer) component;
             for(int k=0; k<container.getChildCount();){
                 WXComponent next = container.getChild(k);
-                k += doRender(next, context);
+                k += doRenderComponent(next, context);
             }
         }
     }

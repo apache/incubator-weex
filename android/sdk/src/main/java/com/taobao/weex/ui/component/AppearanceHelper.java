@@ -102,4 +102,8 @@ public class AppearanceHelper {
     return view != null && view.getLocalVisibleRect(mVisibleRect);
 
   }
+
+  public boolean isViewVisible(View view) {
+    return view != null && view.getLocalVisibleRect(mVisibleRect);
+  }
 }

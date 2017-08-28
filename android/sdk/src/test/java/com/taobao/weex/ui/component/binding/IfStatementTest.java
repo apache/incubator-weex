@@ -32,6 +32,7 @@ import java.util.Stack;
 public class IfStatementTest extends TestCase {
 
     public void  testVIfMath(){
+        Assert.assertTrue(Statements.isIfTrue("1 ?  false : true", createContext()));
         Assert.assertTrue(Statements.isIfTrue("1 >= 1", createContext()));
         Assert.assertFalse(Statements.isIfTrue("1 >= 2", createContext()));
         Assert.assertTrue(Statements.isIfTrue("1 && 1 >= 0", createContext()));

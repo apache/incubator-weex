@@ -50,6 +50,7 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
+import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
@@ -62,7 +63,6 @@ import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.binding.Layouts;
 import com.taobao.weex.ui.component.binding.Statements;
-import com.taobao.weex.ui.component.list.BasicListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
@@ -76,9 +76,10 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +128,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Point mLastReport = new Point(-1, -1);
 
     private JSONArray listData;
+    private String listDataKey = "listData";
+    private String listDataItemKey ="item";
+    private String listDataIndexKey = "index";
     private ArrayMap<String, Integer> mTemplateViewTypes;
     private Map<String, WXCell> mTemplates;
     private String listDataTemplateKey = Constants.Name.LIST_TEMPLATE_ID;
@@ -142,7 +146,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     /**
      * appear and disappear event managaer
      * */
-    private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
+    private Map<Integer, AppearanceHelper> mAppearHelpers = new HashMap<>();
 
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
         super(instance, node, parent);
@@ -349,7 +353,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void bindStickStyle(WXComponent component) {
-        WXComponent  template = findCell(component);
+        WXComponent  template = findParentType(component, WXCell.class);
         if(template == null){
             return;
         }
@@ -367,7 +371,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void unbindStickStyle(WXComponent component) {
-        WXComponent  template = findCell(component);
+        WXComponent  template = findParentType(component, WXCell.class);
         if(template == null
                 || listData == null
                 || mStickyHelper == null){
@@ -388,23 +392,31 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return null;
         }
 
-        if (parent instanceof BasicListComponent) {
+        if (parent instanceof WXRecyclerTemplateList) {
             return component;
         }
         return findCell(parent);
     }
 
     private void setAppearanceWatch(WXComponent component, int event, boolean enable) {
-        AppearanceHelper item = mAppearComponents.get(component.getRef());
-        if (item != null) {
-            item.setWatchEvent(event, enable);
-        }else {
-            WXComponent cell = findCell(component);
-            int type = getCellItemType(cell);
-            if (type > 0) {
-                item = new AppearanceHelper(component,  type);
-                item.setWatchEvent(event, enable);
-                mAppearComponents.put(component.getRef(), item);
+        if(listData == null){
+            return;
+        }
+        WXComponent cell = findCell(component);
+        int type = getCellItemType(cell);
+        if(type < 0){
+            return;
+        }
+        for(int position=0; position<listData.size(); position++){
+            if(type == getItemViewType(position)){
+                AppearanceHelper item = mAppearHelpers.get(position);
+                if (item != null) {
+                    item.setWatchEvent(event, enable);
+                }else {
+                    item = new AppearanceHelper(component,  type);
+                    item.setWatchEvent(event, enable);
+                    mAppearHelpers.put(position, item);
+                }
             }
         }
     }
@@ -583,14 +595,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     private void relocateAppearanceHelper() {
-        Iterator<Map.Entry<String, AppearanceHelper>> iterator = mAppearComponents.entrySet().iterator();
+        /**
+        Iterator<Map.Entry<String, AppearanceHelper>> iterator = mAppearHelpers.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, AppearanceHelper> item = iterator.next();
             AppearanceHelper value = item.getValue();
             WXComponent dChild = findCell(value.getAwareChild());
             int index = mChildren.indexOf(dChild);
             value.setCellPosition(index);
-        }
+        }*/
     }
 
     /**
@@ -690,13 +703,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     protected boolean setProperty(String key, Object param) {
         switch (key) {
             case Constants.Name.LIST_DATA:{
-                     if(param instanceof  JSONArray){
-                         boolean update = listData != null;
-                         listData = (JSONArray) param;
-                         if(update){
-                             getHostView().post(notifyUpdate);
-                         }
-                     }
+                     setListData(param);
                 }
                 return true;
             case Constants.Name.LIST_TEMPLATE_ID_KEY:
@@ -714,6 +721,35 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 return true;
         }
         return super.setProperty(key, param);
+    }
+
+
+    public void setListData(Object param){
+        boolean update = listData != null;
+        if(param instanceof  JSONArray){
+            listData = (JSONArray) param;
+        }else if (param instanceof  JSONObject){
+            JSONObject data = null;
+            Object repeat = ((JSONObject) param).getJSONObject(WXStatement.WX_FOR);
+            if(repeat instanceof JSONObject){
+                data = (JSONObject )repeat;
+            }else{
+                data = (JSONObject )param;
+            }
+            Object list = data.get(WXStatement.WX_FOR_LIST);
+            if(list instanceof JSONArray){
+                listData = (JSONArray) list;
+                if(data.getString(WXStatement.WX_FOR_INDEX) != null) {
+                    listDataIndexKey = data.getString(WXStatement.WX_FOR_INDEX);
+                }
+                if(data.getString(WXStatement.WX_FOR_ITEM) != null) {
+                    listDataItemKey = data.getString(WXStatement.WX_FOR_ITEM);
+                }
+            }
+        }
+        if(update){
+            getHostView().post(notifyUpdate);
+        }
     }
 
     @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
@@ -974,11 +1010,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return;
         }
         long start = System.currentTimeMillis();
-        WXCell cell = (WXCell) holder.getComponent();
         TemplateViewHolder templateViewHolder = (TemplateViewHolder) holder;
         templateViewHolder.setHolderPosition(position);
-        cell.setData(listData.get(position));
-        Statements.doRender(component, (Map) listData.get(position));
+        Statements.doRender(component, getItemContextForPosition(position));
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
         Log.e(TAG, "onBindViewHolder used " + (System.currentTimeMillis() - start));
     }
@@ -1025,6 +1059,19 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return type;
     }
 
+
+    public Stack getItemContextForPosition(int position){
+        Stack stack = new Stack();
+        Map map = new HashMap();
+        Object item = listData.get(position);
+        map.put(listDataIndexKey, position);
+        map.put(listDataItemKey, item);
+        map.put(listDataKey, listData);
+        stack.push(map);
+        stack.push(item);
+        return stack;
+    }
+
     /**
      * return tepmlate key for position
      * */
@@ -1049,6 +1096,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
      * get template key from cell; 0  for default type
      * */
     private int getCellItemType(WXComponent cell){
+        if(cell == null){
+            return  -1;
+        }
         if(cell.getDomObject() != null && cell.getDomObject().getAttrs() != null){
             Object templateId = cell.getDomObject().getAttrs().get(Constants.Name.LIST_TEMPLATE_ID);
             String template = WXUtils.getString(templateId, null);
@@ -1089,9 +1139,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     public long getItemId(int position) {
         if(getItemViewType(position) <= 0){
-            long id = position;
-            id = id << 30;
-            return  id;
+            return RecyclerView.NO_ID;
         }
         JSONObject data = listData.getJSONObject(position);
         if(data.containsKey(Constants.Name.LIST_WX_DATA_ITEM_KEY)) {
@@ -1130,7 +1178,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
-        if(mAppearComponents == null || mAppearComponents.size() <= 0){
+        if(mAppearHelpers == null || mAppearHelpers.size() <= 0){
             return;
         }
         String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
@@ -1138,45 +1186,58 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
             direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
         }
-        //notify appear event
-        for(int i=firstVisible; i<=lastVisible; i++){
-
-        }
-
-
-
-
-
-
-        //notify appear state
-        Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
-
-
-        while (it.hasNext()) {
-            AppearanceHelper item = it.next();
-            WXComponent component = item.getAwareChild();
-
-            if (!item.isWatch()) {
+        RecyclerView recyclerView = getHostView().getInnerView();
+        Set<Map.Entry<Integer, AppearanceHelper>> entries = mAppearHelpers.entrySet();
+        for(Map.Entry<Integer, AppearanceHelper> entry : entries){
+            int position = entry.getKey();
+            AppearanceHelper helper = entry.getValue();
+            WXComponent eventComponent = null;
+            if(!helper.isWatch()){
                 continue;
             }
-
-            boolean outOfVisibleRange = item.getCellPositionINScollable() < firstVisible || item.getCellPositionINScollable() > lastVisible;
-
-            View view = component.getHostView();
-            if (view == null) {
+            boolean outOfVisibleRange = position < firstVisible || position > lastVisible;
+            boolean hasAppear = false;
+            if(!outOfVisibleRange){
+                TemplateViewHolder itemHolder = (TemplateViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+                if(itemHolder == null){
+                    return;
+                }
+                WXComponent appearCellChild = itemHolder.findChildByRef(itemHolder.getComponent(), helper.getAwareChild().getRef());
+                hasAppear = helper.isViewVisible(appearCellChild.getHostView());
+                eventComponent = appearCellChild;
+            }
+            int appearStateChanged = helper.setAppearStatus(hasAppear);
+            if(appearStateChanged == AppearanceHelper.RESULT_NO_CHANGE){
                 continue;
             }
-
-            boolean visible = (!outOfVisibleRange) && item.isViewVisible();
-
-            int result = item.setAppearStatus(visible);
-            if (WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
-            }
-            if (result == AppearanceHelper.RESULT_NO_CHANGE) {
+            Log.e("weex", "weex render fire for event" + position);
+            if(eventComponent != null){
+                eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
                 continue;
             }
-            component.notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+            eventComponent = helper.getAwareChild();
+            if(eventComponent.getDomObject().getEvents().getEventBindingArgs() == null){
+                eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+                continue;
+            }
+            TemplateViewHolder itemHolder = (TemplateViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+            if(itemHolder != null){
+                eventComponent = itemHolder.findChildByRef(itemHolder.getComponent(), helper.getAwareChild().getRef());
+                if(eventComponent != null){
+                    eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+                    return;
+                }
+                eventComponent =  helper.getAwareChild();
+            }
+            Log.e("weex", "weex render compontent for event" + position);
+            WXCell cell = (WXCell) findCell(helper.getAwareChild());
+            if(cell == null){
+                continue;
+            }
+            Statements.doRender(cell, getItemContextForPosition(position));
+
+            eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+
         }
     }
 
@@ -1264,5 +1325,18 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return offset;
         }
         return -1;
+    }
+
+    /**
+     * find certain class type parent
+     * */
+    public  WXComponent findParentType(WXComponent component, Class type){
+        if(component.getClass() == type){
+            return component;
+        }
+        if(component.getParent() != null) {
+            findTypeParent(component.getParent(), type);
+        }
+        return  null;
     }
 }

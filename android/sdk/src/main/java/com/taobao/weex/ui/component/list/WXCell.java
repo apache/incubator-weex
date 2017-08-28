@@ -47,9 +47,6 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     private int mScrollPositon = -1;
 
 
-    private Object  data;
-
-
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         this(instance,dom,parent,isLazy);
@@ -129,14 +126,5 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         getHostView().addView(mHeadView);
         mHeadView.setTranslationX(0);
         mHeadView.setTranslationY(0);
-    }
-
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
     }
 }
