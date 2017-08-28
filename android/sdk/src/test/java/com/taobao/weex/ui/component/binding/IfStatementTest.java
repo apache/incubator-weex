@@ -40,6 +40,10 @@ public class IfStatementTest extends TestCase {
         Assert.assertTrue(Statements.isIfTrue("1 >= '1'", createContext()));
         Assert.assertTrue(Statements.isIfTrue("0 >= '-1'", createContext()));
         Assert.assertTrue(Statements.isIfTrue("0 >= '-1", createContext()));
+        Assert.assertFalse(Statements.isIfTrue("!(source)", createContext()));
+
+
+
 
 
         Assert.assertFalse(Statements.isIfTrue("1 > 1", createContext()));
@@ -117,6 +121,7 @@ public class IfStatementTest extends TestCase {
     private Stack createContext(){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
+        data.put("source", true);
         data.getJSONObject("item").put("name", "hello world");
 
         Stack context = new Stack();
