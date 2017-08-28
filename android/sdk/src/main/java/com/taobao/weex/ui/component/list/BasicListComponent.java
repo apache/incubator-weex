@@ -1235,7 +1235,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         continue;
       }
 
-      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible(true);
 
       int result = item.setAppearStatus(visible);
       if (WXEnvironment.isApkDebugable()) {
