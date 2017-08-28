@@ -623,7 +623,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
-          } else if (removeSticky) {
+          } else if (removeSticky || removeOldSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
           }
           cell.setLocationFromStart(top);
