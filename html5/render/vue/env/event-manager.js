@@ -82,9 +82,9 @@ function _init (doc) {
   _inited = true
   const _sp = supportsPassive()
   events.forEach(function (evt) {
-    const option = needPassive.indexOf(evt) > -1 && _sp
-      ? { passive: true }
-      : false
+    const option = evt === 'click' 
+      ? true : needPassive.indexOf(evt) > -1 && _sp
+      ? { passive: true } : false
     doc.addEventListener(evt, function (e) {
       const el = e.target
       let vm = el.__vue__
@@ -94,6 +94,8 @@ function _init (doc) {
        * take full control of redirection of <a> element.
        */
       if (evtName === 'click') {
+        // use '_triggered' to control bubbles event.
+        e._triggered = { target: vm.$el }
         e.preventDefault()
         return
       }
@@ -134,7 +136,12 @@ function _init (doc) {
           const target = elm.getAttribute('target')
           disposed = true
           if (target !== '_blank') {
-            location.href = href
+            if (!!href) {
+              location.href = href
+            }
+            else {
+              console.warn('[weex-vue-render] If you want to use the A tag jump, set the href attribute')
+            }
           }
           else {
             // do nothing.

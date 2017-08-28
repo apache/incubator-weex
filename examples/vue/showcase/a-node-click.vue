@@ -1,9 +1,9 @@
 <template>
   <list class="list">
     <cell class="cell" @click="clickCell">
-      <xlink style="width: 400px;height: 400px;background-color: yellow;" :href = "url">
-        <div class="ct" @click="click">
-          <text >CLICK ME</text>
+      <xlink style="width: 400px;height: 400px;background-color: yellow;" target="_blank" :href = "url">
+        <div class="ct"  @click="click">
+          <text>CLICK ME</text>
         </div>
       </xlink>
     </cell>
