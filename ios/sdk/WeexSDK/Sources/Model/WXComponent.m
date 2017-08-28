@@ -447,9 +447,7 @@
             _transition = [WXTransition new];
         }
         [_transition _handleTransitionWithStyles:styles withTarget:self];
-    }
-    else
-    {
+    } else {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
     }
@@ -463,7 +461,7 @@
 - (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"width"]&&styles[@"width"])
             ||([property containsString:@"height"]&&styles[@"height"])
@@ -483,7 +481,7 @@
 - (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
             ||([property containsString:@"transform"]&&styles[@"transform"])
@@ -527,9 +525,7 @@
     WXAssertMainThread();
     if (![self _isPropertyAnimationStyles:styles]) {
         [self _updateViewStyles:styles];
-    }
-    else
-    {
+    } else {
         [self _transitionUpdateViewProperty:styles];
     }
     
