@@ -349,7 +349,6 @@ typedef enum : NSUInteger {
 {
     NSString *url = @"";
     if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
-        [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
         url = [self.scriptURL absoluteString];
     }
     if (!self.instanceId) {
@@ -357,6 +356,7 @@ typedef enum : NSUInteger {
         return;
     }
     
+    [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
@@ -373,7 +373,7 @@ typedef enum : NSUInteger {
         });
     });
     if(url.length > 0){
-        [WXPrerenderManager addTask:url instanceId:@"" callback:nil];
+        [WXPrerenderManager addGlobalTask:url callback:nil];
     }
 }
 
