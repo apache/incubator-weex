@@ -20,7 +20,6 @@ package com.taobao.weex.ui.component.binding;
 
 import android.graphics.Color;
 import android.support.v4.util.ArrayMap;
-import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -29,8 +28,8 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.binding.BindingUtils;
 import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
-import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -116,14 +115,17 @@ public class Statements {
         if(statement != null){
             WXDomObject parentDomObject = (WXDomObject) parent.getDomObject();
             JSONObject vfor = (JSONObject) statement.get(WXStatement.WX_FOR);
-            String vif = (String) statement.get(WXStatement.WX_IF);
+            Block vif = (Block) statement.get(WXStatement.WX_IF);
             int renderIndex = parent.indexOf(component);
             // execute v-for content
             if(vfor != null){
-                String listKey = vfor.getString(WXStatement.WX_FOR_LIST);
+                Object data = null;
+                Block listBlock = (Block) vfor.get(WXStatement.WX_FOR_LIST);
                 String indexKey = vfor.getString(WXStatement.WX_FOR_INDEX);
                 String itemKey = vfor.getString(WXStatement.WX_FOR_ITEM);
-                Object data = Parser.parse(listKey).execute(context);
+                if(listBlock != null) {
+                    data = listBlock.execute(context);
+                }
                 if(data instanceof List){
                     List list = (List) data;
                     Map<String, Object> loop = new HashMap<>();
@@ -131,8 +133,8 @@ public class Statements {
                     for(int i=0; i<list.size(); i++){
                         loop.put(indexKey, i);
                         loop.put(itemKey, list.get(i));
-                        if(!TextUtils.isEmpty(vif)){
-                            if(!isIfTrue(vif, context)){
+                        if(vif != null){
+                            if(!Operators.isTrue(vif.execute(context))){
                                 continue;
                             }
                         }
@@ -176,7 +178,7 @@ public class Statements {
 
             //execute v-if context
             if(vif != null){
-                if(!isIfTrue(vif, context)){
+                if(!Operators.isTrue(vif.execute(context))){
                     component.setWaste(true);
                     return 1;
                 }
@@ -218,7 +220,7 @@ public class Statements {
                 && domObject.getAttrs().getBindingAttrs() != null
                 && domObject.getAttrs().getBindingAttrs().size() > 0){
             ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
-            Map<String, Object> dynamic =  getDynamicAttrs(bindAttrs, context);
+            Map<String, Object> dynamic =  getBindingAttrs(bindAttrs, context);
             domObject.updateAttr(dynamic);
             component.updateProperties(dynamic);
         }
@@ -228,7 +230,7 @@ public class Statements {
         }
         Set<Map.Entry<String, Object>> eventBindArgsEntrySet = event.getEventBindingArgs().entrySet();
         for(Map.Entry<String, Object> eventBindArgsEntry : eventBindArgsEntrySet){
-             List<Object> values = getBindingEventArgsValue(context, eventBindArgsEntry.getValue());
+             List<Object> values = getBindingEventArgs(context, eventBindArgsEntry.getValue());
              if(values != null){
                  event.putEventBindingArgsValue(eventBindArgsEntry.getKey(), values);
              }
@@ -241,7 +243,7 @@ public class Statements {
      * @param  context  context
      * return binding attrs rended value in context
      * */
-    public static Map<String, Object> getDynamicAttrs(ArrayMap bindAttrs, Stack context){
+    private static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, Stack context){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){
@@ -251,9 +253,10 @@ public class Statements {
             if(key.equals("text")){
                 key = "value";
             }
-            if(entry.getValue() instanceof  JSONObject && ((JSONObject) binding).containsKey(BindingUtils.BINDING)){
-                Object bindingValue = getBindingValue(((JSONObject) binding).getString(BindingUtils.BINDING), context);
-                dynamic.put(key, bindingValue);
+            if(entry.getValue() instanceof  JSONObject
+                    && (((JSONObject) binding).get(BindingUtils.BINDING)  instanceof  Block)){
+                Block block = (Block) (((JSONObject) binding).get(BindingUtils.BINDING));
+                dynamic.put(key, block.execute(context));
             }else if(binding instanceof JSONArray){
                 JSONArray array = (JSONArray) binding;
                 StringBuilder builder = new StringBuilder();
@@ -263,12 +266,14 @@ public class Statements {
                         builder.append(value);
                         continue;
                     }
-                    if(value instanceof JSONObject && ((JSONObject) value).containsKey(BindingUtils.BINDING)){
-                        Object bindingValue = getBindingValue( ((JSONObject) value).getString(BindingUtils.BINDING), context);
-                        if(bindingValue == null){
-                            bindingValue = "";
+                    if(value instanceof JSONObject
+                            && (((JSONObject) value).get(BindingUtils.BINDING) instanceof Block)){
+                        Block block = (Block) (((JSONObject) value).get(BindingUtils.BINDING));
+                        Object blockValue = block.execute(context);
+                        if(blockValue == null){
+                            blockValue = "";
                         }
-                        builder.append(bindingValue);
+                        builder.append(blockValue);
                     }
                 }
                 dynamic.put(key, builder.toString());
@@ -277,47 +282,33 @@ public class Statements {
         return  dynamic;
     }
 
-    public static List<Object> getBindingEventArgsValue(Stack context, Object bindings){
+    private static List<Object> getBindingEventArgs(Stack context, Object bindings){
           List<Object>  params = new ArrayList<>(4);
           if(bindings instanceof  JSONArray){
               JSONArray array = (JSONArray) bindings;
               for(int i=0; i<array.size(); i++){
                   Object value = array.get(i);
-                  if(value instanceof  JSONObject && ((JSONObject) value).containsKey(BindingUtils.BINDING)){
-                      Object bindingValue = getBindingValue(((JSONObject)value).getString(BindingUtils.BINDING), context);
-                      params.add(bindingValue);
+                  if(value instanceof  JSONObject
+                          && (((JSONObject) value).get(BindingUtils.BINDING) instanceof  Block)){
+                      Block block = (Block)(((JSONObject) value).get(BindingUtils.BINDING));
+                      Object blockValue = block.execute(context);
+                      params.add(blockValue);
                   }else{
                       params.add(value);
                   }
               }
-
-
           }else if(bindings instanceof  JSONObject){
               JSONObject binding = (JSONObject) bindings;
-               if(binding.containsKey(BindingUtils.BINDING)){
-                   Object bindingValue = getBindingValue(binding.getString(BindingUtils.BINDING), context);
-                   params.add(bindingValue);
+               if(binding.get(BindingUtils.BINDING) instanceof  Block){
+                   Block block = (Block) binding.get(BindingUtils.BINDING);
+                   Object blockValue = block.execute(context);
+                   params.add(blockValue);
                }else{
-                   params.add(bindings);
+                   params.add(bindings.toString());
                }
           }else{
               params.add(bindings.toString());
           }
           return  params;
-    }
-
-
-    /**
-     * */
-    public static Object getBindingValue(String expression, Stack context){
-         return Parser.parse(expression).execute(context);
-    }
-
-    /**
-     * check vif is true in context. vif can contain's
-     * operator parse priority
-     * */
-    public static boolean isIfTrue(String vif, Stack context){
-        return Operators.isTrue(Parser.parse(vif).execute(context));
     }
 }

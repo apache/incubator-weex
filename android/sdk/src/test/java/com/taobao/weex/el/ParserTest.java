@@ -82,6 +82,7 @@ public class ParserTest extends TestCase {
 
 
     public void  testEl(){
+        Assert.assertEquals(21.0, Parser.parse("item[1] + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item.name + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item[name] + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item[name + index").execute(createContext()));
@@ -110,6 +111,7 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
         Parser.parse("item.code  \"string test \" ( item.ddd)  .item  1000  ccc ? ddd : 0");
         Parser.parse("1+e6");
+        show(null);
 
         show("()++++");
     }
@@ -145,6 +147,7 @@ public class ParserTest extends TestCase {
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
         data.put("index", 20);
+        data.put("1", 10);
         data.put("source", true);
         data.put("e6", 10);
         data.put("e7", "e7hello");

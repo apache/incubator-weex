@@ -196,7 +196,7 @@ public class Parser {
                 operator.self = stacks.pop();
                 return operator;
             }
-            return null; //invalid
+            return operator; //invalid
         }
         if(stacks.size() > secondMin) {
             operator.second = stacks.pop();

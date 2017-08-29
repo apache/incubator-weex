@@ -20,6 +20,8 @@ package com.taobao.weex.dom.binding;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.el.parse.Block;
+import com.taobao.weex.el.parse.Parser;
 
 /**
  * util's for binding and statment
@@ -50,14 +52,48 @@ public class BindingUtils {
     }
 
     /**
-     * @param name value check object is statement
+     * parse binding code to block, enable fast execute
      * */
-
-    public static boolean isStatement(String name){
-        if(WXStatement.WX_IF.equals(name) || WXStatement.WX_FOR.equals(name)){
-            return  true;
+    public static Object bindingBlock(Object value){
+        if(value instanceof JSONObject){
+            JSONObject  object = (JSONObject) value;
+            if(object.containsKey(BINDING)){
+                Object binding = object.get(BINDING);
+                if(!(binding instanceof Block)){
+                    object.put(BINDING, Parser.parse(binding.toString()));
+                }
+            }
+        }else if(value instanceof JSONArray){
+            JSONArray array = (JSONArray) value;
+            for(int i=0; i<array.size(); i++){
+                bindingBlock(array.get(i));
+            }
         }
-        return  false;
+        return  value;
+    }
+
+    public static boolean isVif(String name){
+        return WXStatement.WX_IF.equals(name);
+    }
+
+    public static boolean isVfor(String name){
+        return WXStatement.WX_FOR.equals(name);
+    }
+
+    public static Block vifBlock(String code){
+        return Parser.parse(code);
+    }
+
+    public static Object vforBlock(Object vfor){
+        if(vfor instanceof  JSONObject){
+            if(((JSONObject) vfor).containsKey(WXStatement.WX_FOR_LIST)){
+                Object list = ((JSONObject) vfor).get(WXStatement.WX_FOR_LIST);
+                if(!(list instanceof Block)){
+                    ((JSONObject) vfor).put(WXStatement.WX_FOR_LIST, Parser.parse(list.toString()));
+                }
+            }
+        }
+        return vfor;
     }
 
 

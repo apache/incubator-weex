@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.binding;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.el.parse.Parser;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -32,19 +33,23 @@ import java.util.Stack;
 public class BindingValueTest extends TestCase {
 
     public void testBindingValue(){
-        Assert.assertTrue(Statements.getBindingValue("true ? true : false", createContext()).equals("true"));
-        Assert.assertTrue(Statements.getBindingValue("true ? item.name : false", createContext()).equals("hello world"));
-        Assert.assertTrue(Statements.getBindingValue("false ? item.name : false", createContext()).equals("false"));
-        Assert.assertTrue(Statements.getBindingValue("item.name ? item.name : false", createContext()).equals("hello world"));
-        Assert.assertTrue(Statements.getBindingValue("item.name > 0 ? item.name : false", createContext()).equals("false"));
-        Assert.assertTrue(Statements.getBindingValue("? item.name : false", createContext()).equals("false"));
+        Assert.assertTrue(getBindingValue("true ? true : false", createContext()).equals("true"));
+        Assert.assertTrue(getBindingValue("true ? item.name : false", createContext()).equals("hello world"));
+        Assert.assertTrue(getBindingValue("false ? item.name : false", createContext()).equals("false"));
+        Assert.assertTrue(getBindingValue("item.name ? item.name : false", createContext()).equals("hello world"));
+        Assert.assertTrue(getBindingValue("item.name > 0 ? item.name : false", createContext()).equals("false"));
+        Assert.assertTrue(getBindingValue("? item.name : false", createContext()).equals("false"));
     }
 
 
     public void testDebug(){
-        Assert.assertTrue(Statements.getBindingValue("? item.name : false", createContext()).equals("false"));
+        Assert.assertTrue(getBindingValue("? item.name : false", createContext()).equals("false"));
     }
 
+
+    private Object getBindingValue(String expression, Stack context){
+        return Parser.parse(expression).execute(context);
+    }
 
     private Stack createContext(){
         JSONObject data = new JSONObject();

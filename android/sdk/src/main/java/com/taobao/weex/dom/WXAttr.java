@@ -70,7 +70,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
-    attr.putAll(filterBindingAttrsStatement(standardMap));
+    attr.putAll(filterBindingStatement(standardMap));
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -398,7 +398,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public Object put(String key, Object value) {
-    if(filterBindingAttrsStatement(key, value)){
+    if(filterBindingStatement(key, value)){
       return null;
     }
     return attr.put(key,value);
@@ -406,7 +406,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.attr.putAll(filterBindingAttrsStatement(map));
+    this.attr.putAll(filterBindingStatement(map));
   }
 
   @Override
@@ -453,7 +453,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic state ment
    * */
-  private Map<String, Object> filterBindingAttrsStatement(Map attrs) {
+  private Map<String, Object> filterBindingStatement(Map attrs) {
     if(attrs == null || attrs.size() == 0){
       return attrs;
     }
@@ -461,15 +461,18 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
         Map.Entry<String,Object> entry = it.next();
-        if(filterBindingAttrsStatement(entry.getKey(), entry.getValue())){
+        if(filterBindingStatement(entry.getKey(), entry.getValue())){
            it.remove();
         }
     }
     return attrs;
   }
 
-  private boolean filterBindingAttrsStatement(String key, Object value) {
-        //FIXME REMOVE CODE
+  /**
+   * filter dynamic attrs and statements
+   * */
+  private boolean filterBindingStatement(String key, Object value) {
+        //FIXME REMOVE Test CODE
         if(value instanceof  String){
           if(((String) value).startsWith("{") && ((String) value).endsWith("}")
                   || (((String) value).startsWith("[") && ((String) value).endsWith("]"))){
@@ -480,16 +483,24 @@ public class WXAttr implements Map<String, Object>,Cloneable {
           if(mBindingAttrs == null){
               mBindingAttrs = new ArrayMap<String, Object>();
           }
+          value = BindingUtils.bindingBlock(value);
           mBindingAttrs.put(key, value);
           return  true;
         }
-
-        if(BindingUtils.isStatement(key)){
+        if(BindingUtils.isVif(key)){
           if(mStatement == null){
-            mStatement = new WXStatement();
+             mStatement = new WXStatement();
           }
-          mStatement.put(key, value);
+          mStatement.put(key, BindingUtils.vifBlock(value.toString()));
           return  true;
+        }
+
+        if(BindingUtils.isVfor(key)){
+           if(mStatement == null){
+              mStatement = new WXStatement();
+           }
+           value = BindingUtils.vforBlock(value);;
+           mStatement.put(key, value);
         }
         return  false;
   }
