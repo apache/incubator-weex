@@ -165,6 +165,7 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.3.2'
     testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
+
 }
 if(file('../license/LICENSE').exists()){
     license {

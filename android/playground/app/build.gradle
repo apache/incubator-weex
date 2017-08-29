@@ -1,11 +1,6 @@
 apply plugin: 'com.android.application'
 apply from: '../../jacoco.gradle'
 
-//apply plugin: 'jacoco'
-//
-//jacoco {
-//    toolVersion = "0.7.9+"
-//}
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -51,6 +46,7 @@ android {
             java {
                 srcDirs = ["src/main/java", "src/main/java_zxing"];
             }
+            resources.includes = [ '**/jacoco-agent.properties' ]
         }
     }
     lintOptions {
@@ -113,6 +109,4 @@ dependencies {
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     compile 'com.taobao.android:weex_inspector:0.11.0'
-//    compile group: 'org.jruby', name: 'jruby', version: '1.4.1+'
-    compile 'org.jacoco:org.jacoco.agent:0.7.9'
 }

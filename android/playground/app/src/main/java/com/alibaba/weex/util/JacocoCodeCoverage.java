@@ -20,6 +20,8 @@
 package com.alibaba.weex.util;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,35 +76,17 @@ public class JacocoCodeCoverage {
 	  WXLogUtils.d( TAG, "generateCoverageReport: ok! " +
 			  "file in [Android/data/com.alibaba.weex/files]" );
 
-	} catch (ClassNotFoundException e) {
-	  reportJacocoError(e);
-	} catch (SecurityException e) {
-	  reportJacocoError(e);
-	} catch (NoSuchMethodException e) {
-	  reportJacocoError(e);
-	} catch (IllegalArgumentException e) {
-	  reportJacocoError(e);
-	} catch (IllegalAccessException e) {
-	  reportJacocoError(e);
-	} catch (InvocationTargetException e) {
-	  reportJacocoError(e);
-	} catch (FileNotFoundException e){
-	  reportJacocoError(e);
-	} catch (IOException e) {
-	  reportJacocoError(e);
+	} catch (Exception e) {
+	  Log.e(TAG, e.toString());
 	} finally {
 	  if (out != null) {
 		try {
 		  out.close();
 		} catch (IOException e) {
-		  reportJacocoError(e);
+		  Log.e(TAG, e.getMessage().toString());
 		}
 	  }
 	}
-  }
-
-  private static void reportJacocoError(Exception e) {
-	WXLogUtils.e(TAG, e.toString());
   }
 }
 

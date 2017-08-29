@@ -9,9 +9,7 @@ jacoco {
 
 def coverageSourceDirs = [
         '../app/src/main/java',
-        '../../../android/sdk/src/main/java'
-
-]
+        '../../../android/sdk/src/main/java']
 
 task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
@@ -34,7 +32,7 @@ task jacocoTestReport(type: JacocoReport) {
 
 
 
-    executionData = files("$buildDir/outputs/code-coverage/connected/coverage.exec")
+    executionData = files("$buildDir/outputs/code-coverage/connected/coverage.ec")
     doFirst {
         new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
             if (file.name.contains('$$')) {
