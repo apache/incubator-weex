@@ -120,7 +120,7 @@
     }
     
     [_instance destroyInstance];
-    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+    if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
     }
 
@@ -154,7 +154,7 @@
         [weakSelf _updateInstanceState:WeexInstanceAppear];
     };
     
-    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+    if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
