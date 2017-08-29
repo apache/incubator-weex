@@ -27,6 +27,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Layout;
 import android.view.ViewGroup;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -162,16 +163,23 @@ public class WXText extends WXComponent<WXTextView> {
   @Override
   public void destroy() {
     super.destroy();
-    if (getContext() != null && mTypefaceObserver != null) {
-      LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTypefaceObserver);
+    if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
+      WXLogUtils.d("WXText", "Unregister the typeface observer");
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
+      mTypefaceObserver = null;
     }
   }
 
   private void registerTypefaceObserver(String desiredFontFamily) {
-    if (getContext() == null) {
-      WXLogUtils.w("WXText", "Content is null on register typeface observer");
+    if (WXEnvironment.getApplication() == null) {
+      WXLogUtils.w("WXText", "ApplicationContent is null on register typeface observer");
+      return;
     }
     mFontFamily = desiredFontFamily;
+    if (mTypefaceObserver != null) {
+      return;
+    }
+
     mTypefaceObserver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -181,20 +189,21 @@ public class WXText extends WXComponent<WXTextView> {
         }
 
         FontDO fontDO = TypefaceUtil.getFontDO(fontFamily);
-        if (fontDO != null && fontDO.getTypeface() != null) {
-          Layout layout = getHostView().getTextLayout();
+        if (fontDO != null && fontDO.getTypeface() != null && getHostView() != null) {
+          WXTextView hostView = getHostView();
+          Layout layout = hostView.getTextLayout();
           if (layout != null) {
             layout.getPaint().setTypeface(fontDO.getTypeface());
             WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
           } else {
             WXLogUtils.w("WXText", "Layout not created");
           }
-          getHostView().invalidate();
+          hostView.invalidate();
         }
         WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
       }
     };
 
-    LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
   }
 }
