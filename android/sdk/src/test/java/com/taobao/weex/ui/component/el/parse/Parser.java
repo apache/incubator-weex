@@ -24,13 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import static com.taobao.weex.ui.component.el.parse.Operator.AND_NOT;
-import static com.taobao.weex.ui.component.el.parse.Operator.CONDITION_IF_STRING;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_BLOCK;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_DOUBLE;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_INT;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_OPERATOR;
 import static com.taobao.weex.ui.component.el.parse.Token.keywords;
+import static com.taobao.weex.ui.component.el.parse.Operators.*;
 
 /**
  * Created by furture on 2017/8/28.
@@ -82,17 +81,17 @@ public class Parser {
         char ch = nextToken();
         if(Character.isJavaIdentifierStart(ch)){
             scanEl();
-        }else if (ch == EL.BRACKET_START) {
+        }else if (ch == BRACKET_START) {
             scanBracket();
-        }else if (ch ==  EL.QUOTE || ch == EL.SINGLE_QUOTE) {
+        }else if (ch ==  QUOTE || ch == SINGLE_QUOTE) {
             scanString();
-        }else if((ch == EL.DOT && Character.isDigit(code.charAt(position + 1))) || Character.isDigit(ch)){ //number .00 .00e6
+        }else if((ch == DOT && Character.isDigit(code.charAt(position + 1))) || Character.isDigit(ch)){ //number .00 .00e6
             scanNumber();
-        }else if(ch ==  Operator.CONDITION_IF){
+        }else if(ch ==  CONDITION_IF){
             scanIf();
-        }else if(ch ==  Operator.CONDITION_IF_MIDDLE){
+        }else if(ch ==  CONDITION_IF_MIDDLE){
             return ch;
-        }else if(ch ==  EL.BRACKET_END){
+        }else if(ch ==  BRACKET_END){
             return ch;
         }else if(ch ==  ' '){
             position++;
@@ -112,16 +111,16 @@ public class Parser {
         int length = Math.min(position + 3, code.length());
         String operator = code.substring(position, length);
         if(operator.length() >= 3){
-            if(!Operator.PRIORITY_MAP.containsKey(operator)){
+            if(!OPERATORS_PRIORITY.containsKey(operator)){
                 operator = operator.substring(0, 2);
             }
         }
         if(operator.length() >= 2){
-            if(!Operator.PRIORITY_MAP.containsKey(operator)){
+            if(!OPERATORS_PRIORITY.containsKey(operator)){
                 operator = operator.substring(0, 1);
             }
         }
-        if(!Operator.PRIORITY_MAP.containsKey(operator)){
+        if(!OPERATORS_PRIORITY.containsKey(operator)){
             //just skip illegal character
             int illegalChar = Math.min(start + 1, code.length());
             WXLogUtils.e("weex", new IllegalArgumentException(code.substring(0, illegalChar) + " illegal code operator" + operator));
@@ -129,7 +128,7 @@ public class Parser {
             return;
         }
         if((!operators.isEmpty() && operators.peek() != null)){
-            if(Operator.PRIORITY_MAP.get(operators.peek()) >= Operator.PRIORITY_MAP.get(operator)){
+            if(OPERATORS_PRIORITY.get(operators.peek()) >= OPERATORS_PRIORITY.get(operator)){
                 stacks.push(createOperator(operators.pop()));
             }
         }
@@ -165,7 +164,7 @@ public class Parser {
         stacks.push(operator);
         position++;
         while (hasNextToken()){
-            if(scanNextToken() == Operator.CONDITION_IF_MIDDLE){
+            if(scanNextToken() == CONDITION_IF_MIDDLE){
                 break;
             }
             position++;
@@ -251,7 +250,7 @@ public class Parser {
         int stateSize = stacks.size();
         position++;
         while (hasNextToken()){
-            if(scanNextToken() == EL.BRACKET_END){
+            if(scanNextToken() == BRACKET_END){
                 position++;
                 break;
             }

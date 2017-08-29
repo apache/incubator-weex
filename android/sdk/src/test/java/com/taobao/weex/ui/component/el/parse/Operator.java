@@ -19,9 +19,8 @@
 package com.taobao.weex.ui.component.el.parse;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+
+import static com.taobao.weex.ui.component.el.parse.Operators.*;
 
 /**
  * Created by furture on 2017/8/28.
@@ -99,72 +98,5 @@ public class Operator extends Token {
             return "{" + first +  getToken() + second + "}";
         }
         return "{" + self + getToken() + first + ":" + second + "}";
-    }
-
-    /**
-     * condition
-     * */
-    public static final char  CONDITION_IF = '?';
-    public static final String  CONDITION_IF_STRING = "?";
-    public static final char  CONDITION_IF_MIDDLE = ':';
-
-
-
-    /**
-     * match
-     * */
-    public static final String PLUS ="+";
-    public static final String SUB = "-";
-    public static final String MUL = "*";
-    public static final String DIV = "/";
-    public static final String MOD = "%";
-
-
-
-    public static final String AND  = "&&";
-    public static final String OR  = "||";
-    /**
-     * and operator
-     * */
-    public static final String EQUAL = "===";
-    public static final String EQUAL2 = "==";
-    public static final String NOT_EQUAL = "!==";
-    public static final String NOT_EQUAL2 = "!=";
-    public static final String AND_NOT = "!";
-
-
-    public static final String G = ">";
-    public static final String GE = ">=";
-    public static final String LE = "<=";
-    public static final String L = "<";
-
-
-
-
-
-    /**
-     * https://github.com/jquery/esprima/blob/master/src/parser.ts
-     * */
-    public static  Map<String, Integer> PRIORITY_MAP = new HashMap<>();
-    static {
-        PRIORITY_MAP.put(OR, 1);
-        PRIORITY_MAP.put(AND, 1);
-
-        PRIORITY_MAP.put(EQUAL, 2);
-        PRIORITY_MAP.put(EQUAL2, 2);
-        PRIORITY_MAP.put(NOT_EQUAL, 2);
-        PRIORITY_MAP.put(NOT_EQUAL2, 2);
-
-        PRIORITY_MAP.put(G, 7);
-        PRIORITY_MAP.put(GE, 7);
-        PRIORITY_MAP.put(L, 7);
-        PRIORITY_MAP.put(LE, 8);
-
-        PRIORITY_MAP.put(PLUS, 9);
-        PRIORITY_MAP.put(SUB, 9);
-        PRIORITY_MAP.put(MUL, 10);
-        PRIORITY_MAP.put(DIV, 10);
-        PRIORITY_MAP.put(MOD, 10);
-        PRIORITY_MAP.put(AND_NOT, 11);
     }
 }

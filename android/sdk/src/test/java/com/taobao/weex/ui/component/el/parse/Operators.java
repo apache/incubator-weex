@@ -18,13 +18,13 @@
  */
 package com.taobao.weex.ui.component.el.parse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by furture on 2017/8/28.
  */
-
-public class Operators {
-
-
+class Operators {
 
     public static Object plus(Token left, Token right, Object context){
         Object leftValue = null;
@@ -240,4 +240,84 @@ public class Operators {
             return Double.parseDouble(value.toString());
         }catch (Exception e){return  0;}
     }
+
+
+
+
+    public static final char BRACKET_END = ')';
+    public static final char BRACKET_START = '(';
+    public static final char QUOTE = '"';
+    public static final char SINGLE_QUOTE = '\'';
+    public static final char DOT = '.';
+    public static final char ARRAY_START = '[';
+    public static final char ARRAY_END = ']';
+
+
+    /**
+     * condition
+     * */
+    public static final char  CONDITION_IF = '?';
+    public static final String  CONDITION_IF_STRING = "?";
+    public static final char  CONDITION_IF_MIDDLE = ':';
+
+
+
+    /**
+     * match
+     * */
+    public static final String PLUS ="+";
+    public static final String SUB = "-";
+    public static final String MUL = "*";
+    public static final String DIV = "/";
+    public static final String MOD = "%";
+
+
+
+    public static final String AND  = "&&";
+    public static final String OR  = "||";
+    /**
+     * and operator
+     * */
+    public static final String EQUAL = "===";
+    public static final String EQUAL2 = "==";
+    public static final String NOT_EQUAL = "!==";
+    public static final String NOT_EQUAL2 = "!=";
+    public static final String AND_NOT = "!";
+
+
+    public static final String G = ">";
+    public static final String GE = ">=";
+    public static final String LE = "<=";
+    public static final String L = "<";
+
+
+
+
+
+    /**
+     * https://github.com/jquery/esprima/blob/master/src/parser.ts
+     * */
+    public static Map<String, Integer> OPERATORS_PRIORITY = new HashMap<>();
+    static {
+        OPERATORS_PRIORITY.put(OR, 1);
+        OPERATORS_PRIORITY.put(AND, 1);
+
+        OPERATORS_PRIORITY.put(EQUAL, 2);
+        OPERATORS_PRIORITY.put(EQUAL2, 2);
+        OPERATORS_PRIORITY.put(NOT_EQUAL, 2);
+        OPERATORS_PRIORITY.put(NOT_EQUAL2, 2);
+
+        OPERATORS_PRIORITY.put(G, 7);
+        OPERATORS_PRIORITY.put(GE, 7);
+        OPERATORS_PRIORITY.put(L, 7);
+        OPERATORS_PRIORITY.put(LE, 8);
+
+        OPERATORS_PRIORITY.put(PLUS, 9);
+        OPERATORS_PRIORITY.put(SUB, 9);
+        OPERATORS_PRIORITY.put(MUL, 10);
+        OPERATORS_PRIORITY.put(DIV, 10);
+        OPERATORS_PRIORITY.put(MOD, 10);
+        OPERATORS_PRIORITY.put(AND_NOT, 11);
+    }
+
 }
