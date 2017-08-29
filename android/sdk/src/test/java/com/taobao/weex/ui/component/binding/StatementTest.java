@@ -79,8 +79,8 @@ public class StatementTest {
         WXDiv div = (WXDiv) cell.getChild(0);
         Assert.assertTrue(div.getChildCount() == count);
         Assert.assertNotNull(div.getChild(0).getDomObject());
-        Assert.assertNotNull(((WXDomObject)div.getChild(0).getDomObject()).getStatement());
-        Assert.assertNull(((WXDomObject)div.getChild(1).getDomObject()).getStatement());
+        Assert.assertNotNull(((WXDomObject)div.getChild(0).getDomObject()).getAttrs().getStatement());
+        Assert.assertNull(((WXDomObject)div.getChild(1).getDomObject()).getAttrs().getStatement());
         WXComponent childOne = div.getChild(0);
         WXComponent childTwo = div.getChild(1);
         WXComponent childThree = div.getChild(2);
@@ -149,7 +149,7 @@ public class StatementTest {
                 "      '@label': 'item'\n" +
                 "    }"));
         WXDomObject domObject = (WXDomObject) text.getDomObject();
-        domObject.setStatement(statement);
+        domObject.getAttrs().setStatement(statement);
         div.addChild(text);
 
         PowerMockito.mockStatic(WXComponentFactory.class, new Answer() {

@@ -31,8 +31,20 @@ import java.util.Stack;
 
 public class IfStatementTest extends TestCase {
 
+    public void  testVIfFront(){
+        Assert.assertFalse(Statements.isIfTrue("1 ?  false : true", createContext()));
+        Assert.assertTrue(Statements.isIfTrue("1 ?  true : false", createContext()));
+        Assert.assertFalse(Statements.isIfTrue("!(source)", createContext()));
+        Assert.assertTrue(Statements.isIfTrue("(source)", createContext()));
+    }
+
+    public void testBinding(){
+        Assert.assertEquals("hello world20", Statements.getBindingValue("item.name + index", createContext()));
+    }
+
     public void  testVIfMath(){
-        Assert.assertTrue(Statements.isIfTrue("1 ?  false : true", createContext()));
+        Assert.assertFalse(Statements.isIfTrue("1 ?  false : true", createContext()));
+        Assert.assertTrue(Statements.isIfTrue("1 ?  true : false", createContext()));
         Assert.assertTrue(Statements.isIfTrue("1 >= 1", createContext()));
         Assert.assertFalse(Statements.isIfTrue("1 >= 2", createContext()));
         Assert.assertTrue(Statements.isIfTrue("1 && 1 >= 0", createContext()));
@@ -41,6 +53,7 @@ public class IfStatementTest extends TestCase {
         Assert.assertTrue(Statements.isIfTrue("0 >= '-1'", createContext()));
         Assert.assertTrue(Statements.isIfTrue("0 >= '-1", createContext()));
         Assert.assertFalse(Statements.isIfTrue("!(source)", createContext()));
+        Assert.assertTrue(Statements.isIfTrue("(source)", createContext()));
 
 
 
@@ -121,6 +134,7 @@ public class IfStatementTest extends TestCase {
     private Stack createContext(){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
+        data.put("index", 20);
         data.put("source", true);
         data.getJSONObject("item").put("name", "hello world");
 

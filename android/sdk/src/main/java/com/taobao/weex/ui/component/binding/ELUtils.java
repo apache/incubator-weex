@@ -26,17 +26,17 @@ import java.util.StringTokenizer;
 
 /**
  * Created by furture on 2017/8/18.
+ * el expression
  */
 public class ELUtils {
 
     private static final String DELIMITER = " .[]";
-
     /**
      * @param  context stack,
      * @param  el     expression
      * get item.key value in context. only supported map list array
      * */
-    public static Object getValue(Stack<Map> context, String el){
+    public static Object getValue(Object context, String el){
         StringTokenizer tokenizer = new StringTokenizer(el, DELIMITER, true);
         Object value = context;
         while (tokenizer.hasMoreTokens()) {
@@ -51,6 +51,10 @@ public class ELUtils {
                 }
             }
             value = doGetValue(value, token);
+            //FIXME length
+            if(value == null && "length".equals(token)){
+
+            }
         }
         if(value == context){
             value = null;
@@ -81,12 +85,12 @@ public class ELUtils {
         if(context instanceof List){
             List list = (List) context;
             try{
-                list.get(Integer.parseInt(key));
+                return list.get(Integer.parseInt(key));
             }catch (Exception e){}
         }
         if(context.getClass().isArray()){
             try{
-                Array.get(context, Integer.parseInt(key));
+                return Array.get(context, Integer.parseInt(key));
             }catch (Exception e){}
         }
         return  null;

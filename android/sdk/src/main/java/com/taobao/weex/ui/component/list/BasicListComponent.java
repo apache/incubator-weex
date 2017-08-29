@@ -1362,7 +1362,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         int spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
         offset = offset / spanCount;
       }
-
       offset += firstVisibleView.getTop();
       return offset;
     } else if (layoutManager instanceof StaggeredGridLayoutManager) {

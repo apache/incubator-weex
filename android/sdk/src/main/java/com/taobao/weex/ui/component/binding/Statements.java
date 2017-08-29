@@ -336,7 +336,19 @@ public class Statements {
      * !
      * */
     public static boolean isIfTrue(String vif, Stack context){
-        if(vif.indexOf('(') >= 0){
+        if(vif.indexOf('?') >= 0 && vif.indexOf(':') >= 0){
+            int start = vif.indexOf('?');
+            int end = vif.indexOf(':');
+            if(start >= 0 && end > 0 && start < end){
+                String[] parts = splitTwoByOperator(vif, "?");
+                String[] values = splitTwoByOperator(parts[1], ":");
+                if(isIfTrue(parts[0], context)){
+                    return isIfTrue(values[0], context);
+                }
+                isIfTrue(values[1], context);
+            }
+            return false;
+        }else if(vif.indexOf('(') >= 0){
             Stack operator = new Stack();
             int start = vif.indexOf('(');
             int matchIndex = -1;
@@ -570,7 +582,7 @@ public class Statements {
         if(value == null){
             return  false;
         }
-        String bool = value.toString();
+        String bool = value.toString().trim();
         if("false".equals(bool) || "undefined".equals(bool)){
             return  false;
         }
@@ -583,7 +595,7 @@ public class Statements {
     /**
      * check string is empty
      * */
-    private static boolean isEmpty(String value){
+    public static boolean isEmpty(String value){
         if (value == null){
             return  true;
         }
@@ -716,4 +728,8 @@ public class Statements {
         }
         return true;
     }
+
+
+
+
 }
