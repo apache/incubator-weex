@@ -1349,15 +1349,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     if (layoutManager instanceof LinearLayoutManager) {
       int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
-      if (firstVisibleView == null) {
-        //Why null?
-        WXComponent firstVisibleComponent = getChild(firstVisibleItemPosition);
-        if (firstVisibleComponent != null) {
-          firstVisibleView = firstVisibleComponent.getHostView();
-        }
+      if (firstVisibleItemPosition == -1) {
+        return 0;
       }
 
+      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
       int firstVisibleViewOffset = 0;
       if (firstVisibleView != null) {
         firstVisibleViewOffset = firstVisibleView.getTop();
@@ -1381,15 +1377,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     } else if (layoutManager instanceof StaggeredGridLayoutManager) {
       int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
       int firstVisibleItemPosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
-      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
-
-      if (firstVisibleView == null) {
-        WXComponent firstVisibleComponent = getChild(firstVisibleItemPosition);
-        if (firstVisibleComponent != null) {
-          firstVisibleView = firstVisibleComponent.getHostView();
-        }
+      if (firstVisibleItemPosition == -1) {
+        return 0;
       }
 
+      View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
       int firstVisibleViewOffset = 0;
       if (firstVisibleView != null) {
         firstVisibleViewOffset = firstVisibleView.getTop();
@@ -1407,6 +1399,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       offset += firstVisibleViewOffset;
       return offset;
     }
+    //Unhandled LayoutManager type
     return -1;
   }
 }
