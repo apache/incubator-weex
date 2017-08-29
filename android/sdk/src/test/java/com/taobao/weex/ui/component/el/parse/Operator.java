@@ -40,6 +40,10 @@ public class Operator extends Token {
     public Object execute(Object context){
         String op = getToken();
         switch (op){
+            case  DOT_STR:
+            case  ARRAY_START_STR:{
+                return  Operators.dot(first, second, context);
+            }
             case  EQUAL:
             case  EQUAL2:{
                 return Operators.isEquals(first, second, context);
@@ -52,13 +56,13 @@ public class Operator extends Token {
                 return Operators.condition(self, first, second, context);
             }
             case  AND_NOT:{
-                return  !Operators.isTokenTrue(self, context);
+                return  !Operators.tokenTrue(self, context);
             }
             case  AND:{
-                return  Operators.isTokenTrue(first, context) && Operators.isTokenTrue(second, context);
+                return  Operators.tokenTrue(first, context) && Operators.tokenTrue(second, context);
             }
             case  OR:{
-                return  Operators.isTokenTrue(first, context) || Operators.isTokenTrue(second, context);
+                return  Operators.tokenTrue(first, context) || Operators.tokenTrue(second, context);
             }
             case  G:{
                 return  Operators.tokenNumber(first, context) > Operators.tokenNumber(second, context);

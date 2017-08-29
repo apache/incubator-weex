@@ -18,13 +18,88 @@
  */
 package com.taobao.weex.ui.component.el.parse;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/28.
  */
-class Operators {
+public class Operators {
+
+
+    public static Object dot(Token left, Token right, Object context){
+        if(left == null || right == null){
+            return null;
+        }
+        Object leftValue = left.execute(context);
+        if(leftValue == null){
+            return null;
+        }
+        Object value = right.execute(leftValue);
+        if(value != null){
+            return value;
+        }
+        return  specialKey(leftValue, right.getToken());
+    }
+
+    /**
+     * get key's value on object
+     * */
+    public static  Object el(Object context, String key){
+        if(context == null){
+            return  null;
+        }
+        if(context instanceof Stack){
+            Stack<Map> stack = (Stack) context;
+            for(Map map : stack){
+                if(map.containsKey(key)){
+                    return map.get(key);
+                }
+            }
+        }
+
+        if(context instanceof  Map){
+            return ((Map) context).get(key);
+        }
+
+        if(context instanceof List){
+            List list = (List) context;
+            try{
+                return list.get(Integer.parseInt(key));
+            }catch (Exception e){}
+        }
+        if(context.getClass().isArray()){
+            try{
+                return Array.get(context, Integer.parseInt(key));
+            }catch (Exception e){}
+        }
+        return  null;
+    }
+
+    public static  Object specialKey(Object leftValue, String key){
+        if("length".equals(key)){
+            if(leftValue instanceof  CharSequence){
+                return ((CharSequence) leftValue).length();
+            }
+            if(leftValue instanceof  Map){
+                return  ((Map) leftValue).size();
+            }
+            if(leftValue instanceof  Map){
+                return  ((Map) leftValue).size();
+            }
+            if(leftValue instanceof  List){
+                return  ((List) leftValue).size();
+            }
+            if(leftValue.getClass().isArray()){
+                return Array.getLength(leftValue);
+            }
+        }
+        return null;
+    }
 
     public static Object plus(Token left, Token right, Object context){
         Object leftValue = null;
@@ -99,28 +174,8 @@ class Operators {
         if(right  != null){
             rightValue = right.execute(context);
         }
-        return ((int)getNumber(leftValue))%((int)getNumber(rightValue));
+        return (getNumber(leftValue))%(getNumber(rightValue));
     }
-
-    /**
-     * is token value is true
-     * */
-    public static boolean isTokenTrue(Token selfs,  Object context) {
-        if(selfs == null){
-            return false;
-        }
-        Object value = selfs.execute(context);
-        return  isTrue(value);
-    }
-
-    public static double tokenNumber(Token self,  Object context) {
-        if(self == null){
-            return  0;
-        }
-        Object value = self.execute(context);
-        return  getNumber(value);
-    }
-
 
     /**
      * condition expression
@@ -142,6 +197,31 @@ class Operators {
         return null;
     }
 
+
+    /**
+     * is token value is true
+     * */
+    public static boolean tokenTrue(Token selfs, Object context) {
+        if(selfs == null){
+            return false;
+        }
+        Object value = selfs.execute(context);
+        return  isTrue(value);
+    }
+
+    /**
+     * get token number
+     * */
+    public static double tokenNumber(Token self,  Object context) {
+        if(self == null){
+            return  0;
+        }
+        Object value = self.execute(context);
+        return  getNumber(value);
+    }
+
+
+
     /**
      * isEquls operation
      * */
@@ -155,7 +235,7 @@ class Operators {
         }
         Object rightValue = null;
         if(right != null) {
-            right.execute(context);
+            rightValue = right.execute(context);
         }
         if(leftValue == null){
             if(rightValue == null){
@@ -213,6 +293,9 @@ class Operators {
         return  true;
     }
 
+    /**
+     * check String value is empty
+     * */
     public static boolean isEmpty(String value){
         if (value == null){
             return  true;
@@ -229,7 +312,7 @@ class Operators {
     /**
      * get number
      * */
-    private static double getNumber(Object value){
+    public static double getNumber(Object value){
         if(value == null){
             return  0;
         }
@@ -241,18 +324,46 @@ class Operators {
         }catch (Exception e){return  0;}
     }
 
+    public static boolean isOpEnd(String op){
+        return isOpEnd(op.charAt(0));
+    }
+    /**
+     * op end, has none operation, should not enter operator stack.
+     * */
+    public static boolean isOpEnd(char op){
+        if(op == BRACKET_END
+                || op == ARRAY_END
+                || op == SPACE){
+            return true;
+        }
+        return  false;
+    }
+
+    /**
+     * is not
+     * */
+    public static boolean isDot(String opStr){
+        char op = opStr.charAt(0);
+        return  op == DOT || op == ARRAY_START;
+    }
+
 
 
 
     public static final char BRACKET_END = ')';
+    public static final String BRACKET_END_STR = ")";
     public static final char BRACKET_START = '(';
+    public static final String BRACKET_START_STR = "(";
     public static final char QUOTE = '"';
     public static final char SINGLE_QUOTE = '\'';
     public static final char DOT = '.';
+    public static final String DOT_STR = ".";
     public static final char ARRAY_START = '[';
+    public static final String ARRAY_START_STR = "[";
     public static final char ARRAY_END = ']';
-
-
+    public static final String ARRAY_END_STR = "]";
+    public static final String SPACE_STR = " ";
+    public static final char SPACE = ' ';
     /**
      * condition
      * */
@@ -299,6 +410,9 @@ class Operators {
      * */
     public static Map<String, Integer> OPERATORS_PRIORITY = new HashMap<>();
     static {
+        OPERATORS_PRIORITY.put(BRACKET_END_STR, 0);
+        OPERATORS_PRIORITY.put(SPACE_STR, 0);
+        OPERATORS_PRIORITY.put(ARRAY_END_STR, 0);
         OPERATORS_PRIORITY.put(OR, 1);
         OPERATORS_PRIORITY.put(AND, 1);
 
@@ -318,6 +432,21 @@ class Operators {
         OPERATORS_PRIORITY.put(DIV, 10);
         OPERATORS_PRIORITY.put(MOD, 10);
         OPERATORS_PRIORITY.put(AND_NOT, 11);
+
+        OPERATORS_PRIORITY.put(DOT_STR, 15);
+        OPERATORS_PRIORITY.put(ARRAY_START_STR, 15);
+
+        OPERATORS_PRIORITY.put(BRACKET_START_STR, 17);
+
+
+    }
+
+    public static final List<String> KEYWORDS = new ArrayList<>();
+    static {
+        KEYWORDS.add("null");
+        KEYWORDS.add("true");
+        KEYWORDS.add("false");
+        KEYWORDS.add("undefined");
     }
 
 }

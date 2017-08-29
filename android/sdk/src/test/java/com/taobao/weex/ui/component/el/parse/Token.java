@@ -18,34 +18,22 @@
  */
 package com.taobao.weex.ui.component.el.parse;
 
-import com.taobao.weex.ui.component.binding.ELUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 /**
  * Created by furture on 2017/8/28.
  */
 public class Token {
-    public static final List<String> keywords = new ArrayList<>();
-    static {
-        keywords.add("null");
-        keywords.add("true");
-        keywords.add("false");
-        keywords.add("undefined");
-    }
+
     /**
      * token's type
      * */
-    public static final int TYPE_EL = 0;
+    public static final int TYPE_IDENTIFIER = 0;
     public static final int TYPE_INT = 1;
     public static final int TYPE_DOUBLE = 2;
     public static final int TYPE_STRING = 3;
     public static final int TYPE_KEYWORD = 4;
     public static final int TYPE_OPERATOR = 5;
     public static final int TYPE_BLOCK = 6;
+
 
     private String token;
     private int type;
@@ -60,8 +48,8 @@ public class Token {
      * execute token in context, and return value.
      * */
     public Object execute(Object context){
-        if(type == TYPE_EL){
-            return ELUtils.getValue(context, token);
+        if(type == TYPE_IDENTIFIER){
+            return Operators.el(context, token);
         }else if(type == TYPE_STRING){
             return  token;
         }else if(type == TYPE_INT){

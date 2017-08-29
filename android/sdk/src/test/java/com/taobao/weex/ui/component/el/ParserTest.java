@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component.el;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.ui.component.el.parse.Block;
+import com.taobao.weex.ui.component.el.parse.Operators;
 import com.taobao.weex.ui.component.el.parse.Parser;
 
 import junit.framework.Assert;
@@ -33,34 +34,73 @@ import java.util.Stack;
 public class ParserTest extends TestCase {
 
 
-    public void testParse(){
-        Parser parser = new Parser("item.code  \"string test \" ( item.ddd)  .item  1000  ccc ? ddd : 0");
-        parser.parse();
 
-        System.out.println(Double.parseDouble("122.01e6"));
+    public void  testParseString(){
+        Assert.assertEquals("hello world", Parser.parse("\"hello world\"").execute(null));
+        Assert.assertEquals("hello 'world",  Parser.parse("\"hello \'world\"").execute(null));
+        Assert.assertEquals("hello \"world", Parser.parse("\"hello \\\"world\"").execute(null));
+        Assert.assertEquals("hello world", Parser.parse("'hello world'").execute(null));
+        Assert.assertEquals("hello \"world", Parser.parse("'hello \"world'").execute(null));
+        Assert.assertEquals("hello 'world", Parser.parse("'hello \\'world'").execute(null));
+    }
 
-        System.out.println(Double.parseDouble("199e1"));
-
-
-        System.out.println("ddd".split(" ").length);
+    public void  testMath(){
+        Assert.assertEquals(5.0, Parser.parse("1+4").execute(null));
+        Assert.assertEquals(4000001.0, Parser.parse("1+4e6").execute(null));
+        Assert.assertEquals(400001.0, Parser.parse("1+.4e6").execute(null));
+        Assert.assertEquals(1.4, Parser.parse("1+.4").execute(null));
+        Assert.assertEquals(11.0, Parser.parse("1+e6").execute(createContext()));
+        Assert.assertEquals("1e7hello", Parser.parse("1+e7").execute(createContext()));
+        Assert.assertEquals(9.0, Parser.parse("1+4*2").execute(null));
+        Assert.assertEquals(5.0, Parser.parse("1+4*2/2").execute(null));
+        Assert.assertEquals(3.0, Parser.parse("1+4/2").execute(null));
+        Assert.assertEquals(2.0, Parser.parse("1+4/4").execute(null));
+        Assert.assertEquals(2.0, Parser.parse("1+4%3").execute(null));
+        Assert.assertEquals(1.0, Parser.parse("1+4%4").execute(null));
+        Assert.assertTrue(Double.isInfinite((double)Parser.parse("1+4/0").execute(null)));
+        Assert.assertTrue(Double.isNaN((double)Parser.parse("4%0").execute(null)));
     }
 
     public void testCondition(){
-        Block block = Parser.parse("0 ? 1 : (2 ? 2 : 1)");
-        Assert.assertEquals(2, block.execute(null));
+        Assert.assertEquals(1, Parser.parse("0 ? 2 : 1").execute(null));
+        Assert.assertEquals(2, Parser.parse("1 ? 2 : 1").execute(null));
+        Assert.assertEquals(3, Parser.parse("0 ? 1 : (2 ? 3 : 4)").execute(null));
+        Assert.assertEquals(3, Parser.parse("0 ? 1 : 2 ? 3 : 4").execute(null));
+        Assert.assertEquals(4, Parser.parse("0 ? 1 : 0 ? 3 : 4").execute(null));
+        Assert.assertEquals(5, Parser.parse("1 ? 5 : (2 ? 3 : 4)").execute(null));
+    }
 
 
-        block = Parser.parse("1 ? 1 : (2 ? 2 : 1)");
-        Assert.assertEquals(1, block.execute(null));
+    public void  testEl(){
+        Assert.assertEquals("hello world20", Parser.parse("item.name + index").execute(createContext()));
+        Assert.assertEquals("hello world20", Parser.parse("item[name] + index").execute(createContext()));
+        Assert.assertEquals("hello world20", Parser.parse("item[name + index").execute(createContext()));
+        Assert.assertEquals("hello world20", Parser.parse("item.name] + index").execute(createContext()));
+        Assert.assertEquals(21.0, Parser.parse("1 + index").execute(createContext()));
+        Assert.assertEquals(11.0, Parser.parse("1 + index/2").execute(createContext()));
+        Assert.assertEquals(20.0, Parser.parse("item.name/10 + index").execute(createContext()));
 
-        block = Parser.parse("item.name + index");
-        System.out.println(block);
-        Assert.assertEquals("hello world20", block.execute(createContext()));
+        Assert.assertEquals(31.0, Parser.parse("item.name.length + index").execute(createContext()));
+        Assert.assertEquals(21.0, Parser.parse("item.length + index").execute(createContext()));
+    }
 
-
-        System.out.println(Parser.parse(" ? ????"));
+    public void testIf(){
+        Assert.assertTrue(Operators.isTrue(Parser.parse("1 ?  true : false").execute(createContext())));
+        Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  false : true").execute(createContext())));
+        Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  null : true").execute(createContext())));
+        Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  undefined : true").execute(createContext())));
+        Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  \"\" : true").execute(createContext())));
 
     }
+
+
+    public void testParse(){
+        Parser.parse("item.code  \"string test \" ( item.ddd)  .item  1000  ccc ? ddd : 0");
+
+        System.out.println(Parser.parse("1+e6"));
+    }
+
+
 
     public void testOperator(){
         Parser parser = new Parser("(1 + 3)/3*3");
@@ -87,6 +127,8 @@ public class ParserTest extends TestCase {
         data.put("item", new JSONObject());
         data.put("index", 20);
         data.put("source", true);
+        data.put("e6", 10);
+        data.put("e7", "e7hello");
         data.getJSONObject("item").put("name", "hello world");
 
         Stack context = new Stack();

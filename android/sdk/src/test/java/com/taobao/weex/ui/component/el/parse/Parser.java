@@ -28,12 +28,11 @@ import static com.taobao.weex.ui.component.el.parse.Token.TYPE_BLOCK;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_DOUBLE;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_INT;
 import static com.taobao.weex.ui.component.el.parse.Token.TYPE_OPERATOR;
-import static com.taobao.weex.ui.component.el.parse.Token.keywords;
 import static com.taobao.weex.ui.component.el.parse.Operators.*;
 
 /**
  * Created by furture on 2017/8/28.
- * simple expression parse
+ * simple expression parse, less node and save memory
  * reference https://github.com/jquery/esprima
  */
 public class Parser {
@@ -41,7 +40,7 @@ public class Parser {
     private String code;
     private int position;
     private Stack<Token> stacks;
-    private Stack<String> operators;
+    private Stack<Symbol> operators;
 
     public Parser(String code){
         this.code = code;
@@ -56,7 +55,11 @@ public class Parser {
             scanNextToken();
         }
         while (!operators.isEmpty()){
-            stacks.push(createOperator(operators.pop()));
+            Symbol op = operators.pop();
+            Token token = createOperator(op);
+            if(token != null) {
+                stacks.push(token);
+            }
         }
         Block block = new Block(stacks, TYPE_BLOCK);
         return block;
@@ -79,27 +82,64 @@ public class Parser {
 
     char scanNextToken(){
         char ch = nextToken();
+        System.out.println("token " + ch);
         if(Character.isJavaIdentifierStart(ch)){
-            scanEl();
+            scanIdentifier();
         }else if (ch == BRACKET_START) {
             scanBracket();
         }else if (ch ==  QUOTE || ch == SINGLE_QUOTE) {
             scanString();
-        }else if((ch == DOT && Character.isDigit(code.charAt(position + 1))) || Character.isDigit(ch)){ //number .00 .00e6
+        }else if((ch == DOT && Character.isDigit(code.charAt(position + 1)))
+                || Character.isDigit(ch)){ //number .00 .00e6
             scanNumber();
         }else if(ch ==  CONDITION_IF){
             scanIf();
-        }else if(ch ==  CONDITION_IF_MIDDLE){
-            return ch;
-        }else if(ch ==  BRACKET_END){
-            return ch;
-        }else if(ch ==  ' '){
+        }else if(ch ==  CONDITION_IF_MIDDLE
+                || ch ==  BRACKET_END
+                || ch == SPACE){
             position++;
             return ch;
         }else{
             scanOperator();
         }
         return ch;
+    }
+
+
+    void  scanBracket(){
+        int stackSize = stacks.size();
+        int opSize = operators.size();
+        int start = position;
+        position++;
+        operators.push(new Symbol(BRACKET_START_STR, stacks.size()));
+        while (hasNextToken()){
+            if(scanNextToken() == BRACKET_END){
+                break;
+            }
+        }
+        if(operators.size() <= opSize){ // empty bracket, none need, save memory
+            //opetion
+
+            return;
+        }
+        while (operators.size() > opSize){
+            Symbol op = operators.pop();
+            if(stacks.size() > stackSize){
+                Token token = createOperator(op);
+                if(token != null) {
+                    stacks.push(token);
+                }
+            }
+        }
+        List<Token> tokens = new ArrayList<>();
+        for(int i=stackSize; i<stacks.size(); i++){
+            tokens.add(stacks.get(i));
+        }
+        while (stacks.size() > stackSize){
+            stacks.pop();
+        }
+        Block block = new Block(tokens, TYPE_BLOCK);
+        stacks.push(block);
     }
 
     /**
@@ -128,26 +168,44 @@ public class Parser {
             return;
         }
         if((!operators.isEmpty() && operators.peek() != null)){
-            if(OPERATORS_PRIORITY.get(operators.peek()) >= OPERATORS_PRIORITY.get(operator)){
-                stacks.push(createOperator(operators.pop()));
+            String preOp = operators.peek().op;
+            if(OPERATORS_PRIORITY.get(preOp) >= OPERATORS_PRIORITY.get(operator)){
+                Symbol op = operators.pop();
+                Token token = createOperator(op);
+                if(token != null) {
+                    stacks.push(token);
+                }
             }
         }
-        operators.push(operator);
+        if(!Operators.isOpEnd(operator)){
+            operators.push(new Symbol(operator, stacks.size()));
+        }
         position += operator.length();
     }
 
-    Operator createOperator(String op){
+
+    Token createOperator(Symbol symbol){
+        String op = symbol.op;
+        if(BRACKET_START_STR.equals(symbol.op)){
+            return null;
+        }
+        int secondMin = symbol.pos;
+        int firstMin = 0;
+        if(!operators.empty()){
+            firstMin = Math.max(operators.peek().pos, firstMin);
+        }
         Operator operator = new Operator(op, TYPE_OPERATOR);
         if(AND_NOT.equals(op)){
-            if(!stacks.isEmpty()) {
+            if(stacks.size() > secondMin) {
                 operator.self = stacks.pop();
+                return operator;
             }
-            return operator;
+            return null; //invalid
         }
-        if(!stacks.isEmpty()) {
+        if(stacks.size() > secondMin) {
             operator.second = stacks.pop();
         }
-        if(!stacks.isEmpty()) {
+        if(stacks.size() > firstMin) {
             operator.first = stacks.pop();
         }
         return operator;
@@ -188,17 +246,20 @@ public class Parser {
      * 199e5
      * */
     void scanNumber(){
-        int start = position;
-        position++;
         boolean isInt = true;
+        int start = position;
+        if(code.charAt(position) == 'e' || code.charAt(position) == '.'){
+            isInt = false;
+        }
+        position++;
         while (hasNext()){
             char ch = code.charAt(position);
-            if(ch == 'e' || ch == '.'){
-                isInt = false;
-            }
             if(Character.isDigit(ch)
                     || ch == '.'
                     || ch =='e'){
+                if(ch == 'e' || ch == '.'){
+                    isInt = false;
+                }
                 position++;
             }else{
                 break;
@@ -246,52 +307,30 @@ public class Parser {
         stacks.push(token);
     }
 
-    void  scanBracket(){
-        int stateSize = stacks.size();
-        position++;
-        while (hasNextToken()){
-            if(scanNextToken() == BRACKET_END){
-                position++;
-                break;
-            }
-            position++;
-        }
-        if(stacks.size() <= stateSize){ // empty bracket, none need, save memory
-            return;
-        }
-        List<Token> tokens = new ArrayList<>();
-        while (stacks.size() > stateSize){
-            tokens.add(stacks.pop());
-        }
-        Block block = new Block(tokens, TYPE_BLOCK);
-        stacks.push(block);
-    }
+
 
     /**
      * scan el expression.
      * */
-    void scanEl(){
+    void scanIdentifier(){
         int start = position;
         position++;
         while (hasNext()){
             char ch = code.charAt(position);
-            System.out.println("el " + ch);
-            if(Character.isJavaIdentifierPart(ch)
-                    || ch == '.'
-                    || ch =='['
-                    || ch ==']'){
+            if(Character.isJavaIdentifierPart(ch)){
                position++;
             }else{
                 break;
             }
+            //2.true
         }
         String el = code.substring(start, position);
-        System.out.println("el" + el);
-        int type = Token.TYPE_EL;
-        if(keywords.contains(el)){
-            type = Token.TYPE_KEYWORD;
+        int type = Token.TYPE_IDENTIFIER;
+        if(KEYWORDS.contains(el)){
+            if(!(!operators.isEmpty() && Operators.isDot(operators.peek().op))){
+                type = Token.TYPE_KEYWORD;
+            }
         }
-        //handle el to o
         Token token = new Token(el, type);
         stacks.push(token);
     }
