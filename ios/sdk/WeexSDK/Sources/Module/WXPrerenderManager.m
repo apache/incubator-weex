@@ -41,7 +41,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 @property (nonatomic, assign) WXState state;
 @property (nonatomic, strong) NSDate *beginDate;
 @property (nonatomic) long long cacheTime;
-@property (nonatomic) BOOL isCache;  // if set cache , cachetime is no use
+@property (nonatomic) BOOL isCache;  // if set cache , the cachetime is no use.
 
 @end
 @implementation WXPrerenderTask
