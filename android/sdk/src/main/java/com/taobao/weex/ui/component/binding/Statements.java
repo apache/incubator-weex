@@ -20,7 +20,7 @@ package com.taobao.weex.ui.component.binding;
 
 import android.graphics.Color;
 import android.support.v4.util.ArrayMap;
-
+import android.text.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.WXAttr;
@@ -119,14 +119,16 @@ public class Statements {
             int renderIndex = parent.indexOf(component);
             // execute v-for content
             if(vfor != null){
-                Object data = null;
                 Block listBlock = (Block) vfor.get(WXStatement.WX_FOR_LIST);
                 String indexKey = vfor.getString(WXStatement.WX_FOR_INDEX);
                 String itemKey = vfor.getString(WXStatement.WX_FOR_ITEM);
+                Object data = null;
                 if(listBlock != null) {
                     data = listBlock.execute(context);
                 }
-                if(data instanceof List){
+                if(data instanceof List
+                        && !TextUtils.isEmpty(indexKey)
+                        && !TextUtils.isEmpty(itemKey)){
                     List list = (List) data;
                     Map<String, Object> loop = new HashMap<>();
                     context.push(loop);
@@ -152,11 +154,12 @@ public class Statements {
                             renderNode = copyComponentTree(component, parent);
                             WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
                             renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
+                            parentDomObject.add(renderNodeDomObject, renderIndex);
                             parent.addChild(renderNode, renderIndex);
                             parent.createChildViewAt(renderIndex);
-                            parentDomObject.add(renderNodeDomObject, renderIndex);
-                            renderNode.applyLayoutAndEvent(component);
-                            //FIXME delete
+                            renderNode.applyLayoutAndEvent(renderNode);
+                            renderNode.bindData(renderNode);
+                            //FIXME remove test debug
                             renderNode.getHostView().setBackgroundColor(Color.RED);
                         }
                         doRenderBindingAttrs(component, domObject, context);
@@ -243,7 +246,7 @@ public class Statements {
      * @param  context  context
      * return binding attrs rended value in context
      * */
-    private static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, Stack context){
+    public static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, Stack context){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){
@@ -282,7 +285,7 @@ public class Statements {
         return  dynamic;
     }
 
-    private static List<Object> getBindingEventArgs(Stack context, Object bindings){
+    public static List<Object> getBindingEventArgs(Stack context, Object bindings){
           List<Object>  params = new ArrayList<>(4);
           if(bindings instanceof  JSONArray){
               JSONArray array = (JSONArray) bindings;

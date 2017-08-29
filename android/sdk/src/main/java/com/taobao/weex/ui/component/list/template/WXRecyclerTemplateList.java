@@ -51,6 +51,7 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
@@ -157,11 +158,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if (node != null && node instanceof WXRecyclerDomObject) {
             mDomObject = (WXRecyclerDomObject) node;
             mDomObject.preCalculateCellWidth();
-            if(WXBasicComponentType.WATERFALL.equals(node.getType())){
-                mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
-            }else{
-                mLayoutType = mDomObject.getLayoutType();
-            }
+            mLayoutType = mDomObject.getLayoutType();
             updateRecyclerAttr();
         }
         mTemplateViewTypes = new ArrayMap<>();
@@ -174,14 +171,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     protected BounceRecyclerView initComponentHostView(@NonNull Context context) {
         final BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap, getOrientation());
-
         String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
-
-        mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
-
+        mItemAnimator = bounceRecyclerView.getInnerView().getItemAnimator();
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
@@ -859,17 +853,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     }
 
                     if (shouldReport(offsetX, offsetY)) {
-                        if(recyclerView.getLayoutManager() instanceof LinearLayoutManager){
-                            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                            int position = linearLayoutManager.findFirstVisibleItemPosition();
-                            if(position > 0){
-                                 int realOffsetX = 0;
-                                 int realOffsetY = 0;
-                                 for(int i=0; i<position; i++){
-                                     WXComponent component = mChildren.get(0);
-                                 }
-                            }
-                        }
                         fireScrollEvent(recyclerView, offsetX, offsetY);
                     }
                 }
@@ -1001,16 +984,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @Override
-    public void onBindViewHolder(final TemplateViewHolder holder, int position) {
-        if(holder == null){
+    public void onBindViewHolder(final TemplateViewHolder templateViewHolder, int position) {
+        if(templateViewHolder == null){
             return;
         }
-        WXComponent component = holder.getComponent();
+        WXComponent component = templateViewHolder.getComponent();
         if(component == null){
             return;
         }
         long start = System.currentTimeMillis();
-        TemplateViewHolder templateViewHolder = (TemplateViewHolder) holder;
         templateViewHolder.setHolderPosition(position);
         Statements.doRender(component, getItemContextForPosition(position));
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
@@ -1030,9 +1012,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
             return new TemplateViewHolder(view, viewType);
         }
+        Log.e(TAG, "onCreateViewHolder view used " + (System.currentTimeMillis() - start));
         component.lazy(false);
         component.createView();
+        Log.e(TAG, "onCreateViewHolder view used " + (System.currentTimeMillis() - start));
         component.applyLayoutAndEvent(component);
+        Log.e(TAG, "onCreateViewHolder layout used " + (System.currentTimeMillis() - start));
         component.bindData(component);
         Log.e(TAG, "onCreateViewHolder used " + (System.currentTimeMillis() - start)
          + "  " + component.isSticky());
@@ -1234,9 +1219,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             if(cell == null){
                 continue;
             }
-            Statements.doRender(cell, getItemContextForPosition(position));
-
-            eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+            //Statements.doRender(cell, getItemContextForPosition(position));
+            //Layouts.doLayout(cell, new CSSLayoutContext());
+           // eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
 
         }
     }
@@ -1304,7 +1289,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 int spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
                 offset = offset / spanCount;
             }
-            offset += firstVisibleView.getTop();
+            if(firstVisibleView != null) {
+                offset += firstVisibleView.getTop();
+            }
             return offset;
         } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
@@ -1321,7 +1308,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             }
 
             offset = offset / spanCount;
-            offset += firstVisibleView.getTop();
+            if(firstVisibleView != null) {
+                offset += firstVisibleView.getTop();
+            }
             return offset;
         }
         return -1;

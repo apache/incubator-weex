@@ -19,6 +19,8 @@
 package com.taobao.weex.ui.component.binding;
 
 
+import android.util.Log;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
@@ -28,7 +30,6 @@ import com.taobao.weex.ui.component.WXVContainer;
 /**
  * Created by furture on 2017/8/21.
  */
-
 public class Layouts {
 
 
@@ -41,7 +42,10 @@ public class Layouts {
         domObject.traverseTree(new WXDomObject.Consumer() {
             @Override
             public void accept(WXDomObject dom) {
-                if (!dom.hasUpdate() || instance == null || instance.isDestroy()) {
+                if(instance == null || instance.isDestroy()){
+                    return;
+                }
+                if(!dom.hasUpdate()){
                     return;
                 }
                 dom.layoutBefore();
@@ -51,10 +55,12 @@ public class Layouts {
         domObject.traverseTree( new WXDomObject.Consumer() {
             @Override
             public void accept(WXDomObject dom) {
-                if (!dom.hasUpdate() || instance == null || instance.isDestroy()) {
+                if(instance == null || instance.isDestroy()){
                     return;
                 }
-                dom.layoutAfter();
+                if (dom.hasUpdate()) {
+                    dom.layoutAfter();
+                }
             }
         });
         setLayout(component, false);

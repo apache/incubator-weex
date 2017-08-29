@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.v4.util.ArrayMap;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.Spacing;
@@ -140,6 +142,28 @@ public class WXRecyclerDomObject extends WXDomObject{
                 || attrs.containsKey(Constants.Name.COLUMN_WIDTH)){
             updateRecyclerAttr();
         }
+    }
+
+    @Override
+    protected Map<String, String> getDefaultStyle() {
+        Map<String,String> map = new ArrayMap<>();
+
+        boolean isVertical = true;
+        if (parent != null) {
+            if (parent.getType() != null) {
+                if (parent.getType().equals(WXBasicComponentType.HLIST)) {
+                    isVertical = false;
+                }
+            }
+        }
+
+        String prop = isVertical ? Constants.Name.HEIGHT : Constants.Name.WIDTH;
+        if (getStyles().get(prop) == null &&
+                getStyles().get(Constants.Name.FLEX) == null) {
+            map.put(Constants.Name.FLEX, "1");
+        }
+
+        return map;
     }
 
 }

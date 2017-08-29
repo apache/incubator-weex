@@ -163,6 +163,10 @@ public class WXTextDomObject extends WXDomObject {
     hasBeenMeasured = false;
     updateStyleAndText();
     spanned = createSpanned(mText);
+    if(hasNewLayout()){
+        WXLogUtils.e("TextDom", new IllegalStateException("Previous csslayout was ignored! markLayoutSeen() never called"));
+        markUpdateSeen();
+    }
     super.dirty();
     super.layoutBefore();
   }
