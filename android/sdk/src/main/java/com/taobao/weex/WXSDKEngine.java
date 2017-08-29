@@ -310,7 +310,7 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
       registerDomObject(WXBasicComponentType.LIST, WXListDomObject.class);
-      registerDomObject(WXBasicComponentType.RECYCLE_LIST, WXListDomObject.class);
+      registerDomObject(WXBasicComponentType.RECYCLE_LIST, WXRecyclerDomObject.class);
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
