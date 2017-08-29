@@ -16,11 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el.parse;
+package com.taobao.weex.el.parse;
 
-
-
-import static com.taobao.weex.ui.component.el.parse.Operators.*;
 
 /**
  * Created by furture on 2017/8/28.
@@ -40,55 +37,55 @@ public class Operator extends Token {
     public Object execute(Object context){
         String op = getToken();
         switch (op){
-            case  DOT_STR:
-            case  ARRAY_START_STR:{
+            case  Operators.DOT_STR:
+            case  Operators.ARRAY_START_STR:{
                 return  Operators.dot(first, second, context);
             }
-            case  EQUAL:
-            case  EQUAL2:{
+            case  Operators.EQUAL:
+            case  Operators.EQUAL2:{
                 return Operators.isEquals(first, second, context);
             }
-            case  NOT_EQUAL:
-            case  NOT_EQUAL2:{
+            case  Operators.NOT_EQUAL:
+            case  Operators.NOT_EQUAL2:{
                 return !Operators.isEquals(first, second, context);
             }
-            case  CONDITION_IF_STRING:{
+            case  Operators.CONDITION_IF_STRING:{
                 return Operators.condition(self, first, second, context);
             }
-            case  AND_NOT:{
+            case  Operators.AND_NOT:{
                 return  !Operators.tokenTrue(self, context);
             }
-            case  AND:{
+            case  Operators.AND:{
                 return  Operators.tokenTrue(first, context) && Operators.tokenTrue(second, context);
             }
-            case  OR:{
+            case  Operators.OR:{
                 return  Operators.tokenTrue(first, context) || Operators.tokenTrue(second, context);
             }
-            case  G:{
+            case  Operators.G:{
                 return  Operators.tokenNumber(first, context) > Operators.tokenNumber(second, context);
             }
-            case  GE:{
+            case  Operators.GE:{
                 return  Operators.tokenNumber(first, context) >= Operators.tokenNumber(second, context);
             }
-            case  L:{
+            case  Operators.L:{
                 return  Operators.tokenNumber(first, context) < Operators.tokenNumber(second, context);
             }
-            case  LE:{
+            case  Operators.LE:{
                 return  Operators.tokenNumber(first, context) <= Operators.tokenNumber(second, context);
             }
-            case  PLUS:{
+            case  Operators.PLUS:{
                 return  Operators.plus(first, second, context);
             }
-            case  SUB:{
+            case  Operators.SUB:{
                 return  Operators.sub(first, second, context);
             }
-            case  MUL:{
+            case  Operators.MUL:{
                 return  Operators.mul(first, second, context);
             }
-            case  DIV:{
+            case  Operators.DIV:{
                 return  Operators.div(first, second, context);
             }
-            case  MOD:{
+            case  Operators.MOD:{
                 return  Operators.mod(first, second, context);
             }
             default:

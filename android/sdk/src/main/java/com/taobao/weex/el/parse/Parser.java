@@ -16,19 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el.parse;
+package com.taobao.weex.el.parse;
 
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-import static com.taobao.weex.ui.component.el.parse.Token.TYPE_BLOCK;
-import static com.taobao.weex.ui.component.el.parse.Token.TYPE_DOUBLE;
-import static com.taobao.weex.ui.component.el.parse.Token.TYPE_INT;
-import static com.taobao.weex.ui.component.el.parse.Token.TYPE_OPERATOR;
-import static com.taobao.weex.ui.component.el.parse.Operators.*;
 
 /**
  * Created by furture on 2017/8/28.
@@ -61,7 +55,7 @@ public class Parser {
                 stacks.push(token);
             }
         }
-        Block block = new Block(stacks, TYPE_BLOCK);
+        Block block = new Block(stacks, Token.TYPE_BLOCK);
         return block;
     }
 
@@ -75,7 +69,7 @@ public class Parser {
             Parser parser = new Parser(code);
             return parser.parse();
         }catch (Exception e){
-            return new Block(null, TYPE_BLOCK);
+            return new Block(null, Token.TYPE_BLOCK);
         }
     }
 
@@ -85,18 +79,18 @@ public class Parser {
         System.out.println("token " + ch);
         if(Character.isJavaIdentifierStart(ch)){
             scanIdentifier();
-        }else if (ch == BRACKET_START) {
+        }else if (ch == Operators.BRACKET_START) {
             scanBracket();
-        }else if (ch ==  QUOTE || ch == SINGLE_QUOTE) {
+        }else if (ch ==  Operators.QUOTE || ch == Operators.SINGLE_QUOTE) {
             scanString();
-        }else if((ch == DOT && Character.isDigit(code.charAt(position + 1)))
+        }else if((ch == Operators.DOT && Character.isDigit(code.charAt(position + 1)))
                 || Character.isDigit(ch)){ //number .00 .00e6
             scanNumber();
-        }else if(ch ==  CONDITION_IF){
+        }else if(ch ==  Operators.CONDITION_IF){
             scanIf();
-        }else if(ch ==  CONDITION_IF_MIDDLE
-                || ch ==  BRACKET_END
-                || ch == SPACE){
+        }else if(ch ==  Operators.CONDITION_IF_MIDDLE
+                || ch ==  Operators.BRACKET_END
+                || ch == Operators.SPACE){
             position++;
             return ch;
         }else{
@@ -109,17 +103,18 @@ public class Parser {
     void  scanBracket(){
         int stackSize = stacks.size();
         int opSize = operators.size();
-        int start = position;
+        operators.push(new Symbol(Operators.BRACKET_START_STR, stacks.size()));
         position++;
-        operators.push(new Symbol(BRACKET_START_STR, stacks.size()));
         while (hasNextToken()){
-            if(scanNextToken() == BRACKET_END){
+            if(scanNextToken() == Operators.BRACKET_END){
                 break;
             }
         }
-        if(operators.size() <= opSize){ // empty bracket, none need, save memory
+        if(stacks.size() <= opSize){ // empty bracket, none need, save memory
             //opetion
-
+            while (operators.size() > opSize){
+                operators.pop();
+            }
             return;
         }
         while (operators.size() > opSize){
@@ -138,7 +133,7 @@ public class Parser {
         while (stacks.size() > stackSize){
             stacks.pop();
         }
-        Block block = new Block(tokens, TYPE_BLOCK);
+        Block block = new Block(tokens, Token.TYPE_BLOCK);
         stacks.push(block);
     }
 
@@ -151,16 +146,16 @@ public class Parser {
         int length = Math.min(position + 3, code.length());
         String operator = code.substring(position, length);
         if(operator.length() >= 3){
-            if(!OPERATORS_PRIORITY.containsKey(operator)){
+            if(!Operators.OPERATORS_PRIORITY.containsKey(operator)){
                 operator = operator.substring(0, 2);
             }
         }
         if(operator.length() >= 2){
-            if(!OPERATORS_PRIORITY.containsKey(operator)){
+            if(!Operators.OPERATORS_PRIORITY.containsKey(operator)){
                 operator = operator.substring(0, 1);
             }
         }
-        if(!OPERATORS_PRIORITY.containsKey(operator)){
+        if(!Operators.OPERATORS_PRIORITY.containsKey(operator)){
             //just skip illegal character
             int illegalChar = Math.min(start + 1, code.length());
             WXLogUtils.e("weex", new IllegalArgumentException(code.substring(0, illegalChar) + " illegal code operator" + operator));
@@ -169,7 +164,7 @@ public class Parser {
         }
         if((!operators.isEmpty() && operators.peek() != null)){
             String preOp = operators.peek().op;
-            if(OPERATORS_PRIORITY.get(preOp) >= OPERATORS_PRIORITY.get(operator)){
+            if(Operators.OPERATORS_PRIORITY.get(preOp) >= Operators.OPERATORS_PRIORITY.get(operator)){
                 Symbol op = operators.pop();
                 Token token = createOperator(op);
                 if(token != null) {
@@ -184,9 +179,10 @@ public class Parser {
     }
 
 
+
     Token createOperator(Symbol symbol){
         String op = symbol.op;
-        if(BRACKET_START_STR.equals(symbol.op)){
+        if(Operators.BRACKET_START_STR.equals(symbol.op)){
             return null;
         }
         int secondMin = symbol.pos;
@@ -194,8 +190,8 @@ public class Parser {
         if(!operators.empty()){
             firstMin = Math.max(operators.peek().pos, firstMin);
         }
-        Operator operator = new Operator(op, TYPE_OPERATOR);
-        if(AND_NOT.equals(op)){
+        Operator operator = new Operator(op, Token.TYPE_OPERATOR);
+        if(Operators.AND_NOT.equals(op)){
             if(stacks.size() > secondMin) {
                 operator.self = stacks.pop();
                 return operator;
@@ -215,28 +211,30 @@ public class Parser {
      * condition if
      * */
     void scanIf(){
-        Operator operator = new Operator(CONDITION_IF_STRING, TYPE_OPERATOR);
-        if(stacks.peek() != null){
+        Operator operator = new Operator(Operators.CONDITION_IF_STRING, Token.TYPE_OPERATOR);
+        int minSize = 0;
+        if(operators.size() > 0){
+            minSize = Math.max(operators.peek().pos, minSize);
+        }
+        if(stacks.size() > minSize){
             operator.self = stacks.pop();
         }
-        stacks.push(operator);
         position++;
         while (hasNextToken()){
-            if(scanNextToken() == CONDITION_IF_MIDDLE){
+            if(scanNextToken() == Operators.CONDITION_IF_MIDDLE){
                 break;
             }
-            position++;
         }
-        if(stacks.peek() != null && stacks.peek() != operator){
+        while (stacks.size() > minSize){
             operator.first = stacks.pop();
         }
-        position++;
         if(hasNextToken()){
             scanNextToken();
-            if(stacks.peek() != null && stacks.peek() != operator){
+            while (stacks.size() > minSize){
                 operator.second = stacks.pop();
             }
         }
+        stacks.push(operator);
     }
 
     /**
@@ -271,9 +269,9 @@ public class Parser {
         }
         Token stack = null;
         if(isInt){
-            stack = new Token(number, TYPE_INT);
+            stack = new Token(number, Token.TYPE_INT);
         }else{
-            stack = new Token(number, TYPE_DOUBLE);
+            stack = new Token(number, Token.TYPE_DOUBLE);
         }
         stacks.push(stack);
     }
@@ -326,7 +324,7 @@ public class Parser {
         }
         String el = code.substring(start, position);
         int type = Token.TYPE_IDENTIFIER;
-        if(KEYWORDS.contains(el)){
+        if(Operators.KEYWORDS.contains(el)){
             if(!(!operators.isEmpty() && Operators.isDot(operators.peek().op))){
                 type = Token.TYPE_KEYWORD;
             }

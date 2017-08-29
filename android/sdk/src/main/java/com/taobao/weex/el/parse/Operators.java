@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el.parse;
+package com.taobao.weex.el.parse;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

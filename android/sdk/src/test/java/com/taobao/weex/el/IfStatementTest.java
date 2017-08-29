@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el;
+package com.taobao.weex.el;
 
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.ui.component.el.parse.Block;
-import com.taobao.weex.ui.component.el.parse.Operators;
-import com.taobao.weex.ui.component.el.parse.Parser;
+import com.taobao.weex.el.parse.Block;
+import com.taobao.weex.el.parse.Operators;
+import com.taobao.weex.el.parse.Parser;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -138,7 +138,7 @@ public class IfStatementTest extends TestCase {
 
     private boolean isIfTrue(String code, Object context){
         Block block = Parser.parse(code);
-        System.out.println(block);
+        System.out.println( code + " ==> " + block);
         return Operators.isTrue(block.execute(context));
     }
     private Stack createContext(){

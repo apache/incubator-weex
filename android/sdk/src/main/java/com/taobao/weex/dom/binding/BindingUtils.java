@@ -23,13 +23,11 @@ import com.alibaba.fastjson.JSONObject;
 
 /**
  * util's for binding and statment
- * Created by furture on 2017/8/17.
+ * Created by jianbai.gbj on 2017/8/17.
  */
 public class BindingUtils {
 
     public static final String BINDING = "@binding";
-
-
 
     /**
      * @param value check object is binding expression

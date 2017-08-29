@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el.parse;
+package com.taobao.weex.el.parse;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * block, has more than one tokens, but only first will be execute.

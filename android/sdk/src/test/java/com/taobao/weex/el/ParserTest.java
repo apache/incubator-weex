@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el;
+package com.taobao.weex.el;
 
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.ui.component.el.parse.Block;
-import com.taobao.weex.ui.component.el.parse.Operators;
-import com.taobao.weex.ui.component.el.parse.Parser;
+import com.taobao.weex.el.parse.Block;
+import com.taobao.weex.el.parse.Operators;
+import com.taobao.weex.el.parse.Parser;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -59,6 +59,10 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(1.0, Parser.parse("1+4%4").execute(null));
         Assert.assertTrue(Double.isInfinite((double)Parser.parse("1+4/0").execute(null)));
         Assert.assertTrue(Double.isNaN((double)Parser.parse("4%0").execute(null)));
+
+        Assert.assertEquals(1.0, Parser.parse("1++*").execute(null));
+        Assert.assertEquals(3.0, Parser.parse("1+2+*").execute(null));
+        Assert.assertEquals(1.0, Parser.parse("1+(2*+*)").execute(null));
     }
 
     public void testCondition(){
@@ -68,7 +72,13 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(3, Parser.parse("0 ? 1 : 2 ? 3 : 4").execute(null));
         Assert.assertEquals(4, Parser.parse("0 ? 1 : 0 ? 3 : 4").execute(null));
         Assert.assertEquals(5, Parser.parse("1 ? 5 : (2 ? 3 : 4)").execute(null));
+        Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
+        Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
+        Assert.assertEquals(4, Parser.parse("0?1:0?3:4").execute(null));
+        Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
     }
+
+
 
 
     public void  testEl(){
@@ -95,11 +105,20 @@ public class ParserTest extends TestCase {
 
 
     public void testParse(){
+        Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
+        Assert.assertEquals(4, Parser.parse("0?1:0?3:4").execute(null));
+        Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
         Parser.parse("item.code  \"string test \" ( item.ddd)  .item  1000  ccc ? ddd : 0");
+        Parser.parse("1+e6");
 
-        System.out.println(Parser.parse("1+e6"));
+        show("()++++");
     }
 
+
+    private void show(String code){
+        Block block = Parser.parse(code);
+        System.out.println( code + " ==> " + block);
+    }
 
 
     public void testOperator(){

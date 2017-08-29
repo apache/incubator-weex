@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.component.el.parse;
+package com.taobao.weex.el.parse;
 
 /**
  * Created by furture on 2017/8/28.
