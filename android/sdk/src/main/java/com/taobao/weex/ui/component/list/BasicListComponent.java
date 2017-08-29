@@ -1349,7 +1349,16 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     if (layoutManager instanceof LinearLayoutManager) {
       int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+      if (firstVisibleItemPosition == -1) {
+        return 0;
+      }
+
       View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+      int firstVisibleViewOffset = 0;
+      if (firstVisibleView != null) {
+        firstVisibleViewOffset = firstVisibleView.getTop();
+      }
+
       int offset = 0;
       for (int i=0;i<firstVisibleItemPosition;i++) {
         WXComponent child = getChild(i);
@@ -1363,12 +1372,20 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         offset = offset / spanCount;
       }
 
-      offset += firstVisibleView.getTop();
+      offset += firstVisibleViewOffset;
       return offset;
     } else if (layoutManager instanceof StaggeredGridLayoutManager) {
       int spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
       int firstVisibleItemPosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+      if (firstVisibleItemPosition == -1) {
+        return 0;
+      }
+
       View firstVisibleView = layoutManager.findViewByPosition(firstVisibleItemPosition);
+      int firstVisibleViewOffset = 0;
+      if (firstVisibleView != null) {
+        firstVisibleViewOffset = firstVisibleView.getTop();
+      }
 
       int offset = 0;
       for (int i=0;i<firstVisibleItemPosition;i++) {
@@ -1379,9 +1396,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
 
       offset = offset / spanCount;
-      offset += firstVisibleView.getTop();
+      offset += firstVisibleViewOffset;
       return offset;
     }
+    //Unhandled LayoutManager type
     return -1;
   }
 }
