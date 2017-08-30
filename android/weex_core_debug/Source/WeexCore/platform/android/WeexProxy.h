@@ -1,21 +1,11 @@
 #ifndef _WEEX_PROXY_H_
 #define _WEEX_PROXY_H_
 
-#include "../../../base/ScopedJString.h"
-#include "../../../base/ScopedJStringUTF8.h"
-#include "../../../IPC/Buffering/IPCBuffer.h"
-#include "../../../IPC/IPCArguments.h"
-#include "../../../IPC/IPCByteArray.h"
-#include "../../../IPC/IPCException.h"
-#include "../../../IPC/IPCHandler.h"
-#include "../../../IPC/IPCMessageJS.h"
-#include "../../../IPC/IPCResult.h"
-#include "../../../IPC/IPCSender.h"
-#include "../../../IPC/IPCString.h"
-#include "../../../IPC/Serializing/IPCSerializer.h"
 
 #include <jni.h>
 #include <unistd.h>
+#include <IPC/Serializing/IPCSerializer.h>
+#include <IPC/IPCHandler.h>
 
 namespace WeexCore {
 

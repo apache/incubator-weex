@@ -1,6 +1,6 @@
 #ifndef _EXTEND_JSAPI_H_
 #define _EXTEND_JSAPI_H_
-#include "../../../base/LogUtils.h"
+#include <base/LogUtils.h>
 // #include "./base/weexjsontools.h"
 #include "../../../IPC/IPCHandler.h"
 #include "../../../IPC/IPCMessageJS.h"

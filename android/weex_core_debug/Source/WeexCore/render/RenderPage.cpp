@@ -7,10 +7,13 @@ RenderPage::RenderPage(std::string pageID, std::string data)
     mPageId = stringToNum<float>(pageID);
     mRenderObjectMap = new std::map<std::string, RenderObject*>();
 
-    char* c_data = new char;
+    int alen = data.length();
+    char* c_data = (char *) malloc(alen + 1);
     strcpy(c_data, data.c_str());
+    c_data[alen] = 0;
     RenderObject* render = json2RenderObject(c_data, this);
-    delete c_data;
+    free(c_data);
+    c_data = nullptr;
     mRenderObjectMap->insert(pair<std::string, RenderObject*>(render->getRef(),render));
     setRootRenderObject(render);
 

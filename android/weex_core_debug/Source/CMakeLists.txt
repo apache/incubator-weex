@@ -7,22 +7,15 @@ add_definitions(-DOS_ANDROID=1)
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/Source/CrashHandler)
+## add_subdirectory for subdirectory has a CMakeLists.txt
+add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 
-include_directories(${CMAKE_SOURCE_DIR}/Source/IPC)
+## include_directories for include head file
+## include_directories(${CMAKE_SOURCE_DIR}/Source/IPC)
+
 
 add_library(weexjsc SHARED
-    ./IPC/Serializing/IPCSerializer.cpp
-    ./IPC/IPCResult.cpp
-    ./IPC/IPCSender.cpp
-    ./IPC/IPCException.cpp
-    ./IPC/IPCCommunicator.cpp
-    ./IPC/IPCHandler.cpp
-    ./IPC/IPCListener.cpp
-    ./IPC/IPCFutexPageQueue.cpp
-    ./IPC/IPCFutexPageQueue.cpp
-    ./IPC/ashmem.c
-    ./IPC/IPCCheck.cpp
+
     ./base/Compatible.cpp
     ./base/base64/base64.cpp
     ./base/base64/modp_base64/modp_b64.cc
@@ -42,11 +35,7 @@ add_library(weexjsc SHARED
     ./rapidjson/weexjsontools.cpp
     )
 
-#    set(weexjsc_LIBRARY_TYPE SHARED)
-
-    set(weexjsc_LIBRARIES
-    CrashHandler
-    log)
+ #    set(weexjsc_LIBRARY_TYPE SHARED)
 
  #   set_target_properties(weexjsc
  #   PROPERTIES
@@ -63,8 +52,10 @@ add_library(weexjsc SHARED
     target_include_directories(weexjsc
                                 PUBLIC
                                 .)
+
     target_link_libraries(weexjsc 
-                                android 
+                                android
+                                IPC
                                 log
                                 z
                                 ${CMAKE_SOURCE_DIR}/libyogacore.so)

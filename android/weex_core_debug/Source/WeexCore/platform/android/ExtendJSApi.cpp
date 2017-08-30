@@ -1,5 +1,6 @@
 #include "ExtendJSApi.h"
 #include "WeexCore.h"
+#include "BridgeAndroid.h"
 
 using namespace WeexCore;
 
@@ -112,12 +113,15 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments* arguments)
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
+  if (isWeexCore) {
     RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),jByteArray2Str(env, jTaskString));
+  }
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
         flag = mBridgeAndroid->callCreateBody(jInstanceId, jTaskString, jCallback);
     }
+  
     return createInt32Result(flag);
 }
 
@@ -395,14 +399,16 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments* arguments)
   //callback  args[4]
   jstring jCallback = getArgumentAsJString(env, arguments, 4);
 
-  std::string pageId = jString2Str(env, jInstanceId);
-  std::string parentRef = jString2Str(env, jref);
-  std::string str_index = jString2Str(env, jindex);
-  int index = stringToNum<int>(str_index);
-  std::string data = jByteArray2Str(env, jdomString);
+  if (isWeexCore) {
+    std::string pageId = jString2Str(env, jInstanceId);
+    std::string parentRef = jString2Str(env, jref);
+    std::string str_index = jString2Str(env, jindex);
+    int index = stringToNum<int>(str_index);
+    std::string data = jByteArray2Str(env, jdomString);
 
-  RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
-  RenderManager::getInstance()->printRenderAndLayoutTree(jString2Str(env, jInstanceId));
+    RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
+    RenderManager::getInstance()->printRenderAndLayoutTree(jString2Str(env, jInstanceId));
+  }
 
     int flag = 0;
     if (mBridgeAndroid.get()) {

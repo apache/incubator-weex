@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_library(IPC
-STATIC
+
+set(IPCSource
 ./Serializing/IPCSerializer.cpp
 ./IPCResult.cpp
 ./IPCSender.cpp
@@ -12,7 +12,12 @@ STATIC
 ./IPCFutexPageQueue.cpp
 ./IPCFutexPageQueue.cpp
 ./ashmem.c
-./IPCCheck.cpp)
+./IPCCheck.cpp
+)
+
+add_library(IPC
+STATIC
+${IPCSource})
 
 target_include_directories(IPC
 PUBLIC
