@@ -41,6 +41,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 @property (nonatomic, assign) WXState state;
 @property (nonatomic, strong) NSDate *beginDate;
 @property (nonatomic) long long cacheTime;
+@property (nonatomic) BOOL isCache;  // if set cache , the cachetime is no use.
 
 @end
 @implementation WXPrerenderTask
@@ -53,7 +54,6 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 @property (nonatomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, WXPrerenderTask*> *prerenderTasks;
 @property (nonatomic) NSInteger maxCacheNumber;
-
 
 @end
 
@@ -99,7 +99,24 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
     __weak WXPrerenderManager *weakSelf = manager;
     dispatch_async(manager.queue, ^{
-        [weakSelf prerender:newUrl instanceId:instanceId callback:callback];
+        [weakSelf prerender:newUrl instanceId:instanceId isCache:NO callback:callback];
+    });
+}
+
++ (void) addGlobalTask:(NSString *) url callback:(WXModuleCallback)callback
+{
+    NSURL *newUrl = [NSURL URLWithString:url];
+    if(!newUrl){
+        if(callback){
+            callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
+        return;
+    }
+    
+    WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
+    __weak WXPrerenderManager *weakSelf = manager;
+    dispatch_async(manager.queue, ^{
+        [weakSelf prerender:newUrl instanceId:@"" isCache:YES callback:callback];
     });
 }
 
@@ -119,7 +136,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     return YES;
 }
 
-- (void) prerender:(NSURL *)url instanceId:(NSString *)instanceId callback:(WXModuleCallback) callback{
+- (void) prerender:(NSURL *)url instanceId:(NSString *)instanceId isCache:(BOOL)isCache callback:(WXModuleCallback) callback{
 
     NSString *str = url.absoluteString;
     if(str.length==0){
@@ -151,11 +168,14 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
             self.maxCacheNumber = max;
         }
     }
+    
+    
     WXSDKInstance *instance = [[WXSDKInstance alloc] init];
     instance.needPrerender = YES;
     task.instance = instance;
     task.parentInstanceId = instanceId;
     task.url = url.absoluteString;
+    task.isCache = isCache;
     
     if(self.prerenderTasks && self.prerenderTasks.count<self.maxCacheNumber){
         [self.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
@@ -185,11 +205,10 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
 }
 
-+ (BOOL)isTaskExist:(NSString *)url{
-    return [[WXPrerenderManager sharedInstance]isTaskExist:url];
++ (BOOL)isTaskReady:(NSString *)url{
+    return [[WXPrerenderManager sharedInstance]isTaskReady:url];
 }
-
-- (BOOL)isTaskExist:(NSString *)url
+- (BOOL)isTaskReady:(NSString *)url
 {
     if( !url ||url.length == 0){
         return NO;
@@ -203,10 +222,30 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
     // compare cache time with begin time
     NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:task.beginDate];
-    if(time > task.cacheTime){
+    if(time > task.cacheTime && !task.isCache){
         return NO;
     }
     
+    if(!task.view)  // view not exist ，not prerender
+    {
+        return NO;
+    }
+    if(task ){
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)isTaskExist:(NSString *)url{
+    return [[WXPrerenderManager sharedInstance]isTaskExist:url];
+}
+
+- (BOOL)isTaskExist:(NSString *)url
+{
+    if( !url ||url.length == 0){
+        return NO;
+    }
+    WXPrerenderTask *task  = [self.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     if(task ){
         return YES;
     }
@@ -216,7 +255,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 + (void)renderFromCache:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    if([manager isTaskExist:url])
+    if([manager isTaskReady:url])
     {
         WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
         
@@ -265,7 +304,10 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     if (url.length > 0) {
         WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
         if(manager.prerenderTasks && [manager.prerenderTasks count]>0){
-            [manager.prerenderTasks removeObjectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+            WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+            if(task){
+                [manager.prerenderTasks removeObjectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+            }
         }
     }
 }

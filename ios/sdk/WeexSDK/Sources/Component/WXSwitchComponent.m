@@ -60,9 +60,7 @@
 - (void)viewDidLoad
 {
     _switchView = (WXSwitchView *)self.view;
-    if (!_testId) {
-        _switchView.isAccessibilityElement = YES;
-    }
+    _switchView.isAccessibilityElement = YES;
     [_switchView setOn:_checked animated:YES];
     [_switchView setEnabled:!_disabled];
     [_switchView addTarget:self action:@selector(checkChanged) forControlEvents:UIControlEventValueChanged];

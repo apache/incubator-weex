@@ -16,7 +16,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/'+goal+'.js'))
-      .waitForElementByName(goal, timeout, 2000)
   });
 
   afterEach(function () {
