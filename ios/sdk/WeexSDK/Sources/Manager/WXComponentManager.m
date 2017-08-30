@@ -430,18 +430,20 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 {
     WXAssertParam(styles);
     WXAssertParam(ref);
-    WXAssertComponentThread();
     
-    WXComponent *component = [_indexDict objectForKey:ref];
-    WXAssertComponentExist(component);
-    
-    NSMutableDictionary *normalStyles = [NSMutableDictionary new];
-    NSMutableArray *resetStyles = [NSMutableArray new];
-    [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
-    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
-    WXPerformBlockOnMainThread(^{
-        [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
-        [component readyToRender];
+    WXPerformBlockOnComponentThread(^{
+        WXComponent *component = [_indexDict objectForKey:ref];
+        WXAssertComponentExist(component);
+        
+        NSMutableDictionary *normalStyles = [NSMutableDictionary new];
+        NSMutableArray *resetStyles = [NSMutableArray new];
+        [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
+        [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
+        WXPerformBlockOnMainThread(^{
+            [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
+            [component readyToRender];
+        });
+
     });
 }
 
