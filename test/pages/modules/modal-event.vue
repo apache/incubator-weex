@@ -1,33 +1,50 @@
 <template>
   <div>
-    <panel title = 'modal-event' :padding-body='0'>
-      <div style='flex-direction:row'> 
-        <button class='mr-base' type="info" size="middle" value="alertClick" @click.native="alertClick"></button>
+    <panel title='modal-event'>
+      <div style='flex-direction:row'>
+        <button class='mr-base' type="info" size="middle" value="toast" @click.native="toastClick"></button>
       </div>
+
+      <div style='flex-direction:row'>
+        <button class='mr-base' type="info" size="middle" value="alert" @click.native="alertClick"></button>
+      </div>
+
+      <div style='flex-direction:row'>
+        <button class='mr-base' type="info" size="middle" value="confirm" @click.native="confirmClick"></button>
+      </div>
+
+      <div style='flex-direction:row'>
+        <button class='mr-base' type="info" size="middle" value="prompt" @click.native="promptClick"></button>
+      </div>
+
       <panel title='校验结果：'>
-        <text style="font-size:30px">{{resultTxt}}</text>
+        <text style="font-size:30px">{{toastResult}}</text>
+        <text style="font-size:30px">{{alertResult}}</text>
+        <text style="font-size:30px">{{confirmResult}}</text>
+        <text style="font-size:30px">{{promptResult}}</text>
       </panel>
     </panel>
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 
+  * 测试modal的四个接口：toast、alert、confirm、prompt
 
 测试方式：
-  * 
-  * 
+  * 调用toast、alert、confirm、prompt，查看是否符合预期
+
       </text>
     </wxc-desc>
   </div>
 </template>
 <script>
-  var GET_URL = 'http://httpbin.org/get';
+
   var modal = weex.requireModule("modal");
   module.exports = {
     data : {
-      resultTxt:'',
-      sendtype:'json',
-      detail:''
+      toastResult:'',
+      alertResult:'',
+      confirmResult:'',
+      promptResult:'',
     },
     components: {
       "wxc-desc":require('../include/wxc-desc.vue'),
@@ -35,16 +52,44 @@
       button: require('../include/button.vue'),
     },
     methods : {
+      toastClick:function() {
+        modal.toast({
+          'message': 'message',
+          'duration': 1000,
+        });
+        this.toastResult = 'Toast success';
+      },
+
       alertClick:function() {
         var params = {
           'message':'message',
           'okTitle':'OK',
         }
         modal.alert(params,()=>{
-          this.resultTxt = 'alert success';
-        })
+          this.alertResult = 'Alert success';
+        });
       },
-      
+
+      confirmClick:function() {
+        modal.confirm({
+          'message': 'msg',
+          'okTitle': 'ok',
+          'cancelTitle': 'cancel',
+        }, ()=>{
+          this.confirmResult = "Confirm success";
+        });
+      },
+
+      promptClick:function() {
+        modal.prompt({
+          'message': 'I am Prompt!',
+          'okTitle': 'ok',
+          'cancelTitle': 'cancel'
+        }, ()=>{
+          this.promptResult = "Prompt success";
+        });
+      },
+
     }
   }
 </script>
