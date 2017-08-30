@@ -1,6 +1,3 @@
-//
-// Created by miomin on 2017/7/27.
-//
 
 #ifndef WEEXV8_CONSTANTSVALUE_H
 #define WEEXV8_CONSTANTSVALUE_H

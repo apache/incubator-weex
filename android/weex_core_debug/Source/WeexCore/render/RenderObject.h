@@ -12,82 +12,79 @@
 #include <map>
 #include <set>
 
-namespace WeexCore
-{
-class RenderObject;
-class RenderPage;
+namespace WeexCore {
+  class RenderObject;
 
-typedef typename std::map<std::string, std::string>::const_iterator ITERATOR_MAP_STRING;
+  class RenderPage;
 
+  class RenderObject {
+  public:
+    typedef std::vector<RenderObject *> ChildrenList;
 
-class RenderObject
-{
-public:
-  typedef std::vector<RenderObject *> ChildrenList;
+  private:
+    std::string mRef = "";
 
-private:
-  std::string mRef = "";
+    std::string mType = "";
 
-  std::string mType = "";
+    RenderPage *mPage;
 
-  RenderPage *mPage;
+    RenderObject *mParentRender;
 
-  RenderObject *mParentRender;
+    std::map<std::string, std::string> *mStyle;
 
-  std::map<std::string, std::string> *mStyle;
+    std::map<std::string, std::string> *mAtrributes;
 
-  std::map<std::string, std::string> *mAtrributes;
+    std::set<std::string> *mEvents;
 
-  std::set<std::string> *mEvents;
+    ChildrenList mChildren;
 
-  ChildrenList mChildren;
+    YGNodeRef mYGNode;
 
-  YGNodeRef mYGNode;
+    int mLeft, mTop, mWidth, mHeight;
 
-  int mLeft, mTop, mWidth, mHeight;
+  public:
+    RenderObject(RenderPage *page);
 
-public:
-  RenderObject(RenderPage *page);
-  ~RenderObject();
+    ~RenderObject();
 
-  void addRenderObject(int index, RenderObject *child);
+    void addRenderObject(int index, RenderObject *child);
 
-  void removeRenderObject(RenderObject* child);
+    void removeRenderObject(RenderObject *child);
 
-  void updateAttr(std::string key, std::string value);
+    void updateAttr(std::string key, std::string value);
 
-  void updateStyle(std::string key, std::string value);
+    void updateStyle(std::string key, std::string value);
 
-  void addEvent(std::string event);
+    void addEvent(std::string event);
 
-  void removeEvent(std::string event);
+    void removeEvent(std::string event);
 
-  RenderObject *getChild(int index);
+    RenderObject *getChild(int index);
 
-  int getChildCount();
+    int getChildCount();
 
-  void setRef(std::string ref);
+    void setRef(std::string ref);
 
-  std::string getRef();
+    std::string getRef();
 
-  void setType(std::string type);
+    void setType(std::string type);
 
-  std::string getType();
+    std::string getType();
 
-  YGNodeRef getYGNode();
+    YGNodeRef getYGNode();
 
-  void applyStyleToYGNode(std::string key, std::string value);
+    void applyStyleToYGNode(std::string key, std::string value);
 
-  void printRenderMsg();
+    void printRenderMsg();
 
-  void printYGNodeMsg();
+    void printYGNodeMsg();
 
-  void setParentRender(RenderObject* render);
+    void setParentRender(RenderObject *render);
 
-  RenderObject* getParentRender();
+    RenderObject *getParentRender();
 
-private:
-  void setLayout(int, int, int, int);
-};
+  private:
+    void setLayout(int, int, int, int);
+  };
 } //end WeexCore
 #endif //RenderObject_h

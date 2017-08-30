@@ -20,60 +20,60 @@ using namespace WeexCore;
  */
 class JsonParserHandler {
 public:
-    bool Null();
+  bool Null();
 
-    bool Bool(bool b);
+  bool Bool(bool b);
 
-    bool Int(int i);
+  bool Int(int i);
 
-    bool Uint(unsigned u);
+  bool Uint(unsigned u);
 
-    bool Int64(int64_t i);
+  bool Int64(int64_t i);
 
-    bool Uint64(uint64_t u);
+  bool Uint64(uint64_t u);
 
-    bool Double(double d);
+  bool Double(double d);
 
-    bool RawNumber(const char *, SizeType, bool);
+  bool RawNumber(const char *, SizeType, bool);
 
-    bool String(const char *str, SizeType length, bool);
+  bool String(const char *str, SizeType length, bool);
 
-    bool StartObject();
+  bool StartObject();
 
-    bool Key(const char *str, SizeType length, bool);
+  bool Key(const char *str, SizeType length, bool);
 
-    bool EndObject(SizeType);
+  bool EndObject(SizeType);
 
-    bool StartArray();
+  bool StartArray();
 
-    bool EndArray(SizeType);
-
-protected:
-    JsonParserHandler(char *str);
-
-    void ParseNext();
+  bool EndArray(SizeType);
 
 protected:
-    enum JsonParsingState {
-        kInit,
-        kError,
-        kHasNull,
-        kHasBool,
-        kHasNumber,
-        kHasString,
-        kHasKey,
-        kEnteringObject,
-        kExitingObject,
-        kEnteringArray,
-        kExitingArray
-    };
+  JsonParserHandler(char *str);
 
-    Value v_;
-    JsonParsingState st_;
-    Reader r_;
-    InsituStringStream ss_;
+  void ParseNext();
 
-    static const int parseFlags = kParseDefaultFlags | kParseInsituFlag;
+protected:
+  enum JsonParsingState {
+    kInit,
+    kError,
+    kHasNull,
+    kHasBool,
+    kHasNumber,
+    kHasString,
+    kHasKey,
+    kEnteringObject,
+    kExitingObject,
+    kEnteringArray,
+    kExitingArray
+  };
+
+  Value v_;
+  JsonParsingState st_;
+  Reader r_;
+  InsituStringStream ss_;
+
+  static const int parseFlags = kParseDefaultFlags | kParseInsituFlag;
 };
 
 /**
@@ -81,40 +81,40 @@ protected:
  */
 class JsonParser : protected JsonParserHandler {
 public:
-    JsonParser(char *str) : JsonParserHandler(str) {}
+  JsonParser(char *str) : JsonParserHandler(str) {}
 
-    bool EnterObject();
+  bool EnterObject();
 
-    bool EnterArray();
+  bool EnterArray();
 
-    const char *NextObjectKey();
+  const char *NextObjectKey();
 
-    bool NextArrayValue();
+  bool NextArrayValue();
 
-    int GetInt();
+  int GetInt();
 
-    double GetDouble();
+  double GetDouble();
 
-    const char *GetString();
+  const char *GetString();
 
-    bool GetBool();
+  bool GetBool();
 
-    void GetNull();
+  void GetNull();
 
-    void SkipObject();
+  void SkipObject();
 
-    void SkipArray();
+  void SkipArray();
 
-    void SkipValue();
+  void SkipValue();
 
-    Value *PeekValue();
+  Value *PeekValue();
 
-    int PeekType(); // returns a rapidjson::Type, or -1 for no value (at end of object/array)
+  int PeekType(); // returns a rapidjson::Type, or -1 for no value (at end of object/array)
 
-    bool IsValid() { return st_ != kError; }
+  bool IsValid() { return st_ != kError; }
 
 protected:
-    void SkipOut(int depth);
+  void SkipOut(int depth);
 };
 
 /**

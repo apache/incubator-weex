@@ -22,7 +22,7 @@
 #include "weexjsc.h"
 
 namespace WEEXJSC {
-extern "C" void soLoad(JavaVM *vm, 
+extern "C" void soLoad(JavaVM *vm,
     jclass* jBridgeClazz,
     jclass* jWXJSObject,
     jclass* jWXLogUtils)

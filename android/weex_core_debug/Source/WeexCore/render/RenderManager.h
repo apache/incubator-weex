@@ -8,41 +8,36 @@
 #include "./base/LogUtils.h"
 #include "./rapidjson/weexjsontools.h"
 
-namespace WeexCore
-{
-class RenderPage;
+namespace WeexCore {
+  class RenderPage;
 
-class RenderManager
-{
+  class RenderManager {
 
   private:
     RenderManager();
+
     ~RenderManager();
 
     static RenderManager *m_pInstance;
 
     //just to release singleton object
-    class Garbo
-    {
-      public:
-        ~Garbo()
-        {
-            if (RenderManager::m_pInstance)
-            {
-                delete RenderManager::m_pInstance;
-            }
+    class Garbo {
+    public:
+      ~Garbo() {
+        if (RenderManager::m_pInstance) {
+          delete RenderManager::m_pInstance;
         }
+      }
     };
+
     static Garbo garbo;
 
   public:
-    static RenderManager *getInstance()
-    {
-        if (!m_pInstance)
-        {
-            m_pInstance = new RenderManager();
-        }
-        return m_pInstance;
+    static RenderManager *getInstance() {
+      if (!m_pInstance) {
+        m_pInstance = new RenderManager();
+      }
+      return m_pInstance;
     }
 
     //TODO: how to triggle a Frame event
@@ -55,7 +50,8 @@ class RenderManager
 
     void removeRenderObject(std::string pageId, std::string ref);
 
-    void moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
+    void
+    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
 
     void updateAttr(std::string pageId, std::string ref, std::string key, std::string value);
 
@@ -68,7 +64,7 @@ class RenderManager
     RenderPage *getPage(std::string id);
 
     void printRenderAndLayoutTree(std::string pageId);
-};
+  };
 }
 
 #endif //RenderManager_h
