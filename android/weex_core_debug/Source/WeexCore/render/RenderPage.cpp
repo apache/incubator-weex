@@ -2,13 +2,16 @@
 
 namespace WeexCore
 {
-RenderPage::RenderPage(String pageID, String data)
+RenderPage::RenderPage(std::string pageID, std::string data)
 {
-    mPageId = pageID.toInt();
-    mRenderObjectMap = new HashMap<String, RenderObject*>();
+    mPageId = stringToNum<float>(pageID);
+    mRenderObjectMap = new std::map<std::string, RenderObject*>();
 
-    RenderObject* render = json2RenderObject(wtfString2cstr(data), this);
-    mRenderObjectMap->set(render->getRef(),render);
+    char* c_data = new char;
+    strcpy(c_data, data.c_str());
+    RenderObject* render = json2RenderObject(c_data, this);
+    delete c_data;
+    mRenderObjectMap->insert(pair<std::string, RenderObject*>(render->getRef(),render));
     setRootRenderObject(render);
 
     // layout by YogaNode Tree
@@ -19,80 +22,77 @@ RenderPage::~RenderPage()
 {
     delete pRoot;
 
-    for (Vector<RenderAction *>::iterator it = mRenderActions.begin(); it != mRenderActions.end();it++) {
-        if (NULL != *it) {
+    for (std::vector<RenderAction *>::iterator it = mRenderActions.begin(); it != mRenderActions.end();it++) {
+        if (nullptr != *it) {
             delete *it;
-            *it = NULL;
+            *it = nullptr;
         }
     }
     mRenderActions.clear();
 
-    typedef typename HashMap<String, RenderObject*>::const_iterator::Keys iterator_keys;
-
-    iterator_keys attr_it = mRenderObjectMap->begin().keys();
-    iterator_keys attr_end = mRenderObjectMap->end().keys();
+    std::map<std::string, RenderObject*>::const_iterator attr_it = mRenderObjectMap->begin();
+    std::map<std::string, RenderObject*>::const_iterator attr_end = mRenderObjectMap->end();
     for (; attr_it != attr_end; ++attr_it)
     {
-        delete mRenderObjectMap->get(*attr_it);
+        delete attr_it->second;
     }
 
     mRenderObjectMap->clear();
     delete mRenderObjectMap;
 }
 
-void RenderPage::addRenderObject(String parentRef, int insertPosiotn, String data)
+void RenderPage::addRenderObject(std::string parentRef, int insertPosiotn, std::string data)
 {
-    RenderObject *parent = getRenderObject(parentRef);
-    if (parent == NULL) {
+  RenderObject *parent = getRenderObject(parentRef);
+  if (parent == nullptr) {
+        return;
+    }
+    char* c_data = (char *) data.data();
+    RenderObject *child = json2RenderObject(c_data, this);
+  if (child == nullptr) {
         return;
     }
 
-    RenderObject *child = json2RenderObject(wtfString2cstr(data),this);
-    if (child == NULL) {
-        return;
-    }
-
-    mRenderObjectMap->set(child->getRef(),child);
+    mRenderObjectMap->insert(pair<std::string, RenderObject*>(child->getRef(),child));
 
     // add child to YogaNode Tree
     YGNodeInsertChild(parent->getYGNode(),child->getYGNode(),parent->getChildCount());
 
     // add child to Render Tree
     child->setParentRender(parent);
-    LOGD("[RenderPage::addRenderObject] parentRef : %s, childRef: %s", parent->getRef().utf8().data(),child->getRef().utf8().data());
     parent->addRenderObject(insertPosiotn, child);
 
     // layout by YogaNode Tree
     YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
 }
 
-void RenderPage::removeRenderObject(String ref)
+void RenderPage::removeRenderObject(std::string ref)
 {
     RenderObject *child = getRenderObject(ref);
     RenderObject *parent = child->getParentRender();
 
     parent->removeRenderObject(child);
     YGNodeRemoveChild(parent->getYGNode(), child->getYGNode());
-    mRenderObjectMap->remove(child->getRef());
+    mRenderObjectMap->erase(child->getRef());
     delete child;
 
     // layout by YogaNode Tree
     YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
 }
 
-void RenderPage::moveRenderObject(String ref, String parentRef, String index)
+void RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index)
 {
     RenderObject *child = getRenderObject(ref);
     RenderObject *oldParent = child->getParentRender();
     RenderObject *newParent = getRenderObject(parentRef);
 
     oldParent->removeRenderObject(child);
-    newParent->addRenderObject(index.toInt(), child);
+    newParent->addRenderObject(stringToNum<int>(index), child);
 
     YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
 }
 
-void RenderPage::updateStyle(String ref, String key, String value)
+void RenderPage::updateStyle(std::string ref, std::string key, std::string value)
 {
     RenderObject *render = getRenderObject(ref);
     render->updateStyle(key, value);
@@ -101,19 +101,19 @@ void RenderPage::updateStyle(String ref, String key, String value)
     YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
 }
 
-void RenderPage::updateAttr(String ref, String key, String value)
+void RenderPage::updateAttr(std::string ref, std::string key, std::string value)
 {
     RenderObject *render = getRenderObject(ref);
     render->updateAttr(key, value);
 }
 
-void RenderPage::addEvent(String ref, String event)
+void RenderPage::addEvent(std::string ref, std::string event)
 {
     RenderObject *render = getRenderObject(ref);
     render->addEvent(event);
 }
 
-void RenderPage::removeEvent(String ref, String event)
+void RenderPage::removeEvent(std::string ref, std::string event)
 {
     RenderObject *render = getRenderObject(ref);
     render->removeEvent(event);
@@ -124,14 +124,14 @@ void RenderPage::addRenderAction(RenderAction *action)
 
 }
 
-RenderObject *RenderPage::getRenderObject(String ref)
+RenderObject *RenderPage::getRenderObject(std::string ref)
 {
-    return mRenderObjectMap->get(ref);
+    return mRenderObjectMap->find(ref)->second;
 }
 
 void RenderPage::setRootRenderObject(RenderObject *root)
 {
-    if (root != NULL)
+    if (root != nullptr)
     {
         pRoot = root;
     }

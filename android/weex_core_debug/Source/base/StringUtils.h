@@ -14,6 +14,9 @@
 #include "../IPC/IPCResult.h"
 #include "../IPC/IPCSender.h"
 #include "../IPC/IPCString.h"
+#include <iostream>
+#include <sstream>
+#include <string>
 
 namespace WeexCore
 {
@@ -22,7 +25,7 @@ static std::string jString2Str(JNIEnv *env, jstring jstr)
 {
     char *rtn = NULL;
     jclass clsstring = env->FindClass("java/lang/String");
-    jstring strencode = env->NewStringUTF("GB2312");
+    jstring strewincode = env->NewStringUTF("GB2312");
     jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
     jbyteArray barr = (jbyteArray)env->CallObjectMethod(jstr, mid, strencode);
     jsize alen = env->GetArrayLength(barr);
@@ -36,23 +39,28 @@ static std::string jString2Str(JNIEnv *env, jstring jstr)
     env->ReleaseByteArrayElements(barr, ba, 0);
     std::string stemp(rtn);
     free(rtn);
-    return stemp;
+
+  env->DeleteLocalRef(clsstring);
+  env->DeleteLocalRef(strencode);
+
+  return stemp;
 }
 
-// static String jString2String(JNIEnv *env, jstring str)
-// {
-//     if (str != NULL)
-//     {
-//         ScopedJString scopedstr(env, str);
-//         size_t length = scopedstr.getCharsLength();
-//         const jchar *str = scopedstr.getChars();
-//         UChar *dst;
-//         String s = String::createUninitialized(length, dst);
-//         memcpy(dst, str, length * sizeof(UChar));
-//         return s;
-//     }
-//     return String("");
-// }
+static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
+    char *rtn = NULL;
+    jsize alen = env->GetArrayLength(barr);
+    jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
+    if (alen > 0)
+    {
+        rtn = (char *)malloc(alen + 1);
+        memcpy(rtn, ba, alen);
+        rtn[alen] = 0;
+    }
+    env->ReleaseByteArrayElements(barr, ba, 0);
+    std::string stemp(rtn);
+    free(rtn);
+    return stemp;
+}
 
 static const char* GetUTFChars(JNIEnv* env, jstring str)
 {
@@ -76,7 +84,12 @@ static jstring Char2JString(JNIEnv* env, const char* pat) {
     // 设置String, 保存语言类型,用于byte数组转换至String时的参数
     jstring encoding = (env)->NewStringUTF("GB2312");
     //将byte数组转换为java String,并输出
-    return (jstring) (env)->NewObject(strClass, ctorID, bytes, encoding);
+
+  env->DeleteLocalRef(strClass);
+  env->DeleteLocalRef(bytes);
+  env->DeleteLocalRef(strClass);
+
+  return (jstring) (env)->NewObject(strClass, ctorID, bytes, encoding);
 }
 
 static jstring Str2JString(JNIEnv* env, std::string& str)  
@@ -144,6 +157,15 @@ static void addJSONString(JNIEnv* env, IPCSerializer* serializer, jstring str)
     const uint16_t* chars = scopedString.getChars();
     size_t charsLength = scopedString.getCharsLength();
     serializer->addJSON(chars, charsLength);
+}
+
+template <class Type>
+static Type stringToNum(const std::string& str)
+{
+    std::istringstream iss(str);
+    Type num;
+    iss >> num;
+    return num;
 }
 
 }

@@ -2,19 +2,18 @@
 #define RenderPage_H
 
 #include "RenderPage.h"
-
-#include <wtf/text/WTFString.h>
-#include <wtf/HashSet.h>
 #include "./base/LogUtils.h"
-#include "./base/weexjsontools.h"
+#include "./rapidjson/weexjsontools.h"
+#include "./base/StringUtils.h"
+#include "action/RenderAction.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
-#include "action/RenderAction.h"
+#include <vector>
+#include <string>
+#include <map>
 
-using namespace WTF;
 namespace WeexCore
 {
-
 class RenderObject;
 class RenderAction;
 
@@ -24,27 +23,27 @@ class RenderPage
   private:
     RenderObject *pRoot;
     int mPageId;
-    Vector<RenderAction *> mRenderActions;
-    HashMap<String, RenderObject*> *mRenderObjectMap;
+    std::vector<RenderAction *> mRenderActions;
+    std::map<std::string, RenderObject*> *mRenderObjectMap;
 
   public:
-    RenderPage(String pageID, String data);
+    RenderPage(std::string pageID, std::string data);
     ~RenderPage();
 
-    void addRenderObject(String parentRef, int insertPosiotn, String data);
-    void removeRenderObject(String ref);
-    void moveRenderObject(String ref, String parentRef, String index);
+    void addRenderObject(std::string parentRef, int insertPosiotn, std::string data);
+    void removeRenderObject(std::string ref);
+    void moveRenderObject(std::string ref, std::string parentRef, std::string index);
 
-    void updateStyle(String ref, String key, String value);
-    void updateAttr(String ref, String key, String value);
-    void addEvent(String ref, String event);
-    void removeEvent(String ref, String event);
+    void updateStyle(std::string ref, std::string key, std::string value);
+    void updateAttr(std::string ref, std::string key, std::string value);
+    void addEvent(std::string ref, std::string event);
+    void removeEvent(std::string ref, std::string event);
 
     void addRenderAction(RenderAction *action);
 
     void batch();
 
-    RenderObject* getRenderObject(String ref);
+    RenderObject* getRenderObject(std::string ref);
 
     void setRootRenderObject(RenderObject *root);
 

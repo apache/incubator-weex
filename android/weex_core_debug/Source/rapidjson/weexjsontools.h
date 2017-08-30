@@ -3,10 +3,9 @@
 
 #include "pointer.h"
 #include <iostream>
-#include <string.h>
-#include "../base/fpconv.h"
 #include <sstream>
-#include <wtf/text/WTFString.h>
+#include <string>
+#include "../base/fpconv.h"
 #include "../base/LogUtils.h"
 #include "../base/StringUtils.h"
 #include "../WeexCore/render/RenderObject.h"
@@ -126,6 +125,6 @@ protected:
  */
 RenderObject *json2RenderObject(char *data, RenderPage *page);
 
-void json2SingleKeyValue(char *data, String &key, String &value);
+void json2SingleKeyValue(char *data, std::string &key, std::string &value);
 
 #endif //WEEX_JSON_TOOLS

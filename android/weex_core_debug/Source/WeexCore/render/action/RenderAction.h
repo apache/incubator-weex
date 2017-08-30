@@ -1,12 +1,12 @@
 #ifndef WEEXV8_RENDERACTION_H
 #define WEEXV8_RENDERACTION_H
 
-#include <wtf/text/WTFString.h>
 #include "../../layout/Position.h"
 #include "../../layout/RenderSize.h"
+#include <string>
 
 using namespace WeexCore;
-using namespace WTF;
+using namespace std;
 
 namespace WeexCore {
 
@@ -15,17 +15,17 @@ class RenderSize;
 
 class RenderAction {
 protected:
-    String mPageId;
-    int mActionType;
-    String mComponentType;
-    String mParentRef;
-    String mRef;
-    String index;
-    String mEvent;
-    Position position;
-    RenderSize renderSize;
-    String key;
-    String value;
+  string mPageId;
+  int mActionType;
+  string mComponentType;
+  string mParentRef;
+  string mRef;
+  string index;
+  string mEvent;
+  Position position;
+  RenderSize renderSize;
+  string key;
+  string value;
 
 public:
     RenderAction();

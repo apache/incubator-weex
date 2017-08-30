@@ -28,11 +28,18 @@ add_library(weexjsc SHARED
     ./base/base64/modp_base64/modp_b64.cc
     ./base/ScopedJString.cpp
     ./base/ScopedJStringUTF8.cpp
+    ./base/fpconv.cpp
+    ./WeexCore/layout/WXStyleUtil.cpp
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/BridgeAndroid.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
     ./WeexCore/platform/android/WeexProxy.cpp
     ./WeexCore/platform/android/WeexCore.cpp
+    ./WeexCore/render/action/RenderAction.cpp
+    ./WeexCore/render/RenderManager.cpp
+    ./WeexCore/render/RenderObject.cpp
+    ./WeexCore/render/RenderPage.cpp
+    ./rapidjson/weexjsontools.cpp
     )
 
 #    set(weexjsc_LIBRARY_TYPE SHARED)

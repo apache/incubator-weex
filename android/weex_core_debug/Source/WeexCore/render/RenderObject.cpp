@@ -1,10 +1,8 @@
 #include "RenderObject.h"
 #include "RenderPage.h"
-using namespace WTF;
 
 namespace WeexCore
 {
-typedef typename HashMap<String, String>::const_iterator::Keys iterator_keys;
 
 static void setDefaultStyle(YGNodeRef ygNode) {
     YGNodeStyleSetFlexDirection(ygNode, YGFlexDirectionColumn);
@@ -16,9 +14,9 @@ static void setDefaultStyle(YGNodeRef ygNode) {
 RenderObject::RenderObject(RenderPage *page)
     : mPage(page)
 {
-    mStyle = new HashMap<String, String>();
-    mAtrributes = new HashMap<String, String>();
-    mEvents = new HashSet<String>();
+    mStyle = new std::map<std::string, std::string>();
+    mAtrributes = new std::map<std::string, std::string>();
+    mEvents = new std::set<std::string>();
 
     YGConfigRef config = YGConfigNew();
     mYGNode = YGNodeNewWithConfig(config);
@@ -27,31 +25,30 @@ RenderObject::RenderObject(RenderPage *page)
 
 RenderObject::~RenderObject()
 {
-    LOGD("[~RenderObject] delete ref : %s，have %d child, parentRef: %s", mRef.utf8().data(),mChildren.size(), mParentRender->getRef().utf8().data());
-    mPage = NULL;
-    mParentRender = NULL;
-    mYGNode = NULL;
+    mPage = nullptr;
+    mParentRender = nullptr;
+    mYGNode = nullptr;
 
-    if (mStyle != NULL)
+    if (mStyle != nullptr)
     {
         delete mStyle;
-        mStyle = NULL;
+        mStyle = nullptr;
     }
-    if (mAtrributes != NULL)
+    if (mAtrributes != nullptr)
     {
         delete mAtrributes;
-        mAtrributes = NULL;
+        mAtrributes = nullptr;
     }
-    if (mEvents != NULL)
+    if (mEvents != nullptr)
     {
         delete mEvents;
-        mEvents = NULL;
+        mEvents = nullptr;
     }
 
-    for (Vector<RenderObject *>::iterator it = mChildren.begin(); it != mChildren.end();it++) {
-        if (NULL != *it) {
+    for (std::vector<RenderObject *>::iterator it = mChildren.begin(); it != mChildren.end();it++) {
+        if (nullptr != *it) {
             delete *it;
-            *it = NULL;
+            *it = nullptr;
         }
     }
 
@@ -60,35 +57,26 @@ RenderObject::~RenderObject()
 
 void RenderObject::addRenderObject(int index, RenderObject *child)
 {
-    LOGD("[RenderObject::addRenderObject] index: %d, parent ref: %s, child ref: %s", index, mRef.utf8().data(), child->getRef().utf8().data());
     // insert RenderObject child
-    mChildren.insert(mChildren.size(), child);
-
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
-    LOGD("[RenderObject::addRenderObject] call succeed");
+//    mChildren.insert(mChildren.begin() + mChildren.size() - 1, child);
+    mChildren.push_back(child);
 }
 
 void RenderObject::removeRenderObject(RenderObject* child)
 {
-    for (unsigned i = 0;i < mChildren.size();i++)
-    {
-        if (mChildren[i] != NULL && mChildren[i]->getRef() == child->getRef()) {
-            LOGD("[RenderObject::removeRenderObject] parent ref: %s ,remove child ref: %s, index: %d", mRef.utf8().data(), mChildren[i]->getRef().utf8().data(), i);
-            mChildren.remove(i);
-            break;
-        }
+    for (std::vector<RenderObject *>::iterator it = mChildren.begin(); it != mChildren.end();it++) {
+      if ((*it)->getRef() == child->getRef()) {
+        mChildren.erase(it);
+        break;
+      }
     }
-
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
 }
 
 RenderObject *RenderObject::getChild(int index)
 {
     if (index < mChildren.size())
     {
-        return mChildren[index];
+        return mChildren.at(index);
     }
     else
     {
@@ -96,57 +84,44 @@ RenderObject *RenderObject::getChild(int index)
     }
 }
 
-void RenderObject::updateAttr(String key, String value)
+void RenderObject::updateAttr(std::string key, std::string value)
 {
-    if (mAtrributes == NULL)
+    if (mAtrributes == nullptr)
     {
-        mAtrributes = new HashMap<String, String>();
+        mAtrributes = new std::map<std::string, std::string>();
     }
 
-    mAtrributes->set(key, value);
-    //
-    // RenderAction action = new RenderAction()
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
+    mAtrributes->insert(pair<std::string,std::string>(key, value));
 }
 
 // TODO: to recognize layout style or not
-void RenderObject::updateStyle(String key, String value)
+void RenderObject::updateStyle(std::string key, std::string value)
 {
-    if (mStyle == NULL)
+    if (mStyle == nullptr)
     {
-        mStyle = new HashMap<String, String>();
+        mStyle = new std::map<std::string, std::string>();
     }
 
-    mStyle->set(key, value);
+    mStyle->insert(pair<std::string,std::string>(key, value));
     applyStyleToYGNode(key, value);
-
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
 }
 
-void RenderObject::addEvent(String event)
+void RenderObject::addEvent(std::string event)
 {
-    if (mEvents == NULL)
+    if (mEvents == nullptr)
     {
-        mEvents = new HashSet<String>();
+        mEvents = new std::set<std::string>();
     }
-    mEvents->add(event);
-
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
+    mEvents->insert(event);
 }
 
-void RenderObject::removeEvent(String event)
+void RenderObject::removeEvent(std::string event)
 {
-    if (mEvents == NULL)
+    if (mEvents == nullptr)
     {
         return;
     }
-    mEvents->remove(event);
-
-    //TODO: create RenderAction info
-    mPage->addRenderAction(new RenderAction());
+    mEvents->erase(event);
 }
 
 void RenderObject::setLayout(int left, int top, int w, int h)
@@ -157,31 +132,28 @@ void RenderObject::setLayout(int left, int top, int w, int h)
         return;
     }
 
-    //TODO RenderAction
-    mPage->addRenderAction(new RenderAction());
-
     mLeft = left;
     mTop = top;
     mWidth = w;
     mHeight = h;
 }
 
-void RenderObject::setRef(String ref)
+void RenderObject::setRef(std::string ref)
 {
     mRef = ref;
 }
 
-String RenderObject::getRef()
+std::string RenderObject::getRef()
 {
     return mRef;
 }
 
-void RenderObject::setType(String type)
+void RenderObject::setType(std::string type)
 {
     mType = type;
 }
 
-String RenderObject::getType()
+std::string RenderObject::getType()
 {
     return mType;
 }
@@ -199,9 +171,9 @@ YGNodeRef RenderObject::getYGNode()
 /**
  * Synchronize the style of RenderObject to YGNode
  */
-void RenderObject::applyStyleToYGNode(String key, String value)
+void RenderObject::applyStyleToYGNode(std::string key, std::string value)
 {
-    if (mStyle == NULL)
+    if (mStyle == nullptr)
         return;
 
     if (key == ALIGN_ITEMS) {
@@ -209,7 +181,7 @@ void RenderObject::applyStyleToYGNode(String key, String value)
     } else if (key == ALIGN_SELF) {
         YGNodeStyleSetAlignSelf(mYGNode, getYGAlignSelf(value));
     } else if (key == FLEX) {
-        YGNodeStyleSetFlex(mYGNode, value.toFloat());
+        YGNodeStyleSetFlex(mYGNode, stringToNum<float>(value));
     } else if (key == FLEX_DIRECTION) {
         YGNodeStyleSetFlexDirection(mYGNode, getYGFlexDirection(value));
     } else if (key == JUSTIFY_CONTENT) {
@@ -217,64 +189,61 @@ void RenderObject::applyStyleToYGNode(String key, String value)
     } else if (key == FLEX_WRAP) {
         YGNodeStyleSetFlexWrap(mYGNode, getYGWrap(value));
     } else if (key == MIN_WIDTH) {
-        YGNodeStyleSetMinWidth(mYGNode, value.toFloat());
+        YGNodeStyleSetMinWidth(mYGNode, stringToNum<float>(value));
     } else if (key == MIN_HEIGHT) {
-        YGNodeStyleSetMinHeight(mYGNode, value.toFloat());
+        YGNodeStyleSetMinHeight(mYGNode, stringToNum<float>(value));
     } else if (key == MAX_WIDTH) {
-        YGNodeStyleSetMaxWidth(mYGNode, value.toFloat());
+        YGNodeStyleSetMaxWidth(mYGNode, stringToNum<float>(value));
     } else if (key == MAX_HEIGHT) {
-        YGNodeStyleSetMaxHeight(mYGNode, value.toFloat());
+        YGNodeStyleSetMaxHeight(mYGNode, stringToNum<float>(value));
     } else if (key == OVERFLOW) {
         YGNodeStyleSetOverflow(mYGNode, getYGOverflow(value));
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
-        YGNodeStyleSetHeight(mYGNode, value.toFloat());
+        YGNodeStyleSetHeight(mYGNode, stringToNum<float>(value));
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
-        YGNodeStyleSetWidth(mYGNode, value.toFloat());
+        YGNodeStyleSetWidth(mYGNode, stringToNum<float>(value));
     } else if (key == POSITION) {
         YGNodeStyleSetPositionType(mYGNode, getYGPositionType(value));
     } else if (key == LEFT) {
-        YGNodeStyleSetPosition(mYGNode, YGEdgeLeft, value.toFloat());
+        YGNodeStyleSetPosition(mYGNode, YGEdgeLeft, stringToNum<float>(value));
     } else if (key == TOP) {
-        YGNodeStyleSetPosition(mYGNode, YGEdgeTop, value.toFloat());
+        YGNodeStyleSetPosition(mYGNode, YGEdgeTop, stringToNum<float>(value));
     } else if (key == RIGHT) {
-        YGNodeStyleSetPosition(mYGNode, YGEdgeRight, value.toFloat());
+        YGNodeStyleSetPosition(mYGNode, YGEdgeRight, stringToNum<float>(value));
     } else if (key == BOTTOM) {
-        YGNodeStyleSetPosition(mYGNode, YGEdgeBottom, value.toFloat());
+        YGNodeStyleSetPosition(mYGNode, YGEdgeBottom, stringToNum<float>(value));
     } else if (key == MARGIN) {
-        YGNodeStyleSetMargin(mYGNode, YGEdgeAll, value.toFloat());
+        YGNodeStyleSetMargin(mYGNode, YGEdgeAll, stringToNum<float>(value));
     } else if (key == MARGIN_LEFT) {
-        YGNodeStyleSetMargin(mYGNode, YGEdgeLeft, value.toFloat());
+        YGNodeStyleSetMargin(mYGNode, YGEdgeLeft, stringToNum<float>(value));
     } else if (key == MARGIN_TOP) {
-        YGNodeStyleSetMargin(mYGNode, YGEdgeTop, value.toFloat());
+        YGNodeStyleSetMargin(mYGNode, YGEdgeTop, stringToNum<float>(value));
     } else if (key == MARGIN_RIGHT) {
-        YGNodeStyleSetMargin(mYGNode, YGEdgeRight, value.toFloat());
+        YGNodeStyleSetMargin(mYGNode, YGEdgeRight, stringToNum<float>(value));
     } else if (key == MARGIN_BOTTOM) {
-        YGNodeStyleSetMargin(mYGNode, YGEdgeBottom, value.toFloat());
+        YGNodeStyleSetMargin(mYGNode, YGEdgeBottom, stringToNum<float>(value));
     } else if (key == BORDER_WIDTH) {
-        YGNodeStyleSetBorder(mYGNode, YGEdgeAll, value.toFloat());
+        YGNodeStyleSetBorder(mYGNode, YGEdgeAll, stringToNum<float>(value));
     } else if (key == BORDER_TOP_WIDTH) {
-        YGNodeStyleSetBorder(mYGNode, YGEdgeTop, value.toFloat());
+        YGNodeStyleSetBorder(mYGNode, YGEdgeTop, stringToNum<float>(value));
     } else if (key == BORDER_RIGHT_WIDTH) {
-        YGNodeStyleSetBorder(mYGNode, YGEdgeRight, value.toFloat());
+        YGNodeStyleSetBorder(mYGNode, YGEdgeRight, stringToNum<float>(value));
     } else if (key == BORDER_BOTTOM_WIDTH) {
-        YGNodeStyleSetBorder(mYGNode, YGEdgeBottom, value.toFloat());
+        YGNodeStyleSetBorder(mYGNode, YGEdgeBottom, stringToNum<float>(value));
     } else if (key == BORDER_LEFT_WIDTH) {
-        YGNodeStyleSetBorder(mYGNode, YGEdgeLeft, value.toFloat());
+        YGNodeStyleSetBorder(mYGNode, YGEdgeLeft, stringToNum<float>(value));
     } else if (key == PADDING) {
-        YGNodeStyleSetPadding(mYGNode, YGEdgeAll, value.toFloat());
+        YGNodeStyleSetPadding(mYGNode, YGEdgeAll, stringToNum<float>(value));
     } else if (key == PADDING_LEFT) {
-        YGNodeStyleSetPadding(mYGNode, YGEdgeLeft, value.toFloat());
+        YGNodeStyleSetPadding(mYGNode, YGEdgeLeft, stringToNum<float>(value));
     } else if (key == PADDING_TOP) {
-        YGNodeStyleSetPadding(mYGNode, YGEdgeTop, value.toFloat());
+        YGNodeStyleSetPadding(mYGNode, YGEdgeTop, stringToNum<float>(value));
     } else if (key == PADDING_RIGHT) {
-        YGNodeStyleSetPadding(mYGNode, YGEdgeRight, value.toFloat());
+        YGNodeStyleSetPadding(mYGNode, YGEdgeRight, stringToNum<float>(value));
     } else if (key == PADDING_BOTTOM) {
-        YGNodeStyleSetPadding(mYGNode, YGEdgeBottom, value.toFloat());
+        YGNodeStyleSetPadding(mYGNode, YGEdgeBottom, stringToNum<float>(value));
     } else {
-        LOGD("[RenderObject::applyStyleToYGNode] [else] %s: %s",wtfString2cstr(key),wtfString2cstr(value));
     }
-
-    LOGD("[RenderObject::applyStyleToYGNode] %s: %s",wtfString2cstr(key),wtfString2cstr(value));
 }
 
 void RenderObject::setParentRender(RenderObject *render)
@@ -289,7 +258,7 @@ RenderObject* RenderObject::getParentRender()
 
 void RenderObject::printRenderMsg()
 {
-    String result("ref: ");
+    std::string result("ref: ");
     result.append(mRef);
     result.append("\n");
 
@@ -300,66 +269,68 @@ void RenderObject::printRenderMsg()
 
     result.append("attr:\n");
 
-    iterator_keys attr_it = mAtrributes->begin().keys();
-    iterator_keys attr_end = mAtrributes->end().keys();
+    std::map<std::string, std::string>::const_iterator attr_it = mAtrributes->begin();
+    std::map<std::string, std::string>::const_iterator attr_end = mAtrributes->end();
     for (; attr_it != attr_end; ++attr_it)
     {
         result.append("   ");
-        result.append(*attr_it);
+        result.append(attr_it->first);
         result.append(":");
-        result.append(mAtrributes->get(*attr_it));
+        result.append(attr_it->second);
         result.append("\n");
     }
 
 
     result.append("style:\n");
 
-    iterator_keys style_it = mStyle->begin().keys();
-    iterator_keys style_end = mStyle->end().keys();
+    std::map<std::string, std::string>::const_iterator style_it = mStyle->begin();
+    std::map<std::string, std::string>::const_iterator style_end = mStyle->end();
     for (; style_it != style_end; ++style_it)
     {
         result.append("   ");
-        result.append(*style_it);
+        result.append(style_it->first);
         result.append(":");
-        result.append(mStyle->get(*style_it));
+        result.append(style_it->second);
         result.append("\n");
     }
 
 
-    if (mEvents != NULL)
+    if (mEvents != nullptr)
     {
         result.append("event:\n");
 
-        HashSet<String>::iterator event_it = mEvents->begin();
-        HashSet<String>::iterator event_end = mEvents->end();
+        std::set<std::string>::const_iterator event_it = mEvents->begin();
+        std::set<std::string>::const_iterator event_end = mEvents->end();
 
         for (; event_it != event_end; ++event_it)
         {
             result.append("   ");
-            result.append(mEvents->take(event_it));
+            result.append(*event_it);
             result.append("\n");
         }
     }
 
-    LOGD("[RenderObject::Render tree] \n %s", wtfString2cstr(result));
+    LOGE("[RenderObject::Render tree] \n %s", result.c_str());
 
-    for (unsigned i = 0;i < mChildren.size();i++)
-    {
-        getChild(i)->printRenderMsg();
+    for (std::vector<RenderObject *>::iterator it = mChildren.begin(); it != mChildren.end();it++) {
+      if (nullptr != *it) {
+        (*it)->printRenderMsg();
+      }
     }
 }
 
 void RenderObject::printYGNodeMsg()
 {
-    LOGD("yoga ref: %s\n", wtfString2cstr(mRef));
-    LOGD("yoga type: %s\n", wtfString2cstr(mType));
+    LOGE("yoga ref: %s\n", mRef.c_str());
+    LOGE("yoga type: %s\n", mType.c_str());
     YGNodePrint(mYGNode,YGPrintOptionsLayout);
     YGNodePrint(mYGNode,YGPrintOptionsStyle);
-    LOGD("\n\n");
+    LOGE("\n\n");
 
-    for (unsigned i = 0;i < mChildren.size();i++)
-    {
-        getChild(i)->printYGNodeMsg();
+    for (std::vector<RenderObject *>::iterator it = mChildren.begin(); it != mChildren.end();it++) {
+      if (nullptr != *it) {
+        (*it)->printYGNodeMsg();
+      }
     }
 }
 } //end WeexCore

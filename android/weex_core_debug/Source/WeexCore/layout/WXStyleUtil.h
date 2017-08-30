@@ -5,24 +5,24 @@
 #ifndef WEEXV8_WXSTYLEUTIL_H
 #define WEEXV8_WXSTYLEUTIL_H
 
-#include <wtf/text/WTFString.h>
 #include "ConstantsValue.h"
 #include "../../yoga/Yoga.h"
+#include <string>
 
-using namespace WTF;
+using namespace std;
 
-YGFlexDirection getYGFlexDirection(String value);
+YGFlexDirection getYGFlexDirection(string value);
 
-YGJustify getYGJustifyContent(String value);
+YGJustify getYGJustifyContent(string value);
 
-YGAlign getYGAlignItem(String value);
+YGAlign getYGAlignItem(string value);
 
-YGPositionType getYGPositionType(String value);
+YGPositionType getYGPositionType(string value);
 
-YGAlign getYGAlignSelf(String value);
+YGAlign getYGAlignSelf(string value);
 
-YGWrap getYGWrap(String value);
+YGWrap getYGWrap(string value);
 
-YGOverflow getYGOverflow(String value);
+YGOverflow getYGOverflow(string value);
 
 #endif //WEEXV8_WXSTYLEUTIL_H

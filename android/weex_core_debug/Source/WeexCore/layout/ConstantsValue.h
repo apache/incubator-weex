@@ -5,30 +5,30 @@
 #ifndef WEEXV8_CONSTANTSVALUE_H
 #define WEEXV8_CONSTANTSVALUE_H
 
-#include <wtf/text/WTFString.h>
+#include <string>
 
-using namespace WTF;
+using namespace std;
 
-const String ROW = "row";
-const String COLUMN = "column"; //default
+const string ROW = "row";
+const string COLUMN = "column"; //default
 
-const String FLEX_START = "flex-start"; //default
-const String FLEX_END = "flex-end";
-const String CENTER = "center";
-const String SPACE_BETWEEN = "space-between";
-const String STRETCH = "stretch"; //default
-const String AUTO = "auto";
+const string FLEX_START = "flex-start"; //default
+const string FLEX_END = "flex-end";
+const string CENTER = "center";
+const string SPACE_BETWEEN = "space-between";
+const string STRETCH = "stretch"; //default
+const string AUTO = "auto";
 
-const String RELATIVE = "relative"; //default
-const String ABSOLUTE = "absolute";
-const String FIXED = "fixed";
-const String STICKY = "sticky";
+const string RELATIVE = "relative"; //default
+const string ABSOLUTE = "absolute";
+const string FIXED = "fixed";
+const string STICKY = "sticky";
 
-const String NOWRAP = "nowrap";
-const String WRAP = "wrap";
+const string NOWRAP = "nowrap";
+const string WRAP = "wrap";
 
-const String VISIBLE = "visible";
-const String HIDDEN = "hidden";
-const String SCROLL = "scroll";
+const string VISIBLE = "visible";
+const string HIDDEN = "hidden";
+const string SCROLL = "scroll";
 
 #endif //WEEXV8_CONSTANTSVALUE_H

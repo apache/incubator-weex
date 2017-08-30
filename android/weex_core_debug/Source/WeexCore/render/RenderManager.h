@@ -3,13 +3,14 @@
 
 #include "RenderObject.h"
 #include "RenderPage.h"
-#include <wtf/HashMap.h>
+#include <map>
+#include <string>
 #include "./base/LogUtils.h"
-#include "./base/weexjsontools.h"
-
+#include "./rapidjson/weexjsontools.h"
 
 namespace WeexCore
 {
+class RenderPage;
 
 class RenderManager
 {
@@ -34,13 +35,10 @@ class RenderManager
     };
     static Garbo garbo;
 
-    // save all pages info with RenderPage;
-    HashMap<String, RenderPage *> *mPages;
-
   public:
     static RenderManager *getInstance()
     {
-        if (m_pInstance == NULL)
+        if (!m_pInstance)
         {
             m_pInstance = new RenderManager();
         }
@@ -51,25 +49,25 @@ class RenderManager
     void batch();
 
     // create root node
-    void createPage(String pageId, String data);
+    void createPage(std::string pageId, std::string data);
 
-    void addRenderObject(String pageId, String parentRef, int index, String data);
+    void addRenderObject(std::string pageId, std::string parentRef, int index, std::string data);
 
-    void removeRenderObject(String pageId, String ref);
+    void removeRenderObject(std::string pageId, std::string ref);
 
-    void moveRenderObject(String pageId, String ref, String parentRef, String index);
+    void moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
 
-    void updateAttr(String pageId, String ref, String key, String value);
+    void updateAttr(std::string pageId, std::string ref, std::string key, std::string value);
 
-    void updateStyle(String pageId, String ref, String key, String value);
+    void updateStyle(std::string pageId, std::string ref, std::string key, std::string value);
 
-    void addEvent(String pageId, String ref, String event);
+    void addEvent(std::string pageId, std::string ref, std::string event);
 
-    void removeEvent(String pageId, String ref, String event);
+    void removeEvent(std::string pageId, std::string ref, std::string event);
 
-    RenderPage *getPage(String id);
+    RenderPage *getPage(std::string id);
 
-    void printRenderAndLayoutTree(String pageId);
+    void printRenderAndLayoutTree(std::string pageId);
 };
 }
 

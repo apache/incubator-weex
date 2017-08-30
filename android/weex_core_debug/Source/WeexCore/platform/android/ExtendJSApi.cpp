@@ -1,7 +1,5 @@
 #include "ExtendJSApi.h"
-#include "BridgeAndroid.h"
 #include "WeexCore.h"
-// #include "./WeexCore/render/RenderManager.h"
 
 using namespace WeexCore;
 
@@ -113,6 +111,8 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments* arguments)
     jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
     //callback args[2]
     jstring jCallback = getArgumentAsJString(env, arguments, 2);
+
+    RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),jByteArray2Str(env, jTaskString));
 
     int flag = 0;
     if (mBridgeAndroid.get()) {
@@ -383,20 +383,30 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments* arguments)
 
 std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments* arguments)
 {
-    JNIEnv* env = getJNIEnv();
-    //instacneID args[0]
+  JNIEnv* env = getJNIEnv();
+  //instacneID args[0]
     jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-    //instacneID args[1]
+  //instacneID args[1]
     jstring jref = getArgumentAsJString(env, arguments, 1);
-    //dom node args[2]
-    jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
-    //index  args[3]
-    jstring jindex = getArgumentAsJString(env, arguments, 3);
-    //callback  args[4]
-    jstring jCallback = getArgumentAsJString(env, arguments, 4);
+  //dom node args[2]
+  jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
+  //index  args[3]
+  jstring jindex = getArgumentAsJString(env, arguments, 3);
+  //callback  args[4]
+  jstring jCallback = getArgumentAsJString(env, arguments, 4);
+
+  std::string pageId = jString2Str(env, jInstanceId);
+  std::string parentRef = jString2Str(env, jref);
+  std::string str_index = jString2Str(env, jindex);
+  int index = stringToNum<int>(str_index);
+  std::string data = jByteArray2Str(env, jdomString);
+
+  RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
+  RenderManager::getInstance()->printRenderAndLayoutTree(jString2Str(env, jInstanceId));
+
     int flag = 0;
     if (mBridgeAndroid.get()) {
-        mBridgeAndroid->callAddElement(jInstanceId, jref, jdomString, jindex, jCallback);
+      flag = mBridgeAndroid->callAddElement(jInstanceId, jref, jdomString, jindex, jCallback);
     }
     return createInt32Result(flag);
 }

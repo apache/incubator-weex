@@ -3,101 +3,107 @@
 namespace WeexCore
 {
 
+  // save all pages info with RenderPage;
+  static std::map<std::string, RenderPage *> *mPages = nullptr;
+
 RenderManager *RenderManager::m_pInstance = nullptr;
 
-RenderManager::RenderManager()
+  RenderManager::RenderManager()
 {
 }
-void RenderManager::createPage(String pageId, String data)
+void RenderManager::createPage(std::string pageId, std::string data)
 {
     RenderPage *page = new RenderPage(pageId, data);
-    if (page != NULL)
+    if (page != nullptr)
     {
-        if (mPages == NULL)
+        if (!mPages)
         {
-            mPages = new HashMap<String, RenderPage *>();
+          mPages = new std::map<std::string, RenderPage *>();
         }
-        mPages->add(pageId, page);
+      (*mPages)[pageId] = page;
     }
 }
 
-void RenderManager::addRenderObject(String pageId, String parentRef, int index, String data)
+void RenderManager::addRenderObject(std::string pageId, std::string parentRef, int index, std::string data)
 {
-    LOGD("[RenderManager::addRenderObject] call addRenderObject, pageID: %d", pageId.toInt());
-    RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+  RenderPage *page = getPage(pageId);
+  if (page != nullptr)
     {
-        page->addRenderObject(parentRef, index, data);
+      page->addRenderObject(parentRef, index, data);
     }
 }
 
-void RenderManager::removeRenderObject(String pageId, String ref)
+void RenderManager::removeRenderObject(std::string pageId, std::string ref)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->removeRenderObject(ref);
     }
 }
 
-void RenderManager::moveRenderObject(String pageId, String ref, String parentRef, String index)
+void RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->moveRenderObject(ref, parentRef, index);
     }
 }
 
-void RenderManager::updateAttr(String pageId, String ref, String key, String value)
+void RenderManager::updateAttr(std::string pageId, std::string ref, std::string key, std::string value)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->updateAttr(ref, key, value);
     }
 }
 
-void RenderManager::updateStyle(String pageId, String ref, String key, String value)
+void RenderManager::updateStyle(std::string pageId, std::string ref, std::string key, std::string value)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->updateStyle(ref, key, value);
     }
 }
 
-void RenderManager::addEvent(String pageId, String ref, String event)
+void RenderManager::addEvent(std::string pageId, std::string ref, std::string event)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->addEvent(ref, event);
     }
 }
 
-void RenderManager::removeEvent(String pageId, String ref, String event)
+void RenderManager::removeEvent(std::string pageId, std::string ref, std::string event)
 {
     RenderPage *page = this->getPage(pageId);
-    if (page != NULL)
+    if (page != nullptr)
     {
         page->removeEvent(ref, event);
     }
 }
 
-RenderPage *RenderManager::getPage(String id)
+RenderPage *RenderManager::getPage(std::string id)
 {
-    if (mPages == NULL)
+    if (mPages == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
-    return mPages->get(id);
+
+    mPages->find(id);
+    RenderPage* page = mPages->find(id)->second;
+    return page;
 }
 
-void RenderManager::printRenderAndLayoutTree(String pageId)
+void RenderManager::printRenderAndLayoutTree(std::string pageId)
 {
-    LOGD("[RenderManager::Render tree] pageId: %s", pageId.utf8().data());
     RenderPage *page = this->getPage(pageId);
+    if (page == nullptr)
+      return;
     page->getRootRenderObject()->printRenderMsg();
     page->getRootRenderObject()->printYGNodeMsg();
 }

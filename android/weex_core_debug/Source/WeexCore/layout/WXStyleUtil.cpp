@@ -3,9 +3,7 @@
 //
 #include "WXStyleUtil.h"
 
-using namespace WTF;
-
-YGFlexDirection getYGFlexDirection(String value) {
+YGFlexDirection getYGFlexDirection(string value) {
     if (value == COLUMN) {
         return YGFlexDirectionColumn;
     } else if (value == ROW) {
@@ -14,7 +12,7 @@ YGFlexDirection getYGFlexDirection(String value) {
     return YGFlexDirectionColumn;
 }
 
-YGJustify getYGJustifyContent(String value) {
+YGJustify getYGJustifyContent(string value) {
     if (value == FLEX_START) {
         return YGJustifyFlexStart;
     } else if (value == FLEX_END) {
@@ -27,7 +25,7 @@ YGJustify getYGJustifyContent(String value) {
     return YGJustifyFlexStart;
 }
 
-YGAlign getYGAlignItem(String value) {
+YGAlign getYGAlignItem(string value) {
     if (value == STRETCH) {
         return YGAlignStretch;
     } else if (value == FLEX_START) {
@@ -40,7 +38,7 @@ YGAlign getYGAlignItem(String value) {
     return YGAlignStretch;
 }
 
-YGPositionType getYGPositionType(String value) {
+YGPositionType getYGPositionType(string value) {
     if (value == RELATIVE) {
         return YGPositionTypeRelative;
     } else if (value == ABSOLUTE) {
@@ -49,7 +47,7 @@ YGPositionType getYGPositionType(String value) {
     return YGPositionTypeRelative;
 }
 
-YGAlign getYGAlignSelf(String value) {
+YGAlign getYGAlignSelf(string value) {
     if (value == AUTO) {
         return YGAlignAuto;
     } else if (value == STRETCH) {
@@ -64,7 +62,7 @@ YGAlign getYGAlignSelf(String value) {
     return YGAlignAuto;
 }
 
-YGWrap getYGWrap(String value) {
+YGWrap getYGWrap(string value) {
     if (value == NOWRAP) {
         return YGWrapNoWrap;
     } else if (value == WRAP) {
@@ -73,7 +71,7 @@ YGWrap getYGWrap(String value) {
     return YGWrapNoWrap;
 }
 
-YGOverflow getYGOverflow(String value) {
+YGOverflow getYGOverflow(string value) {
     if (value == VISIBLE) {
         return YGOverflowVisible;
     } else if (value == HIDDEN) {

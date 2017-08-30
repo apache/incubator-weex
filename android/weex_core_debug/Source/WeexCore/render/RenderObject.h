@@ -1,42 +1,44 @@
 #ifndef RenderObject_h
 #define RenderObject_h
 
-#include <wtf/text/WTFString.h>
-#include <wtf/text/StringHash.h>
-#include <wtf/HashMap.h>
-#include <wtf/HashSet.h>
+#include <vector>
+#include <string>
 #include "./base/LogUtils.h"
 #include "../../yoga/Yoga.h"
 #include "../layout/ConstantsName.h"
 #include "../layout/WXStyleUtil.h"
 #include "./base/StringUtils.h"
 #include "action/RenderAction.h"
-
-using namespace WTF;
+#include <map>
+#include <set>
 
 namespace WeexCore
 {
+class RenderObject;
 class RenderPage;
+
+typedef typename std::map<std::string, std::string>::const_iterator ITERATOR_MAP_STRING;
+
 
 class RenderObject
 {
 public:
-  typedef Vector<RenderObject *> ChildrenList;
+  typedef std::vector<RenderObject *> ChildrenList;
 
 private:
-  String mRef = "";
+  std::string mRef = "";
 
-  String mType = "";
+  std::string mType = "";
 
   RenderPage *mPage;
 
   RenderObject *mParentRender;
 
-  HashMap<String, String> *mStyle;
+  std::map<std::string, std::string> *mStyle;
 
-  HashMap<String, String> *mAtrributes;
+  std::map<std::string, std::string> *mAtrributes;
 
-  HashSet<String> *mEvents;
+  std::set<std::string> *mEvents;
 
   ChildrenList mChildren;
 
@@ -52,29 +54,29 @@ public:
 
   void removeRenderObject(RenderObject* child);
 
-  void updateAttr(String key, String value);
+  void updateAttr(std::string key, std::string value);
 
-  void updateStyle(String key, String value);
+  void updateStyle(std::string key, std::string value);
 
-  void addEvent(String event);
+  void addEvent(std::string event);
 
-  void removeEvent(String event);
+  void removeEvent(std::string event);
 
   RenderObject *getChild(int index);
 
   int getChildCount();
 
-  void setRef(String ref);
+  void setRef(std::string ref);
 
-  String getRef();
+  std::string getRef();
 
-  void setType(String type);
+  void setType(std::string type);
 
-  String getType();
+  std::string getType();
 
   YGNodeRef getYGNode();
 
-  void applyStyleToYGNode(String key, String value);
+  void applyStyleToYGNode(std::string key, std::string value);
 
   void printRenderMsg();
 

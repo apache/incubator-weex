@@ -8,6 +8,8 @@
 #include "../../../IPC/IPCSender.h"
 #include "../../../IPC/IPCString.h"
 #include "../../../IPC/Serializing/IPCSerializer.h"
+#include <WeexCore/render/RenderManager.h>
+#include "BridgeAndroid.h"
 
 // #include "weexjsc.h"
 
