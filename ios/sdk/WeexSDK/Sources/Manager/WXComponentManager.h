@@ -184,9 +184,9 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 
 /**
  * @param styles a NSDictionary value, styles which will resolve
- * @param ref a NSString value, the component ref of target which you want to resolve
+ * @param component a WXComponent value, the target which you want to resolve
  * @param isUpdateStyles a BOOL value, YES will udpate the component style property, NO will notifiy the lifeStyle of compoenent to handle, default value is NO.
  * @abstract handleStyle will be add to a queue to be executed every frame, but handleStyleOnMainThread will switch to main thread and execute imediately, you can call this for your execution time sequence.
  */
-- (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles;
+- (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
 @end
