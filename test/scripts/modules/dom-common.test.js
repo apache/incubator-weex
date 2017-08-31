@@ -22,7 +22,7 @@ describe('weex '+goal+' test', function () {
     return util.quit(driver);
   })
 
-  it('#1 '+goal + ' event,add and remove dom', () => {
+  it('#1 '+goal + ' common opt', () => {
     return driver
       .waitForElementByName(goal, timeout, 2000)
       .waitForElementByName('show text', timeout, 2000)
