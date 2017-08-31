@@ -25,7 +25,7 @@ export default class Differ {
   isEmpty () {
     return this.map.length === 0
   }
-  append (type, depth, ref, handler) {
+  append (type, depth = 0, ref, handler) {
     if (!this.hasTimer) {
       this.hasTimer = true
       setTimeout(() => {

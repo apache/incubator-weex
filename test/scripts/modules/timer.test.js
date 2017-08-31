@@ -7,8 +7,6 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-do_test('Time Module in .we', '/modules/we_timer.js');
-
 do_test('Time Module in .vue', '/modules/vue_timer.js');
 
 function do_test(test_title, url) {
@@ -19,7 +17,6 @@ function do_test(test_title, url) {
     beforeEach(function () {
       return util.init(driver)
         .get(util.getPage(url))
-        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
     });
 
     afterEach(function () {
@@ -28,11 +25,12 @@ function do_test(test_title, url) {
 
     it('#1 SetTimeOut', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setTimeout')
         .click()
-        .sleep(6000)
+        .sleep(4000)
         .click()
-        .sleep(6000)
+        .sleep(4000)
         .elementById('timeout')
         .text()
         .then(text => {
@@ -42,58 +40,58 @@ function do_test(test_title, url) {
 
     it('#2 SetTimeOut Double click', () => {
       return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
         .elementById('setTimeout')
         .click()
         .click()
-        .sleep(6000)
+        .sleep(4000)
         .elementById('timeout')
-        .text()
-        .then(text => {
-          assert.equal(text, 4)
-        })
-    })
-
-    it('#3 ClearTimeOut', () => {
-      return driver
-        .elementById('setTimeout')
-        .click()
-        .elementById('clearTimeout')
-        .click()
-        .sleep(6000)
-        .elementById('timeout')
-        .text()
-        .then(text => {
-          assert.equal(text, 4)
-        })
-    })
-
-    it('#4 SetInterval', () => {
-      return driver
-        .elementById('setInterval')
-        .click()
-        .sleep(11000)
-        .elementById('interval')
         .text()
         .then(text => {
           assert.equal(text, 2)
         })
     })
 
-    let previous = 0
-    it('#5 ClearInterval', () => {
+    it('#3 ClearTimeOut', () => {
       return driver
-        .elementById('clearInterval')
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
+        .elementById('setTimeout')
         .click()
-        .elementById('interval')
+        .elementById('clearTimeout')
+        .click()
+        .sleep(4000)
+        .elementById('timeout')
         .text()
         .then(text => {
-          previous = text
+          assert.equal(text, 0)
         })
+    })
+
+    let previous = 0
+    it('#4 SetInterval ClearInterval', () => {
+      return driver
+        .waitForElementById("interval", util.getGETActionWaitTimeMills(), 1000)
+        .elementById('setInterval')
+        .click()
         .sleep(7000)
         .elementById('interval')
         .text()
         .then(text => {
-          assert.equal(previous, text)
+          assert.equal(text, 2)
+          return driver
+            .elementById('clearInterval')
+            .click()
+            .elementById('interval')
+            .text()
+            .then(text => {
+              previous = text
+            })
+            .sleep(4000)
+            .elementById('interval')
+            .text()
+            .then(text => {
+              assert.equal(previous, text)
+            })
         })
     })
   })

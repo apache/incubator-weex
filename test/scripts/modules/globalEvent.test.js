@@ -31,26 +31,22 @@ describe('weex mobile index', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/globalEvent.js'))
-      .waitForElementById('button',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
       return util.quit(driver)
   })
 
-  it('#0 fireEvent',()=>{
-      return driver
-      .elementById("button")
-      .click()
-      .sleep(2000)
-      .text()
-      .then((elem)=>{
-        assert.equal(elem, "posted")
-    })
-  })
-
-  it('#1 received event', ()=>{
+  it('#0 fireEvent & received event',()=>{
     return driver
+    .waitForElementById('button',util.getGETActionWaitTimeMills(),1000)
+    .elementById("button")
+    .click()
+    .sleep(2000)
+    .text()
+    .then((elem)=>{
+      assert.equal(elem, "posted")
+    })
     .elementById("content")
     .text()
     .then((elem)=>{

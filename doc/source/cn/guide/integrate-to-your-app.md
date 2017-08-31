@@ -256,8 +256,8 @@ WXSample地址
 [WXAppConfiguration setAppName:@"WeexDemo"];
 [WXAppConfiguration setAppVersion:@"1.0.0"];
 
-//init sdk enviroment   
-[WXSDKEngine initSDKEnviroment];
+//init sdk environment   
+[WXSDKEngine initSDKEnvironment];
 
 //register custom module and component，optional
 [WXSDKEngine registerComponent:@"MyView" withClass:[MyViewComponent class]];
@@ -298,7 +298,7 @@ Weex 支持整体页面渲染和部分渲染两种模式，你需要做的事情
     _instance.renderFinish = ^ (UIView *view) {
         //process renderFinish
     };
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"]
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"];
     [_instance renderWithURL:url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
 }
 ```

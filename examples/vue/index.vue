@@ -15,7 +15,6 @@
           {name: root + '/animation', title: 'Animation'},
           {name: root + '/transition', title: 'Transition'},
 
-
           // component
           {name: root + '/components/text', title: 'Text'},
           {name: root + '/iconfont', title: 'iconfont'},

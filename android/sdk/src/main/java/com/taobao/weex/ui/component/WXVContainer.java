@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -231,7 +232,12 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return mChildren == null ? 0 : mChildren.size();
   }
 
+  @Nullable
   public WXComponent getChild(int index) {
+    if (mChildren == null || index < 0 || index >= mChildren.size()) {
+      //To avoid index out of bounds
+      return null;
+    }
     return mChildren.get(index);
   }
 
