@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.taobao.android.jacoco'
+apply plugin: "jacoco"
+
+jacoco {
+    toolVersion = "0.7.9"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -110,7 +116,6 @@ dependencies {
     compile 'com.taobao.android:weex_inspector:0.11.0'
 }
 
-
 def coverageSourceDirs = ['../../../android/sdk/src/main/java']
 task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
@@ -118,6 +123,7 @@ task jacocoTestReport(type: JacocoReport) {
     reports {
         xml.enabled = true
         html.enabled = true
+        csv.enabled true
     }
     classDirectories = fileTree(//"enter code here"
             dir: '../../../android/sdk/build/intermediates/classes/debug',
@@ -141,6 +147,7 @@ task jacocoTestReport(type: JacocoReport) {
     File configFile = file('../../../android/sdk/build/intermediates/classes/debug')
 
     configFile = file(configFile.absolutePath)
+    println 'test==================='
     println configFile.path
 
     executionData = files("$buildDir/outputs/coverage.ec")
