@@ -40,7 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.weex.commons.AbstractWeexActivity;
-import com.google.zxing.client.android.CaptureActivity;
+//import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
@@ -145,7 +145,7 @@ public class IndexActivity extends AbstractWeexActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
           }
         } else {
-          startActivity(new Intent(this, CaptureActivity.class));
+//          startActivity(new Intent(this, CaptureActivity.class));
         }
         break;
       default:
@@ -159,7 +159,7 @@ public class IndexActivity extends AbstractWeexActivity {
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-      startActivity(new Intent(this, CaptureActivity.class));
+//      startActivity(new Intent(this, CaptureActivity.class));
     } else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
     } else {
       Toast.makeText(this, "request camara permission fail!", Toast.LENGTH_SHORT).show();
