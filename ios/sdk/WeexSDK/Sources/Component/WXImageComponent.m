@@ -80,12 +80,8 @@ WX_EXPORT_METHOD(@selector(save:))
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         [self configFilter:styles];
-        if (styles[@"quality"]) {
-            _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
-        }
-        if (attributes[@"quality"]) {
-            _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
-        }
+        _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;

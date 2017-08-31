@@ -591,7 +591,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return  WXImageQualityHigh;
     }
     
-    return  WXImageQualityLow;
+    return  WXImageQualityNone;
 }
 
 + (WXImageSharp)WXImageSharp:(id)value
