@@ -938,6 +938,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         if (instance != null) {
           url = instance.getBundleUrl();
         }
+        try {
+            if (WXEnvironment.getApplication() != null) {
+                crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + crashFile;
+                // Log.e("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         callReportCrash(crashFile, instanceId, url);
         if (reInitCount > CRASHREINIT) {
           return IWXBridge.INSTANCE_RENDERING_ERROR;
@@ -1604,6 +1612,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
     wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
