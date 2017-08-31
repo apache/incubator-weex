@@ -91,7 +91,8 @@
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
-        _ariaHidden = NO;
+        _ariaHidden = nil;
+        _accessible = nil;
         
         _async = NO;
         
@@ -110,13 +111,14 @@
             _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         }
         if (attributes[@"ariaHidden"]) {
-            _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+            
+            _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         }
         if (attributes[@"accessible"]) {
-            _accessible = [WXConvert BOOL:attributes[@"accessible"]];
+            _accessible = [WXConvert NSString:attributes[@"accessible"]];
         }
         
         if (attributes[@"testId"]) {
@@ -263,11 +265,12 @@
         if (_ariaLabel) {
             _view.accessibilityLabel = _ariaLabel;
         }
-        if (_view.isAccessibilityElement != _accessible) {
-            [_view setIsAccessibilityElement:_accessible];
+        if (_accessible) {
+            [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
         }
-        if (self.view.accessibilityElementsHidden != _ariaHidden) {
-            _view.accessibilityElementsHidden = _ariaHidden;
+        
+        if (_ariaHidden) {
+            [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
         }
         
         [self _initEvents:self.events];
@@ -444,9 +447,7 @@
             _transition = [WXTransition new];
         }
         [_transition _handleTransitionWithStyles:styles withTarget:self];
-    }
-    else
-    {
+    } else {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
     }
@@ -460,7 +461,7 @@
 - (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"width"]&&styles[@"width"])
             ||([property containsString:@"height"]&&styles[@"height"])
@@ -480,7 +481,7 @@
 - (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
             ||([property containsString:@"transform"]&&styles[@"transform"])
@@ -524,9 +525,7 @@
     WXAssertMainThread();
     if (![self _isPropertyAnimationStyles:styles]) {
         [self _updateViewStyles:styles];
-    }
-    else
-    {
+    } else {
         [self _transitionUpdateViewProperty:styles];
     }
     
@@ -609,16 +608,12 @@
         self.view.accessibilityTraits = _role;
     }
     if (attributes[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
-        if (self.view.accessibilityElementsHidden != _ariaHidden) {
-            self.view.accessibilityElementsHidden = _ariaHidden;
-        }
+        _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        [self.view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
     }
     if (attributes[@"accessible"]) {
-        _accessible = [WXConvert BOOL:attributes[@"accessible"]];
-        if (self.view.isAccessibilityElement != _accessible) {
-            [self.view setIsAccessibilityElement:_accessible];
-        }
+        _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        [self.view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
     }
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];

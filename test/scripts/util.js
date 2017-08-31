@@ -223,11 +223,19 @@ module.exports = {
                   .sleep(1000)
               })
           })
-            driver = driverFactory.initPromiseChain();
-            driver.configureHttp({
-                timeout: 100000
-            });
-            global._wxDriver = driver;
+          driverFactory.addPromiseChainMethod('saveShot', function(filepath){
+            return this.takeScreenshot()
+              .then(imgData => {
+                var newImg = new Buffer(imgData, 'base64');
+                fs.writeFileSync(filepath, newImg);
+                return this;
+              })
+          });
+          driver = driverFactory.initPromiseChain();
+          driver.configureHttp({
+              timeout: 100000
+          });
+          global._wxDriver = driver;
         }
         
         return driver;
@@ -243,6 +251,7 @@ module.exports = {
     quit:function(driver){
         if(browser)
             return driver.quit()
-        return driver.sleep(1000).back().sleep(1000);
+        var filepath = path.resolve(__dirname,'../../last.png');
+        return driver.saveShot(filepath).sleep(1000).back().sleep(1000);
     }
 }

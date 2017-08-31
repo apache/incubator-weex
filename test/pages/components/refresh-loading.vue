@@ -1,7 +1,7 @@
 <template>
   <div>
     <panel title = 'refresh-loading' :padding-body='0'>
-      <div style='flex-direction:row'> 
+      <div style='flex-direction:row'>
         <button class='mr-base' type="info" size="middle" value="hideRefresh" @click.native="hideRefresh"></button>
         <button class='mr-base' type="info" size="middle" value="hideLoading" @click.native="hideLoading"></button>
       </div>
@@ -15,11 +15,11 @@
         <loading-indicator class="indicator"></loading-indicator>
         <text class="refresh-txt">↓ 下拉刷新</text>
       </refresh>
-  
+
       <cell v-for="(k,v) in cells" style="height:100">
         <text class="txt">{{k}}-{{v}}</text>
       </cell>
-  
+
       <loading class="refresh" :display="loadingDisplay" @loading="onloading">
         <loading-indicator class="indicator"></loading-indicator>
         <text class="refresh-txt">↑ 上拉加载</text>
@@ -29,11 +29,15 @@
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 图片加载后调用load事件及native高宽
+  * 测试list的refresh（下拉刷新）和loading（上拉加载）
 
 测试方式：
-  * 校验第一张图片的native高宽
-  * 切换图片后，校验第二张图片的native高宽
+  * 下拉list，触发refresh事件
+  * refresh事件触发后，将refresh组件的display属性设为hide
+  * 将list上拉到底部
+  * 继续上拉list，触发loadmore事件
+  * loadmore事件触发后，将loading组件的display属性设为hide
+  
       </text>
     </wxc-desc>
   </div>
@@ -67,7 +71,7 @@
       onloading: function() {
         // show
         this.loadingDisplay = 'show';
-        
+
       },
       hideLoading:function() {
         if (this.loadingDisplay !== 'hide') {

@@ -20,6 +20,7 @@
 #import "WXTextAreaComponent.h"
 #import "WXUtility.h"
 #import "WXComponent+Layout.h"
+#import "WXComponent_internal.h"
 
 #define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
 #define CorrectY 8 // textview fill text 8 pixel from top
