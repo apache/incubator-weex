@@ -1804,6 +1804,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
+      if (METHOD_CREATE_INSTANCE.equals(function)) {
+        try {
+          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+            // JSONObject domObject = JSON.parseObject(tasks);
+            WXDomModule domModule = getDomModule(instanceId);
+            Action action = Actions.getReloadPage(instanceId);
+            domModule.postAction((DOMAction)action, true);
+            instance.setNeedLoad(true);
+            return;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 
