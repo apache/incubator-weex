@@ -321,7 +321,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   protected void onDestroy() {
     super.onDestroy();
 	//jacoco code coverage
-	JacocoCodeCoverage.dumpCodeCoverageByJacoco(getApplicationContext());
+//	JacocoCodeCoverage.dumpCodeCoverageByJacoco(getApplicationContext());
 
     if (mInstance != null) {
       mInstance.onActivityDestroy();
