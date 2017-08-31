@@ -180,6 +180,7 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+    String UNDEFINED = "undefined";
   }
 
   public interface Value {

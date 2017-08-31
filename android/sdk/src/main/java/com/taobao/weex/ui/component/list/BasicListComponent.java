@@ -92,8 +92,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private String TAG = "BasicListComponent";
   private int mListCellCount = 0;
   private boolean mForceLoadmoreNextTime = false;
-  private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
-  private static int visibleCellCount = 6;
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
@@ -302,9 +300,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
 
-        if (newState == RecyclerView.SCROLL_STATE_IDLE)
-          recycleViewHolderList();
-
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         if (listeners != null && listeners.size() > 0) {
           for (OnWXScrollListener listener : listeners) {
@@ -358,17 +353,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
     });
     return bounceRecyclerView;
-  }
-
-  private void recycleViewHolderList() {
-    for (ListBaseViewHolder holder : recycleViewList) {
-      if (holder != null
-              && holder.getComponent() != null
-              && !holder.getComponent().isUsing()) {
-        holder.recycled();
-      }
-    }
-    recycleViewList.clear();
   }
 
   @Override
@@ -806,23 +790,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     long begin = System.currentTimeMillis();
 
     holder.setComponentUsing(false);
-    if(holder.canRecycled()) {
-      recycleViewList.add(holder);
+    if (holder != null
+        && holder.canRecycled()
+        && holder.getComponent() != null
+        && !holder.getComponent().isUsing()) {
+      holder.recycled();
 
-      // recycleViewList allowed max size
-      int threshold = visibleCellCount >= 6 ? (visibleCellCount * 6) : (6*6);
-
-      /**
-       * Recycle cache{@link recycleViewList} when recycleViewList.size() > list max child count or threshold
-       */
-      if (recycleViewList.size() > getChildCount() + 1 || recycleViewList.size() >= threshold) {
-        WXLogUtils.d(TAG, "Recycle holder list recycled : cache size is " + recycleViewList.size() +
-                ", visibleCellCount is " + visibleCellCount + ", threshold is " + threshold +
-                ", child count is " + getChildCount());
-        recycleViewHolderList();
-      }
     } else {
-      WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
+      WXLogUtils.w(TAG, "this holder can not be allowed to  recycled");
     }
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "Recycle holder " + (System.currentTimeMillis() - begin) + "  Thread:" + Thread.currentThread().getName());
@@ -1194,9 +1169,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
       direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
-
-    if (mColumnCount > 0)
-      visibleCellCount = (lastVisible - firstVisible) * mColumnCount;
 
     while (it.hasNext()) {
       AppearanceHelper item = it.next();
