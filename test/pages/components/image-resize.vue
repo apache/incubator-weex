@@ -4,13 +4,13 @@
     	<text value='width>height'></text>
     	<div style="flex-direction: row;">
 	      <div class="cell">
-	        <image class="wh200x100 border margin" :src='imgSrc'></image>
+	        <image class="wh200x100 border margin" :src='imgSrc' quality='original' :placeholder='imgSrc' ></image>
 	      </div>
 	      <div class="cell">
-	        <image class="wh200x100 border margin" resize="cover" :src='imgSrc' ></image>
+	        <image class="wh200x100 border margin" :resize="cover" :src='imgSrc' ></image>
 	      </div>
 	      <div class="cell">
-	        <image class="wh200x100 border margin" resize="contain" :src='imgSrc'></image>
+	        <image class="wh200x100 border margin" :resize="contain" :src='imgSrc'></image>
 	      </div>
       </div>
       <text value='width=height'></text>
@@ -52,9 +52,13 @@
 </template>
 <script>
   module.exports = {
-    data : {
-    	imgSrc:"http://gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_200x200.jpg"
-    },
+    data :function(){
+    	return {
+	    	imgSrc:"http://img.alicdn.com/tps/TB1zBLaPXXXXXXeXXXXXXXXXXXX-121-59.svg",
+	    	cover:'stretch',
+	    	contain:'stretch',
+	    }
+    } ,
     components: {
       "wxc-desc":require('../include/wxc-desc.vue'),
       panel: require('../include/panel.vue'),
@@ -62,6 +66,13 @@
       h3: require('../include/h3.vue'),
     },
     methods : {
+    },
+    created:function(){
+    	setTimeout(()=>{
+    		this.cover='cover';
+    		this.contain = 'contain';
+    		this.imgSrc='http://gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_200x200.jpg';
+    	},0);
     }
   }
 </script>
