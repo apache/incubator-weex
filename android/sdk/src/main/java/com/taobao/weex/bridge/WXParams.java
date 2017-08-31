@@ -33,6 +33,7 @@ public class WXParams {
   private String shouldInfoCollect;
   private String logLevel;
   private String needInitV8;
+  private String cacheDir;
 
   private Map<String, String> options;
 
@@ -58,6 +59,14 @@ public class WXParams {
 
   public void setPlatform(String platform) {
     this.platform = platform;
+  }
+
+  public void setCacheDir(String cache) {
+    this.cacheDir = cache;
+  }
+
+  public String getCacheDir() {
+    return this.cacheDir;
   }
 
   public String getOsVersion() {
