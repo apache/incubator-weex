@@ -767,12 +767,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if(![self.view isFirstResponder]) {
         return;
     }
-    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
-    
     CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
-    if(begin.size.height <= 44) {
-        return;
-    }
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
