@@ -1138,6 +1138,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @Override
+    public void onBeforeScroll(int dx, int dy) {
+
+    }
+
+    @Override
     public void onLoadMore(int offScreenY) {
         try {
             String offset = getDomObject().getAttrs().getLoadMoreOffset();
@@ -1201,7 +1206,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 continue;
             }
             eventComponent = helper.getAwareChild();
-            if(eventComponent.getDomObject().getEvents().getEventBindingArgs() == null){
+            if(eventComponent.getDomObject().getEvents().getEventBindingArgs() == null) {
                 eventComponent.notifyAppearStateChange(appearStateChanged == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
                 continue;
             }
@@ -1226,10 +1231,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
     }
 
-    @Override
-    public void onBeforeScroll(int dx, int dy) {
-         mStickyHelper.onBeforeScroll(dx, dy);
-    }
+
 
 
     private int findHeaderPosition(WXCell header){
