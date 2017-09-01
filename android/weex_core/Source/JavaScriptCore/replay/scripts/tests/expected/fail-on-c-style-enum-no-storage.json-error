@@ -1,1 +1,0 @@
-ERROR: Could not parse enumerable type MouseButton: C-style enum declarations not enclosed by a class must specify their storage type so they can be forward declared.

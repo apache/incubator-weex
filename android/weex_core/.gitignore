@@ -1,5 +1,0 @@
-*.pyc
-build32/
-build64/
-cscope.out
-*.so
