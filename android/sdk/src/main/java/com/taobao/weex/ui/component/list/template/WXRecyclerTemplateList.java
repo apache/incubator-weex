@@ -51,12 +51,10 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.binding.WXStatement;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
-import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXLoading;
@@ -134,7 +132,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private String listDataIndexKey = "index";
     private ArrayMap<String, Integer> mTemplateViewTypes;
     private Map<String, WXCell> mTemplates;
-    private String listDataTemplateKey = Constants.Name.LIST_TEMPLATE_ID;
+    private String listDataTemplateKey = Constants.Name.SLOT_TEMPLATE_TYPE;
     private Runnable  notifyUpdate;
     private RecyclerView.ItemAnimator mItemAnimator;
 
@@ -358,8 +356,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             if(template.getDomObject() != null){
                 template.getDomObject().getStyles().put(Constants.Name.POSITION, Constants.Value.STICKY);
             }
-            getHostView().removeCallbacks(notifyUpdate);
-            getHostView().post(notifyUpdate);
+            if(getHostView() != null) {
+                getHostView().removeCallbacks(notifyUpdate);
+                getHostView().post(notifyUpdate);
+            }
         }
     }
 
@@ -375,8 +375,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             if(template.getDomObject() != null){
                 template.getDomObject().getStyles().remove(Constants.Name.POSITION);
             }
-            getHostView().removeCallbacks(notifyUpdate);
-            getHostView().post(notifyUpdate);
+            if(getHostView() != null) {
+                getHostView().removeCallbacks(notifyUpdate);
+                getHostView().post(notifyUpdate);
+            }
         }
     }
 
@@ -534,7 +536,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         if(child instanceof WXCell){
             if(child.getDomObject() != null && child.getDomObject().getAttrs() != null){
-                Object templateId = child.getDomObject().getAttrs().get(Constants.Name.LIST_TEMPLATE_ID);
+                Object templateId = child.getDomObject().getAttrs().get(Constants.Name.SLOT_TEMPLATE_TYPE);
                 String key = WXUtils.getString(templateId, null);
                 if(key != null){
                     mTemplates.put(key, (WXCell) child);
@@ -543,8 +545,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     }
                 }
             }
-            getHostView().removeCallbacks(notifyUpdate);
-            getHostView().post(notifyUpdate);
+            if(getHostView() != null) {
+                getHostView().removeCallbacks(notifyUpdate);
+                getHostView().post(notifyUpdate);
+            }
         }
 
         //FIXME adapter position not exist
@@ -700,8 +704,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                      setListData(param);
                 }
                 return true;
-            case Constants.Name.LIST_TEMPLATE_ID_KEY:
-                listDataTemplateKey = WXUtils.getString(param, Constants.Name.LIST_TEMPLATE_ID);
+            case Constants.Name.LIST_DATA_TEMPLATE_KEY:
+                listDataTemplateKey = WXUtils.getString(param, Constants.Name.SLOT_TEMPLATE_TYPE);
                 return true;
             case LOADMOREOFFSET:
                 return true;
@@ -741,7 +745,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         }
-        if(update){
+        if(update && getHostView() != null){
             getHostView().post(notifyUpdate);
         }
     }
@@ -906,11 +910,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
      * @param child the refresh_view or loading_view
      */
     private boolean setRefreshOrLoading(final WXComponent child) {
-        if (getHostView() == null) {
-            WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
-            return true;
-        }
-        if (child instanceof WXRefresh) {
+        if (child instanceof WXRefresh && getHostView() != null) {
             getHostView().setOnRefreshListener((WXRefresh) child);
             getHostView().postDelayed(new Runnable() {
                 @Override
@@ -921,7 +921,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return true;
         }
 
-        if (child instanceof WXLoading) {
+        if (child instanceof WXLoading && getHostView() != null) {
             getHostView().setOnLoadingListener((WXLoading) child);
             getHostView().postDelayed(new Runnable() {
                 @Override
@@ -1085,7 +1085,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return  -1;
         }
         if(cell.getDomObject() != null && cell.getDomObject().getAttrs() != null){
-            Object templateId = cell.getDomObject().getAttrs().get(Constants.Name.LIST_TEMPLATE_ID);
+            Object templateId = cell.getDomObject().getAttrs().get(Constants.Name.SLOT_TEMPLATE_TYPE);
             String template = WXUtils.getString(templateId, null);
             if(template == null){
                 return  0;
@@ -1139,7 +1139,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void onBeforeScroll(int dx, int dy) {
-
+        if(mStickyHelper != null){
+            mStickyHelper.onBeforeScroll(dx, dy);
+        }
     }
 
     @Override
@@ -1235,7 +1237,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
 
     private int findHeaderPosition(WXCell header){
-        Object templateId = header.getDomObject().getAttrs().get(Constants.Name.LIST_TEMPLATE_ID);
+        Object templateId = header.getDomObject().getAttrs().get(Constants.Name.SLOT_TEMPLATE_TYPE);
         String key = WXUtils.getString(templateId, null);
         if(key == null){
            return  -1;

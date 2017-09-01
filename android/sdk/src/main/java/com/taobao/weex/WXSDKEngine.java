@@ -273,6 +273,7 @@ public class WXSDKEngine {
       registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
+      registerComponent(WXBasicComponentType.CELL_SLOT, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
       registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
@@ -306,6 +307,7 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
       registerDomObject(WXBasicComponentType.HEADER, WXCellDomObject.class);
       registerDomObject(WXBasicComponentType.CELL, WXCellDomObject.class);
+      registerDomObject(WXBasicComponentType.CELL_SLOT, WXCellDomObject.class);
       registerDomObject(WXBasicComponentType.INPUT, BasicEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);

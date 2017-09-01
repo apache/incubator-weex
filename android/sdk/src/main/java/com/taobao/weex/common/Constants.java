@@ -183,8 +183,9 @@ public class Constants {
 
 
     String LIST_DATA = "listData";
-    String LIST_TEMPLATE_ID = "templateId";
-    String LIST_TEMPLATE_ID_KEY = "templateKey";
+    String LIST_DATA_TEMPLATE_KEY = "templateKey";
+    String SLOT_TEMPLATE_TYPE = "templateType";
+
     String LIST_WX_DATA_ITEM_KEY = "key";
   }
 

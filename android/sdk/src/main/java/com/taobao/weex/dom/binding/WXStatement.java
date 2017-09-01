@@ -49,7 +49,7 @@ public class WXStatement implements Map<String, Object>,Cloneable  {
      *      }
      * </code>
      * */
-    public static final String WX_FOR = "repeat";
+    public static final String WX_FOR = "[[repeat]]";
     public static final String WX_FOR_INDEX = "@key";
     public static final String WX_FOR_ITEM = "@label";
     public static final String WX_FOR_LIST = "@exp";
@@ -65,7 +65,7 @@ public class WXStatement implements Map<String, Object>,Cloneable  {
      *      '[[match]]': 'condition'
      *    }
      * */
-    public static final String WX_IF = "match";
+    public static final String WX_IF = "[[match]]";
 
 
     private final ArrayMap<String, Object> map;
