@@ -231,6 +231,37 @@ module.exports = {
                 return this;
               })
           });
+
+          driverFactory.addPromiseChainMethod('clickScreenById', function(id,index) {
+              if(!index)index = 0;
+              return this.elementsById(id)
+                  .then((array)=>{
+                      if(array){
+                          if(index<0)index=0;
+                          if(index>=array.length)index=array.length-1;
+                          return array[index].getRect()
+                            .then(rect => {
+                              var left = rect.x;
+                              var top = rect.y;
+                              var width = rect.width;
+                              var height = rect.height;
+                              var touchX = Math.floor(left + width / 2);
+                              var touchY = Math.floor(top + height / 2);
+                              console.log('rect:' + touchX + " " + touchY);
+                              return this
+                                .touch('tap', {
+                                    x: touchX,
+                                    y: touchY
+                                })
+                                .sleep(500)
+                            })
+                      }else{
+                        console.log('id='+id+'的元素不存在！')
+                        return this;
+                      }
+                  })          
+          });
+
           driver = driverFactory.initPromiseChain();
           driver.configureHttp({
               timeout: 100000
