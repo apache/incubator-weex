@@ -28,6 +28,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.binding.BindingUtils;
 import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.ui.component.WXComponent;
@@ -88,7 +89,7 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    public static final void doRender(WXComponent component, Stack context ){
+    public static final void doRender(WXComponent component, ArrayStack context ){
         try{
             doRenderComponent(component, context);
         }catch (Exception e){
@@ -107,7 +108,7 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    static final int doRenderComponent(WXComponent component, Stack context){
+    static final int doRenderComponent(WXComponent component, ArrayStack context){
         WXVContainer parent = component.getParent();
         WXDomObject domObject = (WXDomObject) component.getDomObject();
         WXAttr attrs = domObject.getAttrs();
@@ -195,7 +196,7 @@ public class Statements {
     /**
      * bind attrs and doRenderComponent next
      * */
-    private static void doRenderChildNode(WXComponent component, Stack context){
+    private static void doRenderChildNode(WXComponent component, ArrayStack context){
         if(component instanceof WXVContainer){
             WXVContainer container = (WXVContainer) component;
             for(int k=0; k<container.getChildCount();){
@@ -217,7 +218,7 @@ public class Statements {
     /**
      * render dynamic binding attrs and bind them to component node.
      * */
-    private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, Stack context){
+    private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, ArrayStack context){
         component.setWaste(false);
         if(domObject.getAttrs() != null
                 && domObject.getAttrs().getBindingAttrs() != null
@@ -246,7 +247,7 @@ public class Statements {
      * @param  context  context
      * return binding attrs rended value in context
      * */
-    public static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, Stack context){
+    public static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, ArrayStack context){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){
@@ -285,7 +286,7 @@ public class Statements {
         return  dynamic;
     }
 
-    public static List<Object> getBindingEventArgs(Stack context, Object bindings){
+    public static List<Object> getBindingEventArgs(ArrayStack context, Object bindings){
           List<Object>  params = new ArrayList<>(4);
           if(bindings instanceof  JSONArray){
               JSONArray array = (JSONArray) bindings;

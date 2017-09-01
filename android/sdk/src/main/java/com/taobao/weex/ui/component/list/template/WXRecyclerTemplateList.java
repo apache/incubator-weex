@@ -52,6 +52,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
@@ -1045,8 +1046,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
 
-    public Stack getItemContextForPosition(int position){
-        Stack stack = new Stack();
+    public ArrayStack getItemContextForPosition(int position){
+        ArrayStack stack = new ArrayStack();
         Map map = new HashMap();
         Object item = listData.get(position);
         map.put(listDataIndexKey, position);

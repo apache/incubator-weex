@@ -53,11 +53,15 @@ public class Operators {
         if(context == null){
             return  null;
         }
-        if(context instanceof Stack){
-            Stack<Map> stack = (Stack) context;
-            for(Map map : stack){
-                if(map.containsKey(key)){
-                    return map.get(key);
+        if(context instanceof ArrayStack){
+            List stack = (List) context;
+            for(int index=stack.size()-1; index >= 0; index--){
+                Object value = stack.get(index);
+                if(value instanceof  Map){
+                    Map map = (Map) value;
+                    if(map.containsKey(key)){
+                        return map.get(key);
+                    }
                 }
             }
         }

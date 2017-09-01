@@ -22,7 +22,6 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/28.
@@ -33,14 +32,14 @@ public class Parser {
 
     private String code;
     private int position;
-    private Stack<Token> stacks;
-    private Stack<Symbol> operators;
+    private ArrayStack<Token> stacks;
+    private ArrayStack<Symbol> operators;
 
     public Parser(String code){
         this.code = code;
         this.position = 0;
-        this.stacks = new Stack<>();
-        this.operators = new Stack<>();
+        this.stacks = new ArrayStack<>();
+        this.operators = new ArrayStack<>();
     }
 
 
@@ -55,7 +54,7 @@ public class Parser {
                 stacks.push(token);
             }
         }
-        Block block = new Block(stacks, Token.TYPE_BLOCK);
+        Block block = new Block(stacks.getList(), Token.TYPE_BLOCK);
         return block;
     }
 
@@ -279,7 +278,7 @@ public class Parser {
 
     void  scanString(){
         int start = position;
-        Stack operator = new Stack();
+        ArrayStack operator = new ArrayStack();
         char quote = code.charAt(start);
         operator.push(quote);
         StringBuilder builder = new StringBuilder();

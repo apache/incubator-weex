@@ -123,7 +123,7 @@ public class BlurTool {
     }
 
     private static Bitmap stackBlur(Bitmap sentBitmap, int radius) {
-        // Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
+        // ArrayStack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {
