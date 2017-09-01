@@ -66,13 +66,14 @@ public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<
         if (child instanceof FlatComponent && !((FlatComponent) child).promoteToView(false)) {
           flatChild = ((FlatComponent) child).getOrCreateFlatWidget();
         } else {
-          flatChild = new AndroidViewWidget(parent.getHostView());
+          flatChild = new AndroidViewWidget(uiImp);
           uiImp.register(child, (AndroidViewWidget) flatChild);
           child.createView();
           ((AndroidViewWidget) flatChild).setContentView(child.getHostView());
           //TODO Use a sort algorithm to decide the childIndex of AndroidViewWidget
           parent.addSubView(child.getHostView(), -1);
         }
+        uiImp.register(flatChild, child);
         addFlatChild(flatChild, ret.second);
       }
     } else {

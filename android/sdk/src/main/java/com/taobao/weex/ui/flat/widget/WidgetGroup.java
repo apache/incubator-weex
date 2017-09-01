@@ -23,7 +23,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.view.View;
+import com.taobao.weex.ui.flat.FlatGUIIContext;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,8 +32,8 @@ public class WidgetGroup extends BaseWidget {
 
   private List<Widget> mChildren = new LinkedList<>();
 
-  public WidgetGroup(@NonNull View flatContainer) {
-    super(flatContainer);
+  public WidgetGroup(@NonNull FlatGUIIContext context) {
+    super(context);
   }
 
   public void replaceAll(@NonNull List<Widget> widgets) {

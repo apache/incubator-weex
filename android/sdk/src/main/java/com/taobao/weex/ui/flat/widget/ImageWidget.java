@@ -25,11 +25,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.view.View;
 import android.widget.ImageView.ScaleType;
 import com.taobao.weex.adapter.IDrawableLoader.AnimatedTarget;
 import com.taobao.weex.adapter.IDrawableLoader.StaticTarget;
 import com.taobao.weex.ui.component.WXImage;
+import com.taobao.weex.ui.flat.FlatGUIIContext;
 import com.taobao.weex.utils.ImageDrawable;
 import java.util.Arrays;
 
@@ -42,8 +42,8 @@ public class ImageWidget extends BaseWidget implements StaticTarget, AnimatedTar
   private ScaleType mScaleType = WXImage.DEFAULT_SCALE_TYPE;
   private float[] borderRadius;
 
-  public ImageWidget(@NonNull View flatContainer) {
-    super(flatContainer);
+  public ImageWidget(@NonNull FlatGUIIContext context) {
+    super(context);
   }
 
   @Override

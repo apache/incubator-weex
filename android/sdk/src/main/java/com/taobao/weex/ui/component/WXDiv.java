@@ -78,7 +78,7 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   @NonNull
   public WidgetGroup getOrCreateFlatWidget() {
     if (mWidgetGroup == null) {
-      mWidgetGroup = new WidgetGroup(getInstance().getFlatUIContext().getFlatComponentAncestor(this).getHostView());
+      mWidgetGroup = new WidgetGroup(getInstance().getFlatUIContext());
       for (int i = 0; i < getChildCount(); i++) {
         createChildViewAt(i);
       }

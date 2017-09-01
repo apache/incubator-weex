@@ -28,6 +28,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
+import com.taobao.weex.ui.flat.FlatGUIIContext;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
 @RestrictTo(Scope.LIBRARY)
@@ -39,11 +40,10 @@ abstract class BaseWidget implements Widget {
   private int leftOffset, topOffset, rightOffset, bottomOffset;
   private Rect borderBox = new Rect();
   private Point offsetOfContainer = new Point();
-  private View flatContainer;
+  private final @NonNull FlatGUIIContext context;
 
-  BaseWidget(@NonNull View flatContainer){
-    //TODO maybe FlatUIImp is better.
-    this.flatContainer = flatContainer;
+  BaseWidget(@NonNull FlatGUIIContext context){
+    this.context = context;
   }
 
   @Override
@@ -132,14 +132,18 @@ abstract class BaseWidget implements Widget {
 
   @Override
   public void invalidate() {
-    Rect dirtyRegion= new Rect(borderBox);
+    Rect dirtyRegion = new Rect(borderBox);
     dirtyRegion.offset(offsetOfContainer.x, offsetOfContainer.y);
-    flatContainer.invalidate(dirtyRegion);
+    View widgetContainer;
+    if ((widgetContainer = context.getWidgetContainerView(this)) != null) {
+      widgetContainer.invalidate(dirtyRegion);
+    }
   }
 
-  protected void setCallback(@NonNull Drawable drawable){
-    if(flatContainer!=null){
-      drawable.setCallback(flatContainer);
+  protected void setCallback(@NonNull Drawable drawable) {
+    View widgetContainer;
+    if ((widgetContainer = context.getWidgetContainerView(this)) != null) {
+      drawable.setCallback(widgetContainer);
     }
   }
 }

@@ -25,13 +25,14 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
+import com.taobao.weex.ui.flat.FlatGUIIContext;
 
 @RestrictTo(Scope.LIBRARY)
 public class AndroidViewWidget extends BaseWidget {
 
   private @Nullable View mView;
-  public AndroidViewWidget(@NonNull View flatContainer) {
-    super(flatContainer);
+  public AndroidViewWidget(@NonNull FlatGUIIContext context) {
+    super(context);
   }
 
   public void setContentView(@NonNull View view){

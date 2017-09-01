@@ -25,6 +25,7 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.view.View;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
@@ -32,6 +33,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
+import com.taobao.weex.ui.flat.widget.Widget;
 import java.util.Map;
 
 //TODO when Weex instance is destroyed, there is a work of garbage collection.
@@ -44,6 +46,7 @@ public class FlatGUIIContext {
   private boolean mFlatUIEnabled;
   private Map<WXComponent, WidgetContainer> mWidgetRegistry = new ArrayMap<>();
   private Map<WXComponent, AndroidViewWidget> mViewWidgetRegistry = new ArrayMap<>();
+  private Map<Widget, WXComponent> widgetToComponent = new ArrayMap<>();
 
   @RestrictTo(Scope.LIBRARY)
   public void setFlatUIEnabled(boolean flag){
@@ -65,6 +68,10 @@ public class FlatGUIIContext {
     mViewWidgetRegistry.put(component, viewWidget);
   }
 
+  public void register(@NonNull Widget widget, @NonNull WXComponent component){
+    widgetToComponent.put(widget, component);
+  }
+
   public
   @Nullable
   WidgetContainer getFlatComponentAncestor(@NonNull WXComponent flatWidget) {
@@ -84,6 +91,23 @@ public class FlatGUIIContext {
         TextUtils.equals(component.getRef(), WXDomObject.ROOT) ||
         (checkAncestor && getFlatComponentAncestor(component) == null) ||
         checkComponent(component);
+  }
+
+  public
+  @Nullable
+  View getWidgetContainerView(Widget widget) {
+    WXComponent component, ancestor;
+    View ret = null;
+    if ((component = getComponent(widget)) != null) {
+      if ((ancestor = getFlatComponentAncestor(component)) != null) {
+        ret = ancestor.getHostView();
+      }
+    }
+    return ret;
+  }
+
+  private @Nullable WXComponent getComponent(@NonNull Widget widget){
+    return widgetToComponent.get(widget);
   }
 
   private boolean checkComponent(@NonNull WXComponent component) {

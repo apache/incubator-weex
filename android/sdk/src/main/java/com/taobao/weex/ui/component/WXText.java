@@ -66,7 +66,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   @NonNull
   public TextWidget getOrCreateFlatWidget() {
     if (mTextWidget == null) {
-      mTextWidget = new TextWidget(getInstance().getFlatUIContext().getFlatComponentAncestor(this).getHostView());
+      mTextWidget = new TextWidget(getInstance().getFlatUIContext());
     }
     return mTextWidget;
   }
