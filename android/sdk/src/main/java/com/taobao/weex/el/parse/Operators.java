@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/28.
@@ -54,7 +53,7 @@ public class Operators {
             return  null;
         }
         if(context instanceof ArrayStack){
-            List stack = (List) context;
+            ArrayStack stack = (ArrayStack) context;
             for(int index=stack.size()-1; index >= 0; index--){
                 Object value = stack.get(index);
                 if(value instanceof  Map){

@@ -30,6 +30,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXDiv;
@@ -162,7 +163,7 @@ public class StatementTest {
         return cell;
     }
 
-    private Stack createContext(int count){
+    private ArrayStack createContext(int count){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
         data.getJSONObject("item").put("name", "hello world");
@@ -172,7 +173,7 @@ public class StatementTest {
         }
         data.getJSONObject("item").put("list", datas);
         data.put("dataList", datas);
-        Stack context = new Stack();
+        ArrayStack context = new ArrayStack();
         context.push(data);
         return context;
     }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * stack for parse and execute code
  * Created by furture on 2017/9/1.
  */
 public class ArrayStack<T> {

@@ -19,6 +19,7 @@
 package com.taobao.weex.el;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Parser;
@@ -26,7 +27,6 @@ import com.taobao.weex.el.parse.Parser;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/29.
@@ -141,14 +141,14 @@ public class IfStatementTest extends TestCase {
         System.out.println( code + " ==> " + block);
         return Operators.isTrue(block.execute(context));
     }
-    private Stack createContext(){
+    private ArrayStack createContext(){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
         data.put("index", 20);
         data.put("source", true);
         data.getJSONObject("item").put("name", "hello world");
 
-        Stack context = new Stack();
+        ArrayStack context = new ArrayStack();
         context.push(data);
         return context;
     }
