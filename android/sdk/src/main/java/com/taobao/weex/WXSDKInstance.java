@@ -117,6 +117,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean trackComponent;
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
+  private boolean mNeedReLoad = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
 
@@ -203,6 +204,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mNeedValidate;
   }
 
+  public boolean isNeedReLoad() {
+    return mNeedReLoad;
+  }
+
+  public void setNeedLoad(boolean load) {
+    mNeedReLoad = load;
+  }
   /*
   *  Warning: use setInstanceViewPortWidth instead.
   *  store custom ViewPort Width
