@@ -36,7 +36,6 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
-import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Map;
 
@@ -51,7 +50,7 @@ import java.util.Map;
 
 public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private String TAG = "WXListComponent";
-  private WXRecyclerDomObject mDomObject;
+  private WXRecyclerDomObject mRecyclerDom;
   private float mPaddingLeft;
   private float mPaddingRight;
 
@@ -64,13 +63,13 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent);
     if (node != null && node instanceof WXRecyclerDomObject) {
-      mDomObject = (WXRecyclerDomObject) node;
-      mDomObject.preCalculateCellWidth();
+      mRecyclerDom = (WXRecyclerDomObject) node;
+      mRecyclerDom.preCalculateCellWidth();
 
       if(WXBasicComponentType.WATERFALL.equals(node.getType())){
         mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
       }else{
-        mLayoutType = mDomObject.getLayoutType();
+        mLayoutType = mRecyclerDom.getLayoutType();
       }
       updateRecyclerAttr();
 
@@ -111,9 +110,9 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
 
     // Synchronize DomObject's attr to Component and Native View
-    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
-            mColumnCount != mDomObject.getColumnCount() ||
-            mColumnGap != mDomObject.getColumnGap())) {
+    if(mRecyclerDom != null && getHostView() != null && (mColumnWidth != mRecyclerDom.getColumnWidth() ||
+            mColumnCount != mRecyclerDom.getColumnCount() ||
+            mColumnGap != mRecyclerDom.getColumnGap())) {
       updateRecyclerAttr();
       getHostView().getInnerView().initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
     }
@@ -122,16 +121,18 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
 
   private void updateRecyclerAttr(){
-    mColumnCount = mDomObject.getColumnCount();
-    mColumnGap = mDomObject.getColumnGap();
-    mColumnWidth = mDomObject.getColumnWidth();
-    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
-    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
+    if(mRecyclerDom != null) {
+      mColumnCount = mRecyclerDom.getColumnCount();
+      mColumnGap = mRecyclerDom.getColumnGap();
+      mColumnWidth = mRecyclerDom.getColumnWidth();
+      mPaddingLeft = mRecyclerDom.getPadding().get(Spacing.LEFT);
+      mPaddingRight = mRecyclerDom.getPadding().get(Spacing.RIGHT);
+    }
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnCount)  {
-    if(mDomObject.getColumnWidth() != mColumnWidth){
+    if(mRecyclerDom != null && mRecyclerDom.getColumnWidth() != mColumnWidth){
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -141,7 +142,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
-    if(mDomObject.getColumnCount() != mColumnCount){
+    if(mRecyclerDom != null && mRecyclerDom.getColumnCount() != mColumnCount){
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -151,7 +152,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
-    if(mDomObject.getColumnGap() != mColumnGap) {
+    if(mRecyclerDom != null && mRecyclerDom.getColumnGap() != mColumnGap) {
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -172,8 +173,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
             ||props.containsKey(Constants.Name.PADDING_LEFT)
             || props.containsKey(Constants.Name.PADDING_RIGHT)){
 
-      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
-              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
+      if(mRecyclerDom != null && (mPaddingLeft != mRecyclerDom.getPadding().get(Spacing.LEFT)
+              || mPaddingRight != mRecyclerDom.getPadding().get(Spacing.RIGHT))) {
 
         markComponentUsable();
         updateRecyclerAttr();
