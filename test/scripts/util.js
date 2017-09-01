@@ -284,5 +284,11 @@ module.exports = {
             return driver.quit()
         var filepath = path.resolve(__dirname,'../../last.png');
         return driver.saveShot(filepath).sleep(1000).back().sleep(1000);
+    },
+    quitWithoutBack:function(driver){
+        if(browser)
+            return driver.quit()
+        var filepath = path.resolve(__dirname,'../../last.png');
+        return driver.saveShot(filepath).sleep(1000);
     }
 }
