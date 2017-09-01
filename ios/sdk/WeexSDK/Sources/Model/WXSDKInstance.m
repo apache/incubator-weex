@@ -44,6 +44,7 @@
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
 #import "WXJSExceptionProtocol.h"
+#import "WXTracingManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -355,6 +356,8 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
+
     
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
@@ -375,6 +378,7 @@ typedef enum : NSUInteger {
     if(url.length > 0){
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
+    
 }
 
 - (void)forceGarbageCollection
