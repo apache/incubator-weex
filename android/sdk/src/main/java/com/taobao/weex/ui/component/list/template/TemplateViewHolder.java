@@ -26,6 +26,9 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by furture on 2017/8/17.
  */
@@ -68,22 +71,5 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     public void setHolderPosition(int holderPosition) {
         this.holderPosition = holderPosition;
-    }
-
-
-    public WXComponent findChildByRef(WXComponent parent, String ref){
-       if(ref.equals(parent.getRef())){
-            return parent;
-       }
-       if(parent instanceof WXVContainer){
-           WXVContainer container = (WXVContainer) parent;
-           for(int i=0; i<container.getChildCount(); i++){
-               WXComponent child = findChildByRef(container.getChild(i), ref);
-               if(child != null){
-                   return  child;
-               }
-           }
-       }
-       return  null;
     }
 }

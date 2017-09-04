@@ -111,6 +111,11 @@ public class AppearanceHelper {
   }
 
   public boolean isViewVisible(View view) {
+    if(view.getVisibility() == View.VISIBLE){
+      if(view.getMeasuredHeight()  == 0){
+        return  true;
+      }
+    }
     return view != null && view.getLocalVisibleRect(mVisibleRect);
   }
 }
