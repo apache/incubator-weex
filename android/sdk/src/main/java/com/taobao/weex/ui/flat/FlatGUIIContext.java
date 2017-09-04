@@ -43,18 +43,13 @@ import java.util.Map;
 @RestrictTo(Scope.LIBRARY)
 public class FlatGUIIContext {
 
-  private boolean mFlatUIEnabled;
+  private boolean mFlatUIEnabled = true;
   private Map<WXComponent, WidgetContainer> mWidgetRegistry = new ArrayMap<>();
   private Map<WXComponent, AndroidViewWidget> mViewWidgetRegistry = new ArrayMap<>();
   private Map<Widget, WXComponent> widgetToComponent = new ArrayMap<>();
 
-  @RestrictTo(Scope.LIBRARY)
-  public void setFlatUIEnabled(boolean flag){
-    mFlatUIEnabled = flag;
-  }
-
-  public boolean isFlatUIEnabled() {
-    return mFlatUIEnabled;
+  public boolean isFlatUIEnabled(WXComponent component) {
+    return mFlatUIEnabled && component.isFlatUIEnabled();
   }
 
   public void register(@NonNull WXComponent descendant, @NonNull WidgetContainer ancestor) {
@@ -86,7 +81,7 @@ public class FlatGUIIContext {
 
   public boolean promoteToView(@NonNull WXComponent component, boolean checkAncestor,
       @NonNull Class<? extends WXComponent<?>> expectedClass) {
-    return !isFlatUIEnabled() ||
+    return !isFlatUIEnabled(component) ||
         !expectedClass.equals(component.getClass()) ||
         TextUtils.equals(component.getRef(), WXDomObject.ROOT) ||
         (checkAncestor && getFlatComponentAncestor(component) == null) ||
@@ -124,9 +119,9 @@ public class FlatGUIIContext {
           attr.containsKey(Name.ARIA_LABEL) ||
           attr.containsKey(WXComponent.PROP_FIXED_SIZE) ||
           style.containsKey(Name.VISIBILITY) ||
-          style.containsKey(Name.POSITION) ||
           attr.containsKey(Name.DISABLED) ||
-          attr.containsKey(Name.PREVENT_MOVE_EVENT) ||
+          style.isFixed() ||
+          style.isSticky() ||
           !style.getPesudoStyles().isEmpty() ||
           domObject.getEvents().size() > 0) {
         ret = true;

@@ -35,6 +35,8 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -68,8 +70,8 @@ import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.flat.FlatComponent;
-import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
 import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.border.BorderDrawable;
@@ -145,6 +147,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
     this.mAnimationHolder = holder;
+  }
+
+  //This method will be removed once flatGUI is completed.
+  @RestrictTo(Scope.LIBRARY)
+  public boolean isFlatUIEnabled(){
+    return mParent != null && mParent.isFlatUIEnabled();
   }
 
   private OnClickListener mClickEventListener = new OnClickListener() {
@@ -500,7 +508,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           UIImp.getFlatComponentAncestor(mParent) != null &&
           UIImp.getAndroidViewWidget(mParent) == null) {
         childOffset.set(rawoffset.x, rawoffset.y);
-      } else {
+      }
+      else{
         childOffset.set(left, top);
       }
 

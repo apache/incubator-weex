@@ -105,7 +105,7 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
 
   @Override
   public boolean intendToBeFlatContainer() {
-    return getInstance().getFlatUIContext().isFlatUIEnabled() && WXDiv.class.equals(getClass());
+    return getInstance().getFlatUIContext().isFlatUIEnabled(this) && WXDiv.class.equals(getClass());
   }
 
   @Override
