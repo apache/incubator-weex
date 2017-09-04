@@ -159,8 +159,6 @@ public class Statements {
                             parent.createChildViewAt(renderIndex);
                             renderNode.applyLayoutAndEvent(renderNode);
                             renderNode.bindData(renderNode);
-                            //FIXME remove test debug
-                            renderNode.getHostView().setBackgroundColor(Color.RED);
                         }
                         doRenderBindingAttrs(component, domObject, context);
                         doRenderChildNode(component, context);
@@ -251,11 +249,7 @@ public class Statements {
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){
             Object binding = entry.getValue();
-            //FIXME remove
             String key = entry.getKey();
-            if(key.equals("text")){
-                key = "value";
-            }
             if(entry.getValue() instanceof  JSONObject
                     && (((JSONObject) binding).get(BindingUtils.BINDING)  instanceof  Block)){
                 Block block = (Block) (((JSONObject) binding).get(BindingUtils.BINDING));

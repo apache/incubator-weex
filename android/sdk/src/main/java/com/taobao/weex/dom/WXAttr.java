@@ -472,13 +472,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
    * filter dynamic attrs and statements
    * */
   private boolean filterBindingStatement(String key, Object value) {
-        //FIXME REMOVE Test CODE
-        if(value instanceof  String){
-          if(((String) value).startsWith("{") && ((String) value).endsWith("}")
-                  || (((String) value).startsWith("[") && ((String) value).endsWith("]"))){
-            value = JSON.parse((String) value);
-          }
-        }
         if(BindingUtils.isBinding(value)){
           if(mBindingAttrs == null){
               mBindingAttrs = new ArrayMap<String, Object>();
