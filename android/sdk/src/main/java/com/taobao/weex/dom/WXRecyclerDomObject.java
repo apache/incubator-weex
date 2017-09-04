@@ -119,6 +119,10 @@ public class WXRecyclerDomObject extends WXDomObject{
         }
     }
 
+    public boolean hasPreCalculateCellWidth(){
+        return mIsPreCalculateCellWidth;
+    }
+
     public void updateRecyclerAttr(){
         preCalculateCellWidth();
         if(mColumnWidth ==0 && mColumnWidth == Float.NaN){

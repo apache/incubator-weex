@@ -38,7 +38,8 @@ public class WXCellDomObject extends WXDomObject {
           WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
           parentDom.preCalculateCellWidth();
           WXDomObject domObject = (WXDomObject) node;
-          if (WXBasicComponentType.CELL.equals(domObject.getType())) {
+          if (WXBasicComponentType.CELL.equals(domObject.getType())
+                  || WXBasicComponentType.CELL_SLOT.equals(domObject.getType())) {
             float w = ((WXRecyclerDomObject) parent).getColumnWidth();
             node.setLayoutWidth(w);
           } else if (WXBasicComponentType.HEADER.equals(domObject.getType())){

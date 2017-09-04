@@ -53,7 +53,6 @@ public class WXBasicComponentType {
   public static final String CYCLE_SLIDER = "cycleslider";
 
   public static final String RECYCLE_LIST = "recycle-list";
-
   public static final String CELL_SLOT = "cell-slot";
 
 }

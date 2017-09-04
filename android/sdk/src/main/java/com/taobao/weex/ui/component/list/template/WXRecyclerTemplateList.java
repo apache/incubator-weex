@@ -49,6 +49,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXRecyclerDomObject;
@@ -1005,11 +1006,23 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(component == null){
             return;
         }
+        if(getDomObject() instanceof  WXRecyclerDomObject){
+            WXRecyclerDomObject domObject = (WXRecyclerDomObject) getDomObject();
+            if(!domObject.hasPreCalculateCellWidth()){
+                domObject.preCalculateCellWidth();
+            }
+            if(component.getDomObject() instanceof WXCellDomObject){
+                WXCellDomObject cellDomObject = (WXCellDomObject) component.getDomObject();
+                float w = ((WXRecyclerDomObject) domObject).getColumnWidth();
+                cellDomObject.setLayoutWidth(w);
+            }
+        }
         long start = System.currentTimeMillis();
         templateViewHolder.setHolderPosition(position);
         Statements.doRender(component, getItemContextForPosition(position));
+        Log.e(TAG, position + "onBindViewHolder render used " + (System.currentTimeMillis() - start));
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
-        Log.e(TAG, "onBindViewHolder used " + (System.currentTimeMillis() - start));
+        Log.e(TAG,  position + "onBindViewHolder layout used " + (System.currentTimeMillis() - start));
     }
 
     @Override
@@ -1034,8 +1047,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         component.bindData(component);
         Log.e(TAG, "onCreateViewHolder used " + (System.currentTimeMillis() - start)
          + "  " + component.isSticky());
-        TemplateViewHolder viewHolder = new TemplateViewHolder(component, viewType);
-        return  viewHolder;
+        TemplateViewHolder templateViewHolder = new TemplateViewHolder(component, viewType);
+        //Layouts.doLayout(component, templateViewHolder.getLayoutContext());
+        return  templateViewHolder;
     }
 
     /**
