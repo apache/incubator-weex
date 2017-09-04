@@ -719,6 +719,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
                 return true;
             case Constants.Name.LIST_DATA_TEMPLATE_KEY:
+            case Constants.Name.SLOT_TEMPLATE_TYPE:
                 listDataTemplateKey = WXUtils.getString(param, Constants.Name.SLOT_TEMPLATE_TYPE);
                 return true;
             case LOADMOREOFFSET:
@@ -1156,8 +1157,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return RecyclerView.NO_ID;
         }
         JSONObject data = listData.getJSONObject(position);
-        if(data.containsKey(Constants.Name.LIST_WX_DATA_ITEM_KEY)) {
-            String itemKey = data.getString(Constants.Name.LIST_WX_DATA_ITEM_KEY);
+        if(data.containsKey(Constants.Name.LIST_DATA_ITEM_KEY)) {
+            String itemKey = data.getString(Constants.Name.LIST_DATA_ITEM_KEY);
             if(TextUtils.isEmpty(itemKey)){
                 return  position;
             }

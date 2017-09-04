@@ -18,9 +18,9 @@
  */
 package com.taobao.weex.ui.component.binding;
 
-import android.graphics.Color;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.WXAttr;
@@ -80,7 +80,7 @@ public class Statements {
 
     /**
      *  @param component component with v-for statement, v-if statement and bind attrs
-     *  @param context  execute context
+     *  @param stack  execute context
      *  render component in context, the function do the following  work.
      *  execute component's v-for statement, v-if statement in context,
      *  and rebuild component's tree with the statement, v-for reuse component execute by pre render.
@@ -160,8 +160,8 @@ public class Statements {
                             renderNode.applyLayoutAndEvent(renderNode);
                             renderNode.bindData(renderNode);
                         }
-                        doRenderBindingAttrs(component, domObject, context);
-                        doRenderChildNode(component, context);
+                        doRenderBindingAttrs(renderNode, domObject, context);
+                        doRenderChildNode(renderNode, context);
                         renderIndex++;
                     }
                     context.pop();

@@ -186,7 +186,7 @@ public class WXTextDomObject extends WXDomObject {
     if (layout != null && !layout.equals(atomicReference.get()) &&
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       if(Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()){
-        warmUpTextLayoutCache(layout);
+          warmUpTextLayoutCache(layout);
       }
     }
     swap();
@@ -221,7 +221,7 @@ public class WXTextDomObject extends WXDomObject {
       dom = new WXTextDomObject();
       copyFields(dom);
       dom.hasBeenMeasured = hasBeenMeasured;
-      dom.atomicReference = atomicReference;
+      dom.atomicReference = new AtomicReference<>(atomicReference.get());
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("WXTextDomObject clone error: ", e);
@@ -473,6 +473,7 @@ public class WXTextDomObject extends WXDomObject {
       layout = null;
       mTextPaint = new TextPaint(mTextPaint);
     }
+    hasBeenMeasured = false;
   }
 
   /**

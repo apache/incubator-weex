@@ -498,9 +498,14 @@ public class WXAttr implements Map<String, Object>,Cloneable {
         return  false;
   }
 
+  public void skipFilterPutAll(Map<String,Object> attrs){
+    this.attr.putAll(attrs);
+  }
+
   @Override
   protected WXAttr clone(){
-    WXAttr wxAttr = new WXAttr(attr);
+    WXAttr wxAttr = new WXAttr();
+    wxAttr.skipFilterPutAll(attr);
     wxAttr.mBindingAttrs = mBindingAttrs;
     wxAttr.mStatement = mStatement;
     return wxAttr;
