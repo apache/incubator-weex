@@ -38,6 +38,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -217,13 +218,36 @@ public class Statements {
      * */
     private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, ArrayStack context){
         component.setWaste(false);
-        if(domObject.getAttrs() != null
-                && domObject.getAttrs().getBindingAttrs() != null
-                && domObject.getAttrs().getBindingAttrs().size() > 0){
+        WXAttr attr = domObject.getAttrs();
+        if(attr != null
+                && attr.getBindingAttrs() != null
+                && attr.getBindingAttrs().size() > 0){
             ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
             Map<String, Object> dynamic =  getBindingAttrs(bindAttrs, context);
-            domObject.updateAttr(dynamic);
-            component.updateProperties(dynamic);
+            Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
+
+            /**
+             * diff attrs, see attrs has update, remove none update attrs
+             * */
+            Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+            while (iterator.hasNext()){
+                Map.Entry<String, Object> entry = iterator.next();
+                String key = entry.getKey();
+                if(entry.getValue() == null){
+                    if(attr.get(key) == null){
+                        iterator.remove();
+                        continue;
+                    }
+                }
+                if(entry.getValue().equals(attr.get(key))){
+                    iterator.remove();
+                }
+            }
+
+            if(dynamic.size() > 0) {
+                domObject.updateAttr(dynamic);
+                component.updateProperties(dynamic);
+            }
         }
         WXEvent event = domObject.getEvents();
         if(event == null || event.getEventBindingArgs() == null){

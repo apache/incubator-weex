@@ -42,7 +42,7 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     private CSSLayoutContext layoutContext;
 
-    private int holderPosition;
+    private int holderPosition = -1;
 
     /**
      * header position

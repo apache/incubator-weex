@@ -140,6 +140,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Runnable  notifyUpdate;
     private RecyclerView.ItemAnimator mItemAnimator;
 
+    private int itemViewCacheSize = 4;
+
     /**
      * sticky helper
      * */
@@ -182,6 +184,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mItemAnimator = bounceRecyclerView.getInnerView().getItemAnimator();
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
+        bounceRecyclerView.getInnerView().setItemViewCacheSize(itemViewCacheSize);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
         bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         bounceRecyclerView.getInnerView().clearOnScrollListeners();
@@ -728,6 +731,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 boolean scrollable = WXUtils.getBoolean(param, true);
                 setScrollable(scrollable);
                 return true;
+            case "itemViewCacheSize":
+                itemViewCacheSize = WXUtils.getNumberInt(param, itemViewCacheSize);
+                return true;
             case Constants.Name.OFFSET_ACCURACY:
                 int accuracy = WXUtils.getInteger(param, 10);
                 setOffsetAccuracy(accuracy);
@@ -1019,11 +1025,14 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             }
         }
         long start = System.currentTimeMillis();
+        if(templateViewHolder.getHolderPosition() == position) {
+            Log.e(TAG, "onBindViewHolder can diff same improve " + templateViewHolder.getHolderPosition() + " " + position);
+        }
         templateViewHolder.setHolderPosition(position);
         Statements.doRender(component, getItemContextForPosition(position));
-        Log.e(TAG, position + "onBindViewHolder render used " + (System.currentTimeMillis() - start));
+        Log.e(TAG, "onBindViewHolder render used " + (System.currentTimeMillis() - start));
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
-        Log.e(TAG,  position + "onBindViewHolder layout used " + (System.currentTimeMillis() - start));
+        Log.e(TAG,  getTemplateKey(position) + "onBindViewHolder layout used " + (System.currentTimeMillis() - start));
     }
 
     @Override
