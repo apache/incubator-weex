@@ -76,9 +76,12 @@ public class Parser {
     char scanNextToken(){
         char ch = nextToken();
         System.out.println("token " + ch);
-        if(Character.isJavaIdentifierStart(ch)){
+        if(ch == Operators.DOLLAR){
+            position++;
+            return ch;
+        }else if(Character.isJavaIdentifierStart(ch)){
             scanIdentifier();
-        }else if (ch == Operators.BRACKET_START) {
+        }else if (ch == Operators.BRACKET_START || ch == Operators.BLOCK_START) {
             scanBracket();
         }else if (ch ==  Operators.QUOTE || ch == Operators.SINGLE_QUOTE) {
             scanString();
@@ -89,6 +92,7 @@ public class Parser {
             scanIf();
         }else if(ch ==  Operators.CONDITION_IF_MIDDLE
                 || ch ==  Operators.BRACKET_END
+                || ch == Operators.BLOCK_END
                 || ch == Operators.SPACE){
             position++;
             return ch;
@@ -102,11 +106,21 @@ public class Parser {
     void  scanBracket(){
         int stackSize = stacks.size();
         int opSize = operators.size();
-        operators.push(new Symbol(Operators.BRACKET_START_STR, stacks.size()));
-        position++;
-        while (hasNextToken()){
-            if(scanNextToken() == Operators.BRACKET_END){
-                break;
+        if(code.charAt(position) == Operators.BLOCK_START){
+            operators.push(new Symbol(Operators.BLOCK_START_STR, stacks.size()));
+            position++;
+            while (hasNextToken()){
+                if(scanNextToken() == Operators.BLOCK_END){
+                    break;
+                }
+            }
+        }else{
+            operators.push(new Symbol(Operators.BRACKET_START_STR, stacks.size()));
+            position++;
+            while (hasNextToken()){
+                if(scanNextToken() == Operators.BRACKET_END){
+                    break;
+                }
             }
         }
         if(stacks.size() <= opSize){ // empty bracket, none need, save memory
@@ -181,7 +195,12 @@ public class Parser {
 
     Token createOperator(Symbol symbol){
         String op = symbol.op;
-        if(Operators.BRACKET_START_STR.equals(symbol.op)){
+        if(Operators.BRACKET_START_STR.equals(symbol.op)
+                || Operators.BLOCK_START_STR.equals(symbol.op)
+                || Operators.DOLLAR_STR.equals(symbol.op)){
+            return null;
+        }
+        if(Operators.BLOCK_START_STR.equals(symbol.op)){
             return null;
         }
         int secondMin = symbol.pos;
@@ -237,6 +256,7 @@ public class Parser {
     }
 
     /**
+     * 1+e6
      * .00
      * .00e6
      * 100
@@ -254,7 +274,8 @@ public class Parser {
             if(Character.isDigit(ch)
                     || ch == '.'
                     || ch =='e'){
-                if(ch == 'e' || ch == '.'){
+                if(ch == 'e'
+                        || ch == '.'){
                     isInt = false;
                 }
                 position++;
@@ -308,6 +329,9 @@ public class Parser {
 
     /**
      * scan el expression.
+     * item.ddd
+     * ${item.dd}
+     * $item.dd
      * */
     void scanIdentifier(){
         int start = position;
@@ -322,6 +346,12 @@ public class Parser {
             //2.true
         }
         String el = code.substring(start, position);
+        if(el.startsWith(Operators.DOLLAR_STR)){
+            if(el.length() == Operators.DOLLAR_STR.length()){
+                return;
+            }
+            el = el.substring(Operators.DOLLAR_STR.length());
+        }
         int type = Token.TYPE_IDENTIFIER;
         if(Operators.KEYWORDS.contains(el)){
             if(!(!operators.isEmpty() && Operators.isDot(operators.peek().op))){

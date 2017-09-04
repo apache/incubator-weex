@@ -54,6 +54,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
@@ -1057,15 +1058,18 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
 
-    public Map getItemContextForPosition(int position){
+    public ArrayStack getItemContextForPosition(int position){
+        ArrayStack stack = new ArrayStack();
         Map map = new HashMap();
+        stack.push(map);
         if(listData != null){
             Object item = listData.get(position);
+            stack.push(item);
             map.put(listDataIndexKey, position);
             map.put(listDataItemKey, item);
             map.put(listDataKey, listData);
         }
-        return map;
+        return stack;
     }
 
     /**

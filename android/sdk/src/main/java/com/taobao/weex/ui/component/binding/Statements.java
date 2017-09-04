@@ -88,10 +88,8 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    public static final void doRender(WXComponent component, Object context ){
+    public static final void doRender(WXComponent component, ArrayStack stack){
         try{
-            ArrayStack stack = new ArrayStack();
-            stack.push(context);
             doRenderComponent(component, stack);
         }catch (Exception e){
             WXLogUtils.e("WeexStatementRender", e);

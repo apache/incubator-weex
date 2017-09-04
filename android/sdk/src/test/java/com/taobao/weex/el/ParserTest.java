@@ -19,6 +19,7 @@
 package com.taobao.weex.el;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Parser;
@@ -78,6 +79,16 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
     }
 
+    public void testDebug(){
+        Block block = Parser.parse("count * ${ratio}");
+        show("count * ${ratio}");
+
+       // show("1+e6");
+
+        show("item[1] + index");
+        System.out.println(block.execute(createContext())
+        + "  " + Double.parseDouble(".0e6"));
+    }
 
 
 
@@ -143,7 +154,7 @@ public class ParserTest extends TestCase {
 
     }
 
-    private Stack createContext(){
+    private ArrayStack createContext(){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
         data.put("index", 20);
@@ -151,11 +162,15 @@ public class ParserTest extends TestCase {
         data.put("source", true);
         data.put("e6", 10);
         data.put("e7", "e7hello");
+        data.put("ratio", 6);
+        data.put("count", 6);
         data.getJSONObject("item").put("name", "hello world");
 
-        Stack context = new Stack();
+        ArrayStack context = new ArrayStack();
         context.push(data);
         return context;
     }
+
+
 
 }

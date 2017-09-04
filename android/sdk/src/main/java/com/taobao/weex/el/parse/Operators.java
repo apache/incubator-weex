@@ -367,6 +367,13 @@ public class Operators {
     public static final String ARRAY_END_STR = "]";
     public static final String SPACE_STR = " ";
     public static final char SPACE = ' ';
+    public static final char BLOCK_START = '{';
+    public static final String BLOCK_START_STR = "{";
+    public static final char BLOCK_END = '}';
+    public static final String BLOCK_END_STR = "}";
+    public static final char DOLLAR = '$';
+    public static final String DOLLAR_STR = "$";
+
     /**
      * condition
      * */
@@ -413,6 +420,7 @@ public class Operators {
      * */
     public static Map<String, Integer> OPERATORS_PRIORITY = new HashMap<>();
     static {
+        OPERATORS_PRIORITY.put(BLOCK_END_STR, 0);
         OPERATORS_PRIORITY.put(BRACKET_END_STR, 0);
         OPERATORS_PRIORITY.put(SPACE_STR, 0);
         OPERATORS_PRIORITY.put(ARRAY_END_STR, 0);
@@ -440,6 +448,7 @@ public class Operators {
         OPERATORS_PRIORITY.put(ARRAY_START_STR, 15);
 
         OPERATORS_PRIORITY.put(BRACKET_START_STR, 17);
+        OPERATORS_PRIORITY.put(BLOCK_START_STR, 17);
 
 
     }
