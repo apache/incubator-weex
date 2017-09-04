@@ -472,6 +472,9 @@ private static String[] splitLineBreak(String str) {
 }
 
 
+  /**
+   * get number
+   * */
   public static int getNumberInt(Object value, int defaultValue){
     if(value == null){
       return  defaultValue;
@@ -480,7 +483,12 @@ private static String[] splitLineBreak(String str) {
       return  ((Number) value).intValue();
     }
     try{
-      return (int)Float.parseFloat(value.toString());
+      String number = value.toString();
+      if(number.indexOf('.') >= 0) {
+        return (int) Float.parseFloat(value.toString());
+      }else{
+        return  Integer.parseInt(number);
+      }
     }catch (Exception e){return  defaultValue;}
   }
 
