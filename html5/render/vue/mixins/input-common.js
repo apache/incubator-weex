@@ -46,10 +46,10 @@ export default {
         const keyboardEvents = {
           'keyup': function (ev) {
             const code = ev.keyCode
-            let key = ev.key
+            const key = ev.key
             if (code === 13) {
-              if (key.toLowerCase() === 'tab') {
-                key = 'next'
+              if (!key || key.toLowerCase() === 'tab') {
+                ev.key = 'next'
               }
               const rightKeyType = findEnterKeyType(customKeyType)
               ev.returnKeyType = rightKeyType
