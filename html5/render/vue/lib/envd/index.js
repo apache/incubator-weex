@@ -55,7 +55,7 @@ else if ((match = ua.match(/(iPhone|iPad|iPod)/))) {
     isIPhone: (name === 'iPhone' || name === 'iPod'),
     isIPad: name === 'iPad',
     isIOS: true,
-    version: match[1].split('_').join('.')
+    version: match && match[1].split('_').join('.') || ''
   }
 }
 else {
@@ -155,7 +155,7 @@ else if (ua.match(/iPhone|iPad|iPod/)) {
     env.browser = {
       name: 'Safari',
       isSafari: true,
-      version: match[1]
+      version: match && match[1] || ''
     }
   }
   else {
@@ -163,7 +163,7 @@ else if (ua.match(/iPhone|iPad|iPod/)) {
     env.browser = {
       name: 'iOS Webview',
       isWebview: true,
-      version: match[1].replace(/_/g, '.')
+      version: match && match[1].replace(/_/g, '.') || ''
     }
   }
 }
