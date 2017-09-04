@@ -27,20 +27,6 @@ const needPassive = ['touchmove']
 
 const events = gestureEvents.concat(nativeEvents)
 
-// /**
-//  * is a element in a '<a>' tag?
-//  * @param {HTMLElement} el
-//  */
-// function isInANode (el) {
-//   let parent = el.parentNode
-//   while (parent && parent !== document.body) {
-//     if (parent.tagName.toLowerCase() === 'a') {
-//       return true
-//     }
-//     parent = parent.parentNode
-//   }
-// }
-
 /**
  * if el is a `<a>` element.
  * @param {HTMLElement} el
@@ -82,7 +68,12 @@ function _init (doc) {
   _inited = true
   const _sp = supportsPassive()
   events.forEach(function (evt) {
-    const option = evt === 'click' 
+    /**
+     * use capture for click handling, therefore there's a chance to handle
+     * it before any other listeners binding on document or document.body.
+     */
+    const option =
+      evt === 'click'
       ? true : needPassive.indexOf(evt) > -1 && _sp
       ? { passive: true } : false
     doc.addEventListener(evt, function (e) {
@@ -133,18 +124,23 @@ function _init (doc) {
          */
         if (evtName === 'click' && isANode(elm)) {
           const href = elm.getAttribute('href')
-          const target = elm.getAttribute('target')
           disposed = true
-          if (target !== '_blank') {
+          /**
+           * Give the chance to the listeners binding on doc or doc.body for
+           * handling the a-jump.
+           * Should set a _should_intercept_a_jump function on window to test
+           * whether we should intercept the a-jump.
+           */
+          if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)) {
+            // do nothing. leave it to the intercept handler.
+          }
+          else {
             if (!!href) {
               location.href = href
             }
             else {
-              console.warn('[weex-vue-render] If you want to use the A tag jump, set the href attribute')
+              console.warn('[vue-render] If you want to use the A tag jump, set the href attribute')
             }
-          }
-          else {
-            // do nothing.
           }
         }
 
