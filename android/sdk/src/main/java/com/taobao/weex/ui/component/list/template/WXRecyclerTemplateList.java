@@ -26,7 +26,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -137,7 +136,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private ArrayMap<String, Integer> mTemplateViewTypes;
     private Map<String, WXCell> mTemplates;
     private String listDataTemplateKey = Constants.Name.SLOT_TEMPLATE_TYPE;
-    private Runnable  notifyUpdate;
+    private Runnable listUpdateRunnable;
     private RecyclerView.ItemAnimator mItemAnimator;
 
     private int itemViewCacheSize = 4;
@@ -153,7 +152,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
      * */
     private ArrayMap<Integer, List<AppearanceHelper>> mAppearHelpers = new ArrayMap<>();
 
-    private ArrayMap<Integer, Map<String,List<Pair<String, List<Object>>>>> mDisAppearWatchList = new ArrayMap<>();
+    private ArrayMap<Integer, Map<String,Map<Integer, List<Object>>>> mDisAppearWatchList = new ArrayMap<>();
 
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
         super(instance, node, parent);
@@ -245,9 +244,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         });
-        notifyUpdate = new Runnable() {
+        listUpdateRunnable = new Runnable() {
             @Override
             public void run() {
+                /**
+                 * compute sticky position
+                 * */
                 mStickyHelper.getStickyPositions().clear();
                 if(listData != null){
                     for(int i=0; i<listData.size(); i++){
@@ -365,10 +367,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             if(template.getDomObject() != null){
                 template.getDomObject().getStyles().put(Constants.Name.POSITION, Constants.Value.STICKY);
             }
-            if(getHostView() != null) {
-                getHostView().removeCallbacks(notifyUpdate);
-                getHostView().post(notifyUpdate);
-            }
+            notifyUpdateList();
         }
     }
 
@@ -385,8 +384,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 template.getDomObject().getStyles().remove(Constants.Name.POSITION);
             }
             if(getHostView() != null) {
-                getHostView().removeCallbacks(notifyUpdate);
-                getHostView().post(notifyUpdate);
+                notifyUpdateList();
             }
         }
     }
@@ -562,10 +560,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     }
                 }
             }
-            if(getHostView() != null) {
-                getHostView().removeCallbacks(notifyUpdate);
-                getHostView().post(notifyUpdate);
-            }
+            notifyUpdateList();
         }
 
         //FIXME adapter position not exist
@@ -766,8 +761,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         }
-        if(update && getHostView() != null){
-            getHostView().post(notifyUpdate);
+        if(update){
+            notifyUpdateList();
         }
     }
 
@@ -1237,20 +1232,26 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 if(childListeners == null || childListeners.size() == 0){
                     break;
                 }
-                Map<String, List<Pair<String, List<Object>>>> disAppearList = mDisAppearWatchList.get(position);
+                Map<String, Map<Integer, List<Object>>> disAppearList = mDisAppearWatchList.get(position);
                 if(disAppearList == null){
                     disAppearList = new ArrayMap<>();
                     mDisAppearWatchList.put(position, disAppearList);
                 }
-                List<Pair<String, List<Object>>> componentDisAppearList = disAppearList.get(helper.getAwareChild().getRef());
+                Map<Integer, List<Object>> componentDisAppearList = disAppearList.get(helper.getAwareChild().getRef());
                 if(componentDisAppearList == null){
                     disAppearList.put(helper.getAwareChild().getRef(), componentDisAppearList);
                 }
                 for(int m=0; m<childListeners.size(); m++){
                     WXComponent childLisener = childListeners.get(m);
                     boolean appear = helper.isViewVisible(childLisener.getHostView());
+                    int key;
+                    if(childLisener.getHostView() != null){
+                        key = childLisener.getHostView().hashCode();
+                    }else{
+                        key = childLisener.hashCode();
+                    }
                     if(appear){
-                        if(componentDisAppearList.size() <= m){
+                        if(!componentDisAppearList.containsKey(key)){
                             childLisener.notifyAppearStateChange(Constants.Event.APPEAR, direction);
                             List<Object> eventArgs = null;
                             if(childLisener.getDomObject().getEvents() != null
@@ -1258,20 +1259,17 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                                     && childLisener.getDomObject().getEvents().getEventBindingArgsValues().get(Constants.Event.DISAPPEAR) != null){
                                 eventArgs = childLisener.getDomObject().getEvents().getEventBindingArgsValues().get(Constants.Event.DISAPPEAR);
                             }
-                            Pair<String, List<Object>> pair = new Pair<>(childLisener.getRef(), eventArgs);
-                            componentDisAppearList.add(pair);
+                            componentDisAppearList.put(key, eventArgs);
                         }
                     }else{
-                        if(componentDisAppearList.size() > m){
-                            //FIXME ADD DIS Appear List
+                        if(componentDisAppearList.containsKey(key)){
+                            childLisener.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
+                            componentDisAppearList.remove(key);
                         }
                     }
                 }
             }
         }
-
-        //handle disappear event in position
-
 
         //handle disappear event, out of position
         int count = getItemCount();
@@ -1280,24 +1278,25 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 position = lastVisible + 1;
                 continue;
             }
-            Map<String,List<Pair<String, List<Object>>>> map = mDisAppearWatchList.get(position);
+            Map<String, Map<Integer, List<Object>>> map = mDisAppearWatchList.get(position);
             if(map == null){
                 continue;
             }
-            Set<Map.Entry<String,List<Pair<String, List<Object>>>>> entries = map.entrySet();
-            for(Map.Entry<String,List<Pair<String, List<Object>>>> entry : entries){
+            Set<Map.Entry<String, Map<Integer, List<Object>>>> entries = map.entrySet();
+            for(Map.Entry<String,Map<Integer, List<Object>>> entry : entries){
                 String ref = entry.getKey();
                 WXComponent component = null;//find
-                List<Pair<String, List<Object>>> eventArgs = entry.getValue();
-                if(eventArgs == null){
+                Map<Integer, List<Object>> eventArgs = entry.getValue();
+                if(eventArgs == null || eventArgs.size() == 0){
                     continue;
                 }
                 WXEvent events = component.getDomObject().getEvents();
-                for(Pair<String, List<Object>> pair : eventArgs){
+                Set<Map.Entry<Integer, List<Object>>> eventArgsEntries = eventArgs.entrySet();
+                for(Map.Entry<Integer, List<Object>> eventArgsEntry : eventArgsEntries){
                     if(events.getEventBindingArgsValues() != null){
-                        events.getEventBindingArgsValues().put(pair.first, pair.second);
+                        events.getEventBindingArgsValues().put(Constants.Event.DISAPPEAR, eventArgsEntry.getValue());
                     }
-                    component.notifyAppearStateChange(pair.first, direction);
+                    component.notifyAppearStateChange(ref, direction);
                 }
             }
             mDisAppearWatchList.remove(position);
@@ -1330,6 +1329,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         try{
             return listData.getJSONObject(position);
         }catch (Exception e){return  JSONObject.parseObject("{}");}
+    }
+
+    private void  notifyUpdateList(){
+        if(getHostView() != null){
+            getHostView().removeCallbacks(listUpdateRunnable);
+            getHostView().post(listUpdateRunnable);
+        }
     }
 
     private int calcContentSize() {

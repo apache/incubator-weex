@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
@@ -492,8 +491,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
            if(mStatement == null){
               mStatement = new WXStatement();
            }
-           value = BindingUtils.vforBlock(value);;
-           mStatement.put(key, value);
+           value = BindingUtils.vforBlock(value);
+           if(value != null) {
+              mStatement.put(key, value);
+              return  true;
+           }
         }
         return  false;
   }

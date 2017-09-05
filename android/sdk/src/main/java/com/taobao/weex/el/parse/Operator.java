@@ -20,7 +20,7 @@ package com.taobao.weex.el.parse;
 
 
 /**
- * Created by furture on 2017/8/28.
+ * Created by jianbai.gbj on 2017/8/28.
  * one operator, two operator, and three operator
  */
 public class Operator extends Token {

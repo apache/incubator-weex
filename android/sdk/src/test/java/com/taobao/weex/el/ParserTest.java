@@ -115,9 +115,11 @@ public class ParserTest extends TestCase {
 
         Assert.assertEquals(31.0, Parser.parse("item.name.length + index").execute(createContext()));
         Assert.assertEquals(21.0, Parser.parse("item.length + index").execute(createContext()));
-
         Assert.assertEquals(36.0, Parser.parse("count * ${ratio}").execute(createContext()));
-
+        Assert.assertEquals(36.0, Parser.parse("count * ${ratio}").execute(createContext()));
+        Assert.assertEquals(36.0, Parser.parse("count * ${{ratio}}").execute(createContext()));
+        Assert.assertEquals(36.0, Parser.parse("count * ${{{ratio}}}").execute(createContext()));
+        Assert.assertEquals(36.0, Parser.parse("count * $ratio").execute(createContext()));
     }
 
     public void testIf(){

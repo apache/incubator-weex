@@ -20,8 +20,10 @@ package com.taobao.weex.dom.binding;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Parser;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * util's for binding and statment
@@ -92,8 +94,12 @@ public class BindingUtils {
                     ((JSONObject) vfor).put(WXStatement.WX_FOR_LIST, Parser.parse(list.toString()));
                 }
             }
+        }else{
+            if(WXEnvironment.isApkDebugable()){
+                WXLogUtils.e("weex", "weex vfor is illegal " + vfor);
+            }
         }
-        return vfor;
+        return null;
     }
 
 

@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.el.parse;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.List;
 
 /**
  * Created by furture on 2017/8/28.
- * simple expression parse, less node and save memory
+ * simple expression parse, less ast node and save memory
  * reference https://github.com/jquery/esprima
  */
 public class Parser {
@@ -61,14 +62,16 @@ public class Parser {
 
 
     /**
-     * item.length > 10
-     * parse expression to code.
+     * parse code to ast block.
      * */
     public static  Block parse(String code){
         try{
             Parser parser = new Parser(code);
             return parser.parse();
         }catch (Exception e){
+            if(WXEnvironment.isApkDebugable()){
+                WXLogUtils.e("code " + code, e);
+            }
             return new Block(null, Token.TYPE_BLOCK);
         }
     }

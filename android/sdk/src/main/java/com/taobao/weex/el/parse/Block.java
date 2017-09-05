@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * block, has more than one tokens, but only first will be execute.
- * Created by furture on 2017/8/28.
+ * Created by jianbai.gbj on 2017/8/28.
  */
 public class Block extends Token {
     private List<Token> tokens;
