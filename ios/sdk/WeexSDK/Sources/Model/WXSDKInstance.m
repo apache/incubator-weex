@@ -262,7 +262,19 @@ typedef enum : NSUInteger {
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
     __weak typeof(self) weakSelf = self;
-    _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
+    _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];
+    _mainBundleLoader.onDataReceived = ^(NSData *data) {
+      __strong typeof(weakSelf) strongSelf = weakSelf;
+      if (strongSelf.onDataReceived) {
+        strongSelf.onDataReceived(data);
+      }
+    };
+    _mainBundleLoader.onResponseReceived = ^(WXResourceResponse *response) {
+      __strong typeof(weakSelf) strongSelf = weakSelf;
+      if (strongSelf.onResponseReceived) {
+        strongSelf.onResponseReceived(response);
+      }
+    };
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSError *error = nil;

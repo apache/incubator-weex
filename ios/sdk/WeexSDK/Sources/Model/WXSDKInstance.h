@@ -161,6 +161,15 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^onRenderProgress)(CGRect renderRect);
 
 /**
+ * the callback triggered when the main task has received a response.
+ */
+@property (nonatomic, copy) void (^onResponseReceived)(WXResourceResponse *response);
+/**
+ * the callback triggered when the main task has received data progressively.
+ */
+@property (nonatomic, copy) void (^onDataReceived)(NSData *data);
+
+/**
  * The callback triggered when the bundleJS request finished in the renderWithURL.
  * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
  */
