@@ -42,17 +42,17 @@ public class WXStatement implements Map<String, Object>,Cloneable  {
      * <code>
      *      attr: {
      *          '[[repeat]]': {
-     *          '@exp': 'dataList',
-     *          '@key': 'index',
+     *          '@expression': 'dataList',
+     *          '@index': 'index',
      *          '@label': 'item'
      *         }
      *      }
      * </code>
      * */
     public static final String WX_FOR = "[[repeat]]";
-    public static final String WX_FOR_INDEX = "@key";
+    public static final String WX_FOR_INDEX = "@index";
     public static final String WX_FOR_ITEM = "@label";
-    public static final String WX_FOR_LIST = "@exp";
+    public static final String WX_FOR_LIST = "@expression";
 
 
     /**

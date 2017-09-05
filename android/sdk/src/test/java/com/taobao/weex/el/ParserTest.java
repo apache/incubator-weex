@@ -98,6 +98,7 @@ public class ParserTest extends TestCase {
     }
 
     public void  testEl(){
+        Assert.assertEquals(true, Parser.parse("${item.name.length == 11}").execute(createContext()));
         Assert.assertEquals("hello world", Parser.parse("${{{item.name}}}").execute(createContext()));
         Assert.assertEquals("hello world", Parser.parse("${{item.name}}").execute(createContext()));
         Assert.assertEquals("hello world", Parser.parse("${{{item.name}}}").execute(createContext()));
