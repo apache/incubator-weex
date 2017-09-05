@@ -344,8 +344,8 @@ function getContent(url) {
         // handle http errors
         console.log('response:', response.statusCode)
         if (response.statusCode < 200 || response.statusCode > 299) {
-          if (response.statusCode === 404) {
-            // ignore this, probably a renamed file.
+          if (response.statusCode === 404  || response.statusCode === 502) {
+            // ignore this, probably a renamed file,or .so that can't blame 
             return resolve('')
           }
           reject(new Error('Failed to load page, status code: ' + response.statusCode + ', '
