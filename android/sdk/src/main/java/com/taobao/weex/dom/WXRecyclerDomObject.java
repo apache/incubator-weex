@@ -79,8 +79,12 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     @Override
     public float getStyleWidth() {
-        if (Float.isNaN(cssstyle.dimensions[DIMENSION_WIDTH]))
-            return getParent().getLayoutWidth();
+        if (Float.isNaN(cssstyle.dimensions[DIMENSION_WIDTH])){
+           if(getParent() != null){
+               return getParent().getLayoutWidth();
+           }
+           return  getViewPortWidth();
+        }
         return super.getStyleWidth();
     }
 

@@ -29,4 +29,9 @@ public class Symbol {
         this.op = op;
         this.pos = pos;
     }
+
+    @Override
+    public String toString() {
+        return op;
+    }
 }

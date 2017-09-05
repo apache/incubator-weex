@@ -80,19 +80,30 @@ public class ParserTest extends TestCase {
     }
 
     public void testDebug(){
-        Block block = Parser.parse("count * ${ratio}");
-        show("count * ${ratio}");
-
-       // show("1+e6");
-
-        show("item[1] + index");
+        Block block = Parser.parse("{{{item.name}}}");
+        /**
+         *
+         * */
+       show("{{item.name}}");
         System.out.println(block.execute(createContext())
         + "  " + Double.parseDouble(".0e6"));
     }
 
 
+    public void  testBracket(){
+        Assert.assertEquals(Parser.parse("(item.name)").toString(), Parser.parse("(((item.name)))").toString());
+        Assert.assertEquals(Parser.parse("((item.name))").toString(), Parser.parse("(((item.name)))").toString());
+        Assert.assertEquals("hello world", Parser.parse("(((item.name)))").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("((item.name))").execute(createContext()));
+    }
 
     public void  testEl(){
+        Assert.assertEquals("hello world", Parser.parse("${{{item.name}}}").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("${{item.name}}").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("${{{item.name}}}").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("{{item.name}}").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("{{{item.name}}}").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("{{{{item.name}}}}").execute(createContext()));
         Assert.assertEquals(21.0, Parser.parse("item[1] + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item.name + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item[name] + index").execute(createContext()));
@@ -104,6 +115,9 @@ public class ParserTest extends TestCase {
 
         Assert.assertEquals(31.0, Parser.parse("item.name.length + index").execute(createContext()));
         Assert.assertEquals(21.0, Parser.parse("item.length + index").execute(createContext()));
+
+        Assert.assertEquals(36.0, Parser.parse("count * ${ratio}").execute(createContext()));
+
     }
 
     public void testIf(){
@@ -112,7 +126,6 @@ public class ParserTest extends TestCase {
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  null : true").execute(createContext())));
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  undefined : true").execute(createContext())));
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  \"\" : true").execute(createContext())));
-
     }
 
 

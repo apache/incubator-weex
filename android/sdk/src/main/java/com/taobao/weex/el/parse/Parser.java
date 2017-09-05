@@ -21,6 +21,7 @@ package com.taobao.weex.el.parse;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -123,8 +124,7 @@ public class Parser {
                 }
             }
         }
-        if(stacks.size() <= opSize){ // empty bracket, none need, save memory
-            //opetion
+        if(stacks.size() <= stackSize){ // empty bracket, none need, save memory
             while (operators.size() > opSize){
                 operators.pop();
             }
@@ -146,8 +146,12 @@ public class Parser {
         while (stacks.size() > stackSize){
             stacks.pop();
         }
-        Block block = new Block(tokens, Token.TYPE_BLOCK);
-        stacks.push(block);
+        if(tokens.size() == 1){
+            stacks.push(tokens.get(0));
+        }else{
+            Block block = new Block(tokens, Token.TYPE_BLOCK);
+            stacks.push(block);
+        }
     }
 
     /**
