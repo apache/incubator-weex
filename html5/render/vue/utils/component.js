@@ -202,7 +202,12 @@ export function detectAppear (context, visible, dir = null) {
   const el = context && context.$el
   if (!el) { return }
   const handlers = getEventHandlers(context)
-  if (!handlers[visible ? 'appear' : 'disappear']) { return }
+  /**
+   * No matter it's binding appear/disappear or both of them. Always
+   * should test it's visibility and change the context._visible.
+   * If neithor of them was bound, then just ignore it.
+   */
+  if (!handlers['appear'] && !handlers['disappear']) { return }
   /**
    * if the component hasn't appeared for once yet, then it shouldn't trigger
    * a disappear event at all.
