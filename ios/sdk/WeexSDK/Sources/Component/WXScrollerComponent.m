@@ -509,6 +509,71 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidZoom:)]) {
+            [delegate scrollViewDidZoom:scrollView];
+        }
+    }
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillBeginDragging:)]) {
+            [delegate scrollViewWillBeginDragging:scrollView];
+        }
+    }
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillEndDragging:withVelocity:targetContentOffset:)]) {
+            [delegate scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
+        }
+    }
+}
+
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    [_loadingComponent.view setHidden:NO];
+    [_refreshComponent.view setHidden:NO];
+    
+    //refresh
+    if (_refreshComponent && scrollView.contentOffset.y < 0 && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
+        [_refreshComponent refresh];
+    }
+    
+    //loading
+    if (_loadingComponent && scrollView.contentOffset.y > 0 &&
+        scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
+        [_loadingComponent loading];
+    }
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)]) {
+            [delegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+        }
+    }
+}
+
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
+{
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillBeginDecelerating:)]) {
+            [delegate scrollViewWillBeginDecelerating:scrollView];
+        }
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)]) {
+            [delegate scrollViewDidEndDecelerating:scrollView];
+        }
+    }
+}
+
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     UIEdgeInsets inset = [scrollView contentInset];
@@ -528,22 +593,50 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [scrollView setContentInset:inset];
+    
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndScrollingAnimation:)]) {
+            [delegate scrollViewDidEndScrollingAnimation:scrollView];
+        }
+    }
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+- (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(nullable UIView *)view
 {
-    [_loadingComponent.view setHidden:NO];
-    [_refreshComponent.view setHidden:NO];
-    
-    //refresh
-    if (_refreshComponent && scrollView.contentOffset.y < 0 && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
-        [_refreshComponent refresh];
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillBeginZooming:withView:)]) {
+            [delegate scrollViewWillBeginZooming:scrollView withView:view];
+        }
     }
-    
-    //loading
-    if (_loadingComponent && scrollView.contentOffset.y > 0 &&
-        scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
-        [_loadingComponent loading];
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(nullable UIView *)view atScale:(CGFloat)scale
+{
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndZooming:withView:atScale:)]) {
+            [delegate scrollViewDidEndZooming:scrollView withView:view atScale:scale];
+        }
+    }
+}
+
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
+{
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewShouldScrollToTop:)]) {
+            if (![delegate scrollViewShouldScrollToTop:scrollView]) {
+                return NO;
+            };
+        }
+    }
+    return YES;
+}
+
+- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView
+{
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidScrollToTop:)]) {
+            [delegate scrollViewDidScrollToTop:scrollView];
+        }
     }
 }
 
