@@ -186,8 +186,8 @@
     _cssNode->layout.position[CSS_TOP] = 0;
     
     [self _frameDidCalculated:isFrameChanged];
-    
-    for (WXComponent *subcomponent in _subcomponents) {
+    NSArray * subcomponents = [_subcomponents copy];
+    for (WXComponent *subcomponent in subcomponents) {
         [subcomponent _calculateFrameWithSuperAbsolutePosition:newAbsolutePosition gatherDirtyComponents:dirtyComponents];
     }
 }
