@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-//        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
@@ -15,16 +15,9 @@ plugins {
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
-apply from: '../jacoco.gradle'
+apply plugin: 'com.getkeepsafe.dexcount'
 
-//apply plugin: 'com.getkeepsafe.dexcount'
-//apply plugin: 'jacoco'
-//
-//jacoco {
-//    toolVersion = "0.7.9+"
-//}
-
-ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'true'
+ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){
     apply plugin: 'com.vanniktech.android.junit.jacoco'
     junitJacoco {
@@ -165,7 +158,6 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.3.2'
     testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
-
 }
 if(file('../license/LICENSE').exists()){
     license {

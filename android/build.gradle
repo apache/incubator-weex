@@ -2,14 +2,10 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url "http://mvnrepo.alibaba-inc.com/mvn/repository"
-        }
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath 'com.taobao.android.gradle:mtl-plugin:2.3.1.jacoco-SNAPSHOT'
+        classpath 'com.android.tools.build:gradle:2.1.3'
     }
 }
 
@@ -17,42 +13,31 @@ plugins {
     id "de.undercouch.download" version "3.2.0"
 }
 
-allprojects {
-    repositories {
+repositories {
         mavenCentral()
-        maven {
-            url "http://mvnrepo.alibaba-inc.com/mvn/repository"
-        }
         jcenter()
-    }
 }
 
 subprojects {
     repositories {
         mavenCentral()
-        maven {
-            url "http://mvnrepo.alibaba-inc.com/mvn/repository"
-        }
         jcenter()
     }
     buildscript {
         repositories {
             mavenCentral()
-            maven {
-                url "http://mvnrepo.alibaba-inc.com/mvn/repository"
-            }
             jcenter()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:2.3.3'
+            classpath 'com.android.tools.build:gradle:2.1.3'
         }
     }
     ext {
         compileSdkVersion=25
         buildToolsVersion="25.0.3"
-        minSdkVersion=21
-        appMinSdkVersion=21
-        targetSdkVersion=21
+        minSdkVersion=14
+        appMinSdkVersion=15
+        targetSdkVersion=25
         supportLibVersion="25.3.1"
         fastjsonLibVersion="1.1.46.android"
     }

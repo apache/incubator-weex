@@ -53,7 +53,6 @@ import com.alibaba.weex.https.HotRefreshManager;
 import com.alibaba.weex.https.WXHttpManager;
 import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
-import com.alibaba.weex.util.JacocoCodeCoverage;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKEngine;
@@ -320,9 +319,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   protected void onDestroy() {
     super.onDestroy();
-	//jacoco code coverage
-//	JacocoCodeCoverage.dumpCodeCoverageByJacoco(getApplicationContext());
-
     if (mInstance != null) {
       mInstance.onActivityDestroy();
     }

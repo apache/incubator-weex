@@ -1,11 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.taobao.android.jacoco'
-apply plugin: "jacoco"
-
-jacoco {
-    toolVersion = "0.7.9"
-    reportsDir = file("$buildDir/customJacocoReportDir")
-}
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -42,15 +35,14 @@ android {
     }
     buildTypes {
         debug {
-            testCoverageEnabled true
+            testCoverageEnabled false
         }
     }
     sourceSets {
         main {
             jniLibs.srcDir(['libs'])
             java {
-//                srcDirs = ["src/main/java", "src/main/java_zxing"];
-                srcDirs = ['src/main/java']
+                srcDirs = ["src/main/java", "src/main/java_zxing"];
             }
         }
     }
@@ -114,48 +106,4 @@ dependencies {
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     compile 'com.taobao.android:weex_inspector:0.11.0'
-}
-
-def coverageSourceDirs = ['../../../android/sdk/src/main/java']
-task jacocoTestReport(type: JacocoReport) {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    reports {
-        xml.enabled = true
-        html.enabled = true
-        csv.enabled true
-    }
-    classDirectories = fileTree(//"enter code here"
-            dir: '../../../android/sdk/build/intermediates/classes/debug',
-            excludes: ['**/R*.class',
-                       '**/*$InjectAdapter.class',
-                       '**/*$ViewInjector*.class',
-                       '**/*$BuildConfig.*',
-                       '**/R.class',
-                       '**/*$ViewInjector*.*',
-                       '**/*$ViewBinder*.*',
-                       '**/*MembersInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/Manifest*.*',
-                       '**/*$Lambda$*.class',
-                       '**/*Factory*.class',
-                       '**/*$Builder*',
-                       '**/*DaggerApplicationComponent*.class',
-                       '**/api'
-            ])
-    sourceDirectories = files(coverageSourceDirs)
-    File configFile = file('../../../android/sdk/build/intermediates/classes/debug')
-
-    configFile = file(configFile.absolutePath)
-    println 'test==================='
-    println configFile.path
-
-    executionData = files("$buildDir/outputs/coverage.ec")
-    doFirst {
-        new File("../../../android/sdk/build/intermediates/classes/").eachFileRecurse { file ->
-            if (file.name.contains('$$')) {
-                file.renameTo(file.path.replace('$$', '$'))
-            }
-        }
-    }
 }
