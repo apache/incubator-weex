@@ -25,43 +25,27 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('image onload @ignore-ios', function () {
+var goal = 'image-onload';
+var maxW = util.getGETActionWaitTimeMills();
+describe('weex '+goal+' test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
   beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/image-onload.js'))
-      .waitForElementById('imgSize',util.getGETActionWaitTimeMills(),1000)
+      .get(util.getPage('/components/'+goal+'.js'))
   });
 
   afterEach(function () {
       return util.quit(driver);
   })
 
-
-  it('#1 download image', () => {
+  it('image onload success and failed', () => {
     return driver
-    .sleep(5000)
-    .elementById('imgSize')
-    .text()
-    .then((text)=>{
-        if(text == '-1,-1') {
-            return;
-        }
-        assert.equal(text, '360,388')
-    })
+    .waitForElementByName(goal, maxW, 2000)
+    .waitForElementByName('360,388',maxW, 2000)
+    .waitForElementByName('failed',maxW, 2000)
   });
-
-  it('#2 test download image failed event', () => {
-    return driver
-    .sleep(5000)
-    .elementById('download')
-    .text()
-    .then((text)=>{
-        assert.equal(text, 'failed')
-    })
-  })
 });
 
 

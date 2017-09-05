@@ -13,15 +13,17 @@
   height: 100%;
   height: calc(100% - 72px);
 
-  &:nth-child(even) {
-    background: $bg-gray;
-    color: $text-blue;
-  }
+  // &:nth-child(even) {
+  //   background: $bg-blue; 
+  //   color: $text-white;
+  // }
 
-  &:nth-child(odd) {
-    background: $bg-blue; 
-    color: $text-white;
-  }
+  // &:nth-child(odd) {
+    
+
+  //   background: $bg-gray;
+  //   color: $text-blue;
+  // }
 
   h2 {
     font-family: "Gill Sans";
@@ -77,6 +79,8 @@
 .header {
   height: 100%;
   position: relative;
+  background: $bg-blue; 
+  color: $text-white;
 
   #slider {
     margin-top: 73px;
@@ -159,6 +163,9 @@
 
 .edge {
 
+  background: $bg-gray;
+  color: $text-blue;
+
   .scene-container {
     .textbox {
       flex: 3;
@@ -210,6 +217,8 @@
 }
 
 .feature {
+  background: $bg-blue; 
+  color: $text-white;
   .feature-content {
     height: 100%;
     max-width: $content-max-width;
@@ -295,6 +304,10 @@
 }
 
 .cross-platform {
+
+  background: $bg-gray;
+  color: $text-blue;
+
   .sketch-content {
     flex: 5;
   }
@@ -330,7 +343,8 @@
 }
 
 .supporting-vue {
-  color: #fff;
+  background: $bg-blue; 
+  color: $text-white;
 
   .sketch-content.imgbox {
     background: url("../images/vue.png") 50% 50% / contain no-repeat;
@@ -350,6 +364,10 @@
 }
 
 .schematic {
+
+  background: $bg-gray;
+  color: $text-blue;
+
   .textbox p {
     color: $text-light-black;
   }
@@ -361,6 +379,10 @@
 }
 
 .users {
+
+  background: $bg-blue; 
+  color: $text-white;
+
   .sketch-content {
     display: flex;
     flex-flow: row wrap;
@@ -490,6 +512,8 @@
 }
 
 .feedback {
+  background: $bg-gray;
+  color: $text-blue;
   .sketch-content {
     display: flex;
     flex-flow: row wrap;
