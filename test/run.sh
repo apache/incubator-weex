@@ -17,12 +17,24 @@ function buildAndroid {
     builddir=$dir'/android'
     current_dir=$PWD;
     cd $builddir;
-    ./gradlew assembleDebug;
+    if [ $needCoverage = "cover" ]; then
+    ./gradlew clean assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex -Dmtl.jaCoCoConfig.blackPkgs=com.google.zxing.*;
+    fi
+    ./gradlew clean assembleDebug
     cd $current_dir;
     pwd
 }
 function runAndroid {
-    buildAndroid
+    echo 'Run in Android...'
+    echo $1 
+    echo $2
+
+    dir=$(pwd)
+    builddir=$dir'/android'
+    codeCoveragedir=$builddir'/plarground' 
+    current_dir=$PWD;
+
+    buildAndroid $2
     startMacacaServer
     startWeexServer
     platform=android ./node_modules/mocha/bin/mocha  $1 --reporter mocha-simple-html-reporter --reporter-options output=report.html -f '@ignore-android' -i --recursive --bail --verbose --retries 3
@@ -80,7 +92,7 @@ needCoverage=${2:-$coverage_status}
 killserver
 #run tests
 if [ $platform = $platform_android ]; then
-    runAndroid ./test/scripts/
+    runAndroid ./test/scripts/ "$needCoverage"
 elif [ $platform = 'web' ]; 
 then
     runWeb ./test/scripts/
