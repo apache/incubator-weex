@@ -145,6 +145,7 @@ vue: {
 #### 0.12.8
 
 * optimize event binding.
+* fix a-jump interception condition.
 
 ## component -> dom map
 
