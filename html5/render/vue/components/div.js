@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { validateStyles } from '../validator'
-import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
 
 const _css = `
 body > .weex-div {
@@ -25,20 +23,31 @@ body > .weex-div {
 }
 `
 
+function getDiv (weex) {
+  const {
+    extractComponentStyle,
+    trimTextVNodes,
+    createEventMap
+  } = weex
+
+  return {
+    name: 'weex-div',
+    render (createElement) {
+      return createElement('html:div', {
+        attrs: { 'weex-type': 'div' },
+        on: createEventMap(this),
+        staticClass: 'weex-div weex-ct',
+        staticStyle: extractComponentStyle(this)
+      }, trimTextVNodes(this.$slots.default))
+    },
+    _css
+  }
+}
+
 export default {
-  name: 'weex-div',
-  render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('div', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
-    this._renderHook()
-    return createElement('html:div', {
-      attrs: { 'weex-type': 'div' },
-      on: createEventMap(this),
-      staticClass: 'weex-div weex-ct',
-      staticStyle: extractComponentStyle(this)
-    }, trimTextVNodes(this.$slots.default))
-  },
-  _css
+  init (weex) {
+    const div = getDiv(weex)
+    weex.registerComponent('div', div)
+    weex.registerComponent('container', div)
+  }
 }

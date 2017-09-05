@@ -27,6 +27,7 @@
 #import "WXComponentManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXAppConfiguration.h"
+#import "WXTracingManager.h"
 
 NSString *const kStartKey = @"start";
 NSString *const kEndKey = @"end";
@@ -104,6 +105,13 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     if (instance.userInfo[@"weex_bundlejs_requestType"]) {
         commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
     }
+    if (instance.userInfo[CACHEPROCESSTIME]) {
+        commitDict[CACHEPROCESSTIME] = instance.userInfo[CACHEPROCESSTIME];
+    }
+    
+    if (instance.userInfo[CACHERATIO]) {
+        commitDict[CACHERATIO] = instance.userInfo[CACHERATIO];
+    }
     if (instance.userInfo[WXCUSTOMMONITORINFO]) {
         if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSDictionary class]]) {
             commitDict[WXCUSTOMMONITORINFO] = [WXUtility JSONString:instance.userInfo[WXCUSTOMMONITORINFO]];
@@ -162,6 +170,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     }
     
     [self printPerformance:commitDict];
+    [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];
 }
 
 + (NSMutableDictionary *)performanceDictForInstance:(WXSDKInstance *)instance

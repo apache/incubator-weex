@@ -20,6 +20,7 @@
 #import "WXPickerModule.h"
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXComponentManager.h"
 #import <UIKit/UIPickerView.h>
 #import <UIKit/UIDatePicker.h>
 #import <UIKit/UIKit.h>
@@ -29,6 +30,9 @@
 
 @interface WXPickerModule()
 
+@property (nonatomic, strong)NSString * pickerType;
+// when resign the picker ,then the focus will be.
+@property (nonatomic, strong)UIView * focusToView;
 //picker
 @property(nonatomic,strong)UIPickerView *picker;
 @property(nonatomic,strong)UIView *backgroundView;
@@ -80,8 +84,14 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    
+    _pickerType = @"picker";
     NSArray *items = @[];
     NSInteger index = 0 ;
+  
     if (options[@"items"]) {
         items = options[@"items"];
     }
@@ -129,6 +139,19 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
 }
 
+- (void)handleA11yFocusback:(NSDictionary*)options
+{
+    __weak typeof(self) weakSelf = self;
+    if (options[@"sourceRef"] && [options[@"sourceRef"] isKindOfClass:[NSString class]]) {
+        WXPerformBlockOnComponentThread(^{
+            WXComponent * focusBackComponent = [weakSelf.weexInstance componentForRef:options[@"sourceRef"]];
+            WXPerformBlockOnMainThread(^{
+                weakSelf.focusToView = focusBackComponent.view;
+            });
+        });
+    }
+}
+
 -(void)SetColorDelay:(NSNumber *)number
 {
     if(self.selectionColor) {
@@ -164,11 +187,20 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
     self.isAnimating = YES;
     self.backgroundView.hidden = NO;
+    UIView * focusView = self.picker;
+    if([_pickerType isEqualToString:@"picker"]) {
+        focusView = self.picker;
+    } else {
+        focusView = self.datePicker;
+    }
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, focusView);
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - WXPickerHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
         self.backgroundView.alpha = 1;
+        
     } completion:^(BOOL finished) {
         self.isAnimating = NO;
+        
     }];
 }
 
@@ -184,6 +216,10 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     } completion:^(BOOL finished) {
         self.backgroundView.hidden = YES;
         self.isAnimating = NO;
+        if (!_focusToView) {
+            _focusToView = self.backgroundView.superview;
+        }
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _focusToView);
         [self.backgroundView removeFromSuperview];
     }];
 }
@@ -357,12 +393,20 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 #pragma Date & Time Picker
 -(void)pickDate:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    _pickerType = @"pickDate";
     self.datePickerMode = UIDatePickerModeDate;
     [self datepick:options callback:callback];
 }
 
 -(void)pickTime:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    _pickerType = @"pickTime";
     self.datePickerMode = UIDatePickerModeTime;
     [self datepick:options callback:callback];
 }

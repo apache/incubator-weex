@@ -20,11 +20,17 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
-#define WXTNetworkHanding          @"loadjs"
-#define WXTExecJS                  @"execjs"
+#define WXTNetworkHanding          @"loadJS"
+#define WXTExecJS                  @"execJS"
 #define WXTJSCall                  @"jsCall"
+#define WXTDomCall                 @"domCall"
 #define WXTRender                  @"render"
-#define WXTRenderFinish            @"RenderFinish"
+#define WXTRenderFinish            @"renderFinish"
+
+#define WXTJSBridgeThread          @"JSThread"
+#define WXTDOMThread               @"DOMThread"
+#define WXTUIThread                @"UIThread"
+#define WXTMainThread              @"MainThread"
 
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
@@ -61,8 +67,10 @@ typedef enum : NSUInteger {
 @property (nonatomic) NSTimeInterval duration;
 @property (nonatomic, copy) NSString *fName; // functionName
 @property (nonatomic, copy) NSString *iid; // instance id
-@property (nonatomic, copy) NSString *parentId;// parent event id
+@property (nonatomic) long long parentId;// parent event id
 @property (nonatomic, copy) NSString *bundleUrl;
+@property (nonatomic, copy) NSString *threadName;
+@property (nonatomic, strong) NSMutableArray *childrenRefs; // children ids
 -(NSDictionary *)dictionary;
 @end
 
@@ -112,6 +120,11 @@ typedef enum : NSUInteger {
 +(void)clearTracingData;
 
 /**
+ *  @discusstion  get current time
+ */
++(NSTimeInterval)getCurrentTime;
+
+/**
  *  @discusstion set bundle type
  *  @param jsBundleString the bundle source.
  *  @param iid the instance  id.
@@ -122,5 +135,17 @@ typedef enum : NSUInteger {
  *  @return  the weex moudle component handler info
  */
 +(NSDictionary *)getTacingApi;
+
+/**
+ *  @discusstion commit tracing info
+ *  @param instanceId the instance  id.
+ */
++(void )commitTracing:(NSString *)instanceId;
+
+/**
+ *  @discusstion commit summary info
+ *  @param instanceId the instance  id.
+ */
++ (void)commitTracingSummaryInfo:(NSDictionary *)info withInstanceId:(NSString *)instanceId;
 
 @end

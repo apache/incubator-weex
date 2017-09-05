@@ -20,12 +20,13 @@
 /**
  * Webview module
  */
-import { isArray } from '../utils'
-export default {
+let isArray
+
+const webview = {
   goBack (vnode) {
     if (isArray(vnode)) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+        console.warn('[vue-render] the ref passed to webview.goBack is a array.')
       }
       vnode = vnode[0]
     }
@@ -36,7 +37,7 @@ export default {
   goForward (vnode) {
     if (isArray(vnode)) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+        console.warn('[vue-render] the ref passed to webview.goForward is a array.')
       }
       vnode = vnode[0]
     }
@@ -47,12 +48,19 @@ export default {
   reload (vnode) {
     if (isArray(vnode)) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+        console.warn('[vue-render] the ref passed to webview.reload is a array.')
       }
       vnode = vnode[0]
     }
     if (vnode && typeof vnode.reload === 'function') {
       vnode.reload()
     }
+  }
+}
+
+export default {
+  init (weex) {
+    isArray = weex.utils.isArray
+    weex.registerModule('webview', webview)
   }
 }

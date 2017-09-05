@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {
-  nextFrame,
-  toCSSText,
-  autoPrefix,
-  camelizeKeys,
-  normalizeStyle,
-  isArray
-} from '../utils'
+const utils = {}
 
 function transitionOnce (vnode, config, callback) {
+  const {
+    nextFrame,
+    toCSSText,
+    autoPrefix,
+    camelizeKeys,
+    normalizeStyle,
+    isArray
+  } = utils
+
   if (isArray(vnode)) {
     if (process.env.NODE_ENV === 'development') {
       console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
@@ -64,7 +66,7 @@ function transitionOnce (vnode, config, callback) {
   })
 }
 
-export default {
+const animation = {
   /**
    * transition
    * @param  {String} vnode
@@ -76,5 +78,21 @@ export default {
     return transitionOnce(vnode, config, () => {
       callback && callback()
     })
+  }
+}
+
+export default {
+  init (weex) {
+    const extendKeys = weex.utils.extendKeys
+    extendKeys(utils, weex.utils, [
+      'nextFrame',
+      'toCSSText',
+      'autoPrefix',
+      'camelizeKeys',
+      'normalizeStyle',
+      'isArray'
+    ])
+
+    weex.registerModule('animation', animation)
   }
 }

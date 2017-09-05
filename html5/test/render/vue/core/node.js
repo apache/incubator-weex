@@ -20,7 +20,6 @@
 
 import { init } from '../helper/runtime'
 import div from '../../../../render/vue/components/div'
-
 import eventBubbleBundle from '../data/build/dotvue/event-bubble.js'
 
 init('core node', (Vue, helper) => {
@@ -37,8 +36,8 @@ init('core node', (Vue, helper) => {
     let infoStr = ''
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
-      expect(tracker).to.equal(shouldBe)
       infoStr = shouldBe
+      expect(tracker).to.equal(shouldBe)
     }
 
     it('should trigger the closest parent.', function (done) {
@@ -50,11 +49,11 @@ init('core node', (Vue, helper) => {
        *  e.g.  div -> foo (whoes root element is the div.)
        */
       const evt = new Event('tap', { bubbles: true })
+      evt._for = 'weex'
       el.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
         trackerShouldBe(tracker, ' > in-bar-outter-div > component-bar')
-        helper.unregisterDone(id)
         done()
       })
     })
@@ -65,7 +64,8 @@ init('core node', (Vue, helper) => {
        * click inner div. should just trigget the inner handler and
        * shouldn't bubbe to outter div.
        */
-      const evt = new Event('tap', { bubbles: true })
+      const evt = new Event('tap', { bubbles: false })
+      evt._for = 'weex'
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {

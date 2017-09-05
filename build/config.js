@@ -37,7 +37,7 @@ const configs = {
   'weex-js-framework': {
     moduleName: 'Weex',
     entry: absolute('html5/render/native/index.js'),
-    dest: absolute('dist/native.js'),
+    dest: absolute('packages/weex-js-framework/index.js'),
     banner: `(this.nativeLog || function(s) {console.log(s)})`
       + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}.');\n`
       + frameworkBanner,
@@ -52,9 +52,35 @@ const configs = {
   'weex-js-runtime': {
     moduleName: 'WeexRuntime',
     entry: absolute('html5/runtime/index.js'),
-    dest: absolute('dist/runtime.js'),
-    banner: `/* 'WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
+    dest: absolute('packages/weex-js-runtime/index.js'),
+    banner: `/* WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
       + frameworkBanner,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
+  'weex-legacy-framework': {
+    moduleName: 'WeexLegacyFramework',
+    entry: absolute('html5/frameworks/legacy/index.js'),
+    dest: absolute('packages/weex-legacy-framework/index.js'),
+    banner: `/* Weex Legacy Framework ${subversion.framework}, Build ${now()}. */\n`,
+    format: 'umd',
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+    ]
+  },
+  'weex-vanilla-framework': {
+    moduleName: 'WeexVanillaFramework',
+    entry: absolute('html5/frameworks/vanilla/index.js'),
+    dest: absolute('packages/weex-vanilla-framework/index.js'),
+    banner: `/* Weex Vanilla Framework ${subversion.framework}, Build ${now()}. */\n`,
     format: 'umd',
     plugins: [
       nodeResolve({
@@ -66,7 +92,7 @@ const configs = {
   'weex-web-render': {
     moduleName: 'Weex',
     entry: absolute('html5/render/browser/index.js'),
-    dest: absolute('dist/browser.js'),
+    dest: absolute('packages/weex-html5/index.js'),
     banner: `(this.nativeLog || function(s) {console.log(s)})`
       + `('START WEEX HTML5: ${subversion.browser}, Build ${now()}.');\n`
       + frameworkBanner,
@@ -82,11 +108,10 @@ const configs = {
   },
   'weex-vue-render': {
     moduleName: 'WeexVueRender',
-    entry: absolute('html5/render/vue/index.js'),
+    entry: absolute('packages/weex-vue-render/src/index.js'),
     dest: absolute('packages/weex-vue-render/dist/index.js'),
     banner:`
-console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');
-window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
+console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
     format: 'umd',
     plugins: [
       postcss(),
@@ -99,6 +124,36 @@ window._jslib_init_start = window.performance && window.performance.now && windo
         'process.env.WEEX_VERSION': subversion['vue-render']
       })
     ]
+  },
+  'weex-vue-render-core': {
+    moduleName: 'WeexVueRenderCore',
+    entry: absolute('packages/weex-vue-render/src/index.core.js'),
+    dest: absolute('packages/weex-vue-render/dist/index.core.js'),
+    banner:`
+console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
+    format: 'umd',
+    plugins: [
+      postcss(),
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
+      replace({
+        'process.env.WEEX_VERSION': subversion['vue-render']
+      })
+    ]
+  },
+  'weex-vue-render-plugins': {
+    format: 'umd',
+    plugins: [
+      postcss(),
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true
+      })
+    ]
   }
 }
 
@@ -107,7 +162,7 @@ function getConfig (name, minify) {
   const config = {
     moduleName: opt.moduleName,
     entry: opt.entry,
-    dest: minify ? opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
+    dest: minify ? opt.dest && opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
     format: opt.format,
     banner: opt.banner,
     plugins: opt.plugins.concat([

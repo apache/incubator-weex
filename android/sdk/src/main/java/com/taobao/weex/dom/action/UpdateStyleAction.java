@@ -39,7 +39,7 @@ import java.util.Map;
  * Created by sospartan on 28/02/2017.
  */
 
-class UpdateStyleAction implements DOMAction, RenderAction {
+class UpdateStyleAction extends TraceableAction implements DOMAction, RenderAction {
   private final String mRef;
   private final JSONObject mData;
   private final boolean mIsCausedByPesudo;

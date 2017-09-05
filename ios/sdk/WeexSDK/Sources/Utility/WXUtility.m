@@ -901,6 +901,28 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     [custormMonitorDict setObject:value forKey:key];
     instance.userInfo[WXCUSTOMMONITORINFO] = custormMonitorDict;
 }
+
++ (NSDictionary *_Nonnull)dataToBase64Dict:(NSData *_Nullable)data
+{
+    NSMutableDictionary *dataDict = [NSMutableDictionary new];
+    if(data){
+        NSString *base64Encoded = [data base64EncodedStringWithOptions:0];
+        [dataDict setObject:@"binary" forKey:@"@type"];
+        [dataDict setObject:base64Encoded forKey:@"base64"];
+    }
+    
+    return dataDict;
+}
+
++ (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict
+{
+    if([@"binary" isEqualToString:base64Dict[@"@type"]]){
+        NSString *base64 = base64Dict[@"base64"];
+        NSData *sendData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+        return sendData;
+    }
+    return nil;
+}
 @end
 
 

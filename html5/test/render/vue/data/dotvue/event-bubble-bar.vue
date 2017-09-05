@@ -10,10 +10,14 @@
   module.exports = {
     methods: {
       outterClick (evt) {
-        this.$parent.$parent.tracker += ' > in-bar-outter-div'
+        if (this.$parent.$parent.tracker.indexOf(' > in-bar-outter-div') === -1) {
+          this.$parent.$parent.tracker += ' > in-bar-outter-div'
+        }
       },
       innerClick (evt) {
-        this.$parent.$parent.tracker += ' > in-bar-inner-div'
+        if (this.$parent.$parent.tracker.indexOf(' > in-bar-inner-div') === -1) {
+          this.$parent.$parent.tracker += ' > in-bar-inner-div'
+        }
       }
     }
   }

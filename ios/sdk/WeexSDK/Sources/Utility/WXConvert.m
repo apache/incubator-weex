@@ -421,6 +421,23 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return [color CGColor];
 }
 
++ (NSString *)HexWithColor:(UIColor *)color
+{
+    uint hex;
+    CGFloat red, green, blue, alpha;
+    if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+        [color getWhite:&red alpha:&alpha];
+        green = red;
+        blue = red;
+    }
+    red = roundf(red * 255.f);
+    green = roundf(green * 255.f);
+    blue = roundf(blue * 255.f);
+    alpha = roundf(alpha * 255.f);
+    hex =  ((uint)red << 16) | ((uint)green << 8) | ((uint)blue);
+    return [NSString stringWithFormat:@"#%02x", hex];
+}
+
 + (WXBorderStyle)WXBorderStyle:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
@@ -591,7 +608,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return  WXImageQualityHigh;
     }
     
-    return  WXImageQualityLow;
+    return  WXImageQualityNone;
 }
 
 + (WXImageSharp)WXImageSharp:(id)value
@@ -672,7 +689,8 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             @"ease-in":kCAMediaTimingFunctionEaseIn,
             @"ease-out":kCAMediaTimingFunctionEaseOut,
             @"ease-in-out":kCAMediaTimingFunctionEaseInEaseOut,
-            @"linear":kCAMediaTimingFunctionLinear
+            @"linear":kCAMediaTimingFunctionLinear,
+            @"ease":kCAMediaTimingFunctionDefault
         };
     });
     

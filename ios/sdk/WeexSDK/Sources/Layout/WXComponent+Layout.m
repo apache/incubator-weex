@@ -17,6 +17,7 @@
  * under the License.
  */
 
+
 #import "WXComponent+Layout.h"
 #import "WXComponent_internal.h"
 #import "WXTransform.h"
@@ -111,6 +112,7 @@
     }
     return (int)(count);
 }
+
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
@@ -408,5 +410,4 @@ static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t w
     
     return (css_dim_t){resultSize.width, resultSize.height};
 }
-
 @end

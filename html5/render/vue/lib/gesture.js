@@ -78,6 +78,12 @@ function fireEvent(element, type, extra) {
     }
   }
 
+  /**
+   * A flag to distinguish with other events with the same name generated
+   * by another library in the same page.
+   */ 
+  event._for = 'weex'
+
   element.dispatchEvent(event)
 }
 

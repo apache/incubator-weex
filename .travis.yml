@@ -46,8 +46,8 @@ matrix:
           components:
             - platform-tools
             - tools
-            - build-tools-23.0.3
-            - android-23
+            - build-tools-25.0.3
+            - android-25
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
@@ -77,8 +77,8 @@ before_script:
       export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
       echo yes | sdkmanager platform-tools
       echo yes | sdkmanager tools #tools
-      echo yes | sdkmanager "build-tools;23.0.3" #build-tool
-      echo yes | sdkmanager "platforms;android-23" #compile target
+      echo yes | sdkmanager "build-tools;25.0.3" #build-tool
+      echo yes | sdkmanager "platforms;android-25" #compile target
       echo yes | sdkmanager "extras;android;m2repository" #support
     fi
 script:

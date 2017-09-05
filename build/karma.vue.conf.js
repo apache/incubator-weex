@@ -92,7 +92,7 @@ module.exports = function (config) {
     browserDisconnectTimeout:10000,
     preprocessors: {
       '../html5/test/**/*.js': ['rollup'],
-      '../html5/test/**/!(components|examples|core)/*.js': ['rollup', 'coverage']
+      '../html5/test/**/!(components|examples|core)/!(component).js': ['rollup', 'coverage']
     },
     rollupPreprocessor: rollupConfig,
 

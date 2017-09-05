@@ -30,6 +30,8 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.utils.WXLogUtils;
@@ -48,6 +50,12 @@ class CreateBodyAction extends AbstractAddElementAction {
 
   @Override
   public void executeDom(DOMActionContext context) {
+    if (WXEnvironment.isApkDebugable()) {
+      WXTracing.TraceEvent execJsEndEvent = WXTracing.newEvent("executeBundleJS", context.getInstanceId(), -1);
+      execJsEndEvent.traceId = context.getInstance().mExecJSTraceId;
+      execJsEndEvent.ph = "E";
+      execJsEndEvent.submit();
+    }
     addDomInternal(context, mData);
   }
 
@@ -58,10 +66,12 @@ class CreateBodyAction extends AbstractAddElementAction {
 
   @Override
   protected void appendDomToTree(DOMActionContext context, WXDomObject domObject) {
+    long startNanos = System.nanoTime();
     String instanceId = context.getInstanceId();
     WXDomObject.prepareRoot(domObject,
         WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(instanceId), WXSDKManager.getInstanceViewPortWidth(instanceId)),
         WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(instanceId), WXSDKManager.getInstanceViewPortWidth(instanceId)));
+    domObject.mDomThreadNanos += (System.nanoTime() - startNanos);
   }
 
   @Override
@@ -84,17 +94,24 @@ class CreateBodyAction extends AbstractAddElementAction {
       return;
     }
     try {
+      Stopwatch.tick();
       long start = System.currentTimeMillis();
       component.createView();
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
+        submitPerformance("createView", "X", instance.getInstanceId(), Stopwatch.tackAndTick(), start, true);
       }
       start = System.currentTimeMillis();
       component.applyLayoutAndEvent(component);
+      if (WXTracing.isAvailable()) {
+        submitPerformance("applyLayoutAndEvent", "X", instance.getInstanceId(), Stopwatch.tackAndTick(), start, true);
+      }
+      start = System.currentTimeMillis();
       component.bindData(component);
 
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
+        submitPerformance("bindData", "X", instance.getInstanceId(), Stopwatch.tack(), start, true);
       }
 
       if (component instanceof WXScroller) {
@@ -108,6 +125,8 @@ class CreateBodyAction extends AbstractAddElementAction {
         instance.onCreateFinish();
       }
       instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      component.mTraceInfo.uiQueueTime = mUIQueueTime;
+      component.onRenderFinish(WXComponent.STATE_ALL_FINISH);
     } catch (Exception e) {
       WXLogUtils.e("create body failed.", e);
     }

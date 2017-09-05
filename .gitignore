@@ -12,7 +12,7 @@ test/build
 weex_tmp
 coverage
 dist
-packages
+*.js.gz
 
 # Node
 logs
@@ -38,6 +38,9 @@ examples/vue/test/
 # Created by Weex Web Packer
 html5/browser/extend/packer.js
 html5/render/browser/extend/packer.js
+
+# Created by weex-vue-bundle-util
+weex-vue-plugins.js
 
 android/playground/app/gradlew
 android/playground/app/gradlew.bat

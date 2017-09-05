@@ -36,6 +36,7 @@ var iOSOpts = {
   target: 'ios',
   platformName: 'iOS',
   slowEnv: isRunInCI,
+  autoAcceptAlerts:false,
   app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
 };
 
@@ -43,6 +44,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
+  autoAcceptAlerts:false,
   app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
 };
 
@@ -102,6 +104,9 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
 
 
 module.exports = {
+    isIos:function(){
+      return isIOS;
+    },
     getConfig:function(){
         if(browser){
             return androidChromeOpts;
@@ -156,6 +161,44 @@ module.exports = {
                     .sleep(1000)
                 })
             })
+
+            //direct : toUp,toDown,toLeft,toRight, dragStartPct: 偏移量，0～1
+            driverFactory.addPromiseChainMethod('drag', function(direct,dragStartPct) {
+                return this.getWindowSize()
+                    .then(size => {
+                        let {width,height} = size;
+                        if(!direct){direct='toUp';}if(!dragStartPct){dragStartPct=0;}
+                        let fromX,toX,fromY,toY;
+                        switch (direct) {
+                          case 'toUp':
+                            fromX = toX = Math.floor(width / 2);
+                            fromY = Math.floor(height * 1 / 4 + height * dragStartPct * 3/4);
+                            toY = Math.floor(height * 3 / 4 + height * dragStartPct * 1/4);
+                            break;
+                          case 'toLeft':
+                            fromY = toY = Math.floor(height / 2);
+                            fromX = Math.floor(width * 1 / 4 + width * dragStartPct * 3 / 4);
+                            toX = Math.floor(width * 3 / 4 + width * dragStartPct * 1 / 4);
+                            break;
+                          case 'toRight':
+                            fromY = toY = Math.floor(height / 2);
+                            toX = Math.floor(width * 1 / 4 + width * dragStartPct * 3 / 4);
+                            fromX = Math.floor(width * 3 / 4 + width * dragStartPct * 1 / 4);
+                            break;
+                          case 'toDown':
+                          default:
+                            fromX = toX = Math.floor(width / 2);
+                            toY = Math.floor(height * 1 / 4 + height * dragStartPct * 3/4);
+                            fromY = Math.floor(height * 3 / 4 + height * dragStartPct * 1/4);
+                            break;
+                        }
+                        return this.touch('drag', {
+                                fromX: fromX,fromY: fromY,toX: toX,toY: toY,duration: 0.1
+                            })
+                            .sleep(500)
+                    })
+            });
+
           driverFactory.addPromiseChainMethod('swipeLeft', function (distanceRatio, yRatio) {
                 return this
                   .getWindowSize()
@@ -180,11 +223,19 @@ module.exports = {
                   .sleep(1000)
               })
           })
-            driver = driverFactory.initPromiseChain();
-            driver.configureHttp({
-                timeout: 100000
-            });
-            global._wxDriver = driver;
+          driverFactory.addPromiseChainMethod('saveShot', function(filepath){
+            return this.takeScreenshot()
+              .then(imgData => {
+                var newImg = new Buffer(imgData, 'base64');
+                fs.writeFileSync(filepath, newImg);
+                return this;
+              })
+          });
+          driver = driverFactory.initPromiseChain();
+          driver.configureHttp({
+              timeout: 100000
+          });
+          global._wxDriver = driver;
         }
         
         return driver;
@@ -200,6 +251,7 @@ module.exports = {
     quit:function(driver){
         if(browser)
             return driver.quit()
-        return driver.sleep(1000).back().sleep(1000);
+        var filepath = path.resolve(__dirname,'../../last.png');
+        return driver.saveShot(filepath).sleep(1000).back().sleep(1000);
     }
 }

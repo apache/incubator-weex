@@ -1,3 +1,5 @@
+// { "framework": "Vanilla" }
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -38,5 +40,3 @@ document.documentElement.appendChild(body)
 body.addEvent('click', function () {
   text.setAttr('value', 'Hello Weex')
 })
-
-sendTasks(id, [{ module: 'dom', method: 'createFinish', args: []}])

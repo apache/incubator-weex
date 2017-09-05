@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,6 +94,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   @Override
   public void applyLayoutAndEvent(WXComponent component) {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -105,6 +107,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       }
 
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   /**
@@ -141,6 +144,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
   @Override
   public void bindData(WXComponent component) {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -151,6 +155,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         getChild(i).bindData(((WXVContainer)component).getChild(i));
       }
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   @Override
@@ -227,7 +232,12 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return mChildren == null ? 0 : mChildren.size();
   }
 
+  @Nullable
   public WXComponent getChild(int index) {
+    if (mChildren == null || index < 0 || index >= mChildren.size()) {
+      //To avoid index out of bounds
+      return null;
+    }
     return mChildren.get(index);
   }
 
@@ -240,6 +250,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public void addChild(WXComponent child, int index) {
+    long startNanos = System.nanoTime();
     if (child == null || index < -1) {
       return;
     }
@@ -250,6 +261,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       mChildren.add(index, child);
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   public final int indexOf(WXComponent comp){
@@ -257,6 +269,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public void createChildViewAt(int index){
+    long startNanos = System.nanoTime();
     int indexToCreate = index;
     if(indexToCreate < 0){
       indexToCreate = childCount()-1;
@@ -269,6 +282,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if(!child.isVirtualComponent()){
       addSubView(child.getHostView(),indexToCreate);
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   protected void addSubView(View child, int index) {
@@ -427,6 +441,16 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     for (int i = 0; i < count; i++) {
       getChild(i).onRequestPermissionsResult(requestCode,permissions,grantResults);
     }
+  }
+
+  @Override
+  public void onRenderFinish(@RenderState int state) {
+    for (int i = 0; i < getChildCount(); i++) {
+      WXComponent child = getChild(i);
+      child.mTraceInfo.uiQueueTime = mTraceInfo.uiQueueTime;
+      child.onRenderFinish(state);
+    }
+    super.onRenderFinish(state);
   }
 
   /********************************
