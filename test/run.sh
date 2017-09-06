@@ -15,12 +15,15 @@ function startWeexServer {
 function buildAndroid {
     dir=$(pwd)
     builddir=$dir'/android'
+    builddirCR=$dir'/android/playground/app'
     current_dir=$PWD;
     cd $builddir;
-    codeCoverageCmd='./gradlew clean assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex -Dmtl.jaCoCoConfig.blackPkgs=com.google.zxing.*'
+    codeCoverageCmd='gradle clean assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex -Dmtl.jaCoCoConfig.blackPkgs=com.google.zxing.*'
     if [ $needCoverage = "cover" ]; then
+    cd $builddirCR
     echo "needCoverage value:$needCoverage"
     $codeCoverageCmd
+    echo $codeCoverageCmd
     fi
     ./gradlew clean assembleDebug
     cd $current_dir;
