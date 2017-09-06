@@ -181,7 +181,7 @@ public class BoxShadowUtil {
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      Drawable shadow = new InsertShadowDrawable(target.getWidth(), target.getHeight(),
+      Drawable shadow = new InsetShadowDrawable(target.getWidth(), target.getHeight(),
           options.hShadow, options.vShadow,
           options.blur, options.spread,
           options.color);
@@ -268,7 +268,7 @@ public class BoxShadowUtil {
     }
   }
 
-  private static class InsertShadowDrawable extends Drawable {
+  private static class InsetShadowDrawable extends Drawable {
     private static final int LEFT_TO_RIGHT = 0;
     private static final int TOP_TO_BOTTOM = 1;
     private static final int RIGHT_TO_LEFT = 2;
@@ -286,7 +286,7 @@ public class BoxShadowUtil {
 
     private Paint paint;
 
-    private InsertShadowDrawable(int viewWidth, int viewHeight, float dx, float dy, float blurRadius, float spread, int shadowColor) {
+    private InsetShadowDrawable(int viewWidth, int viewHeight, float dx, float dy, float blurRadius, float spread, int shadowColor) {
       this.blurRadius = blurRadius;
       this.shadowColor = shadowColor;
 
