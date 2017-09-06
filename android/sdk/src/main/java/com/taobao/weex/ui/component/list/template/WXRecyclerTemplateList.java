@@ -400,14 +400,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
     }
 
-    private @Nullable WXComponent findCell(WXComponent component) {
+    private @Nullable WXCell findCell(WXComponent component) {
+        if(component instanceof  WXCell){
+            return (WXCell) component;
+        }
         WXComponent parent;
         if (component == null || (parent = component.getParent()) == null) {
             return null;
-        }
-
-        if (parent instanceof WXRecyclerTemplateList) {
-            return component;
         }
         return findCell(parent);
     }
@@ -469,6 +468,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         float offsetFloat = 0;
         boolean smooth = true;
         int position = -1;
+        int typeIndex = -1;
         if (options != null) {
             String offsetStr = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
             smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
@@ -479,11 +479,33 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     WXLogUtils.e("Float parseFloat error :"+e.getMessage());
                 }
             }
-            position = WXUtils.getNumberInt(options.get(Constants.Name.POSITION), position);
+            position = WXUtils.getNumberInt(options.get(Constants.Name.CELL_INDEX), position);
+            typeIndex = WXUtils.getNumberInt(options.get(Constants.Name.TYPE_INDEX), position);
+        }
+        WXCell cell = findCell(component);
+        if(typeIndex >= 0){
+            if(listData != null && component.getRef() != null){
+                int typePosition = 0;
+                for(int i=0; i<listData.size(); i++){
+                    WXCell template = getSourceTemplate(i);
+                    if(template == null){
+                        continue;
+                    }
+                    if(cell.getRef().equals(template.getRef())){
+                        typePosition ++;
+                    }
+                    if(typePosition > typeIndex){
+                        position = i;
+                        break;
+                    }
+                }
+                if(position < 0){
+                    position = listData.size() - 1;
+                }
+            }
         }
 
         final int offset = (int) offsetFloat;
-
         BounceRecyclerView bounceRecyclerView = getHostView();
         if (bounceRecyclerView == null) {
             return;
@@ -1220,7 +1242,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             }
             float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),getInstance().getInstanceViewPortWidth());
 
-            if (offScreenY < offsetParsed) {
+            if (offScreenY <= offsetParsed) {
 
                 if (mListCellCount != listData.size()
                         || mForceLoadmoreNextTime) {

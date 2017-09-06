@@ -187,6 +187,8 @@ public class Constants {
     String SLOT_TEMPLATE_TYPE = "templateType";
 
     String LIST_DATA_ITEM_KEY = "key";
+    String CELL_INDEX = "cellIndex";
+    String TYPE_INDEX = "typeIndex";
   }
 
   public interface Value {

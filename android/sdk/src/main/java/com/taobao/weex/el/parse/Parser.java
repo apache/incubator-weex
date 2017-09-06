@@ -79,7 +79,6 @@ public class Parser {
 
     char scanNextToken(){
         char ch = nextToken();
-        System.out.println("token " + ch);
         if(ch == Operators.DOLLAR){
             position++;
             return ch;
