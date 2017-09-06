@@ -118,233 +118,256 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
     }];
-    [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager createRoot:bodyData];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+    if ([_jsBridge respondsToSelector:@selector(registerCallAddElement:)]) {
+        [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
             
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager removeComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId,NSString *ref,NSString *parentRef,NSInteger index) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager startComponentTasks];
-            [manager moveComponent:ref toSuper:parentRef atIndex:index];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *attrsData) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager updateAttributes:attrsData forComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *stylesData) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager startComponentTasks];
-            [manager updateStyles:stylesData forComponent:ref];
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
             
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
             }
-            [manager startComponentTasks];
-            [manager addEvent:event toComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager startComponentTasks];
-            [manager removeEvent:event fromComponent:ref];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
-        });
-        
-        return 0;
-    }];
-    
-    [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
-        
-        // Temporary here , in order to improve performance, will be refactored next version.
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if(![weakSelf checkInstance:instance]) {
-            return -1;
-        }
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = instance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager createFinish];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+                [manager startComponentTasks];
+                [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+            });
             
-        });
-        
-        return 0;
-    }];
+            return 0;
+        }];
+    }
     
-    [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
-        
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        
-        if (!instance) {
-            WXLogInfo(@"instance not found for callNativeModule:%@.%@, maybe already destroyed", moduleName, methodName);
-            return nil;
-        }
-        
-        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
-        if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
-            [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
-            return nil;
-        }
-        return [method invoke];
-    }];
+    if ([_jsBridge respondsToSelector:@selector(registerCallCreateBody:)]) {
+        [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+                [manager startComponentTasks];
+                [manager createRoot:bodyData];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+                
+            });
+            
+            return 0;
+        }];
+    }
     
-    [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
-        [method invoke];
-    }];
+    if ([_jsBridge respondsToSelector:@selector(registerCallRemoveElement:)]) {
+        [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+                [manager startComponentTasks];
+                [manager removeComponent:ref];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+            });
+            
+            return 0;
+        }];
+        
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallMoveElement:)]) {
+        [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId,NSString *ref,NSString *parentRef,NSInteger index) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [manager startComponentTasks];
+                [manager moveComponent:ref toSuper:parentRef atIndex:index];
+            });
+            
+            return 0;
+        }];
+    }
+    if ([_jsBridge respondsToSelector:@selector(registerCallUpdateAttrs:)]) {
+        [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *attrsData) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+                [manager startComponentTasks];
+                [manager updateAttributes:attrsData forComponent:ref];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+            });
+            
+            return 0;
+        }];
+        
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallUpdateStyle:)]) {
+        [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *stylesData) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [manager startComponentTasks];
+                [manager updateStyles:stylesData forComponent:ref];
+                
+            });
+            
+            return 0;
+        }];
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallAddEvent:)]) {
+        [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [manager startComponentTasks];
+                [manager addEvent:event toComponent:ref];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
+            });
+            
+            return 0;
+        }];
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallRemoveEvent:)]) {
+        [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [manager startComponentTasks];
+                [manager removeEvent:event fromComponent:ref];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
+            });
+            
+            return 0;
+        }];
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallCreateFinish:)]) {
+        [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
+            
+            // Temporary here , in order to improve performance, will be refactored next version.
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if(![weakSelf checkInstance:instance]) {
+                return -1;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
+            WXPerformBlockOnComponentThread(^{
+                WXComponentManager *manager = instance.componentManager;
+                if (!manager.isValid) {
+                    return;
+                }
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+                [manager startComponentTasks];
+                [manager createFinish];
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+                
+            });
+            
+            return 0;
+        }];
+    }
+    
+    if ([_jsBridge respondsToSelector:@selector(registerCallNativeModule:)]) {
+        [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
+            
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            
+            if (!instance) {
+                WXLogInfo(@"instance not found for callNativeModule:%@.%@, maybe already destroyed", moduleName, methodName);
+                return nil;
+            }
+            
+            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
+            if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
+                [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
+                return nil;
+            }
+            return [method invoke];
+        }];
+    }
+    
+    if([_jsBridge respondsToSelector:@selector(registerCallNativeComponent:)]) {
+        [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
+            [method invoke];
+        }];
+    }
 }
 
 - (NSMutableArray *)insStack
