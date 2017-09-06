@@ -170,6 +170,16 @@ namespace WeexCore {
     jobject osVersion = env->CallObjectMethod(params, m_osVersion);
     ADDSTRING(osVersion);
 
+    // use param ti get cacheDir
+    jmethodID m_cacheMethod = env->GetMethodID(c_params, "getCacheDir", "()Ljava/lang/String;");
+    if (m_cacheMethod != NULL) {
+      jobject cacheDir = env->CallObjectMethod(params, m_cacheMethod);
+      if (cacheDir != NULL) {
+        ADDSTRING(cacheDir);
+      }
+    }
+
+
     jmethodID m_appVersion = env->GetMethodID(c_params, "getAppVersion", "()Ljava/lang/String;");
     jobject appVersion = env->CallObjectMethod(params, m_appVersion);
     ADDSTRING(appVersion);
@@ -245,10 +255,9 @@ namespace WeexCore {
                                       "(Ljava/lang/String;Ljava/lang/String;)V");
     if (!reportMethodId)
       goto no_method;
-    if (s_cacheDir) {
-      crashFileStr.assign(s_cacheDir);
-      crashFileStr.append("/jsserver_crash/jsserver_crash_info.log");
-    }
+
+    crashFileStr.assign("/jsserver_crash/jsserver_crash_info.log");
+
     crashFile = env->NewStringUTF(crashFileStr.c_str());
     env->CallVoidMethod(jThis, reportMethodId, jinstanceid, crashFile);
     env->DeleteLocalRef(crashFile);
