@@ -23,6 +23,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
@@ -126,7 +128,10 @@ public class StickyHelper {
             recyclerTemplateList.onBindViewHolder(fakeStickyHolder, matchStickyPosition);
             fakeStickyHolder.itemView.setTranslationY(0);
             fakeStickyHolder.itemView.setTag(fakeStickyHolder);
-            bounceRecyclerView.addView(fakeStickyHolder.itemView);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            fakeStickyHolder.getComponent().clearPreLayout();
+            bounceRecyclerView.addView(fakeStickyHolder.itemView, params);
+            fakeStickyHolder.getComponent().setLayout(fakeStickyHolder.getComponent().getDomObject());
             stickyFakeView = fakeStickyHolder.itemView;
             if(fakeStickyHolder.getComponent() != null
                     && fakeStickyHolder.getComponent().getDomObject() != null

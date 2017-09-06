@@ -115,8 +115,14 @@ public class Statements {
         WXStatement statement =  attrs.getStatement();
         if(statement != null){
             WXDomObject parentDomObject = (WXDomObject) parent.getDomObject();
-            Block vif = (Block) statement.get(WXStatement.WX_IF);
-            JSONObject vfor = (JSONObject) statement.get(WXStatement.WX_FOR);
+            Block vif =  null;
+            JSONObject vfor = null;
+            if(statement.get(WXStatement.WX_IF) instanceof  Block){
+                vif = (Block) statement.get(WXStatement.WX_IF);
+            }
+            if(statement.get(WXStatement.WX_FOR) instanceof  JSONObject){
+                vfor = (JSONObject) statement.get(WXStatement.WX_FOR);
+            }
             // execute v-for content
             if(vfor != null){
                 int    renderIndex = parent.indexOf(component);

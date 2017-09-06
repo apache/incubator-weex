@@ -77,7 +77,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     DESTROYED.mRef = "_destroyed";
   }
   private AtomicBoolean sDestroy = new AtomicBoolean();
-
+  
   private int mViewPortWidth =750;
 
   private DomContext mDomContext;
@@ -247,12 +247,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
               String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
               Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
               if (eventName != null) {
-                events.add(eventName);
+                 events.putEventBindingArgs(eventName, args);
+                 continue;
               }
-              if (eventName != null && args != null) {
-                events.putEventBindingArgs(eventName, args);
-              }
-              continue;
             }
             events.add(value.toString());
         }

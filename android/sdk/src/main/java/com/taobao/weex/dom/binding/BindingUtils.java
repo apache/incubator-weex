@@ -99,7 +99,7 @@ public class BindingUtils {
                 WXLogUtils.e("weex", "weex vfor is illegal " + vfor);
             }
         }
-        return null;
+        return vfor;
     }
 
 

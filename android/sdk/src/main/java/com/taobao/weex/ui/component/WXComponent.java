@@ -1369,6 +1369,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return original;
   }
 
+  public void  clearPreLayout(){
+    mPreRealLeft = 0;
+    mPreRealWidth = 0;
+    mPreRealHeight = 0;
+    mPreRealTop = 0;
+  }
+
   /**
    * This method computes user visible left-top point in view's coordinate.
    * The default implementation uses the scrollX and scrollY of the view as the result,

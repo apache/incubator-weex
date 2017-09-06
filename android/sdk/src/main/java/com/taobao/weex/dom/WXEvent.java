@@ -21,6 +21,8 @@ package com.taobao.weex.dom;
 import android.support.v4.util.ArrayMap;
 
 
+import com.taobao.weex.dom.binding.BindingUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,21 +72,27 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     return mEventBindingArgsValues;
   }
 
-  public void putEventBindingArgs(String event, Object value){
-      if(mEventBindingArgs == null){
-         mEventBindingArgs = new ArrayMap();
-      }
+  public void putEventBindingArgs(String event, Object args){
       if(!contains(event)){
           add(event);
       }
-      mEventBindingArgs.put(event, value);
+      if(args != null){
+        if(mEventBindingArgs == null){
+          mEventBindingArgs = new ArrayMap();
+        }
+        mEventBindingArgs.put(event, BindingUtils.bindingBlock(args));
+      }
   }
 
   public void putEventBindingArgsValue(String event, List<Object> value){
     if(mEventBindingArgsValues == null){
-      mEventBindingArgsValues = new ArrayMap();
+        mEventBindingArgsValues = new ArrayMap();
     }
-    mEventBindingArgsValues.put(event, value);
+    if(value == null){
+      mEventBindingArgsValues.remove(event);
+    }else{
+       mEventBindingArgsValues.put(event, value);
+    }
   }
 
 
@@ -92,7 +100,7 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
    *  event data format
    *  {
    *  type: 'appear',
-   *  args: [
+   *  params: [
    *  { '@binding': 'index' },
    *   'static',
    *   { '@binding': 'item.name' },
@@ -101,5 +109,5 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
    *  }
    * */
   public static final String EVENT_KEY_TYPE = "type";
-  public static final String EVENT_KEY_ARGS = "args";
+  public static final String EVENT_KEY_ARGS = "params";
 }
