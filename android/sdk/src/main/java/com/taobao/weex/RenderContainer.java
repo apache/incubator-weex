@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 
 
@@ -84,5 +85,17 @@ public class RenderContainer extends FrameLayout {
           mFrameRateControl = null;
       }
   }
-
+  @Override
+  public void dispatchWindowVisibilityChanged(int visibility) {
+      super.dispatchWindowVisibilityChanged(visibility);
+      if (visibility == View.GONE) {
+          if (mFrameRateControl != null) {
+              mFrameRateControl.stop();
+          }
+      } else if (visibility == View.VISIBLE) {
+          if (mFrameRateControl != null) {
+              mFrameRateControl.start();
+          }
+      }
+  }
 }

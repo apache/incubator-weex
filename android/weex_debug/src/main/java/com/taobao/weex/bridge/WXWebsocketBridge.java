@@ -80,6 +80,11 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public void onVsync(String instanceId) {
+
+    }
+
+    @Override
     public int execJSService(String javascript) {
         return 0;
     }

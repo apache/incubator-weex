@@ -1642,8 +1642,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   @Override
   public void OnVSync() {
-
     // add vSync code for refresh
-    Log.e("networkTime", "shiwentao onvsync instanceId:" + getInstanceId());
+
+
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        WXBridgeManager.getInstance().onVsync(getInstanceId());
+      }
+    });
+
   }
 }

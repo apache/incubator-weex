@@ -34,6 +34,14 @@ static void native_takeHeapSnapshot(JNIEnv *env,
                                     jstring name) {
 }
 
+static void native_onVsync(JNIEnv *env,
+                           jobject object,
+                           jstring jinstanceId) {
+
+
+  LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
+}
+
 static jint native_initFramework(JNIEnv *env,
                                  jobject object,
                                  jstring script,
@@ -73,7 +81,10 @@ static JNINativeMethod gMethods[] = {
         (void *) native_takeHeapSnapshot},
     {"execJSService",
         "(Ljava/lang/String;)I",
-        (void *) native_execJSService}
+        (void *) native_execJSService},
+    {"onVsync",
+            "(Ljava/lang/String;)V",
+            (void*) native_onVsync}
 };
 
 static int registerBridgeNativeMethods(JNIEnv *env, JNINativeMethod *methods, int numMethods) {

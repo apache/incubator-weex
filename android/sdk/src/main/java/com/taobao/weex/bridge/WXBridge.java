@@ -56,6 +56,12 @@ class WXBridge implements IWXBridge {
 
 
   /**
+   * native method
+   */
+  public native void onVsync(String instanceId);
+
+
+  /**
    * register Weex Service
    *
    * @param javascript  code

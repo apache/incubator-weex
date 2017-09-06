@@ -1385,6 +1385,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
+  public void onVsync(String instanceId) {
+      if(mWXBridge != null) {
+          mWXBridge.onVsync(instanceId);
+      }
+  }
+
   @Override
   public boolean handleMessage(Message msg) {
     if (msg == null) {

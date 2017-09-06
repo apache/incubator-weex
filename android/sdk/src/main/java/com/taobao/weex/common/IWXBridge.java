@@ -45,6 +45,8 @@ public interface IWXBridge extends IWXObject {
 
   int execJSService(String javascript);
 
+  void onVsync(String instanceId);
+
   /**
    * take the heap snapshot and serialize the heap to a local file.
    *
