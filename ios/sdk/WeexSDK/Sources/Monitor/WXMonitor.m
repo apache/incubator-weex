@@ -139,9 +139,10 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXPTFrameworkExecute) : JSLIBINITTIME,
                           @(WXPTJSDownload) : NETWORKTIME,
                           @(WXPTJSCreateInstance) : COMMUNICATETIME,
+                          @(WXFirstScreenJSFExecuteTime) : FIRSETSCREENJSFEXECUTETIME,
                           @(WXPTFirstScreenRender) : SCREENRENDERTIME,
                           @(WXPTAllRender) : TOTALTIME,
-                          @(WXPTBundleSize) : JSTEMPLATESIZE
+                          @(WXPTBundleSize) : JSTEMPLATESIZE,
                           };
     });
     
