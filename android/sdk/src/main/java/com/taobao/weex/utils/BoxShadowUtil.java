@@ -118,7 +118,7 @@ public class BoxShadowUtil {
 
     Paint shadowPaint = new Paint();
     shadowPaint.setAntiAlias(true);
-    shadowPaint.setColor(Color.GRAY);
+    shadowPaint.setColor(shadowColor);
     shadowPaint.setStyle(Paint.Style.FILL);
 
     shadowPaint.setShadowLayer(shadowRadius, dx, dy, shadowColor);
