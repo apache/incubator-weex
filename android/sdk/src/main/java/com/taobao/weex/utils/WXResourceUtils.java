@@ -360,6 +360,10 @@ public class WXResourceUtils {
     return points;
   }
 
+  public static boolean isNamedColor(String name) {
+    return colorMap.containsKey(name);
+  }
+
   enum ColorConvertHandler {
     NAMED_COLOR_HANDLER {
       @Override

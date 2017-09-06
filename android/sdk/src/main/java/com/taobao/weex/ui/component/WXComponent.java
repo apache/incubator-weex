@@ -70,6 +70,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
+import com.taobao.weex.utils.BoxShadowUtil;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
@@ -738,8 +739,29 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.RIGHT:
       case Constants.Name.BOTTOM:
         return true;
+      case Constants.Name.BOX_SHADOW:
+        updateBoxShadow();
+        return true;
       default:
         return false;
+    }
+  }
+
+  protected void updateBoxShadow() {
+    if (getDomObject() != null && getDomObject().getStyles() != null) {
+      Object boxShadow = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
+      if (boxShadow == null) {
+        return;
+      }
+
+      String radius = null;
+      Object borderRadius = getDomObject().getStyles().get(Constants.Name.BORDER_RADIUS);
+      if (borderRadius != null) {
+        radius = borderRadius.toString();
+      }
+      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radius, getInstance().getInstanceViewPortWidth());
+    } else {
+      WXLogUtils.w("Can not resolve styles");
     }
   }
 
