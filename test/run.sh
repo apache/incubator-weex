@@ -25,9 +25,9 @@ function buildAndroid {
     echo "needCoverage value:$needCoverage"
     $codeCoverageCmd
     echo $codeCoverageCmd
+    else 
+        ./gradlew clean assembleDebug
     fi
-    ./gradlew clean assembleDebug
-
     cd $current_dir;
     pwd
 }
