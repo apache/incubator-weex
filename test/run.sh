@@ -18,7 +18,8 @@ function buildAndroid {
     builddirCR=$dir'/android/playground/app'
     current_dir=$PWD;
     cd $builddir;
-    codeCoverageCmd='gradle clean assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex -Dmtl.jaCoCoConfig.blackPkgs=com.google.zxing.*'
+    codeCoverageCmd='gradle clean assembleDebug :weex_sdk:assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex'
+    
     if [ $needCoverage = "cover" ]; then
     cd $builddirCR
     echo "needCoverage value:$needCoverage"
@@ -26,6 +27,7 @@ function buildAndroid {
     echo $codeCoverageCmd
     fi
     ./gradlew clean assembleDebug
+
     cd $current_dir;
     pwd
 }
