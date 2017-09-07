@@ -37,9 +37,9 @@
     methods : {
       showPicker:function() {
         var params =  {
-            'value':'2018-01-01',
-            'max':'2020-01-01',
-            'min':'2010-01-01',
+            'value':'2018-01-31',
+            'max':'2020-01-31',
+            'min':'2010-01-31',
         }
         picker.pickDate(params,  (ret) => {
           if(ret.result == 'success') {
