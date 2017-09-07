@@ -58,7 +58,7 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
 
     @Override
     public boolean isLazy() {
-        return mLazy;
+        return mLazy && !isFixed();
     }
 
     public void lazy(boolean lazy) {
