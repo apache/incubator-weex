@@ -45,6 +45,7 @@ public class Token {
 
 
     /**
+     * stack should use array stack.
      * execute token in context, and return value.
      * */
     public Object execute(Object context){

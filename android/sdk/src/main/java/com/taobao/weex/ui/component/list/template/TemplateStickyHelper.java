@@ -35,13 +35,13 @@ import java.util.List;
  * mStickyHelper
  * Created by furture on 2017/8/24.
  */
-public class StickyHelper {
+public class TemplateStickyHelper {
     private WXRecyclerTemplateList recyclerTemplateList;
     private List<Integer> stickyPositions;
     private ArrayMap<Integer, TemplateViewHolder>   stickyHolderCache;
 
 
-    public StickyHelper(WXRecyclerTemplateList recyclerTemplateList) {
+    public TemplateStickyHelper(WXRecyclerTemplateList recyclerTemplateList) {
         this.recyclerTemplateList = recyclerTemplateList;
         this.stickyPositions = new ArrayList<>();
         this.stickyHolderCache = new ArrayMap();

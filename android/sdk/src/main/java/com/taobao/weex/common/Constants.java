@@ -186,7 +186,7 @@ public class Constants {
     String LIST_DATA_TEMPLATE_KEY = "templateKey";
     String SLOT_TEMPLATE_TYPE = "templateType";
 
-    String LIST_DATA_ITEM_KEY = "key";
+    String LIST_DATA_ITEM_ID = "itemId";
     String CELL_INDEX = "cellIndex";
     String TYPE_INDEX = "typeIndex";
   }

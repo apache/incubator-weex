@@ -88,6 +88,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.component.list.template.WXHRecyclerTemplateList;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
@@ -271,6 +272,7 @@ public class WXSDKEngine {
       registerComponent(SimpleListComponent.class,false,simpleList);
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
+      registerComponent(WXHRecyclerTemplateList.class, false,WXBasicComponentType.HRECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.CELL_SLOT, WXCell.class, true);
@@ -313,6 +315,7 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
       registerDomObject(WXBasicComponentType.LIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.RECYCLE_LIST, WXRecyclerDomObject.class);
+      registerDomObject(WXBasicComponentType.HRECYCLE_LIST, WXRecyclerDomObject.class);
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
