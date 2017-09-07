@@ -21,11 +21,12 @@ function buildAndroid {
     codeCoverageCmd='gradle clean assembleDebug :weex_sdk:assembleDebug -Dmtl.jaCoCoConfig.whitePkgs=com.taobao.weex'
     
     if [ $needCoverage = "cover" ]; then
-    cd $builddirCR
-    echo "needCoverage value:$needCoverage"
-    $codeCoverageCmd
-    echo $codeCoverageCmd
+        cd $builddirCR
+        echo "needCoverage value:$needCoverage"
+        $codeCoverageCmd
+        echo $codeCoverageCmd
     else 
+        echo 'else ./gradlew clean assembleDebug'
         ./gradlew clean assembleDebug
     fi
     cd $current_dir;
