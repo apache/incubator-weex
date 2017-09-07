@@ -93,6 +93,7 @@
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
+        _accessibilityHintContent = nil;
         
         _async = NO;
         
@@ -119,6 +120,9 @@
         }
         if (attributes[@"accessible"]) {
             _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        }
+        if(attributes[@"accessibilityHint"]) {
+            _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         }
         
         if (attributes[@"testId"]) {
@@ -260,6 +264,10 @@
         
         if (_testId) {
             _view.accessibilityIdentifier = _testId;
+        }
+        
+        if (_accessibilityHintContent) {
+            [_view setAccessibilityHint:_accessibilityHintContent];
         }
         
         if (_ariaLabel) {
@@ -603,7 +611,7 @@
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     
-    if (attributes[@"role"]){
+    if (attributes[@"role"]) {
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
     }
@@ -618,6 +626,10 @@
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
+    }
+    if (attributes[@"accessibilityHint"]) {
+        _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
+        [self.view setAccessibilityHint:_accessibilityHintContent];
     }
     
     if (attributes[@"testId"]) {
