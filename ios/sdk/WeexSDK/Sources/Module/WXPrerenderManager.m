@@ -234,8 +234,38 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 }
 
 + (BOOL)isTaskExist:(NSString *)url{
+    if( !url ||url.length == 0){
+        return NO;
+    }
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL switchOn = NO; // defautle NO
+        id switchOnValue = [configCenter configForKey:@"iOS_weex_prerender_config.is_switch_on" defaultValue:@YES isDefault:NULL];
+        if(switchOnValue){
+            switchOn = [switchOnValue boolValue];
+        }
+        if(!switchOn){
+            return NO;
+        }
+        
+        id urlsValue = [configCenter configForKey:@"iOS_weex_prerender_config.urls" defaultValue:NULL isDefault:NULL];
+        if(urlsValue){
+            NSData *data = [urlsValue dataUsingEncoding:NSUTF8StringEncoding];
+            NSError *error = nil;
+            NSArray *urls = [WXUtility JSONObject:data error:&error];
+            if(urls && [urls count]>0){
+                for (NSString *configUrl in urls) {
+                    if(configUrl && [[WXPrerenderManager getTaskKeyFromUrl:configUrl] isEqualToString:[WXPrerenderManager getTaskKeyFromUrl:url]]) {
+                            return YES;
+                        }
+                }
+                
+            }
+        }
+        
+    }
     
-    return [[WXPrerenderManager sharedInstance] isTaskExist:url];
+    return NO;
 }
 
 - (BOOL)isTaskExist:(NSString *)url
