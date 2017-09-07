@@ -124,7 +124,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     CGFloat _lineHeight;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
-    NSString * _writeDirection;
     
     BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
@@ -253,9 +252,6 @@ do {\
         _text = [WXConvert NSString:text];
         [self setNeedsRepaint];
         [self setNeedsLayout];
-    }
-    if (attributes[@"dir"]) {
-        _writeDirection = [[WXConvert NSString:attributes[@"dir"]] lowercaseString];
     }
 }
 
@@ -397,11 +393,6 @@ do {\
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }
     
-    if ([[_writeDirection lowercaseString] isEqualToString:@"rtl"])
-    {
-        [attributedString addAttribute:(id)kCTWritingDirectionAttributeName value:@[@(kCTWritingDirectionRightToLeft|kCTWritingDirectionEmbedding)] range:NSMakeRange(0, string.length)];
-    }
-    
     if (_fontFamily) {
         NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
         NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
@@ -479,10 +470,6 @@ do {\
     // set textColor
     if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    if ([[_writeDirection lowercaseString] isEqualToString:@"rtl"])
-    {
-        [attributedString addAttribute:NSWritingDirectionAttributeName value:@[@(1)] range:NSMakeRange(0, string.length)];
     }
     
     if (_fontFamily) {
