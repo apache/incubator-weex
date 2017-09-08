@@ -88,6 +88,7 @@
         
         _absolutePosition = CGPointMake(NAN, NAN);
         
+        _displayType = WXDisplayTypeBlock;
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
@@ -134,6 +135,41 @@
     }
     
     return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NSInteger copyId = 0;
+    @synchronized(self){
+        static NSInteger __copy = 0;
+        copyId = __copy % (1024*1024);
+        __copy++;
+    }
+    NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
+    WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
+    if (_isTemplate) {
+        component->_templateComponent = self;
+    } else {
+        component->_templateComponent = self->_templateComponent;
+    }
+    memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
+    component->_cssNode->context = (__bridge void *)component;
+    component->_calculatedFrame = self.calculatedFrame;
+    
+    NSMutableArray *subcomponentsCopy = [NSMutableArray array];
+    for (WXComponent *subcomponent in self.subcomponents) {
+        WXComponent *subcomponentCopy = [subcomponent copy];
+        subcomponentCopy->_supercomponent = component;
+        [subcomponentsCopy addObject:subcomponentCopy];
+    }
+    
+    component->_subcomponents = subcomponentsCopy;
+    
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
+    });
+    
+    return component;
 }
 
 - (void)dealloc
@@ -193,6 +229,28 @@
     pthread_mutex_unlock(&_propertyMutex);
     
     return events;
+}
+
+- (void)setDisplayType:(WXDisplayType)displayType
+{
+    if (_displayType != displayType) {
+        _displayType = displayType;
+        if (displayType == WXDisplayTypeNone) {
+            _isNeedJoinLayoutSystem = NO;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self removeFromSuperview];
+            });
+        } else {
+            _isNeedJoinLayoutSystem = YES;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self _buildViewHierarchyLazily];
+                // TODO: insert into the correct index
+                [self.supercomponent insertSubview:self atIndex:0];
+            });
+        }
+    }
 }
 
 - (WXSDKInstance *)weexInstance
@@ -421,6 +479,11 @@
 {
     [self _removeFromSupercomponent];
     [newSupercomponent _insertSubcomponent:self atIndex:index];
+}
+
+- (void)_didInserted
+{
+    
 }
 
 - (id<WXScrollerProtocol>)ancestorScroller

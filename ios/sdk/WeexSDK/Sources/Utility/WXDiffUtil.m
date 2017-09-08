@@ -107,7 +107,9 @@ typedef enum : NSUInteger {
         }
     }
     
+#if DEBUG
     [self _printMatrix:matrix rowSize:oldSize columnSize:newSize];
+#endif
     
     NSMutableArray *updates = [NSMutableArray array];
     NSMutableIndexSet *inserts = [NSMutableIndexSet indexSet];

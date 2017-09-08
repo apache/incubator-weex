@@ -25,6 +25,7 @@
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
+typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
@@ -131,6 +132,21 @@
     BOOL _lazyCreateView;
     
     WXTransform *_transform;
+    
+    /**
+     * Data Binding
+     */
+    BOOL _isTemplate;
+    WXComponent *_templateComponent;
+    WXDataBindingBlock _bindingMatch;
+    WXDataBindingBlock _bindingRepeat;
+    NSString *_repeatIndexIdentify;
+    NSString *_repeatLabelIdentify;
+    BOOL _isRepeating;
+    BOOL _isSkipUpdate;
+    
+    NSMutableDictionary<NSString *, NSArray<NSString *> *> *_bindingAttributes;
+    NSMutableDictionary<NSString *, NSArray<NSString *> *> *_bindingStyles;
 }
 
 ///--------------------------------------
@@ -225,6 +241,10 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
 
 - (void)setGradientLayer;
+
+- (void)_storeBindingsWithStyles:(NSDictionary *)styles attributes:(NSDictionary *)attributes;
+
+- (void)_didInserted;
 
 @end
 

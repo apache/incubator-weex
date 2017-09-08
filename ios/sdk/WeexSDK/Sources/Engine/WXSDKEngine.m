@@ -109,6 +109,10 @@
     [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
 	[self registerComponent:@"canvas" withClass:NSClassFromString(@"WXCanvasComponent")];
     [self registerComponent:@"slider-neighbor" withClass:NSClassFromString(@"WXSliderNeighborComponent")];
+    
+    [self registerComponent:@"recycle-list" withClass:NSClassFromString(@"WXRecycleListComponent")];
+    [self registerComponent:@"cell-slot" withClass:NSClassFromString(@"WXCellSlotComponent") withProperties: @{@"append":@"tree", @"isTemplate":@YES}];
+    
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz

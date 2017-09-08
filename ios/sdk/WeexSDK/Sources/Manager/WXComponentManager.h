@@ -24,8 +24,15 @@
 @class WXSDKInstance;
 @class WXComponent;
 
-extern void WXPerformBlockOnComponentThread(void (^block)());
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+void WXPerformBlockOnComponentThread(void (^block)());
+    
+#ifdef __cplusplus
+}
+#endif
 
 @interface WXComponentManager : NSObject
 
@@ -91,6 +98,7 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  */
 - (NSUInteger)numberOfComponents;
 
+- (void)addComponent:(WXComponent *)component toIndexDictForRef:(NSString *)ref;
 
 ///--------------------------------------
 /// @name Updating

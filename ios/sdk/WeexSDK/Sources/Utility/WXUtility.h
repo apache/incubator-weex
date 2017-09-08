@@ -81,33 +81,41 @@ do {\
     }\
 }while(0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 /**
  * @abstract execute asynchronous action block on the main thread.
  *
  */
-extern void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
 
 /**
  * @abstract execute synchronous action block on the main thread.
  *
  */
-extern void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
 
 /**
  * @abstract execute action block on the specific thread.
  *
  */
-extern void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
 
 /**
  * @abstract swizzling methods.
  *
  */
-extern void WXSwizzleInstanceMethod(_Nonnull Class className, _Nonnull SEL original, _Nonnull SEL replaced);
+void WXSwizzleInstanceMethod(_Nonnull Class className, _Nonnull SEL original, _Nonnull SEL replaced);
 
-extern void WXSwizzleInstanceMethodWithBlock(_Nonnull Class className, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
+void WXSwizzleInstanceMethodWithBlock(_Nonnull Class className, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
 
-extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
+_Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
+    
+#ifdef __cplusplus
+}
+#endif
 
 @interface WXUtility : NSObject
 
