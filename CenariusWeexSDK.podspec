@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
   s.name         = "CenariusWeexSDK"
 
-  s.version      = "0.15.0.2"
+  s.version      = "0.15.0.3"
 
   s.summary      = "WeexSDK Source ."
 

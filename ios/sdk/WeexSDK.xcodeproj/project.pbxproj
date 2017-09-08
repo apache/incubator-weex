@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 042013AC1E66CD6A001FC79C /* WXValidateProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0C509B951F626F6B008AF7B6 /* SRWebSocket+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012721E1502A6003378D0 /* SRWebSocket+Weex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C1A2BED1D91172800539AA1 /* WXConvertTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C1A2BEC1D91172800539AA1 /* WXConvertTests.m */; };
 		1D3000F11D40B9AC004F3B4F /* WXClipboardModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D3000EF1D40B9AB004F3B4F /* WXClipboardModule.h */; };
 		1D3000F21D40B9AC004F3B4F /* WXClipboardModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3000F01D40B9AB004F3B4F /* WXClipboardModule.m */; };
@@ -252,7 +253,6 @@
 		C4E375381E5FCBD3009B2D9C /* WXComponent+BoxShadow.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E375361E5FCBD3009B2D9C /* WXComponent+BoxShadow.h */; };
 		C4E97D331F1EF46D00ABC314 /* WXTracingManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */; };
-		C4F012791E1502A6003378D0 /* SRWebSocket+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012721E1502A6003378D0 /* SRWebSocket+Weex.h */; };
 		C4F0127A1E1502A6003378D0 /* SRWebSocket+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012731E1502A6003378D0 /* SRWebSocket+Weex.m */; };
 		C4F0127B1E1502A6003378D0 /* WXWebSocketDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012741E1502A6003378D0 /* WXWebSocketDefaultImpl.h */; };
 		C4F0127C1E1502A6003378D0 /* WXWebSocketDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012751E1502A6003378D0 /* WXWebSocketDefaultImpl.m */; };
@@ -1477,6 +1477,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C509B951F626F6B008AF7B6 /* SRWebSocket+Weex.h in Headers */,
 				7408C48E1CFB345D000BCCD0 /* WXComponent+Events.h in Headers */,
 				775BEE711C1BD977008D1629 /* WXModuleProtocol.h in Headers */,
 				7469869F1C4E2C000054A57E /* NSArray+Weex.h in Headers */,
@@ -1538,7 +1539,6 @@
 				744D61141E4AF23E00B624B3 /* WXDiffUtil.h in Headers */,
 				74862F791E02B88D00B7A041 /* JSValue+Weex.h in Headers */,
 				2A1F57B71C75C6A600B58017 /* WXTextInputComponent.h in Headers */,
-				C4F012791E1502A6003378D0 /* SRWebSocket+Weex.h in Headers */,
 				74A4BA9A1CB3BAA100195969 /* WXThreadSafeMutableDictionary.h in Headers */,
 				74A4BA9E1CB3C0A100195969 /* WXHandlerFactory.h in Headers */,
 				741DFE021DDD7D18009B020F /* WXRoundedRect.h in Headers */,
