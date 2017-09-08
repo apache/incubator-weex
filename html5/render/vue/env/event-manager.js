@@ -124,6 +124,8 @@ function _init (doc) {
          */
         if (evtName === 'click' && isANode(elm)) {
           const href = elm.getAttribute('href')
+          const voidHrefReg = /^\s*javascript\s*:\s*void\s*(?:\(\s*0\s*\)|0)\s*;?\s*$/
+          const prevent = elm.getAttribute('prevent')
           disposed = true
           /**
            * Give the chance to the listeners binding on doc or doc.body for
@@ -131,16 +133,15 @@ function _init (doc) {
            * Should set a _should_intercept_a_jump function on window to test
            * whether we should intercept the a-jump.
            */
-          if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)) {
+          if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)
+            || href.match(voidHrefReg)
+            || prevent === '' || prevent === 'true') {
             // do nothing. leave it to the intercept handler.
           }
-          else {
-            if (!!href) {
-              location.href = href
-            }
-            else {
-              console.warn('[vue-render] If you want to use the A tag jump, set the href attribute')
-            }
+          else if (href) {
+            location.href = href
+          } else if (process.env.NODE_ENV === 'development') {
+            console.warn('[vue-render] If you want to use the A tag jump, set the href attribute')
           }
         }
 
