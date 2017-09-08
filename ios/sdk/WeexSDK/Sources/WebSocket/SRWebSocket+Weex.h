@@ -19,7 +19,6 @@
 
 #import "SRWebSocket.h"
 #import "WXWebSocketHandler.h"
-#import <objc/runtime.h>
 
 @interface SRWebSocket (Weex)
 

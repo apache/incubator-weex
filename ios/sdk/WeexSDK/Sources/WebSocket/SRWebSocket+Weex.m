@@ -18,6 +18,8 @@
  */
 
 #import "SRWebSocket+Weex.h"
+#import <objc/runtime.h>
+
 static char wx_IdentifierKey;
 static char wx_WebSocketDelegateKey;
 

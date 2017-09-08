@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
   s.name         = "CenariusWeexSDK"
 
-  s.version      = "0.15.0.1"
+  s.version      = "0.15.0.2"
 
   s.summary      = "WeexSDK Source ."
 
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.authors      = { "M" => "myeveryheart@qq.com" }
   s.platform     = :ios
-  s.ios.deployment_target = '7.0'
+  s.ios.deployment_target = '10.0'
   s.source       = { :git => "https://github.com/macula-projects/cenarius-weex.git", :tag => "#{s.version}" }
   s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
   s.resources = 'pre-build/native-bundle-main.js', 'ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
