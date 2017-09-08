@@ -21,9 +21,9 @@
 #import "WXComponentFactory.h"
 #import "WXModuleFactory.h"
 #import "WXSDKManager.h"
-#import <WeexSDK/WXComponentFactory.h>
-#import <WeexSDK/WXModuleFactory.h>
-#import <WeexSDK/WXHandlerFactory.h>
+#import "WXComponentFactory.h"
+#import "WXModuleFactory.h"
+#import "WXHandlerFactory.h"
 #import "WXUtility.h"
 #import "WXComponentManager.h"
 
