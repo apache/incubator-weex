@@ -84,7 +84,6 @@
 		740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 740451E91E14BB26004157CB /* WXServiceFactory.m */; };
 		7408C48E1CFB345D000BCCD0 /* WXComponent+Events.h in Headers */ = {isa = PBXBuildFile; fileRef = 7408C48C1CFB345D000BCCD0 /* WXComponent+Events.h */; };
 		7408C48F1CFB345D000BCCD0 /* WXComponent+Events.m in Sources */ = {isa = PBXBuildFile; fileRef = 7408C48D1CFB345D000BCCD0 /* WXComponent+Events.m */; };
-		740938EC1D3D075700DBB801 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */; };
 		740938EE1D3D079100DBB801 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938ED1D3D079100DBB801 /* JavaScriptCore.framework */; };
 		740938EF1D3D083900DBB801 /* libicucore.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7469869B1C4DEAC20054A57E /* libicucore.tbd */; };
 		740938F31D3D0D9300DBB801 /* WXComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 740938EA1D3D026600DBB801 /* WXComponentTests.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -234,6 +233,7 @@
 		77E65A161C155EB5008B8775 /* WXTextComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E65A141C155EB5008B8775 /* WXTextComponent.m */; };
 		77E65A191C155F25008B8775 /* WXScrollerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E65A171C155F25008B8775 /* WXScrollerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77E65A1A1C155F25008B8775 /* WXScrollerComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E65A181C155F25008B8775 /* WXScrollerComponent.m */; };
+		90174BCFD38996999450BE66 /* libPods-WeexSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */; };
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
@@ -570,8 +570,6 @@
 		1D3000F01D40B9AB004F3B4F /* WXClipboardModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXClipboardModule.m; sourceTree = "<group>"; };
 		2A1F57B51C75C6A600B58017 /* WXTextInputComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextInputComponent.h; sourceTree = "<group>"; };
 		2A1F57B61C75C6A600B58017 /* WXTextInputComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextInputComponent.m; sourceTree = "<group>"; };
-		2A27E7D71C3E360B00D7A552 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRWebSocket.h; path = dependency/SRWebSocket.h; sourceTree = "<group>"; };
-		2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRWebSocket.m; path = dependency/SRWebSocket.m; sourceTree = "<group>"; };
 		2A42AF851C23B33E00818EA6 /* libWeexSDK_MTL.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWeexSDK_MTL.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A42AF871C23B33E00818EA6 /* WeexSDK_MTL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WeexSDK_MTL.h; sourceTree = "<group>"; };
 		2A42AF891C23B33E00818EA6 /* WeexSDK_MTL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeexSDK_MTL.m; sourceTree = "<group>"; };
@@ -797,6 +795,8 @@
 		77E65A141C155EB5008B8775 /* WXTextComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextComponent.m; sourceTree = "<group>"; };
 		77E65A171C155F25008B8775 /* WXScrollerComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXScrollerComponent.h; sourceTree = "<group>"; };
 		77E65A181C155F25008B8775 /* WXScrollerComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXScrollerComponent.m; sourceTree = "<group>"; };
+		8DA442E655CE33DEE8568920 /* Pods-WeexSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexSDK.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WeexSDK/Pods-WeexSDK.debug.xcconfig"; sourceTree = "<group>"; };
+		98AEEB5437199147AF9E486A /* Pods-WeexSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexSDK.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexSDK/Pods-WeexSDK.release.xcconfig"; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
@@ -889,6 +889,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90174BCFD38996999450BE66 /* libPods-WeexSDK.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,15 +904,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2A27E7D61C3E360400D7A552 /* dependency */ = {
-			isa = PBXGroup;
-			children = (
-				2A27E7D71C3E360B00D7A552 /* SRWebSocket.h */,
-				2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */,
-			);
-			name = dependency;
-			sourceTree = "<group>";
-		};
 		2A42AF861C23B33E00818EA6 /* WeexSDK_MTL */ = {
 			isa = PBXGroup;
 			children = (
@@ -953,6 +945,15 @@
 				59A5962E1CB632050012CD52 /* WXRootViewController.m */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		687517B2865EFBD46BA74B94 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8DA442E655CE33DEE8568920 /* Pods-WeexSDK.debug.xcconfig */,
+				98AEEB5437199147AF9E486A /* Pods-WeexSDK.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		7408C48B1CFB345D000BCCD0 /* Events */ = {
@@ -1121,6 +1122,7 @@
 				DCA445261EFA555400D0CFA8 /* WeexSDK-Dynamic */,
 				77D160FE1C02DBE70010B15B /* Products */,
 				A5818E244F9E235722E3B938 /* Frameworks */,
+				687517B2865EFBD46BA74B94 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1138,7 +1140,6 @@
 		77D160FF1C02DBE70010B15B /* WeexSDK */ = {
 			isa = PBXGroup;
 			children = (
-				2A27E7D61C3E360400D7A552 /* dependency */,
 				77D161171C02DCB90010B15B /* Resources */,
 				77D161181C02DCB90010B15B /* Sources */,
 			);
@@ -1799,11 +1800,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 77D161111C02DBE70010B15B /* Build configuration list for PBXNativeTarget "WeexSDK" */;
 			buildPhases = (
+				97173F78F4B6D32CEB35E807 /* [CP] Check Pods Manifest.lock */,
 				59D3CA601D003832008835DC /* Generate WeexSDK.h */,
 				77D160F81C02DBE70010B15B /* Sources */,
 				77D160F91C02DBE70010B15B /* Frameworks */,
 				77D160FA1C02DBE70010B15B /* Headers */,
 				77D160FB1C02DBE70010B15B /* Resources */,
+				CF9704FDA11DD8DD148D2FE0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1938,6 +1941,39 @@
 			shellPath = /bin/sh;
 			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'";
 		};
+		97173F78F4B6D32CEB35E807 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-WeexSDK-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CF9704FDA11DD8DD148D2FE0 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WeexSDK/Pods-WeexSDK-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1974,7 +2010,6 @@
 				DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */,
 				1C1A2BED1D91172800539AA1 /* WXConvertTests.m in Sources */,
 				74EF31C31DE6935600667A07 /* WXURLRewriteTests.m in Sources */,
-				740938EC1D3D075700DBB801 /* SRWebSocket.m in Sources */,
 				740938F31D3D0D9300DBB801 /* WXComponentTests.m in Sources */,
 				596FDD661D3F52700082CD5B /* WXAnimationModuleTests.m in Sources */,
 				591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */,
@@ -2414,6 +2449,7 @@
 		};
 		77D161121C02DBE70010B15B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8DA442E655CE33DEE8568920 /* Pods-WeexSDK.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = NO;
@@ -2448,7 +2484,7 @@
 					"-framework",
 					"\"Security\"",
 				);
-				PODS_ROOT = "";
+				PODS_ROOT = "${SRCROOT}/Pods";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -2459,6 +2495,7 @@
 		};
 		77D161131C02DBE70010B15B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 98AEEB5437199147AF9E486A /* Pods-WeexSDK.release.xcconfig */;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = NO;
@@ -2492,7 +2529,7 @@
 					"-framework",
 					"\"Security\"",
 				);
-				PODS_ROOT = "";
+				PODS_ROOT = "${SRCROOT}/Pods";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

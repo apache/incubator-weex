@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "SRWebSocket.h"
+#import <SRWebSocket.h>
 #import "WXWebSocketHandler.h"
 
 @interface SRWebSocket (Weex)

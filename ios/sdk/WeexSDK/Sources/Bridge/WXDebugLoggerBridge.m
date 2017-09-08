@@ -18,7 +18,7 @@
  */
 
 #import "WXDebugLoggerBridge.h"
-#import "SRWebSocket.h"
+#import <SRWebSocket.h>
 #import "WXSDKManager.h"
 #import "WXUtility.h"
 #import "WXLog.h"
