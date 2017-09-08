@@ -37,7 +37,6 @@ import java.util.List;
  * FrameLayout wrapper
  *
  */
-//TODO Read the code of View.draw, and override the correct method.
 public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv> {
 
   private WXGesture wxGesture;
@@ -98,7 +97,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
   protected void dispatchDraw(Canvas canvas) {
     if (mWidgets != null) {
       canvas.save();
-      //TODO need clip here
       canvas.translate(getPaddingLeft(), getPaddingTop());
       for (Widget widget : mWidgets) {
         widget.draw(canvas);

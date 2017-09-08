@@ -23,7 +23,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class WidgetGroup extends BaseWidget {
 
   private List<Widget> mChildren = new LinkedList<>();
 
-  public WidgetGroup(@NonNull FlatGUIIContext context) {
+  public WidgetGroup(@NonNull FlatGUIContext context) {
     super(context);
   }
 

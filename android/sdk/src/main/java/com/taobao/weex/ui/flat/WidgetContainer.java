@@ -56,7 +56,7 @@ public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<
       if (ret.first != null) {
         WXComponent child = ret.first;
         Widget flatChild;
-        FlatGUIIContext uiImp = getInstance().getFlatUIContext();
+        FlatGUIContext uiImp = getInstance().getFlatUIContext();
         WidgetContainer parent = uiImp.getFlatComponentAncestor(this);
         if (parent == null || uiImp.getAndroidViewWidget(this) != null) {
           parent = this;

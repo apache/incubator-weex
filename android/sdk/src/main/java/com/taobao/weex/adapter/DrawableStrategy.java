@@ -20,13 +20,8 @@
 package com.taobao.weex.adapter;
 
 
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.WXImageQuality;
-
 public class DrawableStrategy {
 
   public int width;
   public int height;
-  public WXImageStrategy imageStrategy;
-  public WXImageQuality imageQuality;
 }

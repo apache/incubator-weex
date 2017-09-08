@@ -37,19 +37,17 @@ import com.taobao.weex.ui.flat.widget.Widget;
 import java.util.Map;
 
 //TODO when Weex instance is destroyed, there is a work of garbage collection.
-//TODO !!!!The index of weex playground show empty cell sometimes.
 //TODO The constructor of FlatGUIContext should have a flag decide whether to enable flagGUI.
 
 @RestrictTo(Scope.LIBRARY)
-public class FlatGUIIContext {
+public class FlatGUIContext {
 
-  private boolean mFlatUIEnabled = true;
   private Map<WXComponent, WidgetContainer> mWidgetRegistry = new ArrayMap<>();
   private Map<WXComponent, AndroidViewWidget> mViewWidgetRegistry = new ArrayMap<>();
   private Map<Widget, WXComponent> widgetToComponent = new ArrayMap<>();
 
   public boolean isFlatUIEnabled(WXComponent component) {
-    return mFlatUIEnabled && component.isFlatUIEnabled();
+    return component.isFlatUIEnabled();
   }
 
   public void register(@NonNull WXComponent descendant, @NonNull WidgetContainer ancestor) {
@@ -111,7 +109,7 @@ public class FlatGUIIContext {
     if (domObject != null) {
       WXStyle style = domObject.getStyles();
       WXAttr attr = domObject.getAttrs();
-      //disabled && pro_fixed_size, attr or style
+      //TODO disabled && pro_fixed_size, attr or style
       if (style.containsKey(Name.OPACITY) ||
           style.containsKey(Name.TRANSFORM) ||
           attr.containsKey(Name.ELEVATION) ||

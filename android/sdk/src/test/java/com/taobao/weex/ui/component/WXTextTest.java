@@ -32,7 +32,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.SimpleComponentHolder;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -59,7 +59,7 @@ public class WXTextTest {
         WXEnvironment.sApplication = RuntimeEnvironment.application;
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
-        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIIContext());
+        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         mParentDomObj = Mockito.spy(new WXDomObject());
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());

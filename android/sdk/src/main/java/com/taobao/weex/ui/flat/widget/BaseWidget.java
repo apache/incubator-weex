@@ -24,11 +24,10 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
 @RestrictTo(Scope.LIBRARY)
@@ -40,9 +39,10 @@ abstract class BaseWidget implements Widget {
   private int leftOffset, topOffset, rightOffset, bottomOffset;
   private Rect borderBox = new Rect();
   private Point offsetOfContainer = new Point();
-  private final @NonNull FlatGUIIContext context;
+  private final @NonNull
+  FlatGUIContext context;
 
-  BaseWidget(@NonNull FlatGUIIContext context){
+  BaseWidget(@NonNull FlatGUIContext context){
     this.context = context;
   }
 
@@ -77,48 +77,16 @@ abstract class BaseWidget implements Widget {
     invalidate();
   }
 
-  @Override
-  public
-  @NonNull
-  Rect getBorderBox() {
-    return borderBox;
-  }
-
   @NonNull
   @Override
   public Point getLocInFlatContainer() {
     return offsetOfContainer;
   }
 
-  @Nullable
-  @Override
-  public BorderDrawable getBackgroundAndBorder() {
-    return backgroundBorder;
-  }
-
-  @Override
-  public int getLeftOffset() {
-    return leftOffset;
-  }
-
-  @Override
-  public int getTopOffset() {
-    return topOffset;
-  }
-
-  @Override
-  public int getRightOffset() {
-    return rightOffset;
-  }
-
-  @Override
-  public int getBottomOffset() {
-    return bottomOffset;
-  }
-
   @Override
   public final void draw(@NonNull Canvas canvas) {
     canvas.save();
+    //TODO clip according to path, not borderBox
     canvas.clipRect(borderBox);
     canvas.translate(borderBox.left, borderBox.top);
     if (backgroundBorder != null) {
@@ -130,8 +98,7 @@ abstract class BaseWidget implements Widget {
     canvas.restore();
   }
 
-  @Override
-  public void invalidate() {
+  protected void invalidate() {
     Rect dirtyRegion = new Rect(borderBox);
     dirtyRegion.offset(offsetOfContainer.x, offsetOfContainer.y);
     View widgetContainer;

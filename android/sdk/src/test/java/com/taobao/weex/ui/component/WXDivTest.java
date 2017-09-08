@@ -27,7 +27,7 @@ import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +61,7 @@ public class WXDivTest {
     public void setUp() throws Exception {
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
-        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIIContext());
+        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         WXDomObject divDom = new WXDomObject();
         WXDomObject spy = Mockito.spy(divDom);
@@ -77,7 +77,7 @@ public class WXDivTest {
     public void testAddChild(){
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
-        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIIContext());
+        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         WXDomObject testDom = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom.getPadding()).thenReturn(new Spacing());

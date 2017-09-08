@@ -24,14 +24,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.Layout;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 
 @RestrictTo(Scope.LIBRARY)
 public class TextWidget extends BaseWidget {
 
   private Layout mLayout;
 
-  public TextWidget(@NonNull FlatGUIIContext context) {
+  public TextWidget(@NonNull FlatGUIContext context) {
     super(context);
   }
 

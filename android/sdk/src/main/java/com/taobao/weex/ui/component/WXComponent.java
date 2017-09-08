@@ -70,7 +70,7 @@ import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.flat.FlatComponent;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
 import com.taobao.weex.ui.flat.widget.Widget;
@@ -473,14 +473,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   private void setComponentLayoutParams(int realWidth, int realHeight, int realLeft, int realTop,
       int realRight, int realBottom, Point rawOffset) {
-    FlatGUIIContext UIImp = getInstance().getFlatUIContext();
+    FlatGUIContext UIImp = getInstance().getFlatUIContext();
     WidgetContainer ancestor;
     Widget widget;
     if ((ancestor = UIImp.getFlatComponentAncestor(this)) != null) {
       if (this instanceof FlatComponent && !((FlatComponent) this).promoteToView(true)) {
         widget = ((FlatComponent) this).getOrCreateFlatWidget();
       } else {
-        //TODO Be careful with nested hierarchy, such as widget, view, widget hierarchy.
         widget = UIImp.getAndroidViewWidget(this);
       }
       setWidgetParams(widget, UIImp, rawOffset, realWidth, realHeight, realLeft, realRight, realTop,
@@ -500,7 +499,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  private void setWidgetParams(Widget widget, FlatGUIIContext UIImp, Point rawoffset,
+  private void setWidgetParams(Widget widget, FlatGUIContext UIImp, Point rawoffset,
       int width, int height, int left, int right, int top, int bottom) {
     Point childOffset = new Point();
     if (mParent != null) {

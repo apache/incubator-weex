@@ -70,7 +70,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.flat.FlatGUIIContext;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
@@ -79,7 +79,6 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
-import com.taobao.weex.WXSDKEngine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -123,7 +122,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
   private final  @NonNull
-  FlatGUIIContext mUIImp =new FlatGUIIContext();
+  FlatGUIContext mUIImp =new FlatGUIContext();
 
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
@@ -205,7 +204,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public @NonNull
-  FlatGUIIContext getFlatUIContext(){
+  FlatGUIContext getFlatUIContext(){
     return mUIImp;
   }
 
