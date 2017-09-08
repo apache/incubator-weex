@@ -29,6 +29,7 @@ import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -95,16 +96,20 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    if (mWidgets != null) {
-      canvas.save();
-      canvas.translate(getPaddingLeft(), getPaddingTop());
-      for (Widget widget : mWidgets) {
-        widget.draw(canvas);
+    try {
+      if (mWidgets != null) {
+        canvas.save();
+        canvas.translate(getPaddingLeft(), getPaddingTop());
+        for (Widget widget : mWidgets) {
+          widget.draw(canvas);
+        }
+        canvas.restore();
+      } else {
+        WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
+        super.dispatchDraw(canvas);
       }
-      canvas.restore();
-    } else {
-      WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
-      super.dispatchDraw(canvas);
+    }catch (Throwable e){
+      WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
     }
   }
 }
