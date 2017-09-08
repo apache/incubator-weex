@@ -140,7 +140,8 @@ function _init (doc) {
           }
           else if (href) {
             location.href = href
-          } else if (process.env.NODE_ENV === 'development') {
+          }
+          else if (process.env.NODE_ENV === 'development') {
             console.warn('[vue-render] If you want to use the A tag jump, set the href attribute')
           }
         }
