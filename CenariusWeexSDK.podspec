@@ -3,15 +3,15 @@ Pod::Spec.new do |s|
 
   s.name         = "CenariusWeexSDK"
 
-  s.version      = "0.15.0.5"
+  s.version      = "0.15.0.6"
 
-  s.summary      = "WeexSDK Source ."
+  s.summary      = "WeexSDK Dynamic."
 
   s.description  = <<-DESC
                    A framework for building Mobile cross-platform UI
                    DESC
 
-  s.homepage     = "https://github.com/alibaba/weex"
+  s.homepage     = "https://github.com/macula-projects/cenarius-weex"
   s.license      = "MIT"
   s.authors      = { "M" => "myeveryheart@qq.com" }
   s.platform     = :ios
