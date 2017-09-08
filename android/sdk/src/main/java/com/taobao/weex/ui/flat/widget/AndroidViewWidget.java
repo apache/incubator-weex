@@ -25,10 +25,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 
 @RestrictTo(Scope.LIBRARY)
-public class AndroidViewWidget extends BaseWidget {
+public class AndroidViewWidget extends BaseWidget implements Destroyable {
 
   private @Nullable View mView;
   public AndroidViewWidget(@NonNull FlatGUIContext context) {
@@ -64,5 +65,12 @@ public class AndroidViewWidget extends BaseWidget {
 
   public @Nullable View getView() {
     return mView;
+  }
+
+  @Override
+  public void destroy() {
+    if (mView != null) {
+      mView = null;
+    }
   }
 }

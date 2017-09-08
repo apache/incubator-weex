@@ -169,7 +169,9 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     @Override
     public void unmountFlatGUI() {
-
+        if (getHostView() != null) {
+            getHostView().unmountFlatGUI();
+        }
     }
 
     @Override

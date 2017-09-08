@@ -100,7 +100,9 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
 
   @Override
   public void unmountFlatGUI() {
-    //TODO unmout must be called before you mount FlatGUI second times.
+    if (getHostView() != null) {
+      getHostView().unmountFlatGUI();
+    }
   }
 
   @Override

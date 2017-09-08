@@ -27,6 +27,7 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
 import com.taobao.weex.common.Constants.Name;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
@@ -35,12 +36,12 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
 import com.taobao.weex.ui.flat.widget.Widget;
 import java.util.Map;
+import java.util.Map.Entry;
 
-//TODO when Weex instance is destroyed, there is a work of garbage collection.
 //TODO The constructor of FlatGUIContext should have a flag decide whether to enable flagGUI.
 
 @RestrictTo(Scope.LIBRARY)
-public class FlatGUIContext {
+public class FlatGUIContext implements Destroyable{
 
   private Map<WXComponent, WidgetContainer> mWidgetRegistry = new ArrayMap<>();
   private Map<WXComponent, AndroidViewWidget> mViewWidgetRegistry = new ArrayMap<>();
@@ -99,6 +100,22 @@ public class FlatGUIContext {
     return ret;
   }
 
+  @Override
+  @RestrictTo(Scope.LIBRARY)
+  public void destroy(){
+    widgetToComponent.clear();
+
+    for(Entry<WXComponent, AndroidViewWidget> entry: mViewWidgetRegistry.entrySet()){
+      entry.getValue().destroy();
+    }
+    mViewWidgetRegistry.clear();
+
+    for(Entry<WXComponent, WidgetContainer> entry:mWidgetRegistry.entrySet()){
+      entry.getValue().unmountFlatGUI();
+    }
+    mWidgetRegistry.clear();
+  }
+
   private @Nullable WXComponent getComponent(@NonNull Widget widget){
     return widgetToComponent.get(widget);
   }
@@ -109,14 +126,13 @@ public class FlatGUIContext {
     if (domObject != null) {
       WXStyle style = domObject.getStyles();
       WXAttr attr = domObject.getAttrs();
-      //TODO disabled && pro_fixed_size, attr or style
       if (style.containsKey(Name.OPACITY) ||
           style.containsKey(Name.TRANSFORM) ||
+          style.containsKey(Name.VISIBILITY) ||
           attr.containsKey(Name.ELEVATION) ||
           attr.containsKey(Name.ARIA_HIDDEN) ||
           attr.containsKey(Name.ARIA_LABEL) ||
           attr.containsKey(WXComponent.PROP_FIXED_SIZE) ||
-          style.containsKey(Name.VISIBILITY) ||
           attr.containsKey(Name.DISABLED) ||
           style.isFixed() ||
           style.isSticky() ||
