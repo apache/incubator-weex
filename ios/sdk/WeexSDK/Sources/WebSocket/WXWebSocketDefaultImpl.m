@@ -18,7 +18,7 @@
  */
 
 #import "WXWebSocketDefaultImpl.h"
-#import <SRWebSocket.h>
+#import <SocketRocket/SRWebSocket.h>
 #import "WXThreadSafeMutableDictionary.h"
 #import "SRWebSocket+Weex.h"
 
