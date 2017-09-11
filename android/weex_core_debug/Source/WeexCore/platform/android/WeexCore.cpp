@@ -39,7 +39,7 @@ static void native_onVsync(JNIEnv *env,
                            jstring jinstanceId) {
 
 
-  LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
+  // LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
 }
 
 static jint native_initFramework(JNIEnv *env,
