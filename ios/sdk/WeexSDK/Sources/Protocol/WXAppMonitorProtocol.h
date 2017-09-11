@@ -35,6 +35,7 @@
 #define COMMUNICATETIME     @"communicateTime"
 #define SCREENRENDERTIME    @"screenRenderTime"
 #define TOTALTIME           @"totalTime"
+#define FIRSETSCREENJSFEXECUTETIME  @"firstScreenJSFExecuteTime"
 
 #define CACHEPROCESSTIME    @"cacheProcessTime"
 #define CACHERATIO          @"cacheRatio"

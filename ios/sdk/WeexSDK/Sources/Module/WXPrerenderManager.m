@@ -168,19 +168,15 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
             self.maxCacheNumber = max;
         }
     }
-    
-    
-    WXSDKInstance *instance = [[WXSDKInstance alloc] init];
-    instance.needPrerender = YES;
-    task.instance = instance;
-    task.parentInstanceId = instanceId;
-    task.url = url.absoluteString;
-    task.isCache = isCache;
-    
     if(self.prerenderTasks && self.prerenderTasks.count<self.maxCacheNumber){
         [self.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
         WXPerformBlockOnMainThread(^{
-            [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
+            WXSDKInstance *instance = [[WXSDKInstance alloc] init];
+            instance.needPrerender = YES;
+            task.instance = instance;
+            task.parentInstanceId = instanceId;
+            task.url = url.absoluteString;
+            task.isCache = isCache;
             WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
             __weak typeof(self) weakSelf = manager;
             instance.onCreate = ^(UIView *view) {
@@ -198,6 +194,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
                     [weakSelf.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
                 }
             };
+            [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
         });
         if(callback){
             callback(@{@"url":url.absoluteString,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
@@ -237,7 +234,38 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 }
 
 + (BOOL)isTaskExist:(NSString *)url{
-    return [[WXPrerenderManager sharedInstance]isTaskExist:url];
+    if( !url ||url.length == 0){
+        return NO;
+    }
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL switchOn = NO; // defautle NO
+        id switchOnValue = [configCenter configForKey:@"iOS_weex_prerender_config.is_switch_on" defaultValue:@YES isDefault:NULL];
+        if(switchOnValue){
+            switchOn = [switchOnValue boolValue];
+        }
+        if(!switchOn){
+            return NO;
+        }
+        
+        id urlsValue = [configCenter configForKey:@"iOS_weex_prerender_config.urls" defaultValue:NULL isDefault:NULL];
+        if(urlsValue){
+            NSData *data = [urlsValue dataUsingEncoding:NSUTF8StringEncoding];
+            NSError *error = nil;
+            NSArray *urls = [WXUtility JSONObject:data error:&error];
+            if(urls && [urls count]>0){
+                for (NSString *configUrl in urls) {
+                    if(configUrl && [[WXPrerenderManager getTaskKeyFromUrl:configUrl] isEqualToString:[WXPrerenderManager getTaskKeyFromUrl:url]]) {
+                            return YES;
+                        }
+                }
+                
+            }
+        }
+        
+    }
+    
+    return NO;
 }
 
 - (BOOL)isTaskExist:(NSString *)url

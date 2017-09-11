@@ -444,6 +444,10 @@
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
 
     NSInteger sectionNum = indexPath.section;
+    if (sectionNum >= [_sections count] || sectionNum < 0) {
+        // try to protect sectionNum out of range.
+        return;
+    }
     NSInteger row = indexPath.row;
     NSMutableArray *sections = _sections;
     WXSectionComponent *section = sections[sectionNum];

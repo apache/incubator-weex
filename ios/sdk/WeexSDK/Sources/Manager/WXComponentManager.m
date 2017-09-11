@@ -205,6 +205,7 @@ static NSThread *WXComponentThread;
     
     [self _initRootCSSNode];
     __weak typeof(self) weakSelf = self;
+    WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
     [self _addUITask:^{
         [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
         __strong typeof(self) strongSelf = weakSelf;
@@ -594,7 +595,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponent *component;
     while ((component = [enumerator nextObject])) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [component _unloadViewWithReusing:NO];
+            if ([self isValid]) {
+                [component _unloadViewWithReusing:NO];
+            }
         });
     }
     

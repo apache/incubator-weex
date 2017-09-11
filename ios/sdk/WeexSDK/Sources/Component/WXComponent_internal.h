@@ -68,6 +68,7 @@
     NSString * _ariaLabel; //accessibilityLabel
     NSString * _ariaHidden; // accessibilityElementsHidden
     NSString * _accessible; // accessible
+    NSString * _accessibilityHintContent; // hint for the action
     NSString * _testId;// just for auto-test
     
     /**
