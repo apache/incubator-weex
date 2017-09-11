@@ -147,6 +147,10 @@ vue: {
 * optimize event binding.
 * fix a-jump interception condition.
 
+#### 0.12.9
+
+* event handling ignore none-vue element.
+
 ## component -> dom map
 
 | component | dom element | children | note |

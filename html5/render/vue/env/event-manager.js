@@ -81,6 +81,9 @@ function _init (doc) {
       let vm = el.__vue__
       let disposed = false
       let evtName = e.type
+      if (!vm) {  // not a vue component.
+        return
+      }
       /**
        * take full control of redirection of <a> element.
        */
