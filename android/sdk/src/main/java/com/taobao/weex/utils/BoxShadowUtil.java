@@ -28,8 +28,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
@@ -40,6 +38,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +65,12 @@ public class BoxShadowUtil {
 
     if (target == null) {
       WXLogUtils.w(TAG, "Target view is null!");
+      return;
+    }
+
+    if (options.isClear && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      target.getOverlay().clear();
+      WXLogUtils.d(TAG, "Remove box-shadow");
       return;
     }
 
@@ -111,6 +116,18 @@ public class BoxShadowUtil {
     Bitmap output = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(output);
 
+    float offsetX = shadowRadius + shadowSpread + Math.abs(dx);
+    float offsetY = shadowRadius + shadowSpread + Math.abs(dy);
+    RectF selfRect = new RectF(
+        offsetX,
+        offsetY,
+        (float) Math.floor(viewWidth + offsetX),
+        (float) Math.floor(viewHeight + offsetY));
+    Path contentPath = new Path();
+    contentPath.addRoundRect(selfRect, radii, Path.Direction.CCW);
+    // can not antialias
+    canvas.clipPath(contentPath, Region.Op.DIFFERENCE);
+
     RectF shadowRect = new RectF(
         shadowRadius,
         shadowRadius,
@@ -130,24 +147,17 @@ public class BoxShadowUtil {
     shadowPaint.setShadowLayer(shadowRadius, dx, dy, shadowColor);
 
     Path shadowPath = new Path();
-    shadowPath.addRoundRect(shadowRect, radii, Path.Direction.CCW);
+    float[] shadowRadii = new float[8];
+    for (int i = 0; i < radii.length; i++) {
+      float contentRadius = radii[i];
+      if (contentRadius == 0f) {
+        shadowRadii[i] = 0f;
+      } else {
+        shadowRadii[i] = radii[i] + shadowSpread;
+      }
+    }
+    shadowPath.addRoundRect(shadowRect, shadowRadii, Path.Direction.CCW);
     canvas.drawPath(shadowPath, shadowPaint);
-
-    float offsetX = shadowRadius + shadowSpread + dx;
-    float offsetY = shadowRadius + shadowSpread + dy;
-    RectF selfRect = new RectF(
-        offsetX,
-        offsetY,
-        viewWidth + offsetX,
-        viewHeight + offsetY);
-    Paint maskPaint = new Paint();
-    maskPaint.setAntiAlias(true);
-    maskPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-
-    Path contentPath = new Path();
-    contentPath.addRoundRect(selfRect, radii, Path.Direction.CCW);
-    canvas.drawPath(contentPath, maskPaint);
-
     return output;
   }
 
@@ -173,8 +183,8 @@ public class BoxShadowUtil {
       target.getOverlay().clear();
       target.getOverlay().add(shadowDrawable);
       //Relayout to ensure the shadows are fully drawn
-      //target.getParent().requestLayout();
-      WXLogUtils.e("FLAG", "shadow");
+      target.getParent().requestLayout();
+      ((ViewGroup) target.getParent()).invalidate(shadowDrawable.getBounds());
     } else {
       // I have a dream that one day our minSdkVersion will equals or higher than 21
       Log.w("BoxShadowUtil", "Call setNormalBoxShadow() requires API level 18 or higher.");
@@ -196,7 +206,7 @@ public class BoxShadowUtil {
       Drawable shadow = new InsetShadowDrawable(target.getWidth(), target.getHeight(),
           options.hShadow, options.vShadow,
           options.blur, options.spread,
-          options.color);
+          options.color, options.radii);
       target.getOverlay().clear();
       target.getOverlay().add(shadow);
       target.invalidate();
@@ -208,7 +218,8 @@ public class BoxShadowUtil {
   public static BoxShadowOptions parseBoxShadow(String boxShadow, int viewport) {
     BoxShadowOptions result = new BoxShadowOptions(viewport);
     if (TextUtils.isEmpty(boxShadow)) {
-      return null;
+      result.isClear = true;
+      return result;
     }
 
     String boxShadowCopy = boxShadow;
@@ -289,6 +300,8 @@ public class BoxShadowUtil {
     private float blurRadius;
     private int shadowColor;
 
+    private float[] radii;
+
     private float width, height;
 
     private float shadowXSize, shadowYSize;
@@ -298,7 +311,7 @@ public class BoxShadowUtil {
 
     private Paint paint;
 
-    private InsetShadowDrawable(int viewWidth, int viewHeight, float dx, float dy, float blurRadius, float spread, int shadowColor) {
+    private InsetShadowDrawable(int viewWidth, int viewHeight, float dx, float dy, float blurRadius, float spread, int shadowColor, float[] radii) {
       this.blurRadius = blurRadius;
       this.shadowColor = shadowColor;
 
@@ -307,6 +320,8 @@ public class BoxShadowUtil {
 
       this.shadowXSize = dx + spread;
       this.shadowYSize = dy + spread;
+
+      this.radii = radii;
 
       setBounds(0, 0, viewWidth, viewHeight);
       prepare();
@@ -384,6 +399,12 @@ public class BoxShadowUtil {
 
     @Override
     public void draw(Canvas canvas) {
+      Path border = new Path();
+      RectF rectF = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
+      border.addRoundRect(rectF, radii, Path.Direction.CCW);
+      canvas.clipPath(border);
+      //TODO: we need clip border-width too
+
       for (int i = 0; i < 4; i++) {
         Shader shader = shades[i];
         Path path = paths[i];
@@ -419,6 +440,8 @@ public class BoxShadowUtil {
     public float[] radii = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
     public int color = Color.BLACK;
     public boolean isInset = false;
+
+    public boolean isClear = false;
 
     private BoxShadowOptions(int vp) {
       if (viewport != 0) {
