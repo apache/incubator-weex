@@ -161,6 +161,10 @@ public class WXRecyclerDomObject extends WXDomObject{
             if (parent.getType() != null) {
                 if (parent.getType().equals(WXBasicComponentType.HLIST)) {
                     isVertical = false;
+                }else{
+                    if(getOrientation() == Constants.Orientation.HORIZONTAL){
+                        isVertical = false;
+                    }
                 }
             }
         }
@@ -172,6 +176,15 @@ public class WXRecyclerDomObject extends WXDomObject{
         }
 
         return map;
+    }
+
+
+    public int getOrientation(){
+        String direction = (String) getAttrs().get(Constants.Name.SCROLL_DIRECTION);
+        if(Constants.Value.HORIZONTAL.equals(direction)){
+            return Constants.Orientation.HORIZONTAL;
+        }
+        return  Constants.Orientation.VERTICAL;
     }
 
 }

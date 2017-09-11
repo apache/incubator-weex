@@ -126,6 +126,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private RecyclerView.ItemAnimator mItemAnimator;
 
     /**
+     * default orientation
+     * */
+    private  int orientation = Constants.Orientation.VERTICAL;
+
+    /**
      * offset reported
      * */
     private boolean isScrollable = true;
@@ -179,6 +184,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mTemplateViewTypes.put("", 0); //empty view, when template was not sended
         mTemplates = new HashMap<>();
         mStickyHelper = new TemplateStickyHelper(this);
+        orientation = mDomObject.getOrientation();
 
     }
 
@@ -549,7 +555,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     public int getOrientation() {
-        return Constants.Orientation.VERTICAL;
+        return orientation;
     }
 
     @Override

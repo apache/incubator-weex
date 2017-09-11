@@ -233,6 +233,8 @@ public class Constants {
 
     String NONE = "none";
     String DEFAULT = "default";
+
+    String HORIZONTAL = "horizontal";
   }
 
   public interface Event {

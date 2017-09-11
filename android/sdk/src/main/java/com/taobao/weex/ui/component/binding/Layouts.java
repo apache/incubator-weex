@@ -19,7 +19,6 @@
 package com.taobao.weex.ui.component.binding;
 
 
-import android.util.Log;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
