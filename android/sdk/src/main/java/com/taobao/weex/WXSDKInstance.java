@@ -1259,7 +1259,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if(mRootComp != null ) {
       mRootComp.destroy();
       destroyView(mRenderContainer);
-      mRenderContainer = null;
       mRootComp = null;
     }
 
@@ -1275,7 +1274,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 	  mWXScrollListeners = null;
 	}
 
-    mNestedInstanceInterceptor = null;
+	mRenderContainer = null;
+
+	mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;
     mScrollView = null;
     mContext = null;
