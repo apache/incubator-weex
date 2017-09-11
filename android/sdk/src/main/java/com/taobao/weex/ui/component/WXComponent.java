@@ -659,9 +659,23 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-        Float radius = WXUtils.getFloat(param,null);
-        if (radius != null)
-          setBorderRadius(key,radius);
+        final Float radius = WXUtils.getFloat(param,null);
+        final String finalKey = key;
+        if (radius != null) {
+          if (this instanceof WXDiv && mHost != null) {
+            /* Hacked by moxun
+               Set border radius on ViewGroup will cause the Overlay to be cut and don't know why
+               Delay setting border radius can avoid the problem, and don't know why too, dog science…… */
+            mHost.postDelayed(new Runnable() {
+              @Override
+              public void run() {
+                setBorderRadius(finalKey, radius);
+              }
+            }, 64);
+          } else {
+            setBorderRadius(finalKey, radius);
+          }
+        }
         return true;
       case Constants.Name.BORDER_WIDTH:
       case Constants.Name.BORDER_TOP_WIDTH:
@@ -754,12 +768,33 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         return;
       }
 
-      String radius = null;
-      Object borderRadius = getDomObject().getStyles().get(Constants.Name.BORDER_RADIUS);
-      if (borderRadius != null) {
-        radius = borderRadius.toString();
+      float[] radii = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
+      WXStyle style = getDomObject().getStyles();
+      if (style != null) {
+        float tl = WXUtils.getFloat(style.get(Constants.Name.BORDER_TOP_LEFT_RADIUS), 0f);
+        radii[0] = tl;
+        radii[1] = tl;
+
+        float tr = WXUtils.getFloat(style.get(Constants.Name.BORDER_TOP_RIGHT_RADIUS), 0f);
+        radii[2] = tr;
+        radii[3] = tr;
+
+        float br = WXUtils.getFloat(style.get(Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS), 0f);
+        radii[4] = br;
+        radii[5] = br;
+
+        float bl = WXUtils.getFloat(style.get(Constants.Name.BORDER_BOTTOM_LEFT_RADIUS), 0f);
+        radii[6] = bl;
+        radii[7] = bl;
+
+        if (style.containsKey(Constants.Name.BORDER_RADIUS)) {
+          float radius = WXUtils.getFloat(style.get(Constants.Name.BORDER_RADIUS), 0f);
+          for (int i = 0; i < radii.length; i++) {
+            radii[i] = radius;
+          }
+        }
       }
-      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radius, getInstance().getInstanceViewPortWidth());
+      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
     } else {
       WXLogUtils.w("Can not resolve styles");
     }

@@ -52,13 +52,12 @@ import java.util.List;
  *
  * @see <a href="https://www.w3schools.com/cssref/css3_pr_box-shadow.asp">CSS3 box-shadow Property</>
  *
- * Known issue: setBorderRadius on Div will cause the shadows to be cut
  */
 
 public class BoxShadowUtil {
   private static final String TAG = "BoxShadowUtil";
 
-  public static void setBoxShadow(final View target, String style, String cornerRadius, int viewPort) {
+  public static void setBoxShadow(final View target, String style, float[] radii, int viewPort) {
     final BoxShadowOptions options = parseBoxShadow(style, viewPort);
     if (options == null) {
       WXLogUtils.w(TAG, "Failed to parse box-shadow: " + style);
@@ -70,9 +69,16 @@ public class BoxShadowUtil {
       return;
     }
 
-    if (!TextUtils.isEmpty(cornerRadius)) {
-      float f = WXUtils.getFloat(cornerRadius, 0f);
-      options.cornerRadius = WXViewUtils.getRealSubPxByWidth(f, viewPort);
+    if (radii != null) {
+      if (radii.length != 8) {
+        WXLogUtils.w(TAG, "Length of radii must be 8");
+      } else {
+        for (int i = 0; i < radii.length; i++) {
+          float realRadius = WXViewUtils.getRealSubPxByWidth(radii[i], viewPort);
+          radii[i] = realRadius;
+        }
+        options.radii = radii;
+      }
     }
 
     WXLogUtils.d(TAG, "Set box-shadow: " + options.toString());
@@ -90,7 +96,7 @@ public class BoxShadowUtil {
   }
 
   private static Bitmap createShadowBitmap(int viewWidth, int viewHeight,
-                                           float cornerRadius, float shadowRadius,
+                                           float[] radii, float shadowRadius,
                                            float shadowSpread,
                                            float dx, float dy, int shadowColor) {
 
@@ -123,7 +129,9 @@ public class BoxShadowUtil {
 
     shadowPaint.setShadowLayer(shadowRadius, dx, dy, shadowColor);
 
-    canvas.drawRoundRect(shadowRect, cornerRadius, cornerRadius, shadowPaint);
+    Path shadowPath = new Path();
+    shadowPath.addRoundRect(shadowRect, radii, Path.Direction.CCW);
+    canvas.drawPath(shadowPath, shadowPaint);
 
     float offsetX = shadowRadius + shadowSpread + dx;
     float offsetY = shadowRadius + shadowSpread + dy;
@@ -135,7 +143,10 @@ public class BoxShadowUtil {
     Paint maskPaint = new Paint();
     maskPaint.setAntiAlias(true);
     maskPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-    canvas.drawRoundRect(selfRect, cornerRadius, cornerRadius, maskPaint);
+
+    Path contentPath = new Path();
+    contentPath.addRoundRect(selfRect, radii, Path.Direction.CCW);
+    canvas.drawPath(contentPath, maskPaint);
 
     return output;
   }
@@ -150,7 +161,7 @@ public class BoxShadowUtil {
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      Bitmap shadowBitmap = createShadowBitmap(w, h, options.cornerRadius, options.blur, options.spread, options.hShadow, options.vShadow, options.color);
+      Bitmap shadowBitmap = createShadowBitmap(w, h, options.radii, options.blur, options.spread, options.hShadow, options.vShadow, options.color);
 
       int overflowX = (int) (options.blur + Math.abs(options.hShadow) + options.spread);
       int overflowY = (int) (options.blur + Math.abs(options.vShadow) + options.spread);
@@ -162,7 +173,8 @@ public class BoxShadowUtil {
       target.getOverlay().clear();
       target.getOverlay().add(shadowDrawable);
       //Relayout to ensure the shadows are fully drawn
-      target.getParent().requestLayout();
+      //target.getParent().requestLayout();
+      WXLogUtils.e("FLAG", "shadow");
     } else {
       // I have a dream that one day our minSdkVersion will equals or higher than 21
       Log.w("BoxShadowUtil", "Call setNormalBoxShadow() requires API level 18 or higher.");
@@ -404,7 +416,7 @@ public class BoxShadowUtil {
     public float vShadow;
     public float blur = 0f;
     public float spread = 0f;
-    public float cornerRadius = 0f;
+    public float[] radii = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
     public int color = Color.BLACK;
     public boolean isInset = false;
 
@@ -440,12 +452,15 @@ public class BoxShadowUtil {
 
     @Override
     public String toString() {
+
+      String r = "[" + radii[0] + "," + radii[2] + "," + radii[4] + "," + radii[6] + "]";
+
       final StringBuffer sb = new StringBuffer("BoxShadowOptions{");
       sb.append("h-shadow=").append(hShadow);
       sb.append(", v-shadow=").append(vShadow);
       sb.append(", blur=").append(blur);
       sb.append(", spread=").append(spread);
-      sb.append(", corner-radius=").append(cornerRadius);
+      sb.append(", corner-radius=").append(r);
       sb.append(", color=#").append(Integer.toHexString(color));
       sb.append(", inset=").append(isInset);
       sb.append('}');
