@@ -56,6 +56,7 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
@@ -809,6 +810,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   protected void appendEventToDOM(String type){
     WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(),type),false);
+  }
+
+
+  public void addEvent(Object type) {
+    if(type instanceof  CharSequence){
+       addEvent(type.toString());
+    }else if(type instanceof JSONObject){
+       JSONObject bindings = (JSONObject) type;
+       String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+       if(eventName != null){
+         addEvent(eventName);
+       }
+    }
   }
 
   /**

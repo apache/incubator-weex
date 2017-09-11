@@ -238,20 +238,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
         int count = eventArray.size();
         for (int i = 0; i < count; ++i) {
             Object value = eventArray.get(i);
-            if (value instanceof CharSequence) {
-              events.add(value.toString());
-              continue;
-            }
-            if (value instanceof JSONObject) {
-              JSONObject bindings = (JSONObject) value;
-              String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
-              Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
-              if (eventName != null) {
-                 events.putEventBindingArgs(eventName, args);
-                 continue;
-              }
-            }
-            events.add(value.toString());
+            events.addEvent(value);
         }
         this.mEvents = events;
     }

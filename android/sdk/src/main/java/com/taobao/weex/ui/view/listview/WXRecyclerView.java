@@ -27,6 +27,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
@@ -95,4 +96,24 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     }
     return result;
   }
+
+  public void setOnSmoothScrollEndListener(final ExtendedLinearLayoutManager.OnSmoothScrollEndListener onSmoothScrollEndListener){
+    if(getLayoutManager() instanceof ExtendedLinearLayoutManager){
+       ExtendedLinearLayoutManager extendedLinearLayoutManager = (ExtendedLinearLayoutManager)getLayoutManager();
+       extendedLinearLayoutManager.setOnScrollEndListener(onSmoothScrollEndListener);
+    }else{
+      addOnScrollListener(new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+          if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+              recyclerView.removeOnScrollListener(this);
+              if(onSmoothScrollEndListener != null){
+                   onSmoothScrollEndListener.onStop();
+              }
+          }
+        }
+      });
+    }
+  }
+
 }

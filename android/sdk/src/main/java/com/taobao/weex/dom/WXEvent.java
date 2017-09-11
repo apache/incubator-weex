@@ -21,6 +21,7 @@ package com.taobao.weex.dom;
 import android.support.v4.util.ArrayMap;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.binding.BindingUtils;
 
 import java.io.Serializable;
@@ -70,6 +71,23 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
 
   public ArrayMap<String, List<Object>> getEventBindingArgsValues() {
     return mEventBindingArgsValues;
+  }
+
+
+  public void addEvent(Object event) {
+    if(event instanceof CharSequence){
+      String eventName = event.toString();
+      if(!contains(eventName)){
+          add(eventName);
+      }
+    }else if(event instanceof JSONObject){
+      JSONObject bindings = (JSONObject) event;
+      String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+      Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
+      if (eventName != null) {
+           putEventBindingArgs(eventName, args);
+      }
+    }
   }
 
   public void putEventBindingArgs(String event, Object args){
