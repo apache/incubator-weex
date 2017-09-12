@@ -190,7 +190,7 @@ public class Constants {
     String CELL_INDEX = "cellIndex";
     String TYPE_INDEX = "typeIndex";
 
-    String KEEP_POSITION = "keepPosition";
+    String VIF_FALSE = "ifFalse";
   }
 
   public interface Value {
