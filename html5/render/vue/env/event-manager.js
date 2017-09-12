@@ -77,13 +77,17 @@ function _init (doc) {
       ? true : needPassive.indexOf(evt) > -1 && _sp
       ? { passive: true } : false
     doc.addEventListener(evt, function (e) {
-      const el = e.target
+      let el = e.target
       let vm = el.__vue__
-      let disposed = false
-      let evtName = e.type
+      while (!vm && el !== document.body) {
+        el = el.parentElement
+        vm = el.__vue__
+      }
       if (!vm) {  // not a vue component.
         return
       }
+      let disposed = false
+      let evtName = e.type
       /**
        * take full control of redirection of <a> element.
        */
