@@ -113,7 +113,7 @@
             _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
         }
         if (attributes[@"role"]) {
-            _role = attributes[@"role"];
+            _roles = attributes[@"role"];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
@@ -140,7 +140,7 @@
     return self;
 }
 
-- (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait role:(NSString*)roleStr
+- (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
 {
     UIAccessibilityTraits newTrait = trait;
     for (NSString * role in [roleStr componentsSeparatedByString:@" "]) {
@@ -268,8 +268,8 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        if (_role) {
-            [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits role:_role]];
+        if (_roles) {
+            [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
         
         if (_testId) {
@@ -621,8 +621,8 @@
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (attributes[@"role"]){
-        _role = attributes[@"role"];
-        [self.view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits role:_role]];
+        _roles = attributes[@"role"];
+        [self.view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
     }
     if (attributes[@"ariaHidden"]) {
         _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];

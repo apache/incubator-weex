@@ -64,7 +64,7 @@
     /**
      * accessibility support
      */
-    NSString * _role; //accessibility
+    NSString * _roles; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
     NSString * _ariaHidden; // accessibilityElementsHidden
     NSString * _accessible; // accessible
