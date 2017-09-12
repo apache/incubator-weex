@@ -66,6 +66,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.binding.Layouts;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.view.listview.ExtendedLinearLayoutManager;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
@@ -522,22 +523,19 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
                 //Any else?
             } else {
-                view.smoothScrollToPosition(pos);
                 if (offset != 0) {
-                    view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    view.setOnSmoothScrollEndListener(new ExtendedLinearLayoutManager.OnSmoothScrollEndListener() {
                         @Override
-                        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                                if (getOrientation() == Constants.Orientation.VERTICAL) {
-                                    recyclerView.smoothScrollBy(0, offset);
-                                } else {
-                                    recyclerView.smoothScrollBy(offset, 0);
-                                }
-                                recyclerView.removeOnScrollListener(this);
+                        public void onStop() {
+                            if (getOrientation() == Constants.Orientation.VERTICAL) {
+                                view.smoothScrollBy(0, offset);
+                            } else {
+                                view.smoothScrollBy(offset, 0);
                             }
                         }
                     });
                 }
+                view.smoothScrollToPosition(pos);
             }
         }
     }
