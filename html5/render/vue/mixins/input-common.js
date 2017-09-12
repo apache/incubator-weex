@@ -38,6 +38,38 @@ export default {
     blur () {
       this.$el && this.$el.blur()
     },
+
+    setSelectionRange (start: number, end: number) {
+      try {
+        this.$el.setSelectionRange(start, end)
+      }
+      catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[vue-render] setSelectionRange is not supported.`)
+        }
+      }
+    },
+
+    getSelectionRange (callback: Function) {
+      try {
+        const selection = window.getSelection()
+        const str = selection.toString()
+        const selectionStart = this.$el.value.indexOf(str)
+        const selectionEnd = selectionStart === -1 ? selectionStart : selectionStart + str.length
+        callback && callback({
+          selectionStart,
+          selectionEnd
+        })
+      }
+      catch (e) {
+        callback && callback(new Error('[vue-render] getSelection is not supported.'))
+      }
+    },
+
+    getEditSelectionRange (callback: Function) {
+      return this.getSelectionRange(callback)
+    },
+
     // support enter key event
     createKeyboardEvent (events: {}) {
       const customKeyType = this.returnKeyType

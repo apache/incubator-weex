@@ -32,11 +32,14 @@ export default `
   text-align: center;
   opacity: 0.7;
   -webkit-transition: all 0.4s ease-in-out;
-          transition: all 0.4s ease-in-out;
+  -moz-transition: all 0.4s ease-in-out;
+  -ms-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
   border-radius: 0.066667rem;
   -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
-      transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .weex-toast.hide {
@@ -77,8 +80,9 @@ export default `
   min-height: 2.666667rem;
   border-radius: 0.066667rem;
   -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   background-color: #fff;
 }
 
@@ -89,20 +93,26 @@ export default `
 .weex-modal-node .content {
   display: -webkit-box;
   display: -webkit-flex;
+  display: -moz-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-flex-direction: column;
+  -moz-box-orient: vertical;
+  -moz-box-direction: normal;
   -ms-flex-direction: column;
       flex-direction: column;
   -webkit-box-align: center;
   -webkit-align-items: center;
   -ms-flex-align: center;
-      align-items: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
+  -moz-box-pack: center;
   -ms-flex-pack: center;
-      justify-content: center;
+  justify-content: center;
   width: 100%;
   min-height: 1.866667rem;
   box-sizing: border-box;

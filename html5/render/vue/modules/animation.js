@@ -17,6 +17,30 @@
  * under the License.
  */
 const utils = {}
+let endEvent
+let styleName
+
+const EVENT_NAME_MAP = {
+  transition: 'transitionend',
+  WebkitTransition: 'webkitTransitionEnd',
+  MozTransition: 'mozTransitionEnd',
+  OTransition: 'oTransitionEnd',
+  msTransition: 'MSTransitionEnd'
+}
+
+function detectEvents () {
+  const testEl = document.createElement('div')
+  const style = testEl.style
+  for (const name in EVENT_NAME_MAP) {
+    if (name in style) {
+      endEvent = EVENT_NAME_MAP[name]
+      styleName = name
+      break
+    }
+  }
+}
+
+detectEvents()
 
 function transitionOnce (vnode, config, callback) {
   const {
@@ -47,19 +71,17 @@ function transitionOnce (vnode, config, callback) {
   dom && weex.utils.fireLazyload(dom, true)
 
   const transitionEndHandler = function (event) {
-    event.stopPropagation()
-    dom.removeEventListener('webkitTransitionEnd', transitionEndHandler)
-    dom.removeEventListener('transitionend', transitionEndHandler)
-    dom.style.transition = ''
-    dom.style.webkitTransition = ''
+    event && event.stopPropagation()
+    if (endEvent) {
+      dom.removeEventListener(endEvent, transitionEndHandler)
+      dom.style[styleName] = ''
+    }
     callback()
   }
-
-  dom.style.transition = transitionValue
-  dom.style.webkitTransition = transitionValue
-  dom.addEventListener('webkitTransitionEnd', transitionEndHandler)
-  dom.addEventListener('transitionend', transitionEndHandler)
-
+  if (endEvent) {
+    dom.style[styleName] = transitionValue
+    dom.addEventListener(endEvent, transitionEndHandler)
+  }
   nextFrame(() => {
     dom.style.cssText
       += toCSSText(autoPrefix(normalizeStyle(camelizeKeys(config.styles))) || {})

@@ -153,6 +153,8 @@ export function autoPrefix (style: {}): {} {
   const flex = prefixed.flex
   if (flex) {
     prefixed.WebkitBoxFlex = flex
+    prefixed.MozBoxFlex = flex
+    prefixed.MsFlex = flex
   }
   return prefixed
 }
@@ -195,7 +197,9 @@ export function normalizeStyle (style: {}) {
 export function getTransformObj (elm: HTMLElement): any {
   let styleObj = {}
   if (!elm) { return styleObj }
-  const transformStr = elm.style.webkitTransform || elm.style.transform
+  const transformStr = elm.style.webkitTransform
+    || elm.style.mozTransform
+    || elm.style.transform
   if (transformStr && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
     styleObj = transformStr.trim().replace(/, +/g, ',').split(' ').reduce(function (pre, str) {
       ['translate', 'scale', 'rotate'].forEach(function (name) {
@@ -243,6 +247,7 @@ export function addTransform (elm: HTMLElement, style: {}, replace: boolean): vo
   }
   const resStr = getTransformStr(styleObj)
   elm.style.webkitTransform = resStr
+  elm.style.mozTransform = resStr
   elm.style.transform = resStr
 }
 
@@ -260,6 +265,7 @@ export function addTranslateX (elm: HTMLElement, toAdd: number): void {
   })
   const resStr = getTransformStr(styleObj)
   elm.style.webkitTransform = resStr
+  elm.style.mozTransform = resStr
   elm.style.transform = resStr
 }
 
@@ -270,7 +276,9 @@ export function addTranslateX (elm: HTMLElement, toAdd: number): void {
 export function copyTransform (from: HTMLElement, to: HTMLElement, key: string | void): void {
   let str
   if (!key) {
-    str = from.style.webkitTransform || from.style.transform
+    str = from.style.webkitTransform
+      || from.style.mozTransform
+      || from.style.transform
   }
   else {
     const fromObj = getTransformObj(from)
@@ -280,6 +288,7 @@ export function copyTransform (from: HTMLElement, to: HTMLElement, key: string |
     str = getTransformStr(toObj)
   }
   to.style.webkitTransform = str
+  to.style.mozTransform = str
   to.style.transform = str
 }
 

@@ -190,8 +190,10 @@ export default {
         this.innerOffset += step * this._wrapperWidth
         // transform the whole slides group.
         inner.style.webkitTransition = `-webkit-transform ${TRANSITION_TIME / 1000}s ease-in-out`
+        inner.style.mozTransition = `transform ${TRANSITION_TIME / 1000}s ease-in-out`
         inner.style.transition = `transform ${TRANSITION_TIME / 1000}s ease-in-out`
         inner.style.webkitTransform = `translate3d(${this.innerOffset}px, 0, 0)`
+        inner.style.mozTransform = `translate3d(${this.innerOffset}px, 0, 0)`
         inner.style.transform = `translate3d(${this.innerOffset}px, 0, 0)`
 
         // emit scroll events.
@@ -213,12 +215,14 @@ export default {
 
           setTimeout(() => {
             inner.style.webkitTransition = ''
+            inner.style.mozTransition = ''
             inner.style.transition = ''
             for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
               const node = this._showNodes[i]
               if (!node) { continue }
               const elm = node.firstElementChild
               elm.style.webkitTransition = ''
+              elm.style.mozTransition = ''
               elm.style.transition = ''
             }
             // clean cloned nodes and rearrange slide cells.
@@ -488,6 +492,7 @@ export default {
       for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
         const elm = this._showNodes[i].firstElementChild
         elm.style.webkitTransition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
+        elm.style.mozTransition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
         elm.style.transition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
         const transObj = {
           scale: `scale(${i === 0 ? this.currentItemScale : this.neighborScale})`
@@ -531,8 +536,11 @@ export default {
     _handleTouchStart (event) {
       const touch = event.changedTouches[0]
       this._stopAutoPlay()
+      const inner = this.$refs.inner
       this._touchParams = {
-        originalTransform: this.$refs.inner.style.webkitTransform || this.$refs.inner.style.transform,
+        originalTransform: inner.style.webkitTransform
+          || inner.style.mozTransform
+          || inner.style.transform,
         startTouchEvent: touch,
         startX: touch.pageX,
         startY: touch.pageY,
@@ -577,8 +585,9 @@ export default {
         this._emitScrollEvent('scroll', {
           offsetXRatio: offsetX / this._wrapperWidth
         })
-        inner.style.transform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
         inner.style.webkitTransform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
+        inner.style.mozTransform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
+        inner.style.transform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
       }
     },
 

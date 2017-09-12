@@ -79,9 +79,9 @@ function _init (doc) {
     doc.addEventListener(evt, function (e) {
       let el = e.target
       let vm = el.__vue__
-      while (!vm && el !== document.body) {
+      while (!vm && el && el !== document.body) {
         el = el.parentElement
-        vm = el.__vue__
+        vm = el && el.__vue__
       }
       if (!vm) {  // not a vue component.
         return
