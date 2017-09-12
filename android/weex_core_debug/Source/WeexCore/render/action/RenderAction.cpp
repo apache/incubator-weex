@@ -1,13 +1,12 @@
 #include "RenderAction.h"
 
+using namespace WeexCore;
+
 namespace WeexCore {
-  RenderAction::RenderAction() {
 
-  }
+  RenderAction::RenderAction() {}
 
-  RenderAction::~RenderAction() {
-
-  }
+  RenderAction::~RenderAction() {}
 
   void RenderAction::ExecuteAction() {
     switch (mActionType) {

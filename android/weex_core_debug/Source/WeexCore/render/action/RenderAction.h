@@ -3,30 +3,42 @@
 
 #include "../../layout/Position.h"
 #include "../../layout/RenderSize.h"
-#include <string>
+#include "../../platform/android/BridgeAndroid.h"
 
 using namespace WeexCore;
-using namespace std;
 
 namespace WeexCore {
+
+  enum ActionType {
+    ACTION_CREATE_BODY,
+    ACTION_ADD_ELEMENT,
+    ACTION_REMOVE_ELEMENT,
+    ACTION_MOVE_ELEMENT,
+    ACTION_ADD_EVENT,
+    ACTION_REMOVE_EVENT,
+    ACTION_CREATE_FINISH,
+    ACTION_UPDATE_ATTR,
+    ACTION_UPDATE_STYLE,
+    ACTION_UPDATE_FINISH,
+    ACTION_REFRESH_FINISH,
+  };
 
   class Position;
 
   class RenderSize;
 
   class RenderAction {
-  protected:
-    string mPageId;
+  public:
+    std::string mPageId;
     int mActionType;
-    string mComponentType;
-    string mParentRef;
-    string mRef;
-    string index;
-    string mEvent;
-    Position position;
-    RenderSize renderSize;
-    string key;
-    string value;
+    std::string mComponentType;
+    std::string mParentRef;
+    std::string mRef;
+    int mIndex;
+    Position mPosition;
+    RenderSize mRenderSize;
+    std::string mKey;
+    std::string mValue;
 
   public:
     RenderAction();
@@ -34,20 +46,6 @@ namespace WeexCore {
     ~RenderAction();
 
     void ExecuteAction();
-
-    enum ActionType {
-      ACTION_CREATE_BODY,
-      ACTION_ADD_ELEMENT,
-      ACTION_REMOVE_ELEMENT,
-      ACTION_MOVE_ELEMENT,
-      ACTION_ADD_EVENT,
-      ACTION_REMOVE_EVENT,
-      ACTION_CREATE_FINISH,
-      ACTION_UPDATE_ATTR,
-      ACTION_UPDATE_STYLE,
-      ACTION_UPDATE_FINISH,
-      ACTION_REFRESH_FINISH,
-    };
   };
 
 }
