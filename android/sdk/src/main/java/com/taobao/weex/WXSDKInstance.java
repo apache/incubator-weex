@@ -1269,13 +1269,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if(mComponentObserver != null){
         mComponentObserver = null;
     }
-
-    if(mWXScrollListeners != null){
-	  mWXScrollListeners = null;
-	}
-
+    
+	mWXScrollListeners = null;
 	mRenderContainer = null;
-
 	mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;
     mScrollView = null;
