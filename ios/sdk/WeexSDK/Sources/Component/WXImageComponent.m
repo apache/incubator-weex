@@ -243,7 +243,6 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     if (attributes[@"src"]) {
         [self setImageSrc:[[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-        [self updateImage];
     }
     if (attributes[@"quality"]) {
         _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
