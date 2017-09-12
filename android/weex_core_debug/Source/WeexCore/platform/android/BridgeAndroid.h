@@ -12,9 +12,30 @@ namespace WeexCore {
     jobject jThis;
 
   public:
+    static BridgeAndroid *m_instance;
+
+    //just to release singleton object
+    class Garbo {
+    public:
+      ~Garbo() {
+        if (BridgeAndroid::m_instance) {
+          delete BridgeAndroid::m_instance;
+        }
+      }
+    };
+
+    static Garbo garbo;
+
     BridgeAndroid();
 
     ~BridgeAndroid();
+
+    static BridgeAndroid *getInstance() {
+      if (m_instance == nullptr) {
+        m_instance = new BridgeAndroid();
+      }
+      return m_instance;
+    }
 
     void setGlobalRef(jobject &jRef) {
       jThis = jRef;
@@ -67,6 +88,20 @@ namespace WeexCore {
 
     int callRemoveEvent(jstring &instanceId,
                         jstring &ref, jstring &event, jstring &callback);
+
+    int callCreateBodyByWeexCore(jstring &jPageId, jstring &jComponentType,
+                                 jstring &jRef,
+                                 int top, int bottom,
+                                 int left, int right, int height, int width);
+
+    int callAddElementByWeexCore(jstring &jPageId, jstring &jComponentType,
+                                 jstring &jRef,
+                                 int top, int bottom,
+                                 int left, int right, int height, int width, int index,
+                                 jstring jParentRef);
+
+    int callUpdateStyleByWeexCore(jstring &jPageId, jstring &jRef, jstring &jKey,
+                                  jstring &jValue);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

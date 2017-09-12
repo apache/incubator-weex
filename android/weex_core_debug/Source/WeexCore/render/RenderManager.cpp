@@ -13,7 +13,7 @@ namespace WeexCore {
   void RenderManager::createPage(std::string pageId, std::string data) {
     RenderPage *page = new RenderPage(pageId, data);
     if (page != nullptr) {
-      if (!mPages) {
+      if (mPages == nullptr) {
         mPages = new std::map<std::string, RenderPage *>();
       }
       (*mPages)[pageId] = page;

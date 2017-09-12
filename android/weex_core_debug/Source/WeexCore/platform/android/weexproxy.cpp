@@ -28,6 +28,7 @@ namespace WeexCore {
       // initHandler(sHandler.get());
 
       ExtendJSApi *pExtensionJSApi = new ExtendJSApi(jThis);
+      BridgeAndroid::getInstance()->setGlobalRef(jThis);
       pExtensionJSApi->initFunction(sHandler.get());
 
       // using base::debug::TraceEvent;
