@@ -35,7 +35,7 @@ public class AndroidViewWidget extends BaseWidget {
     super(context);
   }
 
-  public void setContentView(@NonNull View view){
+  public void setContentView(@Nullable View view){
     this.mView = view;
   }
 
@@ -43,6 +43,7 @@ public class AndroidViewWidget extends BaseWidget {
   public void setContentBox(int leftOffset, int topOffset, int rightOffset, int bottomOffset) {
     if(mView!=null) {
       mView.setPadding(leftOffset, topOffset, rightOffset, bottomOffset);
+      invalidate();
     }
   }
 
@@ -50,6 +51,14 @@ public class AndroidViewWidget extends BaseWidget {
   public void onDraw(@NonNull Canvas canvas) {
     if(mView!=null) {
       mView.draw(canvas);
+    }
+  }
+
+  @Override
+  public void invalidate() {
+    super.invalidate();
+    if (mView != null) {
+      mView.invalidate();
     }
   }
 
