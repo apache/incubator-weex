@@ -59,7 +59,7 @@ check out [common events](../common-event.html)
 
 `support:v0.12.0`
 
-support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`, we suggest that you call `addRule` in `mounted`
+support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`, we suggest that you call `addRule` in `beforeCreate`
 
 ```html
 <template>
@@ -72,10 +72,10 @@ support `ttf` and `woff` font format to custom your text, call [addRule](../modu
 </template>
 <script>
     module.exports = {
-        mounted: function() {
+        beforeCreate: function() {
 
         var domModule = weex.requireModule('dom');
-        //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
+        //support ttf、woff file，svg、eot can not be supported ,moreItem at http://www.iconfont.cn/
 
         domModule.addRule('fontFace', {
             'fontFamily': "iconfont2",
@@ -86,7 +86,7 @@ support `ttf` and `woff` font format to custom your text, call [addRule](../modu
 </script>
 ```
 
-[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
+[try it](http://dotwe.org/vue/95b2c6716f37066d5f44c5c75c979394)
 
 ## Example
 
