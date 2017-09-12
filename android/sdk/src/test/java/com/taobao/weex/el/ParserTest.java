@@ -141,6 +141,8 @@ public class ParserTest extends TestCase {
         show(null);
 
         show("()++++");
+
+        show("item");
     }
 
 

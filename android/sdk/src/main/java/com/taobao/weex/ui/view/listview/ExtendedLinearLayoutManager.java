@@ -110,6 +110,6 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
     }
 
     public interface OnSmoothScrollEndListener {
-        public void  onStop();
+        void  onStop();
     }
 }

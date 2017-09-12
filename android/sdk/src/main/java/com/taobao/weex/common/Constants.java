@@ -189,6 +189,8 @@ public class Constants {
     String LIST_DATA_ITEM_ID = "itemId";
     String CELL_INDEX = "cellIndex";
     String TYPE_INDEX = "typeIndex";
+
+    String KEEP_POSITION = "keepPosition";
   }
 
   public interface Value {

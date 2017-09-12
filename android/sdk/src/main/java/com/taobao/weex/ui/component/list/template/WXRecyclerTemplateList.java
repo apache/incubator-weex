@@ -1078,11 +1078,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         templateViewHolder.setHolderPosition(position);
         Statements.doRender(component, getStackContextForPosition(position));
         if(WXEnvironment.isApkDebugable()){
-            WXLogUtils.d(TAG, position + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG, position + getTemplateKey(position) + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
         }
         Layouts.doLayout(component, templateViewHolder.getLayoutContext());
         if(WXEnvironment.isApkDebugable()){
-            WXLogUtils.d(TAG, position + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG,  position + getTemplateKey(position) + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
         }
     }
 
@@ -1102,15 +1102,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         component.lazy(false);
         component.createView();
         if(WXEnvironment.isApkDebugable()){
-            WXLogUtils.e(TAG, template + " onCreateViewHolder view used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG, template + " onCreateViewHolder view used " + (System.currentTimeMillis() - start));
         }
         component.applyLayoutAndEvent(component);
         if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.e(TAG, template +  " onCreateViewHolder layout used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG, template +  " onCreateViewHolder layout used " + (System.currentTimeMillis() - start));
         }
         component.bindData(component);
         if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.e(TAG, template + " onCreateViewHolder bindData used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG, template + " onCreateViewHolder bindData used " + (System.currentTimeMillis() - start));
         }
         TemplateViewHolder templateViewHolder = new TemplateViewHolder(component, viewType);
         return  templateViewHolder;
