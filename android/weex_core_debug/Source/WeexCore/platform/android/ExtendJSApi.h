@@ -54,7 +54,7 @@ namespace WeexCore {
 
   class ExtendJSApi {
   public:
-    ExtendJSApi(jobject &jThis);
+    ExtendJSApi();
 
     void initFunction(IPCHandler *handler);
   };

@@ -27,7 +27,7 @@ namespace WeexCore {
       sSender = sConnection->start(sHandler.get());
       // initHandler(sHandler.get());
 
-      ExtendJSApi *pExtensionJSApi = new ExtendJSApi(jThis);
+      ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
       BridgeAndroid::getInstance()->setGlobalRef(jThis);
       pExtensionJSApi->initFunction(sHandler.get());
 
