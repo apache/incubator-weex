@@ -264,8 +264,9 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
       RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
       r.EnterObject();
       while (const char *key2 = r.NextObjectKey()) {
-        char value[100 + 1];
+        // may call
         if (r.PeekType() == kNumberType) {
+          char value[100];
           if (0 == strcmp(key, "attr")) {
             int len = fpconv_dtoa(r.GetDouble(), value);
             value[len] = '\0';
@@ -275,18 +276,23 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
             value[len] = '\0';
             root->updateStyle(key2, value);
           }
+          memset(value, 0, sizeof(value));
         } else if (r.PeekType() == kStringType) {
+          const char* str = r.GetString();
+          const int size = strlen(str) + 1;
+          char value[size];
           if (0 == strcmp(key, "attr")) {
-            strcpy(value, r.GetString());
+            strcpy(value, str);
             root->updateAttr(key2, value);
           } else if (0 == strcmp(key, "style")) {
-            strcpy(value, r.GetString());
+            strcpy(value, str);
             root->updateStyle(key2, value);
           }
+          memset(value, 0, sizeof(value));
         } else {
           r.SkipValue();
         }
-        memset(value, 0, sizeof(value));
+
       }
     } else if (0 == strcmp(key, "event")) {
       RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
