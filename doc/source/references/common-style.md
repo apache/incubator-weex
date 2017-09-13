@@ -203,6 +203,9 @@ Currently supported format:
 * scaleX( <number> )
 * scaleY( <number> )
 * rotate( <angle/degree> )
+- rotateX( <angle/degree> ) <span class="api-version">v0.14+</span>
+- rotateY( <angle/degree> ) <span class="api-version">v0.14+</span>
+- perspective( <number> ), supported for Android 4.1 and above. <span class="api-version">v0.16+</span>
 * transform-origin: number/percentage/keyword(top/left/right/bottom)
 
 ### Example
