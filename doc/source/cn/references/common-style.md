@@ -314,6 +314,9 @@ transform 属性向元素应用 2D 转换。该属性允许我们对元素进行
 - scaleX( <number> )
 - scaleY( <number> )
 - rotate( <angle/degree> )
+- rotateX( <angle/degree> ) <span class="api-version">v0.14+</span>
+- rotateY( <angle/degree> ) <span class="api-version">v0.14+</span>
+- perspective( <number> ) Android 4.1及以上版本支持 <span class="api-version">v0.16+</span>
 - transform-origin: number/percentage/keyword(top/left/right/bottom)
 
 ### 示例
