@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
+import android.util.Pair;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -187,35 +188,31 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @Override
   public void createChildViewAt(int index) {
-    int indexToCreate = index;
-    if (indexToCreate < 0) {
-      indexToCreate = childCount() - 1;
-      if (indexToCreate < 0) {
-        return;
+    Pair<WXComponent, Integer> ret = rearrangeIndexAndGetChild(index);
+    if(ret.first != null) {
+      final WXComponent child = getChild(ret.second);
+      if (child instanceof WXBaseRefresh) {
+        child.createView();
+        if (child instanceof WXRefresh) {
+          getHostView().setOnRefreshListener((WXRefresh) child);
+          getHostView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+              getHostView().setHeaderView(child);
+            }
+          }, 100);
+        } else if (child instanceof WXLoading) {
+          getHostView().setOnLoadingListener((WXLoading) child);
+          getHostView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+              getHostView().setFooterView(child);
+            }
+          }, 100);
+        }
+      } else {
+        super.createChildViewAt(ret.second);
       }
-    }
-    final WXComponent child = getChild(indexToCreate);
-    if (child instanceof WXBaseRefresh) {
-      child.createView();
-      if (child instanceof WXRefresh) {
-        getHostView().setOnRefreshListener((WXRefresh) child);
-        getHostView().postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            getHostView().setHeaderView(child);
-          }
-        }, 100);
-      } else if (child instanceof WXLoading) {
-        getHostView().setOnLoadingListener((WXLoading) child);
-        getHostView().postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            getHostView().setFooterView(child);
-          }
-        }, 100);
-      }
-    } else {
-      super.createChildViewAt(indexToCreate);
     }
   }
 
