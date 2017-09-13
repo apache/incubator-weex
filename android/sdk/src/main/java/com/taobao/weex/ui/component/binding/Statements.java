@@ -49,7 +49,7 @@ import java.util.Set;
  */
 public class Statements {
     /**
-     * recursive copy component,
+     * recursive copy component, none parent connect
      * */
     public static WXComponent copyComponentTree(WXComponent component){
         WXComponent copy =  copyComponentTree(component, component.getParent());
@@ -167,8 +167,7 @@ public class Statements {
                             renderNode.applyLayoutAndEvent(renderNode);
                             renderNode.bindData(renderNode);
                         }
-                        doRenderBindingAttrs(renderNode, domObject, context);
-                        doRenderChildNode(renderNode, context);
+                        doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context);
                         renderIndex++;
                     }
                     context.pop();
@@ -192,21 +191,25 @@ public class Statements {
                 }
             }
         }
-        doRenderBindingAttrs(component, domObject, context);
-        doRenderChildNode(component, context);
+        doBindingAttrsEventAndRenderChildNode(component, domObject, context);
         return  1;
     }
 
     /**
-     * bind attrs and doRenderComponent next
+     * bind attrs and doRender component child
      * */
-    private static void doRenderChildNode(WXComponent component, ArrayStack context){
+    private static void doBindingAttrsEventAndRenderChildNode(WXComponent component, WXDomObject domObject, ArrayStack context){
+        int stackSize = context.size();
+        doRenderBindingAttrsAndEvent(component, domObject, context);
         if(component instanceof WXVContainer){
             WXVContainer container = (WXVContainer) component;
             for(int k=0; k<container.getChildCount();){
                 WXComponent next = container.getChild(k);
                 k += doRenderComponent(next, context);
             }
+        }
+        while (context.size() > stackSize){
+            context.pop();
         }
     }
 
@@ -222,14 +225,14 @@ public class Statements {
     /**
      * render dynamic binding attrs and bind them to component node.
      * */
-    private static void doRenderBindingAttrs(WXComponent component, WXDomObject domObject, ArrayStack context){
+    private static void doRenderBindingAttrsAndEvent(WXComponent component, WXDomObject domObject, ArrayStack context){
         component.setWaste(false);
         WXAttr attr = domObject.getAttrs();
         if(attr != null
                 && attr.getBindingAttrs() != null
                 && attr.getBindingAttrs().size() > 0){
             ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
-            Map<String, Object> dynamic =  getBindingAttrs(bindAttrs, context);
+            Map<String, Object> dynamic =  renderBindingAttrs(bindAttrs, context);
             Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
 
             /**
@@ -274,28 +277,37 @@ public class Statements {
      * @param  context  context
      * return binding attrs rended value in context
      * */
-    public static Map<String, Object> getBindingAttrs(ArrayMap bindAttrs, ArrayStack context){
+    public static Map<String, Object> renderBindingAttrs(ArrayMap bindAttrs, ArrayStack context){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = new HashMap<>();
         for(Map.Entry<String, Object> entry : entrySet){
-            Object binding = entry.getValue();
+            Object value = entry.getValue();
             String key = entry.getKey();
-            if(entry.getValue() instanceof  JSONObject
-                    && (((JSONObject) binding).get(BindingUtils.BINDING)  instanceof  Block)){
-                Block block = (Block) (((JSONObject) binding).get(BindingUtils.BINDING));
-                dynamic.put(key, block.execute(context));
-            }else if(binding instanceof JSONArray){
-                JSONArray array = (JSONArray) binding;
+            if(value instanceof  JSONObject
+                    && (((JSONObject) value).get(BindingUtils.BINDING)  instanceof  Block)){
+                JSONObject binding = (JSONObject) value;
+                Block block = (Block) (binding.get(BindingUtils.BINDING));
+                Object blockValue = block.execute(context);
+                dynamic.put(key, blockValue);
+                if(binding.getString(BindingUtils.ALIAS) != null){
+                   String alias =  binding.getString(BindingUtils.ALIAS);
+                    Map map = new ArrayMap(4);
+                    map.put(alias, blockValue);
+                    context.push(map);
+                }
+            }else if(value instanceof JSONArray){
+                JSONArray array = (JSONArray) value;
                 StringBuilder builder = new StringBuilder();
                 for(int i=0; i<array.size(); i++){
-                    Object value = array.get(i);
-                    if(value instanceof  CharSequence){
-                        builder.append(value);
+                    Object element = array.get(i);
+                    if(element instanceof  CharSequence){
+                        builder.append(element);
                         continue;
                     }
-                    if(value instanceof JSONObject
-                            && (((JSONObject) value).get(BindingUtils.BINDING) instanceof Block)){
-                        Block block = (Block) (((JSONObject) value).get(BindingUtils.BINDING));
+                    if(element instanceof JSONObject
+                            && (((JSONObject) element).get(BindingUtils.BINDING) instanceof Block)){
+                        JSONObject binding = (JSONObject) element;
+                        Block block = (Block) (binding.get(BindingUtils.BINDING));
                         Object blockValue = block.execute(context);
                         if(blockValue == null){
                             blockValue = "";

@@ -30,8 +30,6 @@ import com.taobao.weex.ui.component.WXVContainer;
  * Created by furture on 2017/8/21.
  */
 public class Layouts {
-
-
     /**
      * do dom layout, and set layout to component
      * */

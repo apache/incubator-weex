@@ -33,6 +33,8 @@ public class BindingUtils {
 
     public static final String BINDING = "@binding";
 
+    public static final String ALIAS = "@alias";
+
     /**
      * @param value check object is binding expression
      * */

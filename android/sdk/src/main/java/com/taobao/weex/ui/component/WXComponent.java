@@ -1663,6 +1663,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       this.waste = waste;
       WXDomObject domObject = (WXDomObject) getDomObject();
       if(waste){
+          if(domObject.getAttrs().getStatement() == null) {
+              domObject.setVisible(false);
+              if (getHostView() != null) {
+                getHostView().setVisibility(View.GONE);
+              }
+              return;
+          }
           if(Constants.Value.VISIBLE.equals(domObject.getAttrs().get(Constants.Name.VIF_FALSE))){
              domObject.setVisible(true);
              if(getHostView() != null){

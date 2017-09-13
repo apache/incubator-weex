@@ -1063,17 +1063,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(component == null){
             return;
         }
-        if(getDomObject() instanceof  WXRecyclerDomObject){
-            WXRecyclerDomObject domObject = (WXRecyclerDomObject) getDomObject();
-            if(!domObject.hasPreCalculateCellWidth()){
-                domObject.preCalculateCellWidth();
-            }
-            if(component.getDomObject() instanceof WXCellDomObject){
-                WXCellDomObject cellDomObject = (WXCellDomObject) component.getDomObject();
-                float w = ((WXRecyclerDomObject) domObject).getColumnWidth();
-                cellDomObject.setLayoutWidth(w);
-            }
-        }
         long start = System.currentTimeMillis();
         templateViewHolder.setHolderPosition(position);
         Statements.doRender(component, getStackContextForPosition(position));
@@ -1090,14 +1079,17 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     public TemplateViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         long start = System.currentTimeMillis();
         String template = mTemplateViewTypes.keyAt(viewType);
-        WXCell component = mTemplates.get(template);
-        if(component != null){
-            component = (WXCell) Statements.copyComponentTree(component);
-        }
-        if(component == null){
+        WXCell source = mTemplates.get(template);
+        if(source == null){
             FrameLayout view = new FrameLayout(getContext());
             view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
             return new TemplateViewHolder(view, viewType);
+        }
+        WXCell component = (WXCell) Statements.copyComponentTree(source);
+        if(component.getDomObject() instanceof  WXCellDomObject
+                && getDomObject() instanceof  WXRecyclerDomObject){
+            WXCellDomObject domObject = (WXCellDomObject) component.getDomObject();
+            domObject.setRecyclerDomObject((WXRecyclerDomObject) getDomObject());
         }
         component.lazy(false);
         component.createView();

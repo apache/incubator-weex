@@ -47,12 +47,51 @@ public class WXCellDomObject extends WXDomObject {
             WXLogUtils.d("getAvailableWidth:"+w);
             node.setLayoutWidth(w);
           }
-        }
+        }else if (node instanceof  WXCellDomObject){
+          WXCellDomObject slotDomObject = (WXCellDomObject) node;
+          WXRecyclerDomObject recyclerDomObject = slotDomObject.getRecyclerDomObject();
+          if(recyclerDomObject == null){
+              return;
+          }
+          if(slotDomObject.isSticky()){
+              float w = recyclerDomObject.getAvailableWidth();
+              node.setLayoutWidth(w);
+              measureOutput.width  = w;
+          }else {
+              if(!recyclerDomObject.hasPreCalculateCellWidth()){
+                  recyclerDomObject.preCalculateCellWidth();
+              }
+              float w = recyclerDomObject.getColumnWidth();
+              if(w <= 0 && recyclerDomObject.getColumnCount() <= 1){
+                  w = recyclerDomObject.getAvailableWidth();
+              }
+              node.setLayoutWidth(w);
+              measureOutput.width  = w;
+          }
       }
+
+    }
     }
   };
 
   public WXCellDomObject() {
     setMeasureFunction(CELL_MEASURE_FUNCTION);
   }
+
+
+    public boolean isSticky() {
+        return getStyles().isSticky();
+    }
+    private  WXRecyclerDomObject recyclerDomObject;
+
+
+
+    public WXRecyclerDomObject getRecyclerDomObject() {
+        return recyclerDomObject;
+    }
+
+    public void setRecyclerDomObject(WXRecyclerDomObject recyclerDomObject) {
+        this.recyclerDomObject = recyclerDomObject;
+    }
+
 }
