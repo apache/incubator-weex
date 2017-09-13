@@ -41,6 +41,10 @@ public class WidgetGroup extends BaseWidget {
     invalidate();
   }
 
+  public List<Widget> getChildren() {
+    return mChildren;
+  }
+
   @Override
   public void onDraw(@NonNull Canvas canvas) {
     for (Widget child : mChildren) {

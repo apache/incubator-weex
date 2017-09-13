@@ -24,11 +24,13 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.border.BorderDrawable;
+import com.taobao.weex.utils.WXViewUtils;
 
 @RestrictTo(Scope.LIBRARY)
 abstract class BaseWidget implements Widget {
@@ -79,15 +81,26 @@ abstract class BaseWidget implements Widget {
 
   @NonNull
   @Override
-  public Point getLocInFlatContainer() {
+  public final Point getLocInFlatContainer() {
     return offsetOfContainer;
+  }
+
+  @Nullable
+  @Override
+  public final BorderDrawable getBackgroundAndBorder() {
+    return backgroundBorder;
+  }
+
+  @NonNull
+  @Override
+  public final Rect getBorderBox() {
+    return borderBox;
   }
 
   @Override
   public final void draw(@NonNull Canvas canvas) {
     canvas.save();
-    //TODO clip according to path, not borderBox
-    canvas.clipRect(borderBox);
+    WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
     canvas.translate(borderBox.left, borderBox.top);
     if (backgroundBorder != null) {
       backgroundBorder.draw(canvas);
