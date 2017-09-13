@@ -45,6 +45,7 @@
 #import "WXTracingManager.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXTracingManager.h"
+#import "WXModalUIModule.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -378,7 +379,8 @@ typedef enum : NSUInteger {
     if(url.length > 0){
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
-    
+    NSMutableArray * toastQueue = [[WXToastManager sharedManager] valueForKey:@"toastQueue"];
+    [toastQueue removeAllObjects];
 }
 
 - (void)forceGarbageCollection

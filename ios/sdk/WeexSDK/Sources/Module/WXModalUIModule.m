@@ -43,13 +43,9 @@ typedef enum : NSUInteger {
 
 @end
 
-@interface WXToastManager : NSObject
-
+@interface WXToastManager()
 @property (strong, nonatomic) NSMutableArray<WXToastInfo *> *toastQueue;
 @property (strong, nonatomic) UIView *toastingView;
-
-+ (WXToastManager *)sharedManager;
-
 @end
 
 @implementation WXToastManager

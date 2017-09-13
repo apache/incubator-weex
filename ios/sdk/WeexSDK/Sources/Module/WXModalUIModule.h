@@ -23,3 +23,9 @@
 @interface WXModalUIModule : NSObject <WXModuleProtocol>
 
 @end
+
+@interface WXToastManager : NSObject
+
++ (WXToastManager *)sharedManager;
+
+@end
