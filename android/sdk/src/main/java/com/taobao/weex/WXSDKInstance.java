@@ -606,21 +606,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return "";
   }
 
-  public void reloadPage() {
+  public void reloadPage(boolean reloadThis) {
+
     WXSDKEngine.reload();
 
-    // 可以发送广播吗？
-    if (mContext != null) {
-      Intent intent = new Intent();
-      intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
-      intent.putExtra("url", mBundleUrl);
-      mContext.sendBroadcast(intent);
+    if (reloadThis) {
+      // 可以发送广播吗？
+      if (mContext != null)  {
+        Intent intent = new Intent();
+        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+        intent.putExtra("url", mBundleUrl);
+        mContext.sendBroadcast(intent);
+      }
+      // mRendered = false;
+      //    destroy();
+      // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+      // refreshInstance("{}");
     }
-    // mRendered = false;
-    //    destroy();
-    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
-    // refreshInstance("{}");
-
   }
   /**
    * Refresh instance asynchronously.
