@@ -55,6 +55,9 @@ public class WXCellDomObject extends WXDomObject {
           }
           if(slotDomObject.isSticky()){
               float w = recyclerDomObject.getAvailableWidth();
+              if(w <= 0){
+                  w = recyclerDomObject.getViewPortWidth();
+              }
               node.setLayoutWidth(w);
               measureOutput.width  = w;
           }else {
@@ -64,6 +67,12 @@ public class WXCellDomObject extends WXDomObject {
               float w = recyclerDomObject.getColumnWidth();
               if(w <= 0 && recyclerDomObject.getColumnCount() <= 1){
                   w = recyclerDomObject.getAvailableWidth();
+                  if(w <= 0){
+                      w = recyclerDomObject.getLayoutWidth();
+                      if(w <= 0){
+                          w = recyclerDomObject.getViewPortWidth();
+                      }
+                  }
               }
               node.setLayoutWidth(w);
               measureOutput.width  = w;

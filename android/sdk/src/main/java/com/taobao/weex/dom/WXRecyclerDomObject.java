@@ -34,7 +34,6 @@ import static com.taobao.weex.dom.flex.CSSLayout.DIMENSION_WIDTH;
 /**
  * Created by zhengshihan on 2017/2/21.
  */
-
 public class WXRecyclerDomObject extends WXDomObject{
 
 
@@ -79,13 +78,19 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     @Override
     public float getStyleWidth() {
-        if (Float.isNaN(cssstyle.dimensions[DIMENSION_WIDTH])){
-           if(getParent() != null){
-               return getParent().getLayoutWidth();
-           }
-           return  getViewPortWidth();
+        float width =  getLayoutWidth();
+        if (Float.isNaN(width) || width <= 0){
+            if(getParent() != null){
+                width = getParent().getLayoutWidth();
+            }
+            if (Float.isNaN(width) || width <= 0){
+                width = super.getStyleWidth();
+            }
         }
-        return super.getStyleWidth();
+        if (Float.isNaN(width) || width <= 0){
+            width = getViewPortWidth();
+        }
+        return width;
     }
 
     public void preCalculateCellWidth(){
