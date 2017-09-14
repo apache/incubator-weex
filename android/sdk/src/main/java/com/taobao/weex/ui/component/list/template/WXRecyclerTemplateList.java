@@ -87,22 +87,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * todo-list
- * 1、appear事件
- * 2、sticky事件
- * 3、多列测试
- * 5、for loop
  * weex template list supported
  * https://github.com/Hanks10100/weex-native-directive
- * demo address
- * http://dotwe.org/vue/ee9b5bbbe11629f565372595951670ec
- *
- * http://dotwe.org/vue/87b258b63599136999905a3e65c6c444
- *
- * http://dotwe.org/vue/94839a9b4e87c7c5464585f6a6c109ce
- *
- * http://dotwe.org/vue/0e549fb446458ecdc21e6115ea3a3c7b
- *
  * Created by jianbai.gbj on 2017/8/17.
  */
 @Component(lazyload = false)
@@ -204,6 +190,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         bounceRecyclerView.getInnerView().clearOnScrollListeners();
         bounceRecyclerView.getInnerView().addOnScrollListener(mViewOnScrollListener);
+        if("true".equals(getDomObject().getAttrs().get("hasFixedSize"))){
+            bounceRecyclerView.getInnerView().setHasFixedSize(true);
+        }
         bounceRecyclerView.getInnerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
