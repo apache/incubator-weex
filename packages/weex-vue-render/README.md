@@ -164,6 +164,10 @@ vue: {
 
 * fix NS (svg) bug in vue.js@v2.4.3
 
+#### 0.12.13
+
+* reset `env.deviceHeight` after window's resizing.
+
 ## component -> dom map
 
 | component | dom element | children | note |
