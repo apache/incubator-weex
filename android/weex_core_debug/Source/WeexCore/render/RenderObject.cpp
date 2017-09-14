@@ -3,22 +3,26 @@
 
 namespace WeexCore {
 
-  static void setDefaultStyle(YGNodeRef ygNode) {
+  static void setDefaultStyle(YGNodeRef &ygNode, RenderObject &render) {
     YGNodeStyleSetFlexDirection(ygNode, YGFlexDirectionColumn);
     YGNodeStyleSetJustifyContent(ygNode, YGJustifyFlexStart);
     YGNodeStyleSetAlignItems(ygNode, YGAlignStretch);
     YGNodeStyleSetPositionType(ygNode, YGPositionTypeRelative);
+
+    if (render.getType() == "list") {
+      render.updateStyle(FLEX, "1");
+    }
   }
 
   RenderObject::RenderObject(RenderPage *page)
       : mPage(page) {
     mStyle = new std::map<std::string, std::string>();
-    mAtrributes = new std::map<std::string, std::string>();
+    mAttributes = new std::map<std::string, std::string>();
     mEvents = new std::set<std::string>();
 
     YGConfigRef config = YGConfigNew();
     mYGNode = YGNodeNewWithConfig(config);
-    setDefaultStyle(mYGNode);
+    setDefaultStyle(mYGNode, *this);
   }
 
   RenderObject::~RenderObject() {
@@ -30,17 +34,17 @@ namespace WeexCore {
       delete mStyle;
       mStyle = nullptr;
     }
-    if (mAtrributes != nullptr) {
-      delete mAtrributes;
-      mAtrributes = nullptr;
+    if (mAttributes != nullptr) {
+      delete mAttributes;
+      mAttributes = nullptr;
     }
     if (mEvents != nullptr) {
       delete mEvents;
       mEvents = nullptr;
     }
 
-    for (std::vector<RenderObject *>::iterator it = mChildren.begin();
-         it != mChildren.end(); it++) {
+    for (CHILD_LIST_IT it = getChildListItBegin();
+         it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
         delete *it;
         *it = nullptr;
@@ -57,8 +61,8 @@ namespace WeexCore {
   }
 
   void RenderObject::removeRenderObject(RenderObject *child) {
-    for (std::vector<RenderObject *>::iterator it = mChildren.begin();
-         it != mChildren.end(); it++) {
+    for (CHILD_LIST_IT it = getChildListItBegin();
+         it != getChildListItEnd(); it++) {
       if ((*it)->getRef() == child->getRef()) {
         mChildren.erase(it);
         break;
@@ -75,14 +79,14 @@ namespace WeexCore {
   }
 
   void RenderObject::updateAttr(std::string key, std::string value) {
-    if (mAtrributes == nullptr) {
-      mAtrributes = new std::map<std::string, std::string>();
+    if (mAttributes == nullptr) {
+      mAttributes = new std::map<std::string, std::string>();
     }
 
-    mAtrributes->insert(pair<std::string, std::string>(key, value));
+    mAttributes->insert(pair<std::string, std::string>(key, value));
   }
 
-// TODO: to recognize layout style or not
+  // TODO: to recognize layout style or not
   void RenderObject::updateStyle(std::string key, std::string value) {
     if (mStyle == nullptr) {
       mStyle = new std::map<std::string, std::string>();
@@ -239,8 +243,8 @@ namespace WeexCore {
 
     result.append("attr:\n");
 
-    std::map<std::string, std::string>::const_iterator attr_it = mAtrributes->begin();
-    std::map<std::string, std::string>::const_iterator attr_end = mAtrributes->end();
+    ATTR_IT attr_it = getAttrItBegin();
+    ATTR_IT attr_end = getAttrItEnd();
     for (; attr_it != attr_end; ++attr_it) {
       result.append("   ");
       result.append(attr_it->first);
@@ -252,8 +256,8 @@ namespace WeexCore {
 
     result.append("style:\n");
 
-    std::map<std::string, std::string>::const_iterator style_it = mStyle->begin();
-    std::map<std::string, std::string>::const_iterator style_end = mStyle->end();
+    STYLE_IT style_it = getStyleItBegin();
+    STYLE_IT style_end = getStyleItEnd();
     for (; style_it != style_end; ++style_it) {
       result.append("   ");
       result.append(style_it->first);
@@ -266,8 +270,8 @@ namespace WeexCore {
     if (mEvents != nullptr) {
       result.append("event:\n");
 
-      std::set<std::string>::const_iterator event_it = mEvents->begin();
-      std::set<std::string>::const_iterator event_end = mEvents->end();
+      EVENT_IT event_it = getEventItBegin();
+      EVENT_IT event_end = getEventItEnd();
 
       for (; event_it != event_end; ++event_it) {
         result.append("   ");
@@ -278,8 +282,8 @@ namespace WeexCore {
 
     LOGE("[RenderObject::Render tree] \n %s", result.c_str());
 
-    for (std::vector<RenderObject *>::iterator it = mChildren.begin();
-         it != mChildren.end(); it++) {
+    for (CHILD_LIST_IT it = getChildListItBegin();
+         it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
         (*it)->printRenderMsg();
       }
@@ -293,11 +297,43 @@ namespace WeexCore {
     YGNodePrint(mYGNode, YGPrintOptionsStyle);
     LOGE("\n\n");
 
-    for (std::vector<RenderObject *>::iterator it = mChildren.begin();
-         it != mChildren.end(); it++) {
+    for (CHILD_LIST_IT it = getChildListItBegin();
+         it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
         (*it)->printYGNodeMsg();
       }
     }
+  }
+
+  STYLE_IT RenderObject::getStyleItBegin() {
+    return mStyle->begin();
+  }
+
+  STYLE_IT RenderObject::getStyleItEnd() {
+    return mStyle->end();
+  }
+
+  ATTR_IT RenderObject::getAttrItBegin() {
+    return mAttributes->begin();
+  }
+
+  ATTR_IT RenderObject::getAttrItEnd() {
+    return mAttributes->end();
+  }
+
+  EVENT_IT RenderObject::getEventItBegin() {
+    return mEvents->begin();
+  }
+
+  EVENT_IT RenderObject::getEventItEnd() {
+    return mEvents->end();
+  }
+
+  CHILD_LIST_IT RenderObject::getChildListItBegin() {
+    return mChildren.begin();
+  }
+
+  CHILD_LIST_IT RenderObject::getChildListItEnd() {
+    return mChildren.end();
   }
 } //end WeexCore

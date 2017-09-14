@@ -13,13 +13,19 @@
 #include <set>
 
 namespace WeexCore {
+
   class RenderObject;
 
   class RenderPage;
 
+  typedef std::vector<RenderObject *> ChildrenList;
+  typedef std::map<std::string, std::string>::const_iterator STYLE_IT;
+  typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
+  typedef std::set<std::string>::const_iterator EVENT_IT;
+  typedef ChildrenList::iterator CHILD_LIST_IT;
+
   class RenderObject {
   public:
-    typedef std::vector<RenderObject *> ChildrenList;
 
   private:
     std::string mRef = "";
@@ -32,7 +38,7 @@ namespace WeexCore {
 
     std::map<std::string, std::string> *mStyle;
 
-    std::map<std::string, std::string> *mAtrributes;
+    std::map<std::string, std::string> *mAttributes;
 
     std::set<std::string> *mEvents;
 
@@ -82,6 +88,22 @@ namespace WeexCore {
     void setParentRender(RenderObject *render);
 
     RenderObject *getParentRender();
+
+    STYLE_IT getStyleItBegin();
+
+    STYLE_IT getStyleItEnd();
+
+    ATTR_IT getAttrItBegin();
+
+    ATTR_IT getAttrItEnd();
+
+    EVENT_IT getEventItBegin();
+
+    EVENT_IT getEventItEnd();
+
+    CHILD_LIST_IT getChildListItBegin();
+
+    CHILD_LIST_IT getChildListItEnd();
 
   private:
     void setLayout(int, int, int, int);
