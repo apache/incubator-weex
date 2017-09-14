@@ -31,7 +31,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -68,12 +67,10 @@ import com.taobao.weex.ui.component.binding.Layouts;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.RecyclerTransform;
 import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.view.listview.ExtendedLinearLayoutManager;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
-import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -85,8 +82,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
 
@@ -462,31 +457,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if (position >= 0) {
             final int pos = position;
             final WXRecyclerView view = bounceRecyclerView.getInnerView();
-
-            if (!smooth) {
-                RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
-                if (layoutManager instanceof LinearLayoutManager) {
-                    //GridLayoutManager is also instance of LinearLayoutManager
-                    ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-                } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-                    ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-                }
-                //Any else?
-            } else {
-                if (offset != 0) {
-                    view.setOnSmoothScrollEndListener(new ExtendedLinearLayoutManager.OnSmoothScrollEndListener() {
-                        @Override
-                        public void onStop() {
-                            if (getOrientation() == Constants.Orientation.VERTICAL) {
-                                view.smoothScrollBy(0, offset);
-                            } else {
-                                view.smoothScrollBy(offset, 0);
-                            }
-                        }
-                    });
-                }
-                view.smoothScrollToPosition(pos);
-            }
+            view.scrollTo(smooth, pos, offset, getOrientation());
         }
     }
 
