@@ -144,8 +144,6 @@ public class TemplateStickyHelper {
             if(fakeStickyHolder == null){
                 fakeStickyHolder = recyclerTemplateList.onCreateViewHolder(recyclerView, stickyHolderType);
                 stickyHolderCache.put(stickyHolderType, fakeStickyHolder);
-            }else{
-                fakeStickyHolder.getComponent().recycled();
             }
             recyclerTemplateList.onBindViewHolder(fakeStickyHolder, matchStickyPosition);
             fakeStickyHolder.itemView.setTranslationY(0);
