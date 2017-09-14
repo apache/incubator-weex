@@ -182,13 +182,17 @@ public class Constants {
     String ARIA_HIDDEN = "ariaHidden";
 
 
-    String LIST_DATA = "listData";
-    String LIST_DATA_TEMPLATE_KEY = "templateKey";
-    String SLOT_TEMPLATE_TYPE = "templateType";
+    interface  Recycler{
+      String LIST_DATA = "listData";
+      String LIST_DATA_ITEM  ="item";
+      String LIST_DATA_ITEM_INDEX = "index";
+      String LIST_DATA_TEMPLATE_KEY = "templateKey";
+      String SLOT_TEMPLATE_TYPE = "templateType";
+      String LIST_DATA_ITEM_ID = "itemId";
+      String CELL_INDEX = "cellIndex";
+      String TYPE_INDEX = "typeIndex";
+    }
 
-    String LIST_DATA_ITEM_ID = "itemId";
-    String CELL_INDEX = "cellIndex";
-    String TYPE_INDEX = "typeIndex";
 
     String VIF_FALSE = "ifFalse";
   }

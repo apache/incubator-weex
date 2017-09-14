@@ -125,12 +125,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Point mLastReport = new Point(-1, -1);
 
     private JSONArray listData;
-    private String listDataKey = "listData";
-    private String listDataItemKey ="item";
-    private String listDataIndexKey = "index";
+    private String listDataKey = Constants.Name.Recycler.LIST_DATA;
+    private String listDataItemKey = Constants.Name.Recycler.LIST_DATA_ITEM;
+    private String listDataIndexKey = Constants.Name.Recycler.LIST_DATA_ITEM_INDEX;
     private ArrayMap<String, Integer> mTemplateViewTypes;
     private Map<String, WXCell> mTemplates;
-    private String  listDataTemplateKey = Constants.Name.SLOT_TEMPLATE_TYPE;
+    private String  listDataTemplateKey = Constants.Name.Recycler.SLOT_TEMPLATE_TYPE;
     private Runnable listUpdateRunnable;
 
 
@@ -422,8 +422,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     WXLogUtils.e("Float parseFloat error :"+e.getMessage());
                 }
             }
-            position = WXUtils.getNumberInt(options.get(Constants.Name.CELL_INDEX), position);
-            typeIndex = WXUtils.getNumberInt(options.get(Constants.Name.TYPE_INDEX), position);
+            position = WXUtils.getNumberInt(options.get(Constants.Name.Recycler.CELL_INDEX), position);
+            typeIndex = WXUtils.getNumberInt(options.get(Constants.Name.Recycler.TYPE_INDEX), position);
         }
         WXCell cell = findCell(component);
         if(typeIndex >= 0){
@@ -501,7 +501,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         if(child instanceof WXCell){
             if(child.getDomObject() != null && child.getDomObject().getAttrs() != null){
-                Object templateId = child.getDomObject().getAttrs().get(Constants.Name.SLOT_TEMPLATE_TYPE);
+                Object templateId = child.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
                 String key = WXUtils.getString(templateId, null);
                 if(key != null){
                     mTemplates.put(key, (WXCell) child);
@@ -594,13 +594,19 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     protected boolean setProperty(String key, Object param) {
         switch (key) {
-            case Constants.Name.LIST_DATA:{
+            case Constants.Name.Recycler.LIST_DATA:{
                      setListData(param);
                 }
                 return true;
-            case Constants.Name.LIST_DATA_TEMPLATE_KEY:
-            case Constants.Name.SLOT_TEMPLATE_TYPE:
-                listDataTemplateKey = WXUtils.getString(param, Constants.Name.SLOT_TEMPLATE_TYPE);
+            case Constants.Name.Recycler.LIST_DATA_ITEM:
+                listDataItemKey = WXUtils.getString(param, listDataItemKey);
+                return true;
+            case Constants.Name.Recycler.LIST_DATA_ITEM_INDEX:
+                listDataIndexKey = WXUtils.getString(param, listDataIndexKey);
+                return true;
+            case Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY:
+            case Constants.Name.Recycler.SLOT_TEMPLATE_TYPE:
+                listDataTemplateKey = WXUtils.getString(param, Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
                 return true;
             case LOADMOREOFFSET:
                 return true;
@@ -1027,7 +1033,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return  -1;
         }
         if(cell.getDomObject() != null && cell.getDomObject().getAttrs() != null){
-            Object templateId = cell.getDomObject().getAttrs().get(Constants.Name.SLOT_TEMPLATE_TYPE);
+            Object templateId = cell.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
             String template = WXUtils.getString(templateId, null);
             if(template == null){
                 return  0;
@@ -1069,8 +1075,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return RecyclerView.NO_ID;
         }
         JSONObject data = safeGetListData(position);
-        if(data.containsKey(Constants.Name.LIST_DATA_ITEM_ID)) {
-            String itemKey = data.getString(Constants.Name.LIST_DATA_ITEM_ID);
+        if(data.containsKey(Constants.Name.Recycler.LIST_DATA_ITEM_ID)) {
+            String itemKey = data.getString(Constants.Name.Recycler.LIST_DATA_ITEM_ID);
             if(TextUtils.isEmpty(itemKey)){
                 return  position;
             }
