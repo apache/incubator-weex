@@ -236,6 +236,16 @@ public class Statements {
             Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
 
             /**
+             * scope supported
+             * */
+            if(attr.get(BindingUtils.SCOPE) != null){
+                String alias = attr.get(BindingUtils.SCOPE).toString();
+                Map map = new ArrayMap(4);
+                map.put(alias, dynamic.get(alias));
+                context.push(map);
+            }
+
+            /**
              * diff attrs, see attrs has update, remove none update attrs
              * */
             Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
@@ -289,12 +299,6 @@ public class Statements {
                 Block block = (Block) (binding.get(BindingUtils.BINDING));
                 Object blockValue = block.execute(context);
                 dynamic.put(key, blockValue);
-                if(binding.getString(BindingUtils.ALIAS) != null){
-                   String alias =  binding.getString(BindingUtils.ALIAS);
-                    Map map = new ArrayMap(4);
-                    map.put(alias, blockValue);
-                    context.push(map);
-                }
             }else if(value instanceof JSONArray){
                 JSONArray array = (JSONArray) value;
                 StringBuilder builder = new StringBuilder();

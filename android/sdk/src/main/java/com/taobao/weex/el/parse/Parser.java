@@ -28,7 +28,6 @@ import java.util.List;
 /**
  * Created by furture on 2017/8/28.
  * simple expression parse, less ast node and save memory
- * reference https://github.com/jquery/esprima
  */
 public class Parser {
 

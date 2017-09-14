@@ -133,7 +133,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private String  listDataTemplateKey = Constants.Name.SLOT_TEMPLATE_TYPE;
     private Runnable listUpdateRunnable;
 
-    private int itemViewCacheSize = 4;
 
     /**
      * sticky helper
@@ -513,74 +512,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             }
             notifyUpdateList();
         }
-
-        //FIXME adapter position not exist
-        /**
-        int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
-        BounceRecyclerView view = getHostView();
-        if (view != null) {
-            boolean isAddAnimation = isAddAnimation(child);
-            if (isAddAnimation) {
-                view.getInnerView().setItemAnimator(mItemAnimator);
-            } else {
-                view.getInnerView().setItemAnimator(null);
-            }
-            boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
-            if (isKeepScrollPosition) {
-                int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
-                view.getInnerView().getLayoutManager().scrollToPosition(last);
-                view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
-            } else {
-                view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
-            }
-        }
-        relocateAppearanceHelper();
-         */
-    }
-
-
-    /**
-     * Determine if the component needs to be fixed at the time of insertion
-     * @param child Need to insert the component
-     * @return fixed=true
-     */
-    private boolean isKeepScrollPosition(WXComponent child, int index) {
-        ImmutableDomObject domObject = child.getDomObject();
-        if (domObject != null) {
-            Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
-            if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void relocateAppearanceHelper() {
-        /**
-        Iterator<Map.Entry<String, AppearanceHelper>> iterator = mAppearHelpers.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, AppearanceHelper> item = iterator.next();
-            AppearanceHelper value = item.getValue();
-            WXComponent dChild = findCell(value.getAwareChild());
-            int index = mChildren.indexOf(dChild);
-            value.setCellPosition(index);
-        }*/
-    }
-
-    /**
-     * To determine whether an animation is needed
-     * @param child
-     * @return
-     */
-    private boolean isAddAnimation(WXComponent child) {
-        ImmutableDomObject domObject = child.getDomObject();
-        if (domObject != null) {
-            Object attr = domObject.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
-            if (Constants.Value.DEFAULT.equals(attr)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
