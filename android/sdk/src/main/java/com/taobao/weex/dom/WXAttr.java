@@ -27,7 +27,7 @@ import android.text.TextUtils;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
-import com.taobao.weex.dom.binding.BindingUtils;
+import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -471,27 +471,27 @@ public class WXAttr implements Map<String, Object>,Cloneable {
    * filter dynamic attrs and statements
    * */
   private boolean filterBindingStatement(String key, Object value) {
-        if(BindingUtils.isBinding(value)){
+        if(ELUtils.isBinding(value)){
           if(mBindingAttrs == null){
               mBindingAttrs = new ArrayMap<String, Object>();
           }
-          value = BindingUtils.bindingBlock(value);
+          value = ELUtils.bindingBlock(value);
           mBindingAttrs.put(key, value);
           return  true;
         }
-        if(BindingUtils.isVif(key)){
+        if(ELUtils.isVif(key)){
           if(mStatement == null){
              mStatement = new WXStatement();
           }
-          mStatement.put(key, BindingUtils.vifBlock(value.toString()));
+          mStatement.put(key, ELUtils.vifBlock(value.toString()));
           return  true;
         }
 
-        if(BindingUtils.isVfor(key)){
+        if(ELUtils.isVfor(key)){
            if(mStatement == null){
               mStatement = new WXStatement();
            }
-           value = BindingUtils.vforBlock(value);
+           value = ELUtils.vforBlock(value);
            if(value != null) {
               mStatement.put(key, value);
               return  true;

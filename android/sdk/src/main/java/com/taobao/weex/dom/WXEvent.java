@@ -22,7 +22,7 @@ import android.support.v4.util.ArrayMap;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.dom.binding.BindingUtils;
+import com.taobao.weex.dom.binding.ELUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
         if(mEventBindingArgs == null){
           mEventBindingArgs = new ArrayMap();
         }
-        mEventBindingArgs.put(event, BindingUtils.bindingBlock(args));
+        mEventBindingArgs.put(event, ELUtils.bindingBlock(args));
       }
   }
 

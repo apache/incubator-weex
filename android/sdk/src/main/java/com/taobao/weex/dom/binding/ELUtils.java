@@ -29,7 +29,7 @@ import com.taobao.weex.utils.WXLogUtils;
  * util's for binding and statment
  * Created by jianbai.gbj on 2017/8/17.
  */
-public class BindingUtils {
+public class ELUtils {
 
     public static final String BINDING = "@binding";
 

@@ -26,7 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.dom.binding.BindingUtils;
+import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Block;
@@ -238,8 +238,8 @@ public class Statements {
             /**
              * scope supported
              * */
-            if(attr.get(BindingUtils.SCOPE) != null){
-                String alias = attr.get(BindingUtils.SCOPE).toString();
+            if(attr.get(ELUtils.SCOPE) != null){
+                String alias = attr.get(ELUtils.SCOPE).toString();
                 Map map = new ArrayMap(4);
                 map.put(alias, dynamic.get(alias));
                 context.push(map);
@@ -294,9 +294,9 @@ public class Statements {
             Object value = entry.getValue();
             String key = entry.getKey();
             if(value instanceof  JSONObject
-                    && (((JSONObject) value).get(BindingUtils.BINDING)  instanceof  Block)){
+                    && (((JSONObject) value).get(ELUtils.BINDING)  instanceof  Block)){
                 JSONObject binding = (JSONObject) value;
-                Block block = (Block) (binding.get(BindingUtils.BINDING));
+                Block block = (Block) (binding.get(ELUtils.BINDING));
                 Object blockValue = block.execute(context);
                 dynamic.put(key, blockValue);
             }else if(value instanceof JSONArray){
@@ -309,9 +309,9 @@ public class Statements {
                         continue;
                     }
                     if(element instanceof JSONObject
-                            && (((JSONObject) element).get(BindingUtils.BINDING) instanceof Block)){
+                            && (((JSONObject) element).get(ELUtils.BINDING) instanceof Block)){
                         JSONObject binding = (JSONObject) element;
-                        Block block = (Block) (binding.get(BindingUtils.BINDING));
+                        Block block = (Block) (binding.get(ELUtils.BINDING));
                         Object blockValue = block.execute(context);
                         if(blockValue == null){
                             blockValue = "";
@@ -332,8 +332,8 @@ public class Statements {
               for(int i=0; i<array.size(); i++){
                   Object value = array.get(i);
                   if(value instanceof  JSONObject
-                          && (((JSONObject) value).get(BindingUtils.BINDING) instanceof  Block)){
-                      Block block = (Block)(((JSONObject) value).get(BindingUtils.BINDING));
+                          && (((JSONObject) value).get(ELUtils.BINDING) instanceof  Block)){
+                      Block block = (Block)(((JSONObject) value).get(ELUtils.BINDING));
                       Object blockValue = block.execute(context);
                       params.add(blockValue);
                   }else{
@@ -342,8 +342,8 @@ public class Statements {
               }
           }else if(bindings instanceof  JSONObject){
               JSONObject binding = (JSONObject) bindings;
-               if(binding.get(BindingUtils.BINDING) instanceof  Block){
-                   Block block = (Block) binding.get(BindingUtils.BINDING);
+               if(binding.get(ELUtils.BINDING) instanceof  Block){
+                   Block block = (Block) binding.get(ELUtils.BINDING);
                    Object blockValue = block.execute(context);
                    params.add(blockValue);
                }else{
