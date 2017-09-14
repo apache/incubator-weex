@@ -160,6 +160,10 @@ vue: {
 * fix styles in firefox.
 * implement methods about selection range.
 
+#### 0.12.12
+
+* fix NS (svg) bug in vue.js@v2.4.3
+
 ## component -> dom map
 
 | component | dom element | children | note |
