@@ -58,11 +58,14 @@ public class TemplateStickyHelper {
         RecyclerView recyclerView = recyclerTemplateList.getHostView().getInnerView();
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         int firstVisiblePosition = -1;
+        int lastVisiblePosition = -1;
         if (layoutManager instanceof LinearLayoutManager) {
             firstVisiblePosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            lastVisiblePosition  = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
         }else if (layoutManager instanceof StaggeredGridLayoutManager) {
             int [] firstVisibleItemPositions = new int[3];//max 3 column
             firstVisiblePosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstVisibleItemPositions)[0];
+            lastVisiblePosition = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(firstVisibleItemPositions)[0];
         }
         if(firstVisiblePosition < 0){
             return;
@@ -98,6 +101,22 @@ public class TemplateStickyHelper {
                     stickyFakeViewHolder.getComponent().fireEvent(Constants.Event.UNSTICKY);
                 }
             }
+
+            /**check has sticky cell not visible */
+            for(int i=0; i<recyclerView.getChildCount(); i++) {
+                View itemView = recyclerView.getChildAt(i);
+                TemplateViewHolder itemHolder = (TemplateViewHolder) recyclerView.getChildViewHolder(itemView);
+                if (itemHolder == null) {
+                    continue;
+                }
+                int adapterPosition = itemHolder.getAdapterPosition();
+                if (!stickyPositions.contains(adapterPosition)) {
+                    continue;
+                }
+                if(itemView.getVisibility() != View.VISIBLE) {
+                    itemView.setVisibility(View.VISIBLE);
+                }
+            }
             return;
         }
 
@@ -120,16 +139,23 @@ public class TemplateStickyHelper {
             }
 
             //create new sticky
-            TemplateViewHolder fakeStickyHolder = stickyHolderCache.get(matchStickyPosition);
-            if(fakeStickyHolder == null || fakeStickyHolder.getItemViewType() != recyclerTemplateList.getItemViewType(matchStickyPosition)){
-                fakeStickyHolder = recyclerTemplateList.onCreateViewHolder(recyclerView, recyclerTemplateList.getItemViewType(matchStickyPosition));
-                stickyHolderCache.put(matchStickyPosition, fakeStickyHolder);
+            int stickyHolderType = recyclerTemplateList.getItemViewType(matchStickyPosition);
+            TemplateViewHolder fakeStickyHolder = stickyHolderCache.get(stickyHolderType);
+            if(fakeStickyHolder == null){
+                fakeStickyHolder = recyclerTemplateList.onCreateViewHolder(recyclerView, stickyHolderType);
+                stickyHolderCache.put(stickyHolderType, fakeStickyHolder);
+            }else{
+                fakeStickyHolder.getComponent().recycled();
             }
             recyclerTemplateList.onBindViewHolder(fakeStickyHolder, matchStickyPosition);
             fakeStickyHolder.itemView.setTranslationY(0);
             fakeStickyHolder.itemView.setTag(fakeStickyHolder);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             fakeStickyHolder.getComponent().clearPreLayout();
+            if(fakeStickyHolder.itemView.getParent() != null){
+                ViewGroup parent = (ViewGroup) fakeStickyHolder.itemView.getParent();
+                parent.removeView(fakeStickyHolder.itemView);
+            }
             bounceRecyclerView.addView(fakeStickyHolder.itemView, params);
             fakeStickyHolder.getComponent().setLayout(fakeStickyHolder.getComponent().getDomObject());
             stickyFakeView = fakeStickyHolder.itemView;
@@ -184,8 +210,16 @@ public class TemplateStickyHelper {
             }
         }
 
-        //handle sticky is related
+        //handle sticky is related, find next sticky position on screen
         int nextVisiblePostion = firstVisiblePosition + 1;
+        if(lastVisiblePosition > 0){
+            for(int i=nextVisiblePostion; i<= lastVisiblePosition; i++){
+                if(stickyPositions.contains(i)){
+                    nextVisiblePostion = i;
+                    break;
+                }
+            }
+        }
         if(!stickyPositions.contains(nextVisiblePostion)){
             if(stickyFakeViewHolder.itemView.getTranslationY() < 0){
                 stickyFakeViewHolder.itemView.setTranslationY(0);
