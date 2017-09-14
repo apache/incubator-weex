@@ -16,12 +16,25 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 
 add_library(weexjsc SHARED
 
+    ./prebuild/jni_load.cc
+    ./base/android/android_jni.cpp
+    ./base/android/scoped_java_ref.cpp
+
     ./base/Compatible.cpp
     ./base/base64/base64.cpp
     ./base/base64/modp_base64/modp_b64.cc
     ./base/ScopedJString.cpp
     ./base/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
+    #./base/timer/timer.cpp
+    #./base/timer/time_utils.cpp
+    #./base/timer/timer_heap.cpp
+    #./base/threading/message_loop.cpp
+    #./base/threading/message_pump_android.cpp
+    #./base/threading/message_pump_posix.cpp
+    #./base/threading/thread.cpp
+
+
     ./WeexCore/layout/WXStyleUtil.cpp
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/BridgeAndroid.cpp

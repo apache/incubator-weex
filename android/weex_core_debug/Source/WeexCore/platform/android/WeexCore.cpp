@@ -1,5 +1,7 @@
 #include "WeexCore.h"
 #include "WeexProxy.h"
+#include <base/android/android_jni.h>
+#include <gen/WXBridge_jni.h>
 
 using namespace WeexCore;
 
@@ -21,45 +23,45 @@ JNIEnv *getJNIEnv() {
   return env;
 }
 
-static jint native_execJSService(JNIEnv *env,
-                                 jobject object,
-                                 jstring script) {
+static jint InitFramework(JNIEnv *env,
+                   jobject object,
+                   jstring script,
+                   jobject params) {
+  jThis = env->NewGlobalRef(object);
+  return WeexProxy::doInitFramework(env, jThis, script, params);
+}
+
+static jint ExecJSService(JNIEnv *env,
+                          jobject object,
+                          jstring script) {
   if (script == nullptr)
     return false;
   return WeexProxy::execJSService(env, object, script);
 }
 
-static void native_takeHeapSnapshot(JNIEnv *env,
-                                    jobject object,
-                                    jstring name) {
+static void TakeHeapSnapshot(JNIEnv *env,
+                             jobject object,
+                             jstring name) {
 }
 
-static void native_onVsync(JNIEnv *env,
-                           jobject object,
-                           jstring jinstanceId) {
+static void OnVsync(JNIEnv *env,
+                    jobject object,
+                    jstring jinstanceId) {
 
 
   // LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
-}
-
-static jint native_initFramework(JNIEnv *env,
-                                 jobject object,
-                                 jstring script,
-                                 jobject params) {
-  jThis = env->NewGlobalRef(object);
-  return WeexProxy::doInitFramework(env, jThis, script, params);
 }
 
 /**
  * Called to execute JavaScript such as . createInstance(),destroyInstance ext.
  *
  */
-static jint native_execJS(JNIEnv *env,
-                          jobject jthis,
-                          jstring jinstanceid,
-                          jstring jnamespace,
-                          jstring jfunction,
-                          jobjectArray jargs) {
+static jint ExecJS(JNIEnv *env,
+                   jobject jthis,
+                   jstring jinstanceid,
+                   jstring jnamespace,
+                   jstring jfunction,
+                   jobjectArray jargs) {
   if (jfunction == NULL || jinstanceid == NULL) {
     LOGE("native_execJS function is NULL");
     return false;
@@ -67,47 +69,13 @@ static jint native_execJS(JNIEnv *env,
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
 }
 
-static const char *gBridgeClassPathName = "com/taobao/weex/bridge/WXBridge";
-static JNINativeMethod gMethods[] = {
-    {"initFramework",
-        "(Ljava/lang/String;Lcom/taobao/weex/bridge/WXParams;)I",
-        (void *) native_initFramework},
-    {"execJS",
-        "(Ljava/lang/String;Ljava/lang/String;"
-            "Ljava/lang/String;[Lcom/taobao/weex/bridge/WXJSObject;)I",
-        (void *) native_execJS},
-    {"takeHeapSnapshot",
-        "(Ljava/lang/String;)V",
-        (void *) native_takeHeapSnapshot},
-    {"execJSService",
-        "(Ljava/lang/String;)I",
-        (void *) native_execJSService},
-    {"onVsync",
-            "(Ljava/lang/String;)V",
-            (void*) native_onVsync}
-};
 
-static int registerBridgeNativeMethods(JNIEnv *env, JNINativeMethod *methods, int numMethods) {
-  if (jBridgeClazz == NULL) {
-    LOGE("registerBridgeNativeMethods failed to find bridge class.");
-    return JNI_FALSE;
-  }
-  if ((env)->RegisterNatives(jBridgeClazz, methods, numMethods) < 0) {
-    LOGE("registerBridgeNativeMethods failed to register native methods for bridge class.");
-    return JNI_FALSE;
+namespace WeexCore {
+  bool RegisterJNIUtils(JNIEnv* env) {
+    return RegisterNativesImpl(env);
   }
 
-  return JNI_TRUE;
-}
-
-static bool registerNatives(JNIEnv *env) {
-  if (JNI_TRUE !=
-      registerBridgeNativeMethods(env, gMethods, sizeof(gMethods) / sizeof(gMethods[0])))
-    return false;
-  return true;
-}
-
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+jint OnLoad(JavaVM *vm, void *reserved) {
   LOGD("begin JNI_OnLoad");
   JNIEnv *env;
   /* Get environment */
@@ -120,7 +88,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   }
   sVm = vm;
   jclass tempClass = env->FindClass(
-      "com/taobao/weex/bridge/WXBridge");
+          "com/taobao/weex/bridge/WXBridge");
   jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
 
   tempClass = env->FindClass("com/taobao/weex/bridge/WXJSObject");
@@ -130,17 +98,13 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   jWXLogUtils = (jclass) env->NewGlobalRef(tempClass);
 
   env->DeleteLocalRef(tempClass);
-  if (!registerNatives(env)) {
-    return JNI_FALSE;
-  }
 
   LOGD("end JNI_OnLoad");
   WeexProxy::setCacheDir(env);
-  // s_cacheDir = getCacheDir(env);
   return JNI_VERSION_1_4;
 }
 
-void JNI_OnUnload(JavaVM *vm, void *reserved) {
+void Unload(JavaVM *vm, void *reserved) {
   LOGD("beigin JNI_OnUnload");
   JNIEnv *env;
 
@@ -153,11 +117,7 @@ void JNI_OnUnload(JavaVM *vm, void *reserved) {
   env->DeleteGlobalRef(jWXLogUtils);
   if (jThis)
     env->DeleteGlobalRef(jThis);
-  // FIXME: move to other place
-  // deinitHeapTimer();
-
   WeexProxy::reset();
-  // using base::debug::TraceEvent;
-  // TraceEvent::StopATrace(env);
   LOGD(" end JNI_OnUnload");
+}
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,8 +17,6 @@
  * under the License.
  */
 package com.taobao.weex.bridge;
-
-import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -32,60 +30,49 @@ import com.taobao.weex.utils.WXLogUtils;
 /**
  * Communication interface for Java code and JavaScript code.
  */
-class WXBridge implements IWXBridge {
+
+public class WXBridge implements IWXBridge {
+
+  private native int nativeInitFramework(String framework, WXParams params);
+  private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
+  private native void nativeOnVsync(String instanceId);
+  private native int nativeExecJSService(String javascript);
+  private native void nativeTakeHeapSnapshot(String filename);
+
+
+  @Override
+  public int initFramework(String framework, WXParams params) {
+    return nativeInitFramework(framework, params);
+  }
+
+  @Override
+  public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return nativeExecJS(instanceId, namespace, function, args);
+  }
+
+  @Override
+  public void onVsync(String instanceId) {
+    nativeOnVsync(instanceId);
+  }
+
+  @Override
+  public int execJSService(String javascript) {
+    return nativeExecJSService(javascript);
+  }
+
+  @Override
+  public void takeHeapSnapshot(String filename) {
+    nativeTakeHeapSnapshot(filename);
+  }
+
 
   public static final String TAG = "WXBridge";
-
-  /**
-   * Init JSFrameWork
-   *
-   * @param framework assets/main.js
-   */
-  public native int initFramework(String framework, WXParams params);
-
-
-  /**
-   * Execute JavaScript function
-   *
-   * @param instanceId
-   * @param namespace  default global
-   * @param function   function string name
-   * @param args       WXJSObject array
-   */
-  public native int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
-
-
-  /**
-   * native method
-   */
-  public native void onVsync(String instanceId);
-
-
-  /**
-   * register Weex Service
-   *
-   * @param javascript  code
-   */
-  public native int execJSService(String javascript);
-
-  /**
-   * Take v8's heap snapshot
-   * @param filename the name of the file to be written.
-   */
-  public native void takeHeapSnapshot(String filename);
-
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
 
   public int callNative(String instanceId, byte [] tasks, String callback) {
      return callNative(instanceId,new String(tasks),callback);
   }
 
+  @Override
   public int callNative(String instanceId, String tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -112,47 +99,12 @@ class WXBridge implements IWXBridge {
     }
     return errorCode;
   }
+
   public int callAddElement(String instanceId, String ref,byte[] dom,String index, String callback) {
     return callAddElement(instanceId,ref, new String(dom),index,callback);
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
-  public int callCreateBody(String instanceId, byte [] tasks, String callback) {
-    return callCreateBody(instanceId,new String(tasks),callback);
-  }
-
-  public int callCreateBody(String instanceId, String tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callCreateBody(instanceId, tasks, callback);
-    }catch (Throwable e){
-      //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
-      }
-    }
-    if(instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-
-  /**
-   * JSF render Node by callAddElement
-   */
+  @Override
   public int callAddElement(String instanceId, String ref,String dom,String index, String callback) {
 
     long start = System.currentTimeMillis();
@@ -184,15 +136,44 @@ class WXBridge implements IWXBridge {
   }
 
   /**
-   * Report JavaScript error.
+   * JavaScript uses this methods to call Android code
    *
    * @param instanceId
-   * @param func       exception function
-   * @throws String exception
+   * @param tasks
+   * @param callback
    */
+
+  public int callCreateBody(String instanceId, byte [] tasks, String callback) {
+    return callCreateBody(instanceId,new String(tasks),callback);
+  }
+
+  @Override
+  public int callCreateBody(String instanceId, String tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateBody(instanceId, tasks, callback);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+
   public void reportJSException(String instanceId, String func, String exception) {
     WXBridgeManager.getInstance().reportJSException(instanceId, func, exception);
   }
+
 
   /**
    * Bridge module Js Method
@@ -235,19 +216,12 @@ class WXBridge implements IWXBridge {
   }
 
   public void setJSFrmVersion(String version) {
-    if(!TextUtils.isEmpty(version)) {
+    if(version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
+  @Override
   public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
 
     long start = System.currentTimeMillis();
@@ -270,14 +244,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
+  @Override
   public int callCreateFinish(String instanceId, byte [] tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -299,14 +266,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
+  @Override
   public int callRefreshFinish(String instanceId, byte [] tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -328,14 +288,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
+  @Override
   public int callUpdateAttrs(String instanceId, String ref, byte [] tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -357,14 +310,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   *
-   * @param instanceId
-   * @param tasks
-   * @param callback
-   */
-
+  @Override
   public int callUpdateStyle(String instanceId, String ref, byte [] tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -386,14 +332,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   * @param instanceId
-   * @param ref
-   * @param callback
-   * @return int
-   */
-
+  @Override
   public int callRemoveElement(String instanceId, String ref, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -415,15 +354,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   * @param instanceId
-   * @param ref
-   * @param parentref
-   * @param index
-   * @param callback
-   * @return int
-   */
+  @Override
   public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -446,14 +377,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   * @param instanceId
-   * @param ref
-   * @param event
-   * @param callback
-   * @return int
-   */
+  @Override
   public int callAddEvent(String instanceId, String ref, String event, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -475,14 +399,7 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  /**
-   * JavaScript uses this methods to call Android code
-   * @param instanceId
-   * @param ref
-   * @param event
-   * @param callback
-   * @return int
-   */
+  @Override
   public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);

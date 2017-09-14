@@ -4,7 +4,7 @@
 #include <base/LogUtils.h>
 #include <base/ScopedJString.h>
 #include <base/ScopedJStringUTF8.h>
-#include <base/StringUtils.h>
+
 #include <IPC/Buffering/IPCBuffer.h>
 #include <IPC/IPCArguments.h>
 #include <IPC/IPCByteArray.h>
@@ -30,5 +30,14 @@ extern jobject jThis;
 
 extern JNIEnv *getJNIEnv();
 
+namespace WeexCore {
+
+bool RegisterJNIUtils(JNIEnv* env);
+
+jint OnLoad(JavaVM *vm, void *reserved);
+
+void Unload(JavaVM *vm, void *reserved);
+
+}
 
 #endif //_WEEX_CORE_H_
