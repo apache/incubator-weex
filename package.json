@@ -164,7 +164,7 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.8.29",
-    "vue": "^2.2.6",
+    "vue": "^2.4.3",
     "vue-loader": "^12.2.1",
     "vue-template-compiler": "^2.2.6",
     "webpack": "^1.13.1",
