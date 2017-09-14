@@ -48,6 +48,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
@@ -87,6 +88,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
+
 /**
  * weex template list supported
  * https://github.com/Hanks10100/weex-native-directive
@@ -95,8 +98,12 @@ import java.util.regex.Pattern;
 @Component(lazyload = false)
 public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> implements
         IRecyclerAdapterListener<TemplateViewHolder>, IOnLoadMoreListener, Scrollable {
-    public static final String LOADMOREOFFSET = "loadmoreoffset";
     private static final String TAG = "WXRecyclerTemplateList";
+
+    private static final String NAME_HAS_FIXED_SIZE = "hasFixedSize";
+    private static final String NAME_ITEM_VIEW_CACHE_SIZE = "itemViewCacheSize";
+
+
     private WXRecyclerDomObject mDomObject;
     protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
     protected int mColumnCount = 1;
@@ -176,21 +183,28 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     protected BounceRecyclerView initComponentHostView(@NonNull Context context) {
         final BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap, getOrientation());
-        String transforms = (String) getDomObject().getAttrs().get(RecyclerTransform.TRANSFORM);
+        WXAttr attrs = getDomObject().getAttrs();
+        String transforms = (String) attrs.get(Constants.Name.TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(RecyclerTransform.parseTransforms(getOrientation(), transforms));
         }
         mItemAnimator = bounceRecyclerView.getInnerView().getItemAnimator();
+        boolean hasFixedSize = false;
+        int itemViewCacheSize = 4;
+        if(attrs.get(NAME_ITEM_VIEW_CACHE_SIZE) != null){
+            itemViewCacheSize = WXUtils.getNumberInt(getDomObject().getAttrs().get(NAME_ITEM_VIEW_CACHE_SIZE), itemViewCacheSize);
+        }
+        if(attrs.get(NAME_HAS_FIXED_SIZE) != null){
+            hasFixedSize =  WXUtils.getBoolean(attrs.get(NAME_HAS_FIXED_SIZE), hasFixedSize);
+        }
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
         bounceRecyclerView.getInnerView().setItemViewCacheSize(itemViewCacheSize);
+        bounceRecyclerView.getInnerView().setHasFixedSize(hasFixedSize);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
         bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         bounceRecyclerView.getInnerView().clearOnScrollListeners();
         bounceRecyclerView.getInnerView().addOnScrollListener(mViewOnScrollListener);
-        if("true".equals(getDomObject().getAttrs().get("hasFixedSize"))){
-            bounceRecyclerView.getInnerView().setHasFixedSize(true);
-        }
         bounceRecyclerView.getInnerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -697,8 +711,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 if (result != null)
                     setShowScrollbar(result);
                 return true;
-            case "itemViewCacheSize":
-                itemViewCacheSize = WXUtils.getNumberInt(param, itemViewCacheSize);
+            case NAME_ITEM_VIEW_CACHE_SIZE:
+                return true;
+            case NAME_HAS_FIXED_SIZE:
                 return true;
             case Constants.Name.OFFSET_ACCURACY:
                 int accuracy = WXUtils.getInteger(param, 10);
