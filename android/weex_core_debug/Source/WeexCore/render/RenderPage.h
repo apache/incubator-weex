@@ -17,6 +17,9 @@ namespace WeexCore {
 
   class RenderAction;
 
+  typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
+  typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
+
   class RenderPage {
 
   private:

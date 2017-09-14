@@ -22,7 +22,7 @@ namespace WeexCore {
   RenderPage::~RenderPage() {
     delete pRoot;
 
-    for (std::vector<RenderAction *>::iterator it = mRenderActions.begin();
+    for (RENDERACTION_IT it = mRenderActions.begin();
          it != mRenderActions.end(); it++) {
       if (nullptr != *it) {
         delete *it;
@@ -31,10 +31,10 @@ namespace WeexCore {
     }
     mRenderActions.clear();
 
-    std::map<std::string, RenderObject *>::const_iterator attr_it = mRenderObjectMap->begin();
-    std::map<std::string, RenderObject *>::const_iterator attr_end = mRenderObjectMap->end();
-    for (; attr_it != attr_end; ++attr_it) {
-      delete attr_it->second;
+    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectMap->begin();
+    RENDEROBJECT_COLLECTION_IT end = mRenderObjectMap->end();
+    for (; begin != end; ++begin) {
+      delete begin->second;
     }
 
     mRenderObjectMap->clear();
@@ -113,7 +113,7 @@ namespace WeexCore {
   }
 
   void RenderPage::addRenderAction(RenderAction *action) {
-
+    action->ExecuteAction();
   }
 
   RenderObject *RenderPage::getRenderObject(std::string ref) {
