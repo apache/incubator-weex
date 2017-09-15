@@ -36,9 +36,11 @@ import com.taobao.weex.dom.RenderActionContext;
 final class ReloadPageAction implements DOMAction, RenderAction {
   private final String TAG = "ReloadPageAction";
   private String mInstanceId;
+  private boolean mReloadThis;
 
-  ReloadPageAction(String instanceId) {
+  ReloadPageAction(String instanceId, boolean reloadThis) {
     mInstanceId = instanceId;
+    mReloadThis = reloadThis;
   }
 
   @Override
@@ -51,7 +53,7 @@ final class ReloadPageAction implements DOMAction, RenderAction {
     WXSDKInstance instance = context.getInstance();
     if (instance != null) {
          // instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-         instance.reloadPage();
+         instance.reloadPage(mReloadThis);
     } else {
       Log.e(TAG, "ReloadPageAction executeDom reloadPage instance is null");
     }
