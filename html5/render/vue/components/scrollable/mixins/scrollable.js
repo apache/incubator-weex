@@ -225,34 +225,41 @@ export default {
     },
 
     handleTouchMove (event) {
-      if (this._touchParams) {
-        const inner = this.$refs.inner
-        const { startY, reachTop, reachBottom } = this._touchParams
-        if (inner) {
-          const touch = event.changedTouches[0]
-          const offsetY = touch.pageY - startY
-          this._touchParams.offsetY = offsetY
-          if (reachTop && this._refresh) {
-            this._refresh.pullingDown(offsetY)
-          }
-          else if (reachBottom && this._loading) {
-            this._loading.pullingUp(-offsetY)
-          }
+      if (!this._touchParams || !this._refresh && !this._loading) {
+        return
+      }
+      const inner = this.$refs.inner
+      const { startY, reachTop, reachBottom } = this._touchParams
+      if (inner) {
+        const touch = event.changedTouches[0]
+        const offsetY = touch.pageY - startY
+        const dir = offsetY > 0 ? 'down' : 'up'
+        this._touchParams.offsetY = offsetY
+        if (this._refresh && (dir === 'down') && reachTop) {
+          this._refresh.pullingDown(offsetY)
+        }
+        else if (this._loading && (dir === 'up') && reachBottom) {
+          this._loading.pullingUp(-offsetY)
         }
       }
     },
 
     handleTouchEnd (event) {
-      if (this._touchParams) {
-        const inner = this.$refs.inner
-        const { reachTop, reachBottom } = this._touchParams
-        if (inner) {
-          if (reachTop && this._refresh) {
-            this._refresh.pullingEnd()
-          }
-          else if (reachBottom && this._loading) {
-            this._loading.pullingEnd()
-          }
+      if (!this._touchParams || !this._refresh && !this._loading) {
+        return
+      }
+      const inner = this.$refs.inner
+      const { startY, reachTop, reachBottom } = this._touchParams
+      if (inner) {
+        const touch = event.changedTouches[0]
+        const offsetY = touch.pageY - startY
+        const dir = offsetY > 0 ? 'down' : 'up'
+        this._touchParams.offsetY = offsetY
+        if (this._refresh && (dir === 'down') && reachTop) {
+          this._refresh.pullingEnd()
+        }
+        else if (this._loading && (dir === 'up') && reachBottom) {
+          this._loading.pullingEnd()
         }
       }
       delete this._touchParams
