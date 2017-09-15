@@ -24,6 +24,8 @@
 #import "WXSDKEngine.h"
 #import "WXSDKManager.h"
 #import "WXUtility.h"
+#import "WXPrerenderManager.h"
+#import "WXMonitor.h"
 
 @interface WXBaseViewController ()
 
@@ -86,15 +88,9 @@
 
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [_instance fireGlobalEvent:WX_APPLICATION_WILL_RESIGN_ACTIVE params:nil];
-}
-
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
     [self _updateInstanceState:WeexInstanceAppear];
     
 }
@@ -122,12 +118,16 @@
     if (!sourceURL) {
         return;
     }
-
+    
     [_instance destroyInstance];
+    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+        _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
+    }
+
     _instance = [[WXSDKInstance alloc] init];
     _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
     _instance.pageObject = self;
-    _instance.pageName = [[WXUtility urlByDeletingParameters:sourceURL] absoluteString];
+    _instance.pageName = sourceURL.absoluteString;
     _instance.viewController = self;
     
     NSString *newURL = nil;
@@ -153,6 +153,15 @@
     _instance.renderFinish = ^(UIView *view) {
         [weakSelf _updateInstanceState:WeexInstanceAppear];
     };
+    
+    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        [WXPrerenderManager renderFromCache:[self.sourceURL absoluteString]];
+        return;
+    }
 }
 
 - (void)_updateInstanceState:(WXState)state

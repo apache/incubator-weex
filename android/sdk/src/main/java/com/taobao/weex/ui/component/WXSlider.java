@@ -62,6 +62,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
+  private int initIndex = -1;
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -163,8 +164,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public boolean containsGesture(WXGestureType WXGestureType) {
-    //TODO Slider don't support any gesture for now.
-    return false;
+    //Enable gesture for slider
+    return super.containsGesture(WXGestureType);
   }
 
   @Override
@@ -183,8 +184,12 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
     mAdapter.addPageView(view);
     hackTwoItemsInfiniteScroll();
-
-    mViewPager.setCurrentItem(0);
+    if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
+      mViewPager.setCurrentItem(initIndex);
+      initIndex = -1;
+    } else {
+      mViewPager.setCurrentItem(0);
+    }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
@@ -340,6 +345,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
       if (index >= mAdapter.getRealCount() || index < 0) {
+        initIndex = index;
         return;
       }
       mViewPager.setCurrentItem(index);

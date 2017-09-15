@@ -11,7 +11,7 @@ version: 2.1
 
 ## 概述
 
-以下为 picker 相关的 API，用于数据选择，日期选择，时间选择。（目前 H5 暂不支持该模块）
+以下为 picker 相关的 API，用于数据选择，日期选择，时间选择。（ H5模块如需使用，请手动引入[weex-picker组件](https://github.com/weexteam/weex-picker)）
 
 ## API
 ### `pick(options, callback[options])`

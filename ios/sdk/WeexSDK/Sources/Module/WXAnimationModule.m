@@ -24,6 +24,7 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 #import "WXLength.h"
+#import "WXAnimationLayout.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -79,16 +80,19 @@
         _animationInfo = info;
         _finishBlock = finishBlock;
     }
-    
     return self;
 }
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    [self applyTransform];
+}
+
+-(void)applyTransform
+{
     if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
         return;
     }
-    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
@@ -133,6 +137,8 @@
 
 @interface WXAnimationModule ()
 
+@property (nonatomic,strong) WXAnimationLayout *animationLayout;
+@property (nonatomic,assign) BOOL needLayout;
 @end
 
 @implementation WXAnimationModule
@@ -143,6 +149,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
+    _needLayout = NO;
+    _animationLayout = [[WXAnimationLayout alloc] init];
+    _animationLayout.weexInstance = self.weexInstance;
     WXPerformBlockOnComponentThread(^{
         WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
         if (!targetComponent) {
@@ -166,6 +175,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
     double duration = [args[@"duration"] doubleValue] / 1000;
     double delay = [args[@"delay"] doubleValue] / 1000;
+    if (args[@"needLayout"]) {
+        _needLayout = [WXConvert BOOL:args[@"needLayout"]];
+    }
+    _animationLayout.animationDuration = duration * 1000;
+    _animationLayout.animationDelay = delay * 1000;
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
     for (NSString *property in styles) {
@@ -189,6 +203,30 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                  **/
                 newInfo.fromValue = @(oldTransform.rotateAngle);
                 newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
+                [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateX != oldTransform.rotateX)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.x";
+                newInfo.fromValue = @(oldTransform.rotateX);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
+                 [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateY != oldTransform.rotateY)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.y";
+                newInfo.fromValue = @(oldTransform.rotateY);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
+                [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateZ != oldTransform.rotateZ)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.z";
+                newInfo.fromValue = @(oldTransform.rotateZ);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
                 [infos addObject:newInfo];
             }
             
@@ -242,6 +280,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
             info.toValue = @(newBounds.size.width);
             [infos addObject:info];
+            if (_needLayout) {
+                _animationLayout.widthInfo = [[WXAnimationLayoutInfo alloc] init];
+                _animationLayout.widthInfo.toValue = info.toValue;
+                _animationLayout.widthInfo.fromValue = info.fromValue;
+                _animationLayout.widthInfo.propertyName = info.propertyName;
+            }
         } else if ([property isEqualToString:@"height"]) {
             info.propertyName = @"bounds.size.height";
             info.fromValue = @(layer.bounds.size.height);
@@ -249,6 +293,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
             info.toValue = @(newBounds.size.height);
             [infos addObject:info];
+            if (_needLayout) {
+                _animationLayout.heightInfo = [[WXAnimationLayoutInfo alloc] init];
+                _animationLayout.heightInfo.toValue = info.toValue;
+                _animationLayout.heightInfo.fromValue = info.fromValue;
+                _animationLayout.heightInfo.propertyName = info.propertyName;
+            }
         }
     }
 
@@ -274,8 +324,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     for (WXAnimationInfo *info in infos) {
         [self _createCAAnimation:info];
     }
-
+    
     [CATransaction commit];
+    if (_needLayout) {
+        _animationLayout.targetComponent = targetComponent;
+        [_animationLayout layoutForAnimation];
+    }
 }
 
 - (void)_createCAAnimation:(WXAnimationInfo *)info
@@ -305,7 +359,14 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         layer.anchorPoint = CGPointZero;
         layer.frame = originFrame;
     }
-    [layer addAnimation:animation forKey:info.propertyName];
+    
+    if(!WXFloatGreaterThan(animation.duration, 0)){
+        if([delegate respondsToSelector:@selector(applyTransform)]) {
+            [delegate applyTransform];
+        }
+    } else {
+        [layer addAnimation:animation forKey:info.propertyName];
+    }
 }
 
 @end

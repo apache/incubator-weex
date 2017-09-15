@@ -45,11 +45,9 @@ export default {
       this.height = this.viewHeight
     }
   },
-  updated () {
-  },
   watch: {
     height (val) {
-      this.$el.style.height = val * weex.config.env.scale + 'px'
+      this.$el.style.height = `${val}px`
     },
     display (val) {
       if (val === 'hide') {
@@ -91,6 +89,7 @@ export default {
   },
   render (createElement) {
     this.$parent._loading = this
+    this._renderHook()
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },

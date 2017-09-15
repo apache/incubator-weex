@@ -82,6 +82,7 @@ WX_EXPORT_METHOD(@selector(goForward))
     _webview = (WXWebView *)self.view;
     _webview.delegate = self;
     _webview.allowsInlineMediaPlayback = YES;
+    _webview.scalesPageToFit = YES;
     _jsContext = [_webview valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     __weak typeof(self) weakSelf = self;
     _jsContext[@"$notifyWeex"] = ^(JSValue *data) {
@@ -117,14 +118,14 @@ WX_EXPORT_METHOD(@selector(goForward))
 
 - (void)setUrl:(NSString *)url
 {
-    NSMutableString* newUrl = [url mutableCopy];
-    WX_REWRITE_URL(url, WXResourceTypeLink, self.weexInstance, &newUrl)
-    if (!newUrl) {
+    NSString* newURL = [url copy];
+    WX_REWRITE_URL(url, WXResourceTypeLink, self.weexInstance)
+    if (!newURL) {
         return;
     }
     
-    if (![newUrl isEqualToString:_url]) {
-        _url = newUrl;
+    if (![newURL isEqualToString:_url]) {
+        _url = newURL;
         if (_url) {
             [self loadURL:_url];
         }

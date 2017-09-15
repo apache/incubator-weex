@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -134,6 +135,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private List<OnWXScrollListener> mWXScrollListeners;
 
   /**
+   * whether we are in preRender mode
+   * */
+  private volatile boolean isPreRenderMode;
+
+  private LayoutFinishListener mLayoutFinishListener;
+
+  private boolean mCurrentGround = false;
+  private ComponentObserver mComponentObserver;
+
+  /**
    * If anchor is created manually(etc. define a layout xml resource ),
    * be aware do not add it to twice when {@link IWXRenderListener#onViewCreated(WXSDKInstance, View)}.
    * @param a
@@ -239,12 +250,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mNestedInstanceInterceptor = interceptor;
   }
 
-  public WXSDKInstance createNestedInstance(NestedContainer container){
-    WXSDKInstance sdkInstance = new WXSDKInstance(mContext);
+  public final WXSDKInstance createNestedInstance(NestedContainer container){
+    WXSDKInstance sdkInstance = newNestedInstance();
     if(mNestedInstanceInterceptor != null){
       mNestedInstanceInterceptor.onCreateNestInstance(sdkInstance,container);
     }
     return sdkInstance;
+  }
+
+  protected WXSDKInstance newNestedInstance() {
+    return new WXSDKInstance(mContext);
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
@@ -264,6 +279,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+  }
+
+  /**
+   * Set a Observer for component.
+   * This observer will be called in each component, should not doing
+   * anything will impact render performance.
+   *
+   * @param observer
+   */
+  public void setComponentObserver(ComponentObserver observer){
+    mComponentObserver = observer;
+  }
+
+  public ComponentObserver getComponentObserver(){
+    return mComponentObserver;
   }
 
   public NativeInvokeHelper getNativeInvokeHelper() {
@@ -338,6 +368,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param jsonInitData Initial data for rendering
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
+  @Deprecated
   public void render(String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     render(WXPerformance.DEFAULT, template, options, jsonInitData, flag);
   }
@@ -362,6 +393,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
+       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
+       return;
+    }
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
@@ -402,6 +437,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
+
+    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
@@ -625,6 +662,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
+
+  public boolean isPreRenderMode() {
+    return this.isPreRenderMode;
+  }
+
+  public void setPreRenderMode(final boolean isPreRenderMode) {
+    WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        WXSDKInstance.this.isPreRenderMode = isPreRenderMode;
+      }
+    },0);
+  }
+
+  public void setContext(@NonNull Context context) {
+    this.mContext = context;
+  }
+
   /********************************
    * begin register listener
    ********************************************************/
@@ -639,6 +694,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
+  }
+
+  public void setLayoutFinishListener(@Nullable LayoutFinishListener listener) {
+    this.mLayoutFinishListener = listener;
+  }
+
+  public LayoutFinishListener getLayoutFinishListener() {
+    return this.mLayoutFinishListener;
+  }
+
+
+  /**set render start time*/
+  public void setRenderStartTime(long renderStartTime) {
+    this.mRenderStartTime = renderStartTime;
   }
 
   /********************************
@@ -690,6 +759,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return true;
   }
 
+
   @Override
   public void onActivityPause() {
     onViewDisappear();
@@ -712,10 +782,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    WXLogUtils.i("Application onActivityPause()");
+    if (!mCurrentGround) {
+      WXLogUtils.i("Application to be in the backround");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      this.mCurrentGround = true;
+    }
   }
 
 
@@ -731,10 +806,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    if (mCurrentGround) {
+      WXLogUtils.i("Application  to be in the foreground");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      mCurrentGround = false;
+    }
 
     onViewAppear();
 
@@ -1133,6 +1212,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mGlobalEvents.clear();
     }
 
+    if(mComponentObserver != null){
+        mComponentObserver = null;
+    }
 
     mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;

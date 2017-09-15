@@ -18,18 +18,6 @@
  */
 package com.taobao.weex.dom;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXImageSharpen;
-import com.taobao.weex.utils.WXViewUtils;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
-
 import static com.taobao.weex.common.Constants.Name.IMAGE_QUALITY;
 import static com.taobao.weex.common.Constants.Name.SRC;
 import static com.taobao.weex.common.Constants.Name.VALUE;
@@ -38,7 +26,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(RobolectricGradleTestRunner.class)
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXImageSharpen;
+import com.taobao.weex.utils.WXViewUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class WXAttrTest {
 
@@ -65,7 +64,7 @@ public class WXAttrTest {
 
   @Test
   public void testGetImageQuality() throws Exception {
-    assertEquals(WXImageQuality.LOW,attr.getImageQuality());
+    assertEquals(WXImageQuality.AUTO,attr.getImageQuality());
 
     attr.put(IMAGE_QUALITY,HIGH);
     assertEquals(WXImageQuality.HIGH,attr.getImageQuality());

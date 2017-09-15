@@ -65,7 +65,9 @@
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
 {
     WXAssert(name && clazz, @"Fail to register the module, please check if the parameters are correct ！");
-    
+    if (!clazz || !name) {
+        return;
+    }
     NSString *moduleName = [WXModuleFactory registerModule:name withClass:clazz];
     NSDictionary *dict = [WXModuleFactory moduleMethodMapsWithName:moduleName];
     
@@ -159,8 +161,10 @@
     [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
-    [self registerHandler:[WXWebSocketDefaultImpl new] withProtocol:@protocol(WXWebSocketHandler)];
-
+    if (NSClassFromString(@"WXWebSocketDefaultImpl")) {
+        [self registerHandler:[NSClassFromString(@"WXWebSocketDefaultImpl") new] withProtocol:NSProtocolFromString(@"WXWebSocketHandler")];
+    }
+    
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
@@ -182,7 +186,7 @@
 + (void)initSDKEnvironment
 {
     
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
     
@@ -274,7 +278,7 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [self restartWithScript:script];
 }
@@ -314,6 +318,7 @@ static NSDictionary *_customEnvironment;
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {
+    NSMutableDictionary * mutableComponents = [components mutableCopy];
     void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         
         NSString *name = mObj[@"name"];
@@ -324,23 +329,25 @@ static NSDictionary *_customEnvironment;
         }
         [self registerComponent:name withClass:NSClassFromString(componentClass) withProperties:pros];
     };
-    [components enumerateKeysAndObjectsUsingBlock:componentBlock];
+    [mutableComponents enumerateKeysAndObjectsUsingBlock:componentBlock];
     
 }
 
 + (void)_originalRegisterModules:(NSDictionary *)modules {
+    NSMutableDictionary * mutableModules = [modules mutableCopy];
     void (^moduleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         
         [self registerModule:mKey withClass:NSClassFromString(mObj)];
     };
-    [modules enumerateKeysAndObjectsUsingBlock:moduleBlock];
+    [mutableModules enumerateKeysAndObjectsUsingBlock:moduleBlock];
 }
 
 + (void)_originalRegisterHandlers:(NSDictionary *)handlers {
+    NSMutableDictionary * mutableHandlers = [handlers mutableCopy];
     void (^handlerBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         [self registerHandler:mObj withProtocol:NSProtocolFromString(mKey)];
     };
-    [handlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
+    [mutableHandlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
 }
 
 @end

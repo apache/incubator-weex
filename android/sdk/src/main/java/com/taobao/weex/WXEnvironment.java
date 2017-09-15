@@ -43,6 +43,7 @@ public class WXEnvironment {
   public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
   public static final String SYS_MODEL = android.os.Build.MODEL;
   public static final String ENVIRONMENT = "environment";
+  public static final String WEEX_CURRENT_KEY = "wx_current_url";
   /*********************
    * Global config
    ***************************/
@@ -82,6 +83,10 @@ public class WXEnvironment {
   public static boolean sShow3DLayer=true;
 
   private static Map<String, String> options = new HashMap<>();
+  static {
+    options.put(WXConfig.os, OS);
+    options.put(WXConfig.osName, OS);
+  }
 
   /**
    * dynamic

@@ -21,7 +21,7 @@ if [ ! -f scripts/build_from_source.sh ];then
     echo "This script must execute in project root"
     exit 1
 fi
-PROJECT_DIR=$(pwd)
+
 echo "Build Weex SDK From Source...."
 
 npm install --production
@@ -31,15 +31,13 @@ npm run build:source
 echo "Javascript Framework and HTML5 SDK build completed."
 sleep 2
 
-cp dist/native.min.js ios/sdk/WeexSDK/Resources/main.js
-cp dist/native.min.js android/sdk/assets/main.js
+cp dist/native.min.js ios_sdk/WeexSDK/Resources/main.js
+cp dist/native.min.js android_sdk/assets/main.js
 
-cd android 
 gradle wrapper --gradle-version 2.14.1
-echo 'include ":sdk"'>settings.gradle
-./gradlew :sdk:assemble -PasfRelease
-cd $PROJECT_DIR
+echo 'include ":android_sdk"'>settings.gradle
+./gradlew :android_sdk:assemble -PasfRelease
 
-xcodebuild -project ios/sdk/WeexSDK.xcodeproj -target WeexSDK_MTL
+xcodebuild -project ios_sdk/WeexSDK.xcodeproj -target WeexSDK_MTL
 
 echo "Weex SDK Build completed."

@@ -21,6 +21,7 @@ package com.taobao.weex.common;
 public interface WXConfig {
 
   String os = "os";
+  String osName = "osName";
   String appVersion="appVersion";
   String devId="devId";
   String sysVersion="sysVersion";

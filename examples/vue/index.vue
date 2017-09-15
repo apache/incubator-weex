@@ -10,12 +10,13 @@
       return {
         items: [ 
           // common
-          {name: root + '/syntax/hello-world', title: 'Hello World'},
+          {name: root + '/hello', title: 'Hello World'},
           {name: root + '/style/index', title: 'Common Style'},
           {name: root + '/animation', title: 'Animation'},
 
           // component
           {name: root + '/components/text', title: 'Text'},
+          {name: root + '/iconfont', title: 'iconfont'},
           {name: root + '/components/image', title: 'Image'},
           {name: root + '/components/input', title: 'Input'},
           {name: root + '/components/scroller', title: 'Scroller'},
@@ -33,6 +34,7 @@
           // module
           {name: root + '/modules/instance-api', title: 'Instance API'},
           {name: root + '/modules/modal', title: 'Modal'},
+          {name: root + '/modules/webSocket', title: 'WebSocket'},
           {name: root + '/modules/stream', title: 'Stream'},
           {name: root + '/modules/storage',title:'Storage'},
           // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing

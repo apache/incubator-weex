@@ -107,9 +107,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
-    NSMutableString *newUrlStr = [urlStr mutableCopy];
-    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &newUrlStr)
-    urlStr = newUrlStr;
+    NSString *newURL = [urlStr copy];
+    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
+    urlStr = newURL;
     
     if (!options || [WXUtility isBlankString:urlStr]) {
         [callbackRsp setObject:@(-1) forKey:@"status"];

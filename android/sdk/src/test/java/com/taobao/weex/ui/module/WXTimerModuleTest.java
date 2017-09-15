@@ -18,9 +18,15 @@
  */
 package com.taobao.weex.ui.module;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+
 import android.os.Handler;
 import android.os.Message;
-
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
@@ -28,7 +34,7 @@ import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.common.WXThread;
-
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,26 +43,20 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest(WXBridgeManager.class)
 public class WXTimerModuleTest {
 
   public final static int VALID_FUNC_ID = 20;
+  public final static int NO_CACHING_FUNC_ID = 565654;
   public final static int INVALID_FUNC_ID = 0;
   public final static int DELAY = 50;
   public final static int IMMEDIATELY = 0;
@@ -95,6 +95,7 @@ public class WXTimerModuleTest {
     Mockito.verify(module, times(1)).handleMessage(any(Message.class));
   }
 
+  @SuppressWarnings("Range")
   @Test
   public void testSetTimeoutError1() throws Exception {
     module.setTimeout(INVALID_FUNC_ID, DELAY);
@@ -102,6 +103,7 @@ public class WXTimerModuleTest {
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
+  @SuppressWarnings("Range")
   @Test
   public void testSetTimeoutError2() throws Exception {
     module.setTimeout(VALID_FUNC_ID, INVALID_DELAY);
@@ -109,6 +111,7 @@ public class WXTimerModuleTest {
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
+  @SuppressWarnings("Range")
   @Test
   public void testSetIntervalError1() throws Exception {
     module.setInterval(INVALID_FUNC_ID, DELAY);
@@ -116,6 +119,7 @@ public class WXTimerModuleTest {
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
+  @SuppressWarnings("Range")
   @Test
   public void testSetIntervalError2() throws Exception {
     module.setInterval(VALID_FUNC_ID, INVALID_DELAY);
@@ -163,7 +167,7 @@ public class WXTimerModuleTest {
   public void testClearTimeout() throws Exception {
     module.setTimeout(VALID_FUNC_ID, DELAY);
     module.clearTimeout(VALID_FUNC_ID);
-    mLooper.idle(DELAY);
+    mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
@@ -171,7 +175,23 @@ public class WXTimerModuleTest {
   public void testClearInterval() throws Exception {
     module.setInterval(VALID_FUNC_ID, DELAY);
     module.clearInterval(VALID_FUNC_ID);
-    mLooper.idle(DELAY);
+    mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void setClearTimeout2(){
+    module.setTimeout(NO_CACHING_FUNC_ID, DELAY);
+    module.clearTimeout(NO_CACHING_FUNC_ID);
+    mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void setClearInterval2(){
+    module.setInterval(NO_CACHING_FUNC_ID, DELAY);
+    module.clearInterval(NO_CACHING_FUNC_ID);
+    mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 }

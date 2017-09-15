@@ -41,7 +41,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
@@ -73,6 +72,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
+  private boolean mIgnoreNextOnInputEvent = false;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -154,7 +154,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
 
     editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
-    editText.setText(getDomObject().getAttrs().optString(Constants.Name.VALUE));
   }
 
 
@@ -170,19 +169,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       addFocusChangeListener(new OnFocusChangeListener() {
         @Override
         public void onFocusChange(boolean hasFocus) {
-          ImmutableDomObject domObject = getDomObject();
-          if(domObject == null){
-            return;
-          }
-
           if (hasFocus) {
             mLastValue = text.getText().toString();
           } else {
             CharSequence newValue = text.getText();
             newValue = newValue == null ? "" : newValue;
             if (!newValue.toString().equals(mLastValue)) {
-              String event = domObject.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
-              fireEvent(event, newValue.toString());
+              fireEvent(Constants.Event.CHANGE, newValue.toString());
               mLastValue = text.getText().toString();
             }
           }
@@ -192,13 +185,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       addEditorActionListener(new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-          ImmutableDomObject domObject = getDomObject();
-          if (domObject != null && actionId == mEditorAction) {
+          if (actionId == mEditorAction) {
             CharSequence newValue = text.getText();
             newValue = newValue == null ? "" : newValue;
             if (!newValue.toString().equals(mLastValue)) {
-              String eventName = domObject.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
-              fireEvent(eventName, newValue.toString());
+              fireEvent(Constants.Event.CHANGE, newValue.toString());
               mLastValue = text.getText().toString();
             }
             if (getParent() != null) {
@@ -219,15 +210,20 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-          ImmutableDomObject domObject = getDomObject();
-          if (mBeforeText.equals(s.toString()) || domObject == null) {
+
+          if (mIgnoreNextOnInputEvent) {
+            mIgnoreNextOnInputEvent = false;
+          }
+
+          if (mBeforeText.equals(s.toString())) {
             return;
           }
 
-          String event = domObject.getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
-          fireEvent(event, s.toString());
-
           mBeforeText = s.toString();
+
+          if (!mIgnoreNextOnInputEvent) {
+            fireEvent(Constants.Event.INPUT, s.toString());
+          }
         }
 
         @Override
@@ -274,8 +270,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   public void performOnChange(String value) {
-    String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
-    fireEvent(event, value);
+    if (getDomObject() != null && getDomObject().getEvents() != null) {
+      String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+      fireEvent(event, value);
+    }
   }
 
   @Override
@@ -335,7 +333,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         Integer maxLength = WXUtils.getInteger(param, null);
         if (maxLength != null)
           setMaxLength(maxLength);
-          return true;
+        return true;
       case Constants.Name.MAX:
         setMax(String.valueOf(param));
         return true;
@@ -440,8 +438,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       return;
     }
 
+    mIgnoreNextOnInputEvent = true;
     view.setText(value);
-    view.setSelection(value == null?0:value.length());
+    view.setSelection(value == null ? 0 : value.length());
   }
 
   @WXComponentProp(name = Constants.Name.COLOR)
@@ -655,6 +654,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   public void setSelectionRange(int selectionStart, int selectionEnd) {
     EditText hostView;
     if ((hostView = getHostView()) != null) {
+      int length = getHostView().length();
+      if (selectionStart > length || selectionEnd > length) {
+        return;
+      }
       focus();
       hostView.setSelection(selectionStart, selectionEnd);
     }

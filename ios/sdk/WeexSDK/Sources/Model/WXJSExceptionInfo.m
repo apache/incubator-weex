@@ -19,6 +19,7 @@
 
 #import "WXJSExceptionInfo.h"
 #import "WXAppConfiguration.h"
+#import "WXDefine.h"
 
 @implementation WXJSExceptionInfo
 

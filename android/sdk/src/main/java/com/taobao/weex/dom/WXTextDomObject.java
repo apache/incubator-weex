@@ -33,8 +33,6 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.StrikethroughSpan;
-import android.text.style.UnderlineSpan;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
@@ -256,9 +254,7 @@ public class WXTextDomObject extends WXDomObject {
     if (style != null) {
       if (style.containsKey(Constants.Name.LINES)) {
         int lines = WXStyle.getLines(style);
-        if (lines > 0) {
-          mNumberOfLines = lines;
-        }
+        mNumberOfLines = lines > 0 ? lines : UNSET;
       }
       if (style.containsKey(Constants.Name.FONT_SIZE)) {
         mFontSize = WXStyle.getFontSize(style,getViewPortWidth());
@@ -407,13 +403,8 @@ public class WXTextDomObject extends WXDomObject {
     List<SetSpanOperation> ops = new LinkedList<>();
     int start = 0;
     if (end >= start) {
-      if (mTextDecoration == WXTextDecoration.UNDERLINE) {
-        ops.add(new SetSpanOperation(start, end,
-                                     new UnderlineSpan(), spanFlag));
-      }
-      if (mTextDecoration == WXTextDecoration.LINETHROUGH) {
-        ops.add(new SetSpanOperation(start, end,
-                                     new StrikethroughSpan(), spanFlag));
+      if (mTextDecoration == WXTextDecoration.UNDERLINE || mTextDecoration == WXTextDecoration.LINETHROUGH) {
+        ops.add(new SetSpanOperation(start, end, new TextDecorationSpan(mTextDecoration), spanFlag));
       }
       if (mIsColorSet) {
         ops.add(new SetSpanOperation(start, end,

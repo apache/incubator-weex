@@ -29,7 +29,7 @@ version: 2.1
   - 支持 `text-align` 样式.
   - 支持 `text-decoration` 样式.
   - 支持 `text-overflow` 样式.
-  - 支持 `line-height`样式<sup class="wx-v">0.6.1+</sup> 。`line-height` 在 iOS 中与 H5 和 Android 中不同， 文本值将放置在框的底部。
+  - 支持 `line-height`样式<sup class="wx-v">0.6.1+</sup>
   - 不支持 `flex-direction`, `justify-content`, `align-items` 这些为子节点设置的属性，并且`<text>`没有子节点。
 
 - 通用样式：支持所有通用样式
@@ -57,6 +57,39 @@ version: 2.1
 ## 约束
 
 1. `<text>` 里直接写文本头尾空白会被过滤，如果需要保留头尾空白，暂时只能通过数据绑定写头尾空格。
+
+## iconfont 
+
+`支持版本:v0.12.0`
+
+支持ttf和woff字体格式的自定义字体, 可以通过调用 `dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用, addRule 建议在 `beforeCreate` 或者更早时调用
+
+```html
+<template>
+    <div style='flex-direction:row;margin-top:50px'>
+        <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
+        <text style='font-family:iconfont4;font-size:50;'>&#xe614;&#xe612;&#xe613;&#xe61d;&#xe714;</text>
+        <text style='font-family:iconfont4;font-size:60;color:blue'>&#xe711;</text>
+        <text style='font-family:iconfont4;font-size:60;color:green'>&#xe71c;&#xe60b;</text>
+    </div>
+</template>
+<script>
+    module.exports = {
+        beforeCreate: function() {
+
+        var domModule = weex.requireModule('dom');
+        //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
+
+        domModule.addRule('fontFace', {
+            'fontFamily': "iconfont2",
+            'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+        });
+    }
+}
+</script>
+```
+
+[try it](http://dotwe.org/vue/95b2c6716f37066d5f44c5c75c979394)
 
 ## 示例
 
@@ -100,35 +133,4 @@ version: 2.1
 
 [try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)
 
-## iconfont 
 
-`支持版本:v0.12.0`
-
-支持ttf和woff字体格式的自定义字体, 可以通过调用`dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用
-
-```html
-<template>
-    <div style='flex-direction:row;margin-top:50px'>
-        <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
-        <text style='font-family:iconfont4;font-size:50;'>&#xe614;&#xe612;&#xe613;&#xe61d;&#xe714;</text>
-        <text style='font-family:iconfont4;font-size:60;color:blue'>&#xe711;</text>
-        <text style='font-family:iconfont4;font-size:60;color:green'>&#xe71c;&#xe60b;</text>
-    </div>
-</template>
-<script>
-    module.exports = {
-        created: function() {
-
-        var domModule = weex.requireModule('dom');
-        //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
-
-        domModule.addRule('fontFace', {
-            'fontFamily': "iconfont2",
-            'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
-        });
-    }
-}
-</script>
-```
-
-[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)

@@ -79,6 +79,7 @@ export default {
     // const style = this._normalizeInlineStyles(this.$vnode.data)
     const resizeStyle = getResizeStyle(this)
     const style = extractComponentStyle(this)
+    this._renderHook()
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',

@@ -36,7 +36,7 @@ this.text = textComponent.attr.value;
   * support 'text-align' style.
   * support 'text-decoration' style.
   * support 'text-overflow' style.
-  * support 'line-height'(available from v0.6.1) style. line-height in iOS is different from h5 and Android, text value will be placed at bottom of line box.
+  * support 'line-height'(available from v0.6.1) style.
   * not support 'flex-direction, 'justify-content', 'align-items' which is active for child nodes, and text has no child nodes.
 
 ### common styles
@@ -54,6 +54,39 @@ check out [common events](../common-event.html)
 
 * support 'click' event.
 * support 'appear' / 'disappear' event. 
+
+## iconfont
+
+`support:v0.12.0`
+
+support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`, we suggest that you call `addRule` in `beforeCreate`
+
+```html
+<template>
+    <div style='flex-direction:row;margin-top:50px'>
+        <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
+        <text style='font-family:iconfont4;font-size:50;'>&#xe614;&#xe612;&#xe613;&#xe61d;&#xe714;</text>
+        <text style='font-family:iconfont4;font-size:60;color:blue'>&#xe711;</text>
+        <text style='font-family:iconfont4;font-size:60;color:green'>&#xe71c;&#xe60b;</text>
+    </div>
+</template>
+<script>
+    module.exports = {
+        beforeCreate: function() {
+
+        var domModule = weex.requireModule('dom');
+        //support ttf、woff file，svg、eot can not be supported ,moreItem at http://www.iconfont.cn/
+
+        domModule.addRule('fontFace', {
+            'fontFamily': "iconfont2",
+            'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+        });
+    }
+}
+</script>
+```
+
+[try it](http://dotwe.org/vue/95b2c6716f37066d5f44c5c75c979394)
 
 ## Example
 
@@ -96,37 +129,3 @@ check out [common events](../common-event.html)
 ```
 
 [try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)
-
-## iconfont
-
-`support:v0.12.0`
-
-support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`
-
-
-```html
-<template>
-    <div style='flex-direction:row;margin-top:50px'>
-        <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
-        <text style='font-family:iconfont4;font-size:50;'>&#xe614;&#xe612;&#xe613;&#xe61d;&#xe714;</text>
-        <text style='font-family:iconfont4;font-size:60;color:blue'>&#xe711;</text>
-        <text style='font-family:iconfont4;font-size:60;color:green'>&#xe71c;&#xe60b;</text>
-    </div>
-</template>
-<script>
-    module.exports = {
-        created: function() {
-
-        var domModule = weex.requireModule('dom');
-        //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
-
-        domModule.addRule('fontFace', {
-            'fontFamily': "iconfont2",
-            'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
-        });
-    }
-}
-</script>
-```
-
-[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)

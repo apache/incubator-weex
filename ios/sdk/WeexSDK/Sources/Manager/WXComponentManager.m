@@ -33,6 +33,9 @@
 #import "WXInvocationConfig.h"
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
+#import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
+#import "WXLayoutDefine.h"
 
 static NSThread *WXComponentThread;
 
@@ -49,7 +52,8 @@ static NSThread *WXComponentThread;
     // access only on component thread
     NSMapTable<NSString *, WXComponent *> *_indexDict;
     NSMutableArray<dispatch_block_t> *_uiTaskQueue;
-    
+    NSMutableDictionary *_uiPrerenderTaskQueue;
+
     WXComponent *_rootComponent;
     NSMutableArray *_fixedComponents;
     
@@ -165,7 +169,29 @@ static NSThread *WXComponentThread;
 
 - (void)_addUITask:(void (^)())block
 {
-    [_uiTaskQueue addObject:block];
+    if(!_uiPrerenderTaskQueue){
+        _uiPrerenderTaskQueue = [NSMutableDictionary new];
+    }
+    if(self.weexInstance.needPrerender){
+        NSMutableArray<dispatch_block_t> *tasks  = [_uiPrerenderTaskQueue objectForKey:self.weexInstance.scriptURL.absoluteString];
+        if(!tasks){
+            tasks = [NSMutableArray new];
+        }
+        [tasks addObject:block];
+        [_uiPrerenderTaskQueue setObject:tasks forKey:self.weexInstance.scriptURL.absoluteString];
+    }else{
+        [_uiTaskQueue addObject:block];
+    }
+}
+
+- (void)excutePrerenderUITask:(NSString *)url
+{
+    NSMutableArray *tasks  = [_uiPrerenderTaskQueue objectForKey:self.weexInstance.scriptURL.absoluteString];
+    for (id block in tasks) {
+        [_uiTaskQueue addObject:block];
+    }
+    tasks = [NSMutableArray new];
+    [_uiPrerenderTaskQueue setObject:tasks forKey:self.weexInstance.scriptURL.absoluteString];
 }
 
 #pragma mark Component Tree Building
@@ -176,9 +202,8 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     
     _rootComponent = [self _buildComponentForData:data];
-
-    [self _initRootCSSNode];
     
+    [self _initRootCSSNode];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;
@@ -231,8 +256,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
-    
+
     [self _addUITask:^{
+        
         [supercomponent insertSubview:component atIndex:index];
     }];
 
@@ -484,7 +510,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssertComponentThread();
     
     WXSDKInstance *instance  = self.weexInstance;
-    [self _addUITask:^{        
+    [self _addUITask:^{
         UIView *rootView = instance.rootView;
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
@@ -493,6 +519,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
             instance.renderFinish(rootView);
         }
     }];

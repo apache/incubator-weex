@@ -20,6 +20,7 @@ package com.taobao.weex.dom;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
@@ -133,6 +134,14 @@ public final class WXDomManager {
     }
   }
 
+  void consumeRenderTask(String instanceId) {
+    throwIfNotDomThread();
+    DOMActionContextImpl context = mDomRegistries.get(instanceId);
+    if(context != null) {
+      context.consumeRenderTasks();
+    }
+  }
+
   private void throwIfNotDomThread(){
     if (!isDomThread()) {
       throw new WXRuntimeException("dom operation must be done in dom thread");
@@ -182,4 +191,14 @@ public final class WXDomManager {
     msg.obj = task;
     sendMessageDelayed(msg, delay);
   }
+
+  public void postRenderTask(@NonNull String instanceId) {
+    Message msg = Message.obtain();
+    msg.what = WXDomHandler.MsgType.WX_CONSUME_RENDER_TASKS;
+    WXDomTask task = new WXDomTask();
+    task.instanceId = instanceId;
+    msg.obj = task;
+    sendMessage(msg);
+  }
+
 }

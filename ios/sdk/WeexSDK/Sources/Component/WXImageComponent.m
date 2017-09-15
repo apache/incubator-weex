@@ -76,7 +76,12 @@ static dispatch_queue_t WXImageUpdateQueue;
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         [self configFilter:styles];
-        _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        if (styles[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        }
+        if (attributes[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        }
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;
@@ -150,6 +155,10 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
+    if (attributes[@"quality"]) {
+        _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        [self updateImage];
+    }
     
     [self configPlaceHolder:attributes];
     
@@ -161,6 +170,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     UIImageView *imageView = (UIImageView *)self.view;
     imageView.contentMode = _resizeMode;
     imageView.userInteractionEnabled = YES;
@@ -171,6 +181,11 @@ static dispatch_queue_t WXImageUpdateQueue;
     
     [self updateImage];
     
+}
+
+- (BOOL)_needsDrawBorder
+{
+    return NO;
 }
 
 - (BOOL)needsDrawRect
@@ -255,8 +270,8 @@ static dispatch_queue_t WXImageUpdateQueue;
     
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-        NSMutableString *newURL = [_placeholdSrc mutableCopy];
-        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance, &newURL)
+        NSString *newURL = [_placeholdSrc copy];
+        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance)
         
         __weak typeof(self) weakSelf = self;
         self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
@@ -294,20 +309,14 @@ static dispatch_queue_t WXImageUpdateQueue;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
-        NSMutableString * newURL = [imageSrc mutableCopy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance, &newURL)
+        NSString * newURL = [imageSrc copy];
+        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(self) strongSelf = weakSelf;
                     
-                    if (weakSelf.imageLoadEvent) {
-                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
-                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
-                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
-                    }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
                         [strongSelf readyToRender];
@@ -326,6 +335,13 @@ static dispatch_queue_t WXImageUpdateQueue;
                         strongSelf.imageDownloadFinish = YES;
                         strongSelf->_image = image;
                         [strongSelf setNeedsDisplay];
+                    }
+                    
+                    if (strongSelf.imageLoadEvent) {
+                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
                 });
             }];
@@ -377,6 +393,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.path = bezierPath.CGPath;
     self.layer.mask = shapeLayer;
+    self.layer.cornerRadius = 0;
 }
 
 #ifdef UITEST

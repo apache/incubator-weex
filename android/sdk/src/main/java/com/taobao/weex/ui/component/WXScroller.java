@@ -37,6 +37,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
@@ -147,48 +148,61 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (Constants.Event.SCROLL.equals(type) && getInnerView() != null && getInnerView() instanceof WXScrollView) {
-      ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {
-        @Override
-        public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
-          if (shouldReport(x, y)) {
-            Rect frame = scrollView.getContentFrame();
-
-            Map<String, Object> event = new HashMap<>(2);
-            Map<String, Object> contentSize = new HashMap<>(2);
-            Map<String, Object> contentOffset = new HashMap<>(2);
-
-            int viewport = getInstance().getInstanceViewPortWidth();
-
-            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(frame.width(), viewport));
-            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(frame.height(), viewport));
-
-            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(x, viewport));
-            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(y, viewport));
-
-            event.put(Constants.Name.CONTENT_SIZE, contentSize);
-            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-            fireEvent(Constants.Event.SCROLL, event);
+    if (Constants.Event.SCROLL.equals(type) && getInnerView() != null) {
+      if (getInnerView() instanceof WXScrollView) {
+        ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {
+          @Override
+          public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
+            if (shouldReport(x, y)) {
+              fireScrollEvent(scrollView.getContentFrame(), x, y, oldx, oldy);
+            }
           }
-        }
 
-        @Override
-        public void onScrollToBottom(WXScrollView scrollView, int x, int y) {
-          //ignore
-        }
+          @Override
+          public void onScrollToBottom(WXScrollView scrollView, int x, int y) {
+            //ignore
+          }
 
-        @Override
-        public void onScrollStopped(WXScrollView scrollView, int x, int y) {
-          //ignore
-        }
+          @Override
+          public void onScrollStopped(WXScrollView scrollView, int x, int y) {
+            //ignore
+          }
 
-        @Override
-        public void onScroll(WXScrollView scrollView, int x, int y) {
-          //ignore
-        }
-      });
+          @Override
+          public void onScroll(WXScrollView scrollView, int x, int y) {
+            //ignore
+          }
+        });
+      } else if (getInnerView() instanceof WXHorizontalScrollView) {
+        ((WXHorizontalScrollView) getInnerView()).addScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
+          @Override
+          public void onScrollChanged(WXHorizontalScrollView scrollView, int x, int y, int oldx, int oldy) {
+            if (shouldReport(x, y)) {
+              fireScrollEvent(scrollView.getContentFrame(), x, y, oldx, oldy);
+            }
+          }
+        });
+      }
     }
+  }
+
+  private void fireScrollEvent(Rect contentFrame, int x, int y, int oldx, int oldy) {
+    Map<String, Object> event = new HashMap<>(2);
+    Map<String, Object> contentSize = new HashMap<>(2);
+    Map<String, Object> contentOffset = new HashMap<>(2);
+
+    int viewport = getInstance().getInstanceViewPortWidth();
+
+    contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentFrame.width(), viewport));
+    contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentFrame.height(), viewport));
+
+    contentOffset.put(Constants.Name.X, -WXViewUtils.getWebPxByWidth(x, viewport));
+    contentOffset.put(Constants.Name.Y, -WXViewUtils.getWebPxByWidth(y, viewport));
+
+    event.put(Constants.Name.CONTENT_SIZE, contentSize);
+    event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+    fireEvent(Constants.Event.SCROLL, event);
   }
 
   private boolean shouldReport(int x, int y) {
@@ -397,7 +411,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
           if(listeners!=null && listeners.size()>0){
             for (OnWXScrollListener listener : listeners) {
               if (listener != null) {
-                listener.onScrolled(scrollView, x, y);
+                if(listener instanceof ICheckBindingScroller){
+                  if(((ICheckBindingScroller) listener).isNeedScroller(getRef(),null)){
+                    listener.onScrolled(scrollView, x, y);
+                  }
+                }else {
+                  listener.onScrolled(scrollView, x, y);
+                }
               }
             }
           }

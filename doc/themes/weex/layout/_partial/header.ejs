@@ -7,17 +7,7 @@
       <ul class="links">
         <li><a href="<%= url_for_lang('guide') %>"><%= _p('menu.guide') %></a></li>
         <li><a href="<%= url_for_lang('references') %>"><%= _p('menu.references') %></a></li>
-        <li class="dropdown">
-          <a href="javascript:;"><%= _p('menu.note') %></a>
-          <ul class="dropdown-menu subnav">
-            <li>
-              <a href="<%= url_for_lang('faq.html') %>"><%= _p('menu.faq') %></a>
-            </li>
-            <li>
-              <a href="<%= url_for_lang('releasenote.html') %>"><%= _p('menu.releasenote') %></a>
-            </li>
-          </ul>
-        </li>
+        <li><a href="<%= url_for_lang('guide/contributing.html') %>"><%= _p('menu.invovled') %></a></li>
         <li class="dropdown">
             <a href="javascript:;"><%= _p('menu.tools') %></a>
             <ul class="dropdown-menu subnav">
@@ -33,8 +23,23 @@
               <li>
                 <a href="https://market.dotwe.org" target="_blank">Market</a>
               </li>
+              <li>
+                <a href="<%= url_for_lang('guide/tools/plugin.html') %>">Weex Language Plugin</a>
+              </li>
             </ul>
         </li>
+        <li class="dropdown">
+          <a href="javascript:;"><%= _p('menu.note') %></a>
+          <ul class="dropdown-menu subnav">
+            <li>
+              <a href="<%= url_for_lang('faq.html') %>"><%= _p('menu.faq') %></a>
+            </li>
+            <li>
+              <a href="<%= url_for_lang('releasenote.html') %>"><%= _p('menu.releasenote') %></a>
+            </li>
+          </ul>
+        </li>
+        <li><a href="/blog"><%= _p('menu.blog') %></a></li>
       </ul>
       <ul class="info">
         <li><a href="https://github.com/apache/incubator-weex/" target="_blank"><span class="btn-github iconfont icon-github"></span></a></li>

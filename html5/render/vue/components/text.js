@@ -68,6 +68,7 @@ export default {
     // }
     const style = extractComponentStyle(this)
     const textSpecStyle = getTextSpecStyle(style)
+    this._renderHook()
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
       on: createEventMap(this),

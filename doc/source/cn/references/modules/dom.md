@@ -274,7 +274,7 @@ domModule.addRule('fontFace', {
 
 ```
 
-[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)
+[try it](http://dotwe.org/vue/95b2c6716f37066d5f44c5c75c979394)
 
 ## 其他
 

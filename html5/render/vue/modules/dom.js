@@ -17,13 +17,19 @@
  * under the License.
  */
 import { camelToKebab, appendCss, isArray } from '../utils'
+import config from '../config'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
-  if (vnode.weexType === 'scroller' || vnode.weexType === 'list') {
-    return vnode
+  const vm = vnode.$el
+    ? vnode : vnode.elm
+    ? vnode.componentInstance || vnode.context : null
+  if (!vm) return null
+  const type = vm.$el && vm.$el.getAttribute('weex-type')
+  if (config.scrollableTypes.indexOf(type) > -1) {
+    return vm
   }
-  return getParentScroller(vnode.$parent)
+  return getParentScroller(vm.$parent)
 }
 
 function now () {
@@ -59,7 +65,12 @@ function step (context) {
   context.method.call(context.scrollable, context.dSuffix, currentPosition)
 
   // return when end points have been reached
-  if (currentPosition === context.position) {
+  /**
+   * NOTE: should use ~~ to parse position number into integer. Otherwise
+   * this two float numbers maybe have a slicely little difference, which
+   * will cause this function never to stop.
+   */
+  if (~~currentPosition === ~~context.position) {
     window.cancelAnimationFrame(context.frame)
     return
   }
@@ -78,7 +89,7 @@ function ease (k) {
 export default {
   /**
    * scrollToElement
-   * @param  {String} vnode
+   * @param  {Vnode | VComponent} vnode
    * @param  {Object} options {offset:Number}
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
@@ -95,7 +106,7 @@ export default {
 
     const isWindow = !scroller
     const ct = isWindow ? document.body : scroller.$el
-    const el = vnode.$el
+    const el = vnode.$el || vnode.elm
 
     if (ct && el) {
       // if it's a list, then the listVnode.scrollDirection is undefined. just
@@ -106,11 +117,22 @@ export default {
       })[scrollDirection]
 
       const ctRect = ct.getBoundingClientRect()
-      const elRect = el.getBoundingClientRect()
+      let elRect = el.getBoundingClientRect()
+
+      /**
+       * if it's a waterfall, and you want to scroll to a header, then just
+       * scroll to the top.
+       */
+      if (scroller
+        && scroller.weexType === 'waterfall'
+        && scroller._headers
+        && scroller._headers.indexOf(vnode.$vnode || vnode) > -1) {
+        // it's in waterfall. just scroll to the top.
+        elRect = ct.firstElementChild.getBoundingClientRect()
+      }
 
       const dir = dSuffix.toLowerCase()
-      let offset = el[`scroll${dSuffix}`] + elRect[dir] - ctRect[dir]
-      // let offset = el[`offset${dSuffix}`]
+      let offset = (isWindow ? 0 : ct[`scroll${dSuffix}`]) + elRect[dir] - ctRect[dir]
 
       if (options) {
         offset += options.offset && options.offset * weex.config.env.scale || 0
@@ -150,22 +172,32 @@ export default {
       vnode = vnode[0]
     }
 
+    const scale = window.weex.config.env.scale
     const info = { result: false }
+    const rectKeys = ['width', 'height', 'top', 'bottom', 'left', 'right']
+
+    function recalc (rect) {
+      const res = {}
+      rectKeys.forEach(key => {
+        res[key] = rect[key] / scale
+      })
+      return res
+    }
 
     if (vnode && vnode === 'viewport') {
       info.result = true
-      info.size = {
+      info.size = recalc({
         width: document.documentElement.clientWidth,
         height: document.documentElement.clientHeight,
         top: 0,
         left: 0,
         right: document.documentElement.clientWidth,
         bottom: document.documentElement.clientHeight
-      }
+      })
     }
     else if (vnode && vnode.$el) {
       info.result = true
-      info.size = vnode.$el.getBoundingClientRect()
+      info.size = recalc(vnode.$el.getBoundingClientRect())
     }
 
     const message = info.result ? info : {

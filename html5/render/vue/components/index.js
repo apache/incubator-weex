@@ -17,7 +17,6 @@
  * under the License.
  */
 import _switch from './switch'
-export { _switch as switch }
 
 import a from './a'
 import div from './div'
@@ -25,6 +24,7 @@ import image from './image'
 import input from './input'
 import header from './scrollable/header'
 import list from './scrollable/list'
+import waterfall from './scrollable/waterfall'
 import cell from './scrollable/list/cell'
 import scroller from './scrollable/scroller'
 import slider from './slider'
@@ -35,7 +35,7 @@ import indicator from './slider/indicator'
 // import loading from './warning'
 import refresh from './scrollable/refresh'
 import loading from './scrollable/loading'
-import LoadingIndicator from './scrollable/loading-indicator'
+import loadingIndicator from './scrollable/loading-indicator'
 import text from './text'
 import textarea from './textarea'
 import video from './video'
@@ -48,16 +48,19 @@ export default {
   image,
   img: image,
   input,
+  switch: _switch,
   header,
   list,
+  waterfall,
   cell,
   scroller,
   slider,
+  cycleslider: slider,
   'slider-neighbor': neighbor,
   indicator,
   refresh,
   loading,
-  LoadingIndicator,
+  'loading-indicator': loadingIndicator,
   text,
   textarea,
   video,

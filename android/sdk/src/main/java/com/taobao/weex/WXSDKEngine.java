@@ -59,6 +59,7 @@ import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
+import com.taobao.weex.ui.IExternalModuleGetter;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
@@ -389,6 +390,11 @@ public class WXSDKEngine {
    */
   public static <T extends WXModule> boolean registerModuleWithFactory(String moduleName, DestroyableModuleFactory factory, boolean global) throws WXException {
     return registerModule(moduleName, factory,global);
+  }
+
+
+  public static <T extends WXModule> boolean registerModuleWithFactory(String moduleName, IExternalModuleGetter factory, boolean global) throws WXException {
+    return registerModule(moduleName, factory.getExternalModuleClass(moduleName,WXEnvironment.getApplication()),global);
   }
 
   private static <T extends WXModule> boolean registerModule(String moduleName, ModuleFactory factory, boolean global) throws WXException {
