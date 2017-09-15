@@ -168,6 +168,10 @@ vue: {
 
 * reset `env.deviceHeight` after window's resizing.
 
+#### 0.12.14
+
+* fix loading & refresh: pulling down wrongly triggered.
+
 ## component -> dom map
 
 | component | dom element | children | note |
