@@ -1500,7 +1500,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * Check whether the current module registered the event
    * @param eventName EventName register in weex
    * @param module Events occur in this Module
-   * @return  register->true
+   * @return  boolean true
    */
   public boolean checkModuleEventRegistered(String eventName,WXModule module) {
     if (module != null) {
