@@ -1420,6 +1420,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  public void notifyWatchAppearDisappearEvent(String wxEventType,String direction){
+    if(containsEvent(wxEventType)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+  }
+
   public boolean isUsing() {
     return isUsing;
   }

@@ -170,6 +170,11 @@ public class ParserTest extends TestCase {
 
         System.out.println(block.getTokens().size());
 
+        int count = 10;
+        for (int i = 0; i < count; ++i) {
+            System.out.println("i=" + i);
+        }
+
     }
 
     private ArrayStack createContext(){

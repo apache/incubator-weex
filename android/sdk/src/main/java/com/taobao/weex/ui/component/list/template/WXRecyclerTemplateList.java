@@ -1171,7 +1171,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     int key = childLisener.getHostView().hashCode();
                     if(appear){
                         if(!componentDisAppearList.containsKey(key)){
-                            childLisener.notifyAppearStateChange(Constants.Event.APPEAR, direction);
+                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.APPEAR, direction);
                             List<Object> eventArgs = null;
                             if(childLisener.getDomObject().getEvents() != null
                                     && childLisener.getDomObject().getEvents().getEventBindingArgsValues() != null
@@ -1182,7 +1182,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }else{
                         if(componentDisAppearList.containsKey(key)){
-                            childLisener.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
+                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
                             componentDisAppearList.remove(key);
                         }
                     }
@@ -1220,7 +1220,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 Set<Map.Entry<Integer, List<Object>>> eventWatcherEntries = eventWatchers.entrySet();
                 for(Map.Entry<Integer, List<Object>> eventWatcherEntry : eventWatcherEntries){
                     events.putEventBindingArgsValue(Constants.Event.DISAPPEAR, eventWatcherEntry.getValue());
-                    component.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
+                    component.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
                 }
                 eventWatchers.clear();
             }

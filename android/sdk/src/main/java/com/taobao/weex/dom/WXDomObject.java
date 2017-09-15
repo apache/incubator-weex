@@ -231,7 +231,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
         WXEvent events = new WXEvent();
         JSONArray eventArray = (JSONArray) event;
         int count = eventArray.size();
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < count; i++) {
             Object value = eventArray.get(i);
             events.addEvent(value);
         }
