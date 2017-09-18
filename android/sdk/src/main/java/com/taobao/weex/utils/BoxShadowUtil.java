@@ -50,7 +50,6 @@ import java.util.List;
  * Requires Android 4.3 and higher
  *
  * @see <a href="https://www.w3schools.com/cssref/css3_pr_box-shadow.asp">CSS3 box-shadow Property</>
- *
  */
 
 public class BoxShadowUtil {
@@ -128,11 +127,19 @@ public class BoxShadowUtil {
     // can not antialias
     canvas.clipPath(contentPath, Region.Op.DIFFERENCE);
 
+    float shadowLeft, shadowTop;
+    if (shadowSpread == 0f) {
+      shadowLeft = shadowRadius;
+      shadowTop = shadowRadius;
+    } else {
+      shadowLeft = shadowRadius + dx - shadowSpread;
+      shadowTop = shadowRadius + dy - shadowSpread;
+    }
     RectF shadowRect = new RectF(
-        shadowRadius,
-        shadowRadius,
-        canvasWidth - shadowRadius,
-        canvasHeight - shadowRadius);
+        shadowLeft,
+        shadowTop,
+        canvasWidth - shadowRadius + shadowSpread,
+        canvasHeight - shadowRadius + shadowSpread);
 
     shadowRect.top += Math.abs(dy);
     shadowRect.bottom -= Math.abs(dy);
@@ -144,7 +151,12 @@ public class BoxShadowUtil {
     shadowPaint.setColor(shadowColor);
     shadowPaint.setStyle(Paint.Style.FILL);
 
-    shadowPaint.setShadowLayer(shadowRadius, dx, dy, shadowColor);
+    float shadowDx = 0f, shadowDy = 0f;
+    if (shadowSpread == 0f) {
+      shadowDx = dx;
+      shadowDy = dy;
+    }
+    shadowPaint.setShadowLayer(shadowRadius, shadowDx, shadowDy, shadowColor);
 
     Path shadowPath = new Path();
     float[] shadowRadii = new float[8];
@@ -240,8 +252,8 @@ public class BoxShadowUtil {
     if (!TextUtils.isEmpty(maybeColor)) {
       if (maybeColor.startsWith("#") || maybeColor.startsWith("rgb") || WXResourceUtils.isNamedColor(maybeColor)) {
         result.color = WXResourceUtils.getColor(maybeColor, Color.BLACK);
+        params.remove(params.size() - 1);
       }
-      params.remove(params.size() - 1);
     }
 
     try {
@@ -455,6 +467,7 @@ public class BoxShadowUtil {
           if (!TextUtils.isEmpty(param)) {
             float px = WXUtils.getFloat(param, 0f);
             spread = WXViewUtils.getRealSubPxByWidth(px, viewport);
+            WXLogUtils.w(TAG, "Experimental box-shadow attribute: spread");
           }
         }
       };
