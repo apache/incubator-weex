@@ -56,6 +56,12 @@
  **/
 + (NSMutableDictionary *)moduleMethodMapsWithName:(NSString *)name;
 
+/**
+ * @abstract Returns the export Selector in the specific module
+ *
+ * @param name The Selector name
+ **/
++ (NSMutableDictionary *)moduleSelectorMapsWithName:(NSString *)name;
 
 /**
  * @abstract Returns the registered modules.

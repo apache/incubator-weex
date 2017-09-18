@@ -225,4 +225,7 @@ public class Actions {
     return new ExecutableRenderAction(runnable);
   }
 
+  public static DOMAction getReloadPage(String instanceId, boolean relaod) {
+    return new ReloadPageAction(instanceId, relaod);
+  }
 }

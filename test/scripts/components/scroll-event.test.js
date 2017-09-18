@@ -28,20 +28,21 @@ var util = require("../util.js");
 describe('list scroll event', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
-  before(function () {
+  var maxW = util.getGETActionWaitTimeMills();
+  beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/list-scroll.js'))
-      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
+      .get(util.getPage('/components/list-scroll.js'))
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver);
   })
 
 
   it('#1 Drag list', () => {
     return driver
+    .sleep(1000)
+    .waitForElementById('status',maxW,1000)
     .dragUp(200)
     .dragUp(200)
     .elementById('status')
@@ -57,19 +58,19 @@ describe('scroller scroll event', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/scroller-scroll.js'))
-      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
-  after(function () {
-      // return util.quit(driver)
+  afterEach(function () {
+      return util.quit(driver)
   })
 
 
   it('#1 Drag scroller', () => {
     return driver
+    .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
     .dragUp(200)
     .dragUp(200)
     .elementById('status')

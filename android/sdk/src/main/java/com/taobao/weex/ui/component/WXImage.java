@@ -18,13 +18,16 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -34,6 +37,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
@@ -46,6 +51,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.SingleFunctionParser;
+import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -62,6 +68,10 @@ import java.util.Map;
  */
 @Component(lazyload = false)
 public class WXImage extends WXComponent<ImageView> {
+
+  public static final String SUCCEED = "success";
+  public static final String ERRORDESC = "errorDesc";
+
   private String mSrc;
   private int mBlurRadius;
 
@@ -330,6 +340,64 @@ public class WXImage extends WXComponent<ImageView> {
       }
       readyToRender();
     }
+  }
+
+  /**
+   * Need permission {android.permission.WRITE_EXTERNAL_STORAGE}
+   */
+  @JSMethod(uiThread = false)
+  public void save(final JSCallback saveStatuCallback) {
+
+    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Permission denied: android.permission.WRITE_EXTERNAL_STORAGE");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    if (mHost == null) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Image component not initialized");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    if (mSrc == null || mSrc.equals("")) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Image does not have the correct src");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    WXViewToImageUtil.generateImage(mHost, 0, 0xfff8f8f8, new WXViewToImageUtil.OnImageSavedCallback() {
+      @Override
+      public void onSaveSucceed(String path) {
+        if (saveStatuCallback != null) {
+          Map<String, Object> result = new HashMap<>();
+          result.put(SUCCEED, true);
+          saveStatuCallback.invoke(result);
+        }
+      }
+
+      @Override
+      public void onSaveFailed(String errorDesc) {
+        if (saveStatuCallback != null) {
+          Map<String, Object> result = new HashMap<>();
+          result.put(SUCCEED, false);
+          result.put(ERRORDESC,errorDesc);
+          saveStatuCallback.invoke(result);
+        }
+      }
+    });
   }
 
   public interface Measurable {

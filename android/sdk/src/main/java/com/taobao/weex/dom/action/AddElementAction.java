@@ -25,9 +25,13 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.List;
 
 /**
  * Created by sospartan on 22/02/2017.
@@ -58,6 +62,7 @@ final class AddElementAction extends AbstractAddElementAction {
 
   @Override
   protected void appendDomToTree(DOMActionContext context, WXDomObject domObject) {
+    long startNanos = System.nanoTime();
     WXDomObject parent;
     mRef = domObject.getRef();
     if ((parent = context.getDomByRef(mParentRef)) == null) {
@@ -67,6 +72,7 @@ final class AddElementAction extends AbstractAddElementAction {
       //non-root and parent exist
       parent.add(domObject, mAddIndex);
     }
+    domObject.mDomThreadNanos += (System.nanoTime() - startNanos);
   }
 
   @Override
@@ -98,10 +104,30 @@ final class AddElementAction extends AbstractAddElementAction {
         return;
       }
 
+      Stopwatch.tick();
       parent.addChild(component, mAddIndex);
       parent.createChildViewAt(mAddIndex);
+      Stopwatch.split("createViewTree");
+
       component.applyLayoutAndEvent(component);
+      Stopwatch.split("applyLayoutAndEvent");
+
       component.bindData(component);
+      Stopwatch.split("bindData");
+
+      if (WXTracing.isAvailable()) {
+        String instanceId = context.getInstance().getInstanceId();
+        List<Stopwatch.ProcessEvent> splits = Stopwatch.getProcessEvents();
+        for (Stopwatch.ProcessEvent event : splits) {
+          submitPerformance(event.fname, "X", instanceId, event.duration, event.startMillis, true);
+        }
+      }
+      component.mTraceInfo.uiQueueTime = mUIQueueTime;
+      if (component.isLazy()) {
+        component.onRenderFinish(WXComponent.STATE_DOM_FINISH);
+      } else {
+        component.onRenderFinish(WXComponent.STATE_ALL_FINISH);
+      }
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

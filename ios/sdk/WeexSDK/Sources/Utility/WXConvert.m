@@ -421,6 +421,23 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return [color CGColor];
 }
 
++ (NSString *)HexWithColor:(UIColor *)color
+{
+    uint hex;
+    CGFloat red, green, blue, alpha;
+    if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+        [color getWhite:&red alpha:&alpha];
+        green = red;
+        blue = red;
+    }
+    red = roundf(red * 255.f);
+    green = roundf(green * 255.f);
+    blue = roundf(blue * 255.f);
+    alpha = roundf(alpha * 255.f);
+    hex =  ((uint)red << 16) | ((uint)green << 8) | ((uint)blue);
+    return [NSString stringWithFormat:@"#%02x", hex];
+}
+
 + (WXBorderStyle)WXBorderStyle:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
@@ -591,7 +608,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return  WXImageQualityHigh;
     }
     
-    return  WXImageQualityLow;
+    return  WXImageQualityNone;
 }
 
 + (WXImageSharp)WXImageSharp:(id)value
@@ -672,7 +689,8 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             @"ease-in":kCAMediaTimingFunctionEaseIn,
             @"ease-out":kCAMediaTimingFunctionEaseOut,
             @"ease-in-out":kCAMediaTimingFunctionEaseInEaseOut,
-            @"linear":kCAMediaTimingFunctionLinear
+            @"linear":kCAMediaTimingFunctionLinear,
+            @"ease":kCAMediaTimingFunctionDefault
         };
     });
     
@@ -788,7 +806,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     if (![value isKindOfClass:[NSString class]]) {
         return accessibilityTrait;
     }
-    NSString * role = [value lowercaseString];
+    NSString * role = value;
     if ([role isEqualToString:@"button"]) {
         accessibilityTrait = UIAccessibilityTraitButton;
     } else if ([role isEqualToString:@"link"]) {
@@ -803,6 +821,28 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             accessibilityTrait = UIAccessibilityTraitTabBar;
         }
 #endif
+    } else if ([role isEqualToString:@"frequentUpdates"]) {
+        accessibilityTrait = UIAccessibilityTraitUpdatesFrequently;
+    } else if ([role isEqualToString:@"startsMedia"]) {
+        accessibilityTrait = UIAccessibilityTraitStartsMediaSession;
+    } else if ([role isEqualToString:@"allowsDirectInteraction"]) {
+        accessibilityTrait = UIAccessibilityTraitAllowsDirectInteraction;
+    } else if ([role isEqualToString:@"summary"]) {
+        accessibilityTrait = UIAccessibilityTraitSummaryElement;
+    } else if ([role isEqualToString:@"header"]) {
+        accessibilityTrait = UIAccessibilityTraitHeader;
+    } else if ([role isEqualToString:@"keyboardKey"]) {
+        accessibilityTrait = UIAccessibilityTraitKeyboardKey;
+    } else if ([role isEqualToString:@"disabled"]) {
+        accessibilityTrait = UIAccessibilityTraitNotEnabled;
+    } else if ([role isEqualToString:@"playSound"]) {
+        accessibilityTrait = UIAccessibilityTraitPlaysSound;
+    } else if ([role isEqualToString:@"selected"]) {
+        accessibilityTrait = UIAccessibilityTraitSelected;
+    } else if ([role isEqualToString:@"pageTurn"]) {
+        accessibilityTrait = UIAccessibilityTraitCausesPageTurn;
+    } else if ([role isEqualToString:@"text"]) {
+        accessibilityTrait = UIAccessibilityTraitStaticText;
     }
     
     return accessibilityTrait;

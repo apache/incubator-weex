@@ -29,6 +29,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.Spacing;
@@ -54,8 +55,18 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
-  public static final String TRANSFORM = "transform";
-  public static final String TRANSFORM_ORIGIN = "transformOrigin";
+
+  /**
+   * Use {@link Name#TRANSFORM} instead.
+   */
+  @Deprecated
+  public static final String TRANSFORM = Name.TRANSFORM;
+
+  /**
+   * Use {@link Name#TRANSFORM_ORIGIN} instead.
+   */
+  @Deprecated
+  public static final String TRANSFORM_ORIGIN = Name.TRANSFORM_ORIGIN;
   static final WXDomObject DESTROYED = new WXDomObject();
   static{
     DESTROYED.mRef = "_destroyed";
@@ -86,7 +97,11 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   private boolean mYoung = false;
 
+  public long mDomThreadNanos;
+  public long mDomThreadTimestamp;
+
   public void traverseTree(Consumer...consumers){
+    long startNanos = System.nanoTime();
     if (consumers == null) {
       return;
     }
@@ -101,6 +116,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       child = getChild(i);
       child.traverseTree(consumers);
     }
+    mDomThreadNanos += (System.nanoTime() - startNanos);
   }
 
 
@@ -627,7 +643,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
    * @param json the original JSONObject
    * @return Dom Object corresponding to the JSONObject.
    */
-  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance){
+  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance) {
+      return parse(json, wxsdkInstance, null);
+  }
+
+  public static  @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance, WXDomObject parentDomObject){
+      long startNanos = System.nanoTime();
+      long timestamp = System.currentTimeMillis();
       if (json == null || json.size() <= 0) {
         return null;
       }
@@ -639,15 +661,17 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
                 .getValidateProcessor();
         if (processor != null) {
           WXValidateProcessor.WXComponentValidateResult result = processor
-                  .onComponentValidate(wxsdkInstance, type);
+                  .onComponentValidate(wxsdkInstance, type, parentDomObject);
           if (result != null && !result.isSuccess) {
             type = TextUtils.isEmpty(result.replacedComponent) ? WXBasicComponentType.DIV
                     : result.replacedComponent;
             json.put(TYPE, type);
-            if(WXEnvironment.isApkDebugable()&&result.validateInfo!=null){
-              String tag = "[WXDomObject]onComponentValidate failure. >>> "+result.validateInfo.toJSONString();
+            if (WXEnvironment.isApkDebugable() && result.validateInfo != null) {
+              String tag = "[WXDomObject]onComponentValidate failure. >>> " + result.validateInfo.toJSONString();
               WXLogUtils.e(tag);
             }
+          } else if (result == null){
+            return null;
           }
         }
       }
@@ -661,16 +685,19 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       }
       domObject.parseFromJson(json);
       domObject.mDomContext = wxsdkInstance;
+      domObject.parent = parentDomObject;
 
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {
         JSONArray childrenArray = (JSONArray) children;
         int count = childrenArray.size();
         for (int i = 0; i < count; ++i) {
-          domObject.add(parse(childrenArray.getJSONObject(i),wxsdkInstance),-1);
+          domObject.add(parse(childrenArray.getJSONObject(i),wxsdkInstance, domObject),-1);
         }
       }
 
+      domObject.mDomThreadNanos = System.nanoTime() - startNanos;
+      domObject.mDomThreadTimestamp = timestamp;
       return domObject;
   }
 

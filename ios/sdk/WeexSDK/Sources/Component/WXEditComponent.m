@@ -361,16 +361,19 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
-    if (attributes[@"placeholder"]) {
-        _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
-        [self setPlaceholderAttributedString];
-    }
     if (attributes[@"value"]) {
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
         if (_maxLength && [_value length] > [_maxLength integerValue]&& [_maxLength integerValue] >= 0) {
             _value = [_value substringToIndex:([_maxLength integerValue])];
         }
         [self setText:_value];
+    }
+    if (attributes[@"placeholder"]) {
+        _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
+        [self setPlaceholderAttributedString];
+        if(_value.length > 0){
+            _placeHolderLabel.text = @"";
+        }
     }
     if (attributes[@"returnKeyType"]) {
         _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
@@ -764,12 +767,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if(![self.view isFirstResponder]) {
         return;
     }
-    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
-    
     CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
-    if(begin.size.height <= 44) {
-        return;
-    }
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];

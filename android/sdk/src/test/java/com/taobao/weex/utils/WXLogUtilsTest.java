@@ -46,7 +46,6 @@ public class WXLogUtilsTest {
 
   @Before
   public void setUp() throws Exception {
-    WXLogUtils.isShowLineNumber = true;
     PowerMockito.mockStatic(WXEnvironment.class);
     PowerMockito.when(WXEnvironment.isApkDebugable()).thenReturn(true);
   }

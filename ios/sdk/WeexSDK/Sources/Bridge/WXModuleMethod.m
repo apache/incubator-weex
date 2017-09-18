@@ -33,10 +33,12 @@
 - (instancetype)initWithModuleName:(NSString *)moduleName
                         methodName:(NSString *)methodName
                          arguments:(NSArray *)arguments
+                           options:(NSDictionary *)options
                           instance:(WXSDKInstance *)instance
 {
     if (self = [super initWithMethodName:methodName arguments:arguments instance:instance]) {
         _moduleName = moduleName;
+        _options = options;
     }
     
     return self;
@@ -44,12 +46,15 @@
 
 - (NSInvocation *)invoke
 {
-    
     if (self.instance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
-            WXModuleValidateResult* result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
-            if (result && !result.isSuccess) {
+            WXModuleValidateResult* result = nil;
+            if ([validateHandler respondsToSelector:@selector(validateWithWXSDKInstance:module:method:args:options:)]) {
+                result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments options:self.options];
+            }
+
+            if (result==nil || !result.isSuccess) {
                 NSString *errorMessage = [result.error.userInfo  objectForKey:@"errorMsg"];
                 WXLogError(@"%@", errorMessage);
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);

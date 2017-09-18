@@ -196,6 +196,25 @@ describe('test input and output', function () {
       app.$destroy()
     })
 
+    it('use append tree and sub components', (done) => {
+      const name = 'component-append-tree'
+      const sourceCode = readSource(name)
+      const outputCode = readOutput(name)
+
+      app.$create(sourceCode)
+      const expected = eval('(' + outputCode + ')')
+      const actual = app.getRealRoot()
+      expect(actual).eql(expected)
+
+      setTimeout(() => {
+        const actual2 = app.getRealRoot()
+        expect(actual2.children[0].children[0].attr.value).eql('timeout')
+        expect(actual2.children[1].children[0].attr.value).eql('timeout')
+        app.$destroy()
+        done()
+      }, 200)
+    })
+
     it('repeat with array track-by case', () => {
       const name = 'repeat-track-by'
       const sourceCode = readSource(name)

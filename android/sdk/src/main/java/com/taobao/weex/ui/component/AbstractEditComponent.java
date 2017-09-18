@@ -456,7 +456,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
     if (getHostView() != null && fontSize != null ) {
-      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
+      Map<String, Object> map = new HashMap<>(1);
+      map.put(Constants.Name.FONT_SIZE, fontSize);
+      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(map, getInstance().getInstanceViewPortWidth()));
     }
   }
 
@@ -564,7 +566,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         public void run() {
           mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
         }
-      }, 16);
+      }, 100);
     }
     return true;
   }

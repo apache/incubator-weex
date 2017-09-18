@@ -23,7 +23,7 @@
 // track varies kinds of events and listeners.
 const handlerTraker = {}
 
-export default {
+const globalEvent = {
   /**
    * addEventListener
    * NOTE: one callback can only be bound to the same event once. Bind a callback twice doesn't
@@ -65,5 +65,11 @@ export default {
     }
     handlers.forEach(cb => document.removeEventListener(evt, cb))
     delete handlerTraker[evt]
+  }
+}
+
+export default {
+  init (weex) {
+    weex.registerModule('globalEvent', globalEvent)
   }
 }

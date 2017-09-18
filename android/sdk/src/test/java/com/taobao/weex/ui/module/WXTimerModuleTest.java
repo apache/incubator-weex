@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.module;
 
+import static android.R.attr.end;
+import static android.R.attr.start;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -61,6 +63,7 @@ public class WXTimerModuleTest {
   public final static int DELAY = 50;
   public final static int IMMEDIATELY = 0;
   public final static int INVALID_DELAY = -50;
+  public final static float FLOAT_DELAY = 20.6f;
 
   @Rule
   public PowerMockRule rule = new PowerMockRule();
@@ -84,7 +87,26 @@ public class WXTimerModuleTest {
   @Test
   public void testSetTimeoutDelay() throws Exception {
     module.setTimeout(VALID_FUNC_ID, DELAY);
-    mLooper.idle(DELAY);
+    long start, end, duration;
+    start = mLooper.getScheduler().getCurrentTime();
+    mLooper.runOneTask();
+    end = mLooper.getScheduler().getCurrentTime();
+    duration = end - start;
+
+    assertThat(duration, is((long) DELAY));
+    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void testSetTimeoutDelay2() throws Exception {
+    module.setTimeout(VALID_FUNC_ID, FLOAT_DELAY);
+    long start, end, duration;
+    start = mLooper.getScheduler().getCurrentTime();
+    mLooper.runOneTask();
+    end = mLooper.getScheduler().getCurrentTime();
+    duration = end - start;
+
+    assertThat(duration, is((long) FLOAT_DELAY));
     Mockito.verify(module, times(1)).handleMessage(any(Message.class));
   }
 
@@ -164,6 +186,23 @@ public class WXTimerModuleTest {
   }
 
   @Test
+  public void testSetIntervalDelay2() {
+    long start, end, duration;
+    module.setInterval(VALID_FUNC_ID, FLOAT_DELAY);
+
+    start = mLooper.getScheduler().getCurrentTime();
+    mLooper.runOneTask();
+    end = mLooper.getScheduler().getCurrentTime();
+    duration = end - start;
+
+    assertThat(duration, is((long) FLOAT_DELAY));
+
+    mLooper.runOneTask();
+    mLooper.runOneTask();
+    Mockito.verify(module, times(3)).handleMessage(any(Message.class));
+  }
+
+  @Test
   public void testClearTimeout() throws Exception {
     module.setTimeout(VALID_FUNC_ID, DELAY);
     module.clearTimeout(VALID_FUNC_ID);
@@ -180,7 +219,7 @@ public class WXTimerModuleTest {
   }
 
   @Test
-  public void setClearTimeout2(){
+  public void testClearTimeout2(){
     module.setTimeout(NO_CACHING_FUNC_ID, DELAY);
     module.clearTimeout(NO_CACHING_FUNC_ID);
     mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
@@ -188,7 +227,7 @@ public class WXTimerModuleTest {
   }
 
   @Test
-  public void setClearInterval2(){
+  public void testClearInterval2(){
     module.setInterval(NO_CACHING_FUNC_ID, DELAY);
     module.clearInterval(NO_CACHING_FUNC_ID);
     mLooper.idle(DELAY, TimeUnit.MILLISECONDS);
