@@ -57,7 +57,7 @@ We enter the awesome-project folder and install dependencies with the following 
 npm install
 ```
 
-Then we run `sh ./start` in root directory to start watch mode and static server.
+Then we run `npm run dev & npm run serve` in root directory to start watch mode and static server.
 
 Finally, we can see the Weex page in `http://localhost:8080/index.html`.
 
