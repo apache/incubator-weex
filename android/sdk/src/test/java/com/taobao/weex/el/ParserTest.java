@@ -170,9 +170,10 @@ public class ParserTest extends TestCase {
 
         System.out.println(block.getTokens().size());
 
-        int count = 10;
-        for (int i = 0; i < count; ++i) {
-            System.out.println("i=" + i);
+
+        String[] values = {null, null};
+        for (Object value : values) {
+            System.out.println(value + "ddd");
         }
 
     }

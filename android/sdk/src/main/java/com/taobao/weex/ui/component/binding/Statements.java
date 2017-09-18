@@ -35,8 +35,10 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -133,15 +135,42 @@ public class Statements {
                 if(listBlock != null) {
                     data = listBlock.execute(context);
                 }
-                if(data instanceof List
-                        && !TextUtils.isEmpty(indexKey)
-                        && !TextUtils.isEmpty(itemKey)){
-                    List list = (List) data;
+                if((data instanceof List || data instanceof  Map)){
+
+                    Collection collection = null;
+                    Map  map = null;
+                    if(data instanceof  List){
+                        collection = (List)data;
+                    }else{
+                        map = (Map)data;
+                        collection = map.keySet();
+                    }
                     Map<String, Object> loop = new HashMap<>();
-                    context.push(loop);
-                    for(int i=0; i<list.size(); i++){
-                        loop.put(indexKey, i);
-                        loop.put(itemKey, list.get(i));
+                    int index = 0;
+                    for(Object item : collection){
+                        Object key = null;
+                        Object value = item;
+                        if(map == null){
+                             key = index;
+                             value = item;
+                        }else{
+                             key = item;
+                             value = map.get(item);
+                        }
+                        if(indexKey != null){
+                            loop.put(indexKey, key);
+                        }
+
+                        if(itemKey != null){
+                            loop.put(itemKey, value);
+                        }else{
+                            context.push(value);
+                        }
+                        if(loop.size() > 0){
+                            context.push(loop);
+                        }
+
+
                         if(vif != null){
                             if(!Operators.isTrue(vif.execute(context))){
                                 continue;
@@ -169,8 +198,13 @@ public class Statements {
                         }
                         doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context);
                         renderIndex++;
+                        if(loop.size() > 0){
+                            context.push(loop);
+                        }
+                        if(itemKey == null) {
+                            context.pop();
+                        }
                     }
-                    context.pop();
                 }
                 //after v-for execute, remove component created pre v-for.
                 for(;renderIndex<parent.getChildCount(); renderIndex++){
@@ -199,7 +233,19 @@ public class Statements {
      * bind attrs and doRender component child
      * */
     private static void doBindingAttrsEventAndRenderChildNode(WXComponent component, WXDomObject domObject, ArrayStack context){
-        int stackSize = context.size();
+       WXAttr attr = component.getDomObject().getAttrs();
+        /**
+         * sub component supported, sub component new stack
+         * */
+        if(attr.get(ELUtils.IS_COMPONENT_ROOT) != null
+                && WXUtils.getBoolean(attr.get(ELUtils.IS_COMPONENT_ROOT), false)){
+            if(attr.get(ELUtils.COMPONENT_PROPS) != null
+                    && attr.get(ELUtils.COMPONENT_PROPS) instanceof  JSONObject){
+                Map<String, Object>  props  = renderProps((JSONObject) attr.get(ELUtils.COMPONENT_PROPS), context);
+                context = new ArrayStack();
+                context.push(props);
+            }
+        }
         doRenderBindingAttrsAndEvent(component, domObject, context);
         if(component instanceof WXVContainer){
             WXVContainer container = (WXVContainer) component;
@@ -207,9 +253,6 @@ public class Statements {
                 WXComponent next = container.getChild(k);
                 k += doRenderComponent(next, context);
             }
-        }
-        while (context.size() > stackSize){
-            context.pop();
         }
     }
 
@@ -234,17 +277,6 @@ public class Statements {
             ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
             Map<String, Object> dynamic =  renderBindingAttrs(bindAttrs, context);
             Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
-
-            /**
-             * scope supported
-             * */
-            if(attr.get(ELUtils.SCOPE) != null){
-                String alias = attr.get(ELUtils.SCOPE).toString();
-                Map map = new ArrayMap(4);
-                map.put(alias, dynamic.get(alias));
-                context.push(map);
-            }
-
             /**
              * diff attrs, see attrs has update, remove none update attrs
              * */
@@ -323,6 +355,26 @@ public class Statements {
             }
         }
         return  dynamic;
+    }
+
+
+    public static Map<String, Object> renderProps(JSONObject props, ArrayStack context){
+        Set<Map.Entry<String, Object>> entrySet = props.entrySet();
+        Map<String, Object> renderProps = new ArrayMap<>(4);
+        for(Map.Entry<String, Object> entry : entrySet){
+            Object value = entry.getValue();
+            String key = entry.getKey();
+            if(value instanceof  JSONObject
+                    && (((JSONObject) value).get(ELUtils.BINDING)  instanceof  Block)){
+                JSONObject binding = (JSONObject) value;
+                Block block = (Block) (binding.get(ELUtils.BINDING));
+                Object blockValue = block.execute(context);
+                renderProps.put(key, blockValue);
+            }else{
+                renderProps.put(key, value);
+            }
+        }
+        return  renderProps;
     }
 
     public static List<Object> getBindingEventArgs(ArrayStack context, Object bindings){

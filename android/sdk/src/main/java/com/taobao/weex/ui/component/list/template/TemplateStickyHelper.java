@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * mStickyHelper
+ * StickyHelper For Template List
  * Created by furture on 2017/8/24.
  */
 public class TemplateStickyHelper {

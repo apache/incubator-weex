@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.dom;
 
+import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
 import static java.lang.Boolean.parseBoolean;
 
 import android.support.annotation.NonNull;
@@ -471,6 +472,10 @@ public class WXAttr implements Map<String, Object>,Cloneable {
    * filter dynamic attrs and statements
    * */
   private boolean filterBindingStatement(String key, Object value) {
+        if(COMPONENT_PROPS.equals(key)){
+          ELUtils.bindingBlock(value);
+          return  false;
+        }
         if(ELUtils.isBinding(value)){
           if(mBindingAttrs == null){
               mBindingAttrs = new ArrayMap<String, Object>();

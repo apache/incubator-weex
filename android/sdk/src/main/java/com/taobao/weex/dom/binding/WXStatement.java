@@ -51,7 +51,7 @@ public class WXStatement implements Map<String, Object>,Cloneable  {
      * */
     public static final String WX_FOR = "[[repeat]]";
     public static final String WX_FOR_INDEX = "@index";
-    public static final String WX_FOR_ITEM = "@label";
+    public static final String WX_FOR_ITEM = "@alias";
     public static final String WX_FOR_LIST = "@expression";
 
 

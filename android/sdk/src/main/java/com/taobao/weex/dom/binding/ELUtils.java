@@ -25,6 +25,8 @@ import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.Set;
+
 /**
  * util's for binding and statment
  * Created by jianbai.gbj on 2017/8/17.
@@ -32,8 +34,12 @@ import com.taobao.weex.utils.WXLogUtils;
 public class ELUtils {
 
     public static final String BINDING = "@binding";
+    /**
+     * sub template
+     * */
+    public static final String IS_COMPONENT_ROOT = "@isComponentRoot";
 
-    public static final String SCOPE = "scope";
+    public static final String COMPONENT_PROPS = "@componentProps";
 
     /**
      * @param value check object is binding expression
@@ -65,6 +71,17 @@ public class ELUtils {
                 Object binding = object.get(BINDING);
                 if(!(binding instanceof Block)){
                     object.put(BINDING, Parser.parse(binding.toString()));
+                }
+            }
+            Set<String> keys = object.keySet();
+            for(Object propsKey : keys){
+                if(object.get(propsKey) instanceof  JSONObject
+                        && ((JSONObject)object.get(propsKey)).containsKey(BINDING)){
+                    JSONObject propsValue = (JSONObject) object.get(propsKey);
+                    Object binding = propsValue.get(BINDING);
+                    if(!(binding instanceof Block)){
+                        propsValue.put(BINDING, Parser.parse(binding.toString()));
+                    }
                 }
             }
         }else if(value instanceof JSONArray){
