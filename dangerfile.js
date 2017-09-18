@@ -225,7 +225,7 @@ if (danger.git.deleted_files) {
 
 if (has_sdk_changes && !has_test_changes) {
   if(isNotDanger) warn("This PR modify SDK code without add/modify testcases.")
-  else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
+  // else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
 }
 
 if (has_sdk_changes && !has_doc_changes) {
@@ -250,6 +250,7 @@ const ignoreCopyrightVerifyPath = [
   'test',
   'packages',
   'pre-build',
+  'html5/test/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',
@@ -343,8 +344,8 @@ function getContent(url) {
         // handle http errors
         console.log('response:', response.statusCode)
         if (response.statusCode < 200 || response.statusCode > 299) {
-          if (response.statusCode === 404) {
-            // ignore this, probably a renamed file.
+          if (response.statusCode === 404  || response.statusCode === 502) {
+            // ignore this, probably a renamed file,or .so that can't blame 
             return resolve('')
           }
           reject(new Error('Failed to load page, status code: ' + response.statusCode + ', '

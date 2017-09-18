@@ -223,11 +223,50 @@ module.exports = {
                   .sleep(1000)
               })
           })
-            driver = driverFactory.initPromiseChain();
-            driver.configureHttp({
-                timeout: 100000
-            });
-            global._wxDriver = driver;
+          driverFactory.addPromiseChainMethod('saveShot', function(filepath){
+            return this.takeScreenshot()
+              .then(imgData => {
+                var newImg = new Buffer(imgData, 'base64');
+                fs.writeFileSync(filepath, newImg);
+                return this;
+              })
+          });
+
+          driverFactory.addPromiseChainMethod('clickScreenById', function(id,index) {
+              if(!index)index = 0;
+              return this.elementsById(id)
+                  .then((array)=>{
+                      if(array){
+                          if(index<0)index=0;
+                          if(index>=array.length)index=array.length-1;
+                          return array[index].getRect()
+                            .then(rect => {
+                              var left = rect.x;
+                              var top = rect.y;
+                              var width = rect.width;
+                              var height = rect.height;
+                              var touchX = Math.floor(left + width / 2);
+                              var touchY = Math.floor(top + height / 2);
+                              console.log('rect:' + touchX + " " + touchY);
+                              return this
+                                .touch('tap', {
+                                    x: touchX,
+                                    y: touchY
+                                })
+                                .sleep(500)
+                            })
+                      }else{
+                        console.log('id='+id+'的元素不存在！')
+                        return this;
+                      }
+                  })          
+          });
+
+          driver = driverFactory.initPromiseChain();
+          driver.configureHttp({
+              timeout: 100000
+          });
+          global._wxDriver = driver;
         }
         
         return driver;
@@ -243,6 +282,13 @@ module.exports = {
     quit:function(driver){
         if(browser)
             return driver.quit()
-        return driver.sleep(1000).back().sleep(1000);
+        var filepath = path.resolve(__dirname,'../../last.png');
+        return driver.saveShot(filepath).sleep(1000).back().sleep(1000);
+    },
+    quitWithoutBack:function(driver){
+        if(browser)
+            return driver.quit()
+        var filepath = path.resolve(__dirname,'../../last.png');
+        return driver.saveShot(filepath).sleep(1000);
     }
 }

@@ -1,5 +1,10 @@
 buildscript {
+    repositories {
+        mavenCentral()
+    }
+
     dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
@@ -10,6 +15,7 @@ plugins {
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){

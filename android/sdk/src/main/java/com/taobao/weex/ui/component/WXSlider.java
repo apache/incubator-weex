@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -45,7 +44,6 @@ import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -132,7 +130,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
    */
   @Override
   public LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom) {
-    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    ViewGroup.LayoutParams lp = childView == null ? null : childView.getLayoutParams();
     if (lp == null) {
       lp = new FrameLayout.LayoutParams(width, height);
     } else {

@@ -181,4 +181,12 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 - (void)_addUITask:(void (^)())block;
 
 - (void)excutePrerenderUITask:(NSString *)url;
+
+/**
+ * @param styles a NSDictionary value, styles which will resolve
+ * @param component a WXComponent value, the target which you want to resolve
+ * @param isUpdateStyles a BOOL value, YES will udpate the component style property, NO will notifiy the lifeStyle of compoenent to handle, default value is NO.
+ * @abstract handleStyle will be add to a queue to be executed every frame, but handleStyleOnMainThread will switch to main thread and execute imediately, you can call this for your execution time sequence.
+ */
+- (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
 @end

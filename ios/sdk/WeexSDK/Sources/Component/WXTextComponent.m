@@ -38,7 +38,6 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame])) {
-        self.isAccessibilityElement = YES;
         self.accessibilityTraits |= UIAccessibilityTraitStaticText;
         
         self.opaque = NO;
@@ -75,15 +74,23 @@
 
 - (NSString *)accessibilityValue
 {
-    if (self.wx_component) {
-        if (self.wx_component->_ariaLabel) {
-            return self.wx_component->_ariaLabel;
-        }
+    if (self.wx_component && self.wx_component->_ariaLabel) {
+        return [super accessibilityValue];
     }
     if (![(WXTextComponent*)self.wx_component useCoreText]) {
         return _textStorage.string;
     }
     return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+}
+
+- (NSString *)accessibilityLabel
+{
+    if (self.wx_component) {
+        if (self.wx_component->_ariaLabel) {
+            return self.wx_component->_ariaLabel;
+        }
+    }
+    return [super accessibilityLabel];
 }
 
 @end
@@ -275,6 +282,8 @@ do {\
     if (!useCoreText) {
         ((WXTextView *)self.view).textStorage = _textStorage;
     }
+    self.view.isAccessibilityElement = YES;
+    
     [self setNeedsDisplay];
 }
 
@@ -353,12 +362,14 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
+    NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
-        _ctAttributedString = [[self buildCTAttributeString] copy];
+        _ctAttributedString = [self buildCTAttributeString];
     }
+    attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    return [_ctAttributedString copy];
+    return attributedString;
 }
 
 - (void)repaintText:(NSNotification *)notification

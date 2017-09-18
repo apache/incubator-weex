@@ -32,7 +32,6 @@ describe('scroller fixed position item ', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/scroller-fixed.js'))
-      .waitForElementById('div_1',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
@@ -42,6 +41,7 @@ describe('scroller fixed position item ', function () {
 
   it('#1 position:fixed items', () => {
     return driver
+    .waitForElementById('div_1',util.getGETActionWaitTimeMills(),1000)
     .dragUpAndDown()
     .sleep(1000)
     .elementById('text_1')

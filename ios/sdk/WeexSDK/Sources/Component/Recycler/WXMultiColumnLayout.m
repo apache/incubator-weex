@@ -182,18 +182,28 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
         }
         
         // cells
-        for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
-            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
-            CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
-            UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-            NSUInteger column = [self _minHeightColumnForAllColumns];
-            CGFloat x = insets.left + (columnWidth + columnGap) * column;
-            CGFloat y = [self.columnsMaxHeights[column] floatValue];
-            itemAttributes.frame = CGRectMake(x, y, columnWidth, itemHeight);
-            cellAttributes[indexPath] = itemAttributes;
-            
-            self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
+        
+        @try {
+            for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+                CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
+                UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+                NSUInteger column = [self _minHeightColumnForAllColumns];
+                CGFloat x = insets.left + (columnWidth + columnGap) * column;
+                if (column >= [self.columnsMaxHeights count]) {
+                    return;
+                }
+                CGFloat y = [self.columnsMaxHeights[column] floatValue];
+                itemAttributes.frame = CGRectMake(x, y, columnWidth, itemHeight);
+                cellAttributes[indexPath] = itemAttributes;
+                
+                self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
+            }
+        } @catch (NSException *exception) {
+            WXLog(@"%@", exception);
+        } @finally {
         }
+        
         
         currentHeight = [self _maxHeightForAllColumns];
         [self _columnsReachToHeight:currentHeight];

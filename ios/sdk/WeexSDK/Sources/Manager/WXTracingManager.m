@@ -294,7 +294,7 @@
 //            if([t.threadName isEqualToString:WXTJSBridgeThread]&& [self compareRef:tracing.ref withTracing:t] && ([t.name isEqualToString:tracing.name] || [t.name isEqualToString:WXTJSCall])){
             if([t.threadName isEqualToString:WXTJSBridgeThread]&& [self compareRef:tracing.ref withTracing:t]){
                 if([t.fName isEqualToString:tracing.fName]){
-                    return t.traceId;
+                    return (NSInteger)t.traceId;
                 }
             }
         }
@@ -491,6 +491,17 @@
             [tracingHandle commitTracingSummaryInfo:newInfo];
         }
         
+    }
+}
+
++(void)destroyTraincgTaskWithInstance:(NSString *)instanceId
+{
+    if(![self isTracing]){
+        return ;
+    }
+    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:instanceId];
+    if(task){
+        [[WXTracingManager sharedInstance].tracingTasks removeObjectForKey:instanceId];
     }
 }
 

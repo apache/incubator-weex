@@ -18,7 +18,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/'+goal+'.js'))
-      .waitForElementByName(goal, interval, 2000)
   });
 
   afterEach(function () {
@@ -28,6 +27,7 @@ describe('weex '+goal+' test', function () {
   it('#1 '+goal + ' event', () => {
     //TODO ：截图比对
     return driver.waitForElementByName('change', interval, 2000)
+      .waitForElementByName(goal, interval, 2000)
       .click()
       .sleep(500); 
   })

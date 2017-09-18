@@ -348,7 +348,7 @@ function bindKey (vm, el, name, key, calc) {
     }
     const differ = vm && vm._app && vm._app.differ
     if (differ) {
-      differ.append('element', el.depth, el.ref, handler)
+      differ.append('element', el.depth || 0, el.ref, handler)
     }
     else {
       handler()

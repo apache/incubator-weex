@@ -30,13 +30,13 @@
     if ([keys[0] isEqualToString:@"iOS_weex_ext_config"] && [keys[1] isEqualToString:@"slider_class_name"]){
         return @"WXCycleSliderComponent";
     }
-    if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"is_switch_on"]){
+    if ([keys[0] isEqualToString:@"iOS_weex_prerender_config"] && [keys[1] isEqualToString:@"is_switch_on"]){
         return @YES;
     }
-    if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"cacheTime"]){
+    if ([keys[0] isEqualToString:@"iOS_weex_prerender_config"] && [keys[1] isEqualToString:@"cacheTime"]){
         return @300000;
     }
-    if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"max_cache_num"]){
+    if ([keys[0] isEqualToString:@"iOS_weex_prerender_config"] && [keys[1] isEqualToString:@"max_cache_num"]){
         return @2;
     }
     return nil;
