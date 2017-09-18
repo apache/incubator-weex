@@ -436,12 +436,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSMutableDictionary *normalStyles = [NSMutableDictionary new];
     NSMutableArray *resetStyles = [NSMutableArray new];
     [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
-    
-    [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
+    [component _updateStylesOnMainThread:[normalStyles copy] resetStyles:resetStyles];
     [component readyToRender];
     
     WXPerformBlockOnComponentThread(^{
-        [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
+        [component _updateStylesOnComponentThread:[normalStyles copy] resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     });
 }
 
