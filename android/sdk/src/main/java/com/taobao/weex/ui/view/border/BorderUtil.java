@@ -78,30 +78,4 @@ class BorderUtil {
       }
     }
   }
-
-  static boolean areEdgesSame(float... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      float init = numbers[0];
-      for (float number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  static boolean areEdgesSame(int... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      int init = numbers[0];
-      for (int number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
 }

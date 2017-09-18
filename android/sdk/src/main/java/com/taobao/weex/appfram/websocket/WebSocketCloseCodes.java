@@ -20,7 +20,7 @@ package com.taobao.weex.appfram.websocket;
 
 /**
  * Created by moxun on 17/1/3.
- * @link {https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent}
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent">CloseEvent</a>
  */
 
 public enum WebSocketCloseCodes {

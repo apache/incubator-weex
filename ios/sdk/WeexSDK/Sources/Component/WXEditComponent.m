@@ -370,10 +370,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     if (attributes[@"placeholder"]) {
         _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
-        if(_value.length > 0){
-            _placeholderString = @"";
-        }
         [self setPlaceholderAttributedString];
+        if(_value.length > 0){
+            _placeHolderLabel.text = @"";
+        }
     }
     if (attributes[@"returnKeyType"]) {
         _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
