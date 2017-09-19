@@ -86,7 +86,7 @@ import java.util.Set;
 import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
 
 /**
- * weex template list supported
+ * weex template list supported, high performance recycler-list
  * https://github.com/Hanks10100/weex-native-directive
  * Created by jianbai.gbj on 2017/8/17.
  */
@@ -129,6 +129,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private String listDataItemKey = null;
     private String listDataIndexKey = null;
     private ArrayMap<String, Integer> mTemplateViewTypes;
+
+
+
     private Map<String, WXCell> mTemplates;
     private String  listDataTemplateKey = Constants.Name.Recycler.SLOT_TEMPLATE_TYPE;
     private Runnable listUpdateRunnable;
@@ -275,12 +278,25 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }
                 }
+                notifyWatchCreateEvent();
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
             }
         };
         return bounceRecyclerView;
+    }
+
+    /**
+     * notify watch event
+     * */
+    private void notifyWatchCreateEvent() {
+        if(listData != null){
+            return;
+        }
+
+
+
     }
 
 
@@ -405,6 +421,26 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     public void unbindDisappearEvent(WXComponent component) {
         setAppearanceWatch(component, AppearanceHelper.DISAPPEAR, false);
     }
+
+
+    @JSMethod
+    public void scrollTo(int position, Map<String, Object> options){
+        if (position >= 0) {
+            boolean smooth = true;
+            if(options != null) {
+                smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+            }
+
+            final int pos = position;
+            BounceRecyclerView bounceRecyclerView = getHostView();
+            if (bounceRecyclerView == null) {
+                return;
+            }
+            final WXRecyclerView view = bounceRecyclerView.getInnerView();
+            view.scrollTo(smooth, pos, 0, getOrientation());
+        }
+    }
+
 
     @Override
     public void scrollTo(WXComponent component, Map<String, Object> options) {
@@ -1061,7 +1097,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     /**
      * return tepmlate key for position
      * */
-    private String getTemplateKey(int position){
+    public String getTemplateKey(int position){
         JSONObject data =  safeGetListData(position);
         String template = data.getString(listDataTemplateKey);
         if(TextUtils.isEmpty(template)){
@@ -1077,6 +1113,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         String template = getTemplateKey(position);
         return mTemplates.get(template);
     }
+
+
 
     /**
      * get template key from cell; 0  for default type
@@ -1407,5 +1445,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             componentList.add(child);
         }
         return  componentList;
+    }
+
+    public Map<String, WXCell> getTemplates() {
+        return mTemplates;
     }
 }

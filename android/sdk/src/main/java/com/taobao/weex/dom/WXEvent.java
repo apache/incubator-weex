@@ -61,6 +61,17 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     super.clear();
   }
 
+
+  public boolean remove(String o) {
+     if(mEventBindingArgs != null){
+        mEventBindingArgs.remove(o);
+     }
+     if(mEventBindingArgsValues != null){
+        mEventBindingArgsValues.remove(o);
+     }
+     return super.remove(o);
+  }
+
   /**
    * can by null
    * */
@@ -88,6 +99,17 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
            putEventBindingArgs(eventName, args);
       }
     }
+  }
+
+  public static String getEventName(Object event){
+    if(event instanceof CharSequence){
+      return event.toString();
+    }else if(event instanceof JSONObject){
+      JSONObject bindings = (JSONObject) event;
+      String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+      return  eventName;
+    }
+    return  event.toString();
   }
 
   public void putEventBindingArgs(String event, Object args){
