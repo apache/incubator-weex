@@ -334,6 +334,7 @@
     // fill background color
     if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
         CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
+        CGContextSetAlpha(context, _opacity);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
     }
