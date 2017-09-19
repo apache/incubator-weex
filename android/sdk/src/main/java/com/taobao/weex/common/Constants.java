@@ -197,6 +197,8 @@ public class Constants {
 
 
     String VIF_FALSE = "ifFalse";
+    String UNDEFINED = "undefined";
+    String FLAT = "flat";
   }
 
   public interface Value {

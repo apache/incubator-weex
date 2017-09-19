@@ -494,4 +494,15 @@
     }
 }
 
++(void)destroyTraincgTaskWithInstance:(NSString *)instanceId
+{
+    if(![self isTracing]){
+        return ;
+    }
+    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:instanceId];
+    if(task){
+        [[WXTracingManager sharedInstance].tracingTasks removeObjectForKey:instanceId];
+    }
+}
+
 @end

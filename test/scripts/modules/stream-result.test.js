@@ -7,28 +7,24 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-var switchTag = 'XCUIElementTypeSwitch';
-
 var goal = 'stream-result';
-var timeout = util.getGETActionWaitTimeMills();
-describe('weex '+goal+' test', function () {
+
+describe('stream-result-test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
+  var maxWt = util.getGETActionWaitTimeMills();
   beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/modules/'+goal+'.js'))
-      .waitForElementByName(goal, timeout, 2000)
+      .get(util.getPage('/modules/stream-result.js'))
   });
 
   afterEach(function () {
     return util.quit(driver);
   })
 
-  it('#1 '+goal + ' event', () => {
-    //TODO ：截图比对
-    return driver.waitForElementByName('streamGet', timeout, 2000)
-      .click()
-      .waitForElementByName('response:success', timeout, 2000) 
+  it('#1 ' + 'stream-result' + ' event', () => {
+    return driver.waitForElementById('streamGet', maxWt, 2000)
+    .click()
+    .waitForElementByName('Completed', maxWt, 10000);
   })
 });

@@ -608,7 +608,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return  WXImageQualityHigh;
     }
     
-    return  WXImageQualityLow;
+    return  WXImageQualityNone;
 }
 
 + (WXImageSharp)WXImageSharp:(id)value
@@ -806,7 +806,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     if (![value isKindOfClass:[NSString class]]) {
         return accessibilityTrait;
     }
-    NSString * role = [value lowercaseString];
+    NSString * role = value;
     if ([role isEqualToString:@"button"]) {
         accessibilityTrait = UIAccessibilityTraitButton;
     } else if ([role isEqualToString:@"link"]) {
@@ -821,6 +821,28 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             accessibilityTrait = UIAccessibilityTraitTabBar;
         }
 #endif
+    } else if ([role isEqualToString:@"frequentUpdates"]) {
+        accessibilityTrait = UIAccessibilityTraitUpdatesFrequently;
+    } else if ([role isEqualToString:@"startsMedia"]) {
+        accessibilityTrait = UIAccessibilityTraitStartsMediaSession;
+    } else if ([role isEqualToString:@"allowsDirectInteraction"]) {
+        accessibilityTrait = UIAccessibilityTraitAllowsDirectInteraction;
+    } else if ([role isEqualToString:@"summary"]) {
+        accessibilityTrait = UIAccessibilityTraitSummaryElement;
+    } else if ([role isEqualToString:@"header"]) {
+        accessibilityTrait = UIAccessibilityTraitHeader;
+    } else if ([role isEqualToString:@"keyboardKey"]) {
+        accessibilityTrait = UIAccessibilityTraitKeyboardKey;
+    } else if ([role isEqualToString:@"disabled"]) {
+        accessibilityTrait = UIAccessibilityTraitNotEnabled;
+    } else if ([role isEqualToString:@"playSound"]) {
+        accessibilityTrait = UIAccessibilityTraitPlaysSound;
+    } else if ([role isEqualToString:@"selected"]) {
+        accessibilityTrait = UIAccessibilityTraitSelected;
+    } else if ([role isEqualToString:@"pageTurn"]) {
+        accessibilityTrait = UIAccessibilityTraitCausesPageTurn;
+    } else if ([role isEqualToString:@"text"]) {
+        accessibilityTrait = UIAccessibilityTraitStaticText;
     }
     
     return accessibilityTrait;

@@ -29,6 +29,7 @@
 #import "UIBezierPath+Weex.h"
 #import "WXSDKEngine.h"
 #import "WXUtility.h"
+#import <pthread/pthread.h>
 
 @interface WXImageView : UIImageView
 
@@ -46,8 +47,12 @@
 static dispatch_queue_t WXImageUpdateQueue;
 
 @interface WXImageComponent ()
+{
+    NSString * _imageSrc;
+    pthread_mutex_t _imageSrcMutex;
+    pthread_mutexattr_t _propertMutexAttr;
+}
 
-@property (nonatomic, strong) NSString *imageSrc;
 @property (nonatomic, strong) NSString *placeholdSrc;
 @property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
@@ -72,20 +77,30 @@ WX_EXPORT_METHOD(@selector(save:))
         if (!WXImageUpdateQueue) {
             WXImageUpdateQueue = dispatch_queue_create("com.taobao.weex.ImageUpdateQueue", DISPATCH_QUEUE_SERIAL);
         }
+        
+        pthread_mutexattr_init(&(_propertMutexAttr));
+        pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&(_imageSrcMutex), &(_propertMutexAttr));
+        
         if (attributes[@"src"]) {
+             pthread_mutex_lock(&(_imageSrcMutex));
             _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+             pthread_mutex_unlock(&(_imageSrcMutex));
         } else {
             WXLogWarning(@"image src is nil");
         }
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         [self configFilter:styles];
+        
+        _imageQuality = WXImageQualityNone;
         if (styles[@"quality"]) {
             _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         }
         if (attributes[@"quality"]) {
             _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
         }
+        
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;
@@ -220,13 +235,14 @@ WX_EXPORT_METHOD(@selector(save:))
 - (void)dealloc
 {
     [self cancelImage];
+    pthread_mutex_destroy(&(_imageSrcMutex));
+    pthread_mutexattr_destroy(&_propertMutexAttr);
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
-        _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [self updateImage];
+        [self setImageSrc:[[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
     }
     if (attributes[@"quality"]) {
         _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
@@ -305,13 +321,24 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
+- (NSString *)imageSrc
+{
+    pthread_mutex_lock(&(_imageSrcMutex));
+    NSString * imageSrcCpy = [_imageSrc copy];
+    pthread_mutex_unlock(&(_imageSrcMutex));
+    
+    return imageSrcCpy;
+}
+
 - (void)setImageSrc:(NSString*)src
 {
+    pthread_mutex_lock(&(_imageSrcMutex));
     if (![src isEqualToString:_imageSrc]) {
         _imageSrc = src;
         _imageDownloadFinish = NO;
         [self updateImage];
     }
+    pthread_mutex_unlock(&(_imageSrcMutex));
 }
 
 - (void)updateImage
@@ -345,7 +372,6 @@ WX_EXPORT_METHOD(@selector(save:))
     NSString *placeholderSrc = self.placeholdSrc;
     
     if ([WXUtility isBlankString:placeholderSrc]) {
-//        WXLogError(@"image placeholder src is empty");
         return;
     }
     
@@ -384,8 +410,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    NSString *imageSrc = self.imageSrc;
-    
+    NSString *imageSrc = [NSString stringWithFormat:@"%@", self.imageSrc?:@""];
     if ([WXUtility isBlankString:imageSrc]) {
         WXLogError(@"image src is empty");
         return;

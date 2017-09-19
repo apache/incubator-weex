@@ -14,7 +14,6 @@ describe('a-src-test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/a-src.js'))
-      .waitForElementByName("a-src",maxWt,2000)
   });
 
   afterEach(function () {
@@ -23,6 +22,7 @@ describe('a-src-test', function () {
 
   it('#1 Click A tag itself', () => {
     return driver
+      .waitForElementByName("a-src",maxWt,2000)
       .waitForElementById('a-itself', maxWt, 2000)
       .click()
       .waitForElementByName('a-support-href1', maxWt, 2000)

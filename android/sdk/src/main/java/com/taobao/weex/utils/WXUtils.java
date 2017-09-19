@@ -25,6 +25,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
@@ -48,34 +49,38 @@ public class WXUtils {
     if (value == null) {
       return Float.NaN;
     }
-
     String temp = value.toString().trim();
-    if(!TextUtils.isEmpty(temp)) {
-      if (temp.endsWith("wx")) {
-        try {
-          return transferWx(temp, viewport);
-        } catch (NumberFormatException e) {
-          WXLogUtils.e("Argument format error! value is " + value, e);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
-        }
-      } else if (temp.endsWith("px")) {
-        try {
-          temp = temp.substring(0, temp.indexOf("px"));
-          return Float.parseFloat(temp);
-        } catch (NumberFormatException nfe) {
-          WXLogUtils.e("Argument format error! value is " + value, nfe);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
-        }
-      } else {
-        try {
-          return Float.parseFloat(temp);
-        } catch (NumberFormatException nfe) {
-          WXLogUtils.e("Argument format error! value is " + value, nfe);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
-        }
+    if (Constants.Name.AUTO.equals(temp)
+        || Constants.Name.UNDEFINED.equals(temp)
+        || TextUtils.isEmpty(temp)) {
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:" + Float.NaN);
+      return Float.NaN;
+    }
+
+    if (temp.endsWith("wx")) {
+      try {
+        return transferWx(temp, viewport);
+      } catch (NumberFormatException e) {
+        WXLogUtils.e("Argument format error! value is " + value, e);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
+      }
+    } else if (temp.endsWith("px")) {
+      try {
+        temp = temp.substring(0, temp.indexOf("px"));
+        return Float.parseFloat(temp);
+      } catch (NumberFormatException nfe) {
+        WXLogUtils.e("Argument format error! value is " + value, nfe);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
+      }
+    } else {
+      try {
+        return Float.parseFloat(temp);
+      } catch (NumberFormatException nfe) {
+        WXLogUtils.e("Argument format error! value is " + value, nfe);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
       }
     }
     return Float.NaN;
@@ -91,7 +96,10 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
-    if(TextUtils.isEmpty(temp)){
+    if(Constants.Name.AUTO.equals(temp)
+        || Constants.Name.UNDEFINED.equals(temp)
+        || TextUtils.isEmpty(temp)){
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:"+Float.NaN);
       return df;
     }
     if (temp.endsWith("wx")) {

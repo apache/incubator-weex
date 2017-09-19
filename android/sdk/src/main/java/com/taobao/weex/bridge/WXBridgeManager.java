@@ -137,6 +137,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private static final int CRASHREINIT = 50;
   private static int reInitCount = 1;
 
+  private static String crashUrl = null;
+  private static long lastCrashTime = 0;
+
 
   /**
    * next tick tasks, can set priority
@@ -940,6 +943,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         if (instance != null) {
           url = instance.getBundleUrl();
         }
+        try {
+            if (WXEnvironment.getApplication() != null) {
+                crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + crashFile;
+                // Log.e("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         callReportCrash(crashFile, instanceId, url);
         if (reInitCount > CRASHREINIT) {
           return IWXBridge.INSTANCE_RENDERING_ERROR;
@@ -956,17 +967,33 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXLogUtils.e("[WXBridgeManager] callReportCrashReloadPage exception: ", e);
       }
       try {
+
           if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-              // JSONObject domObject = JSON.parseObject(tasks);
+              boolean reloadThisInstance = shouReloadCurrentInstance(
+                      WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
               WXDomModule domModule = getDomModule(instanceId);
-              Action action = Actions.getReloadPage(instanceId);
-              domModule.postAction((DOMAction)action, true);
+              Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
+              domModule.postAction((DOMAction) action, true);
           }
+
       } catch (Exception e) {
           WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
           commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
       }
       return IWXBridge.INSTANCE_RENDERING_ERROR;
+  }
+
+  public boolean shouReloadCurrentInstance(String aUrl) {
+    long time = System.currentTimeMillis();
+    if (crashUrl == null ||
+            (crashUrl != null && !crashUrl.equals(aUrl)) ||
+            ((time - lastCrashTime) > 10000)) {
+      crashUrl = aUrl;
+      lastCrashTime = time;
+      return true;
+    }
+    lastCrashTime = time;
+    return false;
   }
 
   public void callReportCrash(String crashFile, final String instanceId, final String url) {
@@ -1625,6 +1652,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
     wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
@@ -1816,6 +1844,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
+      if (METHOD_CREATE_INSTANCE.equals(function)) {
+        try {
+          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+            // JSONObject domObject = JSON.parseObject(tasks);
+            WXDomModule domModule = getDomModule(instanceId);
+            Action action = Actions.getReloadPage(instanceId, true);
+            domModule.postAction((DOMAction)action, true);
+            instance.setNeedLoad(true);
+            return;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 
