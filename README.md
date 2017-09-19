@@ -1,6 +1,3 @@
-# CenariusWeexSDK
-由于Weex一直没有动态库，给swift项目造成很大麻烦，于是CenariusWeexSDK变诞生了。
-
 # Weex
 
 A framework for building Mobile cross-platform UI.
