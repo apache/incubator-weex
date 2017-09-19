@@ -37,6 +37,7 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXUtility.h"
+#import "WXExtendCallNativeManager.h"
 
 @implementation WXSDKEngine
 
@@ -60,6 +61,7 @@
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
+    [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -112,6 +114,11 @@
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
 {
     [self registerComponent:name withClass:clazz withProperties: @{@"append":@"tree"}];
+}
+
++ (void)registerExtendCallNative:(NSString *)name withClass:(Class)clazz
+{
+    [WXExtendCallNativeManager registerExtendCallNative:name withClass:clazz];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary *)properties

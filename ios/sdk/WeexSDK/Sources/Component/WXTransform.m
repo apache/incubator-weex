@@ -43,6 +43,7 @@
     float _rotateX;
     float _rotateY;
     float _rotateZ;
+    float _perspective;
     
     CATransform3D _nativeTransform;
     BOOL _useNativeTransform;
@@ -58,6 +59,9 @@
         _rotateY = 0.0;
         _rotateZ = 0.0;
         _rotateAngle = 0.0;
+        
+        // default is parallel projection
+        _perspective = CGFLOAT_MAX;
         
         [self parseTransform:cssValue];
         [self parseTransformOrigin:origin];
@@ -147,19 +151,19 @@
     if (_useNativeTransform) {
         return _nativeTransform;
     }
+    
     CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
+
+    if (_rotateAngle != 0 || _rotateZ != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateAngle?:_rotateZ, 0, 0, 1);
+    }
+    
+    if (_rotateY != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateY, 0, 1, 0);
+    }
     
     if (_rotateX != 0) {
-        CATransform3D rotateXTransform = CATransform3DMakeRotation(_rotateX, 1, 0, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateXTransform);
-    }
-    if (_rotateY != 0) {
-        CATransform3D rotateYTransform = CATransform3DMakeRotation(_rotateY, 0, 1, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateYTransform);
-    }
-    if (_rotateAngle != 0 || _rotateZ != 0) {
-        CATransform3D rotateZTransform = CATransform3DMakeRotation(_rotateAngle?:_rotateZ, 0, 0, 1);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateZTransform);
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateX, 1, 0, 0);
     }
     
     return nativeTransform3d;
@@ -169,6 +173,9 @@
 {
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
+    if (_perspective && !isinf(_perspective)) {
+        nativeTansform3D.m34 = -1.0/_perspective*[UIScreen mainScreen].scale;
+    }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
         return nativeTansform3D;
     }
@@ -219,7 +226,7 @@
           **/
         CGPoint anchorPoint = CGPointMake(
                                           _originX ? [_originX valueForMaximum:view.bounds.size.width] / view.bounds.size.width : 0.5,
-                                          _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
+                                          _originY ? [_originY valueForMaximum:view.bounds.size.height] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
@@ -328,6 +335,14 @@
 - (void)parseRotatez:(NSArray *)value
 {
    _rotateZ = [self getAngle:value[0]];
+}
+
+- (void)parsePerspective:(NSArray *)value
+{
+    _perspective = [value[0] doubleValue];
+    if (_perspective <= 0 ) {
+        _perspective = CGFLOAT_MAX;
+    }
 }
 
 - (void)parseTranslate:(NSArray *)value

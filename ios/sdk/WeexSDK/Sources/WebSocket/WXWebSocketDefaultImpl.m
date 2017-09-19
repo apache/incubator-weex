@@ -56,7 +56,7 @@
     [_webSockets setObject:webSocket forKey:identifier];
 }
 
-- (void)send:(NSString *)identifier data:(NSString *)data
+- (void)send:(id)identifier data:(NSString *)data
 {
     SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
     if(webSocket) {

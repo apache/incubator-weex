@@ -123,7 +123,8 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
   public void setCircleViewPager(WXCircleViewPager mCircleViewPager) {
     this.mCircleViewPager = mCircleViewPager;
     if (this.mCircleViewPager != null) {
-      this.mCircleViewPager.setOnPageChangeListener(this);
+      this.mCircleViewPager.addOnPageChangeListener(this);
+      this.realCurrentItem = mCircleViewPager.getRealCurrentItem();
     }
     requestLayout();
   }

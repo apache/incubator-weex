@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.dom;
 
-import android.os.Message;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
@@ -28,6 +26,9 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.action.TraceableAction;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.utils.WXLogUtils;
 
 
@@ -78,16 +79,16 @@ public final class WXDomModule extends WXModule {
     mWXSDKInstance = instance;
   }
 
-  public void callDomMethod(JSONObject task) {
+  public void callDomMethod(JSONObject task, long... parseNanos) {
     if (task == null) {
       return;
     }
     String method = (String) task.get(WXBridgeManager.METHOD);
     JSONArray args = (JSONArray) task.get(WXBridgeManager.ARGS);
-    callDomMethod(method,args);
+    callDomMethod(method,args,parseNanos);
   }
   
-  public Object callDomMethod(String method, JSONArray args) {
+  public Object callDomMethod(String method, JSONArray args, long... parseNanos) {
 
     if (method == null) {
       return null;
@@ -102,6 +103,34 @@ public final class WXDomModule extends WXModule {
         postAction((DOMAction)action, CREATE_BODY.equals(method) || ADD_RULE.equals(method));
       }else {
         postAction((RenderAction)action);
+      }
+
+      if (WXTracing.isAvailable() && action instanceof TraceableAction) {
+        //TODO: CHECK AGAIN
+        String ref = null;
+        String type = null;
+        if (args.size() > 0) {
+          if (args.size() >= 1) {
+            if (args.get(0) instanceof String) {
+              ref = args.getString(0);
+            } else if (args.get(0) instanceof JSONObject) {
+              ref = ((JSONObject) args.get(0)).getString("ref");
+              type = ((JSONObject) args.get(0)).getString("type");
+            }
+          }
+
+          if (args.size() >= 2) {
+            if (args.get(1) instanceof JSONObject) {
+              ref = ((JSONObject) args.get(1)).getString("ref");
+              type = ((JSONObject) args.get(1)).getString("type");
+            }
+          }
+        }
+        if (parseNanos != null && parseNanos.length == 1) {
+          ((TraceableAction) action).mParseJsonNanos = parseNanos[0];
+          ((TraceableAction) action).mStartMillis -= Stopwatch.nanosToMillis(parseNanos[0]);
+        }
+        ((TraceableAction) action).onStartDomExecute(mWXSDKInstance.getInstanceId(), method, ref, type, args.toJSONString());
       }
     } catch (IndexOutOfBoundsException e) {
       // no enougn args

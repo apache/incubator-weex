@@ -28,16 +28,16 @@
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
 
-@interface WXText : UIView
+// WXText is a non-public is not permitted
+@interface WXTextView : UIView
 @property (nonatomic, strong) NSTextStorage *textStorage;
 @end
 
-@implementation WXText
+@implementation WXTextView
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame])) {
-        self.isAccessibilityElement = YES;
         self.accessibilityTraits |= UIAccessibilityTraitStaticText;
         
         self.opaque = NO;
@@ -74,15 +74,23 @@
 
 - (NSString *)accessibilityValue
 {
-    if (self.wx_component) {
-        if (self.wx_component->_ariaLabel) {
-            return self.wx_component->_ariaLabel;
-        }
+    if (self.wx_component && self.wx_component->_ariaLabel) {
+        return [super accessibilityValue];
     }
     if (![(WXTextComponent*)self.wx_component useCoreText]) {
         return _textStorage.string;
     }
     return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+}
+
+- (NSString *)accessibilityLabel
+{
+    if (self.wx_component) {
+        if (self.wx_component->_ariaLabel) {
+            return self.wx_component->_ariaLabel;
+        }
+    }
+    return [super accessibilityLabel];
 }
 
 @end
@@ -182,7 +190,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if (_needsRemoveObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
-    _ctAttributedString = nil;
     pthread_mutex_destroy(&_ctAttributedStringMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
 }
@@ -251,7 +258,11 @@ do {\
 - (void)setNeedsRepaint
 {
     _textStorage = nil;
+    
+    pthread_mutex_lock(&(_ctAttributedStringMutex));
     _ctAttributedString = nil;
+    pthread_mutex_unlock(&(_ctAttributedStringMutex));
+    
 }
 
 #pragma mark - Subclass
@@ -269,14 +280,16 @@ do {\
         useCoreText = [(WXTextComponent*)self.view.wx_component useCoreText];
     }
     if (!useCoreText) {
-        ((WXText *)self.view).textStorage = _textStorage;
+        ((WXTextView *)self.view).textStorage = _textStorage;
     }
+    self.view.isAccessibilityElement = YES;
+    
     [self setNeedsDisplay];
 }
 
 - (UIView *)loadView
 {
-    return [[WXText alloc] init];
+    return [[WXTextView alloc] init];
 }
 
 - (BOOL)needsDrawRect
@@ -290,7 +303,7 @@ do {\
     if (_isCompositingChild) {
         [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
     } else {
-        WXText *textView = (WXText *)_view;
+        WXTextView *textView = (WXTextView *)_view;
         [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
     }
     
@@ -349,12 +362,14 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
+    NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
-        _ctAttributedString = [[self buildCTAttributeString] copy];
+        _ctAttributedString = [self buildCTAttributeString];
     }
+    attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    return [_ctAttributedString copy];
+    return attributedString;
 }
 
 - (void)repaintText:(NSNotification *)notification
@@ -563,7 +578,7 @@ do {\
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
             if (![self useCoreText]) {
-                ((WXText *)self.view).textStorage = textStorage;
+                ((WXTextView *)self.view).textStorage = textStorage;
             }
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
@@ -595,7 +610,7 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXTextView *)view
 {
     if (bounds.size.width <= 0 || bounds.size.height <= 0) {
         return;

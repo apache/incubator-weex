@@ -28,6 +28,16 @@ describe('utils', function () {
       expect(clickEvent.type).to.be.equal('click')
       expect(clickEvent.target).to.be.a('null')
     })
+    it('createBubblesEvent', () => {
+      const {
+        createBubblesEvent
+      } = event
+      const clickEvent = createBubblesEvent('', 'click')
+      expect(createBubblesEvent).to.be.a('function')
+      expect(clickEvent.type).to.be.equal('click')
+      expect(clickEvent.target).to.be.a('null')
+      expect(clickEvent.bubbles).to.be.true
+    })
     it('createCustomEvent', () => {
       const {
         createCustomEvent

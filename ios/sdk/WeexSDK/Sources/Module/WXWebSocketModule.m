@@ -61,6 +61,8 @@ WX_EXPORT_METHOD(@selector(onclose:))
             NSMutableDictionary *dic = [NSMutableDictionary new];
             if([message isKindOfClass:[NSString class]]) {
                 [dic setObject:message forKey:@"data"];
+            }else if([message isKindOfClass:[NSData class]]){
+                [dic setObject:[WXUtility dataToBase64Dict:message] forKey:@"data"];
             }
             if (weakSelf.messageCallBack) {
                 weakSelf.messageCallBack(dic,true);;
@@ -103,9 +105,19 @@ WX_EXPORT_METHOD(@selector(onclose:))
     [loader open];
 }
 
-- (void)send:(NSString *)data
+- (void)send:(id)data
 {
-    [loader send:data];
+    if([data isKindOfClass:[NSString class]]){
+        [loader send:data];
+    }else if([data isKindOfClass:[NSDictionary class]]){
+        NSData *sendData = [WXUtility base64DictToData:data];
+        if(sendData){
+            [loader send:sendData];
+        }
+        
+    }
+    
+    
 }
 
 - (void)close
