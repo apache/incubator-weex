@@ -39,12 +39,14 @@ public class TemplateStickyHelper {
     private WXRecyclerTemplateList recyclerTemplateList;
     private List<Integer> stickyPositions;
     private ArrayMap<Integer, TemplateViewHolder>   stickyHolderCache;
+    private List<String> mStickyTypes;
 
 
     public TemplateStickyHelper(WXRecyclerTemplateList recyclerTemplateList) {
         this.recyclerTemplateList = recyclerTemplateList;
         this.stickyPositions = new ArrayList<>();
         this.stickyHolderCache = new ArrayMap();
+        this.mStickyTypes = new ArrayList<>(8);
     }
 
     /**
@@ -120,7 +122,7 @@ public class TemplateStickyHelper {
             return;
         }
 
-        //create holder for match position if not exist
+        //onCreate holder for match position if not exist
         View stickyFakeView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() - 1);
         if(!(stickyFakeView.getTag() instanceof  TemplateViewHolder)
                 || ((TemplateViewHolder) stickyFakeView.getTag()).getHolderPosition() != matchStickyPosition){
@@ -138,7 +140,7 @@ public class TemplateStickyHelper {
                 }
             }
 
-            //create new sticky
+            //onCreate new sticky
             int stickyHolderType = recyclerTemplateList.getItemViewType(matchStickyPosition);
             TemplateViewHolder fakeStickyHolder = stickyHolderCache.get(stickyHolderType);
             if(fakeStickyHolder == null){
@@ -242,5 +244,9 @@ public class TemplateStickyHelper {
             stickyPositions = new ArrayList<>();
         }
         return stickyPositions;
+    }
+
+    public List<String> getStickyTypes() {
+        return mStickyTypes;
     }
 }

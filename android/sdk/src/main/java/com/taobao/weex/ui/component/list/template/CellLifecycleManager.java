@@ -18,7 +18,7 @@
  */
 package com.taobao.weex.ui.component.list.template;
 
-import android.support.v4.util.ArrayMap;
+import android.util.Log;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXEvent;
@@ -30,56 +30,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * cell-slot lifecycle manager
+ * cell-slot lifecycle manager, onCreate onAttach onDetach destroy
  * Created by furture on 2017/9/19.
  */
-public class LifecycleManager {
+public class CellLifecycleManager {
 
-    private static final String[] eventNames = {
-            Constants.Event.Recycler.CREATE,
-            Constants.Event.Recycler.ATTACH,
-            Constants.Event.Recycler.DETACH,
-            Constants.Event.Recycler.DESTORY
+    private static final String[] lifecycleEventNames = {
+            Constants.Event.SLOT_LIFECYCLE.CREATE,
+            Constants.Event.SLOT_LIFECYCLE.ATTACH,
+            Constants.Event.SLOT_LIFECYCLE.DETACH,
+            Constants.Event.SLOT_LIFECYCLE.DESTORY
     };
-
 
     private WXRecyclerTemplateList recyclerTemplateList;
     private Map<String,Map<String,List<String>>> eventSlotWatchRefs;
+    private List<String> createEvent; // only call once
 
 
-    private Map<String,List<String>> slotWatchCreateRefs;
-    private Map<String,List<String>> slotWatchAttachRefs;
-    private Map<String,List<String>> slotWatchDetachRefs;
-    private Map<String,List<String>> slotWatchDestroyRefs;
-    private List<String> createEvent;
-    private Map<String, Object> params;
-    public LifecycleManager(WXRecyclerTemplateList recyclerTemplateList) {
+    public CellLifecycleManager(WXRecyclerTemplateList recyclerTemplateList) {
         this.recyclerTemplateList = recyclerTemplateList;
         this.eventSlotWatchRefs = new HashMap<>();
-        this.slotWatchCreateRefs = new ArrayMap<>();
-        this.slotWatchAttachRefs = new ArrayMap<>();
-        this.slotWatchDetachRefs = new ArrayMap<>();
-        this.slotWatchDestroyRefs = new ArrayMap<>();
         this.createEvent = new ArrayList<>();
-        this.params = new HashMap<>();
     }
 
 
 
-    public void updateListData(){
-        Map<String, WXCell>  templates =  recyclerTemplateList.getTemplates();
-        Set<Map.Entry<String, WXCell>> entries = templates.entrySet();
-        for(Map.Entry<String, WXCell> entry : entries){
-            entry.getValue();
-        }
-    }
-
-    public void updateSlotLifecycle(WXCell cell, WXComponent component){
+    public void updateSlotLifecycleWatch(WXCell cell, WXComponent component){
         WXEvent wxEvent = component.getDomObject().getEvents();
-        for(String event : eventNames){
+        for(String event : lifecycleEventNames){
             if(wxEvent.contains(event)){
                 Map<String,List<String>> slotWatchRefs = eventSlotWatchRefs.get(event);
                 if(slotWatchRefs == null){
@@ -91,26 +71,28 @@ public class LifecycleManager {
                     refs = new ArrayList<>(8);
                     slotWatchRefs.put(cell.getRef(), refs);
                 }
-                if(refs.contains(component.getRef())){
+                if(!refs.contains(component.getRef())){
                     refs.add(component.getRef());
                 }
             }
         }
         if(component instanceof WXVContainer){
             WXVContainer container = (WXVContainer) component;
-            for(int k=0; k<container.getChildCount();){
-                WXComponent next = container.getChild(k);
-                updateSlotLifecycle(cell, next);
+            for(int i=0; i<container.getChildCount(); i++){
+                WXComponent child = container.getChild(i);
+                updateSlotLifecycleWatch(cell, child);
             }
         }
     }
 
     /**
-     * create event
+     * onCreate event
      * */
-    public void create(int position){
+    public void onCreate(int position){
         String key = recyclerTemplateList.getTemplateKey(position);
-        if(slotWatchCreateRefs.get(key) == null
+        Map<String,List<String>>  slotWatchCreateRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.CREATE);
+        if(slotWatchCreateRefs == null
+                || slotWatchCreateRefs.get(key) == null
                 || slotWatchCreateRefs.get(key).size() == 0){
             return;
         }
@@ -123,50 +105,56 @@ public class LifecycleManager {
         if(cell == null){
             return;
         }
-        params.clear();
+        Map<String, Object> params = new HashMap<>(8);
         params.put("position", position);
-        cell.fireEvent(Constants.Event.Recycler.CREATE, params);
+        cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.CREATE, params);
         createEvent.add(key + position);
     }
 
 
     /**
-     * attach event
+     * onAttach event
      * */
-    public void attach(int position, WXCell cell){
+    public void onAttach(int position, WXCell cell){
         if(cell == null || position < 0){
             return;
         }
-        if(slotWatchAttachRefs.get(cell.getRef()) == null
+        Map<String,List<String>> slotWatchAttachRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.ATTACH);
+        if(slotWatchAttachRefs == null
+                || slotWatchAttachRefs.get(cell.getRef()) == null
                 || slotWatchAttachRefs.get(cell.getRef()).size() == 0){
             return;
         }
-        params.clear();
+        Map<String, Object> params = new HashMap<>(8);
         params.put("position", position);
-        cell.fireEvent(Constants.Event.Recycler.ATTACH, params);
+        cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.ATTACH, params);
     }
 
     /**
-     * detach event
+     * onDetach event
      * */
-    public void detach(int position, WXCell cell){
+    public void onDetach(int position, WXCell cell){
         if(cell == null || position < 0){
             return;
         }
-        if(slotWatchDetachRefs.get(cell.getRef()) == null
+        Map<String,List<String>> slotWatchDetachRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.ATTACH);
+        if(slotWatchDetachRefs == null
+                || slotWatchDetachRefs.get(cell.getRef()) == null
                 || slotWatchDetachRefs.get(cell.getRef()).size() == 0){
             return;
         }
-        params.clear();
+        Map<String, Object> params = new HashMap<>(8);
         params.put("position", position);
-        cell.fireEvent(Constants.Event.Recycler.DETACH, params);
+        cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.DETACH, params);
     }
 
     /**
-     * destory event
+     * onDestory event
      * */
-    public void destory(){
-        if(slotWatchDestroyRefs.size() == 0){
+    public void onDestory(){
+        Map<String,List<String>> slotWatchDestroyRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.DESTORY);
+        if(slotWatchDestroyRefs == null
+                || slotWatchDestroyRefs.size() == 0){
             return;
         }
         int size = recyclerTemplateList.getItemCount();
@@ -180,9 +168,10 @@ public class LifecycleManager {
             if(cell == null){
                 return;
             }
-            params.clear();
+            Map<String, Object> params = new HashMap<>(8);
             params.put("position", position);
-            cell.fireEvent(Constants.Event.Recycler.DESTORY, params);
+            cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.DESTORY, params);
         }
+        eventSlotWatchRefs.clear();
     }
 }

@@ -38,7 +38,7 @@ public class TemplateViewHolder extends ListBaseViewHolder {
     /**
      * strong reference, prevent recycled
      * */
-    private WXComponent template;
+    private WXCell template;
 
     private CSSLayoutContext layoutContext;
 
@@ -48,7 +48,7 @@ public class TemplateViewHolder extends ListBaseViewHolder {
      * header position
      * */
 
-    public TemplateViewHolder(WXComponent component, int viewType) {
+    public TemplateViewHolder(WXCell component, int viewType) {
         super(component, viewType);
         this.template = component;
     }
@@ -71,5 +71,9 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     public void setHolderPosition(int holderPosition) {
         this.holderPosition = holderPosition;
+    }
+
+    public WXCell getTemplate() {
+        return template;
     }
 }

@@ -191,7 +191,7 @@ public class Constants {
       String LIST_DATA_ITEM_ID = "itemId";
       String CELL_INDEX = "cellIndex";
       String TYPE_INDEX = "typeIndex";
-      String APPEND = "append";
+      String APPEND_LIST_DATA = "appendListData";
       String UPDATE_CELL = "updateCell";
     }
 
@@ -282,11 +282,11 @@ public class Constants {
     String UNSTICKY = "unsticky";
     String STICKY = "sticky";
 
-    interface Recycler{
-      String CREATE = "recycler-create";
-      String ATTACH = "recycler-attach";
-      String DETACH = "recycler-detach";
-      String DESTORY = "recycler-destroy";
+    interface SLOT_LIFECYCLE{
+      String CREATE = "create";
+      String ATTACH = "attach";
+      String DETACH = "detach";
+      String DESTORY = "destroy";
     }
 
   }
