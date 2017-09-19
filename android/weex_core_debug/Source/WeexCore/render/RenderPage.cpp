@@ -1,4 +1,5 @@
 #include "RenderPage.h"
+#include <yoga/Yoga.h>
 
 namespace WeexCore {
   RenderPage::RenderPage(std::string pageID, std::string data) {

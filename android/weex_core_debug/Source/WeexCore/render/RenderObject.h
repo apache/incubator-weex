@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include "./base/LogUtils.h"
-#include "../../yoga/Yoga.h"
+#include <yoga/Yoga.h>
 #include "../layout/ConstantsName.h"
 #include "../layout/WXStyleUtil.h"
 #include "./base/StringUtils.h"

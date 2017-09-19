@@ -9,6 +9,8 @@ add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 
 ## add_subdirectory for subdirectory has a CMakeLists.txt
 add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Source/yoga)
+
 
 ## include_directories for include head file
 ## include_directories(${CMAKE_SOURCE_DIR}/Source/IPC)
@@ -70,8 +72,9 @@ add_library(weexjsc SHARED
                                 android
                                 IPC
                                 log
-                                z
-                                ${CMAKE_SOURCE_DIR}/libyogacore.so)
+                                yoga
+                                z)
+#                                ${CMAKE_SOURCE_DIR}/libyogacore.so)
 
 #    target_link_libraries(weexjsc ${CMAKE_SOURCE_DIR}/libyogacore.so)
     
