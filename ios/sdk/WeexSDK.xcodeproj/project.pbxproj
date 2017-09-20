@@ -243,8 +243,6 @@
 		C42E8FAB1F3C7C09001EBE9D /* WXExtendCallNativeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C42E8FAC1F3C7C3B001EBE9D /* WXExtendCallNativeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78CD1F2998EE001D3B0C /* WXExtendCallNativeManager.m */; };
 		C42E8FAD1F3C7C3F001EBE9D /* WXExtendCallNativeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C47B78CC1F2998EE001D3B0C /* WXExtendCallNativeManager.h */; };
-		C42E8FAE1F3C7C49001EBE9D /* WXRecyclerDragController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC7764911F3C2CA300B5727E /* WXRecyclerDragController.m */; };
-		C42E8FAF1F3C7C4B001EBE9D /* WXRecyclerDragController.h in Headers */ = {isa = PBXBuildFile; fileRef = DC7764921F3C2CA300B5727E /* WXRecyclerDragController.h */; };
 		C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */; };
 		C4424E5B1F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1674,7 +1672,6 @@
 				333D9A281F41507A007CED39 /* WXTransition.h in Headers */,
 				DCA445A51EFA571600D0CFA8 /* WXSDKError.h in Headers */,
 				DCA445AD1EFA575100D0CFA8 /* WXNavigationProtocol.h in Headers */,
-				C42E8FAF1F3C7C4B001EBE9D /* WXRecyclerDragController.h in Headers */,
 				DCA445B01EFA576200D0CFA8 /* WXModalUIModule.h in Headers */,
 				DCA445A61EFA571E00D0CFA8 /* WXSDKEngine.h in Headers */,
 				DCA445AA1EFA573900D0CFA8 /* WXResourceRequest.h in Headers */,
@@ -2243,7 +2240,6 @@
 				DCA4457A1EFA55B300D0CFA8 /* WXSimulatorShortcutManager.m in Sources */,
 				DCA4457B1EFA55B300D0CFA8 /* WXAssert.m in Sources */,
 				DCA4457C1EFA55B300D0CFA8 /* WXAppConfiguration.m in Sources */,
-				C42E8FAE1F3C7C49001EBE9D /* WXRecyclerDragController.m in Sources */,
 				DCA4457D1EFA55B300D0CFA8 /* WXThreadSafeMutableDictionary.m in Sources */,
 				DCA4457E1EFA55B300D0CFA8 /* WXThreadSafeMutableArray.m in Sources */,
 				DCA4457F1EFA55B300D0CFA8 /* NSObject+WXSwizzle.m in Sources */,
