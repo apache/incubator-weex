@@ -24,7 +24,7 @@ mkdir -p $dest/android/sdk/src/test/java/org/apache
 mv $dest/android/sdk/src/test/java/com/taobao $dest/android/sdk/src/test/java/org/apache
 rm -rf $dest/android/sdk/src/test/java/com
 
-sed -i '' 's/com\/taobao\/weex/org\/apache\/weex/g' $dest/android/sdk/build.gradle
+#sed -i '' 's/com\/taobao\/weex/org\/apache\/weex/g' $dest/android/sdk/build.gradle
 
 mv $dest/ios/sdk $dest/ios_sdk
 rm -rf $dest/ios
