@@ -38,7 +38,17 @@ public class Operators {
         if(leftValue == null){
             return null;
         }
-        Object value = right.execute(leftValue);
+        Object value =  null;
+        if(right.getType() != Token.TYPE_IDENTIFIER){
+            Object identifter = right.execute(context);
+            if(identifter instanceof Double){
+                identifter = ((Double) identifter).intValue();
+            }
+            String key = identifter == null ? "" : identifter.toString().trim();
+            value = Operators.el(leftValue, key);
+        }else{
+            value = right.execute(leftValue);
+        }
         if(value != null){
             return value;
         }
@@ -336,7 +346,8 @@ public class Operators {
     public static boolean isOpEnd(char op){
         if(op == BRACKET_END
                 || op == ARRAY_END
-                || op == SPACE){
+                || op == SPACE
+                || op == ARRAY_SEPRATOR){
             return true;
         }
         return  false;
@@ -363,6 +374,8 @@ public class Operators {
     public static final String DOT_STR = ".";
     public static final char ARRAY_START = '[';
     public static final String ARRAY_START_STR = "[";
+    public static final char ARRAY_SEPRATOR = ',';
+    public static final String ARRAY_SEPRATOR_STR = ",";
     public static final char ARRAY_END = ']';
     public static final String ARRAY_END_STR = "]";
     public static final String SPACE_STR = " ";
@@ -423,6 +436,7 @@ public class Operators {
         OPERATORS_PRIORITY.put(BLOCK_END_STR, 0);
         OPERATORS_PRIORITY.put(BRACKET_END_STR, 0);
         OPERATORS_PRIORITY.put(SPACE_STR, 0);
+        OPERATORS_PRIORITY.put(ARRAY_SEPRATOR_STR, 0);
         OPERATORS_PRIORITY.put(ARRAY_END_STR, 0);
         OPERATORS_PRIORITY.put(OR, 1);
         OPERATORS_PRIORITY.put(AND, 1);
@@ -445,7 +459,9 @@ public class Operators {
         OPERATORS_PRIORITY.put(AND_NOT, 11);
 
         OPERATORS_PRIORITY.put(DOT_STR, 15);
-        OPERATORS_PRIORITY.put(ARRAY_START_STR, 15);
+        
+        OPERATORS_PRIORITY.put(ARRAY_START_STR, 16);
+
 
         OPERATORS_PRIORITY.put(BRACKET_START_STR, 17);
         OPERATORS_PRIORITY.put(BLOCK_START_STR, 17);

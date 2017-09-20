@@ -21,8 +21,8 @@ package com.taobao.weex.dom.binding;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Parser;
+import com.taobao.weex.el.parse.Token;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Set;
@@ -69,7 +69,7 @@ public class ELUtils {
             JSONObject  object = (JSONObject) value;
             if(object.containsKey(BINDING)){
                 Object binding = object.get(BINDING);
-                if(!(binding instanceof Block)){
+                if(!(binding instanceof Token)){
                     object.put(BINDING, Parser.parse(binding.toString()));
                 }
             }
@@ -79,7 +79,7 @@ public class ELUtils {
                         && ((JSONObject)object.get(propsKey)).containsKey(BINDING)){
                     JSONObject propsValue = (JSONObject) object.get(propsKey);
                     Object binding = propsValue.get(BINDING);
-                    if(!(binding instanceof Block)){
+                    if(!(binding instanceof Token)){
                         propsValue.put(BINDING, Parser.parse(binding.toString()));
                     }
                 }
@@ -101,7 +101,7 @@ public class ELUtils {
         return WXStatement.WX_FOR.equals(name);
     }
 
-    public static Block vifBlock(String code){
+    public static Token vifBlock(String code){
         return Parser.parse(code);
     }
 
@@ -109,7 +109,7 @@ public class ELUtils {
         if(vfor instanceof  JSONObject){
             if(((JSONObject) vfor).containsKey(WXStatement.WX_FOR_LIST)){
                 Object list = ((JSONObject) vfor).get(WXStatement.WX_FOR_LIST);
-                if(!(list instanceof Block)){
+                if(!(list instanceof Token)){
                     ((JSONObject) vfor).put(WXStatement.WX_FOR_LIST, Parser.parse(list.toString()));
                 }
             }

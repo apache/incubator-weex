@@ -18,15 +18,19 @@
  */
 package com.taobao.weex.el;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.weex.el.parse.ArrayStack;
-import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Parser;
+import com.taobao.weex.el.parse.Token;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import java.util.Stack;
+
 
 /**
  * Created by furture on 2017/8/28.
@@ -61,9 +65,9 @@ public class ParserTest extends TestCase {
         Assert.assertTrue(Double.isInfinite((double)Parser.parse("1+4/0").execute(null)));
         Assert.assertTrue(Double.isNaN((double)Parser.parse("4%0").execute(null)));
 
-        Assert.assertEquals(1.0, Parser.parse("1++*").execute(null));
+        Assert.assertEquals(Parser.parse("1").execute(null), Parser.parse("1++*").execute(null));
         Assert.assertEquals(3.0, Parser.parse("1+2+*").execute(null));
-        Assert.assertEquals(1.0, Parser.parse("1+(2*+*)").execute(null));
+        Assert.assertEquals(3.0, Parser.parse("1+(2*+*)").execute(null));
     }
 
     public void testCondition(){
@@ -80,13 +84,16 @@ public class ParserTest extends TestCase {
     }
 
     public void testDebug(){
-        Block block = Parser.parse("{{{item.name}}}");
+        Parser.parse("item[1]").execute(this.createContext());
+        Token block = Parser.parse("{{{item.name}}}");
         /**
          *
          * */
-       show("{{item.name}}");
+        show("item.[1]");
+       show("((true) && 2 > 1) && (1) && (1)");
         System.out.println(block.execute(createContext())
         + "  " + Double.parseDouble(".0e6"));
+        show("1 > -1");
     }
 
 
@@ -105,17 +112,16 @@ public class ParserTest extends TestCase {
         Assert.assertEquals("hello world", Parser.parse("{{item.name}}").execute(createContext()));
         Assert.assertEquals("hello world", Parser.parse("{{{item.name}}}").execute(createContext()));
         Assert.assertEquals("hello world", Parser.parse("{{{{item.name}}}}").execute(createContext()));
-        Assert.assertEquals(21.0, Parser.parse("item[1] + index").execute(createContext()));
+        Assert.assertEquals(1, Parser.parse("1").execute(createContext()));
+        Assert.assertEquals(30.0, Parser.parse("item[1] + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item.name + index").execute(createContext()));
         Assert.assertEquals("hello world20", Parser.parse("item[name] + index").execute(createContext()));
-        Assert.assertEquals("hello world20", Parser.parse("item[name + index").execute(createContext()));
-        Assert.assertEquals("hello world20", Parser.parse("item.name] + index").execute(createContext()));
         Assert.assertEquals(21.0, Parser.parse("1 + index").execute(createContext()));
         Assert.assertEquals(11.0, Parser.parse("1 + index/2").execute(createContext()));
         Assert.assertEquals(20.0, Parser.parse("item.name/10 + index").execute(createContext()));
 
         Assert.assertEquals(31.0, Parser.parse("item.name.length + index").execute(createContext()));
-        Assert.assertEquals(21.0, Parser.parse("item.length + index").execute(createContext()));
+        Assert.assertEquals(22.0, Parser.parse("item.length + index").execute(createContext()));
         Assert.assertEquals(36.0, Parser.parse("count * ${ratio}").execute(createContext()));
         Assert.assertEquals(36.0, Parser.parse("count * ${ratio}").execute(createContext()));
         Assert.assertEquals(36.0, Parser.parse("count * ${{ratio}}").execute(createContext()));
@@ -147,28 +153,45 @@ public class ParserTest extends TestCase {
 
 
     private void show(String code){
-        Block block = Parser.parse(code);
+        Token block = Parser.parse(code);
         System.out.println( code + " ==> " + block);
+    }
+
+    public void  testArray(){
+        int disableDecimalFeature = JSON.DEFAULT_PARSER_FEATURE &= ~Feature.UseBigDecimal.getMask();
+        Assert.assertEquals(JSONArray.parse("[2, 3, 3]", disableDecimalFeature), Parser.parse("[2, 3, 3]").execute(null));
+        Assert.assertEquals(JSONArray.parse("[2.0, 3, 3]", disableDecimalFeature), Parser.parse("[1+1, 3, 3]").execute(null));
+        Assert.assertEquals(JSONArray.parse("[2.0, 3,[3, 3], 3]", disableDecimalFeature), Parser.parse("[1+1, 3, [3, 3], 3]").execute(null));
+        Assert.assertEquals(JSONArray.parse("['hello world', 3,[3, 3], 3]", disableDecimalFeature), Parser.parse("[item.name, 3, [3, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[10, 3,[3, 3], 3]", disableDecimalFeature), Parser.parse("[item[1], 3, [3, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[1, 3,[3, 3], 3]", disableDecimalFeature), Parser.parse("[1, 3, [3, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[1, 3,['hello world', 3], 3]", disableDecimalFeature), Parser.parse("[1, 3, [item.name, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[1, [1, 2],[3, 3], 3]", disableDecimalFeature), Parser.parse("[1, [1, 2], [3, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(null,  Parser.parse("item[name + index]").execute(this.createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item[name]").execute(this.createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item['name']").execute(this.createContext()));
+        Assert.assertEquals(10, Parser.parse("item[1]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[false, [1, 2],[3, 3], 3]", disableDecimalFeature), Parser.parse("[!true, [1, 2], [3, 3], 3]").execute(this.createContext()));
+        Assert.assertEquals(JSONArray.parse("[2, 3, 3]", disableDecimalFeature), Parser.parse("[(2), 3, 3]").execute(null));
+        Assert.assertEquals(JSONArray.parse("[2, 3, 3]", disableDecimalFeature), Parser.parse("([2, 3, 3])").execute(null));
+        Assert.assertEquals(JSONArray.parse("[2, 3, 3]", disableDecimalFeature), Parser.parse("([2, 3, (3)])").execute(null));
+
     }
 
 
     public void testOperator(){
         Parser parser = new Parser("(1 + 3)/3*3");
-        Block block = parser.parse();
+        Token block = parser.parse();
 
         System.out.println(block.execute(null));
 
         System.out.println(block);
-
-        System.out.println(block.getTokens().size());
 
         Parser parser2 = new Parser("1 + +++");
         block = parser2.parse();
 
 
         System.out.println(block);
-
-        System.out.println(block.getTokens().size());
 
 
         String[] values = {null, null};
@@ -189,11 +212,15 @@ public class ParserTest extends TestCase {
         data.put("ratio", 6);
         data.put("count", 6);
         data.getJSONObject("item").put("name", "hello world");
+        data.getJSONObject("item").put("1", 10);
 
         ArrayStack context = new ArrayStack();
         context.push(data);
         return context;
     }
+
+
+
 
 
 

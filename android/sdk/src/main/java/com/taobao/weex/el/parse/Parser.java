@@ -22,8 +22,9 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
 
 /**
  * Created by furture on 2017/8/28.
@@ -35,25 +36,27 @@ public class Parser {
     private int position;
     private ArrayStack<Token> stacks;
     private ArrayStack<Symbol> operators;
+    private ArrayStack<Symbol> punctuations;
 
     public Parser(String code){
         this.code = code;
         this.position = 0;
         this.stacks = new ArrayStack<>();
         this.operators = new ArrayStack<>();
+        this.punctuations = new ArrayStack<>();
     }
 
 
-    public Block parse(){
+    public Token parse(){
         while (hasNextToken()){
             scanNextToken();
         }
         while (!operators.isEmpty()){
             Symbol op = operators.pop();
-            Token token = createOperator(op);
-            if(token != null) {
-                stacks.push(token);
-            }
+            doOperator(op);
+        }
+        if(stacks.size() == 1){
+            return  stacks.pop();
         }
         Block block = new Block(stacks.getList(), Token.TYPE_BLOCK);
         return block;
@@ -63,7 +66,7 @@ public class Parser {
     /**
      * parse code to ast block.
      * */
-    public static  Block parse(String code){
+    public static  Token parse(String code){
         try{
             Parser parser = new Parser(code);
             return parser.parse();
@@ -81,10 +84,16 @@ public class Parser {
         if(ch == Operators.DOLLAR){
             position++;
             return ch;
+        }else if(ch == Operators.ARRAY_SEPRATOR){
+            punctuations.push(new Symbol(String.valueOf(ch), position));
+            position++;
+            return ch;
         }else if(Character.isJavaIdentifierStart(ch)){
             scanIdentifier();
         }else if (ch == Operators.BRACKET_START || ch == Operators.BLOCK_START) {
             scanBracket();
+        }else if (ch == Operators.ARRAY_START) {
+            scanArray();
         }else if (ch ==  Operators.QUOTE || ch == Operators.SINGLE_QUOTE) {
             scanString();
         }else if((ch == Operators.DOT && Character.isDigit(code.charAt(position + 1)))
@@ -95,7 +104,8 @@ public class Parser {
         }else if(ch ==  Operators.CONDITION_IF_MIDDLE
                 || ch ==  Operators.BRACKET_END
                 || ch == Operators.BLOCK_END
-                || ch == Operators.SPACE){
+                || ch == Operators.SPACE
+                || ch == Operators.ARRAY_END){
             position++;
             return ch;
         }else{
@@ -104,6 +114,61 @@ public class Parser {
         return ch;
     }
 
+
+    void  scanArray(){
+        int stackSize = stacks.size();
+        int opSize = operators.size();
+        int type = Token.TYPE_IDENTIFIER;
+        if(position - 1 < 0 || !Character.isJavaIdentifierPart(code.charAt(position - 1))){
+            type = Token.TYPE_ARRAY;
+        }
+        operators.push(new Symbol(Operators.ARRAY_START_STR, stacks.size()));
+        position++;
+        while (hasNextToken()){
+            char token = scanNextToken();
+            if(token == Operators.ARRAY_END){
+                break;
+            }
+        }
+
+        if(stacks.size() <= stackSize){ // empty bracket, none need, save memory
+            while (operators.size() > opSize){
+                operators.pop();
+            }
+            return;
+        }
+
+        while (operators.size() > opSize){
+            Symbol op = operators.pop();
+            if(stacks.size() > stackSize){
+                doOperator(op);
+            }
+        }
+        List<Token> tokens = new ArrayList<>(4);
+        for(int i=stackSize; i<stacks.size(); i++){
+            tokens.add(stacks.get(i));
+        }
+        while (stacks.size() > stackSize){
+            stacks.pop();
+        }
+        if(type == Token.TYPE_ARRAY || stacks.size() == 0){
+            Block block = new Block(tokens, Token.TYPE_ARRAY);
+            stacks.push(block);
+            return;
+        }
+
+        Token identifer = stacks.pop();
+        Token second = null;
+        if(tokens.size() == 1){
+            second = tokens.get(0);
+        }else{
+            second = new Block(tokens, Token.TYPE_BLOCK);
+        }
+        Operator operator = new Operator(Operators.DOT_STR, type);
+        operator.first = identifer;
+        operator.second = second;
+        stacks.push(operator);
+    }
 
     void  scanBracket(){
         int stackSize = stacks.size();
@@ -134,13 +199,10 @@ public class Parser {
         while (operators.size() > opSize){
             Symbol op = operators.pop();
             if(stacks.size() > stackSize){
-                Token token = createOperator(op);
-                if(token != null) {
-                    stacks.push(token);
-                }
+                doOperator(op);
             }
         }
-        List<Token> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>(4);
         for(int i=stackSize; i<stacks.size(); i++){
             tokens.add(stacks.get(i));
         }
@@ -184,10 +246,7 @@ public class Parser {
             String preOp = operators.peek().op;
             if(Operators.OPERATORS_PRIORITY.get(preOp) >= Operators.OPERATORS_PRIORITY.get(operator)){
                 Symbol op = operators.pop();
-                Token token = createOperator(op);
-                if(token != null) {
-                    stacks.push(token);
-                }
+                doOperator(op);
             }
         }
         if(!Operators.isOpEnd(operator)){
@@ -198,36 +257,46 @@ public class Parser {
 
 
 
-    Token createOperator(Symbol symbol){
+    void doOperator(Symbol symbol){
         String op = symbol.op;
         if(Operators.BRACKET_START_STR.equals(symbol.op)
                 || Operators.BLOCK_START_STR.equals(symbol.op)
+                || Operators.ARRAY_START_STR.equals(symbol.op)
                 || Operators.DOLLAR_STR.equals(symbol.op)){
-            return null;
+            return;
         }
         if(Operators.BLOCK_START_STR.equals(symbol.op)){
-            return null;
+            return;
         }
-        int secondMin = symbol.pos;
-        int firstMin = 0;
-        if(!operators.empty()){
-            firstMin = Math.max(operators.peek().pos, firstMin);
+        int second = symbol.pos;
+        int first  = Math.max(symbol.pos - 1, 0);
+        if(!operators.isEmpty()){
+            first = Math.max(first, operators.peek().pos);
         }
+
         Operator operator = new Operator(op, Token.TYPE_OPERATOR);
         if(Operators.AND_NOT.equals(op)){
-            if(stacks.size() > secondMin) {
-                operator.self = stacks.pop();
-                return operator;
+            if(stacks.size() > second) {
+                Token token = stacks.remove(second);
+                operator.self = token;
+                stacks.add(second, operator);
+                return;
             }
-            return operator; //invalid
+            return; //invalid
         }
-        if(stacks.size() > secondMin) {
-            operator.second = stacks.pop();
+        if(stacks.size() > second) {
+            operator.second = stacks.remove(second);
+        }else{
+            return;
         }
-        if(stacks.size() > firstMin) {
-            operator.first = stacks.pop();
+        if(stacks.size() > first) {
+            operator.first = stacks.remove(first);
+        }else{
+            if(operator.second == null){
+                return;
+            }
         }
-        return operator;
+        stacks.add(first, operator);
     }
 
     /**

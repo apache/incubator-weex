@@ -57,6 +57,14 @@ public class ArrayStack<T> {
         return stack.get(i);
     }
 
+    public T remove(int i) {
+        return stack.remove(i);
+    }
+
+    public void add(int i, T t) {
+        stack.add(i, t);
+    }
+
     public boolean isEmpty() {
         return   stack.isEmpty();
     }

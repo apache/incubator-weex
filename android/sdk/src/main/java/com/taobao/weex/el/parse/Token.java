@@ -34,6 +34,9 @@ public class Token {
     public static final int TYPE_OPERATOR = 5;
     public static final int TYPE_BLOCK = 6;
 
+    public static final int TYPE_ARRAY = 7;
+
+
 
     private String token;
     private int type;

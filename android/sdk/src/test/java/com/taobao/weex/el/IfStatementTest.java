@@ -20,9 +20,9 @@ package com.taobao.weex.el;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.el.parse.ArrayStack;
-import com.taobao.weex.el.parse.Block;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Parser;
+import com.taobao.weex.el.parse.Token;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -71,14 +71,14 @@ public class IfStatementTest extends TestCase {
 
         Assert.assertFalse(isIfTrue("1 < 1", createContext()));
 
-        Assert.assertFalse(isIfTrue("1 <= ", createContext()));
-        Assert.assertFalse(isIfTrue("1 < ", createContext()));
-        Assert.assertTrue(isIfTrue("1 > ", createContext()));
-        Assert.assertTrue(isIfTrue("1 >= ", createContext()));
-        Assert.assertFalse(isIfTrue(" >= 1", createContext()));
-        Assert.assertFalse(isIfTrue(" > 1", createContext()));
-        Assert.assertTrue(isIfTrue(" < 1", createContext()));
-        Assert.assertTrue(isIfTrue(" <= 1", createContext()));
+        Assert.assertFalse(isIfTrue("1 <= -1", createContext()));
+        Assert.assertFalse(isIfTrue("1 < -2 ", createContext()));
+        Assert.assertTrue(isIfTrue("1 > 0", createContext()));
+        Assert.assertTrue(isIfTrue("1 >= 0.1", createContext()));
+        Assert.assertFalse(isIfTrue("0 >= 1", createContext()));
+        Assert.assertFalse(isIfTrue(" -1 > 1", createContext()));
+        Assert.assertTrue(isIfTrue("0 < 1", createContext()));
+        Assert.assertTrue(isIfTrue(" -1 <= 1", createContext()));
     }
 
 
@@ -91,7 +91,7 @@ public class IfStatementTest extends TestCase {
         Assert.assertTrue(isIfTrue("true || false", createContext()));
         Assert.assertTrue(isIfTrue("1 || false", createContext()));
         Assert.assertFalse(isIfTrue("false && false", createContext()));
-        Assert.assertFalse(isIfTrue("1 && ", createContext()));
+        Assert.assertFalse(isIfTrue("1 && false", createContext()));
         Assert.assertFalse(isIfTrue(" && 1", createContext()));
         Assert.assertTrue(isIfTrue("1 && 1 && 1 && true && true", createContext()));
         Assert.assertFalse(isIfTrue("false && 1 && 1 && true && true", createContext()));
@@ -111,8 +111,8 @@ public class IfStatementTest extends TestCase {
 
 
         Assert.assertTrue(isIfTrue("((true) && 2 > 1) && (1)", createContext()));
-        Assert.assertFalse(isIfTrue("((true) && 2 > 1) && (1) && ()", createContext()));
-        Assert.assertTrue(isIfTrue("((true) && 2 > 1) && (1) || ()", createContext()));
+        Assert.assertTrue(isIfTrue("((true) && 2 > 1) && (1) && (1)", createContext()));
+        Assert.assertTrue(isIfTrue("((true) && 2 > 1) && (1) || (3)", createContext()));
 
         Assert.assertTrue(isIfTrue("1", createContext()));
         Assert.assertTrue(isIfTrue("true && 2 > 1 && 1", createContext()));
@@ -120,9 +120,9 @@ public class IfStatementTest extends TestCase {
 
     public void  testDebug(){
         //System.out.println("isIfTrue" + isIfTrue("((true) && 2 > 1) && 1", createContext()));
-        Assert.assertFalse(isIfTrue("1 <= ", createContext()));
+        Assert.assertFalse(isIfTrue("1 <= 0", createContext()));
         Assert.assertTrue(isIfTrue("1 > -1 + 1", createContext()));
-        Assert.assertFalse(isIfTrue("1 < ", createContext()));
+        Assert.assertFalse(isIfTrue("1 < -1", createContext()));
         //Assert.assertTrue(isIfTrue("-1", createContext()));
     }
 
@@ -137,7 +137,7 @@ public class IfStatementTest extends TestCase {
     }
 
     private boolean isIfTrue(String code, Object context){
-        Block block = Parser.parse(code);
+        Token block = Parser.parse(code);
         System.out.println( code + " ==> " + block);
         return Operators.isTrue(block.execute(context));
     }

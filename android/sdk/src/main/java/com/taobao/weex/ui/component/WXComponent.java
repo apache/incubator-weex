@@ -1733,7 +1733,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           }
           uiEvent.submit();
         } else {
-          WXLogUtils.w("onRenderFinish", "createView() not called");
+          if(WXEnvironment.isApkDebugable() && !isLazy()) {
+            WXLogUtils.w("onRenderFinish", "createView() not called");
+          }
         }
       }
     }

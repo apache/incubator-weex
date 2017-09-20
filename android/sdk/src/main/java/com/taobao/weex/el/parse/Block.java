@@ -18,13 +18,15 @@
  */
 package com.taobao.weex.el.parse;
 
+import com.alibaba.fastjson.JSONArray;
+
 import java.util.List;
 
 /**
  * block, has more than one tokens, but only first will be execute.
  * Created by jianbai.gbj on 2017/8/28.
  */
-public class Block extends Token {
+class Block extends Token {
     private List<Token> tokens;
     public Block(List<Token> tokens,  int type) {
         super("", type);
@@ -33,6 +35,21 @@ public class Block extends Token {
 
     @Override
     public Object execute(Object context){
+        if(getType() == TYPE_ARRAY){
+            if(tokens == null || tokens.size() == 0){
+                return  new JSONArray(4);
+            }
+            JSONArray arrayList = new JSONArray(tokens.size());
+            for(int i=0; i<tokens.size(); i++){
+                Token token = tokens.get(i);
+                if(token == null){
+                    arrayList.add(null);
+                }else{
+                    arrayList.add(token.execute(context));
+                }
+            }
+            return arrayList;
+        }
         if(tokens == null || tokens.size() == 0){
             return  null;
         }
@@ -46,6 +63,13 @@ public class Block extends Token {
 
     @Override
     public String toString() {
-        return "{" + tokens + '}';
+        if(getType() == TYPE_ARRAY){
+            return "" + tokens + "";
+        }else {
+            if(tokens != null && tokens.size() == 1){
+                return "{" + tokens.get(0) + '}';
+            }
+            return "{" + tokens + '}';
+        }
     }
 }

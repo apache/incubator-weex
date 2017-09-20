@@ -23,7 +23,7 @@ package com.taobao.weex.el.parse;
  * Created by jianbai.gbj on 2017/8/28.
  * one operator, two operator, and three operator
  */
-public class Operator extends Token {
+class Operator extends Token {
     public Token self;
     public Token first;
     public Token second;
@@ -95,6 +95,9 @@ public class Operator extends Token {
 
     @Override
     public String toString() {
+        if(Operators.AND_NOT.equals(getToken())){
+            return "{!" +  self + "}";
+        }
         if(self == null){
             return "{" + first +  getToken() + second + "}";
         }
