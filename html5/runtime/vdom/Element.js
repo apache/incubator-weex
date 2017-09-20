@@ -347,9 +347,12 @@ export default class Element extends Node {
    * @param {string} event type
    * @param {function} event handler
    */
-  addEvent (type, handler) {
+  addEvent (type, handler, params) {
+    if (!this.event) {
+      this.event = {}
+    }
     if (!this.event[type]) {
-      this.event[type] = handler
+      this.event[type] = { handler, params }
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
         taskCenter.send(
@@ -366,7 +369,7 @@ export default class Element extends Node {
    * @param {string} event type
    */
   removeEvent (type) {
-    if (this.event[type]) {
+    if (this.event && this.event[type]) {
       delete this.event[type]
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
@@ -382,19 +385,26 @@ export default class Element extends Node {
   /**
    * Fire an event manually.
    * @param {string} type type
-   * @param {function} e handler
+   * @param {function} event handler
    * @param {boolean} isBubble whether or not event bubble
+   * @param {boolean} options
    * @return {} anything returned by handler function
    */
-  fireEvent (type, e, isBubble) {
+  fireEvent (type, event, isBubble, options) {
     let result = null
     let isStopPropagation = false
-    const handler = this.event[type]
-    if (handler && e) {
-      e.stopPropagation = () => {
+    const eventDesc = this.event[type]
+    if (eventDesc && event) {
+      const handler = eventDesc.handler
+      event.stopPropagation = () => {
         isStopPropagation = true
       }
-      result = handler.call(this, e)
+      if (options && options.params) {
+        result = handler.call(this, ...options.params, event)
+      }
+      else {
+        result = handler.call(this, event)
+      }
     }
 
     if (!isStopPropagation
@@ -402,8 +412,8 @@ export default class Element extends Node {
       && BUBBLE_EVENTS.includes(type)
       && this.parentNode
       && this.parentNode.fireEvent) {
-      e.currentTarget = this.parentNode
-      this.parentNode.fireEvent(type, e, isBubble)
+      event.currentTarget = this.parentNode
+      this.parentNode.fireEvent(type, event, isBubble) // no options
     }
 
     return result
@@ -428,7 +438,16 @@ export default class Element extends Node {
       attr: filterDirective(this.attr),
       style: this.toStyle()
     }
-    const event = Object.keys(this.event)
+    const event = []
+    for (const type in this.event) {
+      const { params } = this.event[type]
+      if (!params) {
+        event.push(type)
+      }
+      else {
+        event.push({ type, params })
+      }
+    }
     if (event.length) {
       result.event = event
     }
