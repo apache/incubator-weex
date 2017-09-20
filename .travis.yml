@@ -75,8 +75,7 @@ script:
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
-      npm run build &&
-      npm run test
+      npm run danger -- --dangerfile=./dangerfile-jsfm.js
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
