@@ -64,10 +64,6 @@ before_script:
       npm install
     fi
   - |
-    if [[ $TEST_SUITE = "ios" ]]; then
-      brew update
-    fi
-  - |
     if [[ $TEST_SUITE = "release" ]]; then
       brew update
       #manual install android sdk
@@ -90,7 +86,7 @@ script:
     fi
   - |
     if [[ $TEST_SUITE = "ios" ]]; then
-      xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
+      npm run danger -- --dangerfile=./dangerfile-ios.js
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
