@@ -11,11 +11,11 @@
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 
+  * 验证iconfont是否正常展示
 
 测试方式：
-  * 
-  * 
+  * 截图比对
+  * 点击按钮`change`，截图判断是否变化
       </text>
     </wxc-desc>
   </div>
