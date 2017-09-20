@@ -52,11 +52,11 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
   /**
    * Fill color of unselected circle
    */
-  private int pageColor = Color.BLUE;
+  private int pageColor = Color.LTGRAY;
   /**
    * Fill color of the selected circle
    */
-  private int fillColor = Color.BLACK;
+  private int fillColor = Color.DKGRAY;
   private int realCurrentItem;
 
 
