@@ -283,7 +283,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }
                 }
-                notifyWatchCreateEvent();
+                fireOnCellOnCreateEvent();
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
@@ -292,17 +292,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return bounceRecyclerView;
     }
 
-    /**
-     * notify watch event
-     * */
-    private void notifyWatchCreateEvent() {
-        if(listData != null){
-            return;
-        }
 
-
-
-    }
 
 
     @Override
@@ -547,7 +537,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     }
                 }
             }
-            cellLifecycleManager.updateSlotLifecycleWatch((WXCell)child, child);
+            cellLifecycleManager.filterLifecycleWatchEvent((WXCell)child, child);
             notifyUpdateList();
         }
     }
@@ -687,6 +677,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         if(update){
             notifyUpdateList();
+        }
+        fireOnCellOnCreateEvent();
+    }
+
+    private void fireOnCellOnCreateEvent(){
+        if(listData != null){
+            for(int i=0; i<listData.size(); i++){
+                cellLifecycleManager.onCreate(i);
+            }
         }
     }
 
@@ -1097,7 +1096,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     /**
      * get source template
      * */
-    private WXCell getSourceTemplate(int position){
+    public WXCell getSourceTemplate(int position){
         String template = getTemplateKey(position);
         return mTemplates.get(template);
     }
