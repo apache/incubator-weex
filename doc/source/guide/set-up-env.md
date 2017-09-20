@@ -44,7 +44,7 @@ Then you can use the Weex command to verify that the installation is successful:
 You can use the CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
 
 ```bash
-$ weex init awesome-project
+$ weex create awesome-project
 ```
 
 Then enter the awesome-project folder, the CLI has been for us to generate a standard project structure.

@@ -74,7 +74,7 @@ $ sudo cnpm install -g weex-toolkit
 然后初始化 Weex 项目：
 
 ```bash
-$ weex init awesome-project
+$ weex create awesome-project
 ```
 
 执行完命令后，在 `awesome-project` 目录中就创建了一个使用 Weex 和 Vue 的模板项目。
