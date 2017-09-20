@@ -88,6 +88,7 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(false, Parser.parse("true ? false : item.name.work").execute(this.createContext()));
         Assert.assertEquals("hello world", Parser.parse("item.name ? item.name : false").execute(this.createContext()));
         Assert.assertEquals(null, Parser.parse("item.name ? item.name.not : false").execute(this.createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item.name == null ? false : (item.name)").execute(this.createContext()));
 
 
     }
@@ -95,9 +96,12 @@ public class ParserTest extends TestCase {
     public void testDebug(){
 
 
-        System.out.println("execute " + Parser.parse("true ? false : item.name").execute(this.createContext()));
+        //System.out.println("execute " + Parser.parse("true ? false : item.name").execute(this.createContext()));
 
-        show("true ? false : item.name");
+
+        show("true ? false : true xxxx");
+
+        show("true ? false : ((item.name))");
         /**
         Parser.parse("item[1]").execute(this.createContext());
         Token block = Parser.parse("{{{item.name}}}");
