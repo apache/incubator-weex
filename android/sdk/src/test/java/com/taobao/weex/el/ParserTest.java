@@ -22,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Parser;
@@ -94,23 +93,17 @@ public class ParserTest extends TestCase {
     }
 
     public void testDebug(){
-
-
-        //System.out.println("execute " + Parser.parse("true ? false : item.name").execute(this.createContext()));
-
-
+        System.out.println("execute " + Parser.parse("true ? false : item.name").execute(this.createContext()));
         show("true ? false : true xxxx");
-
         show("true ? false : ((item.name))");
-        /**
         Parser.parse("item[1]").execute(this.createContext());
         Token block = Parser.parse("{{{item.name}}}");
         show("true ? item.name : false");
-       show("((true) && 2 > 1) && (1) && (1)");
+        show("((true) && 2 > 1) && (1) && (1)");
         System.out.println(block.execute(createContext())
         + "  " + Double.parseDouble(".0e6"));
         show("1 > -1");
-         */
+
     }
 
 
