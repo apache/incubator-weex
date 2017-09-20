@@ -66,20 +66,20 @@ before_script:
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
-      npm run danger -- --dangerfile=./dangerfile-android.js
+      npm run danger -- run --dangerfile ./dangerfile-android.js
       cd $TRAVIS_BUILD_DIR
     fi
   - |
     if [[ $TEST_SUITE = "ios" ]]; then
-      npm run danger -- --dangerfile=./dangerfile-ios.js
+      npm run danger -- run --dangerfile ./dangerfile-ios.js
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
-      npm run danger -- --dangerfile=./dangerfile-jsfm.js
+      npm run danger -- run --dangerfile ./dangerfile-jsfm.js
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
-      npm run danger -- --dangerfile=./dangerfile.js
+      npm run danger -- run --dangerfile ./dangerfile.js
     fi
   - |
     if [[ $TEST_SUITE = "release" ]]; then
