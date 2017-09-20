@@ -53,8 +53,7 @@ const configs = {
     moduleName: 'WeexRuntime',
     entry: absolute('html5/runtime/index.js'),
     dest: absolute('packages/weex-js-runtime/index.js'),
-    banner: `/* WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`
-      + frameworkBanner,
+    banner: `/* WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`,
     format: 'umd',
     plugins: [
       nodeResolve({
