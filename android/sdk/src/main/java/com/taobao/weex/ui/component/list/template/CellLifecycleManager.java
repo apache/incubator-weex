@@ -125,9 +125,8 @@ public class CellLifecycleManager {
                 || slotWatchAttachRefs.get(cell.getRef()).size() == 0){
             return;
         }
-        Map<String, Object> params = new HashMap<>(8);
-        params.put("position", position);
-        cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.ATTACH, params);
+        List<String> refs = slotWatchAttachRefs.get(cell.getRef());
+        fireChildEvent(Constants.Event.SLOT_LIFECYCLE.ATTACH, cell, refs, position);
     }
 
     /**
@@ -143,9 +142,8 @@ public class CellLifecycleManager {
                 || slotWatchDetachRefs.get(cell.getRef()).size() == 0){
             return;
         }
-        Map<String, Object> params = new HashMap<>(8);
-        params.put("position", position);
-        cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.DETACH, params);
+        List<String> refs = slotWatchDetachRefs.get(cell.getRef());
+        fireChildEvent(Constants.Event.SLOT_LIFECYCLE.DETACH, cell, refs, position);
     }
 
     /**
@@ -173,5 +171,17 @@ public class CellLifecycleManager {
             cell.fireEvent(Constants.Event.SLOT_LIFECYCLE.DESTORY, params);
         }
         eventSlotWatchRefs.clear();
+    }
+
+    private final  void  fireChildEvent(String event, WXCell cell, List<String> refs, int position){
+        for(String ref : refs){
+            WXComponent component = recyclerTemplateList.findChildByRef(cell, ref);
+            if(component == null){
+                continue;
+            }
+            Map<String, Object> params = new HashMap<>(8);
+            params.put("position", position);
+            component.fireEvent(event, params);
+        }
     }
 }
