@@ -9,7 +9,6 @@ env:
   - TEST_SUITE=danger
   - TEST_SUITE=jsfm
   - TEST_SUITE=android
-  - TEST_SUITE=release
 matrix:
     fast_finish: true
     exclude:
@@ -25,15 +24,7 @@ matrix:
         env: TEST_SUITE=ios
       - os: linux
         env: TEST_SUITE=android
-      - os: osx
-        env: TEST_SUITE=release
-      - os: linux
-        env: TEST_SUITE=release
     include:
-      - os: linux
-        env: TEST_SUITE=release
-        osx_image: oraclejdk8
-        language: android
       - os: osx
         env: TEST_SUITE=ios
         osx_image: xcode8.1
@@ -80,11 +71,6 @@ script:
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
       npm run danger -- run --dangerfile ./dangerfile.js
-    fi
-  - |
-    if [[ $TEST_SUITE = "release" ]]; then
-      bash scripts/generate_apache_release.sh &&
-      cd apache_release_temp
     fi
 notifications:
   webhooks:

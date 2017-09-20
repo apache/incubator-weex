@@ -100,6 +100,6 @@ if(hasJsfmFile){
     fail("jsfm run test failed!");
   }
 }else{
-  message('has no ios file changed,skip test!');
+  message('has no jsfm file changed,skip test!');
 }
 
