@@ -30,10 +30,10 @@ matrix:
       - os: linux
         env: TEST_SUITE=release
     include:
-      - os: osx
+      - os: linux
         env: TEST_SUITE=release
-        osx_image: xcode8.1
-        language: objective-c
+        osx_image: oraclejdk8
+        language: android
       - os: osx
         env: TEST_SUITE=ios
         osx_image: xcode8.1
@@ -63,25 +63,10 @@ before_script:
       nvm install 7.0
       npm install
     fi
-  - |
-    if [[ $TEST_SUITE = "release" ]]; then
-      brew update
-      #manual install android sdk
-      brew cask install android-sdk
-      brew install gradle
-      export ANDROID_HOME=/usr/local/share/android-sdk
-      export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
-      echo yes | sdkmanager platform-tools
-      echo yes | sdkmanager tools #tools
-      echo yes | sdkmanager "build-tools;25.0.3" #build-tool
-      echo yes | sdkmanager "platforms;android-25" #compile target
-      echo yes | sdkmanager "extras;android;m2repository" #support
-    fi
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
-      cd android
-      ./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
+      npm run danger -- --dangerfile=./dangerfile-android.js
       cd $TRAVIS_BUILD_DIR
     fi
   - |
@@ -95,14 +80,12 @@ script:
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
-      npm run danger
+      npm run danger -- --dangerfile=./dangerfile.js
     fi
   - |
     if [[ $TEST_SUITE = "release" ]]; then
       bash scripts/generate_apache_release.sh &&
-      cd apache_release_temp &&
-      bash scripts/build_from_source.sh &&
-      cd $TRAVIS_BUILD_DIR
+      cd apache_release_temp
     fi
 notifications:
   webhooks:

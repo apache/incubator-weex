@@ -57,57 +57,52 @@ const getFileType = file => {
   }
 }
 
-function checkIosFile(file){
+function checkAndroidFile(file){
   var type = getFileType(file);
-  return type == type_ios_sdk || type == type_ios_test || type == type_jsfm;
+  return type == type_android_test || type == type_android_sdk || type == type_jsfm;
 }
 
-var hasIosFile = false;
+var hasAndroidFile = false;
 
-if (!hasIosFile && danger.git.created_files) {
+if (!hasAndroidFile && danger.git.created_files) {
   danger.git.created_files.some(file => {
-    var f = checkIosFile(file);
+    var f = checkAndroidFile(file);
     if(f){
-      hasIosFile =f;
+      hasAndroidFile =f;
     }
     return f;
   });
 }
-if (!hasIosFile && danger.git.modified_files) {
+if (!hasAndroidFile && danger.git.modified_files) {
   danger.git.modified_files.some(file => {
-    var f = checkIosFile(file);
+    var f = checkAndroidFile(file);
     if(f){
-      hasIosFile =f;
+      hasAndroidFile =f;
     }
     return f;
   });
 }
-if (!hasIosFile && danger.git.deleted_files) {
+if (!hasAndroidFile && danger.git.deleted_files) {
   danger.git.deleted_files.some(file => {
-    var f = checkIosFile(file);
+    var f = checkAndroidFile(file);
     if(f){
-      hasIosFile =f;
+      hasAndroidFile =f;
     }
     return f;
   });
 }
 
-if(hasIosFile){
-  var brewUpdateCmd='source ~/.bash_profile; '
-    + 'brew update'
-  var runSuccess = shell.exec(brewUpdateCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
-  if(!runSuccess){
-    warn("ios platform brew update failed!");
-  }
+if(hasAndroidFile){
   var runTestCmd='source ~/.bash_profile; '
-    +'xcodebuild -project ios/sdk/WeexSDK.xcodeproj test '
-    +'-scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO '
-    +'-destination "platform=iOS Simulator,name=iPhone 6"'
-  runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
+    +'cd android; '
+    +'./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true '
+    +'-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m '
+    +'-XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 '
+  var runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
   if(!runSuccess){
-    fail("ios platform run unit test failed!");
+    fail("android platform run unit test failed!");
   }
 }else{
-  message('has no ios file changed,skip test!');
+  message('has no android file changed,skip test!');
 }
 
