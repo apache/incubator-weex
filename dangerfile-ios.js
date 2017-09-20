@@ -93,12 +93,6 @@ if (!hasIosFile && danger.git.deleted_files) {
 }
 
 if(hasIosFile){
-  var brewUpdateCmd='source ~/.bash_profile; '
-    + 'brew update'
-  var runSuccess = shell.exec(brewUpdateCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
-  if(!runSuccess){
-    warn("ios platform brew update failed!");
-  }
   var runTestCmd='source ~/.bash_profile; '
     +'xcodebuild -project ios/sdk/WeexSDK.xcodeproj test '
     +'-scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO '
