@@ -44,7 +44,7 @@ public class WXStatement implements Map<String, Object>,Cloneable  {
      *          '[[repeat]]': {
      *          '@expression': 'dataList',
      *          '@index': 'index',
-     *          '@label': 'item'
+     *          '@alias': 'item'
      *         }
      *      }
      * </code>

@@ -28,6 +28,7 @@ import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXTextDomObject;
+import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.el.parse.ArrayStack;
@@ -78,7 +79,7 @@ public class StatementTest {
         Statements.doRenderComponent(cell, createContext(count));
         Assert.assertTrue(cell.getChildCount() == 1);
         WXDiv div = (WXDiv) cell.getChild(0);
-        Assert.assertTrue(div.getChildCount() == count);
+        Assert.assertEquals(div.getChildCount(), count);
         Assert.assertNotNull(div.getChild(0).getDomObject());
         Assert.assertNotNull(((WXDomObject)div.getChild(0).getDomObject()).getAttrs().getStatement());
         Assert.assertNull(((WXDomObject)div.getChild(1).getDomObject()).getAttrs().getStatement());
@@ -144,11 +145,13 @@ public class StatementTest {
         cell.addChild(div);
         WXText text = new WXText(WXSDKInstanceTest.createInstance(), new WXTextDomObject(), div);
         WXStatement statement = new WXStatement();
-        statement.put("repeat", JSON.parse("{\n" +
-                "      '@exp': 'dataList',\n" +
-                "      '@key': 'index',\n" +
-                "      '@label': 'item'\n" +
-                "    }"));
+        statement.put("[[repeat]]",
+                ELUtils.vforBlock(
+                        JSON.parse("{\n" +
+                                "      '@expression': 'dataList',\n" +
+                                "      '@index': 'index',\n" +
+                                "      '@alias': 'item'\n" +
+                                "    }")));
         WXDomObject domObject = (WXDomObject) text.getDomObject();
         domObject.getAttrs().setStatement(statement);
         div.addChild(text);

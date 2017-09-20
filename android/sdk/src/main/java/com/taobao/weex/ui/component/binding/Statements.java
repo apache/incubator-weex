@@ -128,83 +128,87 @@ public class Statements {
             // execute v-for content
             if(vfor != null){
                 int    renderIndex = parent.indexOf(component);
-                Token  listBlock = (Token) vfor.get(WXStatement.WX_FOR_LIST);
-                String indexKey = vfor.getString(WXStatement.WX_FOR_INDEX);
-                String itemKey = vfor.getString(WXStatement.WX_FOR_ITEM);
-                Object data = null;
-                if(listBlock != null) {
-                    data = listBlock.execute(context);
-                }
-                if((data instanceof List || data instanceof  Map)){
-
-                    Collection collection = null;
-                    Map  map = null;
-                    if(data instanceof  List){
-                        collection = (List)data;
-                    }else{
-                        map = (Map)data;
-                        collection = map.keySet();
+                if(vfor.get(WXStatement.WX_FOR_LIST) instanceof Token){
+                    Token  listBlock = (Token) vfor.get(WXStatement.WX_FOR_LIST);
+                    String indexKey = vfor.getString(WXStatement.WX_FOR_INDEX);
+                    String itemKey = vfor.getString(WXStatement.WX_FOR_ITEM);
+                    Object data = null;
+                    if(listBlock != null) {
+                        data = listBlock.execute(context);
                     }
-                    Map<String, Object> loop = new HashMap<>();
-                    int index = 0;
-                    for(Object item : collection){
-                        Object key = null;
-                        Object value = item;
-                        if(map == null){
-                             key = index;
-                             value = item;
+                    if((data instanceof List || data instanceof  Map)){
+
+                        Collection collection = null;
+                        Map  map = null;
+                        if(data instanceof  List){
+                            collection = (List)data;
                         }else{
-                             key = item;
-                             value = map.get(item);
+                            map = (Map)data;
+                            collection = map.keySet();
                         }
-                        if(indexKey != null){
-                            loop.put(indexKey, key);
-                        }
+                        Map<String, Object> loop = new HashMap<>();
+                        int index = 0;
+                        for(Object item : collection){
+                            Object key = null;
+                            Object value = item;
+                            if(map == null){
+                                key = index;
+                                value = item;
+                            }else{
+                                key = item;
+                                value = map.get(item);
+                            }
+                            if(indexKey != null){
+                                loop.put(indexKey, key);
+                            }
 
-                        if(itemKey != null){
-                            loop.put(itemKey, value);
-                        }else{
-                            context.push(value);
-                        }
-                        if(loop.size() > 0){
-                            context.push(loop);
-                        }
+                            if(itemKey != null){
+                                loop.put(itemKey, value);
+                            }else{
+                                context.push(value);
+                            }
+                            if(loop.size() > 0){
+                                context.push(loop);
+                            }
 
 
-                        if(vif != null){
-                            if(!Operators.isTrue(vif.execute(context))){
-                                continue;
+                            if(vif != null){
+                                if(!Operators.isTrue(vif.execute(context))){
+                                    continue;
+                                }
+                            }
+                            //find resuable renderNode
+                            WXComponent renderNode = null;
+                            if(renderIndex < parent.getChildCount()){
+                                renderNode = parent.getChild(renderIndex);
+                                //check is same statment, if true, it is usabled.
+                                if(!isCreateFromNodeStatement(renderNode, component)){
+                                    renderNode = null;
+                                }
+                            }
+                            //none resuable render node, create node, add to parent, but clear node's statement
+                            if(renderNode == null){
+                                renderNode = copyComponentTree(component, parent);
+                                WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
+                                renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
+                                parentDomObject.add(renderNodeDomObject, renderIndex);
+                                parent.addChild(renderNode, renderIndex);
+                                parent.createChildViewAt(renderIndex);
+                                renderNode.applyLayoutAndEvent(renderNode);
+                                renderNode.bindData(renderNode);
+                            }
+                            doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context);
+                            renderIndex++;
+                            if(loop.size() > 0){
+                                context.push(loop);
+                            }
+                            if(itemKey == null) {
+                                context.pop();
                             }
                         }
-                        //find resuable renderNode
-                        WXComponent renderNode = null;
-                        if(renderIndex < parent.getChildCount()){
-                            renderNode = parent.getChild(renderIndex);
-                            //check is same statment, if true, it is usabled.
-                            if(!isCreateFromNodeStatement(renderNode, component)){
-                                renderNode = null;
-                            }
-                        }
-                        //none resuable render node, create node, add to parent, but clear node's statement
-                        if(renderNode == null){
-                            renderNode = copyComponentTree(component, parent);
-                            WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
-                            renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
-                            parentDomObject.add(renderNodeDomObject, renderIndex);
-                            parent.addChild(renderNode, renderIndex);
-                            parent.createChildViewAt(renderIndex);
-                            renderNode.applyLayoutAndEvent(renderNode);
-                            renderNode.bindData(renderNode);
-                        }
-                        doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context);
-                        renderIndex++;
-                        if(loop.size() > 0){
-                            context.push(loop);
-                        }
-                        if(itemKey == null) {
-                            context.pop();
-                        }
                     }
+                }else{
+                    WXLogUtils.e("StatementsVFor",  vfor.toJSONString() + " not call vfor block, for pre compile");
                 }
                 //after v-for execute, remove component created pre v-for.
                 for(;renderIndex<parent.getChildCount(); renderIndex++){

@@ -20,9 +20,7 @@ package com.taobao.weex.el.parse;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -36,18 +34,16 @@ public class Parser {
     private int position;
     private ArrayStack<Token> stacks;
     private ArrayStack<Symbol> operators;
-    private ArrayStack<Symbol> punctuations;
 
     public Parser(String code){
         this.code = code;
         this.position = 0;
         this.stacks = new ArrayStack<>();
         this.operators = new ArrayStack<>();
-        this.punctuations = new ArrayStack<>();
     }
 
 
-    public Token parse(){
+    public final Token parse(){
         while (hasNextToken()){
             scanNextToken();
         }
@@ -79,13 +75,9 @@ public class Parser {
     }
 
 
-    char scanNextToken(){
+    final char scanNextToken(){
         char ch = nextToken();
         if(ch == Operators.DOLLAR){
-            position++;
-            return ch;
-        }else if(ch == Operators.ARRAY_SEPRATOR){
-            punctuations.push(new Symbol(String.valueOf(ch), position));
             position++;
             return ch;
         }else if(Character.isJavaIdentifierStart(ch)){
@@ -115,7 +107,7 @@ public class Parser {
     }
 
 
-    void  scanArray(){
+    final void  scanArray(){
         int stackSize = stacks.size();
         int opSize = operators.size();
         int type = Token.TYPE_IDENTIFIER;
@@ -304,29 +296,53 @@ public class Parser {
      * */
     void scanIf(){
         Operator operator = new Operator(Operators.CONDITION_IF_STRING, Token.TYPE_OPERATOR);
-        int minSize = 0;
+        int selfIndex = 0;
+        doStackOperators(0);
         if(operators.size() > 0){
-            minSize = Math.max(operators.peek().pos, minSize);
+            selfIndex = Math.max(operators.peek().pos, selfIndex);
         }
-        if(stacks.size() > minSize){
+        if(stacks.size() > selfIndex){
             operator.self = stacks.pop();
         }
+
+        int stackSize = stacks.size();
+        int leftOperatorSize = operators.size();
         position++;
         while (hasNextToken()){
             if(scanNextToken() == Operators.CONDITION_IF_MIDDLE){
                 break;
             }
         }
-        while (stacks.size() > minSize){
+        while (operators.size() > leftOperatorSize){
+            Symbol symbol = operators.pop();
+            doOperator(symbol);
+        }
+
+        while (stacks.size() > stackSize){
             operator.first = stacks.pop();
         }
-        if(hasNextToken()){
+        int rightOperatorsSize = operators.size();
+        while (hasNextToken()){
             scanNextToken();
-            while (stacks.size() > minSize){
-                operator.second = stacks.pop();
+            if(hasNextToken()){
+                scanNextToken();
+            }
+            if(operators.size() <= rightOperatorsSize){
+                break;
             }
         }
+        doStackOperators(rightOperatorsSize);
+        while (stacks.size() > stackSize){
+            operator.second = stacks.pop();
+        }
         stacks.push(operator);
+    }
+
+    private final void doStackOperators(int operatorSize){
+        while (operators.size() > operatorSize){
+            Symbol symbol = operators.pop();
+            doOperator(symbol);
+        }
     }
 
     /**
@@ -336,7 +352,7 @@ public class Parser {
      * 100
      * 199e5
      * */
-    void scanNumber(){
+    final void scanNumber(){
         boolean isInt = true;
         int start = position;
         if(code.charAt(position) == 'e' || code.charAt(position) == '.'){
@@ -371,7 +387,7 @@ public class Parser {
     }
 
 
-    void  scanString(){
+    final void  scanString(){
         int start = position;
         ArrayStack operator = new ArrayStack();
         char quote = code.charAt(start);
@@ -407,7 +423,7 @@ public class Parser {
      * ${item.dd}
      * $item.dd
      * */
-    void scanIdentifier(){
+    final void scanIdentifier(){
         int start = position;
         position++;
         while (hasNext()){
@@ -427,7 +443,7 @@ public class Parser {
             el = el.substring(Operators.DOLLAR_STR.length());
         }
         int type = Token.TYPE_IDENTIFIER;
-        if(Operators.KEYWORDS.contains(el)){
+        if(Operators.KEYWORDS.containsKey(el)){
             if(!(!operators.isEmpty() && Operators.isDot(operators.peek().op))){
                 type = Token.TYPE_KEYWORD;
             }
@@ -437,13 +453,13 @@ public class Parser {
     }
 
 
-    boolean hasNext(){
+    final boolean hasNext(){
         return position < code.length();
     }
 
 
 
-    boolean hasNextToken(){
+    final boolean hasNextToken(){
         while (hasNext()){
             char ch = code.charAt(position);
             if(ch == ' '){
@@ -455,7 +471,7 @@ public class Parser {
         return false;
     }
 
-    char nextToken(){
+    final char nextToken(){
         char ch = code.charAt(position);
         while (ch == ' '){
             position ++;

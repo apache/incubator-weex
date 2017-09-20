@@ -33,21 +33,23 @@ import java.util.Stack;
 public class BindingValueTest extends TestCase {
 
     public void testBindingValue(){
-        Assert.assertTrue(getBindingValue("true ? true : false", createContext()).equals("true"));
-        Assert.assertTrue(getBindingValue("true ? item.name : false", createContext()).equals("hello world"));
-        Assert.assertTrue(getBindingValue("false ? item.name : false", createContext()).equals("false"));
-        Assert.assertTrue(getBindingValue("item.name ? item.name : false", createContext()).equals("hello world"));
-        Assert.assertTrue(getBindingValue("item.name > 0 ? item.name : false", createContext()).equals("false"));
-        Assert.assertTrue(getBindingValue("? item.name : false", createContext()).equals("false"));
+        System.out.println(Parser.parse("true ? item.name : false").execute(createContext()));
+        Assert.assertEquals(getValue("true ? true : false", createContext()), true);
+        Assert.assertEquals(getValue("true ? item.name : false", createContext()), "hello world");
+        Assert.assertEquals(getValue("false ? item.name : false", createContext()), false);
+        Assert.assertEquals(getValue("item.name ? item.name : false", createContext()), "hello world");
+        Assert.assertEquals(getValue("item.name > 0 ? item.name : false", createContext()), false);
+        Assert.assertEquals(getValue("? item.name : false", createContext()), false);
     }
 
 
     public void testDebug(){
-        Assert.assertTrue(getBindingValue("? item.name : false", createContext()).equals("false"));
+        System.out.println(Parser.parse("true ? item.name : false"));
+        Assert.assertTrue(getValue("false ? item.name : false", createContext()).toString().equals("false"));
     }
 
 
-    private Object getBindingValue(String expression, Stack context){
+    private Object getValue(String expression, Stack context){
         return Parser.parse(expression).execute(context);
     }
 

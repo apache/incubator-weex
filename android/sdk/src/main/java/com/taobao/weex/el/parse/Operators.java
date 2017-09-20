@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/28.
@@ -64,6 +65,18 @@ public class Operators {
         }
         if(context instanceof ArrayStack){
             ArrayStack stack = (ArrayStack) context;
+            for(int index=stack.size()-1; index >= 0; index--){
+                Object value = stack.get(index);
+                if(value instanceof  Map){
+                    Map map = (Map) value;
+                    if(map.containsKey(key)){
+                        return map.get(key);
+                    }
+                }
+            }
+        }
+        if(context instanceof Stack){
+            Stack stack = (Stack) context;
             for(int index=stack.size()-1; index >= 0; index--){
                 Object value = stack.get(index);
                 if(value instanceof  Map){
@@ -438,6 +451,8 @@ public class Operators {
         OPERATORS_PRIORITY.put(SPACE_STR, 0);
         OPERATORS_PRIORITY.put(ARRAY_SEPRATOR_STR, 0);
         OPERATORS_PRIORITY.put(ARRAY_END_STR, 0);
+
+
         OPERATORS_PRIORITY.put(OR, 1);
         OPERATORS_PRIORITY.put(AND, 1);
 
@@ -469,12 +484,16 @@ public class Operators {
 
     }
 
-    public static final List<String> KEYWORDS = new ArrayList<>();
+    public static final Object keywordValue(String keyword){
+        return KEYWORDS.get(keyword);
+    }
+
+    public static final Map<String,Object> KEYWORDS = new HashMap<>();
     static {
-        KEYWORDS.add("null");
-        KEYWORDS.add("true");
-        KEYWORDS.add("false");
-        KEYWORDS.add("undefined");
+        KEYWORDS.put("null", null);
+        KEYWORDS.put("true", Boolean.TRUE);
+        KEYWORDS.put("false", Boolean.FALSE);
+        KEYWORDS.put("undefined", null);
     }
 
 }

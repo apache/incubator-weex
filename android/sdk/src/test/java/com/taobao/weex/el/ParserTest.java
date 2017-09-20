@@ -80,20 +80,33 @@ public class ParserTest extends TestCase {
         Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
         Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
         Assert.assertEquals(4, Parser.parse("0?1:0?3:4").execute(null));
-        Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
+        Assert.assertEquals(3, Parser.parse("0?1:0+1?3:4").execute(null));
+        Assert.assertEquals("hello world", Parser.parse("item.name ? item.name : false").execute(this.createContext()));
+        Assert.assertEquals(10, Parser.parse("item.name ? item[1] : false").execute(this.createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item.name == null ? false : item.name").execute(this.createContext()));
+        Assert.assertEquals(false, Parser.parse("true ? false : item.name").execute(this.createContext()));
+        Assert.assertEquals(false, Parser.parse("true ? false : item.name.work").execute(this.createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item.name ? item.name : false").execute(this.createContext()));
+        Assert.assertEquals(null, Parser.parse("item.name ? item.name.not : false").execute(this.createContext()));
+
+
     }
 
     public void testDebug(){
+
+
+        System.out.println("execute " + Parser.parse("true ? false : item.name").execute(this.createContext()));
+
+        show("true ? false : item.name");
+        /**
         Parser.parse("item[1]").execute(this.createContext());
         Token block = Parser.parse("{{{item.name}}}");
-        /**
-         *
-         * */
-        show("item.[1]");
+        show("true ? item.name : false");
        show("((true) && 2 > 1) && (1) && (1)");
         System.out.println(block.execute(createContext())
         + "  " + Double.parseDouble(".0e6"));
         show("1 > -1");
+         */
     }
 
 
@@ -135,13 +148,20 @@ public class ParserTest extends TestCase {
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  null : true").execute(createContext())));
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  undefined : true").execute(createContext())));
         Assert.assertFalse(Operators.isTrue(Parser.parse("1 ?  \"\" : true").execute(createContext())));
+        Assert.assertEquals("hello world", Parser.parse("true ? item.name : false").execute(createContext()));
+        Assert.assertEquals("hello world", Parser.parse("item.name ? item.name : false").execute(createContext()));
+        Assert.assertEquals(true, Parser.parse("true").execute(createContext()));
+        Assert.assertEquals(false, Parser.parse("false").execute(createContext()));
+        Assert.assertEquals(null, Parser.parse("null").execute(createContext()));
+        Assert.assertEquals(null, Parser.parse("undefined").execute(createContext()));
+
     }
 
 
     public void testParse(){
         Assert.assertEquals(1, Parser.parse("0?2:1").execute(null));
         Assert.assertEquals(4, Parser.parse("0?1:0?3:4").execute(null));
-        Assert.assertEquals(3.0, Parser.parse("0?1:0+1?3:4").execute(null));
+        Assert.assertEquals(3, Parser.parse("0?1:0+1?3:4").execute(null));
         Parser.parse("item.code  \"string test \" ( item.ddd)  .item  1000  ccc ? ddd : 0");
         Parser.parse("1+e6");
         show(null);
