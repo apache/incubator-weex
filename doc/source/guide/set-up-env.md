@@ -90,4 +90,4 @@ You can modify this page in `src/foo.vue`. The code is shown below:
 </style>
 ```
 
-If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](https://dotwe.org) and preview at anytime.
+If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](http://dotwe.org) and preview at anytime.
