@@ -76,9 +76,9 @@ static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplate
     
     if ([self needsLayout]) {
         layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-//        if ([WXLog logLevel] >= WXLogLevelDebug) {
+        if ([WXLog logLevel] >= WXLogLevelDebug) {
             print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
-//        }
+        }
     }
     
     NSMutableSet<WXComponent *> *dirtyComponents = [NSMutableSet set];

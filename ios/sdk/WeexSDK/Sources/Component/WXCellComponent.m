@@ -56,7 +56,7 @@
     
 }
 
-- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
 {
     return self == object;
 }

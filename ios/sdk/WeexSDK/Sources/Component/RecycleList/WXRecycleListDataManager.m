@@ -47,6 +47,13 @@
     _data = data;
 }
 
+- (NSArray *)data
+{
+    WXAssertMainThread();
+    
+    return _data;
+}
+
 - (NSDictionary *)dataAtIndex:(NSInteger)index
 {
     WXAssertMainThread();

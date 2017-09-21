@@ -21,7 +21,7 @@
 
 @protocol WXDiffable <NSObject>
 
-- (BOOL)isEqualToWXObject:(id<WXDiffable>)object;
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object;
 
 @end
 
@@ -40,6 +40,10 @@
 
 - (BOOL)hasChanges;
 
+- (instancetype)initWithInserts:(NSIndexSet *)inserts
+                        deletes:(NSIndexSet *)deletes
+                        updates:(NSArray<WXDiffUpdateIndex *> *)updates;
+
 @end
 
 @interface WXDiffUtil : NSObject
@@ -47,3 +51,20 @@
 + (WXDiffResult *)diffWithMinimumDistance:(NSArray<id<WXDiffable>> *)newArray oldArray:(NSArray<id<WXDiffable>> *)oldArray;
 
 @end
+
+@interface NSNumber (WXDiffable) <WXDiffable>
+
+@end
+
+@interface NSString (WXDiffable) <WXDiffable>
+
+@end
+
+@interface NSArray (WXDiffable) <WXDiffable>
+
+@end
+
+@interface NSDictionary (WXDiffable) <WXDiffable>
+
+@end
+

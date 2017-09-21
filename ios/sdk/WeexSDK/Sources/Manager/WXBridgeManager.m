@@ -304,12 +304,22 @@ void WXPerformBlockOnBridgeThread(void (^block)())
 
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges
 {
+    [self fireEvent:instanceId ref:ref type:type params:params domChanges:domChanges handlerArguments:nil];
+}
+
+- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments
+{
     if (!type || !ref) {
         WXLogError(@"Event type and component ref should not be nil");
         return;
     }
     
     NSArray *args = @[ref, type, params?:@{}, domChanges?:@{}];
+    if (handlerArguments) {
+        NSMutableArray *newArgs = [args mutableCopy];
+        [newArgs addObject:@{@"params":handlerArguments}];
+        args = newArgs;
+    }
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];

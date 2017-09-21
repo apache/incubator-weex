@@ -566,25 +566,30 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
+- (CGPoint)absolutePositionForComponent:(WXComponent *)component
+{
+    return [component->_view.superview convertPoint:component->_view.frame.origin toView:_view];
+}
+
 #pragma mark  Private Methods
 
 - (void)scrollToTarget:(WXScrollToTarget *)target scrollRect:(CGRect)rect
 {
     WXComponent *component = target.target;
-    if (![component isViewLoaded]) {
+    if (![component isViewLoaded]) { 
         return;
     }
     
     CGFloat ctop;
     if (component && component->_view && component->_view.superview) {
-        ctop = [component->_view.superview convertPoint:component->_view.frame.origin toView:_view].y;
+        ctop = [self absolutePositionForComponent:component].y;
     } else {
         ctop = 0.0;
     }
     CGFloat cbottom = ctop + CGRectGetHeight(component.calculatedFrame);
     CGFloat cleft;
     if (component && component->_view && component->_view.superview) {
-        cleft = [component->_view.superview convertPoint:component->_view.frame.origin toView:_view].x;
+        cleft = [self absolutePositionForComponent:component].x;
     } else {
         cleft = 0.0;
     }
@@ -595,6 +600,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if(!target.hasAppear && component){
             target.hasAppear = YES;
             if (component->_appearEvent) {
+//                NSLog(@"appear:%@, %.2f", component, ctop);
                 [component fireEvent:@"appear" params:_direction ? @{@"direction":_direction} : nil];
             }
         }
@@ -602,6 +608,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if(target.hasAppear && component){
             target.hasAppear = NO;
             if(component->_disappearEvent){
+//                NSLog(@"disappear:%@", component);
                 [component fireEvent:@"disappear" params:_direction ? @{@"direction":_direction} : nil];
             }
         }

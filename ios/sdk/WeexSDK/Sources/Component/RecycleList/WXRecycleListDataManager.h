@@ -25,6 +25,8 @@
 
 - (void)updateData:(NSArray *)data;
 
+- (NSArray *)data;
+
 - (NSDictionary *)dataAtIndex:(NSInteger)index;
 
 - (NSInteger)numberOfItems;

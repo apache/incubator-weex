@@ -18,8 +18,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXComponent.h"
+#import "WXScrollerComponent.h"
 
-@interface WXRecycleListComponent : WXComponent <UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
+@interface WXRecycleListComponent : WXScrollerComponent 
 
 @end

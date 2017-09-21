@@ -29,6 +29,7 @@ extern "C" {
 #endif
     
 void WXPerformBlockOnComponentThread(void (^block)());
+void WXPerformBlockSyncOnComponentThread(void (^block)());
     
 #ifdef __cplusplus
 }

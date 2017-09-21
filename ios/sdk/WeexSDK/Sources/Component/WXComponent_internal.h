@@ -145,8 +145,12 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     BOOL _isRepeating;
     BOOL _isSkipUpdate;
     
-    NSMutableDictionary<NSString *, NSArray<NSString *> *> *_bindingAttributes;
-    NSMutableDictionary<NSString *, NSArray<NSString *> *> *_bindingStyles;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingProps;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingStyles;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingEvents;
+    
+    NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
 ///--------------------------------------
@@ -222,6 +226,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_removeAllEvents;
 
+- (void)_addEventParams:(NSDictionary *)params;
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName;
+
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
 
 - (void)_initCompositingAttribute:(NSDictionary *)attributes;
@@ -242,7 +250,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)setGradientLayer;
 
-- (void)_storeBindingsWithStyles:(NSDictionary *)styles attributes:(NSDictionary *)attributes;
+- (void)_storeBindingsWithProps:(NSDictionary *)props styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSDictionary *)events;
 
 - (void)_didInserted;
 

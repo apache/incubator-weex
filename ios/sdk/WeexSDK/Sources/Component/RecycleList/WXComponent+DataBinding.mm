@@ -27,8 +27,10 @@
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 typedef enum : NSUInteger {
-    WXDataBindingTypeStyle = 0,
+    WXDataBindingTypeProp = 0,
+    WXDataBindingTypeStyle,
     WXDataBindingTypeAttributes,
+    WXDataBindingTypeEvents,
     WXDataBindingTypeCount,
 } WXDataBindingType;
 
@@ -57,6 +59,19 @@ static JSContext *jsContext;
         return;
     }
     
+    if (templateComponent->_bindingProps) {
+        NSMutableDictionary *newData = [NSMutableDictionary dictionary];
+        [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
+            BOOL needUpdate;
+            id value = block(data, &needUpdate);
+            if (value) {
+                newData[key] = value;
+            }
+        }];
+        
+        data = newData;
+    }
+    
     if (!_isRepeating) {
         WXDataBindingBlock repeatBlock = templateComponent->_bindingRepeat;
         if (repeatBlock) {
@@ -80,7 +95,7 @@ static JSContext *jsContext;
     }
     
     for (int i = WXDataBindingTypeStyle; i < WXDataBindingTypeCount; i++) {
-        NSDictionary *bindingMap = i == WXDataBindingTypeStyle ? templateComponent->_bindingStyles : templateComponent->_bindingAttributes;
+        NSDictionary *bindingMap = i == WXDataBindingTypeStyle ? templateComponent->_bindingStyles : (i == WXDataBindingTypeAttributes ? templateComponent->_bindingAttributes : templateComponent->_bindingEvents);
         if (!bindingMap || bindingMap.count == 0) {
             continue;
         }
@@ -98,8 +113,10 @@ static JSContext *jsContext;
             [self.weexInstance.componentManager startComponentTasks];
             if (i == WXDataBindingTypeStyle) {
                 [self.weexInstance.componentManager updateStyles:newAttributesOrStyles forComponent:self.ref];
-            } else {
+            } else if (i == WXDataBindingTypeAttributes) {
                 [self.weexInstance.componentManager updateAttributes:newAttributesOrStyles forComponent:self.ref];
+            } else if (i == WXDataBindingTypeEvents) {
+                [self _addEventParams:newAttributesOrStyles];
             }
         }
     }
@@ -163,41 +180,78 @@ static JSContext *jsContext;
     }
 }
 
-- (void)_storeBindingsWithStyles:(NSDictionary *)styles attributes:(NSDictionary *)attributes
-{
-    if (!_bindingAttributes) {
-        _bindingAttributes = [NSMutableDictionary new];
-    }
-    if (!_bindingStyles) {
-        _bindingStyles = [NSMutableDictionary new];
-    }
-    [self _storeBindings:styles type:WXDataBindingTypeStyle];
-    [self _storeBindings:attributes type:WXDataBindingTypeAttributes];
-}
-
-- (void)_storeBindings:(NSDictionary *)attributesOrStyles type:(WXDataBindingType)type
+- (void)_storeBindingsWithProps:(NSDictionary *)props styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSDictionary *)events
 {
     WXAssertComponentThread();
     
-    NSMutableDictionary *bindingMap = type == WXDataBindingTypeStyle ? _bindingStyles : _bindingAttributes;
+    if (props.count > 0) {
+        if (!_bindingProps) {
+            _bindingProps = [NSMutableDictionary dictionary];
+        }
+        [self _storeBindings:props type:WXDataBindingTypeProp];
+    }
     
-    // many-to-many relationship between attibuteName and bindingKey
-    [attributesOrStyles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull attributeOrStyleName, id  _Nonnull attributeOrStyle, BOOL * _Nonnull stop) {
-        if ([attributeOrStyle isKindOfClass:[NSDictionary class]] && attributeOrStyle[WXBindingIdentify]) {
+    if (styles.count > 0) {
+        if (!_bindingStyles) {
+            _bindingStyles = [NSMutableDictionary dictionary];
+        }
+        [self _storeBindings:styles type:WXDataBindingTypeStyle];
+    }
+    
+    if (attributes.count > 0) {
+        if (!_bindingAttributes) {
+            _bindingAttributes = [NSMutableDictionary dictionary];
+        }
+        [self _storeBindings:attributes type:WXDataBindingTypeAttributes];
+    }
+    
+    if (events.count > 0) {
+        if (!_bindingEvents) {
+            _bindingEvents = [NSMutableDictionary dictionary];
+        }
+        [self _storeBindings:events type:WXDataBindingTypeEvents];
+    }
+}
+
+- (void)_storeBindings:(NSDictionary *)stylesOrAttributesOrEvents type:(WXDataBindingType)type
+{
+    WXAssertComponentThread();
+    
+    NSMutableDictionary *bindingMap;
+    switch (type) {
+        case WXDataBindingTypeProp:
+            bindingMap = _bindingProps;
+            break;
+        case WXDataBindingTypeStyle:
+            bindingMap = _bindingStyles;
+            break;
+        case WXDataBindingTypeAttributes:
+            bindingMap = _bindingAttributes;
+            break;
+        case WXDataBindingTypeEvents:
+            bindingMap = _bindingEvents;
+            break;
+        default:
+            WXAssert(NO, @"error binding type:%z", type);
+            break;
+    }
+    
+    [stylesOrAttributesOrEvents enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull name, id  _Nonnull binding, BOOL * _Nonnull stop) {
+        if ([binding isKindOfClass:[NSDictionary class]] && binding[WXBindingIdentify]) {
             // {"attributeOrStyleName":{"@binding":"bindingExpression"}
-            NSString *bindingExpression = attributeOrStyle[WXBindingIdentify];
+            NSString *bindingExpression = binding[WXBindingIdentify];
             WXJSASTParser *parser = [WXJSASTParser parserWithScript:bindingExpression];
             WXJSExpression *expression = [parser parseExpression];
             WXDataBindingBlock block = [self bindingBlockWithExpression:expression];
-            bindingMap[attributeOrStyleName] = block;
-        } else if ([attributeOrStyle isKindOfClass:[NSArray class]]) {
+            bindingMap[name] = block;
+        } else if ([binding isKindOfClass:[NSArray class]]) {
             // {"attributeOrStyleName":[..., "string", {"@binding":"bindingExpression"}, "string", {"@binding":"bindingExpression"}, ...]
             NSMutableDictionary *bindingBlocksForIndex = [NSMutableDictionary dictionary];
             __block BOOL isBinding = NO;
-            [attributeOrStyle enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                if ([obj isKindOfClass:[NSDictionary class]] && obj[WXBindingIdentify]) {
+            [binding enumerateObjectsUsingBlock:^(id  _Nonnull bindingInArray, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([bindingInArray isKindOfClass:[NSDictionary class]] && bindingInArray[WXBindingIdentify]) {
                     isBinding = YES;
-                    NSString *bindingExpression = obj[WXBindingIdentify];
+                    NSString *bindingExpression = bindingInArray[WXBindingIdentify];
                     WXJSASTParser *parser = [WXJSASTParser parserWithScript:bindingExpression];
                     WXJSExpression *expression = [parser parseExpression];
                     WXDataBindingBlock block = [self bindingBlockWithExpression:expression];
@@ -205,9 +259,9 @@ static JSContext *jsContext;
                 }
             }];
             
-            bindingMap[attributeOrStyleName] = ^NSString *(NSDictionary *data, BOOL *needUpdate) {
-                NSMutableArray *newArray = [attributeOrStyle mutableCopy];
-                [attributeOrStyle enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            bindingMap[name] = ^id(NSDictionary *data, BOOL *needUpdate) {
+                NSMutableArray *newArray = [binding mutableCopy];
+                [binding enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                     BOOL _needUpdate = NO;
                     WXDataBindingBlock block = bindingBlocksForIndex[@(idx)];
                     if (block) {
@@ -221,21 +275,21 @@ static JSContext *jsContext;
                     }
                 }];
                 
-                return [newArray componentsJoinedByString:@""];
+                return type == WXDataBindingTypeEvents ? newArray : [newArray componentsJoinedByString:@""];
             };
         }
         
         if (type == WXDataBindingTypeAttributes) {
-            if ([WXBindingMatchIdentify isEqualToString:attributeOrStyleName]) {
-                WXJSASTParser *parser = [WXJSASTParser parserWithScript:attributeOrStyle];
+            if ([WXBindingMatchIdentify isEqualToString:name]) {
+                WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding];
                 WXJSExpression *expression = [parser parseExpression];
                 _bindingMatch = [self bindingBlockWithExpression:expression];
-            } else if ([WXBindingRepeatIdentify isEqualToString:attributeOrStyleName]) {
-                WXJSASTParser *parser = [WXJSASTParser parserWithScript:attributeOrStyle[WXBindingRepeatExprIdentify]];
+            } else if ([WXBindingRepeatIdentify isEqualToString:name]) {
+                WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding[WXBindingRepeatExprIdentify]];
                 WXJSExpression *expression = [parser parseExpression];
                 _bindingRepeat = [self bindingBlockWithExpression:expression];
-                _repeatIndexIdentify = attributeOrStyle[WXBindingRepeatIndexIdentify];
-                _repeatLabelIdentify = attributeOrStyle[WXBindingRepeatLabelIdentify];
+                _repeatIndexIdentify = binding[WXBindingRepeatIndexIdentify];
+                _repeatLabelIdentify = binding[WXBindingRepeatLabelIdentify];
             }
         }
     }];
@@ -274,6 +328,7 @@ static JSContext *jsContext;
             id object = [self bindingBlockWithExpression:member->object](data, &objectNeedUpdate);
             if (member->computed) {
                 id propertyName = [self bindingBlockWithExpression:member->property](data, &propertyNeedUpdate);
+                *needUpdate = objectNeedUpdate || propertyNeedUpdate;
                 if ([object isKindOfClass:[NSDictionary class]] && [propertyName isKindOfClass:[NSString class]]) {
                     return object[propertyName];
                 } else if ([object isKindOfClass:[NSArray class]] && [propertyName isKindOfClass:[NSNumber class]]) {
@@ -281,10 +336,32 @@ static JSContext *jsContext;
                 }
             } else {
                 NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
+                *needUpdate = objectNeedUpdate;
                 return object[propertyName];
             }
             
             return nil;
+        } else if (expression->is<WXJSArrayExpression>()) {
+            WXJSArrayExpression *expr = (WXJSArrayExpression *)expression;
+            std::vector<WXJSExpression *> expressions = expr->expressions;
+            NSMutableArray *array = [NSMutableArray array];
+            for(WXJSExpression *expr : expressions) {
+                if (expr == NULL) {
+                    continue;
+                }
+                WXDataBindingBlock block = [self bindingBlockWithExpression:expr];
+                *needUpdate = NO;
+                if (block) {
+                    BOOL elementNeedUpdate;
+                    id object = block(data, &elementNeedUpdate);
+                    if (object) {
+                        *needUpdate = *needUpdate || elementNeedUpdate;
+                        [array addObject:object];
+                    }
+                }
+            }
+            
+            return array;
         } else if (expression->is<WXJSUnaryExpression>()) {
             WXJSUnaryExpression *expr = (WXJSUnaryExpression *)expression;
             std::string operator_ = expr->operator_;

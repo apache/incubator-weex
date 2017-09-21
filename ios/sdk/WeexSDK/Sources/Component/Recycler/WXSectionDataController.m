@@ -65,7 +65,7 @@
     return [super hash];
 }
 
-- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
 {
     if ([object isKindOfClass:[WXSectionDataController class]]) {
         WXSectionDataController *controller = (WXSectionDataController *)object;

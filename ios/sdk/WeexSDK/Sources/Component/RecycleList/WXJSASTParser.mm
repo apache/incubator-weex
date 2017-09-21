@@ -762,6 +762,13 @@ static int binaryPrecedence(WXJSToken *token)
 {
     int type = _lookahead->type;
     
+    if (type == WXJSTokenTypePunctuator) {
+        if (_lookahead->value == "[") {
+            return [self parseArrayExpression];
+        } else if (_lookahead->value == "(") {
+            return [self parseGroupExpression];
+        }
+    }
     if (type == WXJSTokenTypeIdentifier) {
         WXJSIdentifier *identifier = new WXJSIdentifier();
         identifier->name = [self nextToken]->value;
@@ -774,6 +781,45 @@ static int binaryPrecedence(WXJSToken *token)
         [self _throwUnexpectedTokenError];
         return new WXJSIdentifier();
     }
+}
+
+- (WXJSArrayExpression *)parseArrayExpression
+{
+    std::vector<WXJSExpression *> expressions;
+    
+    [self expect:"["];
+    
+    while (![self match:"]"]) {
+        if ([self match:","]) {
+            [self nextToken];
+            expressions.push_back(NULL);
+        } else {
+            expressions.push_back([self parseConditionalExpression]);
+            
+            if (![self match:"]"]) {
+                [self expect:","];
+            }
+        }
+    }
+    
+    [self expect:"]"];
+    
+    WXJSArrayExpression *array = new WXJSArrayExpression();
+    array->expressions = expressions;
+    
+    return array;
+}
+
+- (WXJSExpression *)parseGroupExpression
+{
+    WXJSExpression *expr;
+    [self expect:"("];
+    
+    expr = [self parseConditionalExpression];
+    
+    [self expect:")"];
+    
+    return expr;
 }
 
 

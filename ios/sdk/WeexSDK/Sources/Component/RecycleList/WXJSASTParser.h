@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #include <string>
+#include <vector>
 
 typedef enum : NSUInteger {
     WXJSExpressionTypeUnary,
@@ -59,6 +60,10 @@ struct WXJSMemberExpression : WXJSExpression {
     WXJSExpression *object;
     WXJSExpression *property;
     bool computed;
+};
+
+struct WXJSArrayExpression : WXJSExpression {
+    std::vector<WXJSExpression *> expressions;
 };
 
 struct WXJSUnaryExpression : WXJSExpression {

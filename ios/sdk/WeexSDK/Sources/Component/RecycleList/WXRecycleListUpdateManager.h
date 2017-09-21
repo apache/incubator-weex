@@ -19,10 +19,32 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void(^WXRecycleListUpdateCompletion)(BOOL isFinished);
+@class WXRecycleListUpdateManager;
+
+@protocol WXRecycleListUpdateDelegate
+
+- (void)updateManager:(WXRecycleListUpdateManager *)manager willUpdateData:(id)newData;
+
+- (void)updateManager:(WXRecycleListUpdateManager *)manager didUpdateData:(id)newData withSuccess:(BOOL)finished;
+
+@end
+
 @interface WXRecycleListUpdateManager : NSObject
 
 @property (nonatomic, weak) UICollectionView *collectionView;
+@property (nonatomic, weak) id<WXRecycleListUpdateDelegate> delegate;
 
 - (void)reload;
+
+- (void)updateWithNewData:(NSArray *)newData
+                  oldData:(NSArray *)oldData
+               completion:(WXRecycleListUpdateCompletion)completion
+                animation:(BOOL)isAnimated;
+
+- (void)updateWithAppendingData:(NSArray *)appendingData
+                        oldData:(NSArray *)oldData
+                     completion:(WXRecycleListUpdateCompletion)completion
+                      animation:(BOOL)isAnimated;
 
 @end

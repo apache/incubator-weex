@@ -188,6 +188,8 @@
 		74B8BEFE1DC47B72004A6027 /* WXRootView.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B8BEFC1DC47B72004A6027 /* WXRootView.h */; };
 		74B8BEFF1DC47B72004A6027 /* WXRootView.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BEFD1DC47B72004A6027 /* WXRootView.m */; };
 		74B8BF011DC49AFE004A6027 /* WXRootViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */; };
+		74BA4AB31F70F4B600AC29BF /* WXRecycleListLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 74BA4AB11F70F4B600AC29BF /* WXRecycleListLayout.h */; };
+		74BA4AB41F70F4B600AC29BF /* WXRecycleListLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 74BA4AB21F70F4B600AC29BF /* WXRecycleListLayout.m */; };
 		74BB5FB91DFEE81A004FC3DF /* WXMetaModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74BB5FB71DFEE81A004FC3DF /* WXMetaModule.h */; };
 		74BB5FBA1DFEE81A004FC3DF /* WXMetaModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 74BB5FB81DFEE81A004FC3DF /* WXMetaModule.m */; };
 		74BF19F81F5139BB00AEE3D7 /* WXJSASTParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 74BF19F61F5139BB00AEE3D7 /* WXJSASTParser.h */; };
@@ -778,6 +780,8 @@
 		74B8BEFC1DC47B72004A6027 /* WXRootView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXRootView.h; sourceTree = "<group>"; };
 		74B8BEFD1DC47B72004A6027 /* WXRootView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRootView.m; sourceTree = "<group>"; };
 		74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRootViewTests.m; sourceTree = "<group>"; };
+		74BA4AB11F70F4B600AC29BF /* WXRecycleListLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXRecycleListLayout.h; sourceTree = "<group>"; };
+		74BA4AB21F70F4B600AC29BF /* WXRecycleListLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXRecycleListLayout.m; sourceTree = "<group>"; };
 		74BB5FB71DFEE81A004FC3DF /* WXMetaModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMetaModule.h; sourceTree = "<group>"; };
 		74BB5FB81DFEE81A004FC3DF /* WXMetaModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMetaModule.m; sourceTree = "<group>"; };
 		74BF19F61F5139BB00AEE3D7 /* WXJSASTParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXJSASTParser.h; sourceTree = "<group>"; };
@@ -1143,6 +1147,8 @@
 				74CFDD401F45941E007A1A66 /* WXRecycleListTemplateManager.m */,
 				74CFDD431F459443007A1A66 /* WXRecycleListUpdateManager.h */,
 				74CFDD441F459443007A1A66 /* WXRecycleListUpdateManager.m */,
+				74BA4AB11F70F4B600AC29BF /* WXRecycleListLayout.h */,
+				74BA4AB21F70F4B600AC29BF /* WXRecycleListLayout.m */,
 				746B92391F46BE36009AE86B /* WXCellSlotComponent.h */,
 				746B923A1F46BE36009AE86B /* WXCellSlotComponent.m */,
 				7423EB4F1F4ADE30001662D1 /* WXComponent+DataBinding.h */,
@@ -1649,6 +1655,7 @@
 				741081261CEDB4EC001BC6E5 /* WXComponent_internal.h in Headers */,
 				77E65A191C155F25008B8775 /* WXScrollerComponent.h in Headers */,
 				C4E375381E5FCBD3009B2D9C /* WXComponent+BoxShadow.h in Headers */,
+				74BA4AB31F70F4B600AC29BF /* WXRecycleListLayout.h in Headers */,
 				742AD7311DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.h in Headers */,
 				C4F0127D1E1502A6003378D0 /* WXWebSocketHandler.h in Headers */,
 				DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */,
@@ -2193,6 +2200,7 @@
 				7408C48F1CFB345D000BCCD0 /* WXComponent+Events.m in Sources */,
 				C4F012871E150307003378D0 /* WXWebSocketLoader.m in Sources */,
 				C4D872211E5DDEDA00E39BC1 /* WXInnerLayer.m in Sources */,
+				74BA4AB41F70F4B600AC29BF /* WXRecycleListLayout.m in Sources */,
 				745ED2DB1C5F2C7E002DB5A8 /* WXView.m in Sources */,
 				DC03ADB91D508719003F76E7 /* WXTextAreaComponent.m in Sources */,
 				59A596231CB6311F0012CD52 /* WXNavigatorModule.m in Sources */,

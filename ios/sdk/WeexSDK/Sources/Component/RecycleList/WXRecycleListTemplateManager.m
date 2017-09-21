@@ -87,7 +87,7 @@
 - (void)_registerCellClassForReuseID:(NSString *)templateID
 {
     WXLogDebug(@"register cell class for template id:%@", templateID);
-    //TODO: register class updateTemplateId
+    //TODO: register class update TemplateId
     [_collectionView registerClass:[WXReusableCollectionViewCell class] forCellWithReuseIdentifier:templateID];
 }
 

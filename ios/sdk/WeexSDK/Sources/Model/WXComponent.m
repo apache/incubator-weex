@@ -412,6 +412,26 @@
     return _cssNode;
 }
 
+- (void)_addEventParams:(NSDictionary *)params
+{
+    pthread_mutex_lock(&_propertyMutex);
+    if (!_eventParameters) {
+        _eventParameters = [NSMutableDictionary dictionary];
+    }
+    [_eventParameters addEntriesFromDictionary:params];
+    pthread_mutex_unlock(&_propertyMutex);
+}
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName
+{
+    NSArray *params;
+    pthread_mutex_lock(&_propertyMutex);
+    params = _eventParameters[eventName];
+    pthread_mutex_unlock(&_propertyMutex);
+    
+    return params;
+}
+
 #pragma mark Component Hierarchy 
 
 - (NSArray<WXComponent *> *)subcomponents

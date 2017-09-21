@@ -136,6 +136,18 @@ static NSThread *WXComponentThread;
     }
 }
 
++ (void)_performBlockSyncOnComponentThread:(void (^)())block
+{
+    if([NSThread currentThread] == [self componentThread]){
+        block();
+    } else {
+        [self performSelector:@selector(_performBlockOnComponentThread:)
+                     onThread:WXComponentThread
+                   withObject:[block copy]
+                waitUntilDone:YES];
+    }
+}
+
 - (void)startComponentTasks
 {
     [self _awakeDisplayLink];
@@ -406,7 +418,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *bindingStyles;
     NSDictionary *bindingAttibutes;
     NSDictionary *bindingEvents;
+    NSDictionary *bindingProps;
     if (isTemplate) {
+        bindingProps = [self _extractBindingProps:&attributes];
         bindingStyles = [self _extractBindings:&styles];
         bindingAttibutes = [self _extractBindings:&attributes];
         bindingEvents = [self _extractBindingEvents:&events];
@@ -417,7 +431,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     if (isTemplate) {
         component->_isTemplate = YES;
-        [component _storeBindingsWithStyles:bindingStyles attributes:bindingAttibutes];
+        [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
     }
 
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -480,12 +494,25 @@ static css_node_t * rootNodeGetChild(void *context, int i)
             NSString *eventName = event[@"type"];
             NSString *bindingParams = event[@"params"];
             bindingEvents[eventName] = bindingParams;
-            [newEvents removeObject:event];
+            newEvents[idx] = eventName;
         }
     }];
     
     *eventsPoint = newEvents;
     return bindingEvents;
+}
+
+- (NSDictionary *)_extractBindingProps:(NSDictionary **)attributesPoint
+{
+    NSDictionary *attributes = *attributesPoint;
+    if (attributes[@"@componentProps"]) {
+        NSMutableDictionary *newAttributes = [attributes mutableCopy];
+        [newAttributes removeObjectForKey:@"@componentProps"];
+        *attributesPoint = newAttributes;
+        return attributes[@"@componentProps"];
+    }
+    
+    return nil;
 }
 
 #pragma mark Reset
@@ -877,4 +904,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 void WXPerformBlockOnComponentThread(void (^block)())
 {
     [WXComponentManager _performBlockOnComponentThread:block];
+}
+
+void WXPerformBlockSyncOnComponentThread(void (^block)())
+{
+    [WXComponentManager _performBlockSyncOnComponentThread:block];
 }
