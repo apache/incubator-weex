@@ -44,7 +44,9 @@ public class CellLifecycleManager {
 
     private WXRecyclerTemplateList recyclerTemplateList;
     private Map<String,Map<String,List<String>>> eventSlotWatchRefs;
-    private Map<Integer,String> firedCreateEvent; // only call once
+
+
+    private Map<Integer,Boolean> firedCreateEvent; // only call once
 
 
     public CellLifecycleManager(WXRecyclerTemplateList recyclerTemplateList) {
@@ -91,13 +93,14 @@ public class CellLifecycleManager {
         if(cell == null){
             return;
         }
+        if(firedCreateEvent.get(position) != null){
+            return;
+        }
+        firedCreateEvent.put(position, true);
         Map<String,List<String>>  slotWatchCreateRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.CREATE);
         if(slotWatchCreateRefs == null
                 || slotWatchCreateRefs.get(cell.getRef()) == null
                 || slotWatchCreateRefs.get(cell.getRef()).size() == 0){
-            return;
-        }
-        if(cell.getRef().equals(firedCreateEvent.get(position))){
             return;
         }
         List<String> refs = slotWatchCreateRefs.get(cell.getRef());
@@ -105,9 +108,27 @@ public class CellLifecycleManager {
             return;
         }
         fireChildEvent(Constants.Event.SLOT_LIFECYCLE.CREATE, cell, refs, position);
-        firedCreateEvent.put(position, cell.getRef());
     }
 
+    public void onInsert(int position){
+        WXCell  cell = recyclerTemplateList.getSourceTemplate(position);
+        if(cell == null){
+            return;
+        }
+        firedCreateEvent.put(position, true);
+        firedCreateEvent.put(firedCreateEvent.size(), true);
+        Map<String,List<String>>  slotWatchCreateRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.CREATE);
+        if(slotWatchCreateRefs == null
+                || slotWatchCreateRefs.get(cell.getRef()) == null
+                || slotWatchCreateRefs.get(cell.getRef()).size() == 0){
+            return;
+        }
+        List<String> refs = slotWatchCreateRefs.get(cell.getRef());
+        if(refs == null || refs.size() == 0){
+            return;
+        }
+        fireChildEvent(Constants.Event.SLOT_LIFECYCLE.CREATE, cell, refs, position);
+    }
 
     /**
      * onAttach event
@@ -146,30 +167,25 @@ public class CellLifecycleManager {
     /**
      * onDestory event
      * */
-    public void onDestory(){
+    public void onDestory(int position){
+        Boolean hasCreated = firedCreateEvent.remove(position);
+        if(hasCreated == null){
+            return;
+        }
         Map<String,List<String>> slotWatchDestroyRefs = eventSlotWatchRefs.get(Constants.Event.SLOT_LIFECYCLE.DESTORY);
         if(slotWatchDestroyRefs == null
                 || slotWatchDestroyRefs.size() == 0){
             return;
         }
-        int size = recyclerTemplateList.getItemCount();
-        for(int position=0; position<size; position++){
-            String key = recyclerTemplateList.getTemplateKey(position);
-            if(slotWatchDestroyRefs.get(key) == null
-                    || slotWatchDestroyRefs.get(key).size() == 0){
-                continue;
-            }
-            WXCell cell = recyclerTemplateList.getTemplates().get(key);
-            if(cell == null){
-                continue;
-            }
-            List<String> refs = slotWatchDestroyRefs.get(cell.getRef());
-            if(refs == null || refs.size() == 0){
-                continue;
-            }
-            fireChildEvent(Constants.Event.SLOT_LIFECYCLE.DESTORY, cell, refs, position);
+        WXCell cell = recyclerTemplateList.getSourceTemplate(position);
+        if(cell == null){
+            return;
         }
-        eventSlotWatchRefs.clear();
+        List<String> refs = slotWatchDestroyRefs.get(cell.getRef());
+        if(refs == null || refs.size() == 0){
+            return;
+        }
+        fireChildEvent(Constants.Event.SLOT_LIFECYCLE.DESTORY, cell, refs, position);
     }
 
     private final  void  fireChildEvent(String event, WXCell cell, List<String> refs, int position){

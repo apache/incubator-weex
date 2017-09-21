@@ -52,7 +52,6 @@ import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXRecyclerDomObject;
-import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.ui.component.AppearanceHelper;
@@ -284,7 +283,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }
                 }
-                fireOnCellOnCreateEvent();
+                fireCellOnCreateEvent();
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
@@ -645,37 +644,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
 
-    public void setListData(Object param){
-        boolean update = listData != null;
-        if(param instanceof  JSONArray){
-            listData = (JSONArray) param;
-        }else if (param instanceof  JSONObject){
-            JSONObject data = null;
-            Object repeat = ((JSONObject) param).getJSONObject(WXStatement.WX_FOR);
-            if(repeat instanceof JSONObject){
-                data = (JSONObject )repeat;
-            }else{
-                data = (JSONObject )param;
-            }
-            Object list = data.get(WXStatement.WX_FOR_LIST);
-            if(list instanceof JSONArray){
-                listData = (JSONArray) list;
-                if(data.getString(WXStatement.WX_FOR_INDEX) != null) {
-                    listDataIndexKey = data.getString(WXStatement.WX_FOR_INDEX);
-                }
-                if(data.getString(WXStatement.WX_FOR_ITEM) != null) {
-                    listDataItemKey = data.getString(WXStatement.WX_FOR_ITEM);
-                }
-            }
-        }
-        listDataTemplateKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY), Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
-        if(update){
-            notifyUpdateList();
-        }
-        fireOnCellOnCreateEvent();
-    }
 
-    private void fireOnCellOnCreateEvent(){
+
+    private void fireCellOnCreateEvent(){
         if(listData != null){
             for(int i=0; i<listData.size(); i++){
                 cellLifecycleManager.onCreate(i);
@@ -744,19 +715,56 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     @JSMethod
-    public void  appendListData(JSONArray arrayObject){
+    public void setListData(Object param){
+        if(listData != null){
+            for(int i=0;i<listData.size(); i++){
+                cellLifecycleManager.onDestory(i);
+            }
+        }
+        boolean update = listData != null;
+        if(param instanceof  JSONArray){
+            listData = (JSONArray) param;
+        }
+        if(update){
+            notifyUpdateList();
+        }
+        fireCellOnCreateEvent();
+    }
+
+    @JSMethod
+    public void  appendData(JSONArray arrayObject){
         if(listData == null){
             listData = new JSONArray();
         }
+        int position = listData.size();
         if(arrayObject instanceof  JSONArray){
             listData.addAll(arrayObject);
+        }
+        int end = listData.size();
+        for(int i=position; i<end; i++){
+            cellLifecycleManager.onCreate(position);
         }
         notifyUpdateList();
     }
 
     @JSMethod
-    public void  updateData(Integer index, JSONObject data){
-        if(data == null || index == null){
+    public void  insertData(JSONObject data, int index){
+        if(data == null){
+            return;
+        }
+        if(listData == null || index >= listData.size()){
+            return;
+        }
+        listData.add(index, data);
+        cellLifecycleManager.onInsert(index);
+        if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
+            getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
+        }
+    }
+
+    @JSMethod
+    public void  updateData(JSONObject data, int index){
+        if(data == null){
             return;
         }
         if(listData == null || index >= listData.size()){
@@ -765,6 +773,18 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         listData.set(index, data);
         if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
             getHostView().getRecyclerViewBaseAdapter().notifyItemChanged(index);
+        }
+    }
+
+    @JSMethod
+    public void  removeData(int index){
+        if(listData == null || index >= listData.size()){
+            return;
+        }
+        cellLifecycleManager.onDestory(index);
+        listData.remove(index);
+        if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
+            getHostView().getRecyclerViewBaseAdapter().notifyItemRemoved(index);
         }
     }
 
@@ -933,7 +953,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void destroy() {
-        cellLifecycleManager.onDestory();
         if(getHostView() != null){
             getHostView().removeCallbacks(listUpdateRunnable);
         }

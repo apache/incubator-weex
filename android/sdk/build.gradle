@@ -56,8 +56,8 @@ android {
     }
     def line
     new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
-    //def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
-    def jsfmVersion = "0.22.0-beta.2"  //m[0][1]
+    def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
+    def jsfmVersion = m[0][1]
     println jsfmVersion
 
     if(project.hasProperty('asfRelease')){
