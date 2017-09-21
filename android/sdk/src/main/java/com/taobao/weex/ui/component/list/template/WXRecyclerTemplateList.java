@@ -752,9 +752,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         listData.add(index, data);
         cellLifecycleManager.onInsert(index);
-        if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
-            getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
-        }
+        notifyUpdateList();
     }
 
     @JSMethod
@@ -772,29 +770,37 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             cellLifecycleManager.onDestory(index);
             cellLifecycleManager.onCreate(index);
         }
-        if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
-            getHostView().getRecyclerViewBaseAdapter().notifyItemChanged(index);
-        }
+        notifyUpdateList();
     }
 
     @JSMethod
-    public void  removeData(int index){
-        if(listData == null || index >= listData.size()){
+    public void  removeData(List<Integer> array){
+        if(array == null || array.size() == 0){
             return;
         }
-        int markPostion = listData.size() - 1;
-        cellLifecycleManager.onDestory(index);
-        listData.remove(index);
-        if(index < listData.size()){
-            cellLifecycleManager.getFiredCreateEvent().put(index, true);
+        int offset = 0;
+        for(Integer index : array){
+            if(listData == null
+                    || index == null){
+                return;
+            }
+            index -= offset;
+            if(index < listData.size()){
+                int markPostion = listData.size() - 1;
+                cellLifecycleManager.onDestory(index);
+                listData.remove((int)index);
+                if(index < listData.size()){
+                    cellLifecycleManager.getFiredCreateEvent().put(index, true);
+                }
+                if(markPostion >= 0){
+                    cellLifecycleManager.getFiredCreateEvent().remove(markPostion);
+                }
+                offset++;
+            }
         }
-        if(markPostion >= 0){
-            cellLifecycleManager.getFiredCreateEvent().remove(markPostion);
-        }
-        if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
-            getHostView().getRecyclerViewBaseAdapter().notifyItemRemoved(index);
-        }
+        notifyUpdateList();
     }
+
 
     @JSMethod
     public void resetLoadmore() {

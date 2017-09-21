@@ -203,7 +203,7 @@ public class CellLifecycleManager {
             }
             for(WXComponent component : components) {
                 Map<String, Object> params = new HashMap<>(8);
-                params.put("position", position);
+                params.put("index", position);
                 component.fireEvent(event, params);
             }
         }
