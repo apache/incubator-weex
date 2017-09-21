@@ -12,7 +12,7 @@ Weex is a framework for building Mobile cross-platform high performance UI appli
 
 ## Introduction to VueJS
 
->[Vue](https://vuejs.org/) (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. Unlike other monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable. The core library is focused on the view layer only, and is very easy to pick up and integrate with other libraries or existing projects. On the other hand, Vue is also perfectly capable of powering sophisticated Single-Page Applications when used in combination with modern tooling and supporting libraries.
+>[VueJS](https://vuejs.org/) (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. Unlike other monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable. The core library is focused on the view layer only, and is very easy to pick up and integrate with other libraries or existing projects. On the other hand, Vue is also perfectly capable of powering sophisticated Single-Page Applications when used in combination with modern tooling and supporting libraries.
 
 **VueJS is developed by [Evan You](https://twitter.com/youyuxi).**
 
@@ -20,7 +20,7 @@ Weex now fully supports VueJS 2.x officailly. Weex put Vue 2.x as its built-in J
 
 ## Hello world Example
 
-The easiest way to try Weex is to use the [Playground App](../playground.html) to write a **Hello World** example at [dotWe](https://dotwe.org). No installation is required and you do not even have to write native code. 
+The easiest way to try Weex is to use the [Playground App](../playground.html) to write a [Hello World](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) example at [dotWe](http://dotwe.org). No installation is required and you do not even have to write native code. 
 
 To test Weex online using our Playground App:
 

@@ -19,6 +19,7 @@
 
 #ifdef __OBJC__
 
+#import "WXWebSocketHandler.h"
 #import "WXVoiceOverModule.h"
 #import "WXView.h"
 #import "WXValidateProtocol.h"
