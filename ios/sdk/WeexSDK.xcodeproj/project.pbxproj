@@ -182,6 +182,22 @@
 		74AD99841D5B0E59008F0336 /* WXPolyfillSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 74AD99821D5B0E59008F0336 /* WXPolyfillSet.h */; };
 		74AD99851D5B0E59008F0336 /* WXPolyfillSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 74AD99831D5B0E59008F0336 /* WXPolyfillSet.m */; };
 		74B232D21D2A2BA4006322EA /* WXLayoutDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B232D11D2A2BA4006322EA /* WXLayoutDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		74B81AE31F73C3E300D3A61D /* WXRecycleListComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CFDD371F45939C007A1A66 /* WXRecycleListComponent.h */; };
+		74B81AE41F73C3E500D3A61D /* WXRecycleListComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CFDD381F45939C007A1A66 /* WXRecycleListComponent.m */; };
+		74B81AE51F73C3E900D3A61D /* WXRecycleListDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CFDD3B1F459400007A1A66 /* WXRecycleListDataManager.h */; };
+		74B81AE61F73C3E900D3A61D /* WXRecycleListDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CFDD3C1F459400007A1A66 /* WXRecycleListDataManager.m */; };
+		74B81AE71F73C3E900D3A61D /* WXRecycleListTemplateManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CFDD3F1F45941E007A1A66 /* WXRecycleListTemplateManager.h */; };
+		74B81AE81F73C3E900D3A61D /* WXRecycleListTemplateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CFDD401F45941E007A1A66 /* WXRecycleListTemplateManager.m */; };
+		74B81AE91F73C3E900D3A61D /* WXRecycleListUpdateManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CFDD431F459443007A1A66 /* WXRecycleListUpdateManager.h */; };
+		74B81AEA1F73C3E900D3A61D /* WXRecycleListUpdateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CFDD441F459443007A1A66 /* WXRecycleListUpdateManager.m */; };
+		74B81AEB1F73C3E900D3A61D /* WXRecycleListLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 74BA4AB11F70F4B600AC29BF /* WXRecycleListLayout.h */; };
+		74B81AEC1F73C3E900D3A61D /* WXRecycleListLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 74BA4AB21F70F4B600AC29BF /* WXRecycleListLayout.m */; };
+		74B81AED1F73C3E900D3A61D /* WXCellSlotComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 746B92391F46BE36009AE86B /* WXCellSlotComponent.h */; };
+		74B81AEE1F73C3E900D3A61D /* WXCellSlotComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 746B923A1F46BE36009AE86B /* WXCellSlotComponent.m */; };
+		74B81AEF1F73C3E900D3A61D /* WXComponent+DataBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = 7423EB4F1F4ADE30001662D1 /* WXComponent+DataBinding.h */; };
+		74B81AF01F73C3E900D3A61D /* WXComponent+DataBinding.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7423EB501F4ADE30001662D1 /* WXComponent+DataBinding.mm */; };
+		74B81AF11F73C3E900D3A61D /* WXJSASTParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 74BF19F61F5139BB00AEE3D7 /* WXJSASTParser.h */; };
+		74B81AF21F73C3E900D3A61D /* WXJSASTParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74BF19F71F5139BB00AEE3D7 /* WXJSASTParser.mm */; };
 		74B8BEFE1DC47B72004A6027 /* WXRootView.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B8BEFC1DC47B72004A6027 /* WXRootView.h */; };
 		74B8BEFF1DC47B72004A6027 /* WXRootView.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BEFD1DC47B72004A6027 /* WXRootView.m */; };
 		74B8BF011DC49AFE004A6027 /* WXRootViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */; };
@@ -1706,11 +1722,14 @@
 				DCA445A61EFA571E00D0CFA8 /* WXSDKEngine.h in Headers */,
 				DCA445AA1EFA573900D0CFA8 /* WXResourceRequest.h in Headers */,
 				DCA445C61EFA57EE00D0CFA8 /* NSObject+WXSwizzle.h in Headers */,
+				74B81AEB1F73C3E900D3A61D /* WXRecycleListLayout.h in Headers */,
 				DCA445B41EFA577F00D0CFA8 /* WXJSExceptionProtocol.h in Headers */,
+				74B81AEF1F73C3E900D3A61D /* WXComponent+DataBinding.h in Headers */,
 				DCA445B51EFA578400D0CFA8 /* WXJSExceptionInfo.h in Headers */,
 				DCA445B61EFA578B00D0CFA8 /* WXIndicatorComponent.h in Headers */,
 				DCA445BF1EFA57C300D0CFA8 /* WXComponent.h in Headers */,
 				DCA445A71EFA572300D0CFA8 /* WXRootViewController.h in Headers */,
+				74B81AE91F73C3E900D3A61D /* WXRecycleListUpdateManager.h in Headers */,
 				DCA445C01EFA57C900D0CFA8 /* WXBridgeProtocol.h in Headers */,
 				DCA445AC1EFA574A00D0CFA8 /* WXNetworkProtocol.h in Headers */,
 				DCA445C31EFA57DC00D0CFA8 /* WXAppMonitorProtocol.h in Headers */,
@@ -1736,11 +1755,13 @@
 				DCA445A11EFA56FA00D0CFA8 /* WXScrollerProtocol.h in Headers */,
 				DCA445DE1EFA59B800D0CFA8 /* WXSectionDataController.h in Headers */,
 				DCA445F01EFA5A1D00D0CFA8 /* WXComponent_internal.h in Headers */,
+				74B81AE71F73C3E900D3A61D /* WXRecycleListTemplateManager.h in Headers */,
 				DCA445ED1EFA5A1200D0CFA8 /* WXTransform.h in Headers */,
 				DCA445CD1EFA592E00D0CFA8 /* WXComponent+Events.h in Headers */,
 				DCA445EC1EFA5A0E00D0CFA8 /* WXTextAreaComponent.h in Headers */,
 				DCA445D81EFA599400D0CFA8 /* WXRootView.h in Headers */,
 				DCA446131EFA5A8C00D0CFA8 /* WXCallJSMethod.h in Headers */,
+				74B81AED1F73C3E900D3A61D /* WXCellSlotComponent.h in Headers */,
 				DCA445E41EFA59DC00D0CFA8 /* WXVideoComponent.h in Headers */,
 				DCA4460B1EFA5A7200D0CFA8 /* WXAssert.h in Headers */,
 				DCA445F71EFA5A3100D0CFA8 /* WXPickerModule.h in Headers */,
@@ -1772,6 +1793,7 @@
 				DCA4460E1EFA5A7E00D0CFA8 /* WXLength.h in Headers */,
 				DCA445FA1EFA5A3A00D0CFA8 /* WXNavigatorModule.h in Headers */,
 				DCA446081EFA5A6A00D0CFA8 /* NSArray+Weex.h in Headers */,
+				74B81AE51F73C3E900D3A61D /* WXRecycleListDataManager.h in Headers */,
 				DCA445F21EFA5A2300D0CFA8 /* WXHeaderComponent.h in Headers */,
 				DCA445DD1EFA59B300D0CFA8 /* WXRecyclerUpdateController.h in Headers */,
 				DCA4461E1EFA5AAF00D0CFA8 /* WXComponentFactory.h in Headers */,
@@ -1781,6 +1803,7 @@
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
 				DCA445EE1EFA5A1500D0CFA8 /* WXWebComponent.h in Headers */,
 				DCA4460D1EFA5A7900D0CFA8 /* WXThreadSafeMutableArray.h in Headers */,
+				74B81AE31F73C3E300D3A61D /* WXRecycleListComponent.h in Headers */,
 				DCA445DA1EFA59A600D0CFA8 /* WXMultiColumnLayout.h in Headers */,
 				DCA445E01EFA59CD00D0CFA8 /* WXLoadingIndicator.h in Headers */,
 				DCA445E61EFA59E500D0CFA8 /* WXImageComponent.h in Headers */,
@@ -1816,6 +1839,7 @@
 				DCA445EB1EFA5A0B00D0CFA8 /* WXTextInputComponent.h in Headers */,
 				DCA4460C1EFA5A7600D0CFA8 /* WXThreadSafeMutableDictionary.h in Headers */,
 				DCA445CE1EFA593500D0CFA8 /* WXComponent+BoxShadow.h in Headers */,
+				74B81AF11F73C3E900D3A61D /* WXJSASTParser.h in Headers */,
 				DCA4461C1EFA5AA600D0CFA8 /* WXModuleFactory.h in Headers */,
 				DCA445D91EFA59A100D0CFA8 /* WXEditComponent.h in Headers */,
 				DCA445FB1EFA5A3C00D0CFA8 /* WXStorageModule.h in Headers */,
@@ -1928,6 +1952,7 @@
 					};
 					DCA445241EFA555400D0CFA8 = {
 						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = "Xing Zhang";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -2207,7 +2232,9 @@
 				DCA445391EFA55B300D0CFA8 /* WXComponent+PseudoClassManagement.m in Sources */,
 				DCA4453A1EFA55B300D0CFA8 /* WXView.m in Sources */,
 				DCA4453B1EFA55B300D0CFA8 /* WXErrorView.m in Sources */,
+				74B81AEC1F73C3E900D3A61D /* WXRecycleListLayout.m in Sources */,
 				DCA4453C1EFA55B300D0CFA8 /* WXComponent+ViewManagement.m in Sources */,
+				74B81AE41F73C3E500D3A61D /* WXRecycleListComponent.m in Sources */,
 				DC7764951F3C685200B5727E /* WXRecyclerDragController.m in Sources */,
 				DCA4453D1EFA55B300D0CFA8 /* WXRootView.m in Sources */,
 				DCA4453E1EFA55B300D0CFA8 /* WXBaseViewController.m in Sources */,
@@ -2223,7 +2250,9 @@
 				DCA445481EFA55B300D0CFA8 /* WXLoadingIndicator.m in Sources */,
 				DCA445491EFA55B300D0CFA8 /* WXRefreshComponent.m in Sources */,
 				DCA4454A1EFA55B300D0CFA8 /* WXEmbedComponent.m in Sources */,
+				74B81AE81F73C3E900D3A61D /* WXRecycleListTemplateManager.m in Sources */,
 				DCA4454B1EFA55B300D0CFA8 /* WXVideoComponent.m in Sources */,
+				74B81AE61F73C3E900D3A61D /* WXRecycleListDataManager.m in Sources */,
 				DCA4454C1EFA55B300D0CFA8 /* WXComponent.m in Sources */,
 				DCA4454D1EFA55B300D0CFA8 /* WXDivComponent.m in Sources */,
 				DCA4454E1EFA55B300D0CFA8 /* WXImageComponent.m in Sources */,
@@ -2246,6 +2275,7 @@
 				DCA4455D1EFA55B300D0CFA8 /* WXHeaderComponent.m in Sources */,
 				DCA4455E1EFA55B300D0CFA8 /* WXFooterComponent.m in Sources */,
 				DCA4455F1EFA55B300D0CFA8 /* WXNavigationDefaultImpl.m in Sources */,
+				74B81AF21F73C3E900D3A61D /* WXJSASTParser.mm in Sources */,
 				DCA445601EFA55B300D0CFA8 /* WXURLRewriteDefaultImpl.m in Sources */,
 				DCA445611EFA55B300D0CFA8 /* WXPrerenderManager.m in Sources */,
 				DCA445631EFA55B300D0CFA8 /* WXPickerModule.m in Sources */,
@@ -2265,8 +2295,11 @@
 				DCA445711EFA55B300D0CFA8 /* WXMetaModule.m in Sources */,
 				DCA445721EFA55B300D0CFA8 /* WXBoxShadow.m in Sources */,
 				DCA445731EFA55B300D0CFA8 /* NSTimer+Weex.m in Sources */,
+				74B81AEE1F73C3E900D3A61D /* WXCellSlotComponent.m in Sources */,
 				DCA445741EFA55B300D0CFA8 /* WXConvert.m in Sources */,
 				DCA445751EFA55B300D0CFA8 /* WXUtility.m in Sources */,
+				74B81AEA1F73C3E900D3A61D /* WXRecycleListUpdateManager.m in Sources */,
+				74B81AF01F73C3E900D3A61D /* WXComponent+DataBinding.mm in Sources */,
 				DCA445761EFA55B300D0CFA8 /* WXLog.m in Sources */,
 				DCA445771EFA55B300D0CFA8 /* WXWeakObjectWrapper.m in Sources */,
 				DCA445781EFA55B300D0CFA8 /* NSArray+Weex.m in Sources */,
