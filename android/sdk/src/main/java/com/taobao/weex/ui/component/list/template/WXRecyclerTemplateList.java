@@ -283,7 +283,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }
                 }
-                fireCellOnCreateEvent();
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
@@ -644,16 +643,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
 
-
-
-    private void fireCellOnCreateEvent(){
-        if(listData != null){
-            for(int i=0; i<listData.size(); i++){
-                cellLifecycleManager.onCreate(i);
-            }
-        }
-    }
-
     @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
     public void setOffsetAccuracy(int accuracy) {
         float real = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getInstanceViewPortWidth());
@@ -728,7 +717,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(update){
             notifyUpdateList();
         }
-        fireCellOnCreateEvent();
+        if(listData != null){
+            for(int i=0; i<listData.size(); i++){
+                cellLifecycleManager.onCreate(i);
+            }
+        }
     }
 
     @JSMethod
