@@ -180,6 +180,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mStickyHelper = new TemplateStickyHelper(this);
         cellLifecycleManager = new CellLifecycleManager(this);
         orientation = mDomObject.getOrientation();
+        listDataTemplateKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY), Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
     }
 
     @Override
@@ -610,14 +611,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                      setListData(param);
                 }
                 return true;
-            case Constants.Name.Recycler.APPEND_LIST_DATA:{
-                   appendListData(param);
-                 }
-                 return true;
-            case Constants.Name.Recycler.UPDATE_CELL:{
-                    updateCell(param);
-                }
-                return true;
             case Constants.Name.Recycler.LIST_DATA_ITEM:
                 listDataItemKey = WXUtils.getString(param, listDataItemKey);
                 return true;
@@ -675,6 +668,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         }
+        listDataTemplateKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY), Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
         if(update){
             notifyUpdateList();
         }
@@ -749,42 +743,35 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         inner.setScrollable(scrollable);
     }
 
-    @WXComponentProp(name = Constants.Name.Recycler.APPEND_LIST_DATA)
-    public void  appendListData(Object arrayObject){
+    @JSMethod
+    public void  appendListData(JSONArray arrayObject){
         if(listData == null){
             listData = new JSONArray();
         }
-        if(arrayObject instanceof  JSONObject){
-            listData.add(arrayObject);
-        }else if(arrayObject instanceof  JSONArray){
-            listData.addAll((JSONArray)arrayObject);
+        if(arrayObject instanceof  JSONArray){
+            listData.addAll(arrayObject);
         }
         notifyUpdateList();
     }
 
-    @WXComponentProp(name = Constants.Name.Recycler.UPDATE_CELL)
-    public void  updateCell(Object data){
-        if(!(data instanceof  JSONObject)){
+    @JSMethod
+    public void  updateData(Integer index, JSONObject data){
+        if(data == null || index == null){
             return;
         }
-        if(listData == null){
+        if(listData == null || index >= listData.size()){
             return;
         }
-        JSONObject cellData =  (JSONObject)data;
-        if(cellData.get(Constants.Name.Recycler.LIST_DATA_ITEM) == null){
-            return;
-        }
-        Integer cellIndex = cellData.getInteger(Constants.Name.Recycler.CELL_INDEX);
-        if(cellIndex == null){
-            return;
-        }
-        if(cellIndex >= listData.size()){
-            return;
-        }
-        listData.set(cellIndex, cellData.get(Constants.Name.Recycler.LIST_DATA_ITEM));
+        listData.set(index, data);
         if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
-            getHostView().getRecyclerViewBaseAdapter().notifyItemChanged(cellIndex);
+            getHostView().getRecyclerViewBaseAdapter().notifyItemChanged(index);
         }
+    }
+
+    @JSMethod
+    public void resetLoadmore() {
+        mForceLoadmoreNextTime = true;
+        mListCellCount = 0;
     }
 
 
@@ -804,11 +791,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
     }
 
-    @JSMethod
-    public void resetLoadmore() {
-        mForceLoadmoreNextTime = true;
-        mListCellCount = 0;
-    }
 
 
     @Override
