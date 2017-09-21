@@ -17,24 +17,9 @@
  * under the License.
  */
 
-#import "WXScrollerProtocol.h"
-#import "WXComponent.h"
+#import <Foundation/Foundation.h>
+#import "WXScrollerComponent.h"
 
-@interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
-
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
-
-@property (nonatomic, assign) NSUInteger loadmoreretry;
-
-@property (nonatomic, assign) CGSize contentSize;
-
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
-
-- (void)handleAppear;
-
-- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+@interface WXRecycleListComponent : WXScrollerComponent 
 
 @end
-

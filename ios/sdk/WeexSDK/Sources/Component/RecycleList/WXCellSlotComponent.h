@@ -17,24 +17,16 @@
  * under the License.
  */
 
-#import "WXScrollerProtocol.h"
+#import <Foundation/Foundation.h>
 #import "WXComponent.h"
 
-@interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
+@interface WXCellSlotComponent : WXComponent
 
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
+@property (nonatomic, strong) NSString *templateType;
 
-@property (nonatomic, assign) NSUInteger loadmoreretry;
+- (void)updateCellData:(NSDictionary *)data;
 
-@property (nonatomic, assign) CGSize contentSize;
+- (void)triggerLayout;
 
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
-
-- (void)handleAppear;
-
-- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
 
 @end
-

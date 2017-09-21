@@ -109,7 +109,10 @@
         [dict addEntriesFromDictionary:params];
     }
     
-    [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:self.ref type:eventName params:dict domChanges:domChanges];
+    NSArray *handlerArguments = [self _paramsForEvent:eventName];
+    NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
+    
+    [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
 }
 
 - (void)addEvent:(NSString *)addEventName
