@@ -23,7 +23,6 @@
 #import "WXHandlerFactory.h"
 #import "WXWebSocketLoader.h"
 #import "WXConvert.h"
-#import "SRWebSocket.h"
 
 @interface WXWebSocketModule()
 

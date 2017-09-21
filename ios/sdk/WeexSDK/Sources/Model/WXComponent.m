@@ -168,9 +168,8 @@
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
-    
     return styles;
 }
 
