@@ -765,7 +765,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(listData == null || index >= listData.size()){
             return;
         }
+        int before = getItemViewType(index);
         listData.set(index, data);
+        int after = getItemViewType(index);
+        if(before != after){
+            cellLifecycleManager.onDestory(index);
+            cellLifecycleManager.onCreate(index);
+        }
         if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
             getHostView().getRecyclerViewBaseAdapter().notifyItemChanged(index);
         }
@@ -776,8 +782,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(listData == null || index >= listData.size()){
             return;
         }
+        int markPostion = listData.size() - 1;
         cellLifecycleManager.onDestory(index);
         listData.remove(index);
+        if(index < listData.size()){
+            cellLifecycleManager.getFiredCreateEvent().put(index, true);
+        }
+        if(markPostion >= 0){
+            cellLifecycleManager.getFiredCreateEvent().remove(markPostion);
+        }
         if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
             getHostView().getRecyclerViewBaseAdapter().notifyItemRemoved(index);
         }
