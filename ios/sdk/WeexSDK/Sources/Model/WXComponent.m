@@ -174,6 +174,7 @@
     });
     
     return component;
+}
 
 - (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
 {
