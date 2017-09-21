@@ -65,7 +65,7 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
     }
 
     domObject.getEvents().addEvent(mEvent);
-
+    mUpdatedDom = domObject;
     if (WXTracing.isAvailable() && mBeginEvent != null) {
       submitPerformance("addEventToDom", "X", instance.getInstanceId(), Stopwatch.tack(), Stopwatch.lastTickStamp(), true);
     }
