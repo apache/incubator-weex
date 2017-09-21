@@ -492,13 +492,14 @@
         [_timers addObject:ret];
         [self addInstance:appId callback:ret];
     }
+    __weak typeof(self) weakSelf = self;
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSMutableDictionary *dic = [NSMutableDictionary new];
         [dic setObject:appId forKey:@"appId"];
         [dic setObject:ret forKey:@"ret"];
         [dic setObject:arg forKey:@"arg"];
-        [self performSelector:@selector(callBack:) withObject:dic ];
+        [weakSelf performSelector:@selector(callBack:) withObject:dic ];
     });
 }
 
@@ -526,12 +527,13 @@
 {
     double interval = [arg doubleValue]/1000.0f;
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
+    __weak typeof(self) weakSelf = self;
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSMutableDictionary *dic = [NSMutableDictionary new];
         [dic setObject:appId forKey:@"appId"];
         [dic setObject:arg forKey:@"arg"];
         [dic setObject:@(timerId) forKey:@"timerId"];
-        [self performSelector:@selector(callBackInterval:functon:) withObject:dic withObject:block];
+        [weakSelf performSelector:@selector(callBackInterval:functon:) withObject:dic withObject:block];
     });
 }
 
