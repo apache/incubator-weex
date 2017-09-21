@@ -49,7 +49,7 @@ export default class Element extends Node {
 
     const WeexElement = getWeexElement(type)
     if (WeexElement && !isExtended) {
-      return new WeexElement(props)
+      return new WeexElement(type, props, true)
     }
 
     props = props || {}
