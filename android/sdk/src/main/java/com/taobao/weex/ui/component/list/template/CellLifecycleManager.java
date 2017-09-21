@@ -188,6 +188,10 @@ public class CellLifecycleManager {
         fireChildEvent(Constants.Event.SLOT_LIFECYCLE.DESTORY, cell, refs, position);
     }
 
+    public Map<Integer, Boolean> getFiredCreateEvent() {
+        return firedCreateEvent;
+    }
+
     private final  void  fireChildEvent(String event, WXCell cell, List<String> refs, int position){
         if(refs == null || refs.size() == 0){
             return;

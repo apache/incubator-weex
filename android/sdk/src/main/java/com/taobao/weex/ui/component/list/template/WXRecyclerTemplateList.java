@@ -180,6 +180,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         cellLifecycleManager = new CellLifecycleManager(this);
         orientation = mDomObject.getOrientation();
         listDataTemplateKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY), Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
+        listDataItemKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_ITEM), listDataItemKey);
+        listDataIndexKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_ITEM_INDEX), listDataIndexKey);
     }
 
     @Override
