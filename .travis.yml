@@ -11,16 +11,12 @@ env:
 matrix:
     fast_finish: true
     exclude:
-      - os: linux
-        env: TEST_SUITE=ios
       - os: osx
         env: TEST_SUITE=danger
       - os: osx
         env: TEST_SUITE=jsfm
       - os: osx
         env: TEST_SUITE=android
-      - os: osx
-        env: TEST_SUITE=ios
       - os: linux
         env: TEST_SUITE=android
     include:
