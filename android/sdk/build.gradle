@@ -45,7 +45,7 @@ version = "0.9.4"
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
-    //resourcePrefix "weex"
+    resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
     copy {

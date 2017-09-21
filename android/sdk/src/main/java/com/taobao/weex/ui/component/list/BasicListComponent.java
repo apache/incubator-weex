@@ -86,7 +86,7 @@ import java.util.regex.Pattern;
  */
 
 public abstract class BasicListComponent<T extends ViewGroup & ListComponentView> extends WXVContainer<T> implements
-    IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable {
+        IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener, Scrollable {
   public static final String TRANSFORM = "transform";
   public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "BasicListComponent";
@@ -561,62 +561,62 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       stickyComponent = entry.getValue();
 
       if (stickyComponent != null && stickyComponent.getDomObject() != null
-          && stickyComponent instanceof WXCell) {
+              && stickyComponent instanceof WXCell) {
 
         WXCell cell = (WXCell) stickyComponent;
         if (cell.getHostView() == null) {
           return;
         }
 
-          RecyclerView.LayoutManager layoutManager;
-          boolean beforeFirstVisibleItem = false;
-          boolean removeOldSticky = false;
-          layoutManager = getHostView().getInnerView().getLayoutManager();
-          if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
-            int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-            int pos = mChildren.indexOf(cell);
-            cell.setScrollPositon(pos);
+        RecyclerView.LayoutManager layoutManager;
+        boolean beforeFirstVisibleItem = false;
+        boolean removeOldSticky = false;
+        layoutManager = getHostView().getInnerView().getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
+          int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+          int pos = mChildren.indexOf(cell);
+          cell.setScrollPositon(pos);
 
-            if (pos <= fVisible) {
-              beforeFirstVisibleItem = true;
-              if(pos > currentStickyPos) {
-                currentStickyPos = pos;
-              }
-            }
-
-            if(pos > fVisible){
-              removeOldSticky = true;
-            }
-          } else if(layoutManager instanceof StaggeredGridLayoutManager){
-            int [] firstItems= new int[3];
-            int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
-            int pos = mChildren.indexOf(cell);
-
-            if (pos <= fVisible) {
-              beforeFirstVisibleItem = true;
-            }
-
-            if(pos > fVisible){
-              removeOldSticky = true;
+          if (pos <= fVisible) {
+            beforeFirstVisibleItem = true;
+            if(pos > currentStickyPos) {
+              currentStickyPos = pos;
             }
           }
 
-          int[] location = new int[2];
-          stickyComponent.getHostView().getLocationOnScreen(location);
-          int[] parentLocation = new int[2];
-          stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
-
-          int top = location[1] - parentLocation[1];
-
-          boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
-          boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
-          if (showSticky) {
-            bounceRecyclerView.notifyStickyShow(cell);
-          } else if (removeSticky || removeOldSticky) {
-            bounceRecyclerView.notifyStickyRemove(cell);
+          if(pos > fVisible){
+            removeOldSticky = true;
           }
-          cell.setLocationFromStart(top);
+        } else if(layoutManager instanceof StaggeredGridLayoutManager){
+          int [] firstItems= new int[3];
+          int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
+          int pos = mChildren.indexOf(cell);
+
+          if (pos <= fVisible) {
+            beforeFirstVisibleItem = true;
+          }
+
+          if(pos > fVisible){
+            removeOldSticky = true;
+          }
         }
+
+        int[] location = new int[2];
+        stickyComponent.getHostView().getLocationOnScreen(location);
+        int[] parentLocation = new int[2];
+        stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
+
+        int top = location[1] - parentLocation[1];
+
+        boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
+        boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
+        if (showSticky) {
+          bounceRecyclerView.notifyStickyShow(cell);
+        } else if (removeSticky || removeOldSticky) {
+          bounceRecyclerView.notifyStickyRemove(cell);
+        }
+        cell.setLocationFromStart(top);
+      }
     }
 
     if(currentStickyPos>=0){
@@ -690,7 +690,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (child.getDomObject() != null) {
         Object attr = child.getDomObject().getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
         if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
-            isKeepScrollPosition = true;
+          isKeepScrollPosition = true;
         }
       }
       if (isKeepScrollPosition) {
@@ -721,7 +721,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   /**
    * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,
    * {@link WXVContainer#addSubView(View, int)} is an empty implementation in {@link
-   * WXRecyclerView}
+   * com.taobao.weex.ui.view.listview.WXRecyclerView}
    */
   @Override
   protected void addSubView(View child, int index) {
@@ -730,7 +730,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   /**
    * Remove the child from list. This method will use {@link
-   * List#indexOf(Object)} to retrieve the component to be deleted. Like {@link
+   * java.util.List#indexOf(Object)} to retrieve the component to be deleted. Like {@link
    * #addChild(WXComponent)}, this method will not refresh the view immediately, the adapter will
    * decide when to refresh.
    *
@@ -791,9 +791,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
     holder.setComponentUsing(false);
     if (holder != null
-        && holder.canRecycled()
-        && holder.getComponent() != null
-        && !holder.getComponent().isUsing()) {
+            && holder.canRecycled()
+            && holder.getComponent() != null
+            && !holder.getComponent().isUsing()) {
       holder.recycled();
 
     } else {
@@ -816,10 +816,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     holder.setComponentUsing(true);
     WXComponent component = getChild(position);
     if (component == null
-        || (component instanceof WXRefresh)
-        || (component instanceof WXLoading)
-        || (component.getDomObject() != null && component.getDomObject().isFixed())
-        ) {
+            || (component instanceof WXRefresh)
+            || (component instanceof WXLoading)
+            || (component.getDomObject() != null && component.getDomObject().isFixed())
+            ) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
       }
@@ -827,11 +827,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
               && holder.getView() != null
               && component.getDomObject() != null
               && (component.getDomObject().getAttrs().get("holderBackground") != null)){
-         Object holderBackground = component.getDomObject().getAttrs().get("holderBackground");
+        Object holderBackground = component.getDomObject().getAttrs().get("holderBackground");
         int color = WXResourceUtils.getColor(holderBackground.toString(), Color.WHITE);
-         holder.getView().setBackgroundColor(color);
-         holder.getView().setVisibility(View.VISIBLE);
-         holder.getView().postInvalidate();
+        holder.getView().setBackgroundColor(color);
+        holder.getView().setVisibility(View.VISIBLE);
+        holder.getView().postInvalidate();
       }
       return;
     }
@@ -849,8 +849,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       WXCell cell = (WXCell) holder.getComponent();
       boolean isExcluded = DEFAULT_EXCLUDED;
       if(cell.getDomObject() != null){
-         WXAttr cellAttrs = cell.getDomObject().getAttrs();
-         isExcluded = WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
+        WXAttr cellAttrs = cell.getDomObject().getAttrs();
+        isExcluded = WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
       }
 
       mDragHelper.setDragExcluded(holder, isExcluded);
@@ -916,7 +916,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       for (int i = 0; i < mTypes.size(); i++) {
         WXComponent component = mTypes.get(i);
         if (component == null
-            || component.isUsing()) {
+                || component.isUsing()) {
           continue;
         }
         if (component.getDomObject() != null && component.getDomObject().isFixed()) {
@@ -1149,7 +1149,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (offScreenY <= offsetParsed) {
 
         if (mListCellCount != mChildren.size()
-            || mForceLoadmoreNextTime) {
+                || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mListCellCount = mChildren.size();
           mForceLoadmoreNextTime = false;
@@ -1165,7 +1165,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
     String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
-        directionY < 0 ? Constants.Value.DIRECTION_DOWN : null;
+            directionY < 0 ? Constants.Value.DIRECTION_DOWN : null;
     if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
       direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
