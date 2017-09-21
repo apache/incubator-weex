@@ -331,13 +331,13 @@
     WXRadii *radii = borderRect.radii;
     CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
     
+    CGContextSetAlpha(context, _opacity);
     // fill background color
     if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
         CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
     }
-    
     // Top
     if (_borderTopWidth > 0) {
         if(_borderTopStyle == WXBorderStyleDashed || _borderTopStyle == WXBorderStyleDotted){
