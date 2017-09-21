@@ -17,24 +17,16 @@
  * under the License.
  */
 
-#import "WXScrollerProtocol.h"
-#import "WXComponent.h"
+#import <UIKit/UIKit.h>
 
-@interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
+@protocol WXRecycleListLayoutDelegate
 
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
-
-@property (nonatomic, assign) NSUInteger loadmoreretry;
-
-@property (nonatomic, assign) CGSize contentSize;
-
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
-
-- (void)handleAppear;
-
-- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout isNeedStickyForIndexPath:(NSIndexPath *)indexPath;
 
 @end
 
+@interface WXRecycleListLayout : UICollectionViewFlowLayout
+
+@property (nonatomic, weak) id<WXRecycleListLayoutDelegate> delegate;
+
+@end

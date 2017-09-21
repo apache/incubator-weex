@@ -83,6 +83,7 @@ WX_EXPORT_METHOD(@selector(goForward))
     _webview = (WXWebView *)self.view;
     _webview.delegate = self;
     _webview.allowsInlineMediaPlayback = YES;
+    _webview.scalesPageToFit = YES;
     _jsContext = [_webview valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     __weak typeof(self) weakSelf = self;
     _jsContext[@"$notifyWeex"] = ^(JSValue *data) {

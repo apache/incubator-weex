@@ -17,24 +17,15 @@
  * under the License.
  */
 
-#import "WXScrollerProtocol.h"
-#import "WXComponent.h"
+#import <WeexSDK/WeexSDK.h>
 
-@interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
+static const NSString *WXBindingIdentify = @"@binding";
+static const NSString *WXBindingMatchIdentify = @"[[match]]";
+static const NSString *WXBindingRepeatIdentify = @"[[repeat]]";
+static const NSString *WXBindingRepeatExprIdentify = @"@expression";
+static const NSString *WXBindingRepeatIndexIdentify = @"@index";
+static const NSString *WXBindingRepeatLabelIdentify = @"@alias";
 
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
-
-@property (nonatomic, assign) NSUInteger loadmoreretry;
-
-@property (nonatomic, assign) CGSize contentSize;
-
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
-
-- (void)handleAppear;
-
-- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+@interface WXComponent (DataBinding)
 
 @end
-

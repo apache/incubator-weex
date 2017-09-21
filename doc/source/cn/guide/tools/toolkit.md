@@ -53,7 +53,7 @@ $ weex init awesome-project
 - `serve`: 开启静态服务器
 - `debug`: 调试模式
 
-我们先通过 `npm install` 安装项目依赖。之后运行 `npm run dev` 和 `npm run serve` 开启 `watch` 模式和静态服务器。
+我们先通过 `npm install` 安装项目依赖。之后运行根目录下的 `npm run dev & npm run serve` 开启 watch 模式和静态服务器。
 
 然后我们打开浏览器，进入 `http://localhost:8080/index.html` 即可看到 Weex h5 页面。
 

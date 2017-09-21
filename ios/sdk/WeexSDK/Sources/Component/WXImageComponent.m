@@ -29,6 +29,7 @@
 #import "UIBezierPath+Weex.h"
 #import "WXSDKEngine.h"
 #import "WXUtility.h"
+#import "WXAssert.h"
 #import <pthread/pthread.h>
 
 @interface WXImageView : UIImageView
@@ -317,7 +318,10 @@ WX_EXPORT_METHOD(@selector(save:))
     [super _frameDidCalculated:isChanged];
     
     if ([self isViewLoaded] && isChanged) {
-        [self _clipsToBounds];
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnMainThread(^{
+            [weakSelf _clipsToBounds];
+        });
     }
 }
 
@@ -490,6 +494,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)_clipsToBounds
 {
+    WXAssertMainThread();
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.view.bounds topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     // here is computed radii, do not use original style
     WXRadii *radii = borderRect.radii;

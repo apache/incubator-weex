@@ -17,24 +17,17 @@
  * under the License.
  */
 
-#import "WXScrollerProtocol.h"
-#import "WXComponent.h"
+#import <Foundation/Foundation.h>
+#import "WXCellSlotComponent.h"
 
-@interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
+@interface WXRecycleListTemplateManager : NSObject
 
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
+@property (nonatomic, weak) UICollectionView *collectionView;
 
-@property (nonatomic, assign) NSUInteger loadmoreretry;
+- (void)addTemplate:(WXCellSlotComponent *)component;
 
-@property (nonatomic, assign) CGSize contentSize;
+- (WXCellSlotComponent *)dequeueCellSlotWithType:(NSString *)type forIndexPath:(NSIndexPath *)indexPath;
 
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
-
-- (void)handleAppear;
-
-- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+- (WXCellSlotComponent *)templateWithType:(NSString *)type;
 
 @end
-
