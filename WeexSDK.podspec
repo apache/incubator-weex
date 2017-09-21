@@ -39,8 +39,6 @@ Pod::Spec.new do |s|
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC'}
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit', 'OpenGLES', 'CoreText', 'QuartzCore', 'CoreGraphics'
-
-  s.dependency 'SocketRocket'
   s.libraries = "stdc++"
 
 end
