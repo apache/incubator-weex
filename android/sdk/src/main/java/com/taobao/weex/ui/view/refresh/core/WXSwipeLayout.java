@@ -29,6 +29,7 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -109,7 +110,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
 
   // Drag Action
   private int mCurrentAction = -1;
-  private boolean isConfirm = false;
 
   // RefreshView Attrs
   private int mRefreshViewBgColor;
@@ -242,26 +242,17 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       return;
     }
 
-    dy = (int) calculateDistanceY(target, dy);
+//    dy = (int) calculateDistanceY(target, dy);
 
-    if (!isConfirm) {
-      if (dy < 0 && !canChildScrollUp()) {
-        mCurrentAction = PULL_REFRESH;
-        isConfirm = true;
-      } else if (dy > 0 && !canChildScrollDown() && (!mRefreshing)) {
-        mCurrentAction = LOAD_MORE;
-        isConfirm = true;
-      }
-    }
+    mRefreshing = false;
+
+    Log.i("miomin","onNestedPreScroll");
 
     if (moveSpinner(-dy)) {
       consumed[1] += dy;
+    } else {
+      Log.i("miomin","recyclerview move");
     }
-  }
-
-  @Override
-  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-
   }
 
   @Override
@@ -298,40 +289,54 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     if (mRefreshing) {
       return false;
     }
+    LayoutParams lp_header = (LayoutParams) headerView.getLayoutParams();
+    LayoutParams lp_footer = (LayoutParams) footerView.getLayoutParams();
 
-    if (!canChildScrollUp() && mPullRefreshEnable && mCurrentAction == PULL_REFRESH) {
+    if (!canChildScrollUp() && mPullRefreshEnable) {
       // Pull Refresh
-      LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
-      lp.height += distanceY;
-      if (lp.height < 0) {
-        lp.height = 0;
+      lp_header.height += distanceY;
+      if (lp_header.height < 0) {
+        lp_header.height = 0;
       }
 
-      if (lp.height == 0) {
-        isConfirm = false;
+      if (lp_header.height == 0) {
         mCurrentAction = INVALID;
       }
-      headerView.setLayoutParams(lp);
-      onRefreshListener.onPullingDown(distanceY, lp.height, refreshViewFlowHeight);
-      headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
-      moveTargetView(lp.height);
+      headerView.setLayoutParams(lp_header);
+      onRefreshListener.onPullingDown(distanceY, lp_header.height, refreshViewFlowHeight);
+      headerView.setProgressRotation(lp_header.height / refreshViewFlowHeight);
+      moveTargetView(lp_header.height);
       return true;
-    } else if (!canChildScrollDown() && mPullLoadEnable && mCurrentAction == LOAD_MORE) {
-      // Load more
-      LayoutParams lp = (LayoutParams) footerView.getLayoutParams();
-      lp.height -= distanceY;
-      if (lp.height < 0) {
-        lp.height = 0;
+    } else if (lp_header.height > 0 && distanceY < 0) {
+      lp_header.height += distanceY;
+      if (lp_header.height < 0) {
+        lp_header.height = 0;
+        return false;
       }
 
-      if (lp.height == 0) {
-        isConfirm = false;
+      if (lp_header.height == 0) {
         mCurrentAction = INVALID;
       }
-      footerView.setLayoutParams(lp);
-      onLoadingListener.onPullingUp(distanceY, lp.height, loadingViewFlowHeight);
-      footerView.setProgressRotation(lp.height / loadingViewFlowHeight);
-      moveTargetView(-lp.height);
+      headerView.setLayoutParams(lp_header);
+      onRefreshListener.onPullingDown(distanceY, lp_header.height, refreshViewFlowHeight);
+      headerView.setProgressRotation(lp_header.height / refreshViewFlowHeight);
+      moveTargetView(lp_header.height);
+      return true;
+    } else if (!canChildScrollDown() && mPullLoadEnable) {
+      // Load more
+      Log.i("miomin","pullloadmore");
+      lp_footer.height -= distanceY;
+      if (lp_footer.height < 0) {
+        lp_footer.height = 0;
+      }
+
+      if (lp_footer.height == 0) {
+        mCurrentAction = INVALID;
+      }
+      footerView.setLayoutParams(lp_footer);
+      onLoadingListener.onPullingUp(distanceY, lp_footer.height, loadingViewFlowHeight);
+      footerView.setProgressRotation(lp_footer.height / loadingViewFlowHeight);
+      moveTargetView(-lp_footer.height);
       return true;
     }
     return false;
@@ -353,28 +358,27 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     if (isRefreshing()) {
       return;
     }
-    isConfirm = false;
 
-    LayoutParams lp;
-    if (mPullRefreshEnable && mCurrentAction == PULL_REFRESH) {
-      lp = (LayoutParams) headerView.getLayoutParams();
-      if (lp.height >= refreshViewHeight) {
-        startRefresh(lp.height);
-      } else if (lp.height > 0) {
-        resetHeaderView(lp.height);
+    LayoutParams lp_header = (LayoutParams) headerView.getLayoutParams();
+    LayoutParams lp_footer = (LayoutParams) footerView.getLayoutParams();
+
+    if (mPullRefreshEnable && lp_header.height > 0) {
+      if (lp_header.height >= refreshViewHeight) {
+        startRefresh(lp_header.height);
+      } else if (lp_header.height > 0) {
+        resetHeaderView(lp_header.height);
       } else {
-        resetRefreshState();
+        resetState();
       }
     }
 
-    if (mPullLoadEnable && mCurrentAction == LOAD_MORE) {
-      lp = (LayoutParams) footerView.getLayoutParams();
-      if (lp.height >= loadingViewHeight) {
-        startLoadmore(lp.height);
-      } else if (lp.height > 0) {
-        resetFootView(lp.height);
+    if (mPullLoadEnable && lp_footer.height > 0) {
+      if (lp_footer.height >= loadingViewHeight) {
+        startLoadmore(lp_footer.height);
+      } else if (lp_footer.height > 0) {
+        resetFootView(lp_footer.height);
       } else {
-        resetLoadmoreState();
+        resetState();
       }
     }
   }
@@ -429,19 +433,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.addListener(new WXRefreshAnimatorListener() {
       @Override
       public void onAnimationEnd(Animator animation) {
-        resetRefreshState();
+        resetState();
 
       }
     });
     animator.setDuration(300);
     animator.start();
-  }
-
-  private void resetRefreshState() {
-    mRefreshing = false;
-    isConfirm = false;
-    mCurrentAction = -1;
-    //TODO updateLoadText
   }
 
   /**
@@ -494,7 +491,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.addListener(new WXRefreshAnimatorListener() {
       @Override
       public void onAnimationEnd(Animator animation) {
-        resetLoadmoreState();
+        resetState();
 
       }
     });
@@ -502,9 +499,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     animator.start();
   }
 
-  private void resetLoadmoreState() {
+  private void resetState() {
     mRefreshing = false;
-    isConfirm = false;
     mCurrentAction = -1;
     //TODO updateLoadText
   }

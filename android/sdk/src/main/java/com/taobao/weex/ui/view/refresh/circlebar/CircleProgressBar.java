@@ -105,14 +105,10 @@ public class CircleProgressBar extends ImageView {
     this.mBackGroundColor = color;
   }
 
-  private boolean elevationSupported() {
-    return android.os.Build.VERSION.SDK_INT >= 21;
-  }
-
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    if (!elevationSupported()) {
+    if (!(android.os.Build.VERSION.SDK_INT >= 21)) {
       setMeasuredDimension(getMeasuredWidth() + mShadowRadius * 2, getMeasuredHeight()
                                                                    + mShadowRadius * 2);
     }
@@ -140,7 +136,7 @@ public class CircleProgressBar extends ImageView {
       final int shadowXOffset = (int) (density * X_OFFSET);
       mShadowRadius = (int) (density * SHADOW_RADIUS);
 
-      if (elevationSupported()) {
+      if (android.os.Build.VERSION.SDK_INT >= 21) {
         mBgCircle = new ShapeDrawable(new OvalShape());
         ViewCompat.setElevation(this, SHADOW_ELEVATION * density);
       } else {
