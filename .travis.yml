@@ -5,7 +5,6 @@ language: node_js
 node_js: 7.6
 rvm: 2.0.0
 env:
-  - TEST_SUITE=ios
   - TEST_SUITE=danger
   - TEST_SUITE=jsfm
   - TEST_SUITE=android
@@ -59,10 +58,6 @@ script:
     if [[ $TEST_SUITE = "android" ]]; then
       npm run danger -- run --dangerfile ./dangerfile-android.js
       cd $TRAVIS_BUILD_DIR
-    fi
-  - |
-    if [[ $TEST_SUITE = "ios" ]]; then
-      npm run danger -- run --dangerfile ./dangerfile-ios.js
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
