@@ -62,7 +62,7 @@ version: 2.1
 
 `支持版本:v0.12.0`
 
-支持ttf和woff字体格式的自定义字体, 可以通过调用 `dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用, addRule 建议在`mounted`时候调用
+支持ttf和woff字体格式的自定义字体, 可以通过调用 `dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用, addRule 建议在 `beforeCreate` 或者更早时调用
 
 ```html
 <template>
@@ -75,7 +75,7 @@ version: 2.1
 </template>
 <script>
     module.exports = {
-        mounted: function() {
+        beforeCreate: function() {
 
         var domModule = weex.requireModule('dom');
         //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
@@ -89,7 +89,7 @@ version: 2.1
 </script>
 ```
 
-[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
+[try it](http://dotwe.org/vue/95b2c6716f37066d5f44c5c75c979394)
 
 ## 示例
 

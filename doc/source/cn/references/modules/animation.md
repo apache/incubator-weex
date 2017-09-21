@@ -47,6 +47,8 @@ version: 2.1
 | `translate`/`translateX`/`translateY` | 指定元素要移动到的位置      | 像素值或百分比 | 无    |
 | `rotate`                              | 指定元素将被旋转的角度，单位是度 | number  | 无    |
 | `scale`/`scaleX`/`scaleY`             | 按比例放大或缩小元素       | number  | 无    |
+| `rotate`/`rotateX` <span class="api-version">v0.14+</span> /`rotateY` <span class="api-version">v0.14+</span> | 指定元素将被旋转的角度，单位是度 | number | 无 |
+| `perspective` <span class="api-version">v0.16+</span> | 观察者距离z=0平面的距离，在Android 4.1及以上有效 | number | 正无穷
 
 * `callback {Function}`：动画执行完毕之后的回调
 * `needLayout（boolean）`：节点动画执行时是否产生布局动画即LayoutAnimation

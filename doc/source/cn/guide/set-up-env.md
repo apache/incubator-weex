@@ -74,7 +74,7 @@ $ sudo cnpm install -g weex-toolkit
 然后初始化 Weex 项目：
 
 ```bash
-$ weex init awesome-project
+$ weex create awesome-project
 ```
 
 执行完命令后，在 `awesome-project` 目录中就创建了一个使用 Weex 和 Vue 的模板项目。
@@ -90,7 +90,7 @@ $ weex init awesome-project
 - `serve`: 开启静态服务器
 - `debug`: 调试模式
 
-我们先通过 `npm install` 安装项目依赖。之后运行 `npm run dev` 和 `npm run serve` 开启watch 模式和静态服务器。
+我们先通过 `npm install` 安装项目依赖。之后运行根目录下的 `npm run dev & npm run serve` 开启  watch 模式和静态服务器。
 
 然后我们打开浏览器，进入 `http://localhost:8080/index.html` 即可看到 weex h5 页面。 
 
