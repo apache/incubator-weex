@@ -44,7 +44,7 @@ Then you can use the Weex command to verify that the installation is successful:
 You can use the CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
 
 ```bash
-$ weex init awesome-project
+$ weex create awesome-project
 ```
 
 Then enter the awesome-project folder, the CLI has been for us to generate a standard project structure.
@@ -57,7 +57,7 @@ We enter the awesome-project folder and install dependencies with the following 
 npm install
 ```
 
-Then run `npm run dev` and `npm run serve` to start watch mode and static server.
+Then we run `npm run dev & npm run serve` in root directory to start watch mode and static server.
 
 Finally, we can see the Weex page in `http://localhost:8080/index.html`.
 
@@ -90,4 +90,4 @@ You can modify this page in `src/foo.vue`. The code is shown below:
 </style>
 ```
 
-If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](https://dotwe.org) and preview at anytime.
+If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](http://dotwe.org) and preview at anytime.
