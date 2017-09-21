@@ -227,12 +227,6 @@ public class FunctionParser<K, V> {
       return true;
     }
 
-    private void reset() {
-      pointer = 0;
-      value = null;
-      current = null;
-    }
-
     private boolean isCharacterOrDigit(char letter) {
       return (ZERO <= letter && letter <= NINE) || (A_LOWER <= letter && letter <= Z_LOWER) ||
               (A_UPPER <= letter && letter <= Z_UPPER);

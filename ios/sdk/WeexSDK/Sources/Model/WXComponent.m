@@ -94,6 +94,7 @@
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
+        _accessibilityHintContent = nil;
         
         _async = NO;
         
@@ -108,18 +109,21 @@
             }
         }
         
-        if (attributes[@"role"]){
-            _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        }
         if (attributes[@"ariaHidden"]) {
             
             _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        }
+        if (attributes[@"role"]) {
+            _roles = attributes[@"role"];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         }
         if (attributes[@"accessible"]) {
             _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        }
+        if(attributes[@"accessibilityHint"]) {
+            _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         }
         
         if (attributes[@"testId"]) {
@@ -170,6 +174,15 @@
     });
     
     return component;
+
+- (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
+{
+    UIAccessibilityTraits newTrait = trait;
+    for (NSString * role in [roleStr componentsSeparatedByString:@" "]) {
+        newTrait |= [WXConvert WXUIAccessibilityTraits: role];
+    }
+    
+    return newTrait;
 }
 
 - (void)dealloc
@@ -190,9 +203,8 @@
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
-    
     return styles;
 }
 
@@ -312,12 +324,16 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        if (_role) {
-            _view.accessibilityTraits |= _role;
+        if (_roles) {
+            [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
         
         if (_testId) {
             _view.accessibilityIdentifier = _testId;
+        }
+        
+        if (_accessibilityHintContent) {
+            [_view setAccessibilityHint:_accessibilityHintContent];
         }
         
         if (_ariaLabel) {
@@ -685,10 +701,9 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    
     if (attributes[@"role"]){
-        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        self.view.accessibilityTraits = _role;
+        _roles = attributes[@"role"];
+        [self.view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
     }
     if (attributes[@"ariaHidden"]) {
         _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
@@ -701,6 +716,10 @@
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
+    }
+    if (attributes[@"accessibilityHint"]) {
+        _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
+        [self.view setAccessibilityHint:_accessibilityHintContent];
     }
     
     if (attributes[@"testId"]) {

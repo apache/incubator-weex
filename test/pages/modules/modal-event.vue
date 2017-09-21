@@ -55,7 +55,7 @@
       toastClick:function() {
         modal.toast({
           'message': 'message',
-          'duration': 1000,
+          'duration': 3,
         });
         this.toastResult = 'Toast success';
       },
