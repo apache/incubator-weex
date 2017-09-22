@@ -305,7 +305,7 @@ function findReviewer(resolve, reject) {
     owner: danger.github.pr.base.user.login,
     repo: repoName,
     number: danger.github.pr.number,
-    headers: {Accept: 'application/vnd.github.diff'}
+    headers: {Accept: 'application/vnd.github.diff',"user-agent": "node.js"}
   }, function (err, result) {
     console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {

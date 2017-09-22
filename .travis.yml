@@ -49,11 +49,18 @@ before_script:
       nvm install 7.0
       npm install
     fi
+  - |
+    if [[ $TEST_SUITE = "jsfm" ]]; then
+      npm install
+    fi
+  - |
+    if [[ $TEST_SUITE = "danger" ]]; then
+      npm install
+    fi
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       npm run danger -- run --dangerfile ./dangerfile-android.js
-      cd $TRAVIS_BUILD_DIR
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
