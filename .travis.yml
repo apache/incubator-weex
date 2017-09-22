@@ -61,7 +61,7 @@ script:
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
-      npm run danger -- run --dangerfile ./dangerfile.js
+      npm run danger
     fi
 notifications:
   webhooks:
