@@ -553,23 +553,11 @@ do {\
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
             _layer.borderColor = _borderTopColor.CGColor;
-            if (![self _isTransitionBackgroundColorStyles:styles]) {
+            if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
                 _layer.backgroundColor = _backgroundColor.CGColor;
             }
         }
     }
-}
-
-- (BOOL)_isTransitionBackgroundColorStyles:(NSDictionary *)styles
-{
-    BOOL yesOrNo = false;
-    NSString *property = self.styles[kWXTransitionProperty];
-    if (property) {
-        if (([property containsString:@"backgroundColor"])) {
-            yesOrNo = true;
-        }
-    }
-    return yesOrNo;
 }
 
 - (BOOL)_bitmapOpaqueWithSize:(CGSize)size
