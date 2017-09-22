@@ -65,7 +65,6 @@ script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       npm run danger -- run --dangerfile ./dangerfile-android.js
-      cd $TRAVIS_BUILD_DIR
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then

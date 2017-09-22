@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// Removed import
+import { schedule, danger, fail, warn, message, markdown } from "danger";
 import fs from "fs";
 import path from 'path';
 import GitHubApi from 'github';
