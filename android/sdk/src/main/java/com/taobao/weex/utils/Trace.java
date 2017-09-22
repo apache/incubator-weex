@@ -21,6 +21,8 @@ package com.taobao.weex.utils;
 import android.annotation.TargetApi;
 import android.os.Build;
 
+import com.taobao.weex.util.OsVersion;
+
 /**
  * Hepler class for systrace.
  *
@@ -80,7 +82,7 @@ public class Trace {
 
   /**
    * Writes a trace message to indicate that a given section of code has ended.
-   * This call must be preceeded by a corresponding call to {@link #beginSection(String)}
+   * This call must be preceeded by a corresponding call to {@link #beginSection()}
    * on the same thread.
    */
   public static void endSection() {

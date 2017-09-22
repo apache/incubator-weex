@@ -28,6 +28,7 @@
 #import "WXResourceRequestHandlerDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
+#import "WXWebSocketDefaultImpl.h"
 
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
@@ -167,6 +168,9 @@
     [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
+    if (NSClassFromString(@"WXWebSocketDefaultImpl")) {
+        [self registerHandler:[NSClassFromString(@"WXWebSocketDefaultImpl") new] withProtocol:NSProtocolFromString(@"WXWebSocketHandler")];
+    }
     
 }
 

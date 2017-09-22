@@ -37,6 +37,7 @@ import com.taobao.weex.utils.WXViewUtils;
 public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeListener, WXGestureObservable {
 
   private final Paint mPaintPage = new Paint();
+  private final Paint mPaintStroke = new Paint();
   private final Paint mPaintFill = new Paint();
   private WXGesture wxGesture;
   private WXCircleViewPager mCircleViewPager;
@@ -52,24 +53,38 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
   /**
    * Fill color of unselected circle
    */
-  private int pageColor = Color.LTGRAY;
+  private int pageColor;
   /**
    * Fill color of the selected circle
    */
-  private int fillColor = Color.DKGRAY;
+  private int fillColor;
   private int realCurrentItem;
+  private OnPageChangeListener mListener;
 
 
   public WXBaseCircleIndicator(Context context) {
     super(context);
+    getAttrs(context);
     init();
   }
 
-  private void init() {
+  /**
+   * Get attribute of xml
+   */
+  private void getAttrs(Context context) {
     radius = WXViewUtils.dip2px(5);
     circlePadding = WXViewUtils.dip2px(5);
-    pageColor = Color.LTGRAY;
-    fillColor = Color.DKGRAY;
+    pageColor = Color.parseColor("#ffffff");
+    //		strokeWidth= WAViewUtils.dip2px((float)1.5);
+    //		strokeColor = Color.parseColor("#FFDDDDDD");
+    fillColor = Color.parseColor("#ffd545");
+  }
+
+  private void init() {
+    mPaintStroke.setAntiAlias(true);
+    mPaintStroke.setStyle(Style.STROKE);
+    //		mPaintStroke.setColor(strokeColor);
+    //		mPaintStroke.setStrokeWidth(strokeWidth);
 
     mPaintFill.setStyle(Style.FILL);
     mPaintFill.setAntiAlias(true);
@@ -87,7 +102,19 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
    */
   public WXBaseCircleIndicator(Context context, AttributeSet attrs) {
     super(context, attrs);
+    getAttrs(context);
     init();
+  }
+
+  public void setOnPageChangeListener(OnPageChangeListener listener) {
+    mListener = listener;
+  }
+
+  /**
+   * @return the mCircleViewPager
+   */
+  public WXCircleViewPager getCircleViewPager() {
+    return mCircleViewPager;
   }
 
   /**
@@ -98,27 +125,38 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
     if (this.mCircleViewPager != null) {
       this.mCircleViewPager.addOnPageChangeListener(this);
       this.realCurrentItem = mCircleViewPager.getRealCurrentItem();
-      if (realCurrentItem < 0) {
-        realCurrentItem = 0;
-      }
     }
     requestLayout();
   }
 
   @Override
   public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+    if (mListener != null) {
+      mListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+    }
   }
 
   @Override
   public void onPageSelected(int position) {
     realCurrentItem = mCircleViewPager.getRealCurrentItem();
     invalidate();
+    if (mListener != null) {
+      mListener.onPageSelected(position);
+    }
   }
 
   @Override
   public void onPageScrollStateChanged(int state) {
+    if (mListener != null) {
+      mListener.onPageScrollStateChanged(state);
+    }
+  }
 
+  /**
+   * @return the radius
+   */
+  public float getRadius() {
+    return radius;
   }
 
   /**
@@ -126,6 +164,27 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
    */
   public void setRadius(float radius) {
     this.radius = radius;
+  }
+
+  /**
+   * @return the circlePadding
+   */
+  public float getCirclePadding() {
+    return circlePadding;
+  }
+
+  /**
+   * @param circlePadding the circlePadding to set
+   */
+  public void setCirclePadding(float circlePadding) {
+    this.circlePadding = circlePadding;
+  }
+
+  /**
+   * @return the fillColor
+   */
+  public int getFillColor() {
+    return fillColor;
   }
 
   /**
@@ -153,8 +212,35 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
    */
   public void setRealCurrentItem(int realCurrentItem) {
     this.realCurrentItem = realCurrentItem;
-    invalidate();
   }
+
+  //	/**
+  //	 * @return the strokeColor
+  //	 */
+  //	public int getStrokeColor() {
+  //		return strokeColor;
+  //	}
+  //
+  //	/**
+  //	 * @param strokeColor the strokeColor to set
+  //	 */
+  //	public void setStrokeColor(int strokeColor) {
+  //		this.strokeColor = strokeColor;
+  //	}
+  //
+  //	/**
+  //	 * @return the strokeWidth
+  //	 */
+  //	public float getStrokeWidth() {
+  //		return strokeWidth;
+  //	}
+  //
+  //	/**
+  //	 * @param strokeWidth the strokeWidth to set
+  //	 */
+  //	public void setStrokeWidth(float strokeWidth) {
+  //		this.strokeWidth = strokeWidth;
+  //	}
 
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
@@ -172,22 +258,29 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
 
   @Override
   protected void onDraw(Canvas canvas) {
+    // TODO Auto-generated method stub
     super.onDraw(canvas);
 
-    float dotWidth = (circlePadding + radius) * 2;
+    float firstX = getWidth() / 2 + getPaddingLeft() - getCount() / 2.0f * (radius + circlePadding);// + radius;
+    float firstY = getHeight() / 2 + getPaddingTop();// + radius;
 
-    float firstCenterX = getWidth() / 2 - (dotWidth * (getCount() - 1) / 2);
-    float firstCenterY = getHeight() / 2 + getPaddingTop();
-
+    //draw stroked circles
     for (int i = 0; i < getCount(); i++) {
-      float dx = firstCenterX + dotWidth * i;
-      float dy = firstCenterY;
-      if (i != realCurrentItem) {
+      float dx = firstX + circlePadding * i + radius * 2 * i;
+      float dy = firstY;
+      if (mPaintStroke.getStrokeWidth() > 0) {
+        canvas.drawCircle(dx, dy, radius, mPaintStroke);
+      }
+
+      if (mPaintPage.getAlpha() > 0) {
         canvas.drawCircle(dx, dy, radius, mPaintPage);
-      } else {
-        canvas.drawCircle(dx, dy, radius, mPaintFill);
       }
     }
+
+    //Draw the filled circle
+    float dx = firstX + realCurrentItem * circlePadding + radius * 2 * realCurrentItem;
+    float dy = firstY;
+    canvas.drawCircle(dx, dy, radius, mPaintFill);
   }
 
   @Override

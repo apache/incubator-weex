@@ -362,14 +362,12 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
-    NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
-        _ctAttributedString = [self buildCTAttributeString];
+        _ctAttributedString = [[self buildCTAttributeString] copy];
     }
-    attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    return attributedString;
+    return [_ctAttributedString copy];
 }
 
 - (void)repaintText:(NSNotification *)notification

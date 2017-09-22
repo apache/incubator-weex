@@ -19,14 +19,15 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Intent;
-import android.util.Pair;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+
 import java.util.ArrayList;
 
 /**
@@ -114,11 +115,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    *
    */
   public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom){
-    ViewGroup.LayoutParams lp = null;
-    if (childView != null) {
-      lp = childView.getLayoutParams();
-    }
-
+    ViewGroup.LayoutParams lp = childView.getLayoutParams();
     if(lp == null) {
       lp = new ViewGroup.LayoutParams(width,height);
     }else{
@@ -231,11 +228,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return original;
   }
 
-  /**
-   * Use {@link #getChildCount()} instead
-   * @return
-   */
-  @Deprecated
   public int childCount() {
     return mChildren == null ? 0 : mChildren.size();
   }
@@ -250,7 +242,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public int getChildCount() {
-    return childCount();
+    return mChildren.size();
   }
 
   public void addChild(WXComponent child) {
@@ -276,31 +268,21 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return mChildren.indexOf(comp);
   }
 
-  public void createChildViewAt(int index) {
+  public void createChildViewAt(int index){
     long startNanos = System.nanoTime();
-    Pair<WXComponent, Integer> ret = rearrangeIndexAndGetChild(index);
-    if (ret.first != null) {
-      WXComponent child = ret.first;
-      child.createView();
-      if (!child.isVirtualComponent()) {
-        addSubView(child.getHostView(), ret.second);
-      }
-    }
-    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
-  }
-
-  protected Pair<WXComponent, Integer> rearrangeIndexAndGetChild(int index){
     int indexToCreate = index;
     if(indexToCreate < 0){
       indexToCreate = childCount()-1;
+      if(indexToCreate < 0 ){
+        return;
+      }
     }
-
-    if (indexToCreate<0){
-      return new Pair<>(null, indexToCreate);
+    WXComponent child = getChild(indexToCreate);
+    child.createView();
+    if(!child.isVirtualComponent()){
+      addSubView(child.getHostView(),indexToCreate);
     }
-    else {
-      return new Pair<>(getChild(indexToCreate), indexToCreate);
-    }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   protected void addSubView(View child, int index) {

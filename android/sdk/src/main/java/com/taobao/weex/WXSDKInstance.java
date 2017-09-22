@@ -18,8 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,14 +28,13 @@ import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -71,7 +68,6 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
@@ -80,6 +76,8 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.WXSDKEngine;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,6 +85,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -119,8 +120,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedReLoad = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
-  private @NonNull
-  FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
@@ -201,12 +200,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     enableLayerType = enable;
   }
 
-  @RestrictTo(Scope.LIBRARY)
-  public @NonNull
-  FlatGUIContext getFlatUIContext(){
-    return mFlatGUIContext;
-  }
-
   public boolean isNeedValidate() {
     return mNeedValidate;
   }
@@ -258,7 +251,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /**
    * For unittest only.
    */
-  @RestrictTo(Scope.TESTS)
   WXSDKInstance(Context context,String id) {
     mInstanceId = id;
     init(context);
@@ -614,23 +606,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return "";
   }
 
-  public void reloadPage(boolean reloadThis) {
-
+  public void reloadPage() {
     WXSDKEngine.reload();
 
-    if (reloadThis) {
-      // 可以发送广播吗？
-      if (mContext != null)  {
-        Intent intent = new Intent();
-        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
-        intent.putExtra("url", mBundleUrl);
-        mContext.sendBroadcast(intent);
-      }
-      // mRendered = false;
-      //    destroy();
-      // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
-      // refreshInstance("{}");
+    // 可以发送广播吗？
+    if (mContext != null) {
+      Intent intent = new Intent();
+      intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+      intent.putExtra("url", mBundleUrl);
+      mContext.sendBroadcast(intent);
     }
+    // mRendered = false;
+    //    destroy();
+    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+    // refreshInstance("{}");
+
   }
   /**
    * Refresh instance asynchronously.
@@ -1259,41 +1249,35 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public synchronized void destroy() {
-    if(!isDestroy()) {
-      WXSDKManager.getInstance().destroyInstance(mInstanceId);
-      WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
+    WXSDKManager.getInstance().destroyInstance(mInstanceId);
+    WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
-      if (mGlobalEventReceiver != null) {
-        getContext().unregisterReceiver(mGlobalEventReceiver);
-        mGlobalEventReceiver = null;
-      }
-      if (mRootComp != null) {
-        mRootComp.destroy();
-        destroyView(mRenderContainer);
-        mRootComp = null;
-      }
-
-      if (mGlobalEvents != null) {
-        mGlobalEvents.clear();
-      }
-
-      if (mComponentObserver != null) {
-        mComponentObserver = null;
-      }
-
-      getFlatUIContext().destroy();
-      mFlatGUIContext = null;
-
-      mWXScrollListeners = null;
-      mRenderContainer = null;
-      mNestedInstanceInterceptor = null;
-      mUserTrackAdapter = null;
-      mScrollView = null;
-      mContext = null;
-      mRenderListener = null;
-      isDestroy = true;
-      mStatisticsListener = null;
+    if(mGlobalEventReceiver!=null){
+      getContext().unregisterReceiver(mGlobalEventReceiver);
+      mGlobalEventReceiver=null;
     }
+    if(mRootComp != null ) {
+      mRootComp.destroy();
+      destroyView(mRenderContainer);
+      mRenderContainer = null;
+      mRootComp = null;
+    }
+
+    if(mGlobalEvents!=null){
+      mGlobalEvents.clear();
+    }
+
+    if(mComponentObserver != null){
+        mComponentObserver = null;
+    }
+
+    mNestedInstanceInterceptor = null;
+    mUserTrackAdapter = null;
+    mScrollView = null;
+    mContext = null;
+    mRenderListener = null;
+    isDestroy = true;
+    mStatisticsListener = null;
   }
 
   public boolean isDestroy(){
@@ -1500,7 +1484,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * Check whether the current module registered the event
    * @param eventName EventName register in weex
    * @param module Events occur in this Module
-   * @return  boolean true
+   * @return  register->true
    */
   public boolean checkModuleEventRegistered(String eventName,WXModule module) {
     if (module != null) {

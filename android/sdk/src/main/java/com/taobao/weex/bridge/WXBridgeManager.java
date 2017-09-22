@@ -135,9 +135,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private static final int CRASHREINIT = 50;
   private static int reInitCount = 1;
 
-  private static String crashUrl = null;
-  private static long lastCrashTime = 0;
-
 
   /**
    * next tick tasks, can set priority
@@ -965,33 +962,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXLogUtils.e("[WXBridgeManager] callReportCrashReloadPage exception: ", e);
       }
       try {
-
           if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-              boolean reloadThisInstance = shouReloadCurrentInstance(
-                      WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
+              // JSONObject domObject = JSON.parseObject(tasks);
               WXDomModule domModule = getDomModule(instanceId);
-              Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
-              domModule.postAction((DOMAction) action, true);
+              Action action = Actions.getReloadPage(instanceId);
+              domModule.postAction((DOMAction)action, true);
           }
-
       } catch (Exception e) {
           WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
           commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
       }
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-  }
-
-  public boolean shouReloadCurrentInstance(String aUrl) {
-    long time = System.currentTimeMillis();
-    if (crashUrl == null ||
-            (crashUrl != null && !crashUrl.equals(aUrl)) ||
-            ((time - lastCrashTime) > 10000)) {
-      crashUrl = aUrl;
-      lastCrashTime = time;
-      return true;
-    }
-    lastCrashTime = time;
-    return false;
   }
 
   public void callReportCrash(String crashFile, final String instanceId, final String url) {
@@ -1828,7 +1809,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           if (reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
             WXDomModule domModule = getDomModule(instanceId);
-            Action action = Actions.getReloadPage(instanceId, true);
+            Action action = Actions.getReloadPage(instanceId);
             domModule.postAction((DOMAction)action, true);
             instance.setNeedLoad(true);
             return;

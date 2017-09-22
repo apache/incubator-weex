@@ -43,6 +43,7 @@
 - (id)copyWithZone:(NSZone *)zone
 {
     WXAnimationInfo *info = [[WXAnimationInfo allocWithZone:zone] init];
+    
     info.target = self.target;
     info.propertyName = self.propertyName;
     info.fromValue = self.fromValue;
@@ -50,6 +51,7 @@
     info.duration = self.duration;
     info.delay = self.delay;
     info.timingFunction = self.timingFunction;
+    
     return info;
 }
 
@@ -136,7 +138,6 @@
 
 @property (nonatomic,assign) BOOL needLayout;
 @property (nonatomic, strong) WXTransition *transition;
-@property (nonatomic, assign) BOOL isAnimationedSuccess;
 
 @end
 
@@ -149,14 +150,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
     _needLayout = NO;
-    _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
         WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
         if (!targetComponent) {
             if (callback) {
-                NSDictionary *message = @{@"result":@"Fail",
-                                          @"message":[NSString stringWithFormat:@"No component find for ref:%@", nodeRef]};
-                callback(message);
+                callback([NSString stringWithFormat:@"No component find for ref:%@", nodeRef]);
             }
             return;
         }
@@ -165,7 +163,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         });
     });
 }
-
 
 - (NSArray<WXAnimationInfo *> *)animationInfoArrayFromArgs:(NSDictionary *)args target:(WXComponent *)target
 {
@@ -299,6 +296,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
         }
     }
+
     return infos;
 }
 
@@ -340,17 +338,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
     [CATransaction setCompletionBlock:^{
         if (callback) {
-            NSDictionary *message;
-            if (_isAnimationedSuccess) {
-                message = @{@"result":@"Success",
-                            @"message":@"Success"};
-            }
-            else
-            {
-                message = @{@"result":@"Fail",
-                            @"message":@"Animation did not complete"};
-            }
-            callback(message);
+            callback(@"SUCCESS");
         }
     }];
     NSArray<WXAnimationInfo *> *infos = [self animationInfoArrayFromArgs:args target:targetComponent];
@@ -378,9 +366,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     animation.fillMode = kCAFillModeForwards;
     
     WXAnimationDelegate *delegate = [[WXAnimationDelegate alloc] initWithAnimationInfo:info finishBlock:^(BOOL isFinish) {
-        if (!isFinish) {
-            _isAnimationedSuccess = isFinish;
-        }
+        
     }];
     animation.delegate = delegate;
     

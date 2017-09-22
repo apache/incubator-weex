@@ -50,13 +50,11 @@ class CreateBodyAction extends AbstractAddElementAction {
 
   @Override
   public void executeDom(DOMActionContext context) {
-    if (WXTracing.isAvailable()) {
-      if (context != null && context.getInstance() != null) {
-        WXTracing.TraceEvent execJsEndEvent = WXTracing.newEvent("executeBundleJS", context.getInstanceId(), -1);
-        execJsEndEvent.traceId = context.getInstance().mExecJSTraceId;
-        execJsEndEvent.ph = "E";
-        execJsEndEvent.submit();
-      }
+    if (WXEnvironment.isApkDebugable()) {
+      WXTracing.TraceEvent execJsEndEvent = WXTracing.newEvent("executeBundleJS", context.getInstanceId(), -1);
+      execJsEndEvent.traceId = context.getInstance().mExecJSTraceId;
+      execJsEndEvent.ph = "E";
+      execJsEndEvent.submit();
     }
     addDomInternal(context, mData);
   }
