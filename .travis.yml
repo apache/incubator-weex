@@ -51,14 +51,10 @@ before_script:
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
-      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-      nvm install 7.0
       npm install
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
-      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-      nvm install 7.0
       npm install
     fi
 script:
