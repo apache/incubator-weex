@@ -19,7 +19,7 @@
 
 /**
  * @fileOverview Input component.
- * Support v-model only if vue version is large than 2.2.0
+ * Support v-model only if vue version is larger than 2.2.0
  */
 import { extractComponentStyle, createEventMap } from '../core'
 import { inputCommon } from '../mixins'
