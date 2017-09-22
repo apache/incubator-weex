@@ -68,9 +68,7 @@ public class BenchmarkTest {
   private static List<Long> firstScreenRenderTime = new LinkedList<>();
   private static List<Long> flingFrameSeconds = new LinkedList<>();
   private static List<Long> scrollFrameSeconds = new LinkedList<>();
-  private static final String DUMP_START = "Flags,IntendedVsync,Vsync,OldestInputEvent,NewestInputEvent,"
-                                           + "HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,"
-                                           + "SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,\n";
+  private static final String DUMP_START = "QueueBufferDuration,\n";
   private static final String DUMP_END = "---PROFILEDATA---";
   private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
 
@@ -195,7 +193,7 @@ public class BenchmarkTest {
 
   private long calcTime() {
     BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
-    benchmarkActivity.loadWeexPage();
+    benchmarkActivity.loadWeexPage("http://30.8.53.163:8080/complicated.js");
     onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform
         (RecyclerViewActions.scrollToPosition(0));
     return benchmarkActivity.getWXInstance().getWXPerformance().screenRenderTime;

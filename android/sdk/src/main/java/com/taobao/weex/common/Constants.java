@@ -182,6 +182,8 @@ public class Constants {
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
     String UNDEFINED = "undefined";
+
+    String FLAT = "flat";
   }
 
   public interface Value {

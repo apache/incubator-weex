@@ -108,12 +108,12 @@
             }
         }
         
-        if (attributes[@"role"]){
-            _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        }
         if (attributes[@"ariaHidden"]) {
             
             _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        }
+        if (attributes[@"role"]) {
+            _roles = attributes[@"role"];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
@@ -140,6 +140,16 @@
     return self;
 }
 
+- (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
+{
+    UIAccessibilityTraits newTrait = trait;
+    for (NSString * role in [roleStr componentsSeparatedByString:@" "]) {
+        newTrait |= [WXConvert WXUIAccessibilityTraits: role];
+    }
+    
+    return newTrait;
+}
+
 - (void)dealloc
 {
     free_css_node(_cssNode);
@@ -158,9 +168,8 @@
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
-    
     return styles;
 }
 
@@ -258,8 +267,8 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        if (_role) {
-            _view.accessibilityTraits |= _role;
+        if (_roles) {
+            [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
         
         if (_testId) {
@@ -610,10 +619,9 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    
-    if (attributes[@"role"]) {
-        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        self.view.accessibilityTraits = _role;
+    if (attributes[@"role"]){
+        _roles = attributes[@"role"];
+        [self.view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
     }
     if (attributes[@"ariaHidden"]) {
         _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];

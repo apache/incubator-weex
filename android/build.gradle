@@ -5,12 +5,13 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
     }
 }
 
 plugins {
     id "de.undercouch.download" version "3.2.0"
+//    id "com.github.dcendents.android-maven" version "1.5"
 }
 
 repositories {
@@ -29,7 +30,9 @@ subprojects {
             jcenter()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:2.1.3'
+            classpath 'com.android.tools.build:gradle:2.3.3'
+            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+            classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         }
     }
     ext {
@@ -43,6 +46,6 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}

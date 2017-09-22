@@ -337,12 +337,19 @@ public class WXTextDomObject extends WXDomObject {
       int desired, @Nullable TextUtils.TruncateAt truncateAt) {
     Spanned ret = new SpannedString("");
     if (!TextUtils.isEmpty(source) && source.length() > 0) {
-      StaticLayout layout;
       if (truncateAt != null) {
         source.append(ELLIPSIS);
       }
+
+      StaticLayout layout;
+      int startOffset;
+
       while (source.length() > 1) {
-        source.delete(source.length() - 2, source.length() - 1);
+        startOffset = source.length() -1;
+        if (truncateAt != null) {
+          startOffset -= 1;
+        }
+        source.delete(startOffset, startOffset+1);
         layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
         if (layout.getLineCount() <= 1) {
           ret = source;
