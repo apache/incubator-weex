@@ -35,6 +35,15 @@ function isANode (el) {
   return el.tagName.toLowerCase() === 'a'
 }
 
+function isInANode (el) {
+  let parent = el.parentElement
+  while (parent && parent !== document.body) {
+    if (parent.tagName === 'A') { return true }
+    parent = parent.parentElement
+  }
+  return false
+}
+
 /**
  * get listeners from on config and v-on binding.
  * v-on binding has a priority over on config.
@@ -87,70 +96,63 @@ function _init (doc) {
         return
       }
       let disposed = false
-      let evtName = e.type
-      /**
-       * take full control of redirection of <a> element.
-       */
-      if (evtName === 'click') {
-        // use '_triggered' to control bubbles event.
-        e._triggered = { target: vm.$el }
-        e.preventDefault()
-        return
-      }
+      const evtName = e.type
 
       if (evtName === 'tap' && e._for !== 'weex') {
         return
-      }
-      else if (evtName === 'tap') {
-        evtName = 'click'
       }
 
       while (vm) {
         const vnode = vm._vnode || vm.$vnode
         const elm = vm.$el
-        const ons = getListeners(vnode, evtName)
+        const ons = getListeners(vnode, evtName === 'tap' ? 'click' : evtName)
         const len = ons && ons.length
 
         if (len > 0) {
-          for (let i = 0; i < len; i++) {
-            const handler = ons[i]
-            const newEvt = evtName === 'click'
-              ? createEvent(el, evtName)
-              : e
-            applyFns(handler.fns, newEvt)
+          if (evtName !== 'click') {
+            for (let i = 0; i < len; i++) {
+              const handler = ons[i]
+              const newEvt = evtName === 'tap'
+                ? createEvent(el, 'click')
+                : e
+              newEvt._triggered = { target: elm }
+              applyFns(handler.fns, newEvt)
+            }
           }
-          e._triggered = { target: vm.$el }
+          e._triggered = { target: elm }
           disposed = true
         }
 
-        /**
-         * if the handler is binding on a <a> element, should trigger
-         * the handler first and then jump to href.
-         * NOTE: if target==='_blank' then do no jumping and leave it
-         * to users binding handlers for further disposing.
-         */
-        if (evtName === 'click' && isANode(elm)) {
+        if (isANode(elm)
+          && (evtName === 'click' || evtName === 'tap')) {
           const href = elm.getAttribute('href')
           const voidHrefReg = /^\s*javascript\s*:\s*void\s*(?:\(\s*0\s*\)|0)\s*;?\s*$/
           const prevent = elm.getAttribute('prevent')
-          disposed = true
-          /**
-           * Give the chance to the listeners binding on doc or doc.body for
-           * handling the a-jump.
-           * Should set a _should_intercept_a_jump function on window to test
-           * whether we should intercept the a-jump.
-           */
-          if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)
-            || href.match(voidHrefReg)
+          if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)) {
+            // e._triggered should not be true since we left the intercepter to handle the event.
+            e._triggered = false
+            e.preventDefault()
+            disposed = true
+          }
+          else if (href.match(voidHrefReg)
             || prevent === '' || prevent === 'true') {
-            // do nothing. leave it to the intercept handler.
+              e._triggered = false
+              e.preventDefault()
           }
-          else if (href) {
-            location.href = href
+          else {
+            e._triggered = { target: elm }
+            disposed = true // handled by default behavior for clicking on a element.
           }
-          else if (process.env.NODE_ENV === 'development') {
-            console.warn('[vue-render] If you want to use the A tag jump, set the href attribute')
-          }
+        }
+
+        /**
+         * If the click handler is binding on a element inside a <a> element,
+         * then should prevent default.
+         */
+        if (disposed && evtName === 'click' && isInANode(elm)) {
+          e._triggered = { target: elm }
+          e.preventDefault()
+          return
         }
 
         if (disposed) {
