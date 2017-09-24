@@ -131,13 +131,12 @@ function _init (doc) {
           if (window._should_intercept_a_jump && window._should_intercept_a_jump(elm)) {
             // e._triggered should not be true since we left the intercepter to handle the event.
             e._triggered = false
-            e.preventDefault()
             disposed = true
           }
           else if (href.match(voidHrefReg)
             || prevent === '' || prevent === 'true') {
-              e._triggered = false
-              e.preventDefault()
+            e._triggered = false
+            e.preventDefault()
           }
           else {
             e._triggered = { target: elm }

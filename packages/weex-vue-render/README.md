@@ -172,7 +172,7 @@ vue: {
 
 * fix loading & refresh: pulling down wrongly triggered.
 
-#### 0.12.15
+#### 0.12.16
 
 * not to prevent default behaviour of click events unless the click-binding element is inside a `<a>` link, or it is a `<a>` link and has a `prevent` attribute on it.
 
