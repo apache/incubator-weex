@@ -226,6 +226,9 @@ public class Statements {
                 if(!Operators.isTrue(vif.execute(context))){
                     component.setWaste(true);
                     return 1;
+                }else{
+                    component.setWaste(false);
+                    return 1;
                 }
             }
         }
