@@ -27,11 +27,13 @@ import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.WXLogUtils;
+
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
@@ -43,7 +45,6 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   private WXGesture wxGesture;
   private float[] borderRadius;
   private boolean gif;
-  private ScaleType mScaleType = WXImage.DEFAULT_SCALE_TYPE;
 
   public WXImageView(Context context) {
     super(context);
@@ -125,19 +126,6 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Override
   public WXImage getComponent() {
     return null != mWeakReference ? mWeakReference.get() : null;
-  }
-
-  @Override
-  public void setScaleType(ScaleType scaleType) {
-    if(scaleType == WXImage.DEFAULT_SCALE_TYPE){
-      super.setScaleType(scaleType);
-    }
-    mScaleType = scaleType;
-  }
-
-  @Override
-  public ScaleType getScaleType() {
-    return mScaleType;
   }
 
   @Override

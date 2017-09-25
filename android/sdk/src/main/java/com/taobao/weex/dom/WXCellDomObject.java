@@ -38,7 +38,8 @@ public class WXCellDomObject extends WXDomObject {
           WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
           parentDom.preCalculateCellWidth();
           WXDomObject domObject = (WXDomObject) node;
-          if (WXBasicComponentType.CELL.equals(domObject.getType())) {
+          if (WXBasicComponentType.CELL.equals(domObject.getType())
+                  || WXBasicComponentType.CELL_SLOT.equals(domObject.getType())) {
             float w = ((WXRecyclerDomObject) parent).getColumnWidth();
             node.setLayoutWidth(w);
           } else if (WXBasicComponentType.HEADER.equals(domObject.getType())){
@@ -46,12 +47,60 @@ public class WXCellDomObject extends WXDomObject {
             WXLogUtils.d("getAvailableWidth:"+w);
             node.setLayoutWidth(w);
           }
-        }
+        }else if (node instanceof  WXCellDomObject){
+          WXCellDomObject slotDomObject = (WXCellDomObject) node;
+          WXRecyclerDomObject recyclerDomObject = slotDomObject.getRecyclerDomObject();
+          if(recyclerDomObject == null){
+              return;
+          }
+          if(slotDomObject.isSticky()){
+              float w = recyclerDomObject.getAvailableWidth();
+              if(w <= 0){
+                  w = recyclerDomObject.getViewPortWidth();
+              }
+              node.setLayoutWidth(w);
+              measureOutput.width  = w;
+          }else {
+              if(!recyclerDomObject.hasPreCalculateCellWidth()){
+                  recyclerDomObject.preCalculateCellWidth();
+              }
+              float w = recyclerDomObject.getColumnWidth();
+              if(w <= 0 && recyclerDomObject.getColumnCount() <= 1){
+                  w = recyclerDomObject.getAvailableWidth();
+                  if(w <= 0){
+                      w = recyclerDomObject.getLayoutWidth();
+                      if(w <= 0){
+                          w = recyclerDomObject.getViewPortWidth();
+                      }
+                  }
+              }
+              node.setLayoutWidth(w);
+              measureOutput.width  = w;
+          }
       }
+
+    }
     }
   };
 
   public WXCellDomObject() {
     setMeasureFunction(CELL_MEASURE_FUNCTION);
   }
+
+
+    public boolean isSticky() {
+        return getStyles().isSticky();
+    }
+    private  WXRecyclerDomObject recyclerDomObject;
+
+
+
+    public WXRecyclerDomObject getRecyclerDomObject() {
+        return recyclerDomObject;
+    }
+
+    public void setRecyclerDomObject(WXRecyclerDomObject recyclerDomObject) {
+        this.recyclerDomObject = recyclerDomObject;
+    }
+
 }

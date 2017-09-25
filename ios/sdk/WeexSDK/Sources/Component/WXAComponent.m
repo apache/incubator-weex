@@ -24,6 +24,7 @@
 #import "WXComponent+Events.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXComponent_internal.h"
 
 @interface WXAComponent()
 

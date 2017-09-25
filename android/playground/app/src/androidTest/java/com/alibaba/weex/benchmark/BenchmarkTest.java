@@ -19,6 +19,10 @@
 
 package com.alibaba.weex.benchmark;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.filters.SdkSuppress;
@@ -30,18 +34,9 @@ import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.Until;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.alibaba.weex.BenchmarkActivity;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
-
-import org.hamcrest.Matchers;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -49,10 +44,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.Matchers;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BenchmarkTest {
@@ -68,9 +65,7 @@ public class BenchmarkTest {
   private static List<Long> firstScreenRenderTime = new LinkedList<>();
   private static List<Long> flingFrameSeconds = new LinkedList<>();
   private static List<Long> scrollFrameSeconds = new LinkedList<>();
-  private static final String DUMP_START = "Flags,IntendedVsync,Vsync,OldestInputEvent,NewestInputEvent,"
-                                           + "HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,"
-                                           + "SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,\n";
+  private static final String DUMP_START = "QueueBufferDuration,\n";
   private static final String DUMP_END = "---PROFILEDATA---";
   private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
 
@@ -195,7 +190,7 @@ public class BenchmarkTest {
 
   private long calcTime() {
     BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
-    benchmarkActivity.loadWeexPage();
+    benchmarkActivity.loadWeexPage("http://30.8.53.163:8080/complicated.js");
     onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform
         (RecyclerViewActions.scrollToPosition(0));
     return benchmarkActivity.getWXInstance().getWXPerformance().screenRenderTime;

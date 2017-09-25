@@ -38,7 +38,7 @@ public class FrescoImageComponent extends WXImage {
   @Override
   protected ImageView initComponentHostView(@NonNull Context context) {
     FrescoImageView view = new FrescoImageView(context);
-    view.setScaleType(WXImage.DEFAULT_SCALE_TYPE);
+    view.setScaleType(ImageView.ScaleType.FIT_XY);
 
     return view;
   }

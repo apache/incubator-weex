@@ -27,6 +27,7 @@ import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_TIMEOUT;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.VisibleForTesting;
@@ -63,16 +64,16 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
 
   @JSMethod(uiThread = false)
-  public void setTimeout(@IntRange(from = 1) int funcId, @IntRange(from = 0) int delay) {
+  public void setTimeout(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float delay) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_TIMEOUT, funcId, delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 
   @JSMethod(uiThread = false)
-  public void setInterval(@IntRange(from = 1) int funcId, @IntRange(from = 0) int interval) {
+  public void setInterval(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float interval) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_INTERVAL, funcId, interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 

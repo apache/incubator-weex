@@ -87,6 +87,45 @@
     //[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
+- (void)accessibilityIncrement
+{
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(false)];
+#pragma clang diagnostic pop
+    
+    NSInteger lastIndex = _currentIndex;
+    lastIndex --;
+    if (lastIndex < 0) {
+        lastIndex = 0;
+    }
+    [self setCurrentIndex:lastIndex];
+}
+
+- (void)accessibilityDecrement
+{
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(NO)];
+#pragma clang diagnostic pop
+    NSInteger nextIndex = _currentIndex;
+    nextIndex ++;
+    if (nextIndex >= [_itemViews count]) {
+        nextIndex = [_itemViews count]-1;
+    }
+    [self setCurrentIndex:nextIndex];
+}
+
+- (void)accessibilityElementDidLoseFocus
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(YES)];
+#pragma clang diagnostic pop
+}
+
 - (void)setIndicator:(WXIndicatorView *)indicator
 {
     _indicator = indicator;
@@ -405,12 +444,15 @@
     _sliderView.scrollView.pagingEnabled = YES;
     _sliderView.exclusiveTouch = YES;
     _sliderView.scrollView.scrollEnabled = _scrollable;
+    UIAccessibilityTraits traits = UIAccessibilityTraitAdjustable;
     
     if (_autoPlay) {
+        traits |= UIAccessibilityTraitUpdatesFrequently;
         [self _startAutoPlayTimer];
     } else {
         [self _stopAutoPlayTimer];
     }
+    _sliderView.accessibilityTraits = traits;
 }
 
 - (void)layoutDidFinish
@@ -551,6 +593,17 @@
 {
     NSAssert(_sliderView, @"");
     [_sliderView setIndicator:indicatorView];
+}
+
+- (void)resumeAutoPlay:(id)resume
+{
+    if (_autoPlay) {
+        if ([resume boolValue]) {
+            [self _startAutoPlayTimer];
+        } else {
+            [self _stopAutoPlayTimer];
+        }
+    }
 }
 
 #pragma mark Private Methods

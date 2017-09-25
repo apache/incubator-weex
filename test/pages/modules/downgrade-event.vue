@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel title = 'clipboard-event' :padding-body='0'>
+    <panel title = 'downgrade-event' :padding-body='0'>
       <div style='flex-direction:row'> 
         <button class='mr-base' type="info" size="middle" value="setItem" @click.native="setItem"></button>
         <button class='mr-base' type="info" size="middle" value="getItem" @click.native="getItem"></button>

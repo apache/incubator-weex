@@ -37,10 +37,9 @@ There are some useful npm scripts you will use in the future:
 - `serve`: start a web server
 - `debug`: open the debug mode
 
-When all dependences are ready, you can input `npm run dev` and run `npm run server` in a command line tab. Now you can visit our web page in :
+Then we run `npm run dev & npm run serve` in root directory to start watch mode and static server. 
 
-http://localhost:8080/index.html
-
+Finally, we can see the Weex page in `http://localhost:8080/index.html`.
 
 ### preview Weex page in time
 

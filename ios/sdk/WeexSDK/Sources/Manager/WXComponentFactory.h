@@ -18,6 +18,16 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "WXInvocationConfig.h"
+
+@interface WXComponentConfig : WXInvocationConfig
+
+@property (nonatomic, strong) NSDictionary *properties;
+
+- (instancetype)initWithName:(NSString *)name class:(NSString *)clazz pros:(NSDictionary *)pros;
+
+@end
+
 
 @interface WXComponentFactory : NSObject
 
@@ -52,6 +62,8 @@
  * @return The component's class
  */
 + (Class)classWithComponentName:(NSString *)name;
+
++ (WXComponentConfig *)configWithComponentName:(NSString *)name;
 
 /**
  * @abstract Returns the registered components.

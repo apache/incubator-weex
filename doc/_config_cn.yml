@@ -333,3 +333,5 @@ alias:
   cn/guide/tools/weexpack.html: cn/guide/tools/toolkit.html
   guide/tools/devtools.html: guide/tools/toolkit.html
   guide/tools/weexpack.html: guide/tools/toolkit.html
+  cn/guide/tools/plugin.html: cn/giude/tools/plugin.html
+  guide/tools/plugin.html: guide/tools/plugin.html

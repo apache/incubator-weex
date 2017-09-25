@@ -84,6 +84,7 @@ public class Constants {
     String BORDER_BOTTOM_STYLE = "borderBottomStyle";
     String BORDER_LEFT_STYLE = "borderLeftStyle";
     String BORDER_TOP_STYLE = "borderTopStyle";
+    String BOX_SHADOW = "boxShadow";
 
     String POSITION = "position";
 
@@ -180,6 +181,24 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+
+
+    interface  Recycler{
+      String LIST_DATA = "listData";
+      String LIST_DATA_ITEM  ="alias";
+      String LIST_DATA_ITEM_INDEX = "index";
+      String LIST_DATA_TEMPLATE_KEY = "templateKey";
+
+      String SLOT_TEMPLATE_TYPE = "templateType";
+      String LIST_DATA_ITEM_ID = "itemId";
+      String CELL_INDEX = "cellIndex";
+      String TYPE_INDEX = "typeIndex";
+    }
+
+
+    String VIF_FALSE = "ifFalse";
+    String UNDEFINED = "undefined";
+    String FLAT = "flat";
   }
 
   public interface Value {
@@ -224,6 +243,8 @@ public class Constants {
 
     String NONE = "none";
     String DEFAULT = "default";
+
+    String HORIZONTAL = "horizontal";
   }
 
   public interface Event {
@@ -257,6 +278,17 @@ public class Constants {
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
     String KEYBOARD = "keyboard";
+
+    String UNSTICKY = "unsticky";
+    String STICKY = "sticky";
+
+    interface SLOT_LIFECYCLE{
+      String CREATE = "create";
+      String ATTACH = "attach";
+      String DETACH = "detach";
+      String DESTORY = "destroy";
+    }
+
   }
 
   public interface PSEUDO {

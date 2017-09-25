@@ -224,6 +224,12 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public void reportServerCrash(String instanceId, String crashFile) {
+
+    }
+
+
+    @Override
     public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {
         if (type != WebSocket.PayloadType.TEXT) {
             WXLogUtils.w("Websocket received unexpected message with payload of type " + type);

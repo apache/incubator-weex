@@ -18,6 +18,11 @@
  */
 package com.taobao.weex.ui.component;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -27,7 +32,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.SimpleComponentHolder;
-
+import com.taobao.weex.ui.flat.FlatGUIContext;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,14 +42,6 @@ import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by gulin on 16/2/4.
@@ -60,6 +59,7 @@ public class WXTextTest {
         WXEnvironment.sApplication = RuntimeEnvironment.application;
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
+        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         mParentDomObj = Mockito.spy(new WXDomObject());
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());

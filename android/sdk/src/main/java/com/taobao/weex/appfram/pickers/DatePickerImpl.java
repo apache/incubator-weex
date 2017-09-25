@@ -58,7 +58,8 @@ public class DatePickerImpl {
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         int realMonth = monthOfYear + 1;
                         String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
-                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
+                        String realDayString = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
+                        String result = year + "-" + realMonthString + "-" + realDayString;
                         listener.onPick(true, result);
                     }
                 },

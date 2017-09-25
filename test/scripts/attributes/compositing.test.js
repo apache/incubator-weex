@@ -27,7 +27,7 @@ var assert = require('chai').assert
 describe('compositing test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
+  var maxW = util.getGETActionWaitTimeMills();
   if (process.env.platform !== 'ios') {
     return;
   }
@@ -35,16 +35,15 @@ describe('compositing test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/attributes/compositing.js'))
-      .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
   });
 
   afterEach(function () {
     return util.quit(driver);
   })
 
-
   it('#1 compositing screenshot diff', () => {
     return driver
+    .waitForElementById('test-text',maxW + 2000,1000)
     .takeScreenshot()
     .then(imgData => {
       var newImg = new Buffer(imgData, 'base64');

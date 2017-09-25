@@ -68,18 +68,25 @@ public class ImageDrawable extends PaintDrawable {
     Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
                                        imageDrawable.bitmapWidth,
                                        imageDrawable.bitmapHeight);
-    imageDrawable.setIntrinsicWidth(vWidth);
-    imageDrawable.setIntrinsicHeight(vHeight);
+    int intrinsicWidth = vWidth, intrinsicHeight = vHeight;
+    if (scaleType == ImageView.ScaleType.FIT_CENTER) {
+      RectF bitmapRect = new RectF(0, 0, imageDrawable.bitmapWidth, imageDrawable.bitmapHeight), contentRect = new RectF();
+      matrix.mapRect(contentRect, bitmapRect);
+      intrinsicWidth = (int) contentRect.width();
+      intrinsicHeight = (int) contentRect.height();
+      matrix = createShaderMatrix(scaleType, intrinsicWidth, intrinsicHeight, imageDrawable
+          .bitmapWidth, imageDrawable.bitmapHeight);
+    }
+    imageDrawable.setIntrinsicWidth(intrinsicWidth);
+    imageDrawable.setIntrinsicHeight(intrinsicHeight);
     bitmapShader.setLocalMatrix(matrix);
   }
-
-
 
   @NonNull
   private static Matrix createShaderMatrix(@NonNull ImageView.ScaleType scaleType, int vWidth,
                                            int vHeight, int bmWidth, int bmHeight) {
-    //Refer ImageView#configureBounds()
     float scale, translateX = 0, translateY = 0;
+
     if (bmWidth * vHeight > bmHeight * vWidth) {
       scale = vHeight / (float) bmHeight;
       translateX = (vWidth - bmWidth * scale) * 0.5f;

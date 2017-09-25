@@ -31,13 +31,15 @@ abstract class BorderCorner {
   private final float mPreBorderWidth;
   private final float mPostBorderWidth;
   private final RectF mBorderBox;
+  protected final float mAngleBisector;
 
-  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF
-      borderBox) {
+  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth,
+      @NonNull RectF borderBox, float angleBisector) {
     mCornerRadius = cornerRadius;
     mPreBorderWidth = preBorderWidth;
     mPostBorderWidth = postBorderWidth;
     mBorderBox = borderBox;
+    mAngleBisector = angleBisector;
   }
 
   /**
@@ -61,16 +63,24 @@ abstract class BorderCorner {
     return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
   }
 
-  protected float getPreBorderWidth() {
+  protected final float getPreBorderWidth() {
     return mPreBorderWidth;
   }
 
-  protected float getPostBorderWidth() {
+  protected final float getPostBorderWidth() {
     return mPostBorderWidth;
   }
 
-  protected float getOuterCornerRadius() {
+  protected final float getOuterCornerRadius() {
     return mCornerRadius;
+  }
+
+  protected final float getAngleBisectorDegree(){
+    return mAngleBisector;
+  }
+
+  protected final RectF getBorderBox() {
+    return mBorderBox;
   }
 
   /**
@@ -88,12 +98,6 @@ abstract class BorderCorner {
     return lineStart;
   }
 
-  @NonNull
-  abstract protected PointF getRoundCornerStart();
-
-  @NonNull
-  abstract protected PointF getSharpCornerVertex();
-
   /**
    * Get the ending point of the corner.
    * @return the ending point of the corner.
@@ -110,9 +114,13 @@ abstract class BorderCorner {
   }
 
   @NonNull
-  abstract protected PointF getRoundCornerEnd();
+  abstract protected PointF getRoundCornerStart();
 
-  abstract protected float getAngleBisectorDegree();
+  @NonNull
+  abstract protected PointF getSharpCornerVertex();
+
+  @NonNull
+  abstract protected PointF getRoundCornerEnd();
 
   @NonNull
   abstract protected PointF getSharpCornerStart();
@@ -126,7 +134,4 @@ abstract class BorderCorner {
   @NonNull
   abstract protected RectF getOvalIfInnerCornerNotExist();
 
-  protected RectF getBorderBox() {
-    return mBorderBox;
-  }
 }

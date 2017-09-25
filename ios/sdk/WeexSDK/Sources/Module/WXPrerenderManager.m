@@ -25,6 +25,7 @@
 #import "WXBridgeManager.h"
 #import "WXSDKEngine.h"
 #import "WXUtility.h"
+#import "WXTracingManager.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 static NSString *const MSG_PRERENDER_SUCCESS = @"success";
@@ -40,6 +41,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 @property (nonatomic, assign) WXState state;
 @property (nonatomic, strong) NSDate *beginDate;
 @property (nonatomic) long long cacheTime;
+@property (nonatomic) BOOL isCache;  // if set cache , the cachetime is no use.
 
 @end
 @implementation WXPrerenderTask
@@ -52,7 +54,6 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 @property (nonatomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, WXPrerenderTask*> *prerenderTasks;
 @property (nonatomic) NSInteger maxCacheNumber;
-
 
 @end
 
@@ -98,7 +99,24 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
     __weak WXPrerenderManager *weakSelf = manager;
     dispatch_async(manager.queue, ^{
-        [weakSelf prerender:newUrl WXInstance:instanceId callback:callback];
+        [weakSelf prerender:newUrl instanceId:instanceId isCache:NO callback:callback];
+    });
+}
+
++ (void) addGlobalTask:(NSString *) url callback:(WXModuleCallback)callback
+{
+    NSURL *newUrl = [NSURL URLWithString:url];
+    if(!newUrl){
+        if(callback){
+            callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
+        return;
+    }
+    
+    WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
+    __weak WXPrerenderManager *weakSelf = manager;
+    dispatch_async(manager.queue, ^{
+        [weakSelf prerender:newUrl instanceId:@"" isCache:YES callback:callback];
     });
 }
 
@@ -107,7 +125,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     BOOL switchOn = YES; // defautle YES
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        id switchOnValue = [configCenter configForKey:@"weex_prerender_config.is_switch_on" defaultValue:@true isDefault:NULL];
+        id switchOnValue = [configCenter configForKey:@"iOS_weex_prerender_config.is_switch_on" defaultValue:@true isDefault:NULL];
         if(switchOnValue){
             switchOn = [switchOnValue boolValue];
         }
@@ -118,7 +136,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     return YES;
 }
 
-- (void) prerender:(NSURL *)url WXInstance:(NSString *)instanceId callback:(WXModuleCallback) callback{
+- (void) prerender:(NSURL *)url instanceId:(NSString *)instanceId isCache:(BOOL)isCache callback:(WXModuleCallback) callback{
 
     NSString *str = url.absoluteString;
     if(str.length==0){
@@ -138,45 +156,45 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     task.beginDate = [NSDate date];
     task.cacheTime = 300000;
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        long long time = [[configCenter configForKey:@"weex_prerender_config.cacheTime" defaultValue:@300000 isDefault:NULL] longLongValue];
+        long long time = [[configCenter configForKey:@"iOS_weex_prerender_config.cacheTime" defaultValue:@300000 isDefault:NULL] longLongValue];
         if(time){
             task.cacheTime = time;
         }
     }
-    self.maxCacheNumber = 1;
+    self.maxCacheNumber = 5;
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        NSInteger max = [[configCenter configForKey:@"weex_prerender_config.max_cache_num" defaultValue:@1 isDefault:NULL] integerValue];
+        NSInteger max = [[configCenter configForKey:@"iOS_weex_prerender_config.max_cache_num" defaultValue:@5 isDefault:NULL] integerValue];
         if(max){
             self.maxCacheNumber = max;
         }
     }
-    WXSDKInstance *instance = [[WXSDKInstance alloc] init];
-    instance.needPrerender = YES;
-    task.instance = instance;
-    task.parentInstanceId = instanceId;
-    task.url = url.absoluteString;
-    
     if(self.prerenderTasks && self.prerenderTasks.count<self.maxCacheNumber){
-        [self.prerenderTasks setObject:task forKey:url.absoluteString];
+        [self.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
         WXPerformBlockOnMainThread(^{
-            [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
+            WXSDKInstance *instance = [[WXSDKInstance alloc] init];
+            instance.needPrerender = YES;
+            task.instance = instance;
+            task.parentInstanceId = instanceId;
+            task.url = url.absoluteString;
+            task.isCache = isCache;
             WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
             __weak typeof(self) weakSelf = manager;
             instance.onCreate = ^(UIView *view) {
-                WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
+                WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
                 task.view = view;
                 if(task){
-                    [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+                    [weakSelf.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
                 }
             };
             
             instance.onFailed = ^(NSError *error) {
-                WXPrerenderTask *task  = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
+                WXPrerenderTask *task  = [weakSelf.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
                 task.error = error;
                 if(task){
-                    [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+                    [weakSelf.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url.absoluteString]];
                 }
             };
+            [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
         });
         if(callback){
             callback(@{@"url":url.absoluteString,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
@@ -184,16 +202,15 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
 }
 
-+ (BOOL)isTaskExist:(NSString *)url{
-    return [[WXPrerenderManager sharedInstance]isTaskExist:url];
++ (BOOL)isTaskReady:(NSString *)url{
+    return [[WXPrerenderManager sharedInstance]isTaskReady:url];
 }
-
-- (BOOL)isTaskExist:(NSString *)url
+- (BOOL)isTaskReady:(NSString *)url
 {
     if( !url ||url.length == 0){
         return NO;
     }
-    WXPrerenderTask *task  = [self.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task  = [self.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     if(!task ){
         return NO;
     }
@@ -202,10 +219,61 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
     }
     // compare cache time with begin time
     NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:task.beginDate];
-    if(time > task.cacheTime){
+    if(time > task.cacheTime && !task.isCache){
         return NO;
     }
     
+    if(!task.view)  // view not exist ，not prerender
+    {
+        return NO;
+    }
+    if(task ){
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)isTaskExist:(NSString *)url{
+    if( !url ||url.length == 0){
+        return NO;
+    }
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL switchOn = NO; // defautle NO
+        id switchOnValue = [configCenter configForKey:@"iOS_weex_prerender_config.is_switch_on" defaultValue:@YES isDefault:NULL];
+        if(switchOnValue){
+            switchOn = [switchOnValue boolValue];
+        }
+        if(!switchOn){
+            return NO;
+        }
+        
+        id urlsValue = [configCenter configForKey:@"iOS_weex_prerender_config.urls" defaultValue:NULL isDefault:NULL];
+        if(urlsValue){
+            NSData *data = [urlsValue dataUsingEncoding:NSUTF8StringEncoding];
+            NSError *error = nil;
+            NSArray *urls = [WXUtility JSONObject:data error:&error];
+            if(urls && [urls count]>0){
+                for (NSString *configUrl in urls) {
+                    if(configUrl && [[WXPrerenderManager getTaskKeyFromUrl:configUrl] isEqualToString:[WXPrerenderManager getTaskKeyFromUrl:url]]) {
+                            return YES;
+                        }
+                }
+                
+            }
+        }
+        
+    }
+    
+    return NO;
+}
+
+- (BOOL)isTaskExist:(NSString *)url
+{
+    if( !url ||url.length == 0){
+        return NO;
+    }
+    WXPrerenderTask *task  = [self.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     if(task ){
         return YES;
     }
@@ -215,10 +283,10 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 + (void)renderFromCache:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    if([manager isTaskExist:url])
+    if([manager isTaskReady:url])
     {
-        WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:url];
-        task.instance.needPrerender = NO;
+        WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+        
         UIView *view = [self viewFromUrl:url];
         NSError *error = [self errorFromUrl:url];
         if(task.instance.onCreate){
@@ -228,7 +296,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
             task.instance.onFailed(error);
         }
         WXPerformBlockOnComponentThread(^{
+            [task.instance.componentManager startComponentTasks];
             [task.instance.componentManager excutePrerenderUITask:url];
+            task.instance.needPrerender = NO;
         });
         WXPerformBlockOnBridgeThread(^(){
             [WXPrerenderManager excuteModuleTasksForUrl:url];
@@ -239,49 +309,54 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 + (UIView *)viewFromUrl:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     return task.view;
 }
 
 + (NSError *)errorFromUrl:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     return task.error;
 }
 
 + (id )instanceFromUrl:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     return task.instance;
 }
 
 + (void)removePrerenderTaskforUrl:(NSString *)url
 {
-    if (url) {
+    if (url.length > 0) {
         WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-        [manager.prerenderTasks removeObjectForKey:url];
+        if(manager.prerenderTasks && [manager.prerenderTasks count]>0){
+            WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+            if(task){
+                [manager.prerenderTasks removeObjectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
+            }
+        }
     }
 }
 
 + (void)storePrerenderModuleTasks:(WXModuleMethod *)method forUrl:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    WXPrerenderTask *task = [manager.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     if (!task.moduleTasks){
         task.moduleTasks = [NSMutableArray new];
     }
     [task.moduleTasks addObject:method];
     if(task){
-        [manager.prerenderTasks setObject:task forKey:url];
+        [manager.prerenderTasks setObject:task forKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     }
 }
 
 + (void)excuteModuleTasksForUrl:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-    WXPrerenderTask *task = [manager.prerenderTasks objectForKey:url];
+    WXPrerenderTask *task = [manager.prerenderTasks objectForKey:[WXPrerenderManager getTaskKeyFromUrl:url]];
     
     if (task.moduleTasks && [task.moduleTasks count]>0){
         for (WXModuleMethod *method in task.moduleTasks) {
@@ -289,6 +364,17 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
         }
     }
 }
+
++ (NSString *)getTaskKeyFromUrl:(NSString *)url
+{
+    NSURL *newUrl = [NSURL URLWithString:url];
+    NSString * newUrlStr = @"";
+    if(url){
+        newUrlStr =  [NSString stringWithFormat:@"%@/%@",newUrl.host,newUrl.path?:@""];
+    }
+    return newUrlStr;
+}
+
 
 + (void)destroyTask:(NSString *)parentInstanceId
 {
@@ -308,7 +394,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 - (void)removeTask:(WXPrerenderTask *)task
 {
     [task.instance destroyInstance];
-    [self.prerenderTasks removeObjectForKey:task.url];
+    if(self.prerenderTasks && [self.prerenderTasks count] > 0 && task.url.length > 0){
+        [self.prerenderTasks removeObjectForKey:[WXPrerenderManager getTaskKeyFromUrl:task.url]];
+    }
 }
 
 @end

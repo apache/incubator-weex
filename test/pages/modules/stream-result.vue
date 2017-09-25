@@ -1,34 +1,71 @@
 <template>
-  <div>
+  <scroller>
     <panel title = 'stream-result' :padding-body='0'>
-      <div style='flex-direction:row'> 
-        <button class='mr-base' type="info" size="middle" value="streamGet" @click.native="streamGet"></button>
+      <div style='flex-direction:row'>
+        <button test-id='streamGet' class='mr-base' type="info" size="middle" value="streamGet" @click.native="streamGet"></button>
+        <text style="font-size:30px">{{complete}}</text>
       </div>
-      <panel title='校验结果：'>
-        <text style="font-size:30px">{{resultTxt}}</text>
-        <text style="font-size:30px">{{detail}}</text>
+      <panel title='校验结果：GET'>
+        <text style="font-size:30px">{{getResult}}</text>
+      </panel>
+
+      <panel title='校验结果：GET_JSONP'>
+        <text style="font-size:30px">{{getJSONPResult}}</text>
+      </panel>
+
+      <panel title="校验结果：POST">
+        <text style="font-size:30px">{{postResult}}</text>
+      </panel>
+
+      <panel title="校验结果：PUT">
+        <text style="font-size:30px">{{putResult}}</text>
+      </panel>
+
+      <panel title="校验结果：DELETE">
+        <text style="font-size:30px">{{deleteResult}}</text>
+      </panel>
+
+      <panel title="校验结果：HEAD">
+        <text style="font-size:30px">{{headResult}}</text>
+      </panel>
+
+      <panel title="校验结果：PATCH">
+        <text style="font-size:30px">{{patchResult}}</text>
       </panel>
     </panel>
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 
+  * stream模块的网络请求功能是否正常（GET、POST、PUT、DELETE、HEAD、PATCH）
 
 测试方式：
-  * 
-  * 
+  * 截图比对网络请求返回的结果
+
       </text>
     </wxc-desc>
-  </div>
+  </scroller>
 </template>
 <script>
   var GET_URL = 'http://httpbin.org/get';
+  var GET_URL_JSONP = 'http://jsfiddle.net/echo/jsonp/?callback=anything&result=content_in_response';
+  var POST_URL = 'http://httpbin.org/post';
+  var PUT_URL = 'http://httpbin.org/put';
+  var DELETE_URL = 'http://httpbin.org/delete';
+  var HEAD_URL = 'http://httpbin.org/status/418';
+  var PATCH_URL = 'http://httpbin.org/patch';
   var stream = weex.requireModule("stream");
+
   module.exports = {
     data : {
-      resultTxt:'',
       sendtype:'json',
-      detail:''
+      getResult:'',
+      getJSONPResult:'',
+      postResult:'',
+      putResult:'',
+      deleteResult:'',
+      headResult:'',
+      patchResult:'',
+      complete:'',
     },
     components: {
       "wxc-desc":require('../include/wxc-desc.vue'),
@@ -37,38 +74,118 @@
     },
     methods : {
       streamGet:function() {
-        this.streamFetch("GET",GET_URL);
-      },
-      streamFetch:function(stype,surl){
         var me = this;
-        if(this.sendtype=="jsonp"){
-          surl=this.JSONP_URL;
-        }
+
         stream.fetch({
-          method: stype,
-          url: surl,
-          type:this.sendtype,
+          method: "GET",
+          url: GET_URL,
+          type: this.sendtype,
           timeout : 10000
         }, function(ret) {
-          nativeLog(JSON.stringify(ret)+ typeof(ret.data));
-          if(stype=="HEAD"){
-              console.log('get:'+ret);
-              me.resultTxt = 'response:success'
-              me.detail = ret.statusText;
+          if("GET"=="HEAD"){
+              me.getResult = ret.resultTxt_GET;
           }else{
             if(!ret.ok){
-              me.resultTxt = 'response:failed';
-              me.detail = (typeof(ret.data)!='undefined'?JSON.stringify(ret.data):"");
+              me.getResult = "request failed";
             }else{
-              me.resultTxt = 'response:success';
-              me.detail = "data type:"+ typeof(ret.data) + ";  " +JSON.stringify(ret.data);
+              me.getResult = "data type:"+ typeof(ret.data) + ";  " +JSON.stringify(ret.data);
             }
           }
         },function(response){
-          console.log('get in progress:'+JSON.stringify(response));
-          me.resultTxt = JSON.stringify(response);
+          me.getResult = JSON.stringify(response);
         });
-      }
+
+
+        stream.fetch({
+          method: 'GET',
+          url: GET_URL_JSONP,
+          type:'jsonp'
+        }, function(ret) {
+          if(!ret.ok){
+            me.getJSONPResult = "request failed";
+          }else{
+            me.getJSONPResult = JSON.stringify(ret.data);
+          }
+        },function(response){
+          me.getJSONPResult = "bytes received:"+response.length;
+        });
+
+        stream.fetch({
+          method: 'POST',
+          url: POST_URL,
+          type:'json',
+          body:JSON.stringify({username:'weex'})//or you can just use JSON Object {username:'weex'}
+        }, function(ret) {
+          if(!ret.ok){
+            me.postResult = "request failed";
+          }else{
+            me.postResult = JSON.stringify(ret.data);
+          }
+        },function(response){
+          me.postResult = "bytes received:"+response.length;
+        });
+
+
+        stream.fetch({
+          method: 'PUT',
+          url: PUT_URL,
+          type:'json'
+        }, function(ret) {
+          if(!ret.ok){
+            me.putResult = "request failed";
+          }else{
+            me.putResult = JSON.stringify(ret.data);
+          }
+        },function(response){
+          me.putResult = "bytes received:"+response.length;
+        });
+
+        stream.fetch({
+          method: 'DELETE',
+          url: DELETE_URL,
+          type:'json'
+        }, function(ret) {
+
+          if(!ret.ok){
+            me.deleteResult = "request failed";
+          }else{
+            me.deleteResult = JSON.stringify(ret.data);
+          }
+        },function(response){
+          me.deleteResult = "bytes received:"+response.length;
+        });
+
+        stream.fetch({
+          method: 'HEAD',
+          url: HEAD_URL,
+          type:'json'
+        }, function(ret) {
+          if(ret.statusText !== 'I\'m a teapot'){
+            me.headResult = "request failed";
+          }else{
+            me.headResult = ret.statusText;
+          }
+        },function(response){
+          me.headResult = "bytes received:"+response.length;
+        });
+
+        stream.fetch({
+          method: 'PATCH',
+          url: PATCH_URL,
+          type:'json'
+        }, function(ret) {
+          if(!ret.ok){
+            me.patchResult = "request failed";
+            me.complete = "Completed";
+          }else{
+            me.patchResult = JSON.stringify(ret.data);
+            me.complete = "Completed";
+          }
+        },function(response){
+          me.patchResult = "bytes received:"+response.length;
+          me.complete = "Completed";
+        });
+      },
     }
   }
 </script>

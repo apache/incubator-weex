@@ -40,6 +40,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.ui.flat.widget.Widget;
+import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -389,6 +391,22 @@ public class WXViewUtils {
     }
   }
 
+  public static void clipCanvasWithinBorderBox(Widget widget, Canvas canvas) {
+    BorderDrawable borderDrawable;
+    if (clipCanvasDueToAndroidVersion(canvas) &&
+        clipCanvasIfAnimationExist() &&
+        (borderDrawable=widget.getBackgroundAndBorder())!=null ) {
+      if (borderDrawable.isRounded() && clipCanvasIfBackgroundImageExist(widget, borderDrawable)) {
+          Path path = borderDrawable.getContentPath(
+              new RectF(0, 0, widget.getBorderBox().width(), widget.getBorderBox().height()));
+          canvas.clipPath(path);
+      }
+      else {
+        canvas.clipRect(widget.getBorderBox());
+      }
+    }
+  }
+
   /**
    * According to https://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
    API 18 or higher supports clipPath to canvas based on hardware acceleration.
@@ -429,6 +447,19 @@ public class WXViewUtils {
         child = parent.getChildAt(i);
         if (child.getBackground() instanceof BorderDrawable &&
             ((BorderDrawable) child.getBackground()).hasImage() &&
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean clipCanvasIfBackgroundImageExist(@NonNull Widget widget,
+      @NonNull BorderDrawable borderDrawable) {
+    if (widget instanceof WidgetGroup) {
+      for (Widget child : ((WidgetGroup) widget).getChildren()) {
+        if (child.getBackgroundAndBorder().hasImage() &&
             Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
           return false;
         }

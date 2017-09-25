@@ -31,6 +31,7 @@ typedef enum : NSUInteger {
     // instance
     WXPTJSDownload,
     WXPTJSCreateInstance,
+    WXFirstScreenJSFExecuteTime,
     WXPTFirstScreenRender,
     WXPTAllRender,
     WXPTBundleSize,

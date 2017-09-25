@@ -49,9 +49,11 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     }
     long startNanos = System.nanoTime();
     WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
-    component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
-    component.mTraceInfo.rootEventId = mTracingEventId;
-    component.mTraceInfo.domQueueTime = mDomQueueTime;
+    if (component != null) {
+      component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
+      component.mTraceInfo.rootEventId = mTracingEventId;
+      component.mTraceInfo.domQueueTime = mDomQueueTime;
+    }
 
     context.registerComponent(dom.getRef(), component);
     if (component instanceof WXVContainer) {
@@ -65,7 +67,9 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
         }
       }
     }
-    component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
+    if (component != null) {
+      component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
+    }
     return component;
   }
 

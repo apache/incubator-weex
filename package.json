@@ -175,6 +175,7 @@
     "weex-vue-bundle-util": "^0.1.3",
     "weex-wd": "^1.0.23",
     "wwp": "^0.3.5",
-    "xmldom": "^0.1.27"
+    "xmldom": "^0.1.27",
+    "shelljs": "^0.7.8"
   }
 }

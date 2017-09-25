@@ -18,7 +18,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/'+goal+'.js'))
-      .waitForElementByName(goal, interval, 2000)
   });
 
   afterEach(function () {
@@ -27,6 +26,7 @@ describe('weex '+goal+' test', function () {
 
   it('#1 '+goal + ' event', () => {
     return driver
+      .waitForElementByName(goal, interval, 2000)
       .waitForElementById(switchTag, interval, 2000)
       .click()
       .waitForElementByName('change response:true', interval, 2000)

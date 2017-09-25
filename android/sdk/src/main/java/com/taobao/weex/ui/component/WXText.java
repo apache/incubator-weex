@@ -27,11 +27,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Layout;
 import android.view.ViewGroup;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.flat.FlatComponent;
+import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
@@ -43,7 +46,9 @@ import java.lang.reflect.InvocationTargetException;
  * Text component
  */
 @Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView> {
+public class WXText extends WXComponent<WXTextView> implements FlatComponent<TextWidget> {
+
+  private TextWidget mTextWidget;
 
   /**
    * The default text size
@@ -51,6 +56,25 @@ public class WXText extends WXComponent<WXTextView> {
   public static final int sDEFAULT_SIZE = 32;
   private BroadcastReceiver mTypefaceObserver;
   private String mFontFamily;
+
+  @Override
+  public boolean promoteToView(boolean checkAncestor) {
+    return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+  }
+
+  @Override
+  @NonNull
+  public TextWidget getOrCreateFlatWidget() {
+    if (mTextWidget == null) {
+      mTextWidget = new TextWidget(getInstance().getFlatUIContext());
+    }
+    return mTextWidget;
+  }
+
+  @Override
+  public boolean isVirtualComponent() {
+    return !promoteToView(true);
+  }
 
   public static class Creator implements ComponentCreator {
 
@@ -78,11 +102,14 @@ public class WXText extends WXComponent<WXTextView> {
 
   @Override
   public void updateExtra(Object extra) {
-    if (extra instanceof Layout &&
-        getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
+    if(extra instanceof Layout) {
       final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
+      if (!promoteToView(true)) {
+        getOrCreateFlatWidget().updateTextDrawable(layout);
+      } else if (getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
+        getHostView().setTextLayout(layout);
+        getHostView().invalidate();
+      }
     }
   }
 
@@ -117,32 +144,12 @@ public class WXText extends WXComponent<WXTextView> {
       case Constants.Name.VALUE:
         return true;
       case Constants.Name.FONT_FAMILY:
-        registerTypefaceObserver(param.toString());
+        if (param != null) {
+          registerTypefaceObserver(param.toString());
+        }
         return true;
       default:
         return super.setProperty(key, param);
-    }
-  }
-
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra) {
-    if (extra instanceof Layout &&
-        getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
-      if (layoutParams != null) {
-        layoutParams.height = layout.getHeight();
-        layoutParams.width = layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
     }
   }
 
@@ -158,18 +165,32 @@ public class WXText extends WXComponent<WXTextView> {
   }
 
   @Override
+  protected void createViewImpl() {
+    if(promoteToView(true)) {
+      super.createViewImpl();
+    }
+  }
+
+  @Override
   public void destroy() {
     super.destroy();
-    if (getContext() != null && mTypefaceObserver != null) {
-      LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTypefaceObserver);
+    if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
+      WXLogUtils.d("WXText", "Unregister the typeface observer");
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
+      mTypefaceObserver = null;
     }
   }
 
   private void registerTypefaceObserver(String desiredFontFamily) {
-    if (getContext() == null) {
-      WXLogUtils.w("WXText", "Content is null on register typeface observer");
+    if (WXEnvironment.getApplication() == null) {
+      WXLogUtils.w("WXText", "ApplicationContent is null on register typeface observer");
+      return;
     }
     mFontFamily = desiredFontFamily;
+    if (mTypefaceObserver != null) {
+      return;
+    }
+
     mTypefaceObserver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -179,20 +200,21 @@ public class WXText extends WXComponent<WXTextView> {
         }
 
         FontDO fontDO = TypefaceUtil.getFontDO(fontFamily);
-        if (fontDO != null && fontDO.getTypeface() != null) {
-          Layout layout = getHostView().getTextLayout();
+        if (fontDO != null && fontDO.getTypeface() != null && getHostView() != null) {
+          WXTextView hostView = getHostView();
+          Layout layout = hostView.getTextLayout();
           if (layout != null) {
             layout.getPaint().setTypeface(fontDO.getTypeface());
             WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
           } else {
             WXLogUtils.w("WXText", "Layout not created");
           }
-          getHostView().invalidate();
+          hostView.invalidate();
         }
         WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
       }
     };
 
-    LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
   }
 }

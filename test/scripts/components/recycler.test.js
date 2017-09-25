@@ -35,11 +35,11 @@ const isApproximate = (x, y) =>  {
 describe('recycler @ignore-android @ignore-ios', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
+  var maxW = util.getGETActionWaitTimeMills();
 
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
-      .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
   });
 
   afterEach(function () {
@@ -54,6 +54,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   let cell2Height = 0
   it('#1 test recyler layout', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .getWindowSize()
     .then(size=>{
       scaleFactor = size.width / 750
@@ -130,6 +131,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#2 test column count', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('cell2')
     .click()
     .elementById('cell0')
@@ -171,6 +173,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#3 test column gap', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('cell1')
     .click()
     .elementById('cell0')
@@ -213,7 +216,8 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#4 test column width', () => {
     return driver
-     .elementById('cell0')
+    .waitForElementById('waterfall',maxW,1000)
+    .elementById('cell0')
     .click()
     .elementById('cell0')
     .getRect()
@@ -240,6 +244,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#5 test deleting header', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('header2')
     .click()
      .elementById('header1')
@@ -256,7 +261,8 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#6 test footer', () => {
     return driver
-   .elementById('fixed1')
+    .waitForElementById('waterfall',maxW,1000)
+    .elementById('fixed1')
     .click()
     .sleep(500)
     .elementById('footer1')
@@ -272,7 +278,8 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#7 test sticky and fixed', () => {
     return driver
-   .elementById('fixed1')
+    .waitForElementById('waterfall',maxW,1000)
+    .elementById('fixed1')
     .getRect()
     .then((rect)=>{
       console.log(`fixed rect:${JSON.stringify(rect)}`)
@@ -294,6 +301,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#8 test removing cell', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('cell28')
     .click()
     .elementById('cell27')
@@ -308,6 +316,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#9 test moving cell', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('cell29')
     .click()
     .elementById('fixed1')
@@ -323,6 +332,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
 
   it('#10 test recycler padding', () => {
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById('cell26')
     .click()
     .elementById('fixed1')
@@ -358,6 +368,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   it('#11 test onscroll', () => {
     let originContentOffset = 0
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById((isAndroid ? 'cell27' : 'cell28'))
     .click()
     .elementById('stickyText1')
@@ -383,6 +394,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   it('#12 test scrollable', () => {
     let originContentOffset = 0
     return driver
+    .waitForElementById('waterfall',maxW,1000)
     .elementById((isAndroid ? 'cell25' : 'cell26'))
     .click()
     .elementById('stickyText1')

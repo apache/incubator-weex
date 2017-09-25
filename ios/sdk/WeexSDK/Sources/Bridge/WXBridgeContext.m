@@ -441,7 +441,7 @@ _Pragma("clang diagnostic pop") \
     } else {
         args = @[instance, temp, options ?: @{}];
     }
-
+    WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instance]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instance]);
     [self callJSMethod:@"createInstance" args:args];
     WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instance]);
@@ -500,7 +500,7 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(script);
     
     WX_MONITOR_PERF_START(WXPTFrameworkExecute);
-    
+
     [self.jsBridge executeJSFramework:script];
     
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);

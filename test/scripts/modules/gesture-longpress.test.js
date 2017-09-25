@@ -17,7 +17,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/'+goal+'.js'))
-      .waitForElementByName(goal, timeout, 2000)
   });
 
   afterEach(function () {
@@ -25,7 +24,9 @@ describe('weex '+goal+' test', function () {
   })
 
   it('#1 '+goal + ' event', () => {
-    return driver.waitForElementByName('longpress', timeout, 2000)
+    return driver
+      .waitForElementByName(goal, timeout, 2000)
+      .waitForElementByName('longpress', timeout, 2000)
       .touch('press', { duration: 2 })
       .sleep(1000)
       .waitForElementById('result',timeout,1000)

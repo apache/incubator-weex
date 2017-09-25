@@ -18,6 +18,9 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -27,13 +30,14 @@ import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -47,6 +51,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
+import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -66,6 +71,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
@@ -74,7 +80,6 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,9 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -114,8 +116,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean trackComponent;
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
+  private boolean mNeedReLoad = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
+  private @NonNull
+  FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
@@ -196,10 +201,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     enableLayerType = enable;
   }
 
+  @RestrictTo(Scope.LIBRARY)
+  public @NonNull
+  FlatGUIContext getFlatUIContext(){
+    return mFlatGUIContext;
+  }
+
   public boolean isNeedValidate() {
     return mNeedValidate;
   }
 
+  public boolean isNeedReLoad() {
+    return mNeedReLoad;
+  }
+
+  public void setNeedLoad(boolean load) {
+    mNeedReLoad = load;
+  }
   /*
   *  Warning: use setInstanceViewPortWidth instead.
   *  store custom ViewPort Width
@@ -240,6 +258,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /**
    * For unittest only.
    */
+  @RestrictTo(Scope.TESTS)
   WXSDKInstance(Context context,String id) {
     mInstanceId = id;
     init(context);
@@ -398,19 +417,31 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
-       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
-       return;
+      WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
+
+      if (getUIContext() != null) {
+        new AlertDialog.Builder(getUIContext())
+            .setTitle("Error: Missing pageName")
+            .setMessage("We highly recommend you to set pageName. Call" +
+                "\nWXSDKInstance#render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag)\n" +
+                "to fix it.")
+            .show();
+      }
+
+      return;
     }
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
-      mRenderContainer = new RenderContainer(getContext());
-      mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
-      mRenderContainer.setSDKInstance(this);
-      mRenderContainer.addOnLayoutChangeListener(this);
+      if (getContext() != null) {
+        mRenderContainer = new RenderContainer(getContext());
+        mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
+        mRenderContainer.setSDKInstance(this);
+        mRenderContainer.addOnLayoutChangeListener(this);
+      }
     }
   }
 
@@ -422,6 +453,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (mRendered || TextUtils.isEmpty(template)) {
       return;
     }
+
+    WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
@@ -581,6 +614,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return "";
   }
 
+  public void reloadPage(boolean reloadThis) {
+
+    WXSDKEngine.reload();
+
+    if (reloadThis) {
+      // 可以发送广播吗？
+      if (mContext != null)  {
+        Intent intent = new Intent();
+        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+        intent.putExtra("url", mBundleUrl);
+        mContext.sendBroadcast(intent);
+      }
+      // mRendered = false;
+      //    destroy();
+      // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+      // refreshInstance("{}");
+    }
+  }
   /**
    * Refresh instance asynchronously.
    * @param data the new data
@@ -1208,35 +1259,41 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public synchronized void destroy() {
-    WXSDKManager.getInstance().destroyInstance(mInstanceId);
-    WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
+    if(!isDestroy()) {
+      WXSDKManager.getInstance().destroyInstance(mInstanceId);
+      WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
-    if(mGlobalEventReceiver!=null){
-      getContext().unregisterReceiver(mGlobalEventReceiver);
-      mGlobalEventReceiver=null;
-    }
-    if(mRootComp != null ) {
-      mRootComp.destroy();
-      destroyView(mRenderContainer);
-      mRenderContainer = null;
-      mRootComp = null;
-    }
+      if (mGlobalEventReceiver != null) {
+        getContext().unregisterReceiver(mGlobalEventReceiver);
+        mGlobalEventReceiver = null;
+      }
+      if (mRootComp != null) {
+        mRootComp.destroy();
+        destroyView(mRenderContainer);
+        mRootComp = null;
+      }
 
-    if(mGlobalEvents!=null){
-      mGlobalEvents.clear();
-    }
+      if (mGlobalEvents != null) {
+        mGlobalEvents.clear();
+      }
 
-    if(mComponentObserver != null){
+      if (mComponentObserver != null) {
         mComponentObserver = null;
-    }
+      }
 
-    mNestedInstanceInterceptor = null;
-    mUserTrackAdapter = null;
-    mScrollView = null;
-    mContext = null;
-    mRenderListener = null;
-    isDestroy = true;
-    mStatisticsListener = null;
+      getFlatUIContext().destroy();
+      mFlatGUIContext = null;
+
+      mWXScrollListeners = null;
+      mRenderContainer = null;
+      mNestedInstanceInterceptor = null;
+      mUserTrackAdapter = null;
+      mScrollView = null;
+      mContext = null;
+      mRenderListener = null;
+      isDestroy = true;
+      mStatisticsListener = null;
+    }
   }
 
   public boolean isDestroy(){
@@ -1370,8 +1427,18 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param data
    * @param domChanges
    */
+  public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs){
+    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs);
+  }
+  /**
+   * Fire event callback on a element.
+   * @param elementRef
+   * @param type
+   * @param data
+   * @param domChanges
+   */
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges){
-    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges);
+       fireEvent(elementRef, type, data, domChanges, null);
   }
 
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data){
@@ -1443,7 +1510,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * Check whether the current module registered the event
    * @param eventName EventName register in weex
    * @param module Events occur in this Module
-   * @return  register->true
+   * @return  boolean true
    */
   public boolean checkModuleEventRegistered(String eventName,WXModule module) {
     if (module != null) {

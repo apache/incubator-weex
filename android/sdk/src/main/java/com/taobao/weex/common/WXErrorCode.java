@@ -115,6 +115,16 @@ public enum WXErrorCode {
   WX_ERR_DOM_SCROLLTO("-2110", "scrollToElement"),
 
   /**
+   *
+   */
+  WX_ERR_RELOAD_PAGE("-2111", "reloadPage"),
+
+  /**
+   *
+   */
+  WX_ERR_JSC_CRASH("-2112", "weexjscCrash"),
+
+  /**
    * JS Bundle download error
    */
 
@@ -129,7 +139,9 @@ public enum WXErrorCode {
   /**
    * JS Framework run error
    */
-  WX_ERR_JS_FRAMEWORK("-1002", "js framework error");
+  WX_ERR_JS_FRAMEWORK("-1002", "js framework error"),
+
+  WX_ERR_JS_REINIT_FRAMEWORK("-1003", "js reinit framework error");
 
   private String errorCode;
   private String errorMsg;

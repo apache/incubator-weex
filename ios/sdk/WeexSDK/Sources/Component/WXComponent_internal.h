@@ -25,6 +25,7 @@
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
+typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
@@ -64,9 +65,11 @@
     /**
      * accessibility support
      */
-    UIAccessibilityTraits _role; //accessibility
+    NSString * _roles; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
-    BOOL _ariaHidden; // accessibilityElementsHidden
+    NSString * _ariaHidden; // accessibilityElementsHidden
+    NSString * _accessible; // accessible
+    NSString * _accessibilityHintContent; // hint for the action
     NSString * _testId;// just for auto-test
     
     /**
@@ -130,6 +133,25 @@
     BOOL _lazyCreateView;
     
     WXTransform *_transform;
+    
+    /**
+     * Data Binding
+     */
+    BOOL _isTemplate;
+    WXComponent *_templateComponent;
+    WXDataBindingBlock _bindingMatch;
+    WXDataBindingBlock _bindingRepeat;
+    NSString *_repeatIndexIdentify;
+    NSString *_repeatLabelIdentify;
+    BOOL _isRepeating;
+    BOOL _isSkipUpdate;
+    
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingProps;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingStyles;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingEvents;
+    
+    NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
 ///--------------------------------------
@@ -205,6 +227,10 @@
 
 - (void)_removeAllEvents;
 
+- (void)_addEventParams:(NSDictionary *)params;
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName;
+
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
 
 - (void)_initCompositingAttribute:(NSDictionary *)attributes;
@@ -224,6 +250,10 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
 
 - (void)setGradientLayer;
+
+- (void)_storeBindingsWithProps:(NSDictionary *)props styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSDictionary *)events;
+
+- (void)_didInserted;
 
 @end
 

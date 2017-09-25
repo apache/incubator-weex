@@ -148,4 +148,9 @@ typedef enum : NSUInteger {
  */
 + (void)commitTracingSummaryInfo:(NSDictionary *)info withInstanceId:(NSString *)instanceId;
 
+/**
+ *  @discusstion destroy Traincg Task by Instance
+ *  @param instanceId the instanceId.
+ */
++(void)destroyTraincgTaskWithInstance:(NSString *)instanceId;
 @end

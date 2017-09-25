@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#import <WeexSDK/WeexSDK.h>
 #import "WXScannerVC.h"
 #import "AppDelegate.h"
 #import "UIViewController+WXDemoNaviBar.h"
@@ -24,7 +25,6 @@
 #import "WXDebugTool.h"
 #import <TBWXDevTool/WXDevTool.h>
 #import <AudioToolbox/AudioToolbox.h>
-#import <WeexSDK/WeexSDK.h>
 
 @interface WXScannerVC ()
 

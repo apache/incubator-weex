@@ -32,7 +32,6 @@ describe('slider common', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/components/slider-common.js'))
-      .waitForElementById('slider_1', util.getGETActionWaitTimeMills(), 1000)
   });
 
   afterEach(function () {
@@ -43,6 +42,7 @@ describe('slider common', function () {
   it('#1 OnScroll & onChange Event', () => {
     return driver
       .sleep(3000)
+      .waitForElementById('slider_1', util.getGETActionWaitTimeMills(), 1000)
       .elementById('s1_page1')
       .click()
       .elementById('s1_p')
@@ -76,6 +76,7 @@ describe('slider common', function () {
 
   it('#2 Infinite scroll = true', () => {
     return driver.sleep(3000)
+      .waitForElementById('slider_1', util.getGETActionWaitTimeMills(), 1000)
       .elementById('s2_switch')
       .click()
       .sleep(5000)
@@ -88,6 +89,7 @@ describe('slider common', function () {
 
   it('#3 Infinite scroll = false', () => {
     return driver.sleep(3000)
+      .waitForElementById('slider_1', util.getGETActionWaitTimeMills(), 1000)
       .elementById('s3_switch')
       .click()
       .sleep(5000)

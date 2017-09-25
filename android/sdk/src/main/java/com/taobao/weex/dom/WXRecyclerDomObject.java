@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.v4.util.ArrayMap;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.Spacing;
@@ -32,7 +34,6 @@ import static com.taobao.weex.dom.flex.CSSLayout.DIMENSION_WIDTH;
 /**
  * Created by zhengshihan on 2017/2/21.
  */
-
 public class WXRecyclerDomObject extends WXDomObject{
 
 
@@ -77,9 +78,19 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     @Override
     public float getStyleWidth() {
-        if (Float.isNaN(cssstyle.dimensions[DIMENSION_WIDTH]))
-            return getParent().getLayoutWidth();
-        return super.getStyleWidth();
+        float width =  getLayoutWidth();
+        if (Float.isNaN(width) || width <= 0){
+            if(getParent() != null){
+                width = getParent().getLayoutWidth();
+            }
+            if (Float.isNaN(width) || width <= 0){
+                width = super.getStyleWidth();
+            }
+        }
+        if (Float.isNaN(width) || width <= 0){
+            width = getViewPortWidth();
+        }
+        return width;
     }
 
     public void preCalculateCellWidth(){
@@ -117,6 +128,10 @@ public class WXRecyclerDomObject extends WXDomObject{
         }
     }
 
+    public boolean hasPreCalculateCellWidth(){
+        return mIsPreCalculateCellWidth;
+    }
+
     public void updateRecyclerAttr(){
         preCalculateCellWidth();
         if(mColumnWidth ==0 && mColumnWidth == Float.NaN){
@@ -140,6 +155,41 @@ public class WXRecyclerDomObject extends WXDomObject{
                 || attrs.containsKey(Constants.Name.COLUMN_WIDTH)){
             updateRecyclerAttr();
         }
+    }
+
+    @Override
+    protected Map<String, String> getDefaultStyle() {
+        Map<String,String> map = new ArrayMap<>();
+
+        boolean isVertical = true;
+        if (parent != null) {
+            if (parent.getType() != null) {
+                if (parent.getType().equals(WXBasicComponentType.HLIST)) {
+                    isVertical = false;
+                }else{
+                    if(getOrientation() == Constants.Orientation.HORIZONTAL){
+                        isVertical = false;
+                    }
+                }
+            }
+        }
+
+        String prop = isVertical ? Constants.Name.HEIGHT : Constants.Name.WIDTH;
+        if (getStyles().get(prop) == null &&
+                getStyles().get(Constants.Name.FLEX) == null) {
+            map.put(Constants.Name.FLEX, "1");
+        }
+
+        return map;
+    }
+
+
+    public int getOrientation(){
+        String direction = (String) getAttrs().get(Constants.Name.SCROLL_DIRECTION);
+        if(Constants.Value.HORIZONTAL.equals(direction)){
+            return Constants.Orientation.HORIZONTAL;
+        }
+        return  Constants.Orientation.VERTICAL;
     }
 
 }

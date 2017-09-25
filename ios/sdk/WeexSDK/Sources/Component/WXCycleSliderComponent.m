@@ -93,6 +93,34 @@ typedef NS_ENUM(NSInteger, Direction) {
     [self resetAllViewsFrame];
 }
 
+- (void)accessibilityDecrement
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(false)];
+#pragma clang diagnostic pop
+    
+    [self nextPage];
+}
+
+- (void)accessibilityIncrement
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(false)];
+#pragma clang diagnostic pop
+    
+    [self lastPage];
+}
+
+- (void)accessibilityElementDidLoseFocus
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.wx_component performSelector:NSSelectorFromString(@"resumeAutoPlay:") withObject:@(true)];
+#pragma clang diagnostic pop
+}
+
 #pragma mark Private Methods
 - (CGFloat)height {
     return self.frame.size.height;
@@ -222,6 +250,20 @@ typedef NS_ENUM(NSInteger, Direction) {
                 [self.scrollView setContentOffset:CGPointMake(nextIndex * self.width, 0) animated:YES];
             }
         }
+    }
+}
+
+- (void)lastPage
+{
+    
+    NSInteger lastIndex = [self currentIndex]-1;
+    if (_itemViews.count > 1) {
+        if (_infinite) {
+            if (lastIndex < 0) {
+                lastIndex = [_itemViews count]-1;
+            }
+        }
+        [self setCurrentIndex:lastIndex];
     }
 }
 
@@ -399,11 +441,14 @@ typedef NS_ENUM(NSInteger, Direction) {
     _recycleSliderView.exclusiveTouch = YES;
     _recycleSliderView.scrollView.scrollEnabled = _scrollable;
     _recycleSliderView.infinite = _infinite;
+    UIAccessibilityTraits traits = UIAccessibilityTraitAdjustable;
     if (_autoPlay) {
+        traits |= UIAccessibilityTraitUpdatesFrequently;
         [self _startAutoPlayTimer];
     } else {
         [self _stopAutoPlayTimer];
     }
+     _recycleSliderView.accessibilityTraits = traits;
 }
 
 - (void)layoutDidFinish
@@ -549,6 +594,17 @@ typedef NS_ENUM(NSInteger, Direction) {
 {
     NSAssert(_recycleSliderView, @"");
     [_recycleSliderView setIndicator:indicatorView];
+}
+
+- (void)resumeAutoPlay:(id)resume
+{
+    if (_autoPlay) {
+        if ([resume boolValue]) {
+            [self _startAutoPlayTimer];
+        } else {
+            [self _stopAutoPlayTimer];
+        }
+    }
 }
 
 #pragma mark Private Methods

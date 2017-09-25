@@ -226,7 +226,7 @@
           **/
         CGPoint anchorPoint = CGPointMake(
                                           _originX ? [_originX valueForMaximum:view.bounds.size.width] / view.bounds.size.width : 0.5,
-                                          _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
+                                          _originY ? [_originY valueForMaximum:view.bounds.size.height] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];

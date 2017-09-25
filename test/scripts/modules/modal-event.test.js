@@ -16,7 +16,6 @@ describe('weex '+goal+' test', function () {
   beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/modules/'+goal+'.js'))
-      .waitForElementByName(goal, timeout, 2000)
   });
 
   afterEach(function () {
@@ -24,13 +23,22 @@ describe('weex '+goal+' test', function () {
   })
 
   it('#1 '+goal + ' event', () => {
-    //TODO ：截图比对
-    return driver.waitForElementByName('alertClick', timeout, 2000)
+    return driver
+      .waitForElementByName('toast', timeout, 2000)
+      .click()
+      .sleep(2000)
+      .waitForElementByName('alert', timeout, 2000)
       .click()
       .sleep(1000)
       .dismissAlert()
-      .waitForElementByName(goal, timeout, 2000)
+      .waitForElementByName('confirm', timeout, 2000)
       .click()
-      .waitForElementByName('alert success', timeout, 2000) 
+      .sleep(1000)
+      .dismissAlert()
+      .waitForElementByName('prompt', timeout, 2000)
+      .click()
+      .sleep(1000)
+      .dismissAlert()
+      .waitForElementByName('Prompt success', timeout, 2000)
   })
 });

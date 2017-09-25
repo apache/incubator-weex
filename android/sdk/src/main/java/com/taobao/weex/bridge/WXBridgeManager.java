@@ -25,6 +25,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -61,8 +62,14 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.lang.reflect.Constructor;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +122,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String REF = "ref";
   public static final String MODULE = "module";
   public static final String METHOD = "method";
+  public static final String KEY_PARAMS = "params";
   public static final String ARGS = "args";
   public static final String OPTIONS = "options";
   private static final String NON_CALLBACK = "-1";
@@ -125,6 +133,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private static long LOW_MEM_VALUE = 120;
 
   static volatile WXBridgeManager mBridgeManager;
+
+  private static final int CRASHREINIT = 50;
+  private static int reInitCount = 1;
+
+  private static String crashUrl = null;
+  private static long lastCrashTime = 0;
 
 
   /**
@@ -922,13 +936,152 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   }
 
+  public int callReportCrashReloadPage(String instanceId, String crashFile) {
+      try {
+        String url = null;
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (instance != null) {
+          url = instance.getBundleUrl();
+        }
+        try {
+            if (WXEnvironment.getApplication() != null) {
+                crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + crashFile;
+                // Log.e("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        callReportCrash(crashFile, instanceId, url);
+        if (reInitCount > CRASHREINIT) {
+          return IWXBridge.INSTANCE_RENDERING_ERROR;
+        }
+        reInitCount++;
+        // reinit frame work
+        mInit = false;
+        initScriptsFramework("");
+
+        if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+          return IWXBridge.DESTROY_INSTANCE;
+        }
+      } catch (Exception e) {
+        WXLogUtils.e("[WXBridgeManager] callReportCrashReloadPage exception: ", e);
+      }
+      try {
+
+          if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+              boolean reloadThisInstance = shouReloadCurrentInstance(
+                      WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
+              WXDomModule domModule = getDomModule(instanceId);
+              Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
+              domModule.postAction((DOMAction) action, true);
+          }
+
+      } catch (Exception e) {
+          WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
+          commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
+      }
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+  }
+
+  public boolean shouReloadCurrentInstance(String aUrl) {
+    long time = System.currentTimeMillis();
+    if (crashUrl == null ||
+            (crashUrl != null && !crashUrl.equals(aUrl)) ||
+            ((time - lastCrashTime) > 10000)) {
+      crashUrl = aUrl;
+      lastCrashTime = time;
+      return true;
+    }
+    lastCrashTime = time;
+    return false;
+  }
+
+  public void callReportCrash(String crashFile, final String instanceId, final String url) {
+      // statistic weexjsc process crash
+      Date date = new Date();
+      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+      String time = format.format(date);
+      final String origin_filename = crashFile + "." + time;
+      File oldfile = new File(crashFile);
+      File newfile = new File(origin_filename);
+      if (oldfile.exists()) {
+          oldfile.renameTo(newfile);
+      }
+      Thread t = new Thread(new Runnable() {
+           public void run() {
+              try {
+                File file = new File(origin_filename);
+                if (file.exists()) {
+                  if (file.length() > 0) {
+                    StringBuilder result = new StringBuilder();
+                    try{
+                      BufferedReader br = new BufferedReader(new FileReader(origin_filename));
+                      String s = null;
+                      // boolean foundStart = false;
+                      while((s = br.readLine()) != null) {
+                        if ("".equals(s)) {
+                          continue;
+                        }
+                        // 寄存器内容裁剪
+                        // if (("r0:").equals(s)) {
+                        //  break;
+                        // }
+                        result.append(s + "\n");
+                      }
+                      commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
+                      br.close();
+                    } catch(Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else {
+                    WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
+                    // 没收集到crash堆栈不上传
+                    // commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "crash info file empty", instanceId, url);
+                  }
+                  file.delete();
+                }
+//                  Log.e("reportServerCrash", "WXBridge reportServerCrash crashFile:" + origin_filename);
+//                  String filename = CRASHPATH;
+//                  File oldfile = new File(origin_filename);
+//                  File newfile = new File(filename);
+//                  if (newfile.exists() && newfile.isDirectory()) {
+//                      Date date = new Date();
+//                      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+//                      String time = format.format(date);
+//
+//                      filename += "/native" + time + "_bg_jni.log";
+//                      newfile = new File(filename);
+//                      Log.e("reportServerCrash", "WXBridge reportServerCrash time:" + time + " filename" + filename);
+//                      if (oldfile.exists()) {
+//                          oldfile.renameTo(newfile);
+//                          try {
+//                              FileOutputStream fos = new FileOutputStream (new File(filename), true) ;
+//                              String str = "log end: " + time + "\n";
+//                              fos.write(str.getBytes()) ;
+//                              fos.close ();
+//                          } catch (IOException e) {
+//                              e.printStackTrace();
+//                          }
+//                      }
+//                  } else {
+//                      Log.e("reportServerCrash", "WXBridge /data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs not exsist");
+//                  }
+              } catch (Throwable throwable) {
+                  WXLogUtils.e("[WXBridgeManager] callReportCrash exception: ", throwable);
+              }
+          }
+      });
+      t.start();
+
+  }
+
   private void getNextTick(final String instanceId, final String callback) {
     addJSTask(METHOD_CALLBACK,instanceId, callback, "{}");
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 
 
-  private void addJSTask(final String method, final String instanceId, final Object... args) {
+  private void addJSEventTask(final String method, final String instanceId, final List<Object> params, final Object... args) {
     post(new Runnable() {
       @Override
       public void run() {
@@ -938,12 +1091,18 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
         ArrayList<Object> argsList = new ArrayList<>();
         for (Object arg : args) {
-          argsList.add(arg);
+            argsList.add(arg);
+        }
+        if(params != null){
+           ArrayMap map = new ArrayMap(4);
+           map.put(KEY_PARAMS, params);
+           argsList.add(map);
         }
 
         WXHashMap<String, Object> task = new WXHashMap<>();
         task.put(KEY_METHOD, method);
         task.put(KEY_ARGS, argsList);
+
 
         if (mNextTickTasks.get(instanceId) == null) {
           ArrayList<WXHashMap<String, Object>> list = new ArrayList<>();
@@ -954,6 +1113,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
       }
     });
+  }
+
+  private void addJSTask(final String method, final String instanceId, final Object... args) {
+    addJSEventTask(method, instanceId, null, args);
   }
 
   private void sendMessage(String instanceId, int what) {
@@ -1000,15 +1163,24 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
   public void fireEventOnNode(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data,final Map<String, Object> domChanges) {
+      fireEventOnNode(instanceId, ref, type, data, domChanges, null);
+  }
+
+  /**
+   * Notify the JavaScript about the event happened on Android
+   */
+  public void fireEventOnNode(final String instanceId, final String ref,
+                              final String type, final Map<String, Object> data,
+                              final Map<String, Object> domChanges, List<Object> params) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)
-        || TextUtils.isEmpty(type) || mJSHandler == null) {
+            || TextUtils.isEmpty(type) || mJSHandler == null) {
       return;
     }
     if (!checkMainThread()) {
       throw new WXRuntimeException(
-          "fireEvent must be called by main thread");
+              "fireEvent must be called by main thread");
     }
-    addJSTask(METHOD_FIRE_EVENT, instanceId, ref, type, data,domChanges);
+    addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 
@@ -1164,6 +1336,26 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
 
+
+  public void commitJscCrashAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg,
+                                         String instanceId, String url) {
+    if (TextUtils.isEmpty(type) || errorCode == null) {
+      return;
+    }
+
+    String method = "callReportCrash";
+    String exception = "weexjsc process crash and restart exception";
+    Map<String,String> extParams = new HashMap<String, String>();
+    extParams.put("jscCrashStack", errMsg);
+    IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+    if (adapter != null) {
+        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode.getErrorCode(), method, exception, extParams);
+        adapter.onJSException(jsException);
+        if (WXEnvironment.isApkDebugable()) {
+          WXLogUtils.e(jsException.toString());
+        }
+    }
+  }
 
   /**
    * Create instance.
@@ -1382,17 +1574,34 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
-          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, "success");
+          String reinitInfo = "";
+          if (reInitCount > 1) {
+            reinitInfo = "reinit Framework:";
+          }
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, reinitInfo + "success");
         }else{
-          WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
-          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+          if (reInitCount > 1) {
+            WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+            String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail reinit FrameWork";
+            commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK, err);
+          } else {
+            WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+            String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
+            commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+          }
         }
       } catch (Throwable e) {
-        WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-        String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
-        commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+        if (reInitCount > 1) {
+          WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+          String err="[WXBridgeManager] invokeInitFramework reinit FrameWork exception!#"+e.toString();
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK, err);
+        } else {
+          WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+          String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
+        }
       }
+
     }
   }
 
@@ -1443,6 +1652,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
     wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
@@ -1634,6 +1844,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
+      if (METHOD_CREATE_INSTANCE.equals(function)) {
+        try {
+          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+            // JSONObject domObject = JSON.parseObject(tasks);
+            WXDomModule domModule = getDomModule(instanceId);
+            Action action = Actions.getReloadPage(instanceId, true);
+            domModule.postAction((DOMAction)action, true);
+            instance.setNeedLoad(true);
+            return;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 

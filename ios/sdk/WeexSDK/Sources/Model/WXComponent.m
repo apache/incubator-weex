@@ -88,10 +88,13 @@
         
         _absolutePosition = CGPointMake(NAN, NAN);
         
+        _displayType = WXDisplayTypeBlock;
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
-        _ariaHidden = NO;
+        _ariaHidden = nil;
+        _accessible = nil;
+        _accessibilityHintContent = nil;
         
         _async = NO;
         
@@ -106,14 +109,21 @@
             }
         }
         
-        if (attributes[@"role"]){
-            _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        }
         if (attributes[@"ariaHidden"]) {
-            _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+            
+            _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        }
+        if (attributes[@"role"]) {
+            _roles = attributes[@"role"];
         }
         if (attributes[@"ariaLabel"]) {
             _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        }
+        if (attributes[@"accessible"]) {
+            _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        }
+        if(attributes[@"accessibilityHint"]) {
+            _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         }
         
         if (attributes[@"testId"]) {
@@ -129,6 +139,51 @@
     }
     
     return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NSInteger copyId = 0;
+    @synchronized(self){
+        static NSInteger __copy = 0;
+        copyId = __copy % (1024*1024);
+        __copy++;
+    }
+    NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
+    WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
+    if (_isTemplate) {
+        component->_templateComponent = self;
+    } else {
+        component->_templateComponent = self->_templateComponent;
+    }
+    memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
+    component->_cssNode->context = (__bridge void *)component;
+    component->_calculatedFrame = self.calculatedFrame;
+    
+    NSMutableArray *subcomponentsCopy = [NSMutableArray array];
+    for (WXComponent *subcomponent in self.subcomponents) {
+        WXComponent *subcomponentCopy = [subcomponent copy];
+        subcomponentCopy->_supercomponent = component;
+        [subcomponentsCopy addObject:subcomponentCopy];
+    }
+    
+    component->_subcomponents = subcomponentsCopy;
+    
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
+    });
+    
+    return component;
+}
+
+- (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
+{
+    UIAccessibilityTraits newTrait = trait;
+    for (NSString * role in [roleStr componentsSeparatedByString:@" "]) {
+        newTrait |= [WXConvert WXUIAccessibilityTraits: role];
+    }
+    
+    return newTrait;
 }
 
 - (void)dealloc
@@ -149,9 +204,8 @@
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
-    
     return styles;
 }
 
@@ -190,6 +244,28 @@
     return events;
 }
 
+- (void)setDisplayType:(WXDisplayType)displayType
+{
+    if (_displayType != displayType) {
+        _displayType = displayType;
+        if (displayType == WXDisplayTypeNone) {
+            _isNeedJoinLayoutSystem = NO;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self removeFromSuperview];
+            });
+        } else {
+            _isNeedJoinLayoutSystem = YES;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self _buildViewHierarchyLazily];
+                // TODO: insert into the correct index
+                [self.supercomponent insertSubview:self atIndex:0];
+            });
+        }
+    }
+}
+
 - (WXSDKInstance *)weexInstance
 {
     return _weexInstance;
@@ -223,10 +299,8 @@
         
         _layer = _view.layer;
         _view.frame = _calculatedFrame;
-        
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
-        
         if (![self _needsDrawBorder]) {
             _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
@@ -251,19 +325,28 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        if (_role) {
-            _view.accessibilityTraits |= _role;
+        if (_roles) {
+            [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
         
         if (_testId) {
             _view.accessibilityIdentifier = _testId;
         }
         
+        if (_accessibilityHintContent) {
+            [_view setAccessibilityHint:_accessibilityHintContent];
+        }
+        
         if (_ariaLabel) {
             _view.accessibilityLabel = _ariaLabel;
         }
+        if (_accessible) {
+            [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
+        }
         
-        _view.accessibilityElementsHidden = _ariaHidden;
+        if (_ariaHidden) {
+            [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+        }
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -346,6 +429,26 @@
     return _cssNode;
 }
 
+- (void)_addEventParams:(NSDictionary *)params
+{
+    pthread_mutex_lock(&_propertyMutex);
+    if (!_eventParameters) {
+        _eventParameters = [NSMutableDictionary dictionary];
+    }
+    [_eventParameters addEntriesFromDictionary:params];
+    pthread_mutex_unlock(&_propertyMutex);
+}
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName
+{
+    NSArray *params;
+    pthread_mutex_lock(&_propertyMutex);
+    params = _eventParameters[eventName];
+    pthread_mutex_unlock(&_propertyMutex);
+    
+    return params;
+}
+
 #pragma mark Component Hierarchy 
 
 - (NSArray<WXComponent *> *)subcomponents
@@ -415,6 +518,11 @@
     [newSupercomponent _insertSubcomponent:self atIndex:index];
 }
 
+- (void)_didInserted
+{
+    
+}
+
 - (id<WXScrollerProtocol>)ancestorScroller
 {
     if(!_ancestorScroller) {
@@ -439,9 +547,7 @@
             _transition = [WXTransition new];
         }
         [_transition _handleTransitionWithStyles:styles withTarget:self];
-    }
-    else
-    {
+    } else {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
     }
@@ -455,7 +561,7 @@
 - (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"width"]&&styles[@"width"])
             ||([property containsString:@"height"]&&styles[@"height"])
@@ -475,7 +581,7 @@
 - (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = _styles[kWXTransitionProperty];
+    NSString *property = self.styles[kWXTransitionProperty];
     if (property) {
         if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
             ||([property containsString:@"transform"]&&styles[@"transform"])
@@ -519,9 +625,7 @@
     WXAssertMainThread();
     if (![self _isPropertyAnimationStyles:styles]) {
         [self _updateViewStyles:styles];
-    }
-    else
-    {
+    } else {
         [self _transitionUpdateViewProperty:styles];
     }
     
@@ -598,18 +702,25 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    
     if (attributes[@"role"]){
-        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
-        self.view.accessibilityTraits = _role;
+        _roles = attributes[@"role"];
+        [self.view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
     }
     if (attributes[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
-        self.view.accessibilityElementsHidden = _ariaHidden;
+        _ariaHidden = [WXConvert NSString:attributes[@"ariaHidden"]];
+        [self.view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+    }
+    if (attributes[@"accessible"]) {
+        _accessible = [WXConvert NSString:attributes[@"accessible"]];
+        [self.view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
     }
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
+    }
+    if (attributes[@"accessibilityHint"]) {
+        _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
+        [self.view setAccessibilityHint:_accessibilityHintContent];
     }
     
     if (attributes[@"testId"]) {

@@ -34,7 +34,7 @@ sleep 2
 cp packages/weex-js-framework/index.min.js ios_sdk/WeexSDK/Resources/main.js
 cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js
 
-gradle wrapper --gradle-version 2.14.1
+gradle wrapper --gradle-version 3.3
 echo 'include ":android_sdk"'>settings.gradle
 ./gradlew :android_sdk:assemble -PasfRelease
 
