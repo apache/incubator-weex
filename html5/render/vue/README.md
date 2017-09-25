@@ -176,6 +176,10 @@ vue: {
 
 * not to prevent default behaviour of click events unless the click-binding element is inside a `<a>` link, or it is a `<a>` link and has a `prevent` attribute on it.
 
+#### 0.12.17
+
+* support offset appear.
+
 ## component -> dom map
 
 | component | dom element | children | note |
