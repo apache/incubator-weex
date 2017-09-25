@@ -6,6 +6,7 @@ enum class IPCJSMsg {
     EXECJSSERVICE,
     TAKEHEAPSNAPSHOT,
     EXECJS,
+    EXECTIMERCALLBACK,
 };
 
 enum class IPCProxyMsg {
@@ -27,5 +28,8 @@ enum class IPCProxyMsg {
     CALLMOVEELEMENT,
     CALLADDEVENT,
     CALLREMOVEEVENT,
+    CALLGCANVASLINK,
+    SETINTERVAL,
+    CLEARINTERVAL,
 };
 #endif /* IPCMESSAGEJS_H */

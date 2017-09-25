@@ -47,6 +47,9 @@ static std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments);
 
 static std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments);
 
+static std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments);
+
+static std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments);
 
 static void reportException(const char *instanceID, const char *func, const char *exception_string);
 
