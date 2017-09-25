@@ -279,7 +279,7 @@
             WXPerformBlockOnMainThread(^{
                 [self _buildViewHierarchyLazily];
                 // TODO: insert into the correct index
-                [self.supercomponent insertSubview:self atIndex:0];
+                [self.supercomponent.view addSubview:self.view];
             });
         }
     }
