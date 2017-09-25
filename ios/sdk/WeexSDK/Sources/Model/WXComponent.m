@@ -38,6 +38,7 @@
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
 #import "WXTracingManager.h"
+#import "WXComponent+Events.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -190,7 +191,25 @@
 {
     free_css_node(_cssNode);
 
-    [self _removeAllEvents];
+//    [self _removeAllEvents];
+    // remove all gesture and all
+    if (_tapGesture) {
+        [_tapGesture removeTarget:nil action:NULL];
+    }
+    if ([_swipeGestures count]) {
+        for (UISwipeGestureRecognizer *swipeGestures in _swipeGestures) {
+            [swipeGestures removeTarget:nil action:NULL];
+        }
+    }
+    
+    if (_longPressGesture) {
+        [_longPressGesture removeTarget:nil action:NULL];
+    }
+    
+    if (_panGesture) {
+        [_panGesture removeTarget:nil action:NULL];
+    }
+    
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
     }
