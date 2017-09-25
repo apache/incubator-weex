@@ -181,6 +181,9 @@ public class Statements {
                             WXComponent renderNode = null;
                             if(renderIndex < parent.getChildCount()){
                                 renderNode = parent.getChild(renderIndex);
+                                if(renderNode.isWaste()){
+                                    renderNode.setWaste(false);
+                                }
                                 //check is same statment, if true, it is usabled.
                                 if(!isCreateFromNodeStatement(renderNode, component)){
                                     renderNode = null;
