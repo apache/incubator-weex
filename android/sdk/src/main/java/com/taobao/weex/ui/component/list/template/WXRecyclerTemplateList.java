@@ -969,6 +969,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     public void destroy() {
         if(getHostView() != null){
             getHostView().removeCallbacks(listUpdateRunnable);
+            if(getHostView().getInnerView() != null){
+                getHostView().getInnerView().setAdapter(null);
+            }
         }
         if(listData != null){
             listData = null;
