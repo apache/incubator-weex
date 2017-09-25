@@ -356,6 +356,9 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_WILL_DESTROY_NOTIFICATION object:nil userInfo:@{@"instanceId":self.instanceId}];
+    
     [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
 
     
