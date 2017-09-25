@@ -85,7 +85,6 @@
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
         _subcomponents = [NSMutableArray array];
-        
         _absolutePosition = CGPointMake(NAN, NAN);
         
         _displayType = WXDisplayTypeBlock;
@@ -97,6 +96,7 @@
         _accessibilityHintContent = nil;
         
         _async = NO;
+        _transition = [[WXTransition alloc]initWithStyles:styles];
         
         //TODO set indicator style 
         if ([type isEqualToString:@"indicator"]) {
@@ -204,7 +204,7 @@
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = [_styles copy];
+    styles = _styles;
     pthread_mutex_unlock(&_propertyMutex);
     return styles;
 }
@@ -402,7 +402,6 @@
     if (WX_MONITOR_INSTANCE_PERF_IS_RECORDED(WXPTFirstScreenRender, self.weexInstance)) {
         return;
     }
-    
     CGPoint absolutePosition = [self.supercomponent.view convertPoint:_view.frame.origin toView:_weexInstance.rootView];
     if (absolutePosition.y + _view.frame.size.height > self.weexInstance.rootView.frame.size.height + 1) {
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, self.weexInstance);
@@ -543,9 +542,6 @@
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
     if ([self _isPropertyTransitionStyles:styles]) {
-        if (!_transition) {
-            _transition = [WXTransition new];
-        }
         [_transition _handleTransitionWithStyles:styles withTarget:self];
     } else {
         styles = [self parseStyles:styles];
@@ -561,17 +557,16 @@
 - (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = self.styles[kWXTransitionProperty];
-    if (property) {
-        if (([property containsString:@"width"]&&styles[@"width"])
-            ||([property containsString:@"height"]&&styles[@"height"])
-            ||([property containsString:@"right"]&&styles[@"right"])
-            ||([property containsString:@"left"]&&styles[@"left"])
-            ||([property containsString:@"bottom"]&&styles[@"bottom"])
-            ||([property containsString:@"top"]&&styles[@"top"])
-            ||([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
-            ||([property containsString:@"transform"]&&styles[@"transform"])
-            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+    if (_transition.transitionOptions != WXTransitionOptionsNone) {
+        if ((_transition.transitionOptions & WXTransitionOptionsWidth &&styles[@"width"])
+            ||(_transition.transitionOptions & WXTransitionOptionsHeight &&styles[@"height"])
+            ||(_transition.transitionOptions & WXTransitionOptionsRight &&styles[@"right"])
+            ||(_transition.transitionOptions & WXTransitionOptionsLeft &&styles[@"left"])
+            ||(_transition.transitionOptions & WXTransitionOptionsBottom &&styles[@"bottom"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTop &&styles[@"top"])
+            ||(_transition.transitionOptions & WXTransitionOptionsBackgroundColor &&styles[@"backgroundColor"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTransform &&styles[@"transform"])
+            ||(_transition.transitionOptions & WXTransitionOptionsOpacity &&styles[@"opacity"])) {
             yesOrNo = true;
         }
     }
@@ -581,11 +576,10 @@
 - (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = self.styles[kWXTransitionProperty];
-    if (property) {
-        if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
-            ||([property containsString:@"transform"]&&styles[@"transform"])
-            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+    if (_transition.transitionOptions != WXTransitionOptionsNone) {
+        if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor &&styles[@"backgroundColor"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTransform &&styles[@"transform"])
+            ||(_transition.transitionOptions & WXTransitionOptionsOpacity &&styles[@"opacity"])) {
             yesOrNo = true;
         }
     }
