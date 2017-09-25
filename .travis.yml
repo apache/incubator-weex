@@ -11,16 +11,12 @@ env:
 matrix:
     fast_finish: true
     exclude:
-      - os: linux
-        env: TEST_SUITE=ios
       - os: osx
         env: TEST_SUITE=danger
       - os: osx
         env: TEST_SUITE=jsfm
       - os: osx
         env: TEST_SUITE=android
-      - os: osx
-        env: TEST_SUITE=ios
       - os: linux
         env: TEST_SUITE=android
     include:
@@ -53,11 +49,18 @@ before_script:
       nvm install 7.0
       npm install
     fi
+  - |
+    if [[ $TEST_SUITE = "jsfm" ]]; then
+      npm install
+    fi
+  - |
+    if [[ $TEST_SUITE = "danger" ]]; then
+      npm install
+    fi
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       npm run danger -- run --dangerfile ./dangerfile-android.js
-      cd $TRAVIS_BUILD_DIR
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then

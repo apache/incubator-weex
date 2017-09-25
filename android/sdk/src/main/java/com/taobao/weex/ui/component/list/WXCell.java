@@ -122,7 +122,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         mLastLocationY = l;
     }
 
-    void setScrollPositon(int pos){
+    public void setScrollPositon(int pos){
         mScrollPositon = pos;
     }
 

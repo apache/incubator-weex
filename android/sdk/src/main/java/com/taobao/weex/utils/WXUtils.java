@@ -479,4 +479,25 @@ private static String[] splitLineBreak(String str) {
     return items;
 }
 
+
+  /**
+   * get number
+   * */
+  public static int getNumberInt(Object value, int defaultValue){
+    if(value == null){
+      return  defaultValue;
+    }
+    if(value instanceof  Number){
+      return  ((Number) value).intValue();
+    }
+    try{
+      String number = value.toString();
+      if(number.indexOf('.') >= 0) {
+        return (int) Float.parseFloat(value.toString());
+      }else{
+        return  Integer.parseInt(number);
+      }
+    }catch (Exception e){return  defaultValue;}
+  }
+
 }

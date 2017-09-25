@@ -23,10 +23,12 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
@@ -95,4 +97,52 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     }
     return result;
   }
+
+
+  public void scrollTo(boolean smooth, int position, final  int offset, final int orientation){
+    if (!smooth) {
+      RecyclerView.LayoutManager layoutManager = getLayoutManager();
+      if (layoutManager instanceof LinearLayoutManager) {
+        //GridLayoutManager is also instance of LinearLayoutManager
+        ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(position, -offset);
+      } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(position, -offset);
+      }
+      //Any else?
+    } else {
+      if (offset != 0) {
+        setOnSmoothScrollEndListener(new ExtendedLinearLayoutManager.OnSmoothScrollEndListener() {
+          @Override
+          public void onStop() {
+            if (orientation == Constants.Orientation.VERTICAL) {
+                smoothScrollBy(0, offset);
+            } else {
+                smoothScrollBy(offset, 0);
+            }
+          }
+        });
+      }
+      smoothScrollToPosition(position);
+    }
+  }
+
+  public void setOnSmoothScrollEndListener(final ExtendedLinearLayoutManager.OnSmoothScrollEndListener onSmoothScrollEndListener){
+    if(getLayoutManager() instanceof ExtendedLinearLayoutManager){
+       ExtendedLinearLayoutManager extendedLinearLayoutManager = (ExtendedLinearLayoutManager)getLayoutManager();
+       extendedLinearLayoutManager.setOnScrollEndListener(onSmoothScrollEndListener);
+    }else{
+      addOnScrollListener(new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+          if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+              recyclerView.removeOnScrollListener(this);
+              if(onSmoothScrollEndListener != null){
+                   onSmoothScrollEndListener.onStop();
+              }
+          }
+        }
+      });
+    }
+  }
+
 }

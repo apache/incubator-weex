@@ -109,4 +109,13 @@ public class AppearanceHelper {
     return view != null && view.getLocalVisibleRect(mVisibleRect);
 
   }
+
+  public boolean isViewVisible(View view) {
+    if(view.getVisibility() == View.VISIBLE){
+      if(view.getMeasuredHeight()  == 0){
+        return  true;
+      }
+    }
+    return view != null && view.getLocalVisibleRect(mVisibleRect);
+  }
 }

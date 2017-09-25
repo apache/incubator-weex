@@ -27,6 +27,7 @@ import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.component.WXComponent;
 
@@ -39,9 +40,9 @@ class RemoveEventAction implements DOMAction, RenderAction {
 
   private WXDomObject mUpdatedDomObject;
 
-  RemoveEventAction(String ref, String event) {
+  RemoveEventAction(String ref, Object event) {
     this.mRef = ref;
-    this.mEvent = event;
+    this.mEvent = WXEvent.getEventName(event);
   }
 
 

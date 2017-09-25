@@ -59,6 +59,7 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
@@ -66,6 +67,8 @@ import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -143,6 +146,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
+
+  private boolean waste = false;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -297,8 +302,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
     if(mInstance != null && mDomObj != null) {
-      mInstance.fireEvent(mCurrentRef, type, params,domChanges);
+        List<Object> eventArgsValues = null;
+        if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
+             eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
+        }
+        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues);
     }
+  }
+
+
+  /**
+   * find certain class type parent
+   * */
+  public  Object findTypeParent(WXComponent component, Class type){
+    if(component.getClass() == type){
+      return component;
+    }
+    if(component.getParent() != null) {
+        findTypeParent(component.getParent(), type);
+    }
+    return  null;
   }
 
   /**
@@ -866,6 +889,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(),type),false);
   }
 
+
+  public void addEvent(Object type) {
+    if(type instanceof  CharSequence){
+       addEvent(type.toString());
+    }else if(type instanceof JSONObject){
+       JSONObject bindings = (JSONObject) type;
+       String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+       if(eventName != null){
+         addEvent(eventName);
+       }
+    }
+  }
+
   /**
    * Do not use this method to add event, this only apply event already add to DomObject.
    * @param type
@@ -1424,6 +1460,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return original;
   }
 
+  public void  clearPreLayout(){
+    mPreRealLeft = 0;
+    mPreRealWidth = 0;
+    mPreRealHeight = 0;
+    mPreRealTop = 0;
+  }
+
   /**
    * This method computes user visible left-top point in view's coordinate.
    * The default implementation uses the scrollX and scrollY of the view as the result,
@@ -1448,6 +1491,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void notifyAppearStateChange(String wxEventType,String direction){
     if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+  }
+
+  public void notifyWatchAppearDisappearEvent(String wxEventType,String direction){
+    if(containsEvent(wxEventType)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
       fireEvent(wxEventType, params);
@@ -1682,7 +1733,45 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           }
           uiEvent.submit();
         } else {
-          WXLogUtils.w("onRenderFinish", "createView() not called");
+          if(WXEnvironment.isApkDebugable() && !isLazy()) {
+            WXLogUtils.w("onRenderFinish", "createView() not called");
+          }
+        }
+      }
+    }
+  }
+
+  public boolean isWaste() {
+    return waste;
+  }
+
+  public void setWaste(boolean waste) {
+    if(this.waste != waste){
+      this.waste = waste;
+      WXDomObject domObject = (WXDomObject) getDomObject();
+      if(waste){
+          if(domObject.getAttrs().getStatement() == null) {
+              domObject.setVisible(false);
+              if (getHostView() != null) {
+                getHostView().setVisibility(View.GONE);
+              }
+              return;
+          }
+          if(Constants.Value.VISIBLE.equals(domObject.getAttrs().get(Constants.Name.VIF_FALSE))){
+             domObject.setVisible(true);
+             if(getHostView() != null){
+               getHostView().setVisibility(View.VISIBLE);
+             }
+          }else{
+            domObject.setVisible(false);
+            if(getHostView() != null){
+              getHostView().setVisibility(View.GONE);
+            }
+          }
+      }else{
+        domObject.setVisible(true);
+        if(getHostView() != null){
+          getHostView().setVisibility(View.VISIBLE);
         }
       }
     }
