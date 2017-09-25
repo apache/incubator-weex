@@ -28,26 +28,26 @@ brew install node
 
 ```bash
 $ node -v
-v6.3.1
+v6.11.3
 $ npm -v
-3.10.3
+3.10.10
 ```
 
 通常，安装了 Node.js 环境，npm 包管理工具也随之安装了。因此，直接使用 npm 来安装 weex-toolkit。
 
 > npm 是一个 JavaScript 包管理工具，它可以让开发者轻松共享和重用代码。Weex 很多依赖来自社区，同样，Weex 也将很多工具发布到社区方便开发者使用。
 
-**注意: ** weex-toolkit 在 1.0.1 之后才支持初始化 Vue 项目，使用前请确认版本是否正确。
+**注意: ** 在`weex-toolkit`1.0.8版本后添加了npm5规范的`npm-shrinkwrap.json`用于锁定包依赖，故npm版本<5的用户需要通过`npm i npm@latest -g`更新一下npm的版本，使用前请确认版本是否正确。
 
 ```bash
 $ npm install -g weex-toolkit
-$ weex -v
-
-v1.0.3
-weex-builder : v0.2.4
-weex-previewer : v1.3.4
+$ weex -v //查看当前weex版本
 ```
 
+weex-toolkit也支持直接升级子依赖，如：
+```
+weex update weex-devtool@latest //@后标注版本后，latest表示最新
+```
 
 国内开发者可以考虑使用淘宝的 npm 镜像 —— [cnpm](https://npm.taobao.org/) 安装 weex-toolkit
 
@@ -87,42 +87,46 @@ $ weex create awesome-project
 
 - `build`: 源码打包，生成 JS Bundle
 - `dev`: webpack watch 模式，方便开发
-- `serve`: 开启静态服务器
-- `debug`: 调试模式
+- `serve`: 开启HotReload服务器，代码改动的将会实时同步到网页中
 
 我们先通过 `npm install` 安装项目依赖。之后运行根目录下的 `npm run dev & npm run serve` 开启  watch 模式和静态服务器。
 
 然后我们打开浏览器，进入 `http://localhost:8080/index.html` 即可看到 weex h5 页面。 
 
-初始化时已经为我们创建了基本的示例，我们可以在 `src/foo.vue` 中查看。
+初始化时已经为我们创建了基本的示例，我们可以在 `src/index.vue` 中查看。
 
 代码如下所示：
 
 ```html
 <template>
-  <div class="wrapper">
-    <text class="weex">Hello Weex !</text>
-    <text class="vue">Hello Vue !</text>
+  <div class="wrapper" @click="update">
+    <image :src="logoUrl" class="logo"></image>
+    <text class="title">Hello {{target}}</text>
+    <text class="desc">Now, let's use vue to build your weex app.</text>
   </div>
 </template>
 
-<style scoped>
-  .wrapper {
-    flex-direction: column;
-    justify-content: center;
-  }
-  .weex {
-   font-size: 60px;
-   text-align: center;
-   color: #1B90F7;
-  }
-  .vue {
-   font-size: 60px;
-   text-align: center;
-   margin-top: 30px;
-   color: #41B883;
-  }
+<style>
+  .wrapper { align-items: center; margin-top: 120px; }
+  .title { padding-top:40px; padding-bottom: 40px; font-size: 48px; }
+  .logo { width: 360px; height: 156px; }
+  .desc { padding-top: 20px; color:#888; font-size: 24px;}
 </style>
+
+<script>
+  export default {
+    data: {
+      logoUrl: 'http://img1.vued.vanthink.cn/vued08aa73a9ab65dcbd360ec54659ada97c.png',
+      target: 'World'
+    },
+    methods: {
+      update: function (e) {
+        this.target = 'Weex'
+        console.log('target:', this.target)
+      }
+    }
+  }
+</script>
 ```
 
 关于 Weex 语法部分，你可以直接参考 [Vue Guide](https://vuejs.org/v2/guide/)，这里不再重复介绍。如果您想了解有关技术详情的更多信息，请继续阅读下一节。并且不要忘记在 dotWe 写代码并随时预览。
