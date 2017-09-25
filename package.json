@@ -166,7 +166,7 @@
     "uglify-js": "^2.8.29",
     "vue": "^2.4.3",
     "vue-loader": "^12.2.1",
-    "vue-template-compiler": "^2.2.6",
+    "vue-template-compiler": "^2.4.3",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
     "weex-gcanvas": "^0.4.2",
