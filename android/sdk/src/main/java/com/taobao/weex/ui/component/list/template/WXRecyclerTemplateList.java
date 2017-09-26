@@ -23,6 +23,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
@@ -712,13 +713,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 cellLifecycleManager.onDestory(i);
             }
         }
-        boolean update = listData != null;
         if(param instanceof  JSONArray){
             listData = (JSONArray) param;
         }
-        if(update){
-            notifyUpdateList();
-        }
+        notifyUpdateList();
         if(listData != null){
             for(int i=0; i<listData.size(); i++){
                 cellLifecycleManager.onCreate(i);
@@ -1338,8 +1336,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(getHostView() != null
                 && listUpdateRunnable != null
                 && getHostView().getInnerView() != null){
-            getHostView().removeCallbacks(listUpdateRunnable);
-            getHostView().post(listUpdateRunnable);
+            if(Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()){
+                getHostView().removeCallbacks(listUpdateRunnable);
+                getHostView().post(listUpdateRunnable);
+            }else{
+                listUpdateRunnable.run();
+            }
         }
     }
 
