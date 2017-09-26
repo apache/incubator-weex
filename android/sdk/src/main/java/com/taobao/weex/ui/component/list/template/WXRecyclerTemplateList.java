@@ -1461,8 +1461,4 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         return  componentList;
     }
-
-    public Map<String, WXCell> getTemplates() {
-        return mTemplates;
-    }
 }
