@@ -37,10 +37,12 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
 
 - (instancetype) init
 {
-    _cacheMap = [NSMutableDictionary new];
-    _glcontext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    [EAGLContext setCurrentContext:_glcontext];
-    return [super init];
+    if (self = [super init]) {
+        _cacheMap = [NSMutableDictionary new];
+        _glcontext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        [EAGLContext setCurrentContext:_glcontext];
+    }
+    return self;
 }
 
 - (void) dealloc
@@ -59,20 +61,23 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
 
     WXPerformBlockOnComponentThread(^{
         WXCanvasComponent *canvas = (WXCanvasComponent *)[weakSelf.weexInstance componentForRef:elemRef];
+        
         if (!canvas) {
             return;
         }
 
-        [weakSelf performSelectorOnMainThread:@selector(doBlock:) withObject:^() {
+        [weakSelf performSelectorOnMainThread:@selector(executeBlock:) withObject:^() {
             block(canvas);
         } waitUntilDone:NO];
     });
 }
 
 
-- (void)doBlock:(void (^)())block
+- (void)executeBlock:(void (^)())block
 {
-    block();
+    if (block) {
+        block();
+    }
 }
 
 - (void)addDrawActions:(NSString *)elemRef actions:(NSArray *)actions
@@ -106,7 +111,6 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
                                @"width": @(image.size.width),
                                @"height": @(image.size.height)
                                };
-
         [[WXSDKManager bridgeMgr] callBack:self.weexInstance.instanceId funcId:[@(callbackId) stringValue] params:[WXUtility JSONString:data]];
     });
 }

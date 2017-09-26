@@ -40,7 +40,7 @@
 - (void)dealloc
 {
     [_instance destroyInstance];
-    [self _removeObservers];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (instancetype)initWithSourceURL:(NSURL *)sourceURL
@@ -195,11 +195,6 @@
                                                      name:name
                                                    object:nil];
     }
-}
-
-- (void)_removeObservers
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
