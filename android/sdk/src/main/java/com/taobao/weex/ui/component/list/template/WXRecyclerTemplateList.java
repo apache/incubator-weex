@@ -713,10 +713,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 cellLifecycleManager.onDestory(i);
             }
         }
+        boolean update = listData != null;
         if(param instanceof  JSONArray){
             listData = (JSONArray) param;
         }
-        notifyUpdateList();
+        if(update){
+            notifyUpdateList();
+        }
         if(listData != null){
             for(int i=0; i<listData.size(); i++){
                 cellLifecycleManager.onCreate(i);
