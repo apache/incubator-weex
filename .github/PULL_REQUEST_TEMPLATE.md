@@ -1,7 +1,16 @@
 First of all, thank you for your contribution! 
+
 Please makes sure that these checkboxes are checked before submitting your PR, thank you!
 
-Extra checklist:
+<!-- 
+How to use github markdown?
+### checkable example
+- [x] checked
+- [ ] not checked
+More github Markdown info to see https://guides.github.com/features/mastering-markdown/
+-->
+
+CheckList:
 
 **if** *isBugFix* **:**
 
@@ -13,7 +22,6 @@ Extra checklist:
   * [ ] Update/Add demo to demonstrate new feature.
   * [ ] Update test scripts for the feature.
   * [ ] Add unit tests for the feature.
-
 
 <!--
 （请在***提交***前删除这段描述）
