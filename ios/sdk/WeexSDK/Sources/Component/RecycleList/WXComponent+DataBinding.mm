@@ -24,6 +24,8 @@
 #import "WXAssert.h"
 #import "WXJSASTParser.h"
 
+#import <JavaScriptCore/JavaScriptCore.h>
+
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 typedef enum : NSUInteger {

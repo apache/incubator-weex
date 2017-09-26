@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import <WeexSDK/WeexSDK.h>
+#import "WXComponent.h"
 
 static const NSString *WXBindingIdentify = @"@binding";
 static const NSString *WXBindingMatchIdentify = @"[[match]]";
