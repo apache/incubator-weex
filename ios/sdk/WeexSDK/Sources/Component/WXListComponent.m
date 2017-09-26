@@ -155,6 +155,9 @@
     _tableView.delegate = self;
     _tableView.dataSource = self;
     _tableView.userInteractionEnabled = YES;
+#ifdef __IPHONE_11_0
+    _tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#endif
 }
 
 - (void)viewWillUnload

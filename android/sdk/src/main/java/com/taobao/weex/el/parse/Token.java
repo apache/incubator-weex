@@ -69,15 +69,16 @@ public class Token {
                 return 0;
             }
         }else if(type == TYPE_KEYWORD){
-            return  Operators.keywordValue(token);
+            return  Operators.KEYWORDS.get(token);
         }
         throw new IllegalArgumentException("unhandled token type " + type);
     }
 
+    /***
     @Override
     public String toString() {
         return "{" + token + "," + type + '}';
-    }
+    }*/
 
     public String getToken() {
         return token;

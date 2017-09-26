@@ -43,8 +43,10 @@ body > .weex-waterfall {
 
 .weex-waterfall-inner-columns {
   -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
   -webkit-box-orient: horizontal;
 }
 
@@ -65,8 +67,10 @@ body > .weex-waterfall {
 
 .weex-scroller-horizontal .weex-scroller-inner {
   -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  -ms-flex-direction: row;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
+  flex-direction: row;
   -webkit-box-orient: horizontal;
   height: 100%;
 }
@@ -79,12 +83,14 @@ body > .weex-waterfall {
 .weex-loading {
   -webkit-box-align: center;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -moz-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   width: 100%;
   overflow: hidden;
 }

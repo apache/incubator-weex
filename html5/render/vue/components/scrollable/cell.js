@@ -18,13 +18,12 @@
  */
 
 function getCell (weex) {
-  const { extractComponentStyle, createEventMap } = weex
+  const { extractComponentStyle } = weex
   return {
     name: 'weex-cell',
     render (createElement) {
       return createElement('section', {
         attrs: { 'weex-type': 'cell' },
-        on: createEventMap(this),
         staticClass: 'weex-cell weex-ct',
         staticStyle: extractComponentStyle(this)
       }, this.$slots.default)

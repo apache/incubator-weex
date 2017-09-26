@@ -18,11 +18,13 @@
  */
 
 import slider from './slider'
+import neighbor from './slider-neighbor'
 import indicator from './indicator'
 
 export default {
   init (weex) {
     weex.install(slider)
+    weex.install(neighbor)
     weex.install(indicator)
   }
 }

@@ -19,6 +19,7 @@ version: 2.1
 * `options {Object}`：描述动画过程的对象。
   * `options.duration {number}`：指定动画的持续时间 (单位是毫秒)，默认值是 `0`，表示没有动画效果。
   * `options.delay {number}`：指定请求动画操作到执行动画之间的时间间隔 (单位是毫秒)，默认值是 `0`，表示没有延迟，在请求后立即执行动画。
+  * `options.needLayout {boolean}`：节点动画执行时是否产生布局动画即LayoutAnimation，默认值是false。
   * `options.timingFunction {string}`：描述动画执行的速度曲线，用于使动画变化更为平滑。默认值是 `linear`，表示动画从开始到结束都拥有同样的速度。下表列出了所有合法的属性：
 
 | 属性名                            | 描述                                       |
@@ -50,8 +51,7 @@ version: 2.1
 | `rotate`/`rotateX` <span class="api-version">v0.14+</span> /`rotateY` <span class="api-version">v0.14+</span> | 指定元素将被旋转的角度，单位是度 | number | 无 |
 | `perspective` <span class="api-version">v0.16+</span> | 观察者距离z=0平面的距离，在Android 4.1及以上有效 | number | 正无穷
 
-* `callback {Function}`：动画执行完毕之后的回调
-* `needLayout（boolean）`：节点动画执行时是否产生布局动画即LayoutAnimation
+* `callback {Function}`：动画执行完毕之后的回调函数。**注意，在0.16.0+版本后，iOS上可以获取animation是否执行成功的信息，callback中的`result`参数会有两种，分别是是`Success`与`Fail`，Android暂不支持。**
 
 ## Example
 
@@ -78,6 +78,7 @@ version: 2.1
           },
           duration: 800, //ms
           timingFunction: 'ease',
+          needLayout:false,
           delay: 0 //ms
         }, function () {
           modal.toast({ message: 'animation finished.' })

@@ -124,7 +124,7 @@ function getWaterfall (weex) {
         }, this._columns))
         this._loading && children.push(this._loading)
         return [
-          h('html:div', {
+          h('article', {
             ref: 'inner',
             staticClass: 'weex-waterfall-inner weex-ct'
           }, children)

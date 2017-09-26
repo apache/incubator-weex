@@ -28,7 +28,10 @@
 const _css = `
 .weex-text {
   display: -webkit-box;
+  display: -moz-box;
   -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -moz-box-direction: normal;
   position: relative;
   white-space: pre-wrap;  /* not using 'pre': support auto line feed. */
   font-size: 0.426667rem;
