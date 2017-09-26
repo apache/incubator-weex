@@ -25,7 +25,7 @@ import android.support.v4.util.SimpleArrayMap;
  * Created by furture on 2017/8/17.
  * statement expression for template list, like v-if v-for
  */
-public class WXStatement extends ArrayMap implements  Cloneable  {
+public class WXStatement extends ArrayMap<String, Object> implements  Cloneable  {
 
     /**
      * v-for statement, like
