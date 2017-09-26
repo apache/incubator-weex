@@ -182,6 +182,9 @@ public class Constants {
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
 
+    String DIRECTION = "direction";
+    String RTL = "rtl";
+
 
     interface  Recycler{
       String LIST_DATA = "listData";

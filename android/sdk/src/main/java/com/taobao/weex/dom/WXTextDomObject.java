@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.dom;
 
-import static com.taobao.weex.dom.WXStyle.UNSET;
-
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -39,6 +37,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
@@ -47,14 +46,18 @@ import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
+import com.taobao.weex.utils.StaticLayoutProxy;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.taobao.weex.dom.WXStyle.UNSET;
 
 /**
  * Class for calculating a given text's height and width. The calculating of width and height of
@@ -305,8 +308,13 @@ public class WXTextDomObject extends WXDomObject {
     textWidth = getTextWidth(mTextPaint, width, forceWidth);
     Layout layout;
     if (!FloatUtil.floatsEqual(previousWidth, textWidth) || previousLayout == null) {
-      layout = new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-          Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+      boolean forceRtl = false;
+      Object direction = getStyles().get(Constants.Name.DIRECTION);
+      if (direction != null && "text".equals(mType)) {
+        forceRtl = direction.equals(Constants.Name.RTL);
+      }
+      layout = StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
+          Layout.Alignment.ALIGN_NORMAL, 1, 0, false, forceRtl);
     } else {
       layout = previousLayout;
     }
