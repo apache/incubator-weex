@@ -65,7 +65,7 @@ function getScroller (weex) {
           return true
         })
         return [
-          h('html:div', {
+          h('article', {
             ref: 'inner',
             staticClass: 'weex-scroller-inner weex-ct'
           }, this._cells)

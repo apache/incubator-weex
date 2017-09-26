@@ -32,6 +32,9 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
 
     private RecyclerView.SmoothScroller smoothScroller;
 
+
+    private OnSmoothScrollEndListener onScrollEndListener;
+
     public ExtendedLinearLayoutManager(Context context) {
         super(context, VERTICAL, false);
     }
@@ -91,5 +94,22 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
         protected int getVerticalSnapPreference() {
             return SNAP_TO_START;
         }
+
+        @Override
+        protected void onStop() {
+            super.onStop();
+            if(onScrollEndListener != null){
+                onScrollEndListener.onStop();
+                onScrollEndListener = null;
+            }
+        }
+    }
+
+    public void setOnScrollEndListener(OnSmoothScrollEndListener onScrollEndListener) {
+        this.onScrollEndListener = onScrollEndListener;
+    }
+
+    public interface OnSmoothScrollEndListener {
+        void  onStop();
     }
 }

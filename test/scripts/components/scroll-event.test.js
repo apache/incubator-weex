@@ -60,7 +60,7 @@ describe('scroller scroll event', function () {
 
   beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/scroller-scroll.js'))
+      .get(util.getPage('/components/scroller-scroll.js'))
   });
 
   afterEach(function () {

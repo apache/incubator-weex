@@ -33,6 +33,7 @@ import modal from './modal'
 import navigatorModule from './navigator'
 import webview from './webview'
 import websocket from './websocket'
+import meta from './meta'
 
 export default [
   geolocation,
@@ -46,5 +47,6 @@ export default [
   dom,
   globalEvent,
   navigatorModule,
-  webview
+  webview,
+  meta
 ]

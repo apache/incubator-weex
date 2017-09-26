@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,12 +17,16 @@
  * under the License.
  */
 
-#import <SocketRocket/SRWebSocket.h>
-#import "WXWebSocketHandler.h"
+#import <Foundation/Foundation.h>
+#import "WXComponent.h"
 
-@interface SRWebSocket (Weex)
+@interface WXCellSlotComponent : WXComponent
 
-@property (nonatomic, copy) NSString *wx_Identifier;
-@property (nonatomic, weak) id<WXWebSocketDelegate> wx_WebSocketDelegate;
+@property (nonatomic, strong) NSString *templateType;
+
+- (void)updateCellData:(NSDictionary *)data;
+
+- (void)triggerLayout;
+
 
 @end

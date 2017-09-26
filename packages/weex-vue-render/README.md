@@ -138,6 +138,48 @@ vue: {
 * fix `modal.toast` on android.
 * fix css prefixer for gradients.
 
+#### 0.12.4
+
+* fix scanning style in production with uglified code.
+
+#### 0.12.8
+
+* optimize event binding.
+* fix a-jump interception condition.
+
+#### 0.12.9
+
+* event handling ignore none-vue element.
+
+#### 0.12.10
+
+* fix accessing vm in dom which is not a vue component.
+
+#### 0.12.11
+
+* fix styles in firefox.
+* implement methods about selection range.
+
+#### 0.12.12
+
+* fix NS (svg) bug in vue.js@v2.4.3
+
+#### 0.12.13
+
+* reset `env.deviceHeight` after window's resizing.
+
+#### 0.12.14
+
+* fix loading & refresh: pulling down wrongly triggered.
+
+#### 0.12.16
+
+* not to prevent default behaviour of click events unless the click-binding element is inside a `<a>` link, or it is a `<a>` link and has a `prevent` attribute on it.
+
+#### 0.12.17
+
+* support offset appear.
+
 ## component -> dom map
 
 | component | dom element | children | note |

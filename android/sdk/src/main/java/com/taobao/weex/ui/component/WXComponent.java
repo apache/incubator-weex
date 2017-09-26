@@ -59,6 +59,7 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
@@ -66,6 +67,8 @@ import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -78,6 +81,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
+import com.taobao.weex.utils.BoxShadowUtil;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
@@ -143,6 +147,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
+
+  private boolean waste = false;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -297,8 +303,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
     if(mInstance != null && mDomObj != null) {
-      mInstance.fireEvent(mCurrentRef, type, params,domChanges);
+        List<Object> eventArgsValues = null;
+        if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
+             eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
+        }
+        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues);
     }
+  }
+
+
+  /**
+   * find certain class type parent
+   * */
+  public  Object findTypeParent(WXComponent component, Class type){
+    if(component.getClass() == type){
+      return component;
+    }
+    if(component.getParent() != null) {
+        findTypeParent(component.getParent(), type);
+    }
+    return  null;
   }
 
   /**
@@ -735,9 +759,23 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-        Float radius = WXUtils.getFloat(param,null);
-        if (radius != null)
-          setBorderRadius(key,radius);
+        final Float radius = WXUtils.getFloat(param,null);
+        final String finalKey = key;
+        if (radius != null) {
+          if (this instanceof WXDiv && mHost != null) {
+            /* Hacked by moxun
+               Set border radius on ViewGroup will cause the Overlay to be cut and don't know why
+               Delay setting border radius can avoid the problem, and don't know why too, dog science…… */
+            mHost.postDelayed(new Runnable() {
+              @Override
+              public void run() {
+                setBorderRadius(finalKey, radius);
+              }
+            }, 64);
+          } else {
+            setBorderRadius(finalKey, radius);
+          }
+        }
         return true;
       case Constants.Name.BORDER_WIDTH:
       case Constants.Name.BORDER_TOP_WIDTH:
@@ -815,8 +853,50 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.RIGHT:
       case Constants.Name.BOTTOM:
         return true;
+      case Constants.Name.BOX_SHADOW:
+        updateBoxShadow();
+        return true;
       default:
         return false;
+    }
+  }
+
+  protected void updateBoxShadow() {
+    if (getDomObject() != null && getDomObject().getStyles() != null) {
+      Object boxShadow = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
+      if (boxShadow == null) {
+        return;
+      }
+
+      float[] radii = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
+      WXStyle style = getDomObject().getStyles();
+      if (style != null) {
+        float tl = WXUtils.getFloat(style.get(Constants.Name.BORDER_TOP_LEFT_RADIUS), 0f);
+        radii[0] = tl;
+        radii[1] = tl;
+
+        float tr = WXUtils.getFloat(style.get(Constants.Name.BORDER_TOP_RIGHT_RADIUS), 0f);
+        radii[2] = tr;
+        radii[3] = tr;
+
+        float br = WXUtils.getFloat(style.get(Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS), 0f);
+        radii[4] = br;
+        radii[5] = br;
+
+        float bl = WXUtils.getFloat(style.get(Constants.Name.BORDER_BOTTOM_LEFT_RADIUS), 0f);
+        radii[6] = bl;
+        radii[7] = bl;
+
+        if (style.containsKey(Constants.Name.BORDER_RADIUS)) {
+          float radius = WXUtils.getFloat(style.get(Constants.Name.BORDER_RADIUS), 0f);
+          for (int i = 0; i < radii.length; i++) {
+            radii[i] = radius;
+          }
+        }
+      }
+      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
+    } else {
+      WXLogUtils.w("Can not resolve styles");
     }
   }
 
@@ -864,6 +944,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   protected void appendEventToDOM(String type){
     WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(),type),false);
+  }
+
+
+  public void addEvent(Object type) {
+    if(type instanceof  CharSequence){
+       addEvent(type.toString());
+    }else if(type instanceof JSONObject){
+       JSONObject bindings = (JSONObject) type;
+       String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+       if(eventName != null){
+         addEvent(eventName);
+       }
+    }
   }
 
   /**
@@ -1424,6 +1517,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return original;
   }
 
+  public void  clearPreLayout(){
+    mPreRealLeft = 0;
+    mPreRealWidth = 0;
+    mPreRealHeight = 0;
+    mPreRealTop = 0;
+  }
+
   /**
    * This method computes user visible left-top point in view's coordinate.
    * The default implementation uses the scrollX and scrollY of the view as the result,
@@ -1448,6 +1548,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void notifyAppearStateChange(String wxEventType,String direction){
     if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+  }
+
+  public void notifyWatchAppearDisappearEvent(String wxEventType,String direction){
+    if(containsEvent(wxEventType)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
       fireEvent(wxEventType, params);
@@ -1682,7 +1790,45 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           }
           uiEvent.submit();
         } else {
-          WXLogUtils.w("onRenderFinish", "createView() not called");
+          if(WXEnvironment.isApkDebugable() && !isLazy()) {
+            WXLogUtils.w("onRenderFinish", "createView() not called");
+          }
+        }
+      }
+    }
+  }
+
+  public boolean isWaste() {
+    return waste;
+  }
+
+  public void setWaste(boolean waste) {
+    if(this.waste != waste){
+      this.waste = waste;
+      WXDomObject domObject = (WXDomObject) getDomObject();
+      if(waste){
+          if(domObject.getAttrs().getStatement() == null) {
+              domObject.setVisible(false);
+              if (getHostView() != null) {
+                getHostView().setVisibility(View.GONE);
+              }
+              return;
+          }
+          if(Constants.Value.VISIBLE.equals(domObject.getAttrs().get(Constants.Name.VIF_FALSE))){
+             domObject.setVisible(true);
+             if(getHostView() != null){
+               getHostView().setVisibility(View.VISIBLE);
+             }
+          }else{
+            domObject.setVisible(false);
+            if(getHostView() != null){
+              getHostView().setVisibility(View.GONE);
+            }
+          }
+      }else{
+        domObject.setVisible(true);
+        if(getHostView() != null){
+          getHostView().setVisibility(View.VISIBLE);
         }
       }
     }

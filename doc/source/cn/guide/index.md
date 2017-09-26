@@ -10,9 +10,11 @@ has_chapter_content: true
 
 Weex 是一套简单易用的跨平台开发方案，能以 web 的开发体验构建高性能、可扩展的 native 应用，为了做到这些，Weex 与  Vue 合作，使用 Vue 作为上层框架，并遵循 W3C 标准实现了统一的 JSEngine 和 DOM API，这样一来，你甚至可以使用其他框架驱动 Weex，打造三端一致的 native 应用。
 
-## Vue 是什么？
+## VueJS简介
 
-Vue.js 是 Evan You 开发的渐进式 JavaScript 框架。开发者能够通过撰写 `*.vue` 文件，基于 `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。
+> [VueJS](https://vuejs.org/) 是 Evan You 开发的渐进式 JavaScript 框架。开发者能够通过撰写 `*.vue` 文件，基于 `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。
+
+**VueJS 由 [Evan You](https://twitter.com/youyuxi) 开发维护.**
 
 ## Hello World
 
@@ -52,5 +54,6 @@ Vue.js 是 Evan You 开发的渐进式 JavaScript 框架。开发者能够通过
   }
 </script>
 ```
+它太容易了，对吧?看一下语法，这就是vue。
 
-我们暂时不去关心 Weex 的技术细节，仅看大致的代码结构，我们可以看到语法就是我们熟悉的 Vue。你可以修改这个例子，再次扫码尝试。
+你可以试着修改Hello World示例如果你有以前的知识构建VueJS的例子，然后生成一个新的二维码扫描。如果你没有以前的VueJS知识,别担心,这个指南教你。此外，你可以学习(VueJS指南)(https://vuejs.org/v2/guide)。

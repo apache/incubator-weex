@@ -38,6 +38,7 @@
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
 #import "WXTracingManager.h"
+#import "WXComponent+Events.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -85,9 +86,9 @@
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
         _subcomponents = [NSMutableArray array];
-        
         _absolutePosition = CGPointMake(NAN, NAN);
         
+        _displayType = WXDisplayTypeBlock;
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
@@ -96,6 +97,7 @@
         _accessibilityHintContent = nil;
         
         _async = NO;
+        _transition = [[WXTransition alloc]initWithStyles:styles];
         
         //TODO set indicator style 
         if ([type isEqualToString:@"indicator"]) {
@@ -140,6 +142,41 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+    NSInteger copyId = 0;
+    @synchronized(self){
+        static NSInteger __copy = 0;
+        copyId = __copy % (1024*1024);
+        __copy++;
+    }
+    NSString *copyRef = [NSString stringWithFormat:@"%zdcopy_of%@", copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
+    WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
+    if (_isTemplate) {
+        component->_templateComponent = self;
+    } else {
+        component->_templateComponent = self->_templateComponent;
+    }
+    memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
+    component->_cssNode->context = (__bridge void *)component;
+    component->_calculatedFrame = self.calculatedFrame;
+    
+    NSMutableArray *subcomponentsCopy = [NSMutableArray array];
+    for (WXComponent *subcomponent in self.subcomponents) {
+        WXComponent *subcomponentCopy = [subcomponent copy];
+        subcomponentCopy->_supercomponent = component;
+        [subcomponentsCopy addObject:subcomponentCopy];
+    }
+    
+    component->_subcomponents = subcomponentsCopy;
+    
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
+    });
+    
+    return component;
+}
+
 - (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
 {
     UIAccessibilityTraits newTrait = trait;
@@ -154,7 +191,25 @@
 {
     free_css_node(_cssNode);
 
-    [self _removeAllEvents];
+//    [self _removeAllEvents];
+    // remove all gesture and all
+    if (_tapGesture) {
+        [_tapGesture removeTarget:nil action:NULL];
+    }
+    if ([_swipeGestures count]) {
+        for (UISwipeGestureRecognizer *swipeGestures in _swipeGestures) {
+            [swipeGestures removeTarget:nil action:NULL];
+        }
+    }
+    
+    if (_longPressGesture) {
+        [_longPressGesture removeTarget:nil action:NULL];
+    }
+    
+    if (_panGesture) {
+        [_panGesture removeTarget:nil action:NULL];
+    }
+    
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
     }
@@ -170,7 +225,6 @@
     pthread_mutex_lock(&_propertyMutex);
     styles = _styles;
     pthread_mutex_unlock(&_propertyMutex);
-    
     return styles;
 }
 
@@ -207,6 +261,28 @@
     pthread_mutex_unlock(&_propertyMutex);
     
     return events;
+}
+
+- (void)setDisplayType:(WXDisplayType)displayType
+{
+    if (_displayType != displayType) {
+        _displayType = displayType;
+        if (displayType == WXDisplayTypeNone) {
+            _isNeedJoinLayoutSystem = NO;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self removeFromSuperview];
+            });
+        } else {
+            _isNeedJoinLayoutSystem = YES;
+            [self.supercomponent _recomputeCSSNodeChildren];
+            WXPerformBlockOnMainThread(^{
+                [self _buildViewHierarchyLazily];
+                // TODO: insert into the correct index
+                [self.supercomponent.view addSubview:self.view];
+            });
+        }
+    }
 }
 
 - (WXSDKInstance *)weexInstance
@@ -345,7 +421,6 @@
     if (WX_MONITOR_INSTANCE_PERF_IS_RECORDED(WXPTFirstScreenRender, self.weexInstance)) {
         return;
     }
-    
     CGPoint absolutePosition = [self.supercomponent.view convertPoint:_view.frame.origin toView:_weexInstance.rootView];
     if (absolutePosition.y + _view.frame.size.height > self.weexInstance.rootView.frame.size.height + 1) {
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, self.weexInstance);
@@ -370,6 +445,26 @@
 - (css_node_t *)cssNode
 {
     return _cssNode;
+}
+
+- (void)_addEventParams:(NSDictionary *)params
+{
+    pthread_mutex_lock(&_propertyMutex);
+    if (!_eventParameters) {
+        _eventParameters = [NSMutableDictionary dictionary];
+    }
+    [_eventParameters addEntriesFromDictionary:params];
+    pthread_mutex_unlock(&_propertyMutex);
+}
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName
+{
+    NSArray *params;
+    pthread_mutex_lock(&_propertyMutex);
+    params = _eventParameters[eventName];
+    pthread_mutex_unlock(&_propertyMutex);
+    
+    return params;
 }
 
 #pragma mark Component Hierarchy 
@@ -441,6 +536,11 @@
     [newSupercomponent _insertSubcomponent:self atIndex:index];
 }
 
+- (void)_didInserted
+{
+    
+}
+
 - (id<WXScrollerProtocol>)ancestorScroller
 {
     if(!_ancestorScroller) {
@@ -461,9 +561,6 @@
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
     if ([self _isPropertyTransitionStyles:styles]) {
-        if (!_transition) {
-            _transition = [WXTransition new];
-        }
         [_transition _handleTransitionWithStyles:styles withTarget:self];
     } else {
         styles = [self parseStyles:styles];
@@ -479,17 +576,16 @@
 - (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = self.styles[kWXTransitionProperty];
-    if (property) {
-        if (([property containsString:@"width"]&&styles[@"width"])
-            ||([property containsString:@"height"]&&styles[@"height"])
-            ||([property containsString:@"right"]&&styles[@"right"])
-            ||([property containsString:@"left"]&&styles[@"left"])
-            ||([property containsString:@"bottom"]&&styles[@"bottom"])
-            ||([property containsString:@"top"]&&styles[@"top"])
-            ||([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
-            ||([property containsString:@"transform"]&&styles[@"transform"])
-            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+    if (_transition.transitionOptions != WXTransitionOptionsNone) {
+        if ((_transition.transitionOptions & WXTransitionOptionsWidth &&styles[@"width"])
+            ||(_transition.transitionOptions & WXTransitionOptionsHeight &&styles[@"height"])
+            ||(_transition.transitionOptions & WXTransitionOptionsRight &&styles[@"right"])
+            ||(_transition.transitionOptions & WXTransitionOptionsLeft &&styles[@"left"])
+            ||(_transition.transitionOptions & WXTransitionOptionsBottom &&styles[@"bottom"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTop &&styles[@"top"])
+            ||(_transition.transitionOptions & WXTransitionOptionsBackgroundColor &&styles[@"backgroundColor"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTransform &&styles[@"transform"])
+            ||(_transition.transitionOptions & WXTransitionOptionsOpacity &&styles[@"opacity"])) {
             yesOrNo = true;
         }
     }
@@ -499,11 +595,10 @@
 - (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
-    NSString *property = self.styles[kWXTransitionProperty];
-    if (property) {
-        if (([property containsString:@"backgroundColor"]&&styles[@"backgroundColor"])
-            ||([property containsString:@"transform"]&&styles[@"transform"])
-            ||([property containsString:@"opacity"]&&styles[@"opacity"])) {
+    if (_transition.transitionOptions != WXTransitionOptionsNone) {
+        if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor &&styles[@"backgroundColor"])
+            ||(_transition.transitionOptions & WXTransitionOptionsTransform &&styles[@"transform"])
+            ||(_transition.transitionOptions & WXTransitionOptionsOpacity &&styles[@"opacity"])) {
             yesOrNo = true;
         }
     }

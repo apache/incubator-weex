@@ -87,12 +87,12 @@ public class Actions {
         if (args == null) {
           return null;
         }
-        return new AddEventAction(args.getString(0),args.getString(1));
+        return new AddEventAction(args.getString(0),args.get(1));
       case REMOVE_EVENT:
         if (args == null) {
           return null;
         }
-        return new RemoveEventAction(args.getString(0),args.getString(1));
+        return new RemoveEventAction(args.getString(0),args.get(1));
       case CREATE_FINISH:
         return new CreateFinishAction();
       case REFRESH_FINISH:

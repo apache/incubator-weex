@@ -72,7 +72,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     DESTROYED.mRef = "_destroyed";
   }
   private AtomicBoolean sDestroy = new AtomicBoolean();
-
+  
   private int mViewPortWidth =750;
 
   private DomContext mDomContext;
@@ -86,6 +86,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   /** package **/ WXAttr mAttributes;
 
   /** package **/ WXEvent mEvents;
+
+
+
+
 
   private List<WXDomObject> mDomChildren;
 
@@ -158,6 +162,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return mEvents;
   }
 
+
+
   public @NonNull DomContext getDomContext() {
     return mDomContext;
   }
@@ -222,16 +228,20 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     }
     Object event = map.get("event");
     if (event != null && event instanceof JSONArray) {
-      WXEvent events = new WXEvent();
-      JSONArray eventArray = (JSONArray) event;
-      int count = eventArray.size();
-      for (int i = 0; i < count; ++i) {
-        events.add(eventArray.getString(i));
-      }
-      this.mEvents = events;
+        WXEvent events = new WXEvent();
+        JSONArray eventArray = (JSONArray) event;
+        int count = eventArray.size();
+        for (int i = 0; i < count; i++) {
+            Object value = eventArray.get(i);
+            events.addEvent(value);
+        }
+        this.mEvents = events;
     }
 
   }
+
+
+
 
 
   /**

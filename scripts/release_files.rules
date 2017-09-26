@@ -42,6 +42,7 @@
 + /packages/weex-html5
 + /packages/weex-html5/package.json
 + /packages/weex-vue-render
++ /packages/weex-vue-render/src/**
 + /packages/weex-vue-render/package.json
 + /build
 + /build/**

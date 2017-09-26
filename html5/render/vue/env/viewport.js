@@ -118,9 +118,17 @@ export function init (viewportWidth: number = width): ?{
     screenWidth = doc.documentElement.clientWidth
     screenHeight = doc.documentElement.clientHeight
 
+    const resetDeviceHeight = function () {
+      screenHeight = doc.documentElement.clientHeight
+      const env = window.weex && window.weex.config.env
+      info.deviceHeight = env.deviceHeight = screenHeight * dpr
+    }
+
     // set root font for rem.
     setRootFont(screenWidth)
     setMetaViewport(viewportWidth)
+
+    window.addEventListener('resize', resetDeviceHeight)
 
     /**
      * why not to use window.screen.width to get screenWidth ? Because in some

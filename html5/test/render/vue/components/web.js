@@ -29,14 +29,14 @@ init('<web> component', (Vue, helper) => {
     const vm = compile(`<web></web>`)
 
     // console.log(vm.$el)
-    expect(vm.$el.tagName).to.be.equal('IFRAME')
+    expect(vm.$el.tagName.toLowerCase()).to.be.equal('iframe')
     expect(utils.toArray(vm.$el.classList)).to.include.members(['weex-web', 'weex-el'])
   })
 
   it('use src attribute', () => {
     const vm = compile(`<web src="https://x.cn"></web>`)
 
-    expect(vm.$el.tagName).to.be.equal('IFRAME')
+    expect(vm.$el.tagName.toLowerCase()).to.be.equal('iframe')
     expect(vm.$el.getAttribute('src')).to.be.equal('https://x.cn')
     expect(utils.toArray(vm.$el.classList)).to.include.members(['weex-web', 'weex-el'])
   })

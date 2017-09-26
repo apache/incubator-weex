@@ -18,7 +18,7 @@
  */
 
 function getHeader (weex) {
-  const { extractComponentStyle, createEventMap } = weex
+  const { extractComponentStyle } = weex
   const { supportSticky } = weex.utils
 
   return {
@@ -33,7 +33,7 @@ function getHeader (weex) {
 
     mounted () {
       this.initTop = this.$el.offsetTop
-      this.placeholder = window.document.createElement('div')
+      this.placeholder = window.document.createElement('header')
     },
 
     updated () {
@@ -68,7 +68,6 @@ function getHeader (weex) {
       // }
       return createElement('html:header', {
         attrs: { 'weex-type': 'header' },
-        on: createEventMap(this),
         ref: 'header',
         staticClass: 'weex-header weex-ct',
         class: { 'weex-sticky': this.sticky, 'weex-ios-sticky': this.supportSticky },

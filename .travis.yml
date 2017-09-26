@@ -5,35 +5,21 @@ language: node_js
 node_js: 7.6
 rvm: 2.0.0
 env:
-  - TEST_SUITE=ios
   - TEST_SUITE=danger
   - TEST_SUITE=jsfm
   - TEST_SUITE=android
-  - TEST_SUITE=release
 matrix:
     fast_finish: true
     exclude:
-      - os: linux
-        env: TEST_SUITE=ios
       - os: osx
         env: TEST_SUITE=danger
       - os: osx
         env: TEST_SUITE=jsfm
       - os: osx
         env: TEST_SUITE=android
-      - os: osx
-        env: TEST_SUITE=ios
       - os: linux
         env: TEST_SUITE=android
-      - os: osx
-        env: TEST_SUITE=release
-      - os: linux
-        env: TEST_SUITE=release
     include:
-      - os: osx
-        env: TEST_SUITE=release
-        osx_image: xcode8.1
-        language: objective-c
       - os: osx
         env: TEST_SUITE=ios
         osx_image: xcode8.1
@@ -64,49 +50,25 @@ before_script:
       npm install
     fi
   - |
-    if [[ $TEST_SUITE = "ios" ]]; then
-      brew update
+    if [[ $TEST_SUITE = "jsfm" ]]; then
+      npm install
     fi
   - |
-    if [[ $TEST_SUITE = "release" ]]; then
-      brew update
-      #manual install android sdk
-      brew cask install android-sdk
-      brew install gradle
-      export ANDROID_HOME=/usr/local/share/android-sdk
-      export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
-      echo yes | sdkmanager platform-tools
-      echo yes | sdkmanager tools #tools
-      echo yes | sdkmanager "build-tools;25.0.3" #build-tool
-      echo yes | sdkmanager "platforms;android-25" #compile target
-      echo yes | sdkmanager "extras;android;m2repository" #support
+    if [[ $TEST_SUITE = "danger" ]]; then
+      npm install
     fi
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
-      cd android
-      ./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
-      cd $TRAVIS_BUILD_DIR
-    fi
-  - |
-    if [[ $TEST_SUITE = "ios" ]]; then
-      xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
+      npm run danger -- run --dangerfile ./dangerfile-android.js
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
-      npm run build &&
-      npm run test
+      npm run danger -- run --dangerfile ./dangerfile-jsfm.js
     fi
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
-      npm run danger
-    fi
-  - |
-    if [[ $TEST_SUITE = "release" ]]; then
-      bash scripts/generate_apache_release.sh &&
-      cd apache_release_temp &&
-      bash scripts/build_from_source.sh &&
-      cd $TRAVIS_BUILD_DIR
+      npm run danger -- run --dangerfile ./dangerfile.js
     fi
 notifications:
   webhooks:

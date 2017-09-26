@@ -24,13 +24,15 @@ const _css = `
   width: 1rem !important;
   height: 1rem !important;
   -webkit-box-align: center;
+  -moz-box-align: center;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-pack: center;
+  -moz-box-pack: center;
   -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   overflow: visible;
   background: none;
 }
@@ -47,7 +49,8 @@ const _css = `
   position: relative;
   text-indent: -9999em;
   -webkit-animation: weex-spinner 1.1s infinite ease;
-          animation: weex-spinner 1.1s infinite ease;
+  -moz-animation: weex-spinner 1.1s infinite ease;
+  animation: weex-spinner 1.1s infinite ease;
 }
 
 @-webkit-keyframes weex-spinner {
