@@ -147,7 +147,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.scrollEnabled = _scrollable;
     scrollView.pagingEnabled = _pagingEnabled;
 #ifdef __IPHONE_11_0
-    scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    if (@available(iOS 11.0, *)) {
+        scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    } else {
+        // Fallback on earlier versions
+    }
 #endif
     
     if (self.ancestorScroller) {
