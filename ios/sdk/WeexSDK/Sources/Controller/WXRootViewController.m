@@ -33,6 +33,7 @@ typedef void(^OperationBlock)(void);
 
 @implementation WXRootViewController
 
+
 - (void)viewDidLoad
 {
     self.interactivePopGestureRecognizer.delegate = self;
