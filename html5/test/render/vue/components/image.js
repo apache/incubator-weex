@@ -32,7 +32,6 @@ init('<image> component', (Vue, helper) => {
     expect(el.tagName.toLowerCase()).to.be.equal('figure')
     expect(utils.toArray(el.classList)).to.include.members(['weex-image', 'weex-el'])
     expect(el.getAttribute('weex-type')).to.be.equal('image')
-    expect(el.innerHTML).to.be.equal('')
   })
 
   it('<image> with src', () => {
