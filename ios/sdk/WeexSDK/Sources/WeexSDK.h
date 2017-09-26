@@ -67,7 +67,6 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
 #import "WXAComponent.h"
-#import "SRWebSocket+Weex.h"
 #import "NSObject+WXSwizzle.h"
 #import "Layout.h"
 
