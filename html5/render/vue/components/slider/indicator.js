@@ -23,6 +23,8 @@ const _css = `
   z-index: 10;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
   flex-direction: row;
   -webkit-box-orient: horizontal;
   margin: 0;

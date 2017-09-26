@@ -254,7 +254,10 @@ export function appendCss (css: string, cssId: string, replace: boolean) {
   style.appendChild(document.createTextNode(css))
 }
 export function nextFrame (callback: any) {
-  const runner = window.requestAnimationFrame || window.webkitRequestAnimationFrame || (cb => setTimeout(cb, 16))
+  const runner = window.requestAnimationFrame
+    || window.webkitRequestAnimationFrame
+    || window.mozRequestAnimationFrame
+    || (cb => setTimeout(cb, 16))
   runner(callback)
 }
 export function toCSSText (object: any) {

@@ -36,9 +36,52 @@ export function getParentScroller (vm) {
   return _getParentScroller(vm.$parent)
 }
 
-export function hasIntersection (rect, ctRect) {
-  return (rect.left < ctRect.right && rect.right > ctRect.left)
-    && (rect.top < ctRect.bottom && rect.bottom > ctRect.top)
+function horizontalBalance (rect, ctRect) {
+  return rect.left < ctRect.right && rect.right > ctRect.left
+}
+
+function verticalBalance (rect, ctRect) {
+  return rect.top < ctRect.bottom && rect.bottom > ctRect.top
+}
+
+/**
+ * return a data array with two boolean value, which are:
+ * 1. visible in current ct's viewport.
+ * 2. visible with offset in current ct's viewport.
+ */
+export function hasIntersection (rect, ctRect, dir, offset) {
+  dir = dir || 'up'
+  const isHorizontal = dir === 'left' || dir === 'right'
+  const isVertical = dir === 'up' || dir === 'down'
+  if (isHorizontal && !verticalBalance(rect, ctRect)) {
+    return [false, false]
+  }
+  if (isVertical && !horizontalBalance(rect, ctRect)) {
+    return [false, false]
+  }
+  offset = parseInt(offset || 0) * weex.config.env.scale
+  switch (dir) {
+    case 'up':
+      return [
+        rect.top < ctRect.bottom && rect.bottom > ctRect.top,
+        rect.top < ctRect.bottom + offset && rect.bottom > ctRect.top - offset
+      ]
+    case 'down':
+      return [
+        rect.bottom > ctRect.top && rect.top < ctRect.bottom,
+        rect.bottom > ctRect.top - offset && rect.top < ctRect.bottom + offset
+      ]
+    case 'left':
+      return [
+        rect.left < ctRect.right && rect.right > ctRect.left,
+        rect.left < ctRect.right + offset && rect.right > ctRect.left - offset
+      ]
+    case 'right':
+      return [
+        rect.right > ctRect.left && rect.left < ctRect.right,
+        rect.right > ctRect.left - offset && rect.left < ctRect.right + offset
+      ]
+  }
 }
 
 /**
@@ -46,7 +89,7 @@ export function hasIntersection (rect, ctRect) {
  * @param  {HTMLElement}  el    a dom element.
  * @param  {HTMLElement}  container  optional, the container of this el.
  */
-export function isElementVisible (el, container) {
+export function isElementVisible (el, container, dir, offset) {
   if (!el.getBoundingClientRect) { return false }
   const bodyRect = {
     top: 0,
@@ -57,30 +100,11 @@ export function isElementVisible (el, container) {
   const ctRect = (container === document.body)
     ? bodyRect : container
     ? container.getBoundingClientRect() : bodyRect
-  return hasIntersection(
-    el.getBoundingClientRect(),
-    ctRect)
-}
-
-export function isComponentVisible (component) {
-  if (component.$el) {
-    const scroller = getParentScroller(component)
-    if (scroller && scroller.$el) {
-      return hasIntersection(
-        component.$el.getBoundingClientRect(),
-        scroller.$el.getBoundingClientRect()
-      )
-    }
-    else {
-      return isElementVisible(component.$el)
-    }
-  }
-  return false
+  return hasIntersection(el.getBoundingClientRect(), ctRect, dir, offset)
 }
 
 // to trigger the appear/disappear event.
-function triggerEvent (elm, handlers, isShow, dir) {
-  const evt = isShow ? 'appear' : 'disappear'
+function triggerEvent (elm, handlers, evt, dir) {
   let listener = handlers[evt]
   if (listener && listener.fn) {
     listener = listener.fn
@@ -111,21 +135,35 @@ export function getEventHandlers (context) {
   return handlers
 }
 
+function getAppearOffset (el) {
+  return el && el.getAttribute('appear-offset')
+}
+
+function checkHandlers (handlers) {
+  return [
+    !!(handlers.appear || handlers.disappear),
+    !!(handlers.offsetAppear || handlers.offsetDisappear)
+  ]
+}
+
 /**
  * Watch element's visibility to tell whether should trigger a appear/disappear
  * event in scroll handler.
  */
-export function watchAppear (context) {
+export function watchAppear (context, fireNow) {
   const el = context && context.$el
-  if (!el) { return }
+  if (!el || el.nodeType !== 1) { return }
+  const appearOffset = getAppearOffset(el)
 
   const handlers = getEventHandlers(context)
-  if (!handlers.appear && !handlers.disappear) {
+  const checkResults = checkHandlers(handlers)
+  // no appear or offsetAppear handler was bound.
+  if (!checkResults[0] && !checkResults[1]) {
     return
   }
 
   let isWindow = false
-  let container = window
+  let container = document.body
   const scroller = getParentScroller(context)
   if (scroller && scroller.$el) {
     container = scroller.$el
@@ -134,16 +172,23 @@ export function watchAppear (context) {
     isWindow = true
   }
 
+  if (fireNow) {
+    const visibleData = isElementVisible(el, container, null, appearOffset)
+    detectAppear(context, visibleData, null)
+  }
+
   // add current vm to the container's appear watch list.
   if (!container._watchAppearList) {
     container._watchAppearList = []
   }
   container._watchAppearList.push(context)
-  if (container._scrollWatched) { return }
 
   /**
    * Code below will only exec once for binding scroll handler for parent container.
    */
+  if (container._scrollWatched) {
+    return
+  }
   container._scrollWatched = true
   const scrollHandler = throttle(event => {
     /**
@@ -154,42 +199,28 @@ export function watchAppear (context) {
     const scrollTop = isWindow ? window.pageYOffset : container.scrollTop
     const preTop = container._lastScrollTop
     container._lastScrollTop = scrollTop
-    const dir = scrollTop < preTop
+    const dir = (scrollTop < preTop
       ? 'down' : scrollTop > preTop
-      ? 'up' : null
-
+      ? 'up' : container._prevDirection) || null
+    container._prevDirection = dir
     const watchAppearList = container._watchAppearList || []
     const len = watchAppearList.length
     for (let i = 0; i < len; i++) {
       const vm = watchAppearList[i]
-      const visible = isElementVisible(vm.$el, isWindow ? document.body : container)
-      detectAppear(vm, visible, dir)
+      const el = vm.$el
+      const appearOffset = getAppearOffset(el)
+      const visibleData = isElementVisible(el, container, dir, appearOffset)
+      detectAppear(vm, visibleData, dir)
     }
   }, 25, true)
   container.addEventListener('scroll', scrollHandler, false)
 }
 
 /**
- * trigger a appear event.
- */
-export function triggerAppear (context, visible) {
-  if (!context || !context.$el) { return }
-  if (!visible) {
-    let container = document.body
-    const scroller = getParentScroller(context)
-    if (scroller && scroller.$el) {
-      container = scroller.$el
-    }
-    visible = isElementVisible(context.$el, container)
-  }
-  return detectAppear(context, visible)
-}
-
-/**
  * trigger a disappear event.
  */
 export function triggerDisappear (context) {
-  return detectAppear(context, false)
+  return detectAppear(context, [false, false])
 }
 
 /**
@@ -198,21 +229,36 @@ export function triggerDisappear (context) {
  * @param {boolean} visible
  * @param {string} dir
  */
-export function detectAppear (context, visible, dir = null) {
+export function detectAppear (context, visibleData, dir = null, appearOffset) {
   const el = context && context.$el
+  const [visible, offsetVisible] = visibleData
   if (!el) { return }
   const handlers = getEventHandlers(context)
-  if (!handlers[visible ? 'appear' : 'disappear']) { return }
+  /**
+   * No matter it's binding appear/disappear or both of them. Always
+   * should test it's visibility and change the context/._visible.
+   * If neithor of them was bound, then just ignore it.
+   */
   /**
    * if the component hasn't appeared for once yet, then it shouldn't trigger
    * a disappear event at all.
    */
-  if (!visible && !context._appearedOnce) { return }
-  if (!context._visible === visible) {
-    if (!context._appearedOnce) {
-      context._appearedOnce = true
+  if (context._appearedOnce || visible) {
+    if (context._visible !== visible) {
+      if (!context._appearedOnce) {
+        context._appearedOnce = true
+      }
+      context._visible = visible
+      triggerEvent(el, handlers, visible ? 'appear' : 'disappear', dir)
     }
-    context._visible = visible
-    triggerEvent(el, handlers, visible, dir)
+  }
+  if (context._offsetAppearedOnce || offsetVisible) {
+    if (context._offsetVisible !== offsetVisible) {
+      if (!context._offsetAppearedOnce) {
+        context._offsetAppearedOnce = true
+      }
+      context._offsetVisible = offsetVisible
+      triggerEvent(el, handlers, offsetVisible ? 'offsetAppear' : 'offsetDisappear', dir)
+    }
   }
 }

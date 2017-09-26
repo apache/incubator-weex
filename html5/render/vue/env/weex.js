@@ -47,6 +47,27 @@ const weex = {
     return this.registerApiModule(...args)
   },
 
+  support (feature = '') {
+    const match = (feature + '').match(/@(component|module)\/(\w+)(.\w+)?/)
+    if (match) {
+      const type = match[1]
+      const mod = match[2]
+      let method = match[3]
+      method = method && method.replace(/^\./, '')
+      switch (type) {
+        case 'component':
+          return !!this._components[mod]
+        case 'module':
+          const module = this.requireModule(mod)
+          return module && method ? !!module[method] : !!module
+      }
+    }
+    else {
+      console.warn(`[vue-render] invalid argument for weex.support: ${feature}`)
+      return null
+    }
+  },
+
   /**
    * Register a new vue instance in this weex instance. Put its root element into weex.document.body.children, so
    * that user can use weex.document.body to walk through all dom structures in all vue instances in the page.

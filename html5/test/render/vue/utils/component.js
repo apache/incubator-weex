@@ -47,11 +47,6 @@ init('utils component', (Vue, helper) => {
       expect(getParentScroller).to.be.a('function')
       expect(getParentScroller(vm)).to.be.a('undefined')
     })
-    it('isComponentVisible', () => {
-      const { isComponentVisible } = components
-      expect(isComponentVisible).to.be.a('function')
-      expect(isComponentVisible(vm)).to.be.true
-    })
   })
   describe('watchAppear', () => {
     it('should work when mounted and updated.', function (done) {

@@ -17,36 +17,20 @@
  * under the License.
  */
 
-// modules from render/browesr (legacy modules)
+const meta = {
+  /**
+   * setViewport
+   * Changing viewport width at runtime is not supported. Please use weex-viewport meta
+   * tag to specify your viewport in your html file.
+   */
+  setViewport (options) {
+    console.warn(`[vue-render] meta.setViewport doesn't works as expected in web platform.`
+    + ` Please use <meta name="weex-viewport" content="xxx"> to specify your viewport width.`)
+  }
+}
 
-import geolocation from '../../browser/extend/api/geolocation'
-import storage from '../../browser/extend/api/storage'
-import stream from '../../browser/extend/api/stream'
-import clipboard from '../../browser/extend/api/clipboard'
-import eventModule from '../../browser/extend/api/event'
-
-// custom modules
-import animation from './animation'
-import dom from './dom'
-import globalEvent from './globalEvent'
-import modal from './modal'
-import navigatorModule from './navigator'
-import webview from './webview'
-import websocket from './websocket'
-import meta from './meta'
-
-export default [
-  geolocation,
-  storage,
-  stream,
-  clipboard,
-  eventModule,
-  modal,
-  websocket,
-  animation,
-  dom,
-  globalEvent,
-  navigatorModule,
-  webview,
-  meta
-]
+export default {
+  init (weex) {
+    weex.registerModule('meta', meta)
+  }
+}

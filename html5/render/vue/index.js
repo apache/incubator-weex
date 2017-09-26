@@ -20,6 +20,8 @@ import weex from './env'
 import { setVue } from './env'
 import { base, style, sticky } from './mixins'
 
+import initEventMgr from './env/event-manager'
+
 /**
  * init weex.
  * @param  {Vue$2} Vue: Vue Constructor.
@@ -43,9 +45,22 @@ function init (Vue/*, options = {}*/) {
   Vue.config.isReservedTag = tag => htmlRegex.test(tag)
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
 
+  function isWeexTag (tag) {
+    return !!weex._components[tag]
+  }
+  const oldGetTagNamespace = Vue.config.getTagNamespace
+  Vue.config.getTagNamespace = function (tag) {
+    if (isWeexTag(tag)) {
+      return
+    }
+    return oldGetTagNamespace(tag)
+  }
+
   Vue.mixin(base)
   Vue.mixin(style)
   Vue.mixin(sticky)
+
+  initEventMgr()
 }
 
 // auto init in dist mode.
