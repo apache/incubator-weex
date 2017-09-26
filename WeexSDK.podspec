@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
                    }
   s.platform     = :ios
   s.ios.deployment_target = '7.0'
-  s.source =  { :path => '.' }
+  s.source       = { :git => "https://github.com/apache/incubator-weex.git", :tag => "#{s.version}" }
   s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
   s.resources = 'pre-build/native-bundle-main.js', 'ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
 
