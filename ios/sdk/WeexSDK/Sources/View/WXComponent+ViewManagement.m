@@ -94,6 +94,10 @@ do {\
 {
     WXAssertMainThread();
     
+    if (subcomponent.displayType == WXDisplayTypeNone) {
+        return;
+    }
+    
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.rootView addSubview:subcomponent.view];

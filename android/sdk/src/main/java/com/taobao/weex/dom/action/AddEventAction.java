@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.dom.action;
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
@@ -26,6 +27,7 @@ import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
@@ -37,11 +39,11 @@ import java.util.List;
  */
 class AddEventAction extends TraceableAction implements DOMAction, RenderAction {
   private final String mRef;
-  private final String mEvent;
+  private final Object mEvent;
 
   private WXDomObject mUpdatedDom;
 
-  AddEventAction(String ref, String event) {
+  AddEventAction(String ref, Object event) {
     mRef = ref;
     mEvent = event;
   }
@@ -61,9 +63,9 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
       }
       return;
     }
-    domObject.addEvent(mEvent);
-    mUpdatedDom = domObject;
 
+    domObject.getEvents().addEvent(mEvent);
+    mUpdatedDom = domObject;
     if (WXTracing.isAvailable() && mBeginEvent != null) {
       submitPerformance("addEventToDom", "X", instance.getInstanceId(), Stopwatch.tack(), Stopwatch.lastTickStamp(), true);
     }
@@ -83,7 +85,6 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
       Stopwatch.tick();
       comp.updateDom(mUpdatedDom);
       Stopwatch.split("updateDom");
-
       comp.addEvent(mEvent);
       Stopwatch.split("addEventToComponent");
 

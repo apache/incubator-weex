@@ -390,7 +390,7 @@ describe('Element in document methods', () => {
     const handler = function () {}
     el.addEvent('click', handler)
     expect(el.toJSON().event).eql(['click'])
-    expect(el.event.click).equal(handler)
+    expect(el.event.click.handler).equal(handler)
     el.removeEvent('click')
     expect(el.event.click).is.undefined
   })

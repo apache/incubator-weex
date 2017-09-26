@@ -105,6 +105,10 @@ public class WXLogUtils {
     d(tag,new String(msg));
   }
 
+  public static void wtf(String msg){
+    wtf(WEEX_TAG, msg);
+  }
+
   public static void d(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       Log.d(tag, msg);
@@ -170,6 +174,10 @@ public class WXLogUtils {
     log(tag, msg,LogLevel.ERROR);
   }
 
+  public static void wtf(String tag, String msg){
+    log(tag, msg, LogLevel.WTF);
+  }
+
   /**
    * 'p' for 'Performance', use {@link #WEEX_PERF_TAG}
    * @param msg
@@ -205,6 +213,12 @@ public class WXLogUtils {
   public static void e(String prefix, Throwable e) {
     if (WXEnvironment.isApkDebugable()) {
       e(prefix + getStackTrace(e));
+    }
+  }
+
+  public static void wtf(String prefix, Throwable e){
+    if (WXEnvironment.isApkDebugable()) {
+      wtf(prefix + getStackTrace(e));
     }
   }
 

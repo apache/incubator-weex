@@ -346,23 +346,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return WXUtils.getFloatByViewport(get(Constants.Name.BORDER_WIDTH), viewport);
   }
 
-  public float getBorderRightWidth() {
-    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
-  }
-
-  public float getBorderTopWidth() {
-    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
-  }
-
-  public float getBorderBottomWidth() {
-    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH);
-  }
-
-  public float getBorderLeftWidth() {
-    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
-  }
-
-
   public float getBorderRightWidth(int viewport) {
     return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, viewport);
   }

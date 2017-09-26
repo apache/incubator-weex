@@ -19,10 +19,7 @@
 package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
-
 import com.taobao.weex.dom.flex.Spacing;
-
-import static com.taobao.weex.dom.WXDomObject.DESTROYED;
 
 /**
  * Created by sospartan on 25/10/2016.
@@ -33,8 +30,26 @@ public interface ImmutableDomObject {
   @NonNull Spacing getMargin();
   float getLayoutWidth();
   float getLayoutHeight();
+
+  /**
+   * Use {@link #getCSSLayoutLeft()} ()} instead
+   */
+  @Deprecated
   float getLayoutX();
+
+  /**
+   * Use {@link #getCSSLayoutTop()} instead
+   */
+  @Deprecated
   float getLayoutY();
+
+  public float getCSSLayoutTop();
+
+  public float getCSSLayoutBottom();
+
+  public float getCSSLayoutLeft();
+
+  public float getCSSLayoutRight();
   boolean isFixed();
   @NonNull WXStyle getStyles();
   @NonNull WXEvent getEvents();

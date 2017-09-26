@@ -25,6 +25,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -121,6 +122,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String REF = "ref";
   public static final String MODULE = "module";
   public static final String METHOD = "method";
+  public static final String KEY_PARAMS = "params";
   public static final String ARGS = "args";
   public static final String OPTIONS = "options";
   private static final String NON_CALLBACK = "-1";
@@ -134,6 +136,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static final int CRASHREINIT = 50;
   private static int reInitCount = 1;
+
+  private static String crashUrl = null;
+  private static long lastCrashTime = 0;
 
 
   /**
@@ -938,6 +943,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         if (instance != null) {
           url = instance.getBundleUrl();
         }
+        try {
+            if (WXEnvironment.getApplication() != null) {
+                crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + crashFile;
+                // Log.e("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         callReportCrash(crashFile, instanceId, url);
         if (reInitCount > CRASHREINIT) {
           return IWXBridge.INSTANCE_RENDERING_ERROR;
@@ -954,17 +967,33 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXLogUtils.e("[WXBridgeManager] callReportCrashReloadPage exception: ", e);
       }
       try {
+
           if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-              // JSONObject domObject = JSON.parseObject(tasks);
+              boolean reloadThisInstance = shouReloadCurrentInstance(
+                      WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
               WXDomModule domModule = getDomModule(instanceId);
-              Action action = Actions.getReloadPage(instanceId);
-              domModule.postAction((DOMAction)action, true);
+              Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
+              domModule.postAction((DOMAction) action, true);
           }
+
       } catch (Exception e) {
           WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
           commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
       }
       return IWXBridge.INSTANCE_RENDERING_ERROR;
+  }
+
+  public boolean shouReloadCurrentInstance(String aUrl) {
+    long time = System.currentTimeMillis();
+    if (crashUrl == null ||
+            (crashUrl != null && !crashUrl.equals(aUrl)) ||
+            ((time - lastCrashTime) > 10000)) {
+      crashUrl = aUrl;
+      lastCrashTime = time;
+      return true;
+    }
+    lastCrashTime = time;
+    return false;
   }
 
   public void callReportCrash(String crashFile, final String instanceId, final String url) {
@@ -1052,7 +1081,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
 
-  private void addJSTask(final String method, final String instanceId, final Object... args) {
+  private void addJSEventTask(final String method, final String instanceId, final List<Object> params, final Object... args) {
     post(new Runnable() {
       @Override
       public void run() {
@@ -1062,12 +1091,18 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
         ArrayList<Object> argsList = new ArrayList<>();
         for (Object arg : args) {
-          argsList.add(arg);
+            argsList.add(arg);
+        }
+        if(params != null){
+           ArrayMap map = new ArrayMap(4);
+           map.put(KEY_PARAMS, params);
+           argsList.add(map);
         }
 
         WXHashMap<String, Object> task = new WXHashMap<>();
         task.put(KEY_METHOD, method);
         task.put(KEY_ARGS, argsList);
+
 
         if (mNextTickTasks.get(instanceId) == null) {
           ArrayList<WXHashMap<String, Object>> list = new ArrayList<>();
@@ -1078,6 +1113,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
       }
     });
+  }
+
+  private void addJSTask(final String method, final String instanceId, final Object... args) {
+    addJSEventTask(method, instanceId, null, args);
   }
 
   private void sendMessage(String instanceId, int what) {
@@ -1124,15 +1163,24 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
   public void fireEventOnNode(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data,final Map<String, Object> domChanges) {
+      fireEventOnNode(instanceId, ref, type, data, domChanges, null);
+  }
+
+  /**
+   * Notify the JavaScript about the event happened on Android
+   */
+  public void fireEventOnNode(final String instanceId, final String ref,
+                              final String type, final Map<String, Object> data,
+                              final Map<String, Object> domChanges, List<Object> params) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)
-        || TextUtils.isEmpty(type) || mJSHandler == null) {
+            || TextUtils.isEmpty(type) || mJSHandler == null) {
       return;
     }
     if (!checkMainThread()) {
       throw new WXRuntimeException(
-          "fireEvent must be called by main thread");
+              "fireEvent must be called by main thread");
     }
-    addJSTask(METHOD_FIRE_EVENT, instanceId, ref, type, data,domChanges);
+    addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 
@@ -1604,6 +1652,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
     wxParams.setPlatform(config.get(WXConfig.os));
+    wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
@@ -1795,6 +1844,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
+      if (METHOD_CREATE_INSTANCE.equals(function)) {
+        try {
+          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+            // JSONObject domObject = JSON.parseObject(tasks);
+            WXDomModule domModule = getDomModule(instanceId);
+            Action action = Actions.getReloadPage(instanceId, true);
+            domModule.postAction((DOMAction)action, true);
+            instance.setNeedLoad(true);
+            return;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 

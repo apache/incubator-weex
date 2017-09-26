@@ -215,7 +215,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     
     [WXToastManager sharedManager].toastingView = toastView;
     [superView addSubview:toastView];
-    
+    __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.2 delay:duration options:UIViewAnimationOptionCurveEaseInOut animations:^{
         toastView.transform = CGAffineTransformConcat(toastView.transform, CGAffineTransformMakeScale(0.8, 0.8)) ;
     } completion:^(BOOL finished) {
@@ -230,7 +230,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
                 [queue removeObjectAtIndex:0];
                 if (queue.count > 0) {
                     WXToastInfo *info = [queue firstObject];
-                    [self showToast:info.toastView superView:info.superView duration:info.duration];
+                    [weakSelf showToast:info.toastView superView:info.superView duration:info.duration];
                 }
             }
         }];

@@ -102,6 +102,7 @@ public class WXEnvironment {
     Map<String, String> configs = new HashMap<>();
     configs.put(WXConfig.os, OS);
     configs.put(WXConfig.appVersion, getAppVersionName());
+    configs.put(WXConfig.cacheDir, getAppCacheFile());
     configs.put(WXConfig.devId, DEV_Id);
     configs.put(WXConfig.sysVersion, SYS_VERSION);
     configs.put(WXConfig.sysModel, SYS_MODEL);
@@ -136,6 +137,21 @@ public class WXEnvironment {
     }
     return versionName;
   }
+
+  /**
+   *
+   * @return string cache file
+   */
+  private static String getAppCacheFile() {
+    String cache = "";
+    try {
+      cache = sApplication.getApplicationContext().getCacheDir().getPath();
+    } catch (Exception e) {
+      WXLogUtils.e("WXEnvironment getAppCacheFile Exception: ", e);
+    }
+    return cache;
+  }
+
 
   public static Map<String, String> getCustomOptions() {
     return options;

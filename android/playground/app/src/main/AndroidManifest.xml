@@ -47,6 +47,14 @@ under the License.
             tools:overrideLibrary="com.taobao.android.dexposed">
         <uses-library android:name="android.test.runner"/>
 
+        <receiver
+            android:name=".util.CoverageDataDumper"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.taobao.weex.DUMP_COVERAGE_DATA"/>
+            </intent-filter>
+        </receiver>
+
         <activity
                 android:name=".SplashActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"

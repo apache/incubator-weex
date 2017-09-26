@@ -44,6 +44,7 @@
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
 #import "WXJSExceptionProtocol.h"
+#import "WXTracingManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -299,6 +300,11 @@ typedef enum : NSUInteger {
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)
             return;
         }
+        if (!strongSelf.userInfo) {
+            strongSelf.userInfo = [NSMutableDictionary new];
+        }
+        strongSelf.userInfo[@"jsMainBundleStringContentLength"] = @([jsBundleString length]);
+        strongSelf.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:jsBundleString];
 
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
@@ -356,6 +362,11 @@ typedef enum : NSUInteger {
         return;
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_WILL_DESTROY_NOTIFICATION object:nil userInfo:@{@"instanceId":self.instanceId}];
+    
+    [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
+
+    
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
     
@@ -375,6 +386,7 @@ typedef enum : NSUInteger {
     if(url.length > 0){
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
+    
 }
 
 - (void)forceGarbageCollection

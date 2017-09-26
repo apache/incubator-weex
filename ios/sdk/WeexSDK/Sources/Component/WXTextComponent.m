@@ -362,12 +362,14 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
+    NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
-        _ctAttributedString = [[self buildCTAttributeString] copy];
+        _ctAttributedString = [self buildCTAttributeString];
     }
+    attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    return [_ctAttributedString copy];
+    return attributedString;
 }
 
 - (void)repaintText:(NSNotification *)notification
@@ -387,8 +389,12 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    NSString * string = [self text];
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"text %@ is invalid", [self text]);
+        string = @"";
+    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }

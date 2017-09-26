@@ -3,7 +3,7 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.21.11",
+    "framework": "0.22.4",
     "vue-render": "0.12.17",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -106,8 +106,8 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.4.11",
-    "weex-vue-framework": "2.4.2-weex.3"
+    "weex-rax-framework": "0.4.14",
+    "weex-vue-framework": "2.4.2-weex.6"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",
@@ -175,6 +175,7 @@
     "weex-vue-bundle-util": "^0.1.3",
     "weex-wd": "^1.0.23",
     "wwp": "^0.3.5",
-    "xmldom": "^0.1.27"
+    "xmldom": "^0.1.27",
+    "shelljs": "^0.7.8"
   }
 }

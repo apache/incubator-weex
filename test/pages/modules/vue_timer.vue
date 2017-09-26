@@ -1,14 +1,14 @@
 <template>
     <div>
         <text>setTimeout timeout=3000</text>
-        <div class="wrapper">
+        <div class="wrapper-top">
             <text test-id="setTimeout" class="t" @click="stimeout">SetTimeOut</text>
             <text test-id="clearTimeout" class="t" @click="ctimeout">ClearTimeOut</text>
         </div>
         <text class="content" test-id="timeout">{{timeout_content}}</text>
 
         <text style="margin-top: 100px">setInterval interval=3000</text>
-        <div style="background-color:red" class="wrapper">
+        <div class="wrapper-bottom">
             <text test-id="setInterval" class="t" @click="sinterval">SetInterval</text>
             <text test-id="clearInterval" class="t" @click="cinterval">ClearInterval</text>
         </div>
@@ -17,10 +17,18 @@
 </template>
 
 <style>
-    .wrapper {
+    .wrapper-top {
         height: 100px;
         width: 750px;
         background-color: yellow;
+        align-items: center;
+        flex-direction: row
+    }
+    
+    .wrapper-bottom {
+        height: 100px;
+        width: 750px;
+        background-color: red;
         align-items: center;
         flex-direction: row
     }

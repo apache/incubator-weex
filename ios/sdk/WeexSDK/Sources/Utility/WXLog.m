@@ -46,13 +46,6 @@
 // To reset the foreground and background color (to default values) in one operation:
 // Insert the ESCAPE_SEQ into your string, followed by ";"
 
-#define XCODE_COLORS_ESCAPE_SEQ "\033["
-
-#define XCODE_COLORS_RESET_FG   XCODE_COLORS_ESCAPE_SEQ "fg;" // Clear any foreground color
-#define XCODE_COLORS_RESET_BG   XCODE_COLORS_ESCAPE_SEQ "bg;" // Clear any background color
-#define XCODE_COLORS_RESET      XCODE_COLORS_ESCAPE_SEQ ";"  // Clear any foreground or background color
-
-
 #ifdef DEBUG
 static const WXLogLevel defaultLogLevel = WXLogLevelLog;
 #else
@@ -133,32 +126,26 @@ static id<WXLogProtocol> _externalLog;
 + (void)log:(WXLogFlag)flag file:(const char *)fileName line:(NSUInteger)line message:(NSString *)message
 {
     NSString *flagString;
-    NSString *flagColor;
     switch (flag) {
         case WXLogFlagError: {
             flagString = @"error";
-            flagColor = @"fg255,0,0;";
         }
             break;
         case WXLogFlagWarning:
             flagString = @"warn";
-            flagColor = @"fg255,165,0;";
             break;
         case WXLogFlagDebug:
             flagString = @"debug";
-            flagColor = @"fg0,128,0;";
             break;
         case WXLogFlagLog:
             flagString = @"log";
-            flagColor = @"fg128,128,128;";
             break;
         default:
             flagString = @"info";
-            flagColor = @"fg100,149,237;";
             break;
     }
     
-    NSString *logMessage = [NSString stringWithFormat:@"%s%@ <Weex>[%@]%s:%ld, %@ %s", XCODE_COLORS_ESCAPE_SEQ, flagColor, flagString, fileName, (unsigned long)line, message, XCODE_COLORS_RESET];
+    NSString *logMessage = [NSString stringWithFormat:@"<Weex>[%@]%s:%ld, %@", flagString, fileName, (unsigned long)line, message];
     
     
     if ([_externalLog logLevel] & flag) {
