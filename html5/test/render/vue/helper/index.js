@@ -39,6 +39,17 @@ export function init (title, fn) {
       Vue.config.isReservedTag = tag => htmlRegex.test(tag)
       Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
 
+      function isWeexTag (tag) {
+        return !!weex._components[tag]
+      }
+      const oldGetTagNamespace = Vue.config.getTagNamespace
+      Vue.config.getTagNamespace = function (tag) {
+        if (isWeexTag(tag)) {
+          return
+        }
+        return oldGetTagNamespace(tag)
+      }
+
       Vue.mixin(base)
       Vue.mixin(style)
 

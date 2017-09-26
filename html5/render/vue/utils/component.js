@@ -152,7 +152,7 @@ function checkHandlers (handlers) {
  */
 export function watchAppear (context, fireNow) {
   const el = context && context.$el
-  if (!el) { return }
+  if (!el || el.nodeType !== 1) { return }
   const appearOffset = getAppearOffset(el)
 
   const handlers = getEventHandlers(context)
@@ -163,7 +163,7 @@ export function watchAppear (context, fireNow) {
   }
 
   let isWindow = false
-  let container = window
+  let container = document.body
   const scroller = getParentScroller(context)
   if (scroller && scroller.$el) {
     container = scroller.$el
@@ -208,9 +208,8 @@ export function watchAppear (context, fireNow) {
     for (let i = 0; i < len; i++) {
       const vm = watchAppearList[i]
       const el = vm.$el
-      const ct = isWindow ? document.body : container
       const appearOffset = getAppearOffset(el)
-      const visibleData = isElementVisible(el, ct, dir, appearOffset)
+      const visibleData = isElementVisible(el, container, dir, appearOffset)
       detectAppear(vm, visibleData, dir)
     }
   }, 25, true)
