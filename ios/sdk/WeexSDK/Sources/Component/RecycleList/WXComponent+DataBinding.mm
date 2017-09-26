@@ -85,7 +85,14 @@ static JSContext *jsContext;
     WXDataBindingBlock matchBlock = templateComponent->_bindingMatch;
     if (matchBlock) {
         BOOL needUpdate = NO;
-        BOOL needDisplay = [matchBlock(data, &needUpdate) boolValue];
+        BOOL needDisplay = NO;
+        id match = matchBlock(data, &needUpdate);
+        if ([match isKindOfClass:[NSNumber class]]) {
+            needDisplay = [match boolValue];
+        } else {
+            needDisplay = (match != nil);
+        }
+        
         if (!needDisplay) {
             self.displayType = WXDisplayTypeNone;
             return;

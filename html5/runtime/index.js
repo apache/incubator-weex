@@ -34,11 +34,11 @@ import { register, unregister, has } from './api/service'
 function freezePrototype () {
   shared.freezePrototype()
 
-  Object.freeze(config.Element)
+  // Object.freeze(config.Element)
   Object.freeze(config.Comment)
   Object.freeze(config.Listener)
   Object.freeze(config.Document.prototype)
-  Object.freeze(config.Element.prototype)
+  // Object.freeze(config.Element.prototype)
   Object.freeze(config.Comment.prototype)
   Object.freeze(config.Listener.prototype)
 }

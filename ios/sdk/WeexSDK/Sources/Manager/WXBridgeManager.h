@@ -136,8 +136,8 @@ extern void WXPerformBlockOnBridgeThread(void (^block)());
  *  @param ref       :   node reference
  *  @param type      :   event type
  *  @param params    :   parameters in event object
- *  @param domChanges:   dom value changes, used for two-way data binding
- *  @param eventArguments : arguments passed to event handler
+ *  @param domChanges   dom value changes, used for two-way data binding
+ *  @param handlerArguments : arguments passed to event handler
  **/
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments;
 

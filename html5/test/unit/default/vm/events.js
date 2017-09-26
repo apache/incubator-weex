@@ -71,14 +71,14 @@ describe('bind and fire events', () => {
     const vm = new Vm('foo', customComponentMap.foo, { _app: app })
 
     checkReady(vm, function () {
-      expect(doc.body.event.click).a('function')
+      expect(doc.body.event.click.handler).a('function')
 
       const el = doc.body
       expect(el.attr.a).eql(1)
       expect(spy.args.length).eql(1)
       expect(doc.listener.updates.length).eql(0)
 
-      el.event.click({ xxx: 1 })
+      el.event.click.handler({ xxx: 1 })
       expect(el.attr.a).eql(2)
       expect(spy.args.length).eql(2)
       expect(spy.args[1][0]).eql([

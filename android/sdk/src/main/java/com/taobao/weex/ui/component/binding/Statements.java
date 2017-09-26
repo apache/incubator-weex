@@ -185,6 +185,11 @@ public class Statements {
                                 if(!isCreateFromNodeStatement(renderNode, component)){
                                     renderNode = null;
                                 }
+                                if(renderNode != null){
+                                    if(renderNode.isWaste()){
+                                        renderNode.setWaste(false);
+                                    }
+                                }
                             }
                             //none resuable render node, create node, add to parent, but clear node's statement
                             if(renderNode == null){
@@ -226,6 +231,8 @@ public class Statements {
                 if(!Operators.isTrue(vif.execute(context))){
                     component.setWaste(true);
                     return 1;
+                }else{
+                    component.setWaste(false);
                 }
             }
         }

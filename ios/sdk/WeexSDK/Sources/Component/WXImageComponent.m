@@ -340,6 +340,7 @@ WX_EXPORT_METHOD(@selector(save:))
     if (![src isEqualToString:_imageSrc]) {
         _imageSrc = src;
         _imageDownloadFinish = NO;
+        ((UIImageView*)self.view).image = nil;
         [self updateImage];
     }
     pthread_mutex_unlock(&(_imageSrcMutex));

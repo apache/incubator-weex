@@ -389,8 +389,12 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    NSString * string = [self text];
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"text %@ is invalid", [self text]);
+        string = @"";
+    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }

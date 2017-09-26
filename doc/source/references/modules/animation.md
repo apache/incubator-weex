@@ -26,6 +26,7 @@ Smooth and meaningful animation is very effective for enhancing the user experie
 **position:** Transition options.    
 - `duration` (number): Specifies the number of milliseconds of animation execution, the default value is `0`, means that no animation will occur.    
 - `delay` (number): Specifies the amount of milliseconds to wait between a change being requested to a property that is to be transitioned and the start of the transition effect. The default value is `0`.   
+-  `needLayout`(boolean)：Whether or not the layout animation occurs when animation is executed，default value is `false`
 - `timingFunction` (string): Used to describe how the intermediate values of the styles being affected by a transition effect are calculated, default value is `linear`, the allowed attributes are listed in the following table:    
 
 | name                           | description                              |
@@ -56,10 +57,8 @@ properties of `transform`:
 | perspective <span class="api-version">v0.16+</span> | The distance between the z=0 plane and the user in order to give to the 3D-positioned element some perspective. Supported for Android 4.1 and above. | number | positive infinity
 | scale/scaleX/scaleY             | Stretch or shrink the element.           | number           | none          |
 
--  `callback`(function): Callback which is called after the completion of transition.
+-  `callback`(function): Callback which is called after the completion of transition.**NOTISE, after WeexSDK0.16.0, in iOS platform can get animation's message about completion, there are two types of parameters with `result`, is `Success`and `Fail`, Android can not support until now.**
 
-
--  `needLayout`(boolean)：Whether or not the layout animation occurs when animation is executed 
 
 ### Example
 
@@ -86,6 +85,7 @@ properties of `transform`:
           },
           duration: 800, //ms
           timingFunction: 'ease',
+          needLayout:false,
           delay: 0 //ms
         }, function () {
           modal.toast({ message: 'animation finished.' })
