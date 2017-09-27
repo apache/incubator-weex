@@ -459,36 +459,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         //Invalid position
         return;
       }
-
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
-
-      if (!smooth) {
-        RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
-        if (layoutManager instanceof LinearLayoutManager) {
-          //GridLayoutManager is also instance of LinearLayoutManager
-          ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-          ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        }
-        //Any else?
-      } else {
-        view.smoothScrollToPosition(pos);
-        if (offset != 0) {
-          view.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-              if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                if (getOrientation() == Constants.Orientation.VERTICAL) {
-                  recyclerView.smoothScrollBy(0, offset);
-                } else {
-                  recyclerView.smoothScrollBy(offset, 0);
-                }
-                recyclerView.removeOnScrollListener(this);
-              }
-            }
-          });
-        }
-      }
+      view.scrollTo(smooth, pos, offset, getOrientation());
     }
   }
 
