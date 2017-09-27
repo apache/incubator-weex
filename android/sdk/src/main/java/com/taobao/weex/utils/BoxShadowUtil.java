@@ -139,8 +139,14 @@ public class BoxShadowUtil {
         viewWidth + 2f * shadowSpread, viewHeight + 2f * shadowSpread
     );
 
-    float shadowDx = 2f * dx + shadowRadius;
-    float shadowDy = 2f * dy + shadowRadius;
+    float shadowDx = shadowRadius;
+    float shadowDy = shadowRadius;
+    if (dx > 0) {
+      shadowDx = shadowDx + 2f * dx;
+    }
+    if (dy > 0) {
+      shadowDy = shadowDy + 2f * dy;
+    }
     shadowRect.offset(shadowDx, shadowDy);
 
     Paint shadowPaint = new Paint();
