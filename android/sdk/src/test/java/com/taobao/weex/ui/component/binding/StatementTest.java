@@ -76,7 +76,7 @@ public class StatementTest {
     public void testVFor() throws Exception {
         WXCell cell = createVForNode();
         int count = 3;
-        Statements.doRenderComponent(cell, createContext(count));
+        Statements.doRender(cell, createContext(count));
         Assert.assertTrue(cell.getChildCount() == 1);
         WXDiv div = (WXDiv) cell.getChild(0);
         Assert.assertEquals(div.getChildCount(), count);
@@ -88,7 +88,7 @@ public class StatementTest {
         WXComponent childThree = div.getChild(2);
 
         count = 4;
-        Statements.doRenderComponent(cell, createContext(count));
+        Statements.doRender(cell, createContext(count));
         Assert.assertTrue(cell.getChildCount() == 1);
         div = (WXDiv) cell.getChild(0);
         Assert.assertTrue(div.getChildCount() == count);
@@ -98,7 +98,7 @@ public class StatementTest {
         WXComponent childFour = div.getChild(3);
 
         count = 5;
-        Statements.doRenderComponent(cell, createContext(count));
+        Statements.doRender(cell, createContext(count));
         Assert.assertTrue(cell.getChildCount() == 1);
         div = (WXDiv) cell.getChild(0);
         Assert.assertTrue(div.getChildCount() == count);
@@ -109,7 +109,7 @@ public class StatementTest {
 
 
         count = 3;
-        Statements.doRenderComponent(cell, createContext(count));
+        Statements.doRender(cell, createContext(count));
         Assert.assertTrue(cell.getChildCount() == 1);
         div = (WXDiv) cell.getChild(0);
         Assert.assertTrue(div.getChildCount() == 5);

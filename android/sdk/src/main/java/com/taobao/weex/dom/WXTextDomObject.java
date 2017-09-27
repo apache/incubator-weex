@@ -39,6 +39,8 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
@@ -98,9 +100,16 @@ public class WXTextDomObject extends WXDomObject {
       if (CSSConstants.isUndefined(width)) {
         width = node.cssstyle.maxWidth;
       }
-      if(textDomObject.getTextWidth(textDomObject.mTextPaint,width,false)>0) {
-        textDomObject.layout = textDomObject.createLayout(width, false, null);
-        textDomObject.hasBeenMeasured = true;
+      boolean forceWidth = false;
+      if(width > 0){
+         if(node.getParent() != null && textDomObject.mAlignment == Layout.Alignment.ALIGN_CENTER){
+            forceWidth = FloatUtil.floatsEqual(width, node.getParent().getLayoutWidth());
+         }
+      }
+      textDomObject.hasBeenMeasured = true;
+      width = textDomObject.getTextWidth(textDomObject.mTextPaint,width, forceWidth);
+      if(width > 0 && textDomObject.mText != null) {
+        textDomObject.layout = textDomObject.createLayout(width, true, null);
         textDomObject.previousWidth = textDomObject.layout.getWidth();
         measureOutput.height = textDomObject.layout.getHeight();
         measureOutput.width = textDomObject.previousWidth;
@@ -186,7 +195,7 @@ public class WXTextDomObject extends WXDomObject {
     hasBeenMeasured = false;
     if (layout != null && !layout.equals(atomicReference.get()) &&
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      if(Thread.currentThread() instanceof WXThread){
+      if(Thread.currentThread() != Looper.getMainLooper().getThread()){
           warmUpTextLayoutCache(layout);
       }
     }
@@ -241,8 +250,12 @@ public class WXTextDomObject extends WXDomObject {
     float contentWidth = WXDomUtils.getContentWidth(this);
     if (contentWidth > 0) {
       spanned = createSpanned(mText);
-      layout = createLayout(contentWidth, true, layout);
-      previousWidth = layout.getWidth();
+      if(mText != null){
+         layout = createLayout(contentWidth, true, layout);
+         previousWidth = layout.getWidth();
+      }else{
+         previousWidth = 0;
+      }
     }
   }
 
@@ -394,6 +407,12 @@ public class WXTextDomObject extends WXDomObject {
    * outerWidth in case of outerWidth is defined, in other case, it will be outer width.
    */
    float getTextWidth(TextPaint textPaint,float outerWidth, boolean forceToDesired) {
+     if(mText == null){
+       if(forceToDesired){
+         return  outerWidth;
+       }
+        return  0;
+     }
     float textWidth;
     if (forceToDesired) {
       textWidth = outerWidth;

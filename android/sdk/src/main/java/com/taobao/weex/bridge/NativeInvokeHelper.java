@@ -47,7 +47,7 @@ public final class NativeInvokeHelper {
           try {
             invoker.invoke(target, params);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(target + "Invoker " + invoker.toString() ,e);
           }
         }
       }, 0);
