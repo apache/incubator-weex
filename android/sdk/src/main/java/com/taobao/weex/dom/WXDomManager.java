@@ -178,6 +178,10 @@ public final class WXDomManager {
     }
   }
 
+  public DOMActionContext getDomContext(String instanceId){
+     return mDomRegistries.get(instanceId);
+  }
+
   /**
    *  @param action
    * @param createContext only true when create body

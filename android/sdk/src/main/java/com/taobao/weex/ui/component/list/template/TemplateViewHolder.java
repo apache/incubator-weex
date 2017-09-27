@@ -47,6 +47,8 @@ public class TemplateViewHolder extends ListBaseViewHolder {
 
     public AsyncTask<Void, Void, Void> asyncTask;
 
+    public Object  data;
+
     /**
      * header position
      * */

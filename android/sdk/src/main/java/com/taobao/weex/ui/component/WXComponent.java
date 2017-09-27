@@ -337,7 +337,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
-        component = this;
+          component = this;
       }
       setLayout(component.getDomObject());
       setPadding(component.getDomObject().getPadding(), component.getDomObject().getBorder());
@@ -1406,6 +1406,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         view.setVisibility(View.VISIBLE);
       } else if (TextUtils.equals(visibility, Constants.Value.HIDDEN)) {
         view.setVisibility(View.GONE);
+      }
+    }
+    if(mDomObj != null){
+      WXDomObject domObject = (WXDomObject) mDomObj;
+      if (TextUtils.equals(visibility, Constants.Value.VISIBLE)) {
+          domObject.setVisible(true);
+      } else if (TextUtils.equals(visibility, Constants.Value.HIDDEN)) {
+          domObject.setVisible(false);
       }
     }
   }
