@@ -1,68 +1,68 @@
 ---
-title: Set Up Development Environment 
+title: Setup Development Environment
 type: guide
 order: 1.1
 version: 2.1
 has_chapter_content: true
 ---
 
-# Set up development environment 
+# Setup Development Environment
 
 Using [dotWe](http://dotwe.org/vue) is a good choice, but if you want to develop locally on your own machine, you will need to set up your development environment.
 
 You will need Node.js and the [Weex CLI](https://github.com/weexteam/weex-toolkit).
 
-You can install Node using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active node.js versions). Run the following commands in a Terminal after installing nvm:
+Install Node.js using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active Node.js versions). Run the following commands in a terminal after installing nvm:
 
 ```bash
 $ nvm install 6.10.0
 $ nvm use 6.10.0
 ```
 
-Node.js comes with npm, which lets you install the Weex CLI.
+And `npm` comes with Node.js, with witch you can install the Weex command line tools.
 
-**NOTE: ** After the `weex-toolkit`1.0.8 version, the npm-shrinkwrap.json` npm5 specification has been added to lock the package dependencies, so the npm version <5 needs to be updated by` npm i npm @latest -g` npm version, please confirm whether the version is correct before use.
+**NOTE: ** After upgrading the `weex-toolkit` to v1.0.8, the `npm-shrinkwrap.json` npm 5 specification has been added to lock the package dependencies, it is needed to upgrade your npm version to 5 above by command: `npm install npm @latest -g` if your version is lower than this, please check your npm version before using it.
 
-Run the following command in a Terminal:
+Run the following commands in a terminal:
 
 ```bash
 $ npm install -g weex-toolkit
 $ weex -v
 ```
-You can use 'update@x.x.x' command to update specify version of weex-devtool,weex-previewer,weex-builder and weexpack
+You can use 'weex update <component>@x.x.x' to update weex-devtool, weex-previewer, weex-builder and weexpack to a specific version.
 ```
-weex update weex-devtool@latest //latest sign means install latest version
+weex update weex-devtool@latest // Here latest means to install the latest version
 ```
-**NOTE: ** If you get an error like "permission error", try installing with `sudo`.
 
+**NOTE: ** If you receive an error like "permission error", try another time with `sudo`.
 
-Then you can use the Weex command to verify that the installation is successful:
+Then you can use the Weex command to verify if the installation is successful:
 
 ![](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
 
 ### Generate a new Weex project
 
-You can use the CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
+Use the command line tool to generate a Weex project called "awesome-project". Run the following command in a terminal:
 
 ```bash
 $ weex create awesome-project
 ```
 
-Then enter the awesome-project folder, the CLI has been for us to generate a standard project structure.
+Then enter the awesome-project folder, you will see a standard project skeleton has been generated.
 
 ### Usage
 
-We enter the awesome-project folder and install dependencies with the following commands:
+In the awesome-project folder, install dependencies with the following command:
 
 ```bash
 npm install
 ```
 
-Then we run `npm run serve` in root directory to start watch mode and static server.
+Then run `npm run serve` in root directory to start watching mode and static server.
 
-Finally, we can see the Weex page in `http://localhost:8080/index.html`.
+Finally, you can access the Weex page in `http://localhost:8080/index.html`.
 
-You can modify this page in `src/index.vue`. The code is shown below:
+This page can be modified in `src/index.vue`. The codes are shown below:
 
 ```html
 <template>
@@ -96,4 +96,4 @@ You can modify this page in `src/index.vue`. The code is shown below:
 </script>
 ```
 
-If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](http://dotwe.org) and preview at anytime.
+For more technical details, please continue to read the next section. And don't forget to write and preview your codes at [dotWe](http://dotwe.org/vue).
