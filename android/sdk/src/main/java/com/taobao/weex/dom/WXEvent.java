@@ -109,6 +109,9 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
       String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
       return  eventName;
     }
+    if(event == null){
+      return  null;
+    }
     return  event.toString();
   }
 

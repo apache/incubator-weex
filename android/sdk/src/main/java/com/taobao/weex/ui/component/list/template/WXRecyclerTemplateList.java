@@ -23,6 +23,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
@@ -1338,8 +1339,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(getHostView() != null
                 && listUpdateRunnable != null
                 && getHostView().getInnerView() != null){
-            getHostView().removeCallbacks(listUpdateRunnable);
-            getHostView().post(listUpdateRunnable);
+            if(Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()){
+                getHostView().removeCallbacks(listUpdateRunnable);
+                getHostView().post(listUpdateRunnable);
+            }else{
+                listUpdateRunnable.run();
+            }
         }
     }
 
@@ -1455,9 +1460,5 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             componentList.add(child);
         }
         return  componentList;
-    }
-
-    public Map<String, WXCell> getTemplates() {
-        return mTemplates;
     }
 }

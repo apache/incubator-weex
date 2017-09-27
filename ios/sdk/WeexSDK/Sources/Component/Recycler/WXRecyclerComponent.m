@@ -173,6 +173,13 @@ typedef enum : NSUInteger {
     
     _dragController.dragingCell = [[WXCollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 100, 100/2.0f)];
     _dragController.collectionView = _collectionView;
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    } else {
+        // Fallback on earlier versions
+    }
+#endif
     
     [self performUpdatesWithCompletion:^(BOOL finished) {
         

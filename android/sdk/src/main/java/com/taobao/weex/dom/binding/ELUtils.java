@@ -93,18 +93,6 @@ public class ELUtils {
         return  value;
     }
 
-    public static boolean isVif(String name){
-        return WXStatement.WX_IF.equals(name);
-    }
-
-    public static boolean isVfor(String name){
-        return WXStatement.WX_FOR.equals(name);
-    }
-
-    public static Token vifBlock(String code){
-        return Parser.parse(code);
-    }
-
     public static Object vforBlock(Object vfor){
         if(vfor instanceof  JSONObject){
             if(((JSONObject) vfor).containsKey(WXStatement.WX_FOR_LIST)){
