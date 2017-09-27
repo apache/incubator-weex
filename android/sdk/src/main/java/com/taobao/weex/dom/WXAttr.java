@@ -19,6 +19,7 @@
 package com.taobao.weex.dom;
 
 import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
+import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
 import static java.lang.Boolean.parseBoolean;
 
 import android.support.annotation.NonNull;
@@ -476,6 +477,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
         if(COMPONENT_PROPS.equals(key)){
           ELUtils.bindingBlock(value);
           return  false;
+        }
+        for(String exclude : EXCLUDES_BINDING){
+             if(key.equals(exclude)){
+                return  false;
+             }
         }
         if(ELUtils.isBinding(value)){
           if(mBindingAttrs == null){

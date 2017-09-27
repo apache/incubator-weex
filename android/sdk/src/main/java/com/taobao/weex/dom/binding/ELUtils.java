@@ -41,6 +41,8 @@ public class ELUtils {
 
     public static final String COMPONENT_PROPS = "@componentProps";
 
+    public static final  String[] EXCLUDES_BINDING = {"clickEventParams"};
+
     /**
      * @param value check object is binding expression
      * */
