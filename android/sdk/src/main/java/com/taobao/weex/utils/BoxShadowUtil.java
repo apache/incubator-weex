@@ -20,6 +20,7 @@ package com.taobao.weex.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -39,6 +40,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.taobao.weex.WXEnvironment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,17 +106,20 @@ public class BoxShadowUtil {
                                            float[] radii, float shadowRadius,
                                            float shadowSpread,
                                            float dx, float dy, int shadowColor) {
-
-    if (shadowRadius == 0) {
-      // 0 can not draw shadow layer
-      shadowRadius = 0.01f;
-    }
-
     int canvasWidth = viewWidth + 2 * (int) (shadowRadius + shadowSpread + Math.abs(dx));
     int canvasHeight = viewHeight + 2 * (int) (shadowRadius + shadowSpread + Math.abs(dy));
 
     Bitmap output = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(output);
+
+    if (false && WXEnvironment.isApkDebugable()) {
+      // Using for debug
+      Paint strokePaint = new Paint();
+      strokePaint.setColor(Color.BLACK);
+      strokePaint.setStrokeWidth(2);
+      strokePaint.setStyle(Paint.Style.STROKE);
+      canvas.drawRect(canvas.getClipBounds(), strokePaint);
+    }
 
     float offsetX = shadowRadius + shadowSpread + Math.abs(dx);
     float offsetY = shadowRadius + shadowSpread + Math.abs(dy);
@@ -127,36 +133,21 @@ public class BoxShadowUtil {
     // can not antialias
     canvas.clipPath(contentPath, Region.Op.DIFFERENCE);
 
-    float shadowLeft, shadowTop;
-    if (shadowSpread == 0f) {
-      shadowLeft = shadowRadius;
-      shadowTop = shadowRadius;
-    } else {
-      shadowLeft = shadowRadius + dx - shadowSpread;
-      shadowTop = shadowRadius + dy - shadowSpread;
-    }
     RectF shadowRect = new RectF(
-        shadowLeft,
-        shadowTop,
-        canvasWidth - shadowRadius + shadowSpread,
-        canvasHeight - shadowRadius + shadowSpread);
+        0f, 0f,
+        viewWidth + 2f * shadowSpread, viewHeight + 2f * shadowSpread
+    );
 
-    shadowRect.top += Math.abs(dy);
-    shadowRect.bottom -= Math.abs(dy);
-    shadowRect.left += Math.abs(dx);
-    shadowRect.right -= Math.abs(dx);
+    float shadowDx = 2f * dx + shadowRadius;
+    float shadowDy = 2f * dy + shadowRadius;
+    shadowRect.offset(shadowDx, shadowDy);
 
     Paint shadowPaint = new Paint();
     shadowPaint.setAntiAlias(true);
     shadowPaint.setColor(shadowColor);
     shadowPaint.setStyle(Paint.Style.FILL);
 
-    float shadowDx = 0f, shadowDy = 0f;
-    if (shadowSpread == 0f) {
-      shadowDx = dx;
-      shadowDy = dy;
-    }
-    shadowPaint.setShadowLayer(shadowRadius, shadowDx, shadowDy, shadowColor);
+    shadowPaint.setMaskFilter(new BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL));
 
     Path shadowPath = new Path();
     float[] shadowRadii = new float[8];
