@@ -8,7 +8,7 @@ has_chapter_content: true
 
 # 搭建开发环境
 
-使用 dotWe 对 Weex 尝鲜是一个不错的选择，但如果你想更专业的开发 Weex， dotWe 就不怎么够用了。本节会教你如何搭建本地开发环境进行 Weex 开发。
+使用 [dotWe](http://dotwe.org/vue) 对 Weex 尝鲜是一个不错的选择，但如果你想更专业的开发 Weex， dotWe 就不怎么够用了。本节会教你如何搭建本地开发环境进行 Weex 开发。
 
 ## 第一步：安装依赖
 
@@ -129,4 +129,4 @@ $ weex create awesome-project
 </script>
 ```
 
-关于 Weex 语法部分，你可以直接参考 [Vue Guide](https://vuejs.org/v2/guide/)，这里不再重复介绍。如果您想了解有关技术详情的更多信息，请继续阅读下一节。并且不要忘记在 dotWe 写代码并随时预览。
+关于 Weex 语法部分，你可以直接参考 [Vue Guide](https://vuejs.org/v2/guide/)，这里不再重复介绍。如果您想了解有关技术详情的更多信息，请继续阅读下一节。并且不要忘记在 [dotWe](http://dotwe.org/vue) 写代码并随时预览。
