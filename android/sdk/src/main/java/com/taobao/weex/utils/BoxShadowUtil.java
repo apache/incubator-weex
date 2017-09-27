@@ -40,6 +40,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import com.taobao.weex.WXEnvironment;
 
@@ -147,7 +148,9 @@ public class BoxShadowUtil {
     shadowPaint.setColor(shadowColor);
     shadowPaint.setStyle(Paint.Style.FILL);
 
-    shadowPaint.setMaskFilter(new BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL));
+    if (shadowRadius > 0) {
+      shadowPaint.setMaskFilter(new BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL));
+    }
 
     Path shadowPath = new Path();
     float[] shadowRadii = new float[8];
@@ -186,8 +189,13 @@ public class BoxShadowUtil {
       target.getOverlay().clear();
       target.getOverlay().add(shadowDrawable);
       //Relayout to ensure the shadows are fully drawn
-      target.getParent().requestLayout();
-      ((ViewGroup) target.getParent()).invalidate(shadowDrawable.getBounds());
+      ViewParent parent = target.getParent();
+      if (parent != null) {
+        parent.requestLayout();
+        if (parent instanceof ViewGroup) {
+          ((ViewGroup) parent).invalidate(shadowDrawable.getBounds());
+        }
+      }
     } else {
       // I have a dream that one day our minSdkVersion will equals or higher than 21
       Log.w("BoxShadowUtil", "Call setNormalBoxShadow() requires API level 18 or higher.");
