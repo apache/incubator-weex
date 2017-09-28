@@ -21,60 +21,40 @@ package com.taobao.weex.ui.component.binding;
 
 
 import android.os.AsyncTask;
-import android.speech.tts.Voice;
+import android.util.Log;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.template.TemplateViewHolder;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by furture on 2017/8/21.
  */
 public class Layouts {
     /**
-     * do dom layout, and set layout to component
+     * do dom layout async or sync , and set layout to component on main.
+     * on first use do sync layout, when compontnet reuse do async layout
      * */
-    public static void doLayout(final TemplateViewHolder templateViewHolder){
-        final CSSLayoutContext layoutContext = templateViewHolder.getLayoutContext();
+    public static void doLayoutAsync(final TemplateViewHolder templateViewHolder){
         final WXComponent component = templateViewHolder.getComponent();
-        final WXSDKInstance instance = component.getInstance();
         final  int position = templateViewHolder.getHolderPosition();
         if(templateViewHolder.asyncTask != null){
             templateViewHolder.asyncTask.cancel(true);
+            templateViewHolder.asyncTask = null;
         }
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 if(templateViewHolder.getHolderPosition() == position){
-
-                    WXDomObject domObject = (WXDomObject) component.getDomObject();
-                    domObject.traverseTree(new WXDomObject.Consumer() {
-                        @Override
-                        public void accept(WXDomObject dom) {
-                            if(instance == null || instance.isDestroy()){
-                                return;
-                            }
-                            if(!dom.hasUpdate()){
-                                return;
-                            }
-                            dom.layoutBefore();
-                        }
-                    });
-                    domObject.calculateLayout(layoutContext);
-                    domObject.traverseTree( new WXDomObject.Consumer() {
-                        @Override
-                        public void accept(WXDomObject dom) {
-                            if(instance == null || instance.isDestroy()){
-                                return;
-                            }
-                            if (dom.hasUpdate()) {
-                                dom.layoutAfter();
-                            }
-                        }
-                    });
+                    if(component.getInstance() != null && !component.getInstance().isDestroy()) {
+                        doSafeLayout(component, templateViewHolder.getLayoutContext());
+                    }
                 }
                 return null;
             }
@@ -82,13 +62,68 @@ public class Layouts {
             @Override
             protected void onPostExecute(Void aVoid) {
                 if(position == templateViewHolder.getHolderPosition()) {
-                    setLayout(component, false);
+                    if(component.getInstance() != null && !component.getInstance().isDestroy()) {
+                        setLayout(component, false);
+                    }
                 }
             }
         };
         templateViewHolder.asyncTask = asyncTask;
-        asyncTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        asyncTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR); //serial executor is better
+
     }
+
+    /**
+     * safe layout
+     * */
+    public static void doSafeLayout(WXComponent component, final  CSSLayoutContext layoutContext){
+        try{
+            long start = System.currentTimeMillis();
+            doLayout(component, layoutContext);
+            if(WXEnvironment.isApkDebugable()){
+                WXLogUtils.d("WXTemplateList",
+                        component.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_TYPE) + Thread.currentThread().getName() +  " doSafeLayout  used " +
+                                (System.currentTimeMillis() - start));
+            }
+        }catch (Exception e){
+            if(WXEnvironment.isApkDebugable()){
+                WXLogUtils.e("WXTemplateListdoSafeLayout",  e);
+            }
+        }
+    }
+
+    private static void doLayout(WXComponent component, final  CSSLayoutContext layoutContext){
+        WXDomObject domObject = (WXDomObject) component.getDomObject();
+        final WXSDKInstance instance = component.getInstance();
+        domObject.traverseTree(new WXDomObject.Consumer() {
+            @Override
+            public void accept(WXDomObject dom) {
+                if(instance == null || instance.isDestroy()){
+                    return;
+                }
+                if(!dom.hasUpdate()){
+                    return;
+                }
+                dom.layoutBefore();
+            }
+        });
+        if(instance != null && !instance.isDestroy()){
+            domObject.calculateLayout(layoutContext);
+        }
+        domObject.traverseTree( new WXDomObject.Consumer() {
+            @Override
+            public void accept(WXDomObject dom) {
+                if(instance == null || instance.isDestroy()){
+                    return;
+                }
+                if (dom.hasUpdate()) {
+                    dom.layoutAfter();
+                }
+            }
+        });
+    }
+
+
 
 
     /**

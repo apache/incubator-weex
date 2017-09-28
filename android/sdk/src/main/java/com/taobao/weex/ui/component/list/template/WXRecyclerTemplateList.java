@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -53,6 +54,7 @@ import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXRecyclerDomObject;
+import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.ui.component.AppearanceHelper;
@@ -82,6 +84,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
 
@@ -135,7 +138,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Map<String, WXCell> mTemplates;
     private String  listDataTemplateKey = Constants.Name.Recycler.SLOT_TEMPLATE_TYPE;
     private Runnable listUpdateRunnable;
-
+    private ConcurrentHashMap<String, WXCell> mTemplatesCache;
+    private ConcurrentHashMap<String, Boolean> mTemplateRendered;
 
     /**
      * sticky helper
@@ -177,12 +181,20 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mTemplateViewTypes = new ArrayMap<>();
         mTemplateViewTypes.put("", 0); //empty view, when template was not sended
         mTemplates = new HashMap<>();
+        mTemplatesCache = new ConcurrentHashMap<>();
         mStickyHelper = new TemplateStickyHelper(this);
         cellLifecycleManager = new CellLifecycleManager(this);
         orientation = mDomObject.getOrientation();
         listDataTemplateKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_TEMPLATE_KEY), Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
         listDataItemKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_ITEM), listDataItemKey);
         listDataIndexKey = WXUtils.getString(getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA_ITEM_INDEX), listDataIndexKey);
+        if( getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA) instanceof  JSONArray) {
+            JSONArray array = (JSONArray)getDomObject().getAttrs().get(Constants.Name.Recycler.LIST_DATA);
+            if(array.size() > 0) {
+                listData = array;
+            }
+        }
+        mTemplateRendered = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -204,6 +216,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         }
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
+        bounceRecyclerView.getInnerView().setItemAnimator(null);
         bounceRecyclerView.getInnerView().setItemViewCacheSize(itemViewCacheSize);
         bounceRecyclerView.getInnerView().setHasFixedSize(hasFixedSize);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
@@ -533,7 +546,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 Object templateId = child.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_TYPE);
                 String key = WXUtils.getString(templateId, null);
                 if(key != null){
+                    //set visible false, skip layout in dom thread, set visible true in onCreateViewHolder
+                    if(child.getDomObject() != null) {
+                        WXDomObject domObject = (WXDomObject) child.getDomObject();
+                        domObject.setVisible(false);
+                    }
                     mTemplates.put(key, (WXCell) child);
+                    asyncPreloadCellCopyCache(key);
                     if(mTemplateViewTypes.get(key) == null){
                         mTemplateViewTypes.put(key, mTemplateViewTypes.size());
                     }
@@ -1017,8 +1036,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(WXEnvironment.isApkDebugable()){
             WXLogUtils.d(TAG, position + getTemplateKey(position) + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
         }
-
-        Layouts.doLayout(templateViewHolder);
+        Layouts.doLayoutAsync(templateViewHolder);
         cellLifecycleManager.onAttach(position, component);
         if(WXEnvironment.isApkDebugable()){
             WXLogUtils.d(TAG,  position + getTemplateKey(position) + " onBindViewHolder layout used " + (System.currentTimeMillis() - start));
@@ -1034,28 +1052,93 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
             return new TemplateViewHolder(view, viewType);
         }
-        WXCell component = (WXCell) Statements.copyComponentTree(source);
-        if(component.getDomObject() instanceof  WXCellDomObject
-                && getDomObject() instanceof  WXRecyclerDomObject){
-            WXCellDomObject domObject = (WXCellDomObject) component.getDomObject();
-            domObject.setRecyclerDomObject((WXRecyclerDomObject) getDomObject());
-        }
-        component.lazy(false);
         long start = System.currentTimeMillis();
+        WXCell component = mTemplatesCache.remove(template);
+        boolean needLayout = false;
+        if(component == null) {
+            component = (WXCell) copyCell(source);
+            needLayout = true;
+        }
+        asyncPreloadCellCopyCache(template);
+        CSSLayoutContext layoutContext = null;
+        if(needLayout){
+            layoutContext = new CSSLayoutContext();
+            Layouts.doSafeLayout(component, layoutContext);
+            if(WXEnvironment.isApkDebugable()){
+                WXLogUtils.d(TAG, template + " onCreateViewHolder sync layout used " + (System.currentTimeMillis() - start));
+            }
+        }
+        Layouts.setLayout(component, false);
+        component.lazy(false);
         component.createView();
         if(WXEnvironment.isApkDebugable()){
             WXLogUtils.d(TAG, template + " onCreateViewHolder view used " + (System.currentTimeMillis() - start));
         }
         component.applyLayoutAndEvent(component);
         if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, template +  " onCreateViewHolder layout used " + (System.currentTimeMillis() - start));
+            WXLogUtils.d(TAG, template +  " onCreateViewHolder apply layout used " + (System.currentTimeMillis() - start));
         }
         component.bindData(component);
         if(WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(TAG, template + " onCreateViewHolder bindData used " + (System.currentTimeMillis() - start));
         }
         TemplateViewHolder templateViewHolder = new TemplateViewHolder(component, viewType);
+        templateViewHolder.setLayoutContext(layoutContext);
         return  templateViewHolder;
+    }
+
+    private void asyncPreloadCellCopyCache(final String template) {
+        final WXCell cell = mTemplates.get(template);
+        if(cell == null){
+            return;
+        }
+        if(mTemplatesCache.get(template) != null){
+            return;
+        }
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(cell.getInstance() == null || cell.getInstance().isDestroy()){
+                    return;
+                }
+                WXCell component = (WXCell) copyCell(cell);
+                if(cell.getInstance() == null || cell.getInstance().isDestroy()){
+                    return;
+                }
+                Layouts.doSafeLayout(component, new CSSLayoutContext());
+                mTemplatesCache.put(template, component);
+            }
+        });
+    }
+
+    /**
+     * copy cell component from source, and return source
+     * */
+    private WXComponent copyCell(WXComponent  cell){
+        /** pre render for cell */
+        Boolean rendered = mTemplateRendered.get(cell.getRef());
+        if(rendered == null || !rendered) {
+            if(listData != null){
+                for(int i=0; i<listData.size(); i++){
+                    WXCell source = getSourceTemplate(i);
+                    if(source == cell){
+                        Statements.doRender(cell, getStackContextForPosition(i));
+                        mTemplateRendered.put(source.getRef(), true);
+                        break;
+                    }
+                }
+            }
+        }
+        WXCell component = (WXCell) Statements.copyComponentTree(cell);
+        if(component.getDomObject() != null){
+            ((WXDomObject)component.getDomObject()).setVisible(true);
+        }
+        if(component.getDomObject() instanceof  WXCellDomObject
+                && getDomObject() instanceof  WXRecyclerDomObject){
+            WXCellDomObject domObject = (WXCellDomObject) component.getDomObject();
+            domObject.setRecyclerDomObject((WXRecyclerDomObject) getDomObject());
+        }
+        return component;
     }
 
     /**
