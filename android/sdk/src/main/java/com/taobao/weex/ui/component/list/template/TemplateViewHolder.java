@@ -67,6 +67,10 @@ public class TemplateViewHolder extends ListBaseViewHolder {
         return layoutContext;
     }
 
+    public void setLayoutContext(CSSLayoutContext layoutContext){
+        this.layoutContext = layoutContext;
+    }
+
 
     public int getHolderPosition() {
         return holderPosition;

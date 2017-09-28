@@ -18,21 +18,26 @@
  */
 package com.taobao.weex.ui.component.binding;
 
+import android.os.Looper;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Token;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -198,9 +203,11 @@ public class Statements {
                                 renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
                                 parentDomObject.add(renderNodeDomObject, renderIndex);
                                 parent.addChild(renderNode, renderIndex);
-                                parent.createChildViewAt(renderIndex);
-                                renderNode.applyLayoutAndEvent(renderNode);
-                                renderNode.bindData(renderNode);
+                                if(Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                                    parent.createChildViewAt(renderIndex);
+                                    renderNode.applyLayoutAndEvent(renderNode);
+                                    renderNode.bindData(renderNode);
+                                }
                             }
                             doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context);
                             renderIndex++;
@@ -307,8 +314,17 @@ public class Statements {
             }
 
             if(dynamic.size() > 0) {
-                domObject.updateAttr(dynamic);
-                component.updateProperties(dynamic);
+                if(dynamic.size() == 1
+                        && dynamic.get(Constants.Name.SRC) != null
+                        && component instanceof WXImage){
+                    //for image avoid dirty layout, only update src attrs
+                    domObject.getAttrs().put(Constants.Name.SRC, dynamic.get(Constants.Name.SRC));
+                }else {
+                    domObject.updateAttr(dynamic); //dirty layout
+                }
+                if(Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                    component.updateProperties(dynamic);
+                }
             }
         }
         WXEvent event = domObject.getEvents();
