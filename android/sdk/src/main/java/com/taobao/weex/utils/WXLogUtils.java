@@ -114,6 +114,10 @@ public class WXLogUtils {
   }
 
   public static void d(String tag, String msg) {
+    if (!TextUtils.isEmpty(msg) && !TextUtils.isEmpty(tag)) {
+      log(tag, msg, LogLevel.DEBUG);
+    }
+
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       Log.d(tag, msg);
 
