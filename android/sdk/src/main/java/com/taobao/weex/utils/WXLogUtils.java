@@ -43,6 +43,9 @@ public class WXLogUtils {
   private static StringBuilder builder = new StringBuilder(50);
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
 
+  private static JsLogWatcher jsLogWatcher;
+  private static LogWatcher sLogWatcher;
+
   static {
     clazzMaps.put(CLAZZ_NAME_DEBUG_TOOL, loadClass(CLAZZ_NAME_DEBUG_TOOL));
     clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
@@ -76,6 +79,9 @@ public class WXLogUtils {
       Log.println(level.getPriority(),tag, msg);
       writeConsoleLog(level.getName(), msg);
       sendLog(level, msg);
+    }
+    if (sLogWatcher != null) {
+      sLogWatcher.onLog(level.getName(), tag, msg);
     }
   }
 
@@ -123,6 +129,7 @@ public class WXLogUtils {
         }
       }
       sendLog(LogLevel.DEBUG, tag + ":" + msg);
+      log(tag, msg, LogLevel.DEBUG);
     }
   }
 
@@ -285,5 +292,19 @@ public class WXLogUtils {
     String className = stackTrace[index].getFileName();
     int lineNum = stackTrace[index].getLineNumber();
     return "(" + className + ":" + lineNum + ") ";
+
+
+  public static void setLogWatcher(LogWatcher watcher) {
+    sLogWatcher = watcher;
   }
+
+  public interface JsLogWatcher {
+    void onJsLog(int level, String log);
+  }
+
+  public interface LogWatcher {
+    void onLog(String level, String tag, String msg);
+  }
+
+
 }
