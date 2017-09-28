@@ -41,6 +41,7 @@ import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
@@ -185,7 +186,7 @@ public class WXTextDomObject extends WXDomObject {
     hasBeenMeasured = false;
     if (layout != null && !layout.equals(atomicReference.get()) &&
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      if(Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()){
+      if(Thread.currentThread() instanceof WXThread){
           warmUpTextLayoutCache(layout);
       }
     }

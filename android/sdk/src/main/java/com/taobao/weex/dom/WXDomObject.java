@@ -438,6 +438,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       mAttributes = new WXAttr();
     }
     mAttributes.putAll(attrs);
+    if(hasNewLayout()){
+       markUpdateSeen();
+    }
     super.dirty();
   }
 
