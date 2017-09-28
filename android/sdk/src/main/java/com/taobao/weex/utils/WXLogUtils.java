@@ -292,6 +292,7 @@ public class WXLogUtils {
     String className = stackTrace[index].getFileName();
     int lineNum = stackTrace[index].getLineNumber();
     return "(" + className + ":" + lineNum + ") ";
+  }
 
 
   public static void setLogWatcher(LogWatcher watcher) {

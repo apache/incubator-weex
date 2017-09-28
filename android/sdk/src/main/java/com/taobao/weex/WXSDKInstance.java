@@ -876,9 +876,8 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
       mWXPerformance.screenRenderTime =  time;
     }
     mWXPerformance.componentCount = WXComponent.mComponentNum;
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
-    }
+    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
+
     WXComponent.mComponentNum = 0;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
@@ -893,9 +892,9 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
               performance.args=getBundleUrl();
               mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
             }
-            if (WXEnvironment.isApkDebugable()) {
-              WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-            }
+
+            WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
+
           }
         }
       });
