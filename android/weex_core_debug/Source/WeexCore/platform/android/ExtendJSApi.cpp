@@ -4,7 +4,7 @@
 
 using namespace WeexCore;
 
-static bool isWeexCore = true;
+static bool isWeexCore = false;
 
 /**
 * This class aim to extend JS Api
@@ -89,7 +89,10 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
+
   JNIEnv *env = getJNIEnv();
+  int flag = 0;
+
   //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   //task args[1]
@@ -100,10 +103,9 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   if (isWeexCore) {
     RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
                                              jByteArray2Str(env, jTaskString));
+  } else {
+    flag = BridgeAndroid::getInstance()->callCreateBody(jInstanceId, jTaskString, jCallback);
   }
-
-  int flag = 0;
-  flag = BridgeAndroid::getInstance()->callCreateBody(jInstanceId, jTaskString, jCallback);
 
   return createInt32Result(flag);
 }
@@ -361,6 +363,8 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   //callback  args[4]
   jstring jCallback = getArgumentAsJString(env, arguments, 4);
 
+  int flag = 0;
+
   if (isWeexCore) {
     std::string pageId = jString2Str(env, jInstanceId);
     std::string parentRef = jString2Str(env, jref);
@@ -370,11 +374,10 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
 
     RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
     RenderManager::getInstance()->printRenderAndLayoutTree(jString2Str(env, jInstanceId));
+  } else {
+    flag = BridgeAndroid::getInstance()->callAddElement(jInstanceId, jref, jdomString, jindex,
+                                                        jCallback);
   }
-
-  int flag = 0;
-  flag = BridgeAndroid::getInstance()->callAddElement(jInstanceId, jref, jdomString, jindex,
-                                                      jCallback);
 
   return createInt32Result(flag);
 }

@@ -11,8 +11,21 @@ namespace WeexCore {
   void RenderAction::ExecuteAction() {
     switch (mActionType) {
       case ACTION_CREATE_BODY:
+        BridgeAndroid::getInstance()->callCreateBodyByWeexCore(mPageId, mComponentType, mRef,
+                                                               mPosition.mTop,
+                                                               mPosition.mBottom, mPosition.mLeft,
+                                                               mPosition.mRight,
+                                                               mRenderSize.mHeight,
+                                                               mRenderSize.mWidth);
         break;
       case ACTION_ADD_ELEMENT:
+        BridgeAndroid::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
+                                                               mPosition.mTop,
+                                                               mPosition.mBottom, mPosition.mLeft,
+                                                               mPosition.mRight,
+                                                               mRenderSize.mHeight,
+                                                               mRenderSize.mWidth, mIndex,
+                                                               mParentRef);
         break;
       case ACTION_REMOVE_ELEMENT:
         break;
@@ -27,6 +40,7 @@ namespace WeexCore {
       case ACTION_UPDATE_ATTR:
         break;
       case ACTION_UPDATE_STYLE:
+        BridgeAndroid::getInstance()->callUpdateStyleByWeexCore(mPageId, mRef, mKey, mValue);
         break;
       case ACTION_UPDATE_FINISH:
         break;
