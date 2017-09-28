@@ -435,4 +435,46 @@ public class WXBridge implements IWXBridge {
     }
   }
 
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      }
+    }
+    return errorCode;
+  }
+
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+
+    try {
+      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        e.printStackTrace();
+        WXLogUtils.e(TAG,"callNative throw error:"+e.getMessage());
+      }
+    }
+
+    return errorCode;
+  }
+
+  public int callUpdateStyleByWeexCore(String instanceId, String ref, String key, String value) {
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, key, value);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callUpdateStyle throw exception:" + e.getMessage());
+      }
+    }
+    return errorCode;
+  }
 }

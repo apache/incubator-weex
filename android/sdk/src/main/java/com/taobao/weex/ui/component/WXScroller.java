@@ -41,6 +41,7 @@ import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.IWXScroller;
@@ -80,8 +81,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private Point mLastReport = new Point(-1, -1);
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXScroller(instance,node,parent);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXScroller(instance,parent,action);
     }
   }
   /**
@@ -103,13 +104,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean isScrollable = true;
 
   @Deprecated
-  public WXScroller(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent);
+  public WXScroller(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance,parent,action);
   }
 
-  public WXScroller(WXSDKInstance instance, WXDomObject node,
-                    WXVContainer parent) {
-    super(instance, node, parent);
+  public WXScroller(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+    super(instance, parent,action);
     stickyHelper = new WXStickyHelper(this);
   }
 

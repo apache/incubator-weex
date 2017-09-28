@@ -22,6 +22,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.component.WXVContainer;
 
 /**
@@ -30,8 +31,8 @@ import com.taobao.weex.ui.component.WXVContainer;
 @Component(lazyload = false)
 
 public class HorizontalListComponent extends WXListComponent {
-  public HorizontalListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public HorizontalListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+    super(instance, parent, lazy,action);
   }
 
   @Override

@@ -29,6 +29,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXUtils;
@@ -45,12 +46,12 @@ public class WXWeb extends WXComponent {
     protected IWebView mWebView;
 
     @Deprecated
-    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        this(instance,dom,parent,isLazy);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+        this(instance,parent,isLazy,action);
     }
 
-    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-        super(instance, dom, parent, isLazy);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+        super(instance, parent, isLazy,action);
         createWebView();
     }
 

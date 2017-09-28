@@ -52,6 +52,10 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.action.weexcore.AddAlementActionByWeexCore;
+import com.taobao.weex.dom.action.weexcore.CreateBodyActionByWeexCore;
+import com.taobao.weex.dom.action.weexcore.UpdateStyleActionByWeexCore;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1830,4 +1834,150 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     msg.sendToTarget();
   }
 
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width) {
+    if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callCreateBodyByWeexCore: call CreateBody args is null");
+      }
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody: call CreateBody args is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", top:").append(top)
+              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
+              .append(", height:").append(height).append(" width:").append(width);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
+        final WeexCoreAction action = new CreateBodyActionByWeexCore();
+        action.mPageId = pageId;
+        action.mComponentType = componentType;
+        action.mRef = ref;
+        action.mPosition.mTop = top;
+        action.mPosition.mBottom = bottom;
+        action.mPosition.mLeft = left;
+        action.mPosition.mRight = right;
+        action.mRenderSize.mHeight = height;
+        action.mRenderSize.mWidth = width;
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            action.excuteAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody exception "+e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callUpdateStyleByWeexCore(String instanceId, String ref, String key, String value) {
+    if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore: call UpdateStyle args is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyleByWeexCore: call UpdateStyle args is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateStyleByWeexCore >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", key:").append(key)
+              .append(", value:").append(value);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        final WeexCoreAction action = new UpdateStyleActionByWeexCore();
+        action.mPageId = instanceId;
+        action.mRef = ref;
+        action.mKey = key;
+        action.mValue = value;
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            action.excuteAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyleByWeexCore exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef) {
+    if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callAddElement: call callAddElement args is null");
+      }
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement: call callAddElement args is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", top:").append(top)
+              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
+              .append(", height:").append(height).append(", width:").append(width).append(", index:").append(index)
+              .append(", parentRef:").append(parentRef);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
+        final WeexCoreAction action = new AddAlementActionByWeexCore();
+        action.mPageId = pageId;
+        action.mComponentType = componentType;
+        action.mRef = ref;
+        action.mParentRef = parentRef;
+        action.mIndex = index;
+        action.mPosition.mTop = top;
+        action.mPosition.mBottom = bottom;
+        action.mPosition.mLeft = left;
+        action.mPosition.mRight = right;
+        action.mRenderSize.mHeight = height;
+        action.mRenderSize.mWidth = width;
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            action.excuteAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement exception "+e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
 }

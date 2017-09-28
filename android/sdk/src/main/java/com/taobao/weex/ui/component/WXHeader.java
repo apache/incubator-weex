@@ -22,6 +22,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.component.list.WXCell;
 
 /**
@@ -31,12 +32,12 @@ import com.taobao.weex.ui.component.list.WXCell;
 public class WXHeader extends WXCell {
 
   @Deprecated
-  public WXHeader(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  public WXHeader(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance,parent,isLazy,action);
   }
 
-  public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXHeader(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+    super(instance, parent, lazy,action);
     if(WXBasicComponentType.LIST.equals((parent.getDomObject().getType()))){
       setSticky(Constants.Value.STICKY);
     }

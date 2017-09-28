@@ -25,6 +25,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -56,25 +57,25 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private float mPaddingRight;
 
   @Deprecated
-  public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance, parent, isLazy,action);
   }
 
 
-  public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent);
-    if (node != null && node instanceof WXRecyclerDomObject) {
-      mDomObject = (WXRecyclerDomObject) node;
-      mDomObject.preCalculateCellWidth();
-
-      if(WXBasicComponentType.WATERFALL.equals(node.getType())){
-        mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
-      }else{
-        mLayoutType = mDomObject.getLayoutType();
-      }
-      updateRecyclerAttr();
-
-    }
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+    super(instance, parent,action);
+//    if (node != null && node instanceof WXRecyclerDomObject) {
+//      mDomObject = (WXRecyclerDomObject) node;
+//      mDomObject.preCalculateCellWidth();
+//
+//      if(WXBasicComponentType.WATERFALL.equals(node.getType())){
+//        mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
+//      }else{
+//        mLayoutType = mDomObject.getLayoutType();
+//      }
+//      updateRecyclerAttr();
+//
+//    }
   }
 
   @Override

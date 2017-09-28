@@ -4,7 +4,7 @@
 
 using namespace WeexCore;
 
-static bool isWeexCore = false;
+static bool isWeexCore = true;
 
 /**
 * This class aim to extend JS Api

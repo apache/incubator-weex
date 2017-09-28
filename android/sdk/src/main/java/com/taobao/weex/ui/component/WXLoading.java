@@ -27,6 +27,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXLoadingLayout;
@@ -45,8 +46,8 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   public static final String HIDE = "hide";
 
-  public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXLoading(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+    super(instance, parent, lazy,action);
   }
 
   @Override

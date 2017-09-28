@@ -50,6 +50,7 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
@@ -151,8 +152,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private WXStickyHelper stickyHelper;
 
 
-  public BasicListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public BasicListComponent(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+    super(instance, parent,action);
     stickyHelper = new WXStickyHelper(this);
   }
 
@@ -947,7 +948,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             } else {
               ((WXCell) component).lazy(false);
               component.createView();
-              component.applyLayoutAndEvent(component);
+              component.applyLayoutAndEvent();
               return new ListBaseViewHolder(component, viewType);
             }
           } else if (component instanceof WXBaseRefresh) {

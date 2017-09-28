@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 
 import java.util.ArrayList;
 
@@ -38,17 +39,17 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance,parent,isLazy,action);
   }
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+    super(instance, parent,action);
   }
 
-  public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+    super(instance, parent,action);
   }
 
   /**
@@ -92,18 +93,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   @Override
-  public void applyLayoutAndEvent(WXComponent component) {
+  public void applyLayoutAndEvent() {
     if(!isLazy()) {
-      if (component == null) {
-        component = this;
-      }
-      super.applyLayoutAndEvent(component);
+      super.applyLayoutAndEvent();
       int count = childCount();
       for (int i = 0; i < count; i++) {
         WXComponent child = getChild(i);
-        child.applyLayoutAndEvent(((WXVContainer)component).getChild(i));
+        child.applyLayoutAndEvent();
       }
-
     }
   }
 
@@ -176,13 +173,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   @Override
   public void createViewImpl() {
     super.createViewImpl();
-    int count = childCount();
-    for (int i = 0; i < count; ++i) {
-      createChildViewAt(i);
-    }
-    if(getHostView()!=null){
-       getHostView().setClipToPadding(false);
-    }
+//    int count = childCount();
+//    for (int i = 0; i < count; ++i) {
+//      createChildViewAt(i);
+//    }
+//    if(getHostView()!=null){
+//       getHostView().setClipToPadding(false);
+//    }
   }
 
   @Override

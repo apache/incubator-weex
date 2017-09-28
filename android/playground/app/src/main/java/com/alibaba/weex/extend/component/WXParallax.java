@@ -36,6 +36,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
@@ -66,13 +67,13 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
   private int mBackGroundColor = 0;
   private float mOffsetY = 0;
 
-  public WXParallax(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
-    super(instance, dom, parent);
-    initTransform(dom.getAttrs().get(WX_TRANSFORM));
-    initOpacity(dom.getAttrs().get(Constants.Name.OPACITY));
-    initBackgroundColor(dom.getAttrs().get(Constants.Name.BACKGROUND_COLOR));
-
-    mBindingRef = (String) (dom.getAttrs().get(BINDING_SCROLLER));
+  public WXParallax(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+    super(instance, parent,action);
+//    initTransform(dom.getAttrs().get(WX_TRANSFORM));
+//    initOpacity(dom.getAttrs().get(Constants.Name.OPACITY));
+//    initBackgroundColor(dom.getAttrs().get(Constants.Name.BACKGROUND_COLOR));
+//
+//    mBindingRef = (String) (dom.getAttrs().get(BINDING_SCROLLER));
     instance.registerOnWXScrollListener(this);
   }
 

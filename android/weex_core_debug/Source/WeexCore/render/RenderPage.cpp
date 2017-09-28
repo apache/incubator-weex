@@ -13,7 +13,7 @@ namespace WeexCore {
   }
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
-    mPageId = stringToNum<float>(pageID);
+    mPageId = pageID;
     mRenderObjectMap = new std::map<std::string, RenderObject *>();
 
     int alen = data.length();

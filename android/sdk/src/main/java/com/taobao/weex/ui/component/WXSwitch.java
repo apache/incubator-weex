@@ -27,6 +27,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXUtils;
 
@@ -40,12 +41,12 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
   private CompoundButton.OnCheckedChangeListener mListener;
 
   @Deprecated
-  public WXSwitch(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+  public WXSwitch(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance, parent, isLazy,action);
   }
 
-  public WXSwitch(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+  public WXSwitch(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+    super(instance, parent, isLazy,action);
   }
 
   @Override

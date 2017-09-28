@@ -21,6 +21,7 @@ package com.taobao.weex.ui.component;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.view.WXEditText;
 
 /**
@@ -31,12 +32,12 @@ import com.taobao.weex.ui.view.WXEditText;
 public class WXInput extends AbstractEditComponent{
 
   @Deprecated
-  public WXInput(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance,parent,isLazy,action);
   }
 
-  public WXInput(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+    super(instance, parent, isLazy,action);
   }
 
   @Override

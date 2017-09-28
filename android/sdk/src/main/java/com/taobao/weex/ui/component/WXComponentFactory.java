@@ -24,6 +24,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.utils.WXLogUtils;
@@ -72,9 +73,44 @@ public class WXComponentFactory {
     }
 
     try {
-      return holder.createInstance(instance, node, parent);
+//      return holder.createInstance(instance, node, parent);
     } catch (Exception e) {
       WXLogUtils.e("WXComponentFactory Exception type:[" + node.getType() + "] ", e);
+    }
+
+    return null;
+  }
+
+  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+    if (instance == null || TextUtils.isEmpty(action.mComponentType)) {
+      return null;
+    }
+
+
+    if(sComponentTypes.get(instance.getInstanceId())==null){
+      Set<String> types=new HashSet<>();
+      sComponentTypes.put(instance.getInstanceId(),types);
+    }
+    sComponentTypes.get(instance.getInstanceId()).add(action.mComponentType);
+
+    IFComponentHolder holder = WXComponentRegistry.getComponent(action.mComponentType);
+    if (holder == null) {
+      if (WXEnvironment.isApkDebugable()) {
+        String tag = "WXComponentFactory error type:[" +
+                action.mComponentType + "]" + " class not found";
+        WXLogUtils.e(tag);
+      }
+      //For compatible reason of JS framework, unregistered type will be treated as container.
+      holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
+      if(holder == null){
+        throw new WXRuntimeException("Container component not found.");
+      }
+    }
+
+    try {
+      return holder.createInstance(instance, parent,action);
+    } catch (Exception e) {
+      WXLogUtils.e("WXComponentFactory Exception type:[" + action.mComponentType + "] ", e);
     }
 
     return null;

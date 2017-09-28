@@ -31,6 +31,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -47,12 +48,12 @@ import java.util.Map;
 public class WXIndicator extends WXComponent<WXCircleIndicator> {
 
   @Deprecated
-  public WXIndicator(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  public WXIndicator(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+    this(instance,parent,isLazy,action);
   }
 
-  public WXIndicator(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+  public WXIndicator(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+    super(instance, parent, isLazy,action);
   }
 
   @Override

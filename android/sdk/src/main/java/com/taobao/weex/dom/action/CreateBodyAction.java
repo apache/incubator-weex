@@ -90,7 +90,7 @@ class CreateBodyAction extends AbstractAddElementAction {
         WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
       }
       start = System.currentTimeMillis();
-      component.applyLayoutAndEvent(component);
+      component.applyLayoutAndEvent();
       component.bindData(component);
 
       if (WXEnvironment.isApkDebugable()) {

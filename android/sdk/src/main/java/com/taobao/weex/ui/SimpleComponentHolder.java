@@ -28,6 +28,7 @@ import com.taobao.weex.bridge.MethodInvoker;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -83,7 +84,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
     }
 
     @Override
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       if(mConstructor == null){
         loadConstructor();
       }
@@ -91,12 +92,12 @@ public class SimpleComponentHolder implements IFComponentHolder{
       WXComponent component;
 
       if(parameters == 3){
-        component =  mConstructor.newInstance(instance,node,parent);
+        component =  mConstructor.newInstance(instance,parent,action);
       }else if(parameters == 4){
-        component =  mConstructor.newInstance(instance,node,parent,false);
+        component =  mConstructor.newInstance(instance,parent,false,action);
       }else{
         //compatible deprecated constructor
-        component =  mConstructor.newInstance(instance,node,parent,instance.getInstanceId(),parent.isLazy());
+        component =  mConstructor.newInstance(instance,parent,instance.getInstanceId(),parent.isLazy(),action);
       }
       return component;
     }
@@ -179,8 +180,8 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCreator.createInstance(instance,node,parent);
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    WXComponent component = mCreator.createInstance(instance,parent,action);
 
     component.bindHolder(this);
     return component;
