@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <Layout/WXCoreLayout.h>
+#include <Layout/WXCoreStyle.h>
 
 namespace WeexCore {
   class RenderObject;

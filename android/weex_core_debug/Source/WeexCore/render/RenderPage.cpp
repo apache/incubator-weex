@@ -3,13 +3,13 @@
 
 namespace WeexCore {
 
-  void getLayoutInfo(RenderAction *action, YGNodeRef ygNode) {
-    action->mPosition.mTop = YGNodeLayoutGetTop(ygNode);
-    action->mPosition.mBottom = YGNodeLayoutGetBottom(ygNode);
-    action->mPosition.mRight = YGNodeLayoutGetRight(ygNode);
-    action->mPosition.mLeft = YGNodeLayoutGetLeft(ygNode);
-    action->mRenderSize.mHeight = YGNodeLayoutGetHeight(ygNode);
-    action->mRenderSize.mWidth = YGNodeLayoutGetWidth(ygNode);
+  void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
+    action->mPosition.mTop = node->getLayoutTop();
+    action->mPosition.mBottom = node->getLayoutBottom();
+    action->mPosition.mRight = node->getLayoutRight();
+    action->mPosition.mLeft = node->getLayoutLeft();
+    action->mRenderSize.mHeight = node->getLayoutHeight();
+    action->mRenderSize.mWidth = node->getLayoutWidth();
   }
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
@@ -27,7 +27,7 @@ namespace WeexCore {
     setRootRenderObject(render);
 
     // layout by YogaNode Tree
-    YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+    pRoot->getLayoutNode()->calculateLayout();
 
     /**
      * Generate RenderAction: ACTION_CREATE_BODY
@@ -37,7 +37,7 @@ namespace WeexCore {
     createBodyAction->mPageId = mPageId;
     createBodyAction->mComponentType = render->getType();
     createBodyAction->mRef = render->getRef();
-    getLayoutInfo(createBodyAction, render->getYGNode());
+    getLayoutInfo(createBodyAction, render->getLayoutNode());
     addRenderAction(createBodyAction);
 
     /**
@@ -124,14 +124,14 @@ namespace WeexCore {
     mRenderObjectMap->insert(pair<std::string, RenderObject *>(child->getRef(), child));
 
     // add child to YogaNode Tree
-    YGNodeInsertChild(parent->getYGNode(), child->getYGNode(), parent->getChildCount());
+    parent->getLayoutNode()->addChildAt(child->getLayoutNode(),parent->getChildCount());
 
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosiotn, child);
 
     // layout by YogaNode Tree
-    YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+    pRoot->getLayoutNode()->calculateLayout();
 
     /**
      * Generate RenderAction: ACTION_ADD_ELEMENT
@@ -143,7 +143,7 @@ namespace WeexCore {
     addElementAction->mRef = child->getRef();
     addElementAction->mParentRef = parent->getRef();
     addElementAction->mIndex = insertPosiotn;
-    getLayoutInfo(addElementAction, child->getYGNode());
+    getLayoutInfo(addElementAction, child->getLayoutNode());
     addRenderAction(addElementAction);
 
     /**
@@ -200,12 +200,12 @@ namespace WeexCore {
     RenderObject *parent = child->getParentRender();
 
     parent->removeRenderObject(child);
-    YGNodeRemoveChild(parent->getYGNode(), child->getYGNode());
+//    YGNodeRemoveChild(parent->getLayoutNode(), child->getLayoutNode());
     mRenderObjectMap->erase(child->getRef());
     delete child;
 
     // layout by YogaNode Tree
-    YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
   }
 
   void RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
@@ -216,7 +216,7 @@ namespace WeexCore {
     oldParent->removeRenderObject(child);
     newParent->addRenderObject(stringToNum<int>(index), child);
 
-    YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
   }
 
   void RenderPage::updateStyle(std::string ref, std::string key, std::string value) {
@@ -224,7 +224,7 @@ namespace WeexCore {
     render->updateStyle(key, value);
 
     // layout by YogaNode Tree
-    YGNodeCalculateLayout(pRoot->getYGNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {

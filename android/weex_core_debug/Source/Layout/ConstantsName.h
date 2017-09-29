@@ -6,17 +6,17 @@
 
 using namespace std;
 
-const string ALIGN_ITEMS = "alignItems";
-const string ALIGN_SELF = "alignSelf"; //null
 const string FLEX = "flex";
+const string ALIGN_ITEMS = "alignItems";
+const string ALIGN_SELF = "alignSelf";
 const string FLEX_DIRECTION = "flexDirection";
 const string JUSTIFY_CONTENT = "justifyContent";
-const string FLEX_WRAP = "flexWrap"; //null
+const string FLEX_WRAP = "flexWrap";
 
-const string MIN_WIDTH = "minWidth"; //null
-const string MIN_HEIGHT = "minHeight"; //null
-const string MAX_WIDTH = "maxWidth"; //null
-const string MAX_HEIGHT = "maxHeight"; //null
+const string MIN_WIDTH = "minWidth";
+const string MIN_HEIGHT = "minHeight";
+const string MAX_WIDTH = "maxWidth";
+const string MAX_HEIGHT = "maxHeight";
 
 const string DEFAULT_HEIGHT = "defaultHeight";
 const string HEIGHT = "height";
@@ -48,7 +48,5 @@ const string PADDING_LEFT = "paddingLeft";
 const string PADDING_TOP = "paddingTop";
 const string PADDING_RIGHT = "paddingRight";
 const string PADDING_BOTTOM = "paddingBottom";
-
-const string OVERFLOW = "overflow";
 
 #endif //WEEXV8_CONSTANTSNAME_H

@@ -3,32 +3,19 @@
 
 namespace WeexCore {
 
-  static void setDefaultStyle(YGNodeRef &ygNode, RenderObject &render) {
-    YGNodeStyleSetFlexDirection(ygNode, YGFlexDirectionColumn);
-    YGNodeStyleSetJustifyContent(ygNode, YGJustifyFlexStart);
-    YGNodeStyleSetAlignItems(ygNode, YGAlignStretch);
-    YGNodeStyleSetPositionType(ygNode, YGPositionTypeRelative);
-
-    if (render.getType() == "list") {
-      render.updateStyle(FLEX, "1");
-    }
-  }
-
   RenderObject::RenderObject(RenderPage *page)
       : mPage(page) {
     mStyle = new std::map<std::string, std::string>();
     mAttributes = new std::map<std::string, std::string>();
     mEvents = new std::set<std::string>();
-
-    YGConfigRef config = YGConfigNew();
-    mYGNode = YGNodeNewWithConfig(config);
-    setDefaultStyle(mYGNode, *this);
+    mLayoutNode = new WXCoreLayoutNode();
   }
 
   RenderObject::~RenderObject() {
+
     mPage = nullptr;
     mParentRender = nullptr;
-    mYGNode = nullptr;
+    mLayoutNode = nullptr;
 
     if (mStyle != nullptr) {
       delete mStyle;
@@ -142,8 +129,8 @@ namespace WeexCore {
     return mChildren.size();
   }
 
-  YGNodeRef RenderObject::getYGNode() {
-    return mYGNode;
+  WXCoreLayoutNode *RenderObject::getLayoutNode() {
+    return mLayoutNode;
   }
 
 /**
@@ -154,71 +141,69 @@ namespace WeexCore {
       return;
 
     if (key == ALIGN_ITEMS) {
-      YGNodeStyleSetAlignItems(mYGNode, getYGAlignItem(value));
+      mLayoutNode->setAlignItems(getWXCoreAlignItem(value));
     } else if (key == ALIGN_SELF) {
-      YGNodeStyleSetAlignSelf(mYGNode, getYGAlignSelf(value));
+      mLayoutNode->setAlignSelf(getWXCoreAlignSelf(value));
     } else if (key == FLEX) {
-      YGNodeStyleSetFlex(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setFlex(stringToNum<float>(value));
     } else if (key == FLEX_DIRECTION) {
-      YGNodeStyleSetFlexDirection(mYGNode, getYGFlexDirection(value));
+      mLayoutNode->setFlexDirection(getWXCoreFlexDirection(value));
     } else if (key == JUSTIFY_CONTENT) {
-      YGNodeStyleSetJustifyContent(mYGNode, getYGJustifyContent(value));
+      mLayoutNode->setJustifyContent(getWXCoreJustifyContent(value));
     } else if (key == FLEX_WRAP) {
-      YGNodeStyleSetFlexWrap(mYGNode, getYGWrap(value));
+      mLayoutNode->setFlexWrap(getWXCoreFlexWrap(value));
     } else if (key == MIN_WIDTH) {
-      YGNodeStyleSetMinWidth(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setMinWidth(stringToNum<float>(value));
     } else if (key == MIN_HEIGHT) {
-      YGNodeStyleSetMinHeight(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setMinHeight(stringToNum<float>(value));
     } else if (key == MAX_WIDTH) {
-      YGNodeStyleSetMaxWidth(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setMaxWidth(stringToNum<float>(value));
     } else if (key == MAX_HEIGHT) {
-      YGNodeStyleSetMaxHeight(mYGNode, stringToNum<float>(value));
-    } else if (key == OVERFLOW) {
-      YGNodeStyleSetOverflow(mYGNode, getYGOverflow(value));
+      mLayoutNode->setMaxHeight(stringToNum<float>(value));
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
-      YGNodeStyleSetHeight(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setStyleHeight(stringToNum<float>(value));
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
-      YGNodeStyleSetWidth(mYGNode, stringToNum<float>(value));
+      mLayoutNode->setStyleWidth(stringToNum<float>(value));
     } else if (key == POSITION) {
-      YGNodeStyleSetPositionType(mYGNode, getYGPositionType(value));
+      mLayoutNode->setStylePositionType(getWXCorePositionType(value));
     } else if (key == LEFT) {
-      YGNodeStyleSetPosition(mYGNode, YGEdgeLeft, stringToNum<float>(value));
+      mLayoutNode->setStylePositionLeft(stringToNum<float>(value));
     } else if (key == TOP) {
-      YGNodeStyleSetPosition(mYGNode, YGEdgeTop, stringToNum<float>(value));
+      mLayoutNode->setStylePositionTop(stringToNum<float>(value));
     } else if (key == RIGHT) {
-      YGNodeStyleSetPosition(mYGNode, YGEdgeRight, stringToNum<float>(value));
+      mLayoutNode->setStylePositionRight(stringToNum<float>(value));
     } else if (key == BOTTOM) {
-      YGNodeStyleSetPosition(mYGNode, YGEdgeBottom, stringToNum<float>(value));
+      mLayoutNode->setStylePositionBottom(stringToNum<float>(value));
     } else if (key == MARGIN) {
-      YGNodeStyleSetMargin(mYGNode, YGEdgeAll, stringToNum<float>(value));
+      mLayoutNode->setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
     } else if (key == MARGIN_LEFT) {
-      YGNodeStyleSetMargin(mYGNode, YGEdgeLeft, stringToNum<float>(value));
+      mLayoutNode->setMargin(WXCore_Margin_Left, stringToNum<float>(value));
     } else if (key == MARGIN_TOP) {
-      YGNodeStyleSetMargin(mYGNode, YGEdgeTop, stringToNum<float>(value));
+      mLayoutNode->setMargin(WXCore_Margin_Top, stringToNum<float>(value));
     } else if (key == MARGIN_RIGHT) {
-      YGNodeStyleSetMargin(mYGNode, YGEdgeRight, stringToNum<float>(value));
+      mLayoutNode->setMargin(WXCore_Margin_Right, stringToNum<float>(value));
     } else if (key == MARGIN_BOTTOM) {
-      YGNodeStyleSetMargin(mYGNode, YGEdgeBottom, stringToNum<float>(value));
+      mLayoutNode->setMargin(WXCore_Margin_Bottom, stringToNum<float>(value));
     } else if (key == BORDER_WIDTH) {
-      YGNodeStyleSetBorder(mYGNode, YGEdgeAll, stringToNum<float>(value));
+      mLayoutNode->setBorderWidth(WXCore_Border_Width_ALL, stringToNum<float>(value));
     } else if (key == BORDER_TOP_WIDTH) {
-      YGNodeStyleSetBorder(mYGNode, YGEdgeTop, stringToNum<float>(value));
+      mLayoutNode->setBorderWidth(WXCore_Border_Width_Top, stringToNum<float>(value));
     } else if (key == BORDER_RIGHT_WIDTH) {
-      YGNodeStyleSetBorder(mYGNode, YGEdgeRight, stringToNum<float>(value));
+      mLayoutNode->setBorderWidth(WXCore_Border_Width_Right, stringToNum<float>(value));
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      YGNodeStyleSetBorder(mYGNode, YGEdgeBottom, stringToNum<float>(value));
+      mLayoutNode->setBorderWidth(WXCore_Border_Width_Bottom, stringToNum<float>(value));
     } else if (key == BORDER_LEFT_WIDTH) {
-      YGNodeStyleSetBorder(mYGNode, YGEdgeLeft, stringToNum<float>(value));
+      mLayoutNode->setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
     } else if (key == PADDING) {
-      YGNodeStyleSetPadding(mYGNode, YGEdgeAll, stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_ALL,stringToNum<float>(value));
     } else if (key == PADDING_LEFT) {
-      YGNodeStyleSetPadding(mYGNode, YGEdgeLeft, stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Left,stringToNum<float>(value));
     } else if (key == PADDING_TOP) {
-      YGNodeStyleSetPadding(mYGNode, YGEdgeTop, stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Top,stringToNum<float>(value));
     } else if (key == PADDING_RIGHT) {
-      YGNodeStyleSetPadding(mYGNode, YGEdgeRight, stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Right,stringToNum<float>(value));
     } else if (key == PADDING_BOTTOM) {
-      YGNodeStyleSetPadding(mYGNode, YGEdgeBottom, stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Bottom,stringToNum<float>(value));
     } else {
     }
   }
@@ -293,8 +278,8 @@ namespace WeexCore {
   void RenderObject::printYGNodeMsg() {
     LOGE("yoga ref: %s\n", mRef.c_str());
     LOGE("yoga type: %s\n", mType.c_str());
-    YGNodePrint(mYGNode, YGPrintOptionsLayout);
-    YGNodePrint(mYGNode, YGPrintOptionsStyle);
+//    YGNodePrint(mYGNode, YGPrintOptionsLayout);
+//    YGNodePrint(mYGNode, YGPrintOptionsStyle);
     LOGE("\n\n");
 
     for (CHILD_LIST_IT it = getChildListItBegin();

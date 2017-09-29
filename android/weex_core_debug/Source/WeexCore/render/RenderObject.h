@@ -6,11 +6,13 @@
 #include "./base/LogUtils.h"
 #include <yoga/Yoga.h>
 #include "../layout/ConstantsName.h"
-#include "../layout/WXStyleUtil.h"
 #include "./base/StringUtils.h"
 #include "action/RenderAction.h"
 #include <map>
 #include <set>
+#include <Layout/WXCoreLayout.h>
+#include <Layout/WXCoreStyle.h>
+#include <Layout/CssValueGetter.h>
 
 namespace WeexCore {
 
@@ -44,7 +46,7 @@ namespace WeexCore {
 
     ChildrenList mChildren;
 
-    YGNodeRef mYGNode;
+    WXCoreLayoutNode *mLayoutNode;
 
     int mLeft, mTop, mWidth, mHeight;
 
@@ -77,7 +79,7 @@ namespace WeexCore {
 
     std::string getType();
 
-    YGNodeRef getYGNode();
+    WXCoreLayoutNode *getLayoutNode();
 
     void applyStyleToYGNode(std::string key, std::string value);
 

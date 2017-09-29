@@ -37,7 +37,6 @@ add_library(weexjsc SHARED
     #./base/threading/thread.cpp
 
 
-    ./WeexCore/layout/WXStyleUtil.cpp
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/BridgeAndroid.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
@@ -48,6 +47,8 @@ add_library(weexjsc SHARED
     ./WeexCore/render/RenderObject.cpp
     ./WeexCore/render/RenderPage.cpp
     ./rapidjson/weexjsontools.cpp
+
+    ./Layout/WXCoreLayout.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)
