@@ -24,6 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -34,7 +35,7 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXViewUtils;
 
 
-public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeListener, WXGestureObservable {
+public class WXBaseCircleIndicator extends FrameLayout implements WXGestureObservable {
 
   private final Paint mPaintPage = new Paint();
   private final Paint mPaintFill = new Paint();
@@ -58,6 +59,8 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
    */
   private int fillColor = Color.DKGRAY;
   private int realCurrentItem;
+
+  private OnPageChangeListener mListener;
 
 
   public WXBaseCircleIndicator(Context context) {
@@ -91,34 +94,27 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
   }
 
   /**
-   * @param mCircleViewPager the mCircleViewPager to set
+   * @param viewPager the mCircleViewPager to set
    */
-  public void setCircleViewPager(WXCircleViewPager mCircleViewPager) {
-    this.mCircleViewPager = mCircleViewPager;
-    if (this.mCircleViewPager != null) {
-      this.mCircleViewPager.addOnPageChangeListener(this);
+  public void setCircleViewPager(WXCircleViewPager viewPager) {
+    mCircleViewPager = viewPager;
+    if (mCircleViewPager != null) {
+      if (mListener == null) {
+        mListener = new ViewPager.SimpleOnPageChangeListener() {
+          @Override
+          public void onPageSelected(int position) {
+            realCurrentItem = mCircleViewPager.getRealCurrentItem();
+            invalidate();
+          }
+        };
+      }
+      this.mCircleViewPager.addOnPageChangeListener(mListener);
       this.realCurrentItem = mCircleViewPager.getRealCurrentItem();
       if (realCurrentItem < 0) {
         realCurrentItem = 0;
       }
     }
     requestLayout();
-  }
-
-  @Override
-  public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-  }
-
-  @Override
-  public void onPageSelected(int position) {
-    realCurrentItem = mCircleViewPager.getRealCurrentItem();
-    invalidate();
-  }
-
-  @Override
-  public void onPageScrollStateChanged(int state) {
-
   }
 
   /**
