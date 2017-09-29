@@ -223,12 +223,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         ((UIScrollView *)self.view).scrollEnabled = _scrollable;
     }
     if (attributes[@"alwaysScrollableHorizontal"]) {
-        _alwaysScrollableHorizontal = attributes[@"alwaysScrollableHorizontal"]?[WXConvert BOOL:attributes[@"alwaysScrollableHorizontal"]]:NO;
+        _alwaysScrollableHorizontal = [WXConvert BOOL:attributes[@"alwaysScrollableHorizontal"]];
         ((UIScrollView*)self.view).alwaysBounceHorizontal = _alwaysScrollableHorizontal;
     }
     
     if (attributes[@"alwaysScrollableVertical"]) {
-        _alwaysScrollableVertical = attributes[@"alwaysScrollableVertical"]?[WXConvert BOOL:attributes[@"alwaysScrollableVertical"]]:NO;
+        _alwaysScrollableVertical = [WXConvert BOOL:attributes[@"alwaysScrollableVertical"]];
         ((UIScrollView*)self.view).alwaysBounceVertical = _alwaysScrollableVertical;
     }
     if (attributes[@"offsetAccuracy"]) {
