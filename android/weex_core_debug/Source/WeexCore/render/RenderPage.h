@@ -28,7 +28,7 @@ namespace WeexCore {
     RenderObject *pRoot;
     std::string mPageId;
     std::vector<RenderAction *> mRenderActions;
-    std::map<std::string, RenderObject *> *mRenderObjectMap;
+    std::map<std::string, RenderObject *> mRenderObjectMap;
 
   public:
     RenderPage(std::string pageID, std::string data);

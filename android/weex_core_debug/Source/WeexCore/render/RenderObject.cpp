@@ -15,7 +15,11 @@ namespace WeexCore {
 
     mPage = nullptr;
     mParentRender = nullptr;
-    mLayoutNode = nullptr;
+
+    if (mLayoutNode != nullptr) {
+      delete mLayoutNode;
+      mLayoutNode = nullptr;
+    }
 
     if (mStyle != nullptr) {
       delete mStyle;

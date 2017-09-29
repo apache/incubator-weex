@@ -14,7 +14,6 @@ namespace WeexCore {
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
     mPageId = pageID;
-    mRenderObjectMap = new std::map<std::string, RenderObject *>();
 
     int alen = data.length();
     char *c_data = (char *) malloc(alen + 1);
@@ -23,7 +22,7 @@ namespace WeexCore {
     RenderObject *render = json2RenderObject(c_data, this);
     free(c_data);
     c_data = nullptr;
-    mRenderObjectMap->insert(pair<std::string, RenderObject *>(render->getRef(), render));
+    mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
     setRootRenderObject(render);
 
     // layout by YogaNode Tree
@@ -89,7 +88,11 @@ namespace WeexCore {
   }
 
   RenderPage::~RenderPage() {
-    delete pRoot;
+
+    if (pRoot != nullptr) {
+      delete pRoot;
+      pRoot = nullptr;
+    }
 
     for (RENDERACTION_IT it = mRenderActions.begin();
          it != mRenderActions.end(); it++) {
@@ -100,14 +103,13 @@ namespace WeexCore {
     }
     mRenderActions.clear();
 
-    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectMap->begin();
-    RENDEROBJECT_COLLECTION_IT end = mRenderObjectMap->end();
+    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectMap.begin();
+    RENDEROBJECT_COLLECTION_IT end = mRenderObjectMap.end();
     for (; begin != end; ++begin) {
       delete begin->second;
     }
 
-    mRenderObjectMap->clear();
-    delete mRenderObjectMap;
+    mRenderObjectMap.clear();
   }
 
   void RenderPage::addRenderObject(std::string parentRef, int insertPosiotn, std::string data) {
@@ -121,7 +123,7 @@ namespace WeexCore {
       return;
     }
 
-    mRenderObjectMap->insert(pair<std::string, RenderObject *>(child->getRef(), child));
+    mRenderObjectMap.insert(pair<std::string, RenderObject *>(child->getRef(), child));
 
     // add child to YogaNode Tree
     parent->getLayoutNode()->addChildAt(child->getLayoutNode(),parent->getChildCount());
@@ -201,7 +203,7 @@ namespace WeexCore {
 
     parent->removeRenderObject(child);
 //    YGNodeRemoveChild(parent->getLayoutNode(), child->getLayoutNode());
-    mRenderObjectMap->erase(child->getRef());
+    mRenderObjectMap.erase(child->getRef());
     delete child;
 
     // layout by YogaNode Tree
@@ -247,7 +249,7 @@ namespace WeexCore {
   }
 
   RenderObject *RenderPage::getRenderObject(std::string ref) {
-    return mRenderObjectMap->find(ref)->second;
+    return mRenderObjectMap.find(ref)->second;
   }
 
   void RenderPage::setRootRenderObject(RenderObject *root) {
