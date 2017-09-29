@@ -376,7 +376,7 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     NSString *placeholderSrc = self.placeholdSrc;
     
-    if (!placeholderSrc || [WXUtility isBlankString:placeholderSrc]) {
+    if ([WXUtility isBlankString:placeholderSrc]) {
         return;
     }
     
