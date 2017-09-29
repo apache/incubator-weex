@@ -22,6 +22,7 @@
 #import "WXLength.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXConvert.h"
 
 @interface WXTransform()
 
@@ -174,7 +175,7 @@
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
     if (_perspective && !isinf(_perspective)) {
-        nativeTansform3D.m34 = -1.0/_perspective*[UIScreen mainScreen].scale;
+        nativeTansform3D.m34 = -1.0/_perspective;
     }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
         return nativeTansform3D;
@@ -339,7 +340,7 @@
 
 - (void)parsePerspective:(NSArray *)value
 {
-    _perspective = [value[0] doubleValue];
+    _perspective = [WXConvert WXPixelType:value[0] scaleFactor:self.weexInstance.pixelScaleFactor];
     if (_perspective <= 0 ) {
         _perspective = CGFLOAT_MAX;
     }
