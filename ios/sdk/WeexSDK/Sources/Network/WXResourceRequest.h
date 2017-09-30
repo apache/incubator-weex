@@ -32,7 +32,7 @@ typedef enum : NSUInteger {
 
 @interface WXResourceRequest : NSMutableURLRequest
 
-@property (nonatomic, strong) id taskIdentifier;
+@property (nonatomic, weak) id taskIdentifier;
 @property (nonatomic, assign) WXResourceType type;
 
 @property (nonatomic, strong) NSString *referrer;
