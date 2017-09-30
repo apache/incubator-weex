@@ -6,7 +6,7 @@ layout: post
 
 # Release Note
 
-## 0.16
+## v0.16
 -----
 * + support 3d rotate ([#532](https://github.com/apache/incubator-weex/pull/532) [#418](https://github.com/apache/incubator-weex/pull/418))
 * + new feature support perspective function in transform ([#551](https://github.com/apache/incubator-weex/pull/551)[#532](https://github.com/apache/incubator-weex/pull/532))
@@ -33,7 +33,7 @@ layout: post
 * * Fix the problem of 'text-overflow:clip' [#718](https://github.com/apache/incubator-weex/pull/718)
 * * Fix android new Date() cannot get accuracy time [#753](https://github.com/apache/incubator-weex/pull/753)
 
-## 0.15
+## v0.15
 ------
 * + support fast click and hairlines border [#507](https://github.com/apache/incubator-weex/pull/507).
 * + Add `weex.supports` api for feature detections. [#6053](https://github.com/vuejs/vue/pull/6053)
