@@ -65,7 +65,7 @@ public class WXEnvironment {
    */
   public static boolean sDebugMode = false;
   public static String sDebugWsUrl = "";
-  public static boolean sDebugServerConnectable = true;
+  public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
   public static long sJSLibInitTime = 0;
