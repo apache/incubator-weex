@@ -4,7 +4,10 @@
 #include "ConstantsValue.h"
 #include "ConstantsName.h"
 #include "WXCoreStyle.h"
+#include "WXCoreFlexEnum.h"
 #include <string>
+
+using namespace WXCoreFlexLayout;
 
 inline WXCoreFlexDirection getWXCoreFlexDirection(std::string value) {
   if (value == COLUMN) {
@@ -16,7 +19,7 @@ inline WXCoreFlexDirection getWXCoreFlexDirection(std::string value) {
   } else if (value == ROW_REVERSE) {
     return WXCore_Flex_Direction_Row_Reverse;
   }
-  return WXCore_Flex_Direction_Undefined;
+  return WXCore_Flex_Direction_Row;
 }
 
 
@@ -32,7 +35,7 @@ inline WXCoreJustifyContent getWXCoreJustifyContent(std::string value) {
   } else if (value == SPACE_AROUND) {
     return WXCore_Justify_Space_Around;
   }
-  return WXCore_Justify_Undefined;
+  return WXCore_Justify_Flex_Start;
 }
 
 
@@ -48,7 +51,7 @@ inline WXCoreAlignItems getWXCoreAlignItem(std::string value) {
   } else if (value == BASELINE) {
     return WXCore_AlignItems_Baseline;
   }
-  return WXCore_AlignItems_Undefined;
+  return WXCore_AlignItems_Stretch;
 }
 
 
@@ -60,7 +63,7 @@ inline WXCoreFlexWrap getWXCoreFlexWrap(std::string value) {
   } else if (value == WRAP_REVERSE) {
     return WXCore_Wrap_WrapReverse;
   }
-  return WXCore_Wrap_Undefined;
+  return WXCore_Wrap_NoWrap;
 }
 
 
@@ -78,7 +81,7 @@ inline WXCoreAlignSelf getWXCoreAlignSelf(std::string value) {
   } else if (value == BASELINE) {
     return WXCore_AlignSelf_Baseline;
   }
-  return WXCore_AlignSelf_Undefined;
+  return WXCore_AlignSelf_Auto;
 }
 
 
@@ -88,9 +91,8 @@ inline WXCorePositionType getWXCorePositionType(std::string value) {
   } else if (value == ABSOLUTE) {
     return WXCore_PositionType_Absolute;
   }
-  return WXCore_PositionType_Undefined;
+  return WXCore_PositionType_Relative;
 }
-
 
 
 #endif //WEEX_PROJECT_STYLEGETTER_H

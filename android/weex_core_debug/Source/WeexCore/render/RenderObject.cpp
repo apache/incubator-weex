@@ -171,13 +171,13 @@ namespace WeexCore {
     } else if (key == POSITION) {
       mLayoutNode->setStylePositionType(getWXCorePositionType(value));
     } else if (key == LEFT) {
-      mLayoutNode->setStylePositionLeft(stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Left,stringToNum<float>(value));
     } else if (key == TOP) {
-      mLayoutNode->setStylePositionTop(stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Top,stringToNum<float>(value));
     } else if (key == RIGHT) {
-      mLayoutNode->setStylePositionRight(stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Right,stringToNum<float>(value));
     } else if (key == BOTTOM) {
-      mLayoutNode->setStylePositionBottom(stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Bottom,stringToNum<float>(value));
     } else if (key == MARGIN) {
       mLayoutNode->setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
     } else if (key == MARGIN_LEFT) {
