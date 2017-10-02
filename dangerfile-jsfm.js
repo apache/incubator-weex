@@ -100,6 +100,7 @@ if(hasJsfmFile){
     fail("jsfm run test failed!");
   }
 }else{
-  console.log('has no jsfm file changed!');
+  console.log('has no jsfm file changed.');
+  message('has no jsfm file changed.');
 }
 

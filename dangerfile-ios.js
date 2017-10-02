@@ -102,6 +102,7 @@ if(hasIosFile){
     fail("ios platform run unit test failed!");
   }
 }else{
-  console.log('has no ios file changed!');
+  console.log('has no ios file changed.');
+  message('has no ios file changed.');
 }
 
