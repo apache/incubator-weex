@@ -47,6 +47,28 @@ This component supports no child components.
     - `success` : `true` if the image was loaded successfully, otherwise `false`
     - `size` : the original size of image, contains two parameters: `naturalWidth` representing the original width of image in pixels, `naturalHeight` representing the original height of image in pixels. default value. The default value for both parameters is `0`.
 
+**component method**
+
+- support save <sup class="api-version">v0.16.0+</sup> image to local device or photo album.
+  - you should specify a callback function to receive the saving result. 
+	  ```
+	 	var image = this.$refs.imageRef; // image 是之前已经定义过的ref
+	  		image.save(function(result) {
+	  			console.log(JSON.stringify(result))
+		}); 
+		```
+    	and the result can be the following format
+     ```
+      	{
+    		"success" : true/false, // 保存成功或失败
+    		"errorDesc": "errordesc" // 在success 为false的情况会返回
+     	}
+     ```
+  - note
+   you must add `NSPhotoLibraryAddUsageDescription` and `NSPhotoLibraryAddUsageDescription `(iOS 11) privacy to access photo album for iOS, [see more privacy](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html)
+ 
+ [try it for saving image](http://dotwe.org/vue/fadcd44a7031943ff0feaaf1895df414)
+
 ### Examples
 
 ```html
