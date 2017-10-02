@@ -172,6 +172,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(touchmove, addTouchMoveEvent)
     WX_ADD_EVENT(touchend, addTouchEndEvent)
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
+    WX_ADD_EVENT(accessibilityMagicTap, addAccessibilityMagicTapEvent)
     
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = YES;
@@ -200,7 +201,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(touchmove, removeTouchMoveEvent)
     WX_REMOVE_EVENT(touchend, removeTouchEndEvent)
     WX_REMOVE_EVENT(touchcancel, removeTouchCancelEvent)
-    
+    WX_REMOVE_EVENT(accessibilityMagicTap, removeAccessibilityMagicTapEvent)
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = NO;
     }
@@ -257,6 +258,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     _touchGesture.listenPseudoTouch = NO;
     [self checkRemoveTouchGesture];
+}
+
+#pragma mark - Accessibility Event
+
+- (void)addAccessibilityMagicTapEvent
+{
+    _accessibilityMagicTapEvent = YES;
+}
+
+- (void)removeAccessibilityMagicTapEvent
+{
+    _accessibilityMagicTapEvent = NO;
 }
 
 #pragma mark - Click Event
