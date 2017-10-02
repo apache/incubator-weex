@@ -103,6 +103,7 @@ if(hasAndroidFile){
     fail("android platform run unit test failed!");
   }
 }else{
-  console.log('has no android file changed!');
+  console.log('has no android file changed.');
+  message('has no android file changed.')
 }
 
