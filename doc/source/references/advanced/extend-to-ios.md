@@ -329,12 +329,12 @@ after your registration for your own custom component, now you can call it in yo
 
 ```html
 <template>
-  <mycomponent id='mycomponent'></mycomponent>
+  <mycomponent ref='mycomponent'></mycomponent>
 </template>
 <script>
   module.exports = {
     created: function() {
-      this.$el('mycomponent').focus();
+      this.$refs.mycomponent.focus();
     }
   }
 </script>
