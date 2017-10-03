@@ -65,7 +65,7 @@
 - (BOOL)accessibilityPerformMagicTap
 {
     if (self.wx_component->_accessibilityMagicTapEvent) {
-        [self.wx_component fireEvent:@"accessibilityPerformMagicTap" params:nil];
+        [self.wx_component fireEvent:@"accessibilityMagicTap" params:nil];
     }
     return [super accessibilityPerformMagicTap];
 }
