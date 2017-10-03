@@ -75,7 +75,6 @@ public class Layouts {
             asyncTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR); //serial executor is better
         }else{
             doSafeLayout(component, templateViewHolder.getLayoutContext());
-            Log.e("weex", "weex" + component.getLayoutHeight() + "  " + component.getLayoutWidth());
             setLayout(component, false);
         }
 
@@ -140,6 +139,10 @@ public class Layouts {
      * if force is true, always set layout
      * */
     public static final void setLayout(WXComponent component, boolean force){
+        if(component.isWaste()){
+            setLayoutWaste(component, force);
+            return;
+        }
         WXDomObject domObject = (WXDomObject) component.getDomObject();
         if(domObject.hasUpdate() || force){
             domObject.markUpdateSeen();
@@ -158,6 +161,26 @@ public class Layouts {
                 WXComponent child = container.getChild(i);
                 if (child != null) {
                     setLayout(child, force);
+                }
+            }
+        }
+    }
+
+    private static final void setLayoutWaste(WXComponent component, boolean force){
+        WXDomObject domObject = (WXDomObject) component.getDomObject();
+        if(domObject.hasUpdate() || force){
+            domObject.markUpdateSeen();
+            if(domObject.hasUpdate()){
+                domObject.markLayoutStateUpdated();
+            }
+        }
+        if(component instanceof WXVContainer){
+            WXVContainer container = (WXVContainer) component;
+            int count = container.getChildCount();
+            for (int i = 0; i < count; ++i) {
+                WXComponent child = container.getChild(i);
+                if (child != null) {
+                    setLayoutWaste(child, force);
                 }
             }
         }
