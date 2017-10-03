@@ -25,11 +25,12 @@
 #import "WXConvert.h"
 #import "WXRuleManager.h"
 #import "WXDefine.h"
+#import "WXView.h"
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
 
 // WXText is a non-public is not permitted
-@interface WXTextView : UIView
+@interface WXTextView : WXView
 @property (nonatomic, strong) NSTextStorage *textStorage;
 @end
 
