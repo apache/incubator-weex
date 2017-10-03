@@ -66,7 +66,9 @@ import com.taobao.weex.utils.batch.Interceptor;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -143,6 +145,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static String crashUrl = null;
   private static long lastCrashTime = 0;
+  public static final String INITLOGFILE = "/jsserver_start.log";
 
 
   /**
@@ -435,7 +438,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     // if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
           .append(", tasks:").append(tasks).append(", callback:").append(callback);
-      WXLogUtils.e(mLodBuilder.substring(0));
+      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     // }
 
@@ -495,7 +498,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public int callCreateBody(String instanceId, String tasks, String callback) {
     if (TextUtils.isEmpty(tasks)) {
       // if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
+        WXLogUtils.d("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
       // }
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
       return IWXBridge.INSTANCE_RENDERING_ERROR;
@@ -936,7 +939,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     long time = System.currentTimeMillis();
     if (crashUrl == null ||
             (crashUrl != null && !crashUrl.equals(aUrl)) ||
-            ((time - lastCrashTime) > 10000)) {
+            ((time - lastCrashTime) > 15000)) {
       crashUrl = aUrl;
       lastCrashTime = time;
       return true;
@@ -1193,7 +1196,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
         String err = "[WXBridgeManager] invokeRefreshInstance: framework.js uninitialized.";
         commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,err);
-        WXLogUtils.e(err);
+        WXLogUtils.d(err);
         return;
       }
       long start = System.currentTimeMillis();
@@ -1517,8 +1520,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_SUCCESS, reinitInfo + "success");
         }else{
           if (reInitCount > 1) {
-            WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-            String err="[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail reinit FrameWork";
+            WXLogUtils.e("[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail");
+            String err="[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail reinit FrameWork";
             commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK, err);
           } else {
             WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
@@ -1708,7 +1711,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private void invokeRegisterModules(Map<String, Object> modules, List<Map<String, Object>> failReceiver) {
     if (modules == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeRegisterModules: framework.js uninitialized.");
+        WXLogUtils.d("[WXBridgeManager] invokeRegisterModules: framework.js uninitialized.");
       }
       failReceiver.add(modules);
       return;
@@ -1766,41 +1769,92 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
   public void reportJSException(String instanceId, String function,
                                 String exception) {
-    if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.e("reportJSException >>>> instanceId:" + instanceId
-                   + ", exception function:" + function + ", exception:"
-                   + exception);
-    }
-    WXSDKInstance instance;
-    if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
-      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+              + ", exception function:" + function + ", exception:"
+              + exception);
+	  WXSDKInstance instance = null;
+      if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
+          instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
-      if (METHOD_CREATE_INSTANCE.equals(function)) {
-        try {
-          if (reInitCount > 1 && !instance.isNeedReLoad()) {
-            // JSONObject domObject = JSON.parseObject(tasks);
-            WXDomModule domModule = getDomModule(instanceId);
-            Action action = Actions.getReloadPage(instanceId, true);
-            domModule.postAction((DOMAction)action, true);
-            instance.setNeedLoad(true);
-            return;
+          if (METHOD_CREATE_INSTANCE.equals(function)) {
+              try {
+                  if (reInitCount > 1 && !instance.isNeedReLoad()) {
+                      // JSONObject domObject = JSON.parseObject(tasks);
+                      WXDomModule domModule = getDomModule(instanceId);
+                      Action action = Actions.getReloadPage(instanceId, true);
+                      domModule.postAction((DOMAction) action, true);
+                      instance.setNeedLoad(true);
+                      return;
+                  }
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
           }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+          String err = "function:" + function + "#exception:" + exception;
+          commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
       }
-      String err = "function:" + function + "#exception:" + exception;
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 
       IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
       if (adapter != null) {
-        WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, instance.getBundleUrl(), WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
-        adapter.onJSException(jsException);
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d(jsException.toString());
-        }
+          String bundleUrl;
+          String exceptionId = instanceId;
+
+          if (instanceId == "" || instanceId == null) {
+              exceptionId = "instanceIdisNull";
+          }
+
+          if (instance == null) {
+              if (("initFramework").equals(function)) {
+                  bundleUrl = "jsExceptionBeforeRenderInstanceNull";
+                  String exceptionExt = null;
+                  try {
+                      if (WXEnvironment.getApplication() != null) {
+                          final String fileName = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + INITLOGFILE;
+                          try {
+                              File file = new File(fileName);
+                              if (file.exists()) {
+                                  if (file.length() > 0) {
+                                      StringBuilder result = new StringBuilder();
+                                      try {
+                                          InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");
+                                          BufferedReader br = new BufferedReader(read);
+                                          String s = null;
+                                          while ((s = br.readLine()) != null) {
+                                              result.append(s + "\n");
+                                          }
+                                          exceptionExt = result.toString();
+                                          br.close();
+                                      } catch (Exception e) {
+                                          e.printStackTrace();
+                                      }
+                                  }
+                                  file.delete();
+                              }
+                          } catch (Throwable throwable) {
+
+                          }
+                      }
+                  } catch (Throwable e) {
+                      e.printStackTrace();
+                  }
+                  exception += "\n" + exceptionExt;
+                  WXLogUtils.e("reportJSException:" + exception);
+
+              } else if (function == null) {
+                  bundleUrl = "jsExceptionInstanceAndFunctionNull";
+              } else {
+                  bundleUrl = "jsExceptionInstanceNull" + function;
+              }
+          } else {
+              bundleUrl = instance.getBundleUrl();
+          }
+
+          WXJSExceptionInfo jsException = new WXJSExceptionInfo(exceptionId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
+          adapter.onJSException(jsException);
+          if (WXEnvironment.isApkDebugable()) {
+              WXLogUtils.d(jsException.toString());
+          }
       }
-    }
   }
 
   public static class TimerInfo {
