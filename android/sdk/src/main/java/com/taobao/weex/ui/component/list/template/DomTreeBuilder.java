@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component.list.template;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.WXDomObject;
@@ -25,6 +26,7 @@ import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by furture on 2017/10/2.
@@ -40,29 +42,41 @@ class DomTreeBuilder extends TraceableAction {
             return null;
         }
        long startNanos = System.nanoTime();
+        dom.setCloneThis(true);
         WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
         if (component != null) {
             component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
             component.mTraceInfo.rootEventId = mTracingEventId;
             component.mTraceInfo.domQueueTime = mDomQueueTime;
         }
-        ((WXDomObject)component.getDomObject()).applyStyleToNode();
-        context.registerDOMObject(dom.getRef(), dom);
         context.registerComponent(dom.getRef(), component);
         if (component instanceof WXVContainer) {
             WXVContainer container = (WXVContainer) component;
             WXDomObject parentDom = (WXDomObject) container.getDomObject();
-            int count = dom.childCount();
-            WXDomObject child = null;
-            for (int i = 0; i < count; ++i) {
-                child = dom.getChild(i);
+            for (int i = 0; i < dom.childCount(); ++i) {
+                WXDomObject child = dom.getChild(i);
                 if (child != null) {
                     WXComponent childComponent = generateComponentTree(context, child, container);
                     container.addChild(childComponent);
-                    parentDom.add((WXDomObject) childComponent.getDomObject(), -1);
+                    WXDomObject childDomObject = (WXDomObject) childComponent.getDomObject();
+                    if(childDomObject != child) {
+                        int index = parentDom.index(child);
+                        parentDom.add(childDomObject, index);
+                        if(index >= 0) {
+                            parentDom.remove(child);
+                            i--;
+                        }
+                        RuntimeException exception = new IllegalArgumentException(childDomObject.getClass().getName()
+                                + " not support clone this");
+                        WXLogUtils.e("weex", exception);
+                        if(WXEnvironment.isApkDebugable()){
+                            throw  exception;
+                        }
+                    }
                 }
             }
         }
+        dom.setCloneThis(false);
         if (component != null) {
             component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
         }
@@ -74,8 +88,11 @@ class DomTreeBuilder extends TraceableAction {
         if(domActionContext == null){
             return null;
         }
-        domObject.getStyles().put("display", "flex");
         DomTreeBuilder builder = new DomTreeBuilder();
+        domObject.traverseTree(
+                domActionContext.getAddDOMConsumer(),
+                domActionContext.getApplyStyleConsumer()
+        );
         return builder.generateComponentTree(domActionContext, domObject, parent);
 
     }

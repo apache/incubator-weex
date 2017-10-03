@@ -225,6 +225,9 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     @Override
     public WXDomObject clone() {
+        if(isCloneThis()){
+            return  this;
+        }
         WXRecyclerDomObject domObject = (WXRecyclerDomObject) super.clone();
         domObject.cellList = cellList;
         return domObject;

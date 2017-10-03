@@ -197,11 +197,14 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 listData = array;
             }
         }
-
+        long start = System.currentTimeMillis();
         if(mDomObject != null && mDomObject.getCellList() != null){
             for(int i=0; i<mDomObject.getCellList().size(); i++){
                 addChild(DomTreeBuilder.buildTree(mDomObject.getCellList().get(i),  this));
             }
+        }
+        if(WXEnvironment.isApkDebugable()){
+            WXLogUtils.d(TAG, "TemplateList BuildDomTree Used " + (System.currentTimeMillis() - start));
         }
     }
 
@@ -1003,18 +1006,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             return;
         }
         long start = System.currentTimeMillis();
-        boolean async = templateViewHolder.getHolderPosition() >= 0;
+        boolean resuse = templateViewHolder.getHolderPosition() >= 0;
         templateViewHolder.setHolderPosition(position);
         Object data = listData.get(position);
         if(component.getRenderData() == data){
-            if(!async){
-                if(!component.isHasLayout()) {
-                    Layouts.doLayoutAsync(templateViewHolder, async);
-                }
-                if(WXEnvironment.isApkDebugable()){
-                    WXLogUtils.d(TAG,  position + getTemplateKey(position) + " onBindViewHolder source layout used " + (System.currentTimeMillis() - start) + async);
-                }
-            }
             component.setHasLayout(true);
         }else{
             List<WXComponent> updates = Statements.doRender(component, getStackContextForPosition(position, data));
@@ -1024,12 +1019,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 WXLogUtils.d(TAG, position + getTemplateKey(position) + " onBindViewHolder render used " + (System.currentTimeMillis() - start));
             }
             if(component.isHasLayout()){
-                async = true;
+                resuse = true;
             }
-            Layouts.doLayoutAsync(templateViewHolder, async);
+            Layouts.doLayoutAsync(templateViewHolder, true);
             component.setHasLayout(true);
             if(WXEnvironment.isApkDebugable()){
-                WXLogUtils.d(TAG,  position + getTemplateKey(position) + " onBindViewHolder layout used " + (System.currentTimeMillis() - start) + async);
+                WXLogUtils.d(TAG,  position + getTemplateKey(position) + " onBindViewHolder layout used " + (System.currentTimeMillis() - start) + resuse);
             }
         }
     }
@@ -1097,6 +1092,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             WXCellDomObject domObject = (WXCellDomObject) component.getDomObject();
             domObject.setRecyclerDomObject((WXRecyclerDomObject) getDomObject());
         }
+        component.setRenderData(cell.getRenderData());
         return component;
     }
 
@@ -1109,8 +1105,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                             if(cell == getSourceTemplate(i)){
                                 Object data = listData.get(i);
                                 Statements.doRender(cell, getStackContextForPosition(i, data));
+                                Layouts.doSafeLayout(cell, new CSSLayoutContext());
                                 cell.setRenderData(data);
-                                //WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), new RenderSourceCellAction(cell, null, data), false);
                                 break;
                             }
                         }
@@ -1560,7 +1556,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             cellCache = new TemplateCache();
             mTemplatesCache.put(template, cellCache);
         }
-        if(cellCache.cells.size() >= templateCacheSize){
+        if(cellCache.cells.size() > 0){
             cellCache.isLoadIng = false;
             return;
         }
@@ -1571,11 +1567,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         AsyncTask<Void,Void, Void> preloadTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 TemplateCache cellCache = mTemplatesCache.get(template);
                 if(cellCache == null || cellCache.cells == null){
                     return null;
@@ -1620,10 +1611,6 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                                 doInitLazyCell(component, template, true);
                                 return iterator.hasNext();
                             }
-                            if(!component.isHasLayout()){
-                                Layouts.doSafeLayout(component, new CSSLayoutContext());
-                                component.setHasLayout(true);
-                            }
                         }
                         return false;
                     }
@@ -1640,15 +1627,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             component.lazy(false);
             component.createView();
             if(WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d(TAG,  "doInitLazyCell " + inPreload + template +  " createView used " + (System.currentTimeMillis() - start));
+                WXLogUtils.d(TAG,  "doInitLazyCell idle" + inPreload + template +  " createView used " + (System.currentTimeMillis() - start));
             }
             component.applyLayoutAndEvent(component);
             if(WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d(TAG,  "doInitLazyCell " + inPreload  + template +  " apply layout used " + (System.currentTimeMillis() - start));
+                WXLogUtils.d(TAG,  "doInitLazyCell idle" + inPreload  + template +  " apply layout used " + (System.currentTimeMillis() - start));
             }
             component.bindData(component);
             if(WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d(TAG, "doInitLazyCell " + inPreload + template + " bindData used " + (System.currentTimeMillis() - start));
+                WXLogUtils.d(TAG, "doInitLazyCell idle" + inPreload + template + " bindData used " + (System.currentTimeMillis() - start));
             }
         }
     }
