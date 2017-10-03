@@ -26,6 +26,9 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
+@interface UIScrollView(UIScrollerView_ContentInsetAdjustmentBehavior)
+@property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
+@end
 
 @interface WXScrollToTarget : NSObject
 
@@ -154,14 +157,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.pagingEnabled = _pagingEnabled;
     scrollView.alwaysBounceHorizontal = _alwaysScrollableHorizontal;
     scrollView.alwaysBounceVertical = _alwaysScrollableVertical;
-    
-#ifdef __IPHONE_11_0
-    if (@available(iOS 11.0, *)) {
-        scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    } else {
-        // Fallback on earlier versions
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+        // now use the runtime to forbid the contentInset being Adjusted
+        scrollView.contentInsetAdjustmentBehavior = 2;
     }
-#endif
     
     if (self.ancestorScroller) {
         scrollView.scrollsToTop = NO;
@@ -522,7 +521,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             distance = scrollView.contentOffset.y - _lastScrollEventFiredOffset.y;
         }
         if (fabs(distance) >= _offsetAccuracy) {
-            [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+//            [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
