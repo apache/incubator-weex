@@ -174,7 +174,9 @@ public class WXTextDomObject extends WXDomObject {
     updateStyleAndText();
     spanned = createSpanned(mText);
     if(hasNewLayout()){
-        WXLogUtils.e("TextDom", new IllegalStateException("Previous csslayout was ignored! markLayoutSeen() never called"));
+        if(WXEnvironment.isApkDebugable()) {
+          WXLogUtils.w("TextDom", new IllegalStateException("Previous csslayout was ignored! markLayoutSeen() never called"));
+        }
         markUpdateSeen();
     }
     super.dirty();
@@ -226,6 +228,9 @@ public class WXTextDomObject extends WXDomObject {
 
   @Override
   public WXTextDomObject clone() {
+    if(isCloneThis()){
+      return  this;
+    }
     WXTextDomObject dom = null;
     try {
       dom = new WXTextDomObject();
