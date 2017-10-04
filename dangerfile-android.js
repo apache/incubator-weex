@@ -107,3 +107,4 @@ if(hasAndroidFile){
   message('has no android file changed.')
 }
 
+message('android test finished.')

@@ -60,9 +60,7 @@ before_script:
 script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
-      cd android
-      ./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
-      cd $TRAVIS_BUILD_DIR
+      npm run danger -- run --dangerfile ./dangerfile-android.js
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
