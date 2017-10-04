@@ -106,3 +106,6 @@ if(hasIosFile){
   message('has no ios file changed.');
 }
 
+message('ios test finished.')
+
+
