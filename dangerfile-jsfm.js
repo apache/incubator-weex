@@ -104,3 +104,4 @@ if(hasJsfmFile){
   message('has no jsfm file changed.');
 }
 
+message('jsfm test finished.')
