@@ -26,7 +26,7 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
-@interface UIScrollView(UIScrollerView_ContentInsetAdjustmentBehavior)
+@interface UIScrollView(WeexUIScrollerView_ContentInsetAdjustmentBehavior)
 @property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
 @end
 
