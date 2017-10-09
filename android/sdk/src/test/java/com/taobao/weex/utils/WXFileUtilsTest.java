@@ -19,6 +19,9 @@
 package com.taobao.weex.utils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
+
+import junit.framework.Assert;
+
 import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,5 +64,12 @@ public class WXFileUtilsTest {
   @Test
   public void testSaveFile() throws Exception {
     WXFileUtils.saveFile("build/test","test".getBytes(),RuntimeEnvironment.application);
+  }
+
+
+
+  @Test
+  public void  testMd5(){
+    Assert.assertEquals("77963b7a931377ad4ab5ad6a9cd718aa", WXFileUtils.md5("ddd"));
   }
 }
