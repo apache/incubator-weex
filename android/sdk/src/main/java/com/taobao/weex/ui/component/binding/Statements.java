@@ -392,6 +392,7 @@ public class Statements {
         Map<String, Object> dynamic = dynamicLocal.get();
         if(dynamic == null) {
             dynamic = new HashMap<>();
+            dynamicLocal.set(dynamic);
         }
         if(dynamic.size() > 0){
             dynamic.clear();

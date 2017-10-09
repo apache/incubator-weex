@@ -175,7 +175,7 @@ public class WXTextDomObject extends WXDomObject {
     spanned = createSpanned(mText);
     if(hasNewLayout()){
         if(WXEnvironment.isApkDebugable()) {
-          WXLogUtils.w("TextDom", new IllegalStateException("Previous csslayout was ignored! markLayoutSeen() never called"));
+          WXLogUtils.d("Previous csslayout was ignored! markLayoutSeen() never called");
         }
         markUpdateSeen();
     }
