@@ -26,7 +26,15 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
-@interface UIScrollView(WeexUIScrollerView_ContentInsetAdjustmentBehavior)
+
+@interface WXScrollerComponnetView:UIScrollView
+@end
+
+@implementation WXScrollerComponnetView
+@end;
+
+// add a category compatible for new API
+@interface WXScrollerComponnetView(WXScrollerComponnetView_ContentInsetAdjustmentBehavior)
 @property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
 @end
 
@@ -139,14 +147,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (UIView *)loadView
 {
-    return [[UIScrollView alloc] init];
+    return [[WXScrollerComponnetView alloc] init];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self setContentSize:_contentSize];
-    UIScrollView* scrollView = (UIScrollView *)self.view;
+    WXScrollerComponnetView* scrollView = (WXScrollerComponnetView *)self.view;
     scrollView.delegate = self;
     scrollView.exclusiveTouch = YES;
     scrollView.autoresizesSubviews = NO;
