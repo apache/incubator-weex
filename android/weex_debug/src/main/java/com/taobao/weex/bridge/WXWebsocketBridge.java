@@ -204,6 +204,21 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public int initFrameworkEnv(String scriptsFramework,WXParams params, String cacheDir, boolean onSdcard) {
+        if (!mInit) {
+            return -1;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", "evalFramework");
+        ArrayList<String> args = new ArrayList<>();
+        args.add(scriptsFramework);
+        map.put("arguments", args);
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
+        return 0;
+    }
+
+    @Override
     public void takeHeapSnapshot(String filename) {}
 
     @Override
