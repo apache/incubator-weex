@@ -2,10 +2,14 @@
 
 #footer {
   width: 100%;
-  padding: 20px 65px;
+  padding: 20px 65px 0 65px;
   margin: 0;
-  background: $bg-white;
-  border-top: 1px solid #DDDDDD;
+  background: #fdfcfc;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+  p{
+    font-size:12;
+    color:#757575;
+  }
   a{
    text-decoration: underline 
   }
@@ -39,7 +43,11 @@
 
   .row {
     font-size: 12px;
-    margin: 8px 0;
+    padding: 8px 0;
+    p {
+      margin:0;
+      padding-bottom: 5px;
+    }
   } 
 
   .row .icon-baichuan {
@@ -60,7 +68,9 @@
   }
   .disclaimer{
     max-width: 800px;
-    line-height: 150%
+    line-height: 150%;
+    font-size:12;
+     color:#757575;
   }
   hr{
     border: 0;
