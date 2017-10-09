@@ -33,16 +33,28 @@ import com.taobao.weex.utils.WXLogUtils;
 
 public class WXBridge implements IWXBridge {
 
+  private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard);
   private native int nativeInitFramework(String framework, WXParams params);
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
   private native void nativeOnVsync(String instanceId);
   private native int nativeExecJSService(String javascript);
   private native void nativeTakeHeapSnapshot(String filename);
 
+  public static final boolean MULTIPROCESS = true;
+
 
   @Override
   public int initFramework(String framework, WXParams params) {
     return nativeInitFramework(framework, params);
+  }
+
+  @Override
+  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard) {
+    if (MULTIPROCESS) {
+      return nativeInitFrameworkEnv(framework, params, cacheDir, onSdcard);
+    } else {
+      return nativeInitFramework(framework, params);
+    }
   }
 
   @Override
@@ -60,6 +72,7 @@ public class WXBridge implements IWXBridge {
     return nativeExecJSService(javascript);
   }
 
+
   @Override
   public void takeHeapSnapshot(String filename) {
     nativeTakeHeapSnapshot(filename);
@@ -67,6 +80,14 @@ public class WXBridge implements IWXBridge {
 
 
   public static final String TAG = "WXBridge";
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
 
   public int callNative(String instanceId, byte [] tasks, String callback) {
      return callNative(instanceId,new String(tasks),callback);
