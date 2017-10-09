@@ -20,11 +20,15 @@ package com.taobao.weex.ui.component.binding;
 
 
 
+import android.os.AsyncTask;
+import android.speech.tts.Voice;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.list.template.TemplateViewHolder;
 
 /**
  * Created by furture on 2017/8/21.
@@ -33,34 +37,57 @@ public class Layouts {
     /**
      * do dom layout, and set layout to component
      * */
-    public static void doLayout(WXComponent component, CSSLayoutContext layoutContext){
+    public static void doLayout(final TemplateViewHolder templateViewHolder){
+        final CSSLayoutContext layoutContext = templateViewHolder.getLayoutContext();
+        final WXComponent component = templateViewHolder.getComponent();
         final WXSDKInstance instance = component.getInstance();
-        WXDomObject domObject = (WXDomObject) component.getDomObject();
-        domObject.traverseTree(new WXDomObject.Consumer() {
+        final  int position = templateViewHolder.getHolderPosition();
+        if(templateViewHolder.asyncTask != null){
+            templateViewHolder.asyncTask.cancel(true);
+        }
+        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
-            public void accept(WXDomObject dom) {
-                if(instance == null || instance.isDestroy()){
-                    return;
+            protected Void doInBackground(Void... params) {
+                if(templateViewHolder.getHolderPosition() == position){
+
+                    WXDomObject domObject = (WXDomObject) component.getDomObject();
+                    domObject.traverseTree(new WXDomObject.Consumer() {
+                        @Override
+                        public void accept(WXDomObject dom) {
+                            if(instance == null || instance.isDestroy()){
+                                return;
+                            }
+                            if(!dom.hasUpdate()){
+                                return;
+                            }
+                            dom.layoutBefore();
+                        }
+                    });
+                    domObject.calculateLayout(layoutContext);
+                    domObject.traverseTree( new WXDomObject.Consumer() {
+                        @Override
+                        public void accept(WXDomObject dom) {
+                            if(instance == null || instance.isDestroy()){
+                                return;
+                            }
+                            if (dom.hasUpdate()) {
+                                dom.layoutAfter();
+                            }
+                        }
+                    });
                 }
-                if(!dom.hasUpdate()){
-                    return;
-                }
-                dom.layoutBefore();
+                return null;
             }
-        });
-        domObject.calculateLayout(layoutContext);
-        domObject.traverseTree( new WXDomObject.Consumer() {
+
             @Override
-            public void accept(WXDomObject dom) {
-                if(instance == null || instance.isDestroy()){
-                    return;
-                }
-                if (dom.hasUpdate()) {
-                    dom.layoutAfter();
+            protected void onPostExecute(Void aVoid) {
+                if(position == templateViewHolder.getHolderPosition()) {
+                    setLayout(component, false);
                 }
             }
-        });
-        setLayout(component, false);
+        };
+        templateViewHolder.asyncTask = asyncTask;
+        asyncTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
 
