@@ -1429,7 +1429,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR,
                                  "createInstance failed!");
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
-                + " template md5 " + WXFileUtils.md5(template);
+                + " template md5 " + WXFileUtils.md5(template) + " length " + (template == null ? 0 : template.length());
         commitJSBridgeAlarmMonitor(instance.getInstanceId(), WXErrorCode.WX_ERR_INVOKE_NATIVE,err);
         WXLogUtils.e(err);
       }
