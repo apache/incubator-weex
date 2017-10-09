@@ -6,6 +6,57 @@ layout: post
 
 # Release Note
 
+## v0.16
+-----
+* + support 3d rotate ([#532](https://github.com/apache/incubator-weex/pull/532) [#418](https://github.com/apache/incubator-weex/pull/418))
+* + new feature support perspective function in transform ([#551](https://github.com/apache/incubator-weex/pull/551)[#532](https://github.com/apache/incubator-weex/pull/532))
+* + new feature support save image to photo album ([547](https://github.com/apache/incubator-weex/pull/547) [575](https://github.com/apache/incubator-weex/pull/575) [544](https://github.com/apache/incubator-weex/pull/544))
+* + support `image.save` ([#575](https://github.com/apache/incubator-weex/pull/575)).
+* + optimize event binding and support mobile firefox, and also fix a lot of other things ([#606](https://github.com/apache/incubator-weex/pull/606)).
+* + Support js service in Rax DSL.
+* + Partial support of sending `ArrayBuffer` between js and native.
+* + Add basic support of `<recycle-list>`, both in Vue and Rax DSL.
+* + Support saving image to photo alubm in `image` [#547](https://github.com/apache/incubator-weex/pull/547)
+* + Support perspective features [#551](https://github.com/apache/incubator-weex/pull/551)
+* + New interface to performance tracing [#586](https://github.com/apache/incubator-weex/pull/586)
+* + Add the ability of FlatGUI, it can reduce the view hierarchy in `cell` [#643](https://github.com/apache/incubator-weex/pull/643)
+* + Support the `box-shadow` style for Android 4.3 and higher [#685](https://github.com/apache/incubator-weex/pull/685)
+* + Support float interval/delay in timer [#699](https://github.com/apache/incubator-weex/pull/699)
+* + New `recycle-list` compoent with hight performance and low memory cost [#726](https://github.com/apache/incubator-weex/pull/726)
+* * remove dependency about socketRocket dependency in iOS.
+* * fix coretext crash in iOS.
+* * fix toast view still pop while the page was destroyed in iOS.
+* * separate weex-vue-render into two parts: render core and plugins ([#533](https://github.com/apache/incubator-weex/pull/533)).
+* * Fix Jni crash due to emoji [#574](https://github.com/apache/incubator-weex/pull/574)
+* * Fix the lost refresh header of `list` in viewpager [#601](https://github.com/apache/incubator-weex/pull/601)
+* * Fix draw iconfont fail when first download iconfont [#625](https://github.com/apache/incubator-weex/pull/625)
+* * Fix the problem of 'text-overflow:clip' [#718](https://github.com/apache/incubator-weex/pull/718)
+* * Fix android new Date() cannot get accuracy time [#753](https://github.com/apache/incubator-weex/pull/753)
+
+## v0.15
+------
+* + support fast click and hairlines border [#507](https://github.com/apache/incubator-weex/pull/507).
+* + Add `weex.supports` api for feature detections. [#6053](https://github.com/vuejs/vue/pull/6053)
+* + Change default image quality to `WXImageQuality.AUTO` [#478](https://github.com/apache/incubator-weex/pull/478)
+* + Support the `scroll` event on horizontal scroller[#494](https://github.com/apache/incubator-weex/pull/494)
+* * Fix the console API to adapt JSC on Android. [#470](https://github.com/apache/incubator-weex/pull/470)
+* * Fix invalid call scrollToElement when has not option param [#491](https://github.com/apache/incubator-weex/pull/491)
+* * Fix the lines of `text` cannot be reset [#493](https://github.com/apache/incubator-weex/pull/493)
+* * Fix invalid init index on `slider` [#510](https://github.com/apache/incubator-weex/pull/510)
+* * Fix Memory optimization for `list` [#512](https://github.com/apache/incubator-weex/pull/512)
+
+## v0.14
+------
+* + support `waterfall` component ([#438](https://github.com/apache/incubator-weex/pull/438)).
+* + support pseudo-class ([#474](https://github.com/apache/incubator-weex/pull/474)).
+* + Support component method in Vue DSL. ([proposal](https://github.com/alibaba/weex/issues/969))
+* + Support returning value synchronously for module methods. ([proposal](https://github.com/alibaba/weex/issues/1677))
+* + Support drag-drop on `list` [#416](https://github.com/apache/incubator-weex/pull/416)
+* + Support rotateX and rotateY, optimize animation as well [#418](https://github.com/apache/incubator-weex/pull/418)
+* * Fix wrong vertical offset in scroll event on `waterfall` [#424](https://github.com/apache/incubator-weex/pull/424)
+* * Fix `clearTimeout` and `clearInterval` doesn't work when funId is greater than 127 [#439](https://github.com/apache/incubator-weex/pull/439)
+
+
 ## v0.13.0
 ------
 ### Notable Changes

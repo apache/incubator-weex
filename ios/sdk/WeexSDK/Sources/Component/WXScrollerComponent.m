@@ -26,6 +26,9 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
+@interface UIScrollView(WeexUIScrollerView_ContentInsetAdjustmentBehavior)
+@property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
+@end
 
 @interface WXScrollToTarget : NSObject
 
@@ -59,6 +62,8 @@
     CGPoint _lastContentOffset;
     CGPoint _lastScrollEventFiredOffset;
     BOOL _scrollable;
+    BOOL _alwaysScrollableVertical;
+    BOOL _alwaysScrollableHorizontal;
 
     // vertical & horizontal
     WXScrollDirection _scrollDirection;
@@ -107,6 +112,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _lastScrollEventFiredOffset = CGPointMake(0, 0);
         _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
         _showScrollBar = attributes[@"showScrollbar"] ? [WXConvert BOOL:attributes[@"showScrollbar"]] : YES;
+        // default value is NO;
+        _alwaysScrollableVertical = attributes[@"alwaysScrollableVertical"]?[WXConvert BOOL:attributes[@"alwaysScrollableVertical"]] : NO;
+        // default value is NO;
+        _alwaysScrollableHorizontal = attributes[@"alwaysScrollableHorizontal"]?[WXConvert BOOL:attributes[@"alwaysScrollableHorizontal"]] : NO;
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         _loadmoreretry = attributes[@"loadmoreretry"] ? [WXConvert NSUInteger:attributes[@"loadmoreretry"]] : 0;
@@ -146,13 +155,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.showsHorizontalScrollIndicator = _showScrollBar;
     scrollView.scrollEnabled = _scrollable;
     scrollView.pagingEnabled = _pagingEnabled;
-#ifdef __IPHONE_11_0
-    if (@available(iOS 11.0, *)) {
-        scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    } else {
-        // Fallback on earlier versions
+    scrollView.alwaysBounceHorizontal = _alwaysScrollableHorizontal;
+    scrollView.alwaysBounceVertical = _alwaysScrollableVertical;
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+        // now use the runtime to forbid the contentInset being Adjusted
+        scrollView.contentInsetAdjustmentBehavior = 2;
     }
-#endif
     
     if (self.ancestorScroller) {
         scrollView.scrollsToTop = NO;
@@ -212,6 +220,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (attributes[@"scrollable"]) {
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         ((UIScrollView *)self.view).scrollEnabled = _scrollable;
+    }
+    if (attributes[@"alwaysScrollableHorizontal"]) {
+        _alwaysScrollableHorizontal = [WXConvert BOOL:attributes[@"alwaysScrollableHorizontal"]];
+        ((UIScrollView*)self.view).alwaysBounceHorizontal = _alwaysScrollableHorizontal;
+    }
+    
+    if (attributes[@"alwaysScrollableVertical"]) {
+        _alwaysScrollableVertical = [WXConvert BOOL:attributes[@"alwaysScrollableVertical"]];
+        ((UIScrollView*)self.view).alwaysBounceVertical = _alwaysScrollableVertical;
     }
     if (attributes[@"offsetAccuracy"]) {
         _offsetAccuracy = [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor];

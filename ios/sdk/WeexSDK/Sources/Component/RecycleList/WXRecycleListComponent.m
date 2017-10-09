@@ -101,13 +101,6 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
-#ifdef __IPHONE_11_0
-    if (@available(iOS 11.0, *)) {
-        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    } else {
-        // Fallback on earlier versions
-    }
-#endif
     
     _templateManager.collectionView = _collectionView;
     _updateManager.collectionView = _collectionView;
