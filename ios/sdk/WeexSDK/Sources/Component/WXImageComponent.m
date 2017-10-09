@@ -336,14 +336,17 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)setImageSrc:(NSString*)src
 {
-    pthread_mutex_lock(&(_imageSrcMutex));
-    if (![src isEqualToString:_imageSrc]) {
-        _imageSrc = src;
-        _imageDownloadFinish = NO;
-        ((UIImageView*)self.view).image = nil;
-        [self updateImage];
+    if ([src isEqualToString:_imageSrc]) {
+        // if image src is equal to then ignore it.
+        return;
     }
+    pthread_mutex_lock(&(_imageSrcMutex));
+    _imageSrc = src;
+    _imageDownloadFinish = NO;
+    ((UIImageView*)self.view).image = nil;
     pthread_mutex_unlock(&(_imageSrcMutex));
+    
+    [self updateImage];
 }
 
 - (void)updateImage
@@ -426,45 +429,43 @@ WX_EXPORT_METHOD(@selector(save:))
     NSString * newURL = [imageSrc copy];
     WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
     __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof(self) strongSelf = weakSelf;
-                
-                if (strongSelf.imageLoadEvent) {
-                    NSMutableDictionary *sizeDict = [NSMutableDictionary new];
-                    sizeDict[@"naturalWidth"] = @0;
-                    sizeDict[@"naturalHeight"] = @0;
-                    if (!error) {
-                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
-                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
-                    } else {
-                        [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
-                    }
-                    [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+    weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(self) strongSelf = weakSelf;
+            
+            if (strongSelf.imageLoadEvent) {
+                NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                sizeDict[@"naturalWidth"] = @0;
+                sizeDict[@"naturalHeight"] = @0;
+                if (!error) {
+                    sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                    sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                } else {
+                    [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
                 }
-                if (error) {
-                    downloadFailedBlock(imageSrc, error);
-                    [strongSelf readyToRender];
-                    return ;
-                }
-                
-                if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
-                    return ;
-                }
-                
-                if ([strongSelf isViewLoaded]) {
-                    strongSelf.imageDownloadFinish = YES;
-                    ((UIImageView *)strongSelf.view).image = image;
-                    [strongSelf readyToRender];
-                } else if (strongSelf->_isCompositingChild) {
-                    strongSelf.imageDownloadFinish = YES;
-                    strongSelf->_image = image;
-                    [strongSelf setNeedsDisplay];
-                }
-            });
-        }];
-    });
+                [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+            }
+            if (error) {
+                downloadFailedBlock(imageSrc, error);
+                [strongSelf readyToRender];
+                return ;
+            }
+            
+            if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
+                return ;
+            }
+            
+            if ([strongSelf isViewLoaded]) {
+                strongSelf.imageDownloadFinish = YES;
+                ((UIImageView *)strongSelf.view).image = image;
+                [strongSelf readyToRender];
+            } else if (strongSelf->_isCompositingChild) {
+                strongSelf.imageDownloadFinish = YES;
+                strongSelf->_image = image;
+                [strongSelf setNeedsDisplay];
+            }
+        });
+    }];
 }
 
 - (void)readyToRender
