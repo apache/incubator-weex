@@ -759,22 +759,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-        final Float radius = WXUtils.getFloat(param,null);
-        final String finalKey = key;
+        Float radius = WXUtils.getFloat(param,null);
         if (radius != null) {
-          if (this instanceof WXDiv && mHost != null) {
-            /* Hacked by moxun
-               Set border radius on ViewGroup will cause the Overlay to be cut and don't know why
-               Delay setting border radius can avoid the problem, and don't know why too, dog science…… */
-            mHost.postDelayed(new Runnable() {
-              @Override
-              public void run() {
-                setBorderRadius(finalKey, radius);
-              }
-            }, 64);
-          } else {
-            setBorderRadius(finalKey, radius);
-          }
+          setBorderRadius(key, radius);
         }
         return true;
       case Constants.Name.BORDER_WIDTH:
@@ -898,7 +885,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           }
         }
       }
-      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
+
+      View target = mHost;
+      if (this instanceof WXVContainer) {
+        target = ((WXVContainer) this).getBoxShadowHost();
+      }
+
+      BoxShadowUtil.setBoxShadow(target, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
     } else {
       WXLogUtils.w("Can not resolve styles");
     }

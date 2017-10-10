@@ -18,15 +18,19 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Context;
 import android.content.Intent;
-import android.util.Pair;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.utils.WXViewUtils;
+
 import java.util.ArrayList;
 
 /**
@@ -36,6 +40,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   private static final String TAG="WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
+  private BoxShadowHost mBoxShadowHost;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -474,4 +479,22 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+
+  public @Nullable View getBoxShadowHost() {
+    if (mBoxShadowHost == null) {
+      mBoxShadowHost = new BoxShadowHost(getContext());
+      WXViewUtils.setBackGround(mBoxShadowHost, null);
+      mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+      getHostView().addView(mBoxShadowHost);
+    }
+    getHostView().removeView(mBoxShadowHost);
+    getHostView().addView(mBoxShadowHost);
+    return mBoxShadowHost;
+  }
+
+  private class BoxShadowHost extends View {
+    public BoxShadowHost(Context context) {
+      super(context);
+    }
+  }
 }
