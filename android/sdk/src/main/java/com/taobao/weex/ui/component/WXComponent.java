@@ -74,7 +74,7 @@ import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
+import com.taobao.weex.ui.component.pesudo.OnActivePseudoListener;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.flat.FlatComponent;
@@ -112,7 +112,7 @@ import static com.taobao.weex.utils.WXUtils.getBoolean;
  * abstract component
  *
  */
-public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener,OnActivePseudoListner {
+public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener,OnActivePseudoListener {
 
   public static final String PROP_FIXED_SIZE = "fixedSize";
   public static final String PROP_FS_MATCH_PARENT = "m";
@@ -1278,9 +1278,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void setBackgroundColor(String color) {
     if (!TextUtils.isEmpty(color)) {
       int colorInt = WXResourceUtils.getColor(color);
-      Object obj = getDomObject().getAttrs().get(Constants.Name.RIPPLE_ENABLED);
-      boolean isRippleEnabled = getBoolean(obj, false);
-      if (isRippleEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if (isRippleEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         mRippleBackground = prepareBackgroundRipple();
         if (mRippleBackground != null) {
           if (mBackgroundDrawable == null) {
@@ -1735,6 +1733,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         status,
         pesudoStyles,
         styles.getPesudoResetStyles());
+
+    if (resultStyles != null && isRippleEnabled()) {
+      resultStyles.remove(Constants.Name.BACKGROUND_COLOR);
+      if (resultStyles.isEmpty()) {
+        WXLogUtils.d("PseudoClass", "skip empty pseudo styles");
+        return;
+      }
+    }
+
     updateStyleByPesudo(resultStyles);
   }
 
@@ -1895,5 +1902,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         }
       }
     }
+  }
+
+  protected boolean isRippleEnabled() {
+    try {
+      Object obj = getDomObject().getAttrs().get(Constants.Name.RIPPLE_ENABLED);
+      return getBoolean(obj, false);
+    } catch (Throwable t) {
+      //ignore
+    }
+    return false;
   }
 }
