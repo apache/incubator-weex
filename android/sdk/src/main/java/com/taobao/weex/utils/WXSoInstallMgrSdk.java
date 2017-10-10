@@ -192,14 +192,18 @@ public class WXSoInstallMgrSdk {
 //      } catch (Throwable e) {
 //      }
       if (installOnSdcard) {
-        String path = "/data/data/" + pkgName + "/lib";
-        String soName = path + STARTUPSO;
         String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
         File newfile = new File(cacheFile + STARTUPSO);
         if (newfile.exists()) {
           return;
         }
 
+        String path = "/data/data/" + pkgName + "/lib";;
+        if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
+          path = cacheFile.replace("/cache", "/lib");
+        }
+
+        String soName = path + STARTUPSO;
         File oldfile = new File(soName);
         if (oldfile.exists()) {
           //获得原文件流
