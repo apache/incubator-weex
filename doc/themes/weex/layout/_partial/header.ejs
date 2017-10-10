@@ -5,9 +5,15 @@
     </a>
     <div class="main-nav">
       <ul class="links">
-        <li><a href="<%= url_for_lang('guide') %>"><%= _p('menu.guide') %></a></li>
-        <li><a href="<%= url_for_lang('references') %>"><%= _p('menu.references') %></a></li>
-        <li><a href="<%= url_for_lang('guide/contributing.html') %>"><%= _p('menu.invovled') %></a></li>
+        <li class="<%= page.path.match(/\/?guide\/?/i) ? 'current': '' %>">
+          <a href="<%= url_for_lang('guide') %>"><%= _p('menu.guide') %></a>
+        </li>
+        <li class="<%= page.path.match(/\/?references\/?/i) ? 'current': '' %>">
+          <a href="<%= url_for_lang('references') %>"><%= _p('menu.references') %></a>
+        </li>
+        <li>
+          <a href="<%= url_for_lang('guide/contributing.html') %>"><%= _p('menu.invovled') %></a>
+        </li>
         <li class="dropdown">
             <a href="javascript:;"><%= _p('menu.tools') %></a>
             <ul class="dropdown-menu subnav">
@@ -39,10 +45,9 @@
             </li>
           </ul>
         </li>
-        <li><a href="/blog"><%= _p('menu.blog') %></a></li>
-      </ul>
-      <ul class="info">
-        <li><a href="https://github.com/apache/incubator-weex/" target="_blank"><span class="btn-github iconfont icon-github"></span></a></li>
+        <li class="<%= page.path.match(/\/?blog\/?/i) ? 'current': '' %>">
+          <a href="/blog"><%= _p('menu.blog') %></a>
+        </li>
       </ul>
       <ul class="tools">
         <li>
@@ -65,6 +70,9 @@
           </div>
         </li>
         <!--<li></li>-->
+      </ul>
+      <ul>
+        <li><a href="https://github.com/apache/incubator-weex/" target="_blank"><span class="btn-github iconfont icon-github"></span></a></li>
       </ul>
     </div>
   </div>

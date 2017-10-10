@@ -19,10 +19,10 @@ html, body {
 body {
   background: $bg-white;
   // font-family: Exo,'-apple-system','Open Sans',HelveticaNeue-Light,'Helvetica Neue Light','Helvetica Neue','Hiragino Sans GB','Microsoft YaHei',Helvetica,Arial,sans-serif;
-  font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   // font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', 'WenQuanYi Micro Hei',sans-serif;
   // font-size:62.5%;max-height:100%;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 120%;
   color: $text-light-black;
   -webkit-tap-highlight-color: transparent;
@@ -77,31 +77,19 @@ img {
 
 p {
   font-weight: normal;
+  margin: 0 0 1.2em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
   margin: 0 0 1em;
 }
-h1,h2,h3,h4,h5,h6{
-  font-weight: bold;
-  margin: 0 0 1em;
-}
-h1 {
-  font-size: 2em;
-}
 
-h2 {
-  font-size: 1.75em;
-}
-
-h3 {
-  font-size: 1.5em;
-}
-
-h4 {
-  font-size: 1.25em;
-}
-
-h5 {
-  font-size: 1.1em;
-}
+h1 { font-size: 2em; }
+h2 { font-size: 1.75em; }
+h3 { font-size: 1.5em; }
+h4 { font-size: 1.25em; }
+h5 { font-size: 1.1em; }
 
 blockquote {
   margin: 0;
@@ -186,7 +174,7 @@ blockquote {
       line-height: 1.42857143;
       color: $text-light-black;
       white-space: nowrap;
-      
+
       &:hover {
         color: $text-light-black;
         text-decoration: none;
@@ -197,7 +185,7 @@ blockquote {
 
   &:hover .dropdown-menu {
     display: block;
-  } 
+  }
 }
 
 

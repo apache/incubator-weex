@@ -1,11 +1,15 @@
 @import "../variable.scss";
 
+$header-height: 50px;
+$header-bg: #F2F2F2;
+$menu-active-bg: #EEE;
+
 #header {
   width: 100%;
-  height: 72px; 
+  height: $header-height;
   padding: 0 40px;
   position: fixed;
-  background-color: rgba(255, 255, 255, .95);
+  background-color: $header-bg;
   box-shadow: 0 0 1px rgba(0,0,0,0.25);
   top: 0;
   left: 0;
@@ -22,13 +26,13 @@
     display: block;
 
     img {
-      width: 110px;
-      height: 60px;
+      width: 78px;
+      height: 38px;
     }
   }
 
   .navbar {
-    height: 72px;
+    height: $header-height;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -37,7 +41,7 @@
 
   #mobile-nav {
     display: none;
-    height: 72px;
+    height: $header-height;
     align-items: center;
 
     #logo {
@@ -47,7 +51,7 @@
     .btn-menu {
       position: absolute;
       left: 20px;
-      top: 25px;
+      top: 20px;
     }
   }
 
@@ -58,28 +62,33 @@
     & > ul {
       display: flex;
       justify-content: space-between;
-      height: 72px;
-      line-height: 72px;
+      height: $header-height;
+      line-height: $header-height;
     }
 
     li > a {
-      font-size: 1.3em;
+      display: block;
+      height: 100%;
+      font-size: 1.2em;
       color: $text-light-black;
+      padding: 0 16px;
     }
   }
 
   .links {
     & > li > a:hover {
+      color: $text-blue;
+      background-color: $menu-active-bg;
+    }
+
+    & > li.current > a {
+      color: $text-blue;
       border-bottom: .2em solid $text-blue;
     }
 
-    > li + li {
-      margin-left: 30px;
+    > li {
+      margin: 0 3px;
     }
-  }
-
-  .info li {
-    margin-left: 30px;
   }
 
   .tools {
@@ -88,7 +97,7 @@
       position: relative;
     }
     .search-form {
-      width: 120px;
+      width: 140px;
     }
   }
 

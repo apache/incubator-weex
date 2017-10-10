@@ -1,33 +1,33 @@
 @import "variable.scss";
 
 .article-wrapper {
-  position: relative;
+  display: flex;
   width: 100%;
   margin: 0 auto;
-  padding: 120px 0 0;
+  margin-top: 60px;
+  flex-direction: row;
   min-height: 80%;
   min-height: calc(100% - 160px);
 
   &.post-layout {
-    max-width: 900px;
+    max-width: 850px;
   }
-  
+
   &.page-layout {
-    max-width: 1200px;
+    max-width: 1400px;
   }
 
   .article-entry {
-    padding: 0 1.45em;
+    padding: 0 1.2em;
 
     > h1 {
       display: none;
     }
   }
-  .article-heading{
-    margin-top: -85px;
-    border-top: 85px solid transparent
-
+  .article-heading {
+    color: $text-black;
   }
+
   .article-anchor {
     margin-left: 10px;
     display: none
@@ -50,19 +50,13 @@
   }
 
   .doc-nav {
-    position: fixed;
-    top: 72px;
-    left: 0;
-    bottom: 0;
-    width: 260px;
-    padding: 40px 20px 60px 60px;
+    padding: 50px 20px;
     background: $bg-white;
     width: 300px;
-    z-index: 999;
     overflow-x: hidden;
     overflow-y: auto;
   }
-  
+
   .doc-nav-version{
     margin: 20px 0;
   }

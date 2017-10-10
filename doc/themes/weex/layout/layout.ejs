@@ -1,4 +1,39 @@
-<%- partial('_partial/head') %>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <%
+  var title = page.title;
+
+  if (is_archive()){
+    title = __('archive_a');
+
+    if (is_month()){
+      title += ': ' + page.year + '/' + page.month;
+    } else if (is_year()){
+      title += ': ' + page.year;
+    }
+  } else if (is_category()){
+    title = __('category') + ': ' + page.category;
+  } else if (is_tag()){
+    title = __('tag') + ': ' + page.tag;
+  }
+  %>
+  <title><% if (title){ %><%= title %> | <% } %><%= config.title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <%- open_graph({twitter_id: theme.twitter, google_plus: theme.google_plus, fb_admins: theme.fb_admins, fb_app_id: theme.fb_app_id}) %>
+  <% if (theme.rss){ %>
+    <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">
+  <% } %>
+  <% if (theme.favicon){ %>
+    <link rel="icon" href="//gw.alicdn.com/tps/TB1XNqxPXXXXXcSXVXXXXXXXXXX-64-63.png">
+  <% } %>
+  <% if (config.docsearch.enable){ %>
+    <%- css('css/docsearch.min') %>
+  <% } %>
+  <%- css('css/style') %>
+  <%- css('css/swiper.min') %>
+</head>
 <body id="<%- page.type ? page.type : page.path.slice(0, -5) %>" class="lang-<%- page.lang %>">
   <% page_type = page.type ? page.type : page.path.slice(0, -5) %>
   <script>
@@ -8,10 +43,12 @@
   <%- partial('_partial/header') %>
   <%- partial('_partial/sidebar', {post: page, page_type: page_type}) %>
   <%- body %>
-  
+  <%- partial('_partial/footer') %>
+  <%- partial('_partial/after-footer') %>
+
   <%- js('js/reqwest.js') %>
   <%- js('js/common.js') %>
-  <% if (config.docsearch.enable){ %>    
+  <% if (config.docsearch.enable){ %>
     <% index_name = page.path.indexOf('cn/') === 0 ? config.docsearch.index_name_cn : config.docsearch.index_name_en %>
     <% api_key = page.path.indexOf('cn/') === 0 ? config.docsearch.api_key_cn : config.docsearch.api_key_en %>
     <%- js('js/docsearch.min.js') %>

@@ -17,7 +17,7 @@ pre {
 
 pre code {
   border: none;
-  background: rgba(27, 31, 35, 0.08);
+  background: #353639;
   display: block;
   padding: 0;
   -moz-tab-size: 2;
@@ -25,14 +25,12 @@ pre code {
 }
 
 .highlight {
-  margin: 5px 0 15px 0;
-  overflow-x: auto;
   pre {
-    background: #F3F5F7;
-    margin: 0;
-    padding: 10 20px;
-    color: #585d65;
-    overflow-x: auto;
+    background: #353639;
+    padding: 10px 15px;
+    color: #abb2bf;
+    overflow: auto;
+    margin: 20px 0;
     border-radius: 5px;
   }
 
@@ -44,7 +42,7 @@ pre code {
   table td,
   table th,
   tr {
-    // background: #353639;
+    background: #353639;
     border: 0;
     padding: 0;
   }
@@ -69,6 +67,13 @@ pre code {
     float: right;
   }
 
+  pre {
+    padding: 0;
+    border: none;
+    background: none;
+    margin: 0;
+  }
+
   .line {
     height: 22px;
   }
@@ -77,7 +82,7 @@ pre code {
 pre {
   .comment,
   .title {
-    color: #969896;
+    color: #5c6370;
   }
 
   .attribute,

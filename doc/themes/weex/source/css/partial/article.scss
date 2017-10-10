@@ -1,12 +1,41 @@
 @import "../variable.scss";
 
+.article-header {
+  position: relative;
+  padding-bottom: 10px;
+  border-bottom: 1px solid $border-light;
+  margin-bottom: 3.5em;
+
+  h1 {
+    font-size: 2.1em;
+    color: $text-black;
+    margin: 0;
+
+    .article-title {
+      &:hover {
+        color: $text-blue;
+      }
+    }
+  }
+
+  .article-date {
+    position: absolute;
+    bottom: -25px;
+    left: 0px;
+    font-size: .9em;
+    color: $text-gray;
+  }
+}
+
 .article {
   max-width: 900px;
-  margin: 0 0 0 300px;
+  margin-left: 50px;
+  margin-top: 40px;
   position: relative;
   line-height: 1.6;
   overflow-y: auto;
-  
+  color: $text-dark;
+
   &.article-type-article {
     margin-left: 0;
   }
@@ -16,23 +45,31 @@
   }
 
   h2 {
-    font-size: 1.75em;
-    margin: 1.7em 0 .5em;
+    font-size: 1.85em;
+    margin: 1em 0 .8em;
   }
 
   h3 {
     font-size: 1.5em;
-    margin: 1.5em 0 .5em;
+    margin: .85em 0 .7em;
   }
 
   h4 {
-    font-size: 1.25em;
-    margin: 1.2em 0 .5em;
+    font-size: 1.2em;
+    margin: .75em 0 .55em;
   }
 
   h5 {
-    font-size: 1.1em;
-    margin: 1.1em 0 .5em;
+    font-size: 1.05em;
+    margin: .6em 0 .4em;
+  }
+
+  ol, ul {
+    padding-left: 2em;
+  }
+
+  li {
+    line-height: 2;
   }
 
   img[alt="mobile_preview"] {
@@ -40,7 +77,7 @@
   }
 
   a {
-    color: #4078c0;
+    color: $logo-color;
     &:hover {
       text-decoration: underline;
     }
@@ -56,7 +93,7 @@
     position: absolute;
     top: 15px;
     right: 20px;
-  }   
+  }
 }
 
 #blog .article {

@@ -4,6 +4,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  font-size: 15px;
 
   ul, li , ol {
     margin: 0;
@@ -21,34 +22,40 @@
     }
   }
 
-  h2.part-title {
-    color: $text-blue;
-    font-size: 1.2em;
-    font-weight: 600;
-  }
-    
   h3.chapter-title {
-    font-size: 1.1em;
+    font-size: 1.2em;
   }
-    
+
   ul.chapter {
     margin-left: 15px;
     li {
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;    
-      padding-bottom: 15px;
+      text-overflow: ellipsis;
+      margin-bottom: 10px;
     }
   }
 
+}
+
+.doc-summary {
+   & > li {
+    margin-bottom: 20px;
+  }
 }
 
 .lang-en .summary h3.chapter-title{
   font-weight: 600;
 }
 
-.hostbyaliyun {
+.sponsor {
+  margin-top: 20px;
+}
+.sponsor-poster {
+  display: block;
   width: 180px;
-  z-index: 99;
-  display: none;
+}
+.sponsor-title {
+  color: #7f8c8d;
+  font-size:12px;
 }

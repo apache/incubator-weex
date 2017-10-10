@@ -1,74 +1,35 @@
 @import "../variable.scss";
 
+$footer-bg: #F2F2F2;
+$footer-text-color: #888;
+
 #footer {
   width: 100%;
-  padding: 20px 65px;
-  margin: 0;
-  background: $bg-white;
-  border-top: 1px solid #DDDDDD;
-  a{
-   text-decoration: underline 
-  }
-  .ali-logo {
-    width: 83px;
-    height: 41px;
-    float: left;
+  padding: 10px 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $footer-bg;
+  font-size: 12px;
+  color: $footer-text-color;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 
-    img {
-      width: 100%;
+  a { text-decoration: underline; }
+  p { margin: 0; }
+
+  .disclaimer {
+    max-width: 1200px;
+    line-height: 1.5;
+    .title {
+      font-weight: bold;
+      margin-bottom: 10px;
     }
   }
 
-  .select-lang {
-    display: none;
-    width: 105px;
-    height: 25px;
-    line-height: 25px;
-    float: right;
-  }
-
-  .select-lang .dropdown-toggle {
-    color: #00293D;
-    border: 1px solid $border-gray;
-  }
-
-  .select-lang .dropdown-menu {
-    width: 105px;
-    border: 1px solid $border-gray;
-  }
-
-  .row {
-    font-size: 12px;
-    margin: 8px 0;
-  } 
-
-  .row .icon-baichuan {
-    font-size: 14px;
-    color: $text-light-black;
-  } 
-
-  .row .cell {
-    float: left;
-    color: $text-gray;
-    margin: 0 20px 10px 0;
-  }
-
-  .caret {
-    display: inline-block;
-    margin-left: 2px;
-    @include triangle-down($border-gray, 4px);
-  }
-  .disclaimer{
-    max-width: 800px;
-    line-height: 150%
-  }
-  hr{
-    border: 0;
-    border-top: 1px solid #e6e6e6;
-  }
-  .disclaimer .title{
-    font-weight: bold;
-    margin-bottom: 10px;
+  .copyright {
+    margin-top: 15px;
+    a, a:focus { color: #666; }
+    a:active { color: #555; }
   }
 }
 

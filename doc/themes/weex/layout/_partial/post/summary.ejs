@@ -1,23 +1,7 @@
 <% var result = page.path.match(/(v-)(\d+(\.\d+))/) %>
 <% var version = result ? +result[2] : 2.1 %>
 
-<div class="doc-nav-version">
-  <select class="versionBtn" stype="<%- url_for_lang(page.type) %>">
-  <% if (version == 2.1) { %>
-    <option value="2v" selected>v2.x</option>
-    <option value="1v">v1.x</option>
-  <% } else { %>
-    <option value="2v">v2.x</option>
-    <option value="1v" selected>v1.x</option>
-  <% } %>
- </select>
-</div>
 <div class="summary">
-  <h2 class="part-title">
-    <% if (type) { %>
-      <%= _p('menu.' + type) %>
-    <% } %>
-  </h2>
   <ul class="doc-summary">
     <% var pagesArr = site.pages.find({type: type, lang: page.lang, version: version}).sort('order') %>
     <% var pages = [] %>
@@ -29,7 +13,7 @@
         <% pages[i] = [];pages[i].push(item) %>
       <% } %>
     <% }) %>
-   
+
     <% pages.forEach(function (item, index) { %>
       <li>
         <h3 class="chapter-title"><a href="<%= url_for(item[0].path) %>" class="sidebar-link <%- is_current(item[0].path, 'strict') ? 'current' : '' %> <%- item[0].is_new ? 'new' : '' %>"><%- item[0].title %></a></h3>
@@ -44,12 +28,12 @@
         <% } %>
       </li>
     <% }) %>
-    
+
   </ul>
 </div>
-<div class="hostbyaliyun">
-  <a href="https://render.alipay.com/p/s/taobaonpm_click/weex_banner_click">
+<div class="sponsor">
+  <a class="sponsor-poster" target="_blank" href="https://render.alipay.com/p/s/taobaonpm_click/weex_banner_click">
     <img src="https://render.alipay.com/p/s/taobaonpm_click/weex_banner" alt="" width="180px">
   </a>
-  <div style="color: #7f8c8d;font-size: 12px;">阿里云赞助</div>
+  <div class="sponsor-title">本站点由阿里云赞助支持</div>
 </div>
