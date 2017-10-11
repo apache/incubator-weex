@@ -509,6 +509,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       setWidgetParams(widget, UIImp, rawOffset, realWidth, realHeight, realLeft, realRight, realTop,
           realBottom);
     } else if (mHost != null) {
+      // clear box shadow before host's size changed
+      clearBoxShadow();
       if (mDomObj.isFixed()) {
         setFixedHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop,
             realBottom);
@@ -520,6 +522,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mPreRealLeft = realLeft;
       mPreRealTop = realTop;
       onFinishLayout();
+      // restore box shadow
+      updateBoxShadow();
     }
   }
 
@@ -859,6 +863,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         return;
       }
 
+      View target = mHost;
+      if (this instanceof WXVContainer) {
+        target = ((WXVContainer) this).getBoxShadowHost();
+      }
+
+      if (target == null) {
+        return;
+      }
+
       float[] radii = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
       WXStyle style = getDomObject().getStyles();
       if (style != null) {
@@ -886,14 +899,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         }
       }
 
-      View target = mHost;
-      if (this instanceof WXVContainer) {
-        target = ((WXVContainer) this).getBoxShadowHost();
-      }
-
       BoxShadowUtil.setBoxShadow(target, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
     } else {
       WXLogUtils.w("Can not resolve styles");
+    }
+  }
+
+  protected void clearBoxShadow() {
+    View target = mHost;
+    if (this instanceof WXVContainer) {
+      target = ((WXVContainer) this).getBoxShadowHost();
+    }
+
+    if (target != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      target.getOverlay().clear();
     }
   }
 
