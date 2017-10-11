@@ -122,13 +122,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         
         if (attributes[@"alwaysScrollableVertical"]) {
             _alwaysScrollableVertical = [WXConvert NSString:attributes[@"alwaysScrollableVertical"]];
-        }else {
-            _alwaysScrollableVertical = nil;
         }
         if (attributes[@"alwaysScrollableHorizontal"]) {
             _alwaysScrollableHorizontal = [WXConvert NSString:attributes[@"alwaysScrollableHorizontal"]];
-        } else {
-            _alwaysScrollableHorizontal = nil;
         }
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
