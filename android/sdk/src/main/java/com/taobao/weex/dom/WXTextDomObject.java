@@ -37,12 +37,9 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
