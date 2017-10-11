@@ -104,6 +104,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public long mDomThreadNanos;
   public long mDomThreadTimestamp;
 
+  private  boolean cloneThis = false;
+
   public void traverseTree(Consumer...consumers){
     long startNanos = System.nanoTime();
     if (consumers == null) {
@@ -136,6 +138,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return mRef;
   }
 
+
   public String getType(){
     return mType;
   }
@@ -161,7 +164,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
     return mEvents;
   }
-
 
 
   public @NonNull DomContext getDomContext() {
@@ -301,6 +303,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     }
   }
 
+
   public boolean isFixed() {
     return mStyles == null ? false : mStyles.isFixed();
   }
@@ -438,6 +441,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       mAttributes = new WXAttr();
     }
     mAttributes.putAll(attrs);
+    if(hasNewLayout()){
+       markUpdateSeen();
+    }
     super.dirty();
   }
 
@@ -590,6 +596,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if (sDestroy.get()) {
       return null;
     }
+    if(cloneThis){
+      return  this;
+    }
     WXDomObject dom = null;
     try {
       dom = WXDomObjectFactory.newInstance(mType);
@@ -713,5 +722,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   public interface Consumer{
     void accept(WXDomObject dom);
+  }
+
+  public boolean isCloneThis() {
+    return cloneThis;
+  }
+
+  public void setCloneThis(boolean cloneThis) {
+    this.cloneThis = cloneThis;
   }
 }

@@ -313,12 +313,12 @@ WeexSDK 0.9.5 之后支持了在 js 中直接调用 component 的方法，这里
 
   ```html
   <template>
-    <mycomponent id='mycomponent'></mycomponent>
+    <mycomponent ref='mycomponent'></mycomponent>
   </template>
   <script>
     module.exports = {
       created:function() {
-        this.$el('mycomponent').focus();
+        this.$refs.mycomponent.focus();
       }
     }
   </script>

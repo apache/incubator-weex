@@ -141,7 +141,8 @@ public class WXSDKEngine {
 
   public static boolean isInitialized(){
     synchronized(mLock) {
-      return mIsInit;
+
+      return mIsInit && WXEnvironment.JsFrameworkInit;
     }
   }
 

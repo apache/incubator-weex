@@ -32,6 +32,7 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +69,7 @@ public class WXSoInstallMgrSdk {
   private final static String ARMEABI = "armeabi"; //default
   private final static String X86 = "x86";
   private final static String MIPS = "mips";
+  private final static String STARTUPSO = "/libweexjsb.so";
 
   private final static int ARMEABI_Size = 3583820;
   private final static int X86_Size = 4340864;
@@ -110,6 +112,9 @@ public class WXSoInstallMgrSdk {
     if (cpuType.equalsIgnoreCase(MIPS) ) {
       return false;
     }
+
+    // copy startup so
+    copyStartUpSo();
 
     boolean InitSuc = false;
     if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
@@ -168,6 +173,57 @@ public class WXSoInstallMgrSdk {
       }
     }
     return InitSuc;
+  }
+
+  /**
+   * copyStartUpSo
+   */
+  public static void copyStartUpSo() {
+    try {
+      boolean installOnSdcard = true;
+      String pkgName = WXEnvironment.getApplication().getPackageName();
+      // cp weexjsb any way
+//      try {
+//        PackageManager pm = WXEnvironment.getApplication().getApplicationContext().getPackageManager();
+//        ApplicationInfo appInfo = pm.getApplicationInfo(pkgName, 0);
+//        if ((appInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0) {
+//          // App on sdcard
+//          installOnSdcard = true;
+//        }
+//      } catch (Throwable e) {
+//      }
+      if (installOnSdcard) {
+
+        String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+        File newfile = new File(cacheFile + STARTUPSO);
+        if (newfile.exists()) {
+          return;
+        }
+
+        String path = "/data/data/" + pkgName + "/lib";;
+        if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
+          path = cacheFile.replace("/cache", "/lib");
+        }
+
+        String soName = path + STARTUPSO;
+        File oldfile = new File(soName);
+        if (oldfile.exists()) {
+          //获得原文件流
+          FileInputStream inputStream = new FileInputStream(oldfile);
+          byte[] data = new byte[1024];
+          //输出流
+          FileOutputStream outputStream =new FileOutputStream(newfile);
+          //开始处理流
+          while (inputStream.read(data) != -1) {
+            outputStream.write(data);
+          }
+          inputStream.close();
+          outputStream.close();
+        }
+      }
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
   }
 
   private static String _getFieldReflectively(Build build, String fieldName) {

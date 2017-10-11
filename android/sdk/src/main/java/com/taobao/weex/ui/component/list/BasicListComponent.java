@@ -225,56 +225,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return params;
   }
 
-  /**
-   * These transform functions are supported:
-   * - `scale(x,y)`: scale item, x and y should be a positive float number.
-   * - `translate(x,y)`: translate item, `x` and `y` shoule be integer numbers.
-   * - `opacity(n)`: change the transparency of item, `n` must in `[0,1.0]`.
-   * - `rotate(n)`: rotate item, n is integer number.
-   *
-   * @param raw
-   * @return
-   */
-  private RecyclerView.ItemDecoration parseTransforms(String raw) {
-    if (raw == null) {
-      return null;
-    }
-    float scaleX = 0f, scaleY = 0f;
-    int translateX = 0, translateY = 0;
-    float opacity = 0f;
-    int rotate = 0;
-    //public TransformItemDecoration(boolean isVertical,float alpha,int translateX,int translateY,int rotation,float scale)
-    Matcher matcher = transformPattern.matcher(raw);
-    while (matcher.find()) {
-      String match = matcher.group();
-      String name = matcher.group(1);
-      try {
-        switch (name) {
-          case "scale":
-            scaleX = Float.parseFloat(matcher.group(2));
-            scaleY = Float.parseFloat(matcher.group(3));
-            break;
-          case "translate":
-            translateX = Integer.parseInt(matcher.group(2));
-            translateY = Integer.parseInt(matcher.group(3));
-            break;
-          case "opacity":
-            opacity = Float.parseFloat(matcher.group(2));
-            break;
-          case "rotate":
-            rotate = Integer.parseInt(matcher.group(2));
-            break;
-          default:
-            WXLogUtils.e(TAG, "Invaild transform expression:" + match);
-            break;
-        }
-      } catch (NumberFormatException e) {
-        WXLogUtils.e("", e);
-        WXLogUtils.e(TAG, "Invaild transform expression:" + match);
-      }
-    }
-    return new TransformItemDecoration(getOrientation() == Constants.Orientation.VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
-  }
 
   abstract T generateListView(Context context, int orientation);
 
@@ -284,7 +234,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
     String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);
     if (transforms != null) {
-      bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
+      bounceRecyclerView.getInnerView().addItemDecoration(RecyclerTransform.parseTransforms(getOrientation(), transforms));
     }
 
     mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
@@ -509,36 +459,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         //Invalid position
         return;
       }
-
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
-
-      if (!smooth) {
-        RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
-        if (layoutManager instanceof LinearLayoutManager) {
-          //GridLayoutManager is also instance of LinearLayoutManager
-          ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-          ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        }
-        //Any else?
-      } else {
-        view.smoothScrollToPosition(pos);
-        if (offset != 0) {
-          view.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-              if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                if (getOrientation() == Constants.Orientation.VERTICAL) {
-                  recyclerView.smoothScrollBy(0, offset);
-                } else {
-                  recyclerView.smoothScrollBy(offset, 0);
-                }
-                recyclerView.removeOnScrollListener(this);
-              }
-            }
-          });
-        }
-      }
+      view.scrollTo(smooth, pos, offset, getOrientation());
     }
   }
 

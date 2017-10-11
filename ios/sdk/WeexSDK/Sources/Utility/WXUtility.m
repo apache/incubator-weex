@@ -326,11 +326,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
 }
 
 + (BOOL)isBlankString:(NSString *)string {
-    if (![string isKindOfClass:[NSString class]]) {
-        WXLogError(@"%@ is not a string", string);
+    
+    if (string == nil || string == NULL || [string isKindOfClass:[NSNull class]]) {
         return true;
     }
-    if (string == nil || string == NULL || [string isKindOfClass:[NSNull class]]) {
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"%@ is not a string", string);
         return true;
     }
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0) {

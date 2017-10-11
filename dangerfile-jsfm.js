@@ -91,15 +91,17 @@ if (!hasJsfmFile && danger.git.deleted_files) {
     return f;
   });
 }
-
+console.log('-----------------------------hasJsfmFile-----------------------------:'+hasJsfmFile);
 if(hasJsfmFile){
   var runTestCmd='source ~/.bash_profile; '
     + 'npm run build && npm run test'
-  var runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
+  var runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
     fail("jsfm run test failed!");
   }
 }else{
-  message('has no jsfm file changed,skip test!');
+  console.log('has no jsfm file changed.');
+  message('has no jsfm file changed.');
 }
 
+message('jsfm test finished.')

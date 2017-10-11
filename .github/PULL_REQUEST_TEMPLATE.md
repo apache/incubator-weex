@@ -1,4 +1,30 @@
+First of all, thank you for your contribution! 
+
+Please makes sure that these checkboxes are checked before submitting your PR, thank you!
+
+<!-- 
+How to use github markdown?
+### checkable example
+- [x] checked
+- [ ] not checked
+More github Markdown info to see https://guides.github.com/features/mastering-markdown/
+-->
+
+CheckList:
+
+**if** *isBugFix* **:**
+
+  * [ ] Make sure that you add at least one unit test for the bug which you had fixed.
+
+**elif** *isNewFeature* **:**
+
+  * [ ] Update API docs for the component.
+  * [ ] Update/Add demo to demonstrate new feature.
+  * [ ] Update test scripts for the feature.
+  * [ ] Add unit tests for the feature.
+
 <!--
+（请在***提交***前删除这段描述）
 
 Notes: Weex will move into Apache Software Foundation (ASF) on Feb 24 2017.
 
@@ -21,16 +47,14 @@ Thank you for your support.
 -->
 
 <!--
-
-It's ***RECOMMENDED*** to submit typo fix, new demo and tiny bugfix to `dev` branch. New feature and other modifications can be submitted to "domain" branch including `ios`, `android`, `jsfm`, `html5`.
+（请在***提交***前删除这段描述）
+It's ***RECOMMENDED*** to submit typo fix, new demo and tiny bugfix to `master` branch. New feature and other modifications can be submitted to "domain" branch including `ios`, `android`, `jsfm`, `html5`.
     
 See [Branch Strategy](https://github.com/alibaba/weex/blob/dev/CONTRIBUTING.md#branch-management) for more detail.
 
 ----
 
-（请在***提交***前删除这段描述）
-
-错别字修改、新 demo、较小的 bugfix 都可以直接提到 `dev` 分支；新需求以及任何你不确定影响面的改动，请提交到对应“领域”的分支（`ios`、`android`、`jsfm`、`html5`）。
+错别字修改、新 demo、较小的 bugfix 都可以直接提到 `master` 分支；新需求以及任何你不确定影响面的改动，请提交到对应“领域”的分支（`ios`、`android`、`jsfm`、`html5`）。
 
 查看完整的[分支策略 (英文)](https://github.com/alibaba/weex/blob/dev/CONTRIBUTING.md#branch-management)。
 

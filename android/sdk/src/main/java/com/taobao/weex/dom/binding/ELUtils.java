@@ -41,6 +41,8 @@ public class ELUtils {
 
     public static final String COMPONENT_PROPS = "@componentProps";
 
+    public static final  String[] EXCLUDES_BINDING = {"clickEventParams"};
+
     /**
      * @param value check object is binding expression
      * */
@@ -91,18 +93,6 @@ public class ELUtils {
             }
         }
         return  value;
-    }
-
-    public static boolean isVif(String name){
-        return WXStatement.WX_IF.equals(name);
-    }
-
-    public static boolean isVfor(String name){
-        return WXStatement.WX_FOR.equals(name);
-    }
-
-    public static Token vifBlock(String code){
-        return Parser.parse(code);
     }
 
     public static Object vforBlock(Object vfor){

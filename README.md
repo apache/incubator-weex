@@ -97,6 +97,7 @@ See more stuff on [this wiki page](https://github.com/alibaba/weex/wiki/Weex-Com
 * [SegmentFault (cn)](https://segmentfault.com/t/weex): 中文交流与讨论
 * [FAQ](https://weex.apache.org/faq.html)
 * [Articles (cn)](https://github.com/weexteam/article/issues): Weex 相关文章集合
+* [Telegram Russian Community Group](https://telegram.me/weex_ru)
 
 ## Contributing
 

@@ -19,7 +19,7 @@
 
 #import <XCTest/XCTest.h>
 #import "WXStreamModule.h"
-#import <WeexSDK/WeexSDK.h>
+#import "WeexSDK.h"
 #import "WXResourceRequestHandlerDefaultImpl.h"
 
 @interface WXStreamModuleTests : XCTestCase
