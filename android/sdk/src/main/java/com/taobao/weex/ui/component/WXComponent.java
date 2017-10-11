@@ -43,6 +43,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.ViewOverlay;
 import android.widget.FrameLayout;
 
 import com.alibaba.fastjson.JSONArray;
@@ -912,7 +913,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
 
     if (target != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      target.getOverlay().clear();
+      ViewOverlay overlay = target.getOverlay();
+      if (overlay != null) {
+        overlay.clear();
+      }
     }
   }
 
