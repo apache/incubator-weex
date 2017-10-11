@@ -1307,6 +1307,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       return;
     }
+
+    // 如果没有初始化尽快返回Exception，并且异步初始化
+    if (!isJSFrameworkInit()) {
+      instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
+      post(new Runnable() {
+        @Override
+        public void run() {
+          initFramework("");
+        }
+      }, instanceId);
+      return;
+    }
+
     WXModuleManager.createDomModule(instance);
     post(new Runnable() {
       @Override
