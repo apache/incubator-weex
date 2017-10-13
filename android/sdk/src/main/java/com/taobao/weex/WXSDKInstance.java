@@ -1292,6 +1292,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mRenderListener = null;
       isDestroy = true;
       mStatisticsListener = null;
+	  WXEnvironment.sfirstActionComfirmed = false;
     }
   }
 

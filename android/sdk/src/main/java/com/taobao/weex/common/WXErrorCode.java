@@ -125,6 +125,11 @@ public enum WXErrorCode {
   WX_ERR_JSC_CRASH("-2112", "weexjscCrash"),
 
   /**
+   *
+   */
+  WX_ERR_FIRST_DOM_ACTION_EXCEPTION("-2113", "first dom action can not be createFinish"),
+
+  /**
    * JS Bundle download error
    */
 

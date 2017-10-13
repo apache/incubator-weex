@@ -23,7 +23,10 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.action.AbstractAddElementAction;
@@ -31,6 +34,7 @@ import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.WXRenderManager;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -152,7 +156,30 @@ public final class WXDomManager {
     }
   }
 
+  private void  firstActionComfirm(String instanceId, DOMAction action){
+	if(WXEnvironment.sfirstActionComfirmed){
+	  return;
+	}
+	WXLogUtils.d("WXDomManager", "sfirstActionComfirmed is false");
+	if(action != null){
+	  String className = action.getClass().getSimpleName();
+	  if(className.contains("CreateFinishAction")){
+		WXLogUtils.d("WXDomManager", "CreateFinishAction is firstDomAction");
+		WXSDKManager.getInstance().commitCriticalExceptionRT(instanceId,
+				WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorCode(),
+				"executeAction",
+				WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg(),
+				null);
+	  }
+	  WXEnvironment.sfirstActionComfirmed = true;
+	  WXLogUtils.d("WXDomManager", "firstDomAction is " + className);
+	}
+  }
+
   public void executeAction(String instanceId, DOMAction action, boolean createContext) {
+	if(!WXEnvironment.sfirstActionComfirmed){
+	  firstActionComfirm(instanceId, action);
+	}
     DOMActionContext context = mDomRegistries.get(instanceId);
     if(context == null){
       if(createContext){
