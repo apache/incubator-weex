@@ -95,11 +95,6 @@ public class WXEnvironment {
   public static String sDynamicUrl = "";
 
   /**
-   * Dom Action
-   */
-  public static boolean sfirstActionComfirmed = false;
-
-  /**
    * Fetch system information.
    * @return map contains system information.
    */
