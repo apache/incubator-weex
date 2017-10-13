@@ -43,6 +43,7 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.bridge.WXValidateProcessor;
+import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -216,6 +217,7 @@ public class WXSDKManager {
   }
 
   public void destroy() {
+	WXLogUtils.d("WXSDK Instance destroy invoked!!");
     if (mWXDomManager != null) {
       mWXDomManager.destroy();
     }
@@ -453,5 +455,38 @@ public class WXSDKManager {
   public interface InstanceLifeCycleCallbacks {
     void onInstanceDestroyed(String instanceId);
     void onInstanceCreated(String instanceId);
+  }
+
+  /**
+   * commitCriticalExceptionRT eg:JsRuntime Exception or JsFramework Init Exception
+   * @param instanceId
+   * @param errCode
+   * @param function
+   * @param exception
+   * @param extParams
+   */
+  public void commitCriticalExceptionRT(@Nullable String instanceId, @Nullable String errCode, @Nullable String function, @Nullable String exception, @Nullable Map<String,String> extParams ){
+	IWXJSExceptionAdapter adapter = getIWXJSExceptionAdapter();
+	WXSDKInstance instance ;
+	WXJSExceptionInfo exceptionCommit  = null ;
+	String bundleULR = "Weex_SDK_Default_BundleUrl";
+
+	if(!TextUtils.isEmpty(instanceId)){
+	  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+	  if(instance.getContext() != null && instance.getBundleUrl() != null){
+		bundleULR = instance.getBundleUrl();
+		if(adapter != null){
+		  exceptionCommit = new WXJSExceptionInfo(instanceId, bundleULR, errCode, function, exception, extParams);
+		  adapter.onJSException(exceptionCommit);
+		}
+	  }
+	} else {
+	  WXLogUtils.e("Weex instance is Null");
+	  if(adapter != null ){
+		exceptionCommit = new WXJSExceptionInfo("instanceIdIsNull", bundleULR, errCode, function, exception, extParams);
+		adapter.onJSException(exceptionCommit);
+	  }
+	}
+	WXLogUtils.e(exceptionCommit.toString());
   }
 }
