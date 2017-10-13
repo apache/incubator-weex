@@ -19,7 +19,7 @@ Besides Weex dev mailing list, we also have some other mailing lists for you. Yo
 ```
 release
  ↑
-release-{version}
+{version}
  ↑
 master         <--- PR(feature/hotfix/typo)
 ```
@@ -27,9 +27,9 @@ master         <--- PR(feature/hotfix/typo)
 0. `master` branch
     0. `master` is the stable developing branch.
     0. ***It's RECOMMENDED to commit hotfix (like typo) or feature PR to `master `***.
-0. `release-{version}` branch
-    0. `release-{version}` is used for every version which we consider for stable publish.
-    0. e.g. `release-0.16`
+0. `{version}` branch
+    0. `{version}` is used for every version which we consider for stable publish.
+    0. e.g. `v0.16`
 0. `release` branch
     0. `release` is the latest release branch,we will make tag and publish version on this branch.
 
