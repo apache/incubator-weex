@@ -156,30 +156,7 @@ public final class WXDomManager {
     }
   }
 
-  private void  firstActionComfirm(String instanceId, DOMAction action){
-	if(WXEnvironment.sfirstActionComfirmed){
-	  return;
-	}
-	WXLogUtils.d("WXDomManager", "sfirstActionComfirmed is false");
-	if(action != null){
-	  String className = action.getClass().getSimpleName();
-	  if(className.contains("CreateFinishAction")){
-		WXLogUtils.d("WXDomManager", "CreateFinishAction is firstDomAction");
-		WXSDKManager.getInstance().commitCriticalExceptionRT(instanceId,
-				WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorCode(),
-				"executeAction",
-				WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg(),
-				null);
-	  }
-	  WXEnvironment.sfirstActionComfirmed = true;
-	  WXLogUtils.d("WXDomManager", "firstDomAction is " + className);
-	}
-  }
-
   public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-	if(!WXEnvironment.sfirstActionComfirmed){
-	  firstActionComfirm(instanceId, action);
-	}
     DOMActionContext context = mDomRegistries.get(instanceId);
     if(context == null){
       if(createContext){
@@ -187,7 +164,15 @@ public final class WXDomManager {
         mDomRegistries.put(instanceId, oldStatement);
         context = oldStatement;
       }else{
-        //Instance not existed.
+		if(action != null){
+		  String className = action.getClass().getSimpleName();
+		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
+		  WXSDKManager.getInstance().commitCriticalExceptionRT(instanceId,
+				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorCode(),
+				  "executeActionError",
+				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg() + "|current action is" +className,
+				  null);
+		}
         return;
       }
     }
