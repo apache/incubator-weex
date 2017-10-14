@@ -30,7 +30,7 @@ Refer to the following example:
 
 ```
 #### Support synchronous/asynchronous callback 
-you can add  `` @JSMethod (uiThread = false or true ) `` annotation to choose the  callback mode of moudle . see the follow  example.
+you can add  `` @JSMethod (uiThread = false or true ) `` annotation to choose the  callback mode of module. See the following example.
 ```java
      // as sync-callback mode 
     @JSMethod (uiThread = false)
@@ -45,7 +45,7 @@ you can add  `` @JSMethod (uiThread = false or true ) `` annotation to choose th
     }
 
 ```
-#### Register the moulde
+#### Register the module
 
 ```java
 
