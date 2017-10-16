@@ -75,7 +75,6 @@ import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListener;
-import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.flat.FlatComponent;
@@ -732,11 +731,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     switch (key) {
       case Constants.Name.PREVENT_MOVE_EVENT:
         if(mGesture != null){
-          mGesture.setPreventMoveEvent(WXUtils.getBoolean(param,false));
+          mGesture.setPreventMoveEvent(getBoolean(param,false));
         }
         return true;
       case Constants.Name.DISABLED:
-        Boolean disabled = WXUtils.getBoolean(param,null);
+        Boolean disabled = getBoolean(param,null);
         if (disabled != null) {
           setDisabled(disabled);
           setPseudoClassStatus(Constants.PSEUDO.DISABLED, disabled);
@@ -832,7 +831,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         setAriaLabel(label);
         return true;
       case Constants.Name.ARIA_HIDDEN:
-        boolean isHidden = WXUtils.getBoolean(param,false);
+        boolean isHidden = getBoolean(param,false);
         setAriaHidden(isHidden);
         return true;
       case Constants.Name.WIDTH:
@@ -998,7 +997,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (view instanceof WXGestureObservable) {
         if (mGesture == null) {
           mGesture = new WXGesture(this, mContext);
-          boolean isPreventMove = getBoolean(getDomObject().getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT),false);
+          boolean isPreventMove = WXUtils.getBoolean(getDomObject().getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT),false);
           mGesture.setPreventMoveEvent(isPreventMove);
         }
         mGestureType.add(type);
