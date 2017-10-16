@@ -19,7 +19,7 @@ inline WXCoreFlexDirection getWXCoreFlexDirection(std::string value) {
   } else if (value == ROW_REVERSE) {
     return WXCore_Flex_Direction_Row_Reverse;
   }
-  return WXCore_Flex_Direction_Row;
+  return WXCore_Flex_Direction_Column;
 }
 
 
@@ -48,8 +48,6 @@ inline WXCoreAlignItems getWXCoreAlignItem(std::string value) {
     return WXCore_AlignItems_Flex_End;
   } else if (value == CENTER) {
     return WXCore_AlignItems_Center;
-  } else if (value == BASELINE) {
-    return WXCore_AlignItems_Baseline;
   }
   return WXCore_AlignItems_Stretch;
 }
@@ -78,8 +76,6 @@ inline WXCoreAlignSelf getWXCoreAlignSelf(std::string value) {
     return WXCore_AlignSelf_Flex_End;
   } else if (value == CENTER) {
     return WXCore_AlignSelf_Center;
-  } else if (value == BASELINE) {
-    return WXCore_AlignSelf_Baseline;
   }
   return WXCore_AlignSelf_Auto;
 }

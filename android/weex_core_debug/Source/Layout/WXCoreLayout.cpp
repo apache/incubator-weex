@@ -2,13 +2,12 @@
 
 using namespace WXCoreFlexLayout;
 
-const float WXCoreCSSStyle::FLEX_DEFAULT = 1;
 const float WXCoreCSSStyle::FLEX_GROW_DEFAULT = 0;
-const float WXCoreCSSStyle::MAX_SIZE = NAN;
-const WXCoreFlexDirection WXCoreCSSStyle::FLEX_DIRECTION_DEFAULT = WXCore_Flex_Direction_Row;
+const float WXCoreCSSStyle::MAX_SIZE = MAXFLOAT;
+const WXCoreFlexDirection WXCoreCSSStyle::FLEX_DIRECTION_DEFAULT = WXCore_Flex_Direction_Column;
 const WXCoreFlexWrap WXCoreCSSStyle::FLEX_WRAP_DEFAULT = WXCore_Wrap_NoWrap;
 const WXCoreJustifyContent WXCoreCSSStyle::FLEX_JUSTIFY_CONTENT_DEFAULT = WXCore_Justify_Flex_Start;
-const WXCoreAlignItems WXCoreCSSStyle::FLEX_ALIGN_ITEMS_DEFAULT = WXCore_AlignItems_Flex_Start;
+const WXCoreAlignItems WXCoreCSSStyle::FLEX_ALIGN_ITEMS_DEFAULT = WXCore_AlignItems_Stretch;
 const WXCoreAlignSelf WXCoreCSSStyle::FLEX_ALIGN_SELF_DEFAULT = WXCore_AlignSelf_Auto;
 
 template<class T>
@@ -21,15 +20,6 @@ static T min_num(T a, T b) {
   return a < b ? a : b;
 }
 
-static float getChildMeasureSpec(float parentDimension, float padding,
-                                 float childDimension) {
-  if (isnan(parentDimension)) {
-    return childDimension;
-  } else {
-    return isnan(childDimension) ? max_num<float>(0, parentDimension - padding) : childDimension;
-  }
-}
-
 namespace WXCoreFlexLayout {
 
   void WXCoreLayoutNode::onMeasure(float width, float height) {
@@ -39,18 +29,16 @@ namespace WXCoreFlexLayout {
     }
 
     // Only calculate the children views which are affected from the last measure.
-    switch (mCssStyle.mFlexDirection) {
+    switch (mCssStyle->mFlexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
         measureHorizontal(width, height);
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
+      default:
         measureVertical(width, height);
         break;
-//    default:
-//      throw new IllegalStateException(
-//          "Invalid value for the flex direction is set: " + mFlexDirection);
     }
 
     memset(mChildrenFrozen, false, getChildCount());
@@ -66,90 +54,88 @@ namespace WXCoreFlexLayout {
 
     mFlexLines.clear();
 
-    int childCount = getChildCount();
+    uint32_t childCount = getChildCount();
 
-    float largestHeightInRow = -1.0;
+    float largestHeightInRow = 0;
     float totalCrossSize = 0;
     WXCoreFlexLine *flexLine = new WXCoreFlexLine();
 
-    flexLine->mMainSize = getPaddingLeft() + getPaddingRight();
+    flexLine->mMainSize = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
 
     // Determine how many flex lines are needed in this layout by measuring each child.
-    for (int i = 0; i < childCount; i++) {
+    for (uint32_t i = 0; i < childCount; i++) {
       WXCoreLayoutNode *child = getChildAt(i);
 
-      if (child == nullptr) {
-        addFlexLineIfLastFlexItem(i, childCount, flexLine, totalCrossSize);
-        continue;
-      }
-
       // Record stretch child's index
-      if (child->mCssStyle.mAlignSelf == WXCore_AlignSelf_Stretch) {
+      if (child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Stretch ||
+          (mCssStyle->mAlignItems == WXCore_AlignItems_Stretch &&
+           child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Auto)) {
         flexLine->mIndicesAlignSelfStretch.push_back(i);
       }
 
-      // Calculate the MeasureSpec of the child based on its margin and the width/height/padding of its parent
-      float childWidthMeasureSpec = getChildMeasureSpec(width,
-                                                        getPaddingLeft() + getPaddingRight() + child->getMarginLeft()
-                                                        + child->getMarginRight(),
-                                                        child->getStyleWidth());
-      float childHeightMeasureSpec = getChildMeasureSpec(height,
-                                                         getPaddingTop() + getPaddingBottom() + child->getMarginTop()
-                                                         + child->getMarginBottom() + totalCrossSize,
-                                                         child->getStyleHeight());
-
+      float childHeight = (isnan(child->mCssStyle->mStyleHeight) && !isnan(height)) ? height - getPaddingTop() +
+                                                                                      getBorderWidthTop() +
+                                                                                      child->getMarginTop() +
+                                                                                      getPaddingBottom() +
+                                                                                      getBorderWidthBottom() +
+                                                                                      child->getMarginBottom()
+                                                                                    : child->mCssStyle->mStyleHeight;
       // Measure child based on its MeasureSpec
-      child->measure(childWidthMeasureSpec, childHeightMeasureSpec);
+      child->measure(child->mCssStyle->mStyleWidth, childHeight, true);
 
       // Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
       checkSizeConstraints(child);
 
       largestHeightInRow = max_num<float>(largestHeightInRow,
-                                          child->mLayoutResult.mComputedHeight + child->getMarginTop() +
+                                          child->mLayoutResult->mLayoutSize.height + child->getMarginTop() +
                                           child->getMarginBottom());
 
       // Determine if a wrap is required (add a new flexline)
       if (isWrapRequired(width, flexLine->mMainSize,
-                         child->mLayoutResult.mComputedWidth + child->getMarginLeft() + child->getMarginRight()
+                         child->mLayoutResult->mLayoutSize.width + child->getMarginLeft() + child->getMarginRight()
       )) {
-        if (flexLine->getItemCountNotGone() > 0) {
+        if (flexLine->mItemCount > 0) {
           addFlexLine(flexLine, totalCrossSize);
           totalCrossSize += flexLine->mCrossSize;
         }
 
         flexLine = new WXCoreFlexLine();
         flexLine->mItemCount = 1;
-        flexLine->mMainSize = getPaddingLeft() + getPaddingRight();
-        largestHeightInRow = child->mLayoutResult.mComputedHeight + child->getMarginTop() + child->getMarginBottom();
+        flexLine->mMainSize = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
+        largestHeightInRow =
+            child->mLayoutResult->mLayoutSize.height + child->getMarginTop() + child->getMarginBottom();
       } else {
         flexLine->mItemCount++;
       }
 
-      flexLine->mMainSize += child->mLayoutResult.mComputedWidth + child->getMarginLeft() + child->getMarginRight();
-      flexLine->mTotalFlexGrow += child->mCssStyle.mFlexGrowValue;
+      flexLine->mMainSize += child->mLayoutResult->mLayoutSize.width + child->getMarginLeft() + child->getMarginRight();
+
+      if (child->mCssStyle->mFlexGrow > 0) {
+        flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
+        flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.width;
+      } else {
+        mChildrenFrozen[i] = true;
+      }
 
       // Temporarily set the cross axis length as the largest child in the row
       // Expand along the cross axis depending on the mAlignContent property if needed later
       flexLine->mCrossSize = max_num<float>(flexLine->mCrossSize, largestHeightInRow);
 
-      flexLine->mMaxBaseline = max_num<float>(flexLine->mMaxBaseline, child->getBaseline() + child->getMarginTop());
-
       addFlexLineIfLastFlexItem(i, childCount, flexLine, totalCrossSize);
     }
 
     // Determine the main size by expanding the individual flexGrow attribute.
-    determineMainSize(mCssStyle.mFlexDirection, width, height);
+    determineMainSize(mCssStyle->mFlexDirection, width, height);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle.mFlexDirection, width, height, getPaddingTop() + getPaddingBottom());
-
-    // Now cross size for each flex line is determined.
+    determineCrossSize(mCssStyle->mFlexDirection, width, height,
+                       getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
-    stretchViews(mCssStyle.mFlexDirection, mCssStyle.mAlignItems);
+    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
-    setMeasuredDimension(width, height);
+    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, height);
   }
 
 /**
@@ -163,64 +149,68 @@ namespace WXCoreFlexLayout {
 
     mFlexLines.clear();
 
-    int childCount = getChildCount();
-    float largestWidthInColumn = -1.0;
+    uint32_t childCount = getChildCount();
+    float largestWidthInColumn = 0;
     float totalCrossSize = 0;
 
     WXCoreFlexLine *flexLine = new WXCoreFlexLine();
-    flexLine->mMainSize = getPaddingTop() + getPaddingBottom();
+    flexLine->mMainSize = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
 
     // Determine how many flex lines are needed in this layout by measuring each child.
-    for (int i = 0; i < childCount; i++) {
+    for (uint32_t i = 0; i < childCount; i++) {
       WXCoreLayoutNode *child = getChildAt(i);
-      if (child == nullptr) {
-        addFlexLineIfLastFlexItem(i, childCount, flexLine, totalCrossSize);
-        continue;
-      }
 
       // Record stretch child's index
-      if (child->mCssStyle.mAlignSelf == WXCore_AlignSelf_Stretch) {
+      if (child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Stretch ||
+          (mCssStyle->mAlignItems == WXCore_AlignItems_Stretch &&
+           child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Auto)) {
         flexLine->mIndicesAlignSelfStretch.push_back(i);
       }
 
-      // Calculate the MeasureSpec of the child based on its margin and the width/height/padding of its parent
-      float childWidthMeasureSpec = getChildMeasureSpec(width,
-                                                        getPaddingLeft() + getPaddingRight() + child->getMarginLeft()
-                                                        + child->getMarginRight() + totalCrossSize,
-                                                        child->getStyleWidth());
-      float childHeightMeasureSpec = getChildMeasureSpec(height,
-                                                         getPaddingTop() + getPaddingBottom() + child->getMarginTop()
-                                                         + child->getMarginBottom(), child->getStyleHeight());
-
+      float childWidth = (isnan(child->mCssStyle->mStyleWidth) && !isnan(width)) ? width - getPaddingLeft() +
+                                                                                   getBorderWidthLeft() +
+                                                                                   child->getMarginLeft() +
+                                                                                   getPaddingRight() +
+                                                                                   getBorderWidthRight() +
+                                                                                   child->getMarginRight()
+                                                                                 : child->mCssStyle->mStyleWidth;
       // Measure child based on its MeasureSpec
-      child->measure(childWidthMeasureSpec, childHeightMeasureSpec);
+      child->measure(childWidth, child->mCssStyle->mStyleHeight, true);
 
       // Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
       checkSizeConstraints(child);
 
       largestWidthInColumn = max_num<float>(largestWidthInColumn,
-                                            child->mLayoutResult.mComputedWidth + child->getMarginLeft() +
+                                            child->mLayoutResult->mLayoutSize.width + child->getMarginLeft() +
                                             child->getMarginRight());
 
       // Determine if a wrap is required (add a new flexline)
       if (isWrapRequired(height, flexLine->mMainSize,
-                         child->mLayoutResult.mComputedHeight + child->getMarginTop() + child->getMarginBottom()
+                         child->mLayoutResult->mLayoutSize.height + child->getMarginTop() + child->getMarginBottom()
       )) {
-        if (flexLine->getItemCountNotGone() > 0) {
+        if (flexLine->mItemCount > 0) {
           addFlexLine(flexLine, totalCrossSize);
           totalCrossSize += flexLine->mCrossSize;
         }
 
         flexLine = new WXCoreFlexLine();
         flexLine->mItemCount = 1;
-        flexLine->mMainSize = getPaddingTop() + getPaddingBottom();
-        largestWidthInColumn = child->mLayoutResult.mComputedWidth + child->getMarginLeft() + child->getMarginRight();
+        flexLine->mMainSize = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
+        largestWidthInColumn =
+            child->mLayoutResult->mLayoutSize.width + child->getMarginLeft() + child->getMarginRight();
       } else {
         flexLine->mItemCount++;
       }
 
-      flexLine->mMainSize += child->mLayoutResult.mComputedHeight + child->getMarginTop() + child->getMarginBottom();
-      flexLine->mTotalFlexGrow += child->mCssStyle.mFlexGrowValue;
+      flexLine->mMainSize +=
+          child->mLayoutResult->mLayoutSize.height + child->getMarginTop() + child->getMarginBottom();
+
+      if (child->mCssStyle->mFlexGrow > 0) {
+        flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
+        flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.height;
+      } else {
+        mChildrenFrozen[i] = true;
+      }
 
       // Temporarily set the cross axis length as the largest child in the row
       // Expand along the cross axis depending on the mAlignContent property if needed later
@@ -229,18 +219,17 @@ namespace WXCoreFlexLayout {
     }
 
     // Determine the main size by expanding the individual flexGrow attribute.
-    determineMainSize(mCssStyle.mFlexDirection, width, height);
+    determineMainSize(mCssStyle->mFlexDirection, width, height);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle.mFlexDirection, width, height, getPaddingLeft() + getPaddingRight());
-
-    // Now cross size for each flex line is determined.
+    determineCrossSize(mCssStyle->mFlexDirection, width, height,
+                       getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
-    stretchViews(mCssStyle.mFlexDirection, mCssStyle.mAlignItems);
+    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
-    setMeasuredDimension(width, height);
+    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, height);
   }
 
 /**
@@ -249,34 +238,34 @@ namespace WXCoreFlexLayout {
  * {@link WXCoreLayoutNode #mMaxWidth} and {@link WXCoreLayoutNode #mMaxHeight} attributes.
  */
   void WXCoreLayoutNode::checkSizeConstraints(WXCoreLayoutNode *node) {
-    bool needsMeasure = false;
-    float childWidth = node->mLayoutResult.mComputedWidth;
-    float childHeight = node->mLayoutResult.mComputedHeight;
+    bool needReMeasure = false;
+    float childWidth = node->mLayoutResult->mLayoutSize.width;
+    float childHeight = node->mLayoutResult->mLayoutSize.height;
 
-    if (node->mLayoutResult.mComputedWidth < node->mCssStyle.mMinWidth) {
-      needsMeasure = true;
-      childWidth = node->mCssStyle.mMinWidth;
-    } else if (node->mLayoutResult.mComputedWidth > node->mCssStyle.mMaxWidth) {
-      needsMeasure = true;
-      childWidth = node->mCssStyle.mMaxWidth;
+    if (childWidth < node->mCssStyle->mMinWidth) {
+      needReMeasure = true;
+      childWidth = node->mCssStyle->mMinWidth;
+    } else if (childWidth > node->mCssStyle->mMaxWidth) {
+      needReMeasure = true;
+      childWidth = node->mCssStyle->mMaxWidth;
     }
 
-    if (childHeight < node->mCssStyle.mMinHeight) {
-      needsMeasure = true;
-      childHeight = node->mCssStyle.mMinHeight;
-    } else if (childHeight > node->mCssStyle.mMaxHeight) {
-      needsMeasure = true;
-      childHeight = node->mCssStyle.mMaxHeight;
+    if (childHeight < node->mCssStyle->mMinHeight) {
+      needReMeasure = true;
+      childHeight = node->mCssStyle->mMinHeight;
+    } else if (childHeight > node->mCssStyle->mMaxHeight) {
+      needReMeasure = true;
+      childHeight = node->mCssStyle->mMaxHeight;
     }
 
-    if (needsMeasure) {
-      node->measure(childWidth, childHeight);
+    if (needReMeasure) {
+      node->measure(childWidth, childHeight, false);
     }
   }
 
-  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(int childIndex, int childCount, WXCoreFlexLine *flexLine,
+  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
                                                    float usedCrossSizeSoFar) {
-    if (childIndex == childCount - 1 && flexLine->getItemCountNotGone() != 0) {
+    if (childIndex == childCount - 1 && flexLine->mItemCount != 0) {
       // Add the flex line if this item is the last item
       addFlexLine(flexLine, usedCrossSizeSoFar);
     }
@@ -284,51 +273,36 @@ namespace WXCoreFlexLayout {
 
   void WXCoreLayoutNode::addFlexLine(WXCoreFlexLine *flexLine, float usedCrossSizeSoFar) {
     flexLine->mSumCrossSizeBefore = usedCrossSizeSoFar;
-    // The size of the end divider isn't added until the flexLine is added to the flex container
-    // take the divider mStyleWidth (or mStyleHeight) into account when adding the flex line.
     mFlexLines.push_back(flexLine);
   }
 
 /**
  * Determine the main size by expanding the individual flexGrow attribute.
- *
- * @param flexDirection     the value of the flex direction
- * @param widthMeasureSpec  horizontal space requirements as imposed by the parent
- * @param heightMeasureSpec vertical space requirements as imposed by the parent
  */
-  void WXCoreLayoutNode::determineMainSize(WXCoreFlexDirection flexDirection, float widthMeasureSpec,
-                                           float heightMeasureSpec) {
-    float mainSize;
+  void WXCoreLayoutNode::determineMainSize(WXCoreFlexDirection flexDirection, float width,
+                                           float height) {
+    float maxMainSize;
     float paddingAlongMainAxis;
 
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        if (isnan(widthMeasureSpec)) {
-          mainSize = getLargestMainSize();
-        } else {
-          mainSize = widthMeasureSpec;
-        }
-        paddingAlongMainAxis = getPaddingLeft() + getPaddingRight();
+        maxMainSize = isnan(width) ? getLargestMainSize() : width;
+        paddingAlongMainAxis = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
-        if (isnan(heightMeasureSpec)) {
-          mainSize = getLargestMainSize();
-        } else {
-          mainSize = heightMeasureSpec;
-        }
-        paddingAlongMainAxis = getPaddingTop() + getPaddingBottom();
+      default:
+        maxMainSize = isnan(height) ? getLargestMainSize() : height;
+        paddingAlongMainAxis = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
         break;
-//    default:
-//      throw new IllegalArgumentException("Invalid flex direction: " + flexDirection);
     }
 
-    int childIndex = 0;
+    uint32_t childIndex = 0;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
-      if (flexLine->mMainSize < mainSize) {
-        childIndex = expandFlexItems(widthMeasureSpec, heightMeasureSpec, flexLine,
-                                     flexDirection, mainSize, paddingAlongMainAxis, childIndex, false);
+      if (flexLine->mMainSize < maxMainSize) {
+        childIndex = expandFlexItems(flexLine,
+                                     flexDirection, maxMainSize, paddingAlongMainAxis, childIndex, false);
       }
     }
   }
@@ -336,243 +310,122 @@ namespace WXCoreFlexLayout {
 /**
  * Expand the flex items along the main axis based on the individual flexGrow attribute.
  *
- * @param widthMeasureSpec     the horizontal space requirements as imposed by the parent
- * @param heightMeasureSpec    the vertical space requirements as imposed by the parent
  * @param flexLine             the flex line to which flex items belong
- * @param flexDirection        the flexDirection value for this WXCoreLayoutNode
+ * @param flexDirection        the flexDirection value for this item
  * @param maxMainSize          the maximum main size. Expanded main size will be this size
  * @param paddingAlongMainAxis the padding value along the main axis
  * @param startIndex           the start index of the children views to be expanded. This index
- *                             needs to
- *                             be an absolute index in the flex container (WXCoreLayoutNode),
+ *                             needs to be an absolute index in the flex container,
  *                             not the relative index in the flex line.
  * @param calledRecursively    true if this method is called recursively, false otherwise
- * @return the next index, the next flex line's first flex item starts from the returned index
+ * @return the next startIndex, the next flex line's first flex item starts from the returned index
  */
-  int WXCoreLayoutNode::expandFlexItems(float widthMeasureSpec, float heightMeasureSpec, WXCoreFlexLine *flexLine,
-                                        WXCoreFlexDirection flexDirection, float maxMainSize,
-                                        float paddingAlongMainAxis,
-                                        int startIndex, bool calledRecursively) {
-    int childIndex = startIndex;
-    if (flexLine->mTotalFlexGrow <= 0 || maxMainSize < flexLine->mMainSize) {
+  uint32_t WXCoreLayoutNode::expandFlexItems(WXCoreFlexLine *flexLine,
+                                             WXCoreFlexDirection flexDirection, float maxMainSize,
+                                             float paddingAlongMainAxis,
+                                             uint32_t startIndex, bool calledRecursively) {
+    uint32_t childIndex = startIndex;
+    if (flexLine->mTotalFlexGrow <= 0) {
       childIndex += flexLine->mItemCount;
       return childIndex;
     }
 
     float sizeBeforeExpand = flexLine->mMainSize;
-    bool needsReexpand = false;
-    float unitSpace = (maxMainSize - flexLine->mMainSize) / flexLine->mTotalFlexGrow;
+    bool needReExpand = false;
+    float unitSpace = (maxMainSize - flexLine->mMainSize + flexLine->mTotalFlexibleSize) /
+                      (flexLine->mTotalFlexibleSize > 1 ? flexLine->mTotalFlexGrow : 1);
     flexLine->mMainSize = paddingAlongMainAxis;
 
-    // Setting the cross size of the flex line as the temporal value since the cross size of
-    // each flex item may be changed from the initial calculation
-    // (in the measureHorizontal/measureVertical method) even this method is part of the main
-    // size determination.
-    // E.g. If a TextView's layout_width is set to 0dp, layout_height is set to wrap_content,
-    // and layout_flexGrow is set to 1, the TextView is trying to expand to the vertical
-    // direction to enclose its content (in the measureHorizontal method), but
-    // the mStyleWidth will be expanded in this method. In that case, the mStyleHeight needs to be measured
-    // again with the expanded mStyleWidth.
     if (!calledRecursively) {
-      flexLine->mCrossSize = -1.0;
+      flexLine->mCrossSize = 0;
     }
 
     float largestCrossSize = 0;
-    float accumulatedRoundError = 0;
 
-    for (int i = 0; i < flexLine->mItemCount; i++) {
+    for (uint32_t i = 0; i < flexLine->mItemCount; i++) {
       WXCoreLayoutNode *child = getChildAt(childIndex);
-      if (child == nullptr) {
-        continue;
-      }
 
       if (isMainAxisDirectionHorizontal(flexDirection)) {
         // The direction of the main axis is horizontal
         if (!mChildrenFrozen[childIndex]) {
-          float rawCalculatedWidth = child->mLayoutResult.mComputedWidth + unitSpace * child->mCssStyle.mFlexGrowValue;
-          if (i == flexLine->mItemCount - 1) {
-            rawCalculatedWidth += accumulatedRoundError;
-            accumulatedRoundError = 0;
+          float rawCalculatedWidth = unitSpace * child->mCssStyle->mFlexGrow;
+
+          if (rawCalculatedWidth > child->mCssStyle->mMaxWidth) {
+            needReExpand = obeyConstrainsDuringExpandMainAxis(flexLine, childIndex,
+                                                              child->mCssStyle->mFlexGrow);
+            rawCalculatedWidth = child->mCssStyle->mMaxWidth;
+          } else if (rawCalculatedWidth < child->mCssStyle->mMinWidth) {
+            needReExpand = obeyConstrainsDuringExpandMainAxis(flexLine, childIndex,
+                                                              child->mCssStyle->mFlexGrow);
+            rawCalculatedWidth = child->mCssStyle->mMinWidth;
           }
 
-          float newWidth = rawCalculatedWidth;
-          if (newWidth > child->mCssStyle.mMaxWidth) {
-            // This means the child can't expand beyond the value of the maxWidth
-            // attribute.
-            // To adjust the flex line length to the size of maxMainSize, remaining
-            // positive free space needs to be re-distributed to other flex items
-            // (children views). In that case, invoke this method again with the same
-            // startIndex.
-            needsReexpand = true;
-            newWidth = child->mCssStyle.mMaxWidth;
-            mChildrenFrozen[childIndex] = true;
-            flexLine->mTotalFlexGrow -= child->mCssStyle.mFlexGrowValue;
-          } else {
-            accumulatedRoundError += (rawCalculatedWidth - newWidth);
-            if (accumulatedRoundError > 1.0) {
-              newWidth += 1;
-              accumulatedRoundError -= 1.0;
-            } else if (accumulatedRoundError < -1.0) {
-              newWidth -= 1;
-              accumulatedRoundError += 1.0;
-            }
-          }
-
-          float childHeightMeasureSpec = getChildHeightMeasureSpec(heightMeasureSpec, child,
-                                                                   flexLine->mSumCrossSizeBefore);
-          child->measure(newWidth, childHeightMeasureSpec);
-          largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult.mComputedHeight
+          child->measure(rawCalculatedWidth, child->mLayoutResult->mLayoutSize.height, false);
+          largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult->mLayoutSize.height
                                                               + child->getMarginTop() + child->getMarginBottom());
         }
 
-        flexLine->mMainSize += child->mLayoutResult.mComputedWidth + child->getMarginLeft() + child->getMarginRight();
+        flexLine->mMainSize +=
+            child->mLayoutResult->mLayoutSize.width + child->getMarginLeft() + child->getMarginRight();
       } else {
         // The direction of the main axis is vertical
         if (!mChildrenFrozen[childIndex]) {
-          float rawCalculatedHeight =
-              child->mLayoutResult.mComputedHeight + unitSpace * child->mCssStyle.mFlexGrowValue;
-
-          if (i == flexLine->mItemCount - 1) {
-            rawCalculatedHeight += accumulatedRoundError;
-            accumulatedRoundError = 0;
+          float rawCalculatedHeight = unitSpace * child->mCssStyle->mFlexGrow;
+          if (rawCalculatedHeight > child->mCssStyle->mMaxHeight) {
+            needReExpand = obeyConstrainsDuringExpandMainAxis(flexLine, childIndex,
+                                                              child->mCssStyle->mFlexGrow);
+            rawCalculatedHeight = child->mCssStyle->mMaxHeight;
+          } else if (rawCalculatedHeight < child->mCssStyle->mMinHeight) {
+            needReExpand = obeyConstrainsDuringExpandMainAxis(flexLine, childIndex,
+                                                              child->mCssStyle->mFlexGrow);
+            rawCalculatedHeight = child->mCssStyle->mMinHeight;
           }
 
-          float newHeight = rawCalculatedHeight;
-
-          if (newHeight > child->mCssStyle.mMaxHeight) {
-            // This means the child can't expand beyond the value of the maxHeight
-            // attribute.
-            // To adjust the flex line length to the size of maxMainSize, remaining
-            // positive free space needs to be re-distributed to other flex items
-            // (children views). In that case, invoke this method again with the same
-            // startIndex.
-            needsReexpand = true;
-            newHeight = child->mCssStyle.mMaxHeight;
-            mChildrenFrozen[childIndex] = true;
-            flexLine->mTotalFlexGrow -= child->mCssStyle.mFlexGrowValue;
-          } else {
-            accumulatedRoundError += (rawCalculatedHeight - newHeight);
-            if (accumulatedRoundError > 1.0) {
-              newHeight += 1;
-              accumulatedRoundError -= 1.0;
-            } else if (accumulatedRoundError < -1.0) {
-              newHeight -= 1;
-              accumulatedRoundError += 1.0;
-            }
-          }
-
-          float childWidthMeasureSpec = getChildWidthMeasureSpec(widthMeasureSpec, child,
-                                                                 flexLine->mSumCrossSizeBefore);
-          child->measure(childWidthMeasureSpec, newHeight);
-          largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult.mComputedWidth
+          child->measure(child->mLayoutResult->mLayoutSize.width, rawCalculatedHeight, false);
+          largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult->mLayoutSize.width
                                                               + child->getMarginLeft() + child->getMarginRight());
         }
-        flexLine->mMainSize += child->mLayoutResult.mComputedHeight + child->getMarginTop() + child->getMarginBottom();
+        flexLine->mMainSize +=
+            child->mLayoutResult->mLayoutSize.height + child->getMarginTop() + child->getMarginBottom();
       }
 
       flexLine->mCrossSize = max_num<float>(flexLine->mCrossSize, largestCrossSize);
       childIndex++;
     }
 
-    if (needsReexpand && sizeBeforeExpand != flexLine->mMainSize) {
+    if (needReExpand && sizeBeforeExpand != flexLine->mMainSize) {
       // Re-invoke the method with the same startIndex to distribute the positive free space
       // that wasn't fully distributed (because of maximum length constraint)
-      expandFlexItems(widthMeasureSpec, heightMeasureSpec, flexLine, flexDirection,
+      expandFlexItems(flexLine, flexDirection,
                       maxMainSize, paddingAlongMainAxis, startIndex, true);
     }
 
     return childIndex;
   }
 
-  float WXCoreLayoutNode::getChildWidthMeasureSpec(float widthMeasureSpec, WXCoreLayoutNode *node, float padding) {
-    float childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
-                                                      getPaddingLeft() + getPaddingRight() + node->getMarginLeft()
-                                                      + node->getMarginRight() + padding, node->getStyleWidth());
-    float childWidth = childWidthMeasureSpec;
-    if (childWidth > node->mCssStyle.mMaxWidth) {
-      childWidthMeasureSpec = node->mCssStyle.mMaxWidth;
-    } else if (childWidth < node->mCssStyle.mMinWidth) {
-      childWidthMeasureSpec = node->mCssStyle.mMinWidth;
-    }
-
-    return childWidthMeasureSpec;
-  }
-
-  float WXCoreLayoutNode::getChildHeightMeasureSpec(float heightMeasureSpec, WXCoreLayoutNode *node, float padding) {
-    float childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
-                                                       getPaddingTop() + getPaddingBottom() + node->getMarginTop()
-                                                       + node->getMarginBottom() + padding, node->getStyleHeight());
-    float childHeight = childHeightMeasureSpec;
-
-    if (childHeight > node->mCssStyle.mMaxHeight) {
-      childHeightMeasureSpec = node->mCssStyle.mMaxHeight;
-    } else if (childHeight < node->mCssStyle.mMinHeight) {
-      childHeightMeasureSpec = node->mCssStyle.mMinHeight;
-    }
-
-    return childHeightMeasureSpec;
-  }
-
 /**
- * Determines the cross size (Calculate the length along the cross axis).
- * Expand the cross size only if the mStyleHeight mode is MeasureSpec.EXACTLY, otherwise
- * use the sum of cross sizes of all flex lines.
- *
  * @param flexDirection         the flex direction attribute
- * @param widthMeasureSpec      horizontal space requirements as imposed by the parent
- * @param heightMeasureSpec     vertical space requirements as imposed by the parent
- * @param paddingAlongCrossAxis the padding value for the WXCoreLayoutNode along the cross axis
+ * @param width                 stylewidth by this node
+ * @param height                styleheight by this node
+ * @param paddingAlongCrossAxis the padding value for this node along the cross axis
  */
-  void WXCoreLayoutNode::determineCrossSize(WXCoreFlexDirection flexDirection, float widthMeasureSpec,
-                                            float heightMeasureSpec, float paddingAlongCrossAxis) {
-    // The MeasureSpec mode along the cross axis
+  void WXCoreLayoutNode::determineCrossSize(WXCoreFlexDirection flexDirection, float width,
+                                            float height, float paddingAlongCrossAxis) {
     float size;
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        size = heightMeasureSpec;
+        size = height;
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
-        size = widthMeasureSpec;
+      default:
+        size = width;
         break;
-//    default:
-//      throw new IllegalArgumentException("Invalid flex direction: " + flexDirection);
     }
 
-    float totalCrossSize = getSumOfCrossSize() + paddingAlongCrossAxis;
-
-    if (mFlexLines.size() == 1) {
+    if (mFlexLines.size() == 1 && !isnan(size)) {
       mFlexLines[0]->mCrossSize = size - paddingAlongCrossAxis;
-      // alignContent property is valid only if the Flexbox has at least two lines
-    } else if (mFlexLines.size() >= 2) {
-      if (totalCrossSize < size) {
-        float freeSpaceUnit = (size - totalCrossSize) / (float) mFlexLines.size();
-        float accumulatedError = 0;
-
-        for (int i = 0, flexLinesSize = mFlexLines.size(); i < flexLinesSize; i++) {
-          WXCoreFlexLine *flexLine = mFlexLines[i];
-          float newCrossSizeAsFloat = flexLine->mCrossSize + freeSpaceUnit;
-
-          if (i == mFlexLines.size() - 1) {
-            newCrossSizeAsFloat += accumulatedError;
-            accumulatedError = 0;
-          }
-
-          float newCrossSize = newCrossSizeAsFloat;
-          accumulatedError += (newCrossSizeAsFloat - newCrossSize);
-
-          if (accumulatedError > 1) {
-            newCrossSize += 1;
-            accumulatedError -= 1;
-          } else if (accumulatedError < -1) {
-            newCrossSize -= 1;
-            accumulatedError += 1;
-          }
-
-          flexLine->mCrossSize = newCrossSize;
-        }
-      }
     }
   }
 
@@ -585,13 +438,14 @@ namespace WXCoreFlexLayout {
  */
   void WXCoreLayoutNode::stretchViews(WXCoreFlexDirection flexDirection, WXCoreAlignItems alignItems) {
     if (alignItems == WXCore_AlignItems_Stretch) {
-      int viewIndex = 0;
+      // WXCoreAlignItems is STRETCH
+      uint32_t viewIndex = 0;
       for (WXCoreFlexLine *flexLine : mFlexLines) {
-        for (int i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
+        for (uint32_t i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
           WXCoreLayoutNode *child = getChildAt(viewIndex);
 
-          if (child->mCssStyle.mAlignSelf != WXCore_AlignSelf_Auto &&
-              child->mCssStyle.mAlignSelf != WXCore_AlignSelf_Stretch) {
+          if (child->mCssStyle->mAlignSelf != WXCore_AlignSelf_Auto &&
+              child->mCssStyle->mAlignSelf != WXCore_AlignSelf_Stretch) {
             continue;
           }
 
@@ -602,19 +456,17 @@ namespace WXCoreFlexLayout {
               break;
             case WXCore_Flex_Direction_Column:
             case WXCore_Flex_Direction_Column_Reverse:
+            default:
               stretchViewHorizontally(child, flexLine->mCrossSize);
               break;
-//          default:
-//            throw new IllegalArgumentException(
-//                "Invalid flex direction: " + flexDirection);
           }
         }
       }
     } else {
+      // WXCoreAlignItems is STRETCH
       for (WXCoreFlexLine *flexLine : mFlexLines) {
-        for (int index : flexLine->mIndicesAlignSelfStretch) {
+        for (uint32_t index : flexLine->mIndicesAlignSelfStretch) {
           WXCoreLayoutNode *child = getChildAt(index);
-
           switch (flexDirection) {
             case WXCore_Flex_Direction_Row:
             case WXCore_Flex_Direction_Row_Reverse:
@@ -622,11 +474,9 @@ namespace WXCoreFlexLayout {
               break;
             case WXCore_Flex_Direction_Column:
             case WXCore_Flex_Direction_Column_Reverse:
+            default:
               stretchViewHorizontally(child, flexLine->mCrossSize);
               break;
-//          default:
-//            throw new IllegalArgumentException(
-//                "Invalid flex direction: " + flexDirection);
           }
         }
       }
@@ -636,25 +486,53 @@ namespace WXCoreFlexLayout {
 /**
  * Expand the view vertically to the size of the crossSize (considering the view margins)
  *
- * @param node      the View to be stretched
+ * @param node      the item to be stretched
  * @param crossSize the cross size
  */
   void WXCoreLayoutNode::stretchViewVertically(WXCoreLayoutNode *node, float crossSize) {
-    float newHeight = crossSize - node->getMarginTop() - node->getMarginBottom();
-    newHeight = max_num<float>(newHeight, 0);
-    node->measure(node->mLayoutResult.mComputedWidth, newHeight);
+    if (isnan(node->mCssStyle->mStyleHeight)) {
+      float newHeight = crossSize - node->getMarginTop() - node->getMarginBottom();
+      newHeight = max_num<float>(newHeight, 0);
+      node->measure(node->mLayoutResult->mLayoutSize.width, newHeight, false);
+    }
   }
 
 /**
  * Expand the view horizontally to the size of the crossSize (considering the view margins)
  *
- * @param node      the View to be stretched
+ * @param node      the item to be stretched
  * @param crossSize the cross size
  */
   void WXCoreLayoutNode::stretchViewHorizontally(WXCoreLayoutNode *node, float crossSize) {
-    float newWidth = crossSize - node->getMarginLeft() - node->getMarginRight();
-    newWidth = max_num<float>(newWidth, 0);
-    node->measure(newWidth, node->mLayoutResult.mComputedHeight);
+    if (isnan(node->mCssStyle->mStyleWidth)) {
+      float newWidth = crossSize - node->getMarginLeft() - node->getMarginRight();
+      newWidth = max_num<float>(newWidth, 0);
+      node->measure(newWidth, node->mLayoutResult->mLayoutSize.height, false);
+    }
+  }
+
+  void WXCoreLayoutNode::setMeasuredDimensionForFlex(WXCoreFlexDirection flexDirection, float width, float height) {
+    float calculatedMaxHeight, calculatedMaxWidth;
+    switch (flexDirection) {
+      case WXCore_Flex_Direction_Row: // Intentional fall through
+      case WXCore_Flex_Direction_Row_Reverse:
+        calculatedMaxHeight =
+            getSumOfCrossSize() + getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
+        calculatedMaxWidth = getLargestMainSize();
+        break;
+      case WXCore_Flex_Direction_Column:
+      case WXCore_Flex_Direction_Column_Reverse:
+      default:
+        calculatedMaxHeight = getLargestMainSize();
+        calculatedMaxWidth =
+            getSumOfCrossSize() + getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
+        break;
+    }
+
+    float actualWidth, actualHeight;
+    actualWidth = isnan(width) ? calculatedMaxWidth : width;
+    actualHeight = isnan(height) ? calculatedMaxHeight : height;
+    setMeasuredDimension(actualWidth, actualHeight);
   }
 
 /**
@@ -665,25 +543,9 @@ namespace WXCoreFlexLayout {
  * @param childLength   the length of a child view which is to be collected to the flex line
  * @return {@code true} if a wrap is required, {@code false} otherwise
  */
-  bool WXCoreLayoutNode::isWrapRequired(float maxSize, float currentLength, float childLength) {
-    if (mCssStyle.mFlexWrap == WXCore_Wrap_NoWrap) {
-      return false;
-    }
-    return maxSize < currentLength + childLength;
-  }
-
-/**
- * Retrieve the sum of the cross sizes of all flex lines including divider lengths.
- *
- * @return the sum of the cross sizes
- */
-  float WXCoreLayoutNode::getSumOfCrossSize() {
-    float sum = 0;
-    for (int i = 0, size = mFlexLines.size(); i < size; i++) {
-      WXCoreFlexLine *flexLine = mFlexLines[i];
-      sum += flexLine->mCrossSize;
-    }
-    return sum;
+  bool WXCoreLayoutNode::isWrapRequired(float mainSize, float currentLength, float childLength) {
+    return mCssStyle->mFlexWrap != WXCore_Wrap_NoWrap && !isnan(mainSize)
+           && mainSize < currentLength + childLength;
   }
 
   bool WXCoreLayoutNode::isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection) {
@@ -692,22 +554,40 @@ namespace WXCoreFlexLayout {
   }
 
   void WXCoreLayoutNode::onLayout(float left, float top, float right, float bottom) {
-    switch (mCssStyle.mFlexDirection) {
+    switch (mCssStyle->mFlexDirection) {
       case WXCore_Flex_Direction_Row:
         layoutHorizontal(false, left, top, right, bottom);
         break;
       case WXCore_Flex_Direction_Row_Reverse:
         layoutHorizontal(true, left, top, right, bottom);
         break;
-      case WXCore_Flex_Direction_Column:
-        layoutVertical(mCssStyle.mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right, bottom);
-        break;
       case WXCore_Flex_Direction_Column_Reverse:
-        layoutVertical(mCssStyle.mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right, bottom);
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right, bottom);
         break;
-//    default:
-//      *(int *) (uintptr_t) 0xbbadbeef = 0;
-//      throw new IllegalStateException("Invalid flex direction is set: " + mFlexDirection);
+      case WXCore_Flex_Direction_Column:
+      default:
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right, bottom);
+        break;
+    }
+  }
+
+  void WXCoreLayoutNode::determinePositionRelative(float &left, float &top, float &right, float &bottom) {
+    if (mCssStyle->mPositionType == WXCore_PositionType_Relative) {
+      if (mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left) == 0) {
+        left -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
+        right -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
+      } else {
+        left += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+        right += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+      }
+
+      if (mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top) == 0) {
+        top -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
+        bottom -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
+      } else {
+        top += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+        bottom += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+      }
     }
   }
 
@@ -726,64 +606,61 @@ namespace WXCoreFlexLayout {
   void WXCoreLayoutNode::layoutHorizontal(bool isRtl, float left, float top, float right, float bottom) {
 
     float childLeft;
-    int currentViewIndex = 0;
+    uint32_t currentViewIndex = 0;
 
     float height = bottom - top;
     float width = right - left;
 
     // childBottom is used if the mFlexWrap is FLEX_WRAP_WRAP_REVERSE otherwise
     // childTop is used to align the vertical position of the children views.
-    float childBottom = height - getPaddingBottom();
-    float childTop = getPaddingTop();
+    float childBottom = height - getPaddingBottom() - getBorderWidthBottom();
+    float childTop = getPaddingTop() + getBorderWidthTop();
 
     // Used only for RTL layout
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
     float childRight;
 
-    for (int i = 0, size = mFlexLines.size(); i < size; i++) {
+    for (uint32_t i = 0, size = mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
 
       float spaceBetweenItem = 0;
 
-      switch (mCssStyle.mJustifyContent) {
+      switch (mCssStyle->mJustifyContent) {
         case WXCore_Justify_Flex_Start:
-          childLeft = getPaddingLeft();
-          childRight = width - getPaddingRight();
+          childLeft = getPaddingLeft() + getBorderWidthLeft();
+          childRight = width - getPaddingRight() - getBorderWidthRight();
           break;
         case WXCore_Justify_Flex_End:
-          childLeft = width - flexLine->mMainSize + getPaddingRight();
-          childRight = flexLine->mMainSize - getPaddingLeft();
+          childLeft = width - flexLine->mMainSize + getPaddingRight() + getBorderWidthRight();
+          childRight = flexLine->mMainSize - getPaddingLeft() - getBorderWidthLeft();
           break;
         case WXCore_Justify_Center:
-          childLeft = getPaddingLeft() + (width - flexLine->mMainSize) / 2;
-          childRight = width - getPaddingRight() - (width - flexLine->mMainSize) / 2;
+          childLeft = getPaddingLeft() + getBorderWidthLeft() + (width - flexLine->mMainSize) / 2.0f;
+          childRight = width - getPaddingRight() - getBorderWidthRight() - (width - flexLine->mMainSize) / 2.0f;
           break;
         case WXCore_Justify_Space_Around:
-          int visibleCount;
-          visibleCount = flexLine->getItemCountNotGone();
+          uint32_t visibleCount;
+          visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
             spaceBetweenItem = (width - flexLine->mMainSize)
                                / (float) visibleCount;
           }
-          childLeft = getPaddingLeft() + spaceBetweenItem / 2;
-          childRight = width - getPaddingRight() - spaceBetweenItem / 2;
+          childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.0f;
+          childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.0f;
           break;
         case WXCore_Justify_Space_Between:
-          childLeft = getPaddingLeft();
-          int visibleItem = flexLine->getItemCountNotGone();
-          float denominator = visibleItem != 1 ? visibleItem - 1 : 1;
+          childLeft = getPaddingLeft() + getBorderWidthLeft();
+          uint32_t visibleItem = flexLine->mItemCount;
+          float denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
           spaceBetweenItem = (width - flexLine->mMainSize) / denominator;
-          childRight = width - getPaddingRight();
+          childRight = width - getPaddingRight() - getBorderWidthRight();
           break;
-//      default:
-//        throw new IllegalStateException(
-//            "Invalid justifyContent is set: " + mJustifyContent);
       }
 
       spaceBetweenItem = max_num<float>(spaceBetweenItem, 0);
 
-      for (int j = 0; j < flexLine->mItemCount; j++) {
+      for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
 
         WXCoreLayoutNode *child = getChildAt(currentViewIndex);
 
@@ -794,33 +671,33 @@ namespace WXCoreFlexLayout {
         childLeft += child->getMarginLeft();
         childRight -= child->getMarginRight();
 
-        if (mCssStyle.mFlexWrap == WXCore_Wrap_WrapReverse) {
+        if (mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse) {
           if (isRtl) {
-            layoutSingleChildHorizontal(child, flexLine, mCssStyle.mFlexWrap, mCssStyle.mAlignItems,
-                                        childRight - child->mLayoutResult.mComputedWidth,
-                                        childBottom - child->mLayoutResult.mComputedHeight, childRight,
+            layoutSingleChildHorizontal(child, flexLine, mCssStyle->mFlexWrap, mCssStyle->mAlignItems,
+                                        childRight - child->mLayoutResult->mLayoutSize.width,
+                                        childBottom - child->mLayoutResult->mLayoutSize.height, childRight,
                                         childBottom);
           } else {
-            layoutSingleChildHorizontal(child, flexLine, mCssStyle.mFlexWrap, mCssStyle.mAlignItems,
-                                        childLeft, childBottom - child->mLayoutResult.mComputedHeight,
-                                        childLeft + child->mLayoutResult.mComputedWidth,
+            layoutSingleChildHorizontal(child, flexLine, mCssStyle->mFlexWrap, mCssStyle->mAlignItems,
+                                        childLeft, childBottom - child->mLayoutResult->mLayoutSize.height,
+                                        childLeft + child->mLayoutResult->mLayoutSize.width,
                                         childBottom);
           }
         } else {
           if (isRtl) {
-            layoutSingleChildHorizontal(child, flexLine, mCssStyle.mFlexWrap, mCssStyle.mAlignItems,
-                                        childRight - child->mLayoutResult.mComputedWidth, childTop,
-                                        childRight, childTop + child->mLayoutResult.mComputedHeight);
+            layoutSingleChildHorizontal(child, flexLine, mCssStyle->mFlexWrap, mCssStyle->mAlignItems,
+                                        childRight - child->mLayoutResult->mLayoutSize.width, childTop,
+                                        childRight, childTop + child->mLayoutResult->mLayoutSize.height);
           } else {
-            layoutSingleChildHorizontal(child, flexLine, mCssStyle.mFlexWrap, mCssStyle.mAlignItems,
+            layoutSingleChildHorizontal(child, flexLine, mCssStyle->mFlexWrap, mCssStyle->mAlignItems,
                                         childLeft, childTop,
-                                        childLeft + child->mLayoutResult.mComputedWidth,
-                                        childTop + child->mLayoutResult.mComputedHeight);
+                                        childLeft + child->mLayoutResult->mLayoutSize.width,
+                                        childTop + child->mLayoutResult->mLayoutSize.height);
           }
         }
 
-        childLeft += child->mLayoutResult.mComputedWidth + spaceBetweenItem + child->getMarginRight();
-        childRight -= child->mLayoutResult.mComputedWidth + spaceBetweenItem + child->getMarginLeft();
+        childLeft += child->mLayoutResult->mLayoutSize.width + spaceBetweenItem + child->getMarginRight();
+        childRight -= child->mLayoutResult->mLayoutSize.width + spaceBetweenItem + child->getMarginLeft();
         currentViewIndex++;
       }
 
@@ -852,10 +729,10 @@ namespace WXCoreFlexLayout {
   void WXCoreLayoutNode::layoutSingleChildHorizontal(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine,
                                                      WXCoreFlexWrap flexWrap, WXCoreAlignItems alignItems,
                                                      float left, float top, float right, float bottom) {
-    if (node->mCssStyle.mAlignSelf != WXCore_AlignSelf_Auto) {
+    if (node->mCssStyle->mAlignSelf != WXCore_AlignSelf_Auto) {
       // Expecting the values for alignItems and alignSelf match except for ALIGN_SELF_AUTO.
       // Assigning the alignSelf value as alignItems should work.
-      alignItems = static_cast<WXCoreAlignItems>(node->mCssStyle.mAlignSelf);
+      alignItems = static_cast<WXCoreAlignItems>(node->mCssStyle->mAlignSelf);
     }
 
     float crossSize = flexLine->mCrossSize;
@@ -869,38 +746,27 @@ namespace WXCoreFlexLayout {
           node->layout(left, top - node->getMarginBottom(), right, bottom - node->getMarginBottom());
         }
         break;
-      case WXCore_AlignItems_Baseline:
-        if (flexWrap != WXCore_Wrap_WrapReverse) {
-          float marginTop = flexLine->mMaxBaseline - node->getBaseline();
-          marginTop = max_num<float>(marginTop, node->getMarginTop());
-          node->layout(left, top + marginTop, right, bottom + marginTop);
-        } else {
-          float marginBottom = flexLine->mMaxBaseline - node->mLayoutResult.mComputedHeight + node->getBaseline();
-          marginBottom = max_num<float>(marginBottom, node->getMarginBottom());
-          node->layout(left, top - marginBottom, right, bottom - marginBottom);
-        }
-        break;
       case WXCore_AlignItems_Flex_End:
         if (flexWrap != WXCore_Wrap_WrapReverse) {
           node->layout(left,
-                       top + crossSize - node->mLayoutResult.mComputedHeight - node->getMarginBottom(),
+                       top + crossSize - node->mLayoutResult->mLayoutSize.height - node->getMarginBottom(),
                        right, top + crossSize - node->getMarginBottom());
         } else {
           // If the flexWrap == FLEX_WRAP_WRAP_REVERSE, the direction of the
           // flexEnd is flipped (from mStyleTop to mStyleBottom).
-          node->layout(left, top - crossSize + node->mLayoutResult.mComputedHeight + node->getMarginTop(),
-                       right, bottom - crossSize + node->mLayoutResult.mComputedHeight + node->getMarginTop());
+          node->layout(left, top - crossSize + node->mLayoutResult->mLayoutSize.height + node->getMarginTop(),
+                       right, bottom - crossSize + node->mLayoutResult->mLayoutSize.height + node->getMarginTop());
         }
         break;
       case WXCore_AlignItems_Center:
-        float topFromCrossAxis = (crossSize - node->mLayoutResult.mComputedHeight
+        float topFromCrossAxis = (crossSize - node->mLayoutResult->mLayoutSize.height
                                   + node->getMarginTop() - node->getMarginBottom()) / 2;
         if (flexWrap != WXCore_Wrap_WrapReverse) {
           node->layout(left, top + topFromCrossAxis,
-                       right, top + topFromCrossAxis + node->mLayoutResult.mComputedHeight);
+                       right, top + topFromCrossAxis + node->mLayoutResult->mLayoutSize.height);
         } else {
           node->layout(left, top - topFromCrossAxis,
-                       right, top - topFromCrossAxis + node->mLayoutResult.mComputedHeight);
+                       right, top - topFromCrossAxis + node->mLayoutResult->mLayoutSize.height);
         }
         break;
     }
@@ -923,15 +789,15 @@ namespace WXCoreFlexLayout {
  */
   void
   WXCoreLayoutNode::layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top, float right, float bottom) {
-    float childLeft = getPaddingLeft();
-    int currentViewIndex = 0;
+    float childLeft = getPaddingLeft() + getBorderWidthLeft();
+    uint32_t currentViewIndex = 0;
 
     float width = right - left;
     float height = bottom - top;
 
     // childRight is used if the mFlexWrap is FLEX_WRAP_WRAP_REVERSE otherwise
     // childLeft is used to align the horizontal position of the children views.
-    float childRight = width - getPaddingRight();
+    float childRight = width - getPaddingRight() - getBorderWidthRight();
 
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
@@ -940,48 +806,45 @@ namespace WXCoreFlexLayout {
     // Used only for if the direction is from mStyleBottom to mStyleTop
     float childBottom;
 
-    for (int i = 0, size = mFlexLines.size(); i < size; i++) {
+    for (uint32_t i = 0, size = mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
       float spaceBetweenItem = 0;
 
-      switch (mCssStyle.mJustifyContent) {
+      switch (mCssStyle->mJustifyContent) {
         case WXCore_Justify_Flex_Start:
-          childTop = getPaddingTop();
-          childBottom = height - getPaddingBottom();
+          childTop = getPaddingTop() + getBorderWidthTop();
+          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
           break;
         case WXCore_Justify_Flex_End:
-          childTop = height - flexLine->mMainSize + getPaddingBottom();
-          childBottom = flexLine->mMainSize - getPaddingTop();
+          childTop = height - flexLine->mMainSize + getPaddingBottom() + getBorderWidthBottom();
+          childBottom = flexLine->mMainSize - getPaddingTop() - getBorderWidthTop();
           break;
         case WXCore_Justify_Center:
-          childTop = getPaddingTop() + (height - flexLine->mMainSize) / 2;
-          childBottom = height - getPaddingBottom() - (height - flexLine->mMainSize) / 2;
+          childTop = getPaddingTop() + getBorderWidthTop() + (height - flexLine->mMainSize) / 2;
+          childBottom = height - getPaddingBottom() - getBorderWidthBottom() - (height - flexLine->mMainSize) / 2;
           break;
         case WXCore_Justify_Space_Around:
-          int visibleCount;
-          visibleCount = flexLine->getItemCountNotGone();
+          uint32_t visibleCount;
+          visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
             spaceBetweenItem = (height - flexLine->mMainSize)
                                / (float) visibleCount;
           }
-          childTop = getPaddingTop() + spaceBetweenItem / 2;
-          childBottom = height - getPaddingBottom() - spaceBetweenItem / 2;
+          childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
+          childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
           break;
         case WXCore_Justify_Space_Between:
-          childTop = getPaddingTop();
-          int visibleItem = flexLine->getItemCountNotGone();
+          childTop = getPaddingTop() + getBorderWidthTop();
+          uint32_t visibleItem = flexLine->mItemCount;
           float denominator = visibleItem != 1 ? visibleItem - 1 : 1;
           spaceBetweenItem = (height - flexLine->mMainSize) / denominator;
-          childBottom = height - getPaddingBottom();
+          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
           break;
-//      default:
-//        throw new IllegalStateException(
-//            "Invalid justifyContent is set: " + mJustifyContent);
       }
 
       spaceBetweenItem = max_num<float>(spaceBetweenItem, 0);
 
-      for (int j = 0; j < flexLine->mItemCount; j++) {
+      for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
         WXCoreLayoutNode *child = getChildAt(currentViewIndex);
         if (child == nullptr) {
           continue;
@@ -992,30 +855,30 @@ namespace WXCoreFlexLayout {
 
         if (isRtl) {
           if (fromBottomToTop) {
-            layoutSingleChildVertical(child, flexLine, true, mCssStyle.mAlignItems,
-                                      childRight - child->mLayoutResult.mComputedWidth,
-                                      childBottom - child->mLayoutResult.mComputedHeight, childRight,
+            layoutSingleChildVertical(child, flexLine, true, mCssStyle->mAlignItems,
+                                      childRight - child->mLayoutResult->mLayoutSize.width,
+                                      childBottom - child->mLayoutResult->mLayoutSize.height, childRight,
                                       childBottom);
           } else {
-            layoutSingleChildVertical(child, flexLine, true, mCssStyle.mAlignItems,
-                                      childRight - child->mLayoutResult.mComputedWidth, childTop,
-                                      childRight, childTop + child->mLayoutResult.mComputedHeight);
+            layoutSingleChildVertical(child, flexLine, true, mCssStyle->mAlignItems,
+                                      childRight - child->mLayoutResult->mLayoutSize.width, childTop,
+                                      childRight, childTop + child->mLayoutResult->mLayoutSize.height);
           }
         } else {
           if (fromBottomToTop) {
-            layoutSingleChildVertical(child, flexLine, false, mCssStyle.mAlignItems,
-                                      childLeft, childBottom - child->mLayoutResult.mComputedHeight,
-                                      childLeft + child->mLayoutResult.mComputedWidth, childBottom);
+            layoutSingleChildVertical(child, flexLine, false, mCssStyle->mAlignItems,
+                                      childLeft, childBottom - child->mLayoutResult->mLayoutSize.height,
+                                      childLeft + child->mLayoutResult->mLayoutSize.width, childBottom);
           } else {
-            layoutSingleChildVertical(child, flexLine, false, mCssStyle.mAlignItems,
+            layoutSingleChildVertical(child, flexLine, false, mCssStyle->mAlignItems,
                                       childLeft, childTop,
-                                      childLeft + child->mLayoutResult.mComputedWidth,
-                                      childTop + child->mLayoutResult.mComputedHeight);
+                                      childLeft + child->mLayoutResult->mLayoutSize.width,
+                                      childTop + child->mLayoutResult->mLayoutSize.height);
           }
         }
 
-        childTop += child->mLayoutResult.mComputedHeight + spaceBetweenItem + child->getMarginBottom();
-        childBottom -= child->mLayoutResult.mComputedHeight + spaceBetweenItem + child->getMarginTop();
+        childTop += child->mLayoutResult->mLayoutSize.height + spaceBetweenItem + child->getMarginBottom();
+        childBottom -= child->mLayoutResult->mLayoutSize.height + spaceBetweenItem + child->getMarginTop();
         currentViewIndex++;
       }
 
@@ -1049,10 +912,10 @@ namespace WXCoreFlexLayout {
   void WXCoreLayoutNode::layoutSingleChildVertical(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine, bool isRtl,
                                                    WXCoreAlignItems alignItems, float left, float top, float right,
                                                    float bottom) {
-    if (node->mCssStyle.mAlignSelf != WXCore_AlignSelf_Auto) {
+    if (node->mCssStyle->mAlignSelf != WXCore_AlignSelf_Auto) {
       // Expecting the values for alignItems and alignSelf match except for ALIGN_SELF_AUTO.
       // Assigning the alignSelf value as alignItems should work.
-      alignItems = static_cast<WXCoreAlignItems>(node->mCssStyle.mAlignSelf);
+      alignItems = static_cast<WXCoreAlignItems>(node->mCssStyle->mAlignSelf);
     }
 
     float crossSize = flexLine->mCrossSize;
@@ -1060,7 +923,6 @@ namespace WXCoreFlexLayout {
     switch (alignItems) {
       case WXCore_AlignItems_Flex_Start:
       case WXCore_AlignItems_Stretch:
-      case WXCore_AlignItems_Baseline:
         if (!isRtl) {
           node->layout(left + node->getMarginLeft(), top, right + node->getMarginLeft(), bottom);
         } else {
@@ -1069,19 +931,19 @@ namespace WXCoreFlexLayout {
         break;
       case WXCore_AlignItems_Flex_End:
         if (!isRtl) {
-          node->layout(left + crossSize - node->mLayoutResult.mComputedWidth - node->getMarginRight(),
-                       top, right + crossSize - node->mLayoutResult.mComputedWidth - node->getMarginRight(),
+          node->layout(left + crossSize - node->mLayoutResult->mLayoutSize.width - node->getMarginRight(),
+                       top, right + crossSize - node->mLayoutResult->mLayoutSize.width - node->getMarginRight(),
                        bottom);
         } else {
           // If the flexWrap == FLEX_WRAP_WRAP_REVERSE, the direction of the
           // flexEnd is flipped (from mStyleLeft to mStyleRight).
-          node->layout(left - crossSize + node->mLayoutResult.mComputedWidth + node->getMarginLeft(), top,
-                       right - crossSize + node->mLayoutResult.mComputedWidth + node->getMarginLeft(),
+          node->layout(left - crossSize + node->mLayoutResult->mLayoutSize.width + node->getMarginLeft(), top,
+                       right - crossSize + node->mLayoutResult->mLayoutSize.width + node->getMarginLeft(),
                        bottom);
         }
         break;
       case WXCore_AlignItems_Center:
-        float leftFromCrossAxis = (crossSize - node->mLayoutResult.mComputedWidth
+        float leftFromCrossAxis = (crossSize - node->mLayoutResult->mLayoutSize.width
                                    + node->getMarginLeft()
                                    - node->getMarginRight()) / 2;
         if (!isRtl) {
@@ -1094,7 +956,7 @@ namespace WXCoreFlexLayout {
   }
 
   float WXCoreLayoutNode::getLargestMainSize() {
-    float largestSize = -1.0;
+    float largestSize = 0;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
       largestSize = max_num<float>(largestSize, flexLine->mMainSize);
     }

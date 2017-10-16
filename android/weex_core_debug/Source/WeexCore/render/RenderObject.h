@@ -51,9 +51,12 @@ namespace WeexCore {
     int mLeft, mTop, mWidth, mHeight;
 
   public:
+
     RenderObject(RenderPage *page);
 
     ~RenderObject();
+
+    void traverseTree();
 
     void addRenderObject(int index, RenderObject *child);
 

@@ -13,6 +13,7 @@
 #include <map>
 #include <Layout/WXCoreLayout.h>
 #include <Layout/WXCoreStyle.h>
+#include "action/RelayoutRenderAction.h"
 
 namespace WeexCore {
   class RenderObject;
@@ -26,9 +27,14 @@ namespace WeexCore {
 
   private:
     RenderObject *pRoot;
+
     std::string mPageId;
+
     std::vector<RenderAction *> mRenderActions;
+
     std::map<std::string, RenderObject *> mRenderObjectMap;
+
+    void calculateLayout();
 
   public:
     RenderPage(std::string pageID, std::string data);
@@ -58,6 +64,10 @@ namespace WeexCore {
     void setRootRenderObject(RenderObject *root);
 
     RenderObject *getRootRenderObject();
+
+    std::string getPageId() {
+      return mPageId;
+    }
   };
 }
 

@@ -854,7 +854,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (component == null
         || (component instanceof WXRefresh)
         || (component instanceof WXLoading)
-        || (component.getDomObject() != null && component.getDomObject().isFixed())
+          || (component.getDomObject() != null && component.getDomObject().isFixed())
         ) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);

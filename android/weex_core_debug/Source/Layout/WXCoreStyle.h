@@ -2,7 +2,6 @@
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 
 #include "WXCoreFlexEnum.h"
-#include <stdarg.h>
 #include <math.h>
 
 namespace WXCoreFlexLayout {
@@ -22,6 +21,13 @@ namespace WXCoreFlexLayout {
                      mMarginBottom(0),
                      mMarginLeft(0),
                      mMarginRight(0) {}
+
+    ~WXCoreMargin() {
+      mMarginTop = 0;
+      mMarginBottom = 0;
+      mMarginLeft = 0;
+      mMarginRight = 0;
+    }
 
     bool setMargin(WXCoreMarginEdge edge, float margin) {
       bool dirty = false;
@@ -103,6 +109,13 @@ namespace WXCoreFlexLayout {
                       mPaddingLeft(0),
                       mPaddingRight(0) {}
 
+    ~WXCorePadding() {
+      mPaddingTop = 0;
+      mPaddingBottom = 0;
+      mPaddingLeft = 0;
+      mPaddingRight = 0;
+    }
+
     bool setPadding(WXCorePaddingEdge edge, float padding) {
       bool dirty = false;
       switch (edge) {
@@ -183,6 +196,13 @@ namespace WXCoreFlexLayout {
                           mBorderWidthLeft(0),
                           mBorderWidthRight(0) {}
 
+    ~WXCoreBorderWidth() {
+      mBorderWidthTop = 0;
+      mBorderWidthBottom = 0;
+      mBorderWidthLeft = 0;
+      mBorderWidthRight = 0;
+    }
+
     bool setBorderWidth(WXCoreBorderWidthEdge edge, float borderWidth) {
       bool dirty = false;
       switch (edge) {
@@ -262,6 +282,17 @@ namespace WXCoreFlexLayout {
                        mBottom(0),
                        mLeft(0),
                        mRight(0) {}
+
+    ~WXCorePosition() {
+      reset();
+    }
+
+    void reset() {
+      mTop = 0;
+      mBottom = 0;
+      mLeft = 0;
+      mRight = 0;
+    }
 
     bool setPosition(WXCorePositionEdge edge, float position) {
       bool dirty = false;
@@ -358,9 +389,7 @@ namespace WXCoreFlexLayout {
      */
     WXCoreAlignSelf mAlignSelf;
 
-    float mFlexValue;
-
-    float mFlexGrowValue;
+    float mFlexGrow;
 
     float mMinWidth;
 
@@ -405,12 +434,26 @@ namespace WXCoreFlexLayout {
                        mJustifyContent(FLEX_JUSTIFY_CONTENT_DEFAULT),
                        mAlignItems(FLEX_ALIGN_ITEMS_DEFAULT),
                        mAlignSelf(FLEX_ALIGN_SELF_DEFAULT),
-                       mFlexValue(FLEX_DEFAULT),
-                       mFlexGrowValue(FLEX_GROW_DEFAULT),
+                       mFlexGrow(FLEX_GROW_DEFAULT),
                        mStyleWidth(NAN), mStyleHeight(NAN),
                        mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
                        mMinWidth(NAN), mMinHeight(NAN) {
 
+    }
+
+    ~WXCoreCSSStyle() {
+      mFlexDirection = FLEX_DIRECTION_DEFAULT;
+      mFlexWrap = FLEX_WRAP_DEFAULT;
+      mJustifyContent = FLEX_JUSTIFY_CONTENT_DEFAULT;
+      mAlignItems = FLEX_ALIGN_ITEMS_DEFAULT;
+      mAlignSelf = FLEX_ALIGN_SELF_DEFAULT;
+      mFlexGrow = FLEX_GROW_DEFAULT;
+      mStyleWidth = NAN;
+      mStyleHeight = NAN;
+      mMaxWidth = MAXFLOAT;
+      mMaxHeight = MAXFLOAT;
+      mMinWidth = NAN;
+      mMinHeight = NAN;
     }
   };
 }

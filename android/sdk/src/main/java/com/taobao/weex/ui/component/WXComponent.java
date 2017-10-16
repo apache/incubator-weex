@@ -250,6 +250,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  public void requestLayout(WeexCoreAction action) {
+    mPosition = action.mPosition;
+    mRenderSize = action.mRenderSize;
+    setLayout();
+  }
+
   protected void onCreate(){
 
   }
@@ -897,9 +903,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public String getRef() {
-    if (mDomObj == null) {
-      return null;
-    }
     return mCurrentRef;
   }
 
@@ -1062,11 +1065,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public boolean isSticky() {
-    return mDomObj.getStyles().isSticky();
+//    return mDomObj.getStyles().isSticky();
+    return false;
   }
 
   public boolean isFixed() {
-    return mDomObj.getStyles().isFixed();
+//    return mDomObj.getStyles().isFixed();
+    return false;
   }
 
   public void setDisabled(boolean disabled) {

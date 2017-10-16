@@ -65,16 +65,16 @@ public class SimpleComponentHolder implements IFComponentHolder{
       Class<? extends WXComponent> c = mCompClz;
       Constructor<? extends WXComponent> constructor;
       try {
-        constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class);
+        constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, WeexCoreAction.class);
       } catch (NoSuchMethodException e) {
         WXLogUtils.d("ClazzComponentCreator","Use deprecated component constructor");
         try {
           //compatible deprecated constructor with 4 args
-          constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
+          constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, boolean.class, WeexCoreAction.class);
         } catch (NoSuchMethodException e1) {
           try {
             //compatible deprecated constructor with 5 args
-            constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
+            constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class,String.class, boolean.class, WeexCoreAction.class);
           } catch (NoSuchMethodException e2) {
             throw new WXRuntimeException("Can't find constructor of component.");
           }

@@ -477,4 +477,17 @@ public class WXBridge implements IWXBridge {
     }
     return errorCode;
   }
+
+  public int callReLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callReLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callReLayoutByWeexCore throw exception:"+e.getMessage());
+      }
+    }
+    return errorCode;
+  }
 }

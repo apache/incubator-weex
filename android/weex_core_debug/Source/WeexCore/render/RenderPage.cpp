@@ -1,15 +1,21 @@
 #include "RenderPage.h"
-#include <yoga/Yoga.h>
 
 namespace WeexCore {
 
-  void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
+  inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
     action->mPosition.mTop = node->getLayoutPositionTop();
     action->mPosition.mBottom = node->getLayoutPositionBottom();
     action->mPosition.mRight = node->getLayoutPositionRight();
     action->mPosition.mLeft = node->getLayoutPositionLeft();
     action->mRenderSize.mHeight = node->getLayoutHeight();
     action->mRenderSize.mWidth = node->getLayoutWidth();
+  }
+
+  void RenderPage::calculateLayout() {
+    if (pRoot == nullptr)
+      return;
+    pRoot->getLayoutNode()->calculateLayout();
+    pRoot->traverseTree();
   }
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
@@ -26,7 +32,7 @@ namespace WeexCore {
     setRootRenderObject(render);
 
     // layout by YogaNode Tree
-    pRoot->getLayoutNode()->calculateLayout();
+    calculateLayout();
 
     /**
      * Generate RenderAction: ACTION_CREATE_BODY
@@ -126,14 +132,14 @@ namespace WeexCore {
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(child->getRef(), child));
 
     // add child to YogaNode Tree
-    parent->getLayoutNode()->addChildAt(child->getLayoutNode(),parent->getChildCount());
+    parent->getLayoutNode()->addChildAt(child->getLayoutNode(), parent->getChildCount());
 
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosiotn, child);
 
     // layout by YogaNode Tree
-    pRoot->getLayoutNode()->calculateLayout();
+    calculateLayout();
 
     /**
      * Generate RenderAction: ACTION_ADD_ELEMENT

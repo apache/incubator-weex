@@ -448,4 +448,27 @@ namespace WeexCore {
     return flag;
   }
 
+  int BridgeAndroid::callReLayoutByWeexCore(std::string &pageId, std::string &ref, int top,
+                                            int bottom, int left, int right, int height,
+                                            int width) {
+    JNIEnv *env = getJNIEnv();
+    jmethodID jCallReLayoutByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+                                                                 "callReLayoutByWeexCore",
+                                                                 "(Ljava/lang/String;Ljava/lang/String;IIIIII)I");
+
+    jstring jPageId = env->NewStringUTF(pageId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+
+    int flag = 0;
+    flag = env->CallIntMethod(jThis, jCallReLayoutByWeexCoreMethodId, jPageId,
+                              jRef, top, bottom, left, right, height, width);
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callReLayoutByWeexCore");
+    }
+
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    return flag;
+  }
+
 } //end WeexCore

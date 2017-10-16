@@ -45,7 +45,7 @@ namespace WeexCore {
 
     ~RenderAction();
 
-    void ExecuteAction();
+    virtual void ExecuteAction();
   };
 
 }

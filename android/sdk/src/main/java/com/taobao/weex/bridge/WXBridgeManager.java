@@ -54,6 +54,7 @@ import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.action.weexcore.AddAlementActionByWeexCore;
 import com.taobao.weex.dom.action.weexcore.CreateBodyActionByWeexCore;
+import com.taobao.weex.dom.action.weexcore.ReLayoutActionByWeexCore;
 import com.taobao.weex.dom.action.weexcore.UpdateStyleActionByWeexCore;
 import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
 import com.taobao.weex.utils.WXFileUtils;
@@ -1976,6 +1977,55 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement exception "+e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callReLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+    if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callReLayout: call ReLayout args is null");
+      }
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callReLayout: call callReLayout args is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callReLayout >>>> pageId:").append(pageId)
+              .append(", ref:").append(ref).append(", top:").append(top)
+              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
+              .append(", height:").append(height).append(" width:").append(width);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
+        final WeexCoreAction action = new ReLayoutActionByWeexCore();
+        action.mPageId = pageId;
+        action.mRef = ref;
+        action.mPosition.mTop = top;
+        action.mPosition.mBottom = bottom;
+        action.mPosition.mLeft = left;
+        action.mPosition.mRight = right;
+        action.mRenderSize.mHeight = height;
+        action.mRenderSize.mWidth = width;
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            action.excuteAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callReLayout exception: ", e);
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callReLayout exception "+e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;

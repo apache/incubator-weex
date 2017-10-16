@@ -3,12 +3,21 @@
 
 namespace WeexCore {
 
+  inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
+    action->mPosition.mTop = node->getLayoutPositionTop();
+    action->mPosition.mBottom = node->getLayoutPositionBottom();
+    action->mPosition.mRight = node->getLayoutPositionRight();
+    action->mPosition.mLeft = node->getLayoutPositionLeft();
+    action->mRenderSize.mHeight = node->getLayoutHeight();
+    action->mRenderSize.mWidth = node->getLayoutWidth();
+  }
+
   RenderObject::RenderObject(RenderPage *page)
       : mPage(page) {
     mStyle = new std::map<std::string, std::string>();
     mAttributes = new std::map<std::string, std::string>();
     mEvents = new std::set<std::string>();
-    mLayoutNode = new WXCoreLayoutNode();
+    mLayoutNode = WXCoreLayoutNode::newWXCoreNode();
   }
 
   RenderObject::~RenderObject() {
@@ -34,6 +43,8 @@ namespace WeexCore {
       mEvents = nullptr;
     }
 
+    mLayoutNode->freeWXCoreNode();
+
     for (CHILD_LIST_IT it = getChildListItBegin();
          it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
@@ -41,8 +52,22 @@ namespace WeexCore {
         *it = nullptr;
       }
     }
-
     mChildren.clear();
+  }
+
+  void RenderObject::traverseTree() {
+
+    RenderAction *action = new RelayoutRenderAction();
+    action->mPageId = mPage->getPageId();
+    action->mComponentType = getType();
+    action->mRef = getRef();
+    getLayoutInfo(action, getLayoutNode());
+    mPage->addRenderAction(action);
+
+    for (int i = 0; i < getChildCount(); i++) {
+      RenderObject *render = getChild(i);
+      render->traverseTree();
+    }
   }
 
   void RenderObject::addRenderObject(int index, RenderObject *child) {
@@ -65,7 +90,7 @@ namespace WeexCore {
     if (index < mChildren.size()) {
       return mChildren.at(index);
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -123,6 +148,9 @@ namespace WeexCore {
 
   void RenderObject::setType(std::string type) {
     mType = type;
+    if (type.compare("list") == 0) {
+      mLayoutNode->setFlex(1);
+    }
   }
 
   std::string RenderObject::getType() {
@@ -171,13 +199,13 @@ namespace WeexCore {
     } else if (key == POSITION) {
       mLayoutNode->setStylePositionType(getWXCorePositionType(value));
     } else if (key == LEFT) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Left,stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
     } else if (key == TOP) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Top,stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
     } else if (key == RIGHT) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Right,stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
     } else if (key == BOTTOM) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Bottom,stringToNum<float>(value));
+      mLayoutNode->setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
     } else if (key == MARGIN) {
       mLayoutNode->setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
     } else if (key == MARGIN_LEFT) {
@@ -199,15 +227,15 @@ namespace WeexCore {
     } else if (key == BORDER_LEFT_WIDTH) {
       mLayoutNode->setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
     } else if (key == PADDING) {
-      mLayoutNode->setPadding(WXCore_Padding_ALL,stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_ALL, stringToNum<float>(value));
     } else if (key == PADDING_LEFT) {
-      mLayoutNode->setPadding(WXCore_Padding_Left,stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Left, stringToNum<float>(value));
     } else if (key == PADDING_TOP) {
-      mLayoutNode->setPadding(WXCore_Padding_Top,stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Top, stringToNum<float>(value));
     } else if (key == PADDING_RIGHT) {
-      mLayoutNode->setPadding(WXCore_Padding_Right,stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Right, stringToNum<float>(value));
     } else if (key == PADDING_BOTTOM) {
-      mLayoutNode->setPadding(WXCore_Padding_Bottom,stringToNum<float>(value));
+      mLayoutNode->setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
     } else {
     }
   }
@@ -274,7 +302,7 @@ namespace WeexCore {
     for (CHILD_LIST_IT it = getChildListItBegin();
          it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
-        (*it)->printRenderMsg();
+//        (*it)->printRenderMsg();
       }
     }
   }
@@ -289,7 +317,7 @@ namespace WeexCore {
     for (CHILD_LIST_IT it = getChildListItBegin();
          it != getChildListItEnd(); it++) {
       if (nullptr != *it) {
-        (*it)->printYGNodeMsg();
+//        (*it)->printYGNodeMsg();
       }
     }
   }
