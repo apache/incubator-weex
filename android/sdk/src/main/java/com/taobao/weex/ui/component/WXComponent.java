@@ -106,8 +106,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.taobao.weex.utils.WXUtils.getBoolean;
-
 /**
  * abstract component
  *
@@ -731,11 +729,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     switch (key) {
       case Constants.Name.PREVENT_MOVE_EVENT:
         if(mGesture != null){
-          mGesture.setPreventMoveEvent(getBoolean(param,false));
+          mGesture.setPreventMoveEvent(WXUtils.getBoolean(param,false));
         }
         return true;
       case Constants.Name.DISABLED:
-        Boolean disabled = getBoolean(param,null);
+        Boolean disabled = WXUtils.getBoolean(param,null);
         if (disabled != null) {
           setDisabled(disabled);
           setPseudoClassStatus(Constants.PSEUDO.DISABLED, disabled);
@@ -831,7 +829,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         setAriaLabel(label);
         return true;
       case Constants.Name.ARIA_HIDDEN:
-        boolean isHidden = getBoolean(param,false);
+        boolean isHidden = WXUtils.getBoolean(param,false);
         setAriaHidden(isHidden);
         return true;
       case Constants.Name.WIDTH:
@@ -1913,7 +1911,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected boolean isRippleEnabled() {
     try {
       Object obj = getDomObject().getAttrs().get(Constants.Name.RIPPLE_ENABLED);
-      return getBoolean(obj, false);
+      return WXUtils.getBoolean(obj, false);
     } catch (Throwable t) {
       //ignore
     }
