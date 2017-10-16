@@ -182,6 +182,9 @@ public class Constants {
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
 
+    String STICKY_OFFSET = "stickyOffset";
+    String HAS_FIXED_SIZE = "hasFixedSize";
+    String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
 
     interface  Recycler{
       String LIST_DATA = "listData";
