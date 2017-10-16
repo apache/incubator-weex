@@ -1242,7 +1242,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     continue;
                 }
                 TemplateViewHolder itemHolder = (TemplateViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-                if(itemHolder == null){
+                if(itemHolder == null || itemHolder.getComponent() == null){
                     break;
                 }
                 List<WXComponent> childListeners = findChildListByRef(itemHolder.getComponent(), helper.getAwareChild().getRef());
