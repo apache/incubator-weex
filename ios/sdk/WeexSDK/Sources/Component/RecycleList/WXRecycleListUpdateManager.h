@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 typedef void(^WXRecycleListUpdateCompletion)(BOOL isFinished);
 @class WXRecycleListUpdateManager;

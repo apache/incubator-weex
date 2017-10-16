@@ -75,6 +75,7 @@ import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListener;
+import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.flat.FlatComponent;
@@ -862,7 +863,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.BOTTOM:
         return true;
       case Constants.Name.BOX_SHADOW:
-        updateBoxShadow();
+        try {
+          updateBoxShadow();
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
         return true;
       default:
         return false;
@@ -1877,16 +1882,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       this.waste = waste;
       WXDomObject domObject = (WXDomObject) getDomObject();
       if(waste){
+          getDomObject().getStyles().put(Constants.Name.VISIBILITY, Constants.Value.HIDDEN);
           if(domObject.getAttrs().getStatement() == null) {
-              domObject.setVisible(false);
-              if (getHostView() != null) {
+            domObject.setVisible(false);
+            if (getHostView() != null) {
                 getHostView().setVisibility(View.GONE);
-              }
-              return;
+            }
+            return;
           }
           if(Constants.Value.VISIBLE.equals(domObject.getAttrs().get(Constants.Name.VIF_FALSE))){
-             domObject.setVisible(true);
-             if(getHostView() != null){
+            domObject.setVisible(true);
+            if(getHostView() != null){
                getHostView().setVisibility(View.VISIBLE);
              }
           }else{
@@ -1898,8 +1904,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }else{
         domObject.setVisible(true);
         if(getHostView() != null){
-          getHostView().setVisibility(View.VISIBLE);
+           getHostView().setVisibility(View.VISIBLE);
         }
+        getDomObject().getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
       }
     }
   }

@@ -41,11 +41,22 @@ public class WXCellDomObject extends WXDomObject {
           if (WXBasicComponentType.CELL.equals(domObject.getType())
                   || WXBasicComponentType.CELL_SLOT.equals(domObject.getType())) {
             float w = ((WXRecyclerDomObject) parent).getColumnWidth();
+            if(w <= 0 && parentDom.getColumnCount() <= 1){
+                  w = parentDom.getAvailableWidth();
+                  if(w <= 0){
+                      w = parentDom.getLayoutWidth();
+                      if(w <= 0){
+                          w = parentDom.getViewPortWidth();
+                      }
+                  }
+             }
             node.setLayoutWidth(w);
+            measureOutput.width  = w;
           } else if (WXBasicComponentType.HEADER.equals(domObject.getType())){
             float w = parentDom.getAvailableWidth();
             WXLogUtils.d("getAvailableWidth:"+w);
             node.setLayoutWidth(w);
+            measureOutput.width  = w;
           }
         }else if (node instanceof  WXCellDomObject){
           WXCellDomObject slotDomObject = (WXCellDomObject) node;

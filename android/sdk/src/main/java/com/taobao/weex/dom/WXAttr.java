@@ -19,6 +19,7 @@
 package com.taobao.weex.dom;
 
 import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
+import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
 import static java.lang.Boolean.parseBoolean;
 
 import android.support.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -476,6 +478,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
           ELUtils.bindingBlock(value);
           return  false;
         }
+        for(String exclude : EXCLUDES_BINDING){
+             if(key.equals(exclude)){
+                return  false;
+             }
+        }
         if(ELUtils.isBinding(value)){
           if(mBindingAttrs == null){
               mBindingAttrs = new ArrayMap<String, Object>();
@@ -484,15 +491,17 @@ public class WXAttr implements Map<String, Object>,Cloneable {
           mBindingAttrs.put(key, value);
           return  true;
         }
-        if(ELUtils.isVif(key)){
+        if(WXStatement.WX_IF.equals(key)){
           if(mStatement == null){
              mStatement = new WXStatement();
           }
-          mStatement.put(key, ELUtils.vifBlock(value.toString()));
+          if(value != null) {
+            mStatement.put(key, Parser.parse(value.toString()));
+          }
           return  true;
         }
 
-        if(ELUtils.isVfor(key)){
+        if(WXStatement.WX_FOR.equals(key)){
            if(mStatement == null){
               mStatement = new WXStatement();
            }

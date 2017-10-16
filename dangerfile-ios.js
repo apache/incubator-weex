@@ -91,17 +91,21 @@ if (!hasIosFile && danger.git.deleted_files) {
     return f;
   });
 }
-
+console.log('-----------------------------hasIosFile-----------------------------:'+hasIosFile);
 if(hasIosFile){
   var runTestCmd='source ~/.bash_profile; '
     +'xcodebuild -project ios/sdk/WeexSDK.xcodeproj test '
     +'-scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO '
     +'-destination "platform=iOS Simulator,name=iPhone 6"'
-  runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000 }).code == 0;
+  runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
     fail("ios platform run unit test failed!");
   }
 }else{
-  message('has no ios file changed,skip test!');
+  console.log('has no ios file changed.');
+  message('has no ios file changed.');
 }
+
+message('ios test finished.')
+
 

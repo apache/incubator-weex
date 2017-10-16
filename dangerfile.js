@@ -418,7 +418,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     }
     deletedLines.forEach(lineNumber => {
       var name = blames[lineNumber]
-      if (!!reviewers) {
+      if (name && !!reviewers) {
         reviewers[name] = (reviewers[name] || 0) + 3
       }
     })
@@ -433,7 +433,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     }
     normalLines.forEach(lineNumber => {
       var name = blames[lineNumber]
-      if (!!reviewers) {
+      if (name && !!reviewers) {
         reviewers[name] = (reviewers[name] || 0) + 1
       }
     })
@@ -461,7 +461,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     message("According to the blame info, we recommended " + names.join(' , ') + " to be the reviewers.")
   }
 }
-
+message('danger test finished.')
 /*
  * find reviewer end
  */

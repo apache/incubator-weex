@@ -93,6 +93,7 @@ class Operator extends Token {
         }
     }
 
+    /**
     @Override
     public String toString() {
         if(Operators.AND_NOT.equals(getToken())){
@@ -102,5 +103,5 @@ class Operator extends Token {
             return "{" + first +  getToken() + second + "}";
         }
         return "{" + self + getToken() + first + ":" + second + "}";
-    }
+    }*/
 }

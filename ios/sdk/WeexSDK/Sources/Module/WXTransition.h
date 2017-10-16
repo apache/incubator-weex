@@ -24,6 +24,20 @@
 #define kWXTransitionDelay                      @"transitionDelay"
 #define kWXTransitionTimingFunction             @"transitionTimingFunction"
 
+typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
+    WXTransitionOptionsNone             = 0,
+    WXTransitionOptionsWidth            = 1 << 0,
+    WXTransitionOptionsHeight           = 1 << 1,
+    WXTransitionOptionsRight            = 1 << 2,
+    WXTransitionOptionsLeft             = 1 << 3,
+    WXTransitionOptionsBottom           = 1 << 4,
+    WXTransitionOptionsTop              = 1 << 5,
+    WXTransitionOptionsBackgroundColor  = 1 << 6,
+    WXTransitionOptionsTransform        = 1 << 7,
+    WXTransitionOptionsOpacity          = 1 << 8
+};
+
+
 @interface WXLayoutAnimationInfo : NSObject
 @property (nonatomic, strong) id fromValue;
 @property (nonatomic, strong) id toValue;
@@ -35,6 +49,8 @@
 @property(nonatomic,strong) NSMutableDictionary *fromStyles;
 @property(nonatomic,strong) NSMutableDictionary *addStyles;
 @property(nonatomic,strong) NSMutableArray *propertyArray;
+@property(nonatomic,assign) WXTransitionOptions transitionOptions;
+- (instancetype) initWithStyles:(NSDictionary *)styles;
 - (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent;
 @end
 

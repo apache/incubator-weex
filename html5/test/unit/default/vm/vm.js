@@ -1043,7 +1043,7 @@ describe('generate virtual dom for sub vm', () => {
     expect(sub.event.click).is.a.function
 
     const spy = customComponentMap.foo.methods.handleClick
-    sub.event.click(1, 2, 3)
+    sub.event.click.handler(1, 2, 3)
     expect(spy.args.length).eql(1)
     expect(spy.args[0]).eql([1, 2, 3])
 

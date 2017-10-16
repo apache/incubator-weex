@@ -63,6 +63,30 @@
 
 @implementation WXTransition
 
+
+- (instancetype) initWithStyles:(NSDictionary *)styles
+{
+    if (self = [super init]) {
+        NSString *property = styles[kWXTransitionProperty];
+        if (property) {
+            self.transitionOptions |= [property containsString:@"width"]? WXTransitionOptionsWidth:0;
+            self.transitionOptions |= [property containsString:@"height"]? WXTransitionOptionsHeight:0;
+            self.transitionOptions |= [property containsString:@"right"]? WXTransitionOptionsRight:0;
+            self.transitionOptions |= [property containsString:@"left"]? WXTransitionOptionsLeft:0;
+            self.transitionOptions |= [property containsString:@"bottom"]? WXTransitionOptionsBottom:0;
+            self.transitionOptions |= [property containsString:@"top"]? WXTransitionOptionsTop:0;
+            self.transitionOptions |= [property containsString:@"backgroundColor"]? WXTransitionOptionsBackgroundColor:0;
+            self.transitionOptions |= [property containsString:@"transform"]? WXTransitionOptionsTransform:0;
+            self.transitionOptions |= [property containsString:@"opacity"]? WXTransitionOptionsOpacity:0;
+        }
+        else
+        {
+            return self;
+        }
+    }
+    return self;
+}
+
 #pragma mark - HandleStyle
 - (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent
 {

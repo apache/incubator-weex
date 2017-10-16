@@ -113,6 +113,12 @@
     [self _renderWithURL:_sourceURL];
 }
 
+
+- (void)addEdgePop
+{
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+}
+
 - (void)_renderWithURL:(NSURL *)sourceURL
 {
     if (!sourceURL) {

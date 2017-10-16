@@ -19,7 +19,6 @@
 import {
   getThrottleLazyload,
   watchAppear,
-  triggerAppear,
   triggerDisappear,
   extend
 } from '../utils'
@@ -73,8 +72,7 @@ export default {
     if (this.$el && (i = j = this.$vnode) && (i = i.data) && (j = j.componentOptions)) {
       this.$el.attrs = extend({}, i.attrs, j.propsData)
     }
-    triggerAppear(this)
-    watchAppear(this)
+    watchAppear(this, true)
   },
 
   destroyed () {

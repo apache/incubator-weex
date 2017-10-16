@@ -1,6 +1,6 @@
 {
   "name": "weex-js-framework",
-  "version": "0.21.8",
+  "version": "0.22.3",
   "description": "Weex JS Framework",
   "main": "index.js",
   "engines": {

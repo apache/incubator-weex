@@ -45,9 +45,6 @@ public class ArrayStack<T> {
         stack.add(token);
     }
 
-    public boolean empty() {
-       return isEmpty();
-    }
 
     public T peek() {
         return stack.get(stack.size()-1);

@@ -20,6 +20,8 @@ package com.taobao.weex.utils;
 
 import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -39,6 +41,10 @@ public class WXReflectionUtils {
       return value.getClass().isAssignableFrom(double.class) ? value : WXUtils.getDouble(value);
     } else if (paramClazz == float.class) {
       return value.getClass().isAssignableFrom(float.class) ? value : WXUtils.getFloat(value);
+    } else if (paramClazz == JSONArray.class && value != null && value.getClass() == JSONArray.class) {
+      return  value;
+    } else if (paramClazz == JSONObject.class && value != null && value.getClass() == JSONObject.class) {
+      return  value;
     } else {
       return JSON.parseObject(value instanceof String ? (String) value : JSON.toJSONString(value), paramClazz);
     }

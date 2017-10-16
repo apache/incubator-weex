@@ -3,8 +3,8 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.21.11",
-    "vue-render": "0.12.3",
+    "framework": "0.22.4",
+    "vue-render": "0.12.17",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -106,8 +106,8 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.4.11",
-    "weex-vue-framework": "2.4.2-weex.3"
+    "weex-rax-framework": "0.4.14",
+    "weex-vue-framework": "2.4.2-weex.6"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",
@@ -164,9 +164,9 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.8.29",
-    "vue": "^2.2.6",
+    "vue": "2.4.3",
     "vue-loader": "^12.2.1",
-    "vue-template-compiler": "^2.2.6",
+    "vue-template-compiler": "2.4.3",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
     "weex-gcanvas": "^0.4.2",

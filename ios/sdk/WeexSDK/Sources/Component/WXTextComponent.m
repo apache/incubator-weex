@@ -25,11 +25,12 @@
 #import "WXConvert.h"
 #import "WXRuleManager.h"
 #import "WXDefine.h"
+#import "WXView.h"
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
 
 // WXText is a non-public is not permitted
-@interface WXTextView : UIView
+@interface WXTextView : WXView
 @property (nonatomic, strong) NSTextStorage *textStorage;
 @end
 
@@ -389,8 +390,12 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    NSString * string = [self text];
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"text %@ is invalid", [self text]);
+        string = @"";
+    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }

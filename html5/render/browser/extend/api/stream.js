@@ -30,7 +30,7 @@ let jsonpCnt = 0
 const ERROR_STATE = -1
 
 function _jsonp (config, callback, progressCallback) {
-  const cbName = 'jsonp_' + (++jsonpCnt)
+  const cbName = config.jsonpCallbackName || 'jsonp_' + (++jsonpCnt)
   let url
 
   if (!config.url) {

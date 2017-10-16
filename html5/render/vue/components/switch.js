@@ -25,9 +25,9 @@ const _css = `
   position: relative;
   vertical-align: middle;
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   box-sizing: content-box;
   background-clip: content-box;
   color: #64bd63;
@@ -38,7 +38,8 @@ const _css = `
   box-shadow: #dfdfdf 0 0 0 0 inset;
   border-radius: 0.8rem;
   -webkit-transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
-          transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
+  -moz-transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
+  transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
 }
 
 .weex-switch-checked {
@@ -66,7 +67,8 @@ const _css = `
   top: 0;
   left: 0;
   -webkit-transition: background-color 0.4s, left 0.2s;
-          transition: background-color 0.4s, left 0.2s;
+  -moz-transition: background-color 0.4s, left 0.2s;
+  transition: background-color 0.4s, left 0.2s;
 }
 
 .weex-switch-checked > .weex-switch-inner {
