@@ -4,12 +4,12 @@
 namespace WeexCore {
 
   inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
-    action->mPosition.mTop = node->getLayoutPositionTop();
-    action->mPosition.mBottom = node->getLayoutPositionBottom();
-    action->mPosition.mRight = node->getLayoutPositionRight();
-    action->mPosition.mLeft = node->getLayoutPositionLeft();
-    action->mRenderSize.mHeight = node->getLayoutHeight();
-    action->mRenderSize.mWidth = node->getLayoutWidth();
+    action->mTop = node->getLayoutPositionTop();
+    action->mBottom = node->getLayoutPositionBottom();
+    action->mRight = node->getLayoutPositionRight();
+    action->mLeft = node->getLayoutPositionLeft();
+    action->mHeight = node->getLayoutHeight();
+    action->mWidth = node->getLayoutWidth();
   }
 
   RenderObject::RenderObject(RenderPage *page)

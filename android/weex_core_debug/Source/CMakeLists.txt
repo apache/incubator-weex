@@ -40,7 +40,6 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/ExtendJSApi.cpp
     ./WeexCore/platform/android/WeexProxy.cpp
     ./WeexCore/platform/android/WeexCore.cpp
-    ./WeexCore/render/action/RenderAction.cpp
     ./WeexCore/render/RenderManager.cpp
     ./WeexCore/render/RenderObject.cpp
     ./WeexCore/render/RenderPage.cpp

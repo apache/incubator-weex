@@ -3,12 +3,12 @@
 namespace WeexCore {
 
   inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
-    action->mPosition.mTop = node->getLayoutPositionTop();
-    action->mPosition.mBottom = node->getLayoutPositionBottom();
-    action->mPosition.mRight = node->getLayoutPositionRight();
-    action->mPosition.mLeft = node->getLayoutPositionLeft();
-    action->mRenderSize.mHeight = node->getLayoutHeight();
-    action->mRenderSize.mWidth = node->getLayoutWidth();
+    action->mTop = node->getLayoutPositionTop();
+    action->mBottom = node->getLayoutPositionBottom();
+    action->mRight = node->getLayoutPositionRight();
+    action->mLeft = node->getLayoutPositionLeft();
+    action->mHeight = node->getLayoutHeight();
+    action->mWidth = node->getLayoutWidth();
   }
 
   void RenderPage::calculateLayout() {
@@ -37,8 +37,7 @@ namespace WeexCore {
     /**
      * Generate RenderAction: ACTION_CREATE_BODY
      */
-    RenderAction *createBodyAction = new RenderAction();
-    createBodyAction->mActionType = ACTION_CREATE_BODY;
+    RenderAction *createBodyAction = new CreateBodyAction();
     createBodyAction->mPageId = mPageId;
     createBodyAction->mComponentType = render->getType();
     createBodyAction->mRef = render->getRef();
@@ -52,8 +51,7 @@ namespace WeexCore {
     STYLE_IT style_it_end = render->getStyleItEnd();
 
     for (; style_it_star != style_it_end; ++style_it_star) {
-      RenderAction *updateStyleAction = new RenderAction();
-      updateStyleAction->mActionType = ACTION_UPDATE_STYLE;
+      RenderAction *updateStyleAction = new UpdateStyleAction();
       updateStyleAction->mPageId = mPageId;
       updateStyleAction->mRef = render->getRef();
       updateStyleAction->mKey = style_it_star->first;
@@ -68,8 +66,7 @@ namespace WeexCore {
     ATTR_IT attr_it_end = render->getAttrItEnd();
 
     for (; attr_it_star != attr_it_end; ++attr_it_star) {
-      RenderAction *updateAttrAction = new RenderAction();
-      updateAttrAction->mActionType = ACTION_UPDATE_ATTR;
+      RenderAction *updateAttrAction = new UpdateStyleAction();
       updateAttrAction->mPageId = mPageId;
       updateAttrAction->mRef = render->getRef();
       updateAttrAction->mKey = attr_it_star->first;
@@ -84,8 +81,7 @@ namespace WeexCore {
     EVENT_IT event_it_end = render->getEventItEnd();
 
     for (; event_it_start != event_it_end; ++event_it_start) {
-      RenderAction *addEventAction = new RenderAction();
-      addEventAction->mActionType = ACTION_ADD_EVENT;
+      RenderAction *addEventAction = new AddElementAction();
       addEventAction->mPageId = mPageId;
       addEventAction->mRef = render->getRef();
       addEventAction->mValue = *event_it_start;
@@ -144,8 +140,7 @@ namespace WeexCore {
     /**
      * Generate RenderAction: ACTION_ADD_ELEMENT
      */
-    RenderAction *addElementAction = new RenderAction();
-    addElementAction->mActionType = ACTION_ADD_ELEMENT;
+    RenderAction *addElementAction = new AddElementAction();
     addElementAction->mPageId = mPageId;
     addElementAction->mComponentType = child->getType();
     addElementAction->mRef = child->getRef();
@@ -161,8 +156,7 @@ namespace WeexCore {
     STYLE_IT style_it_end = child->getStyleItEnd();
 
     for (; style_it_star != style_it_end; ++style_it_star) {
-      RenderAction *updateStyleAction = new RenderAction();
-      updateStyleAction->mActionType = ACTION_UPDATE_STYLE;
+      RenderAction *updateStyleAction = new UpdateStyleAction();
       updateStyleAction->mPageId = mPageId;
       updateStyleAction->mRef = child->getRef();
       updateStyleAction->mKey = style_it_star->first;
@@ -177,8 +171,7 @@ namespace WeexCore {
     ATTR_IT attr_it_end = child->getAttrItEnd();
 
     for (; attr_it_star != attr_it_end; ++attr_it_star) {
-      RenderAction *updateAttrAction = new RenderAction();
-      updateAttrAction->mActionType = ACTION_UPDATE_ATTR;
+      RenderAction *updateAttrAction = new UpdateStyleAction();
       updateAttrAction->mPageId = mPageId;
       updateAttrAction->mRef = child->getRef();
       updateAttrAction->mKey = attr_it_star->first;
@@ -193,12 +186,11 @@ namespace WeexCore {
     EVENT_IT event_it_end = child->getEventItEnd();
 
     for (; event_it_start != event_it_end; ++event_it_start) {
-      RenderAction *addEventAction = new RenderAction();
-      addEventAction->mActionType = ACTION_ADD_EVENT;
-      addEventAction->mPageId = mPageId;
-      addEventAction->mRef = child->getRef();
-      addEventAction->mValue = *event_it_start;
-      addRenderAction(addEventAction);
+//      RenderAction *addEventAction = new RenderAction();
+//      addEventAction->mPageId = mPageId;
+//      addEventAction->mRef = child->getRef();
+//      addEventAction->mValue = *event_it_start;
+//      addRenderAction(addEventAction);
     }
 
   }
