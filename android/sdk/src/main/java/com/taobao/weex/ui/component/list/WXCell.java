@@ -66,8 +66,6 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private boolean hasLayout = false;
 
 
-
-
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         super(instance, dom, parent);
