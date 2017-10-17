@@ -224,12 +224,9 @@ public class WXSoInstallMgrSdk {
 
         File oldfile = new File(soName);
         if (oldfile.exists()) {
-          //获得原文件流
           FileInputStream inputStream = new FileInputStream(oldfile);
           byte[] data = new byte[1024];
-          //输出流
           FileOutputStream outputStream =new FileOutputStream(newfile);
-          //开始处理流
           while (inputStream.read(data) != -1) {
             outputStream.write(data);
           }
