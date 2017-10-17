@@ -1014,7 +1014,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                   if ("".equals(s)) {
                     continue;
                   }
-                  // 寄存器内容裁剪
                   // if (("r0:").equals(s)) {
                   //  break;
                   // }
@@ -1027,8 +1026,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               }
             } else {
               WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
-              // 没收集到crash堆栈不上传
-              // commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "crash info file empty", instanceId, url);
             }
             file.delete();
           }
@@ -1370,7 +1367,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    // 如果首次启动没初始化尽快返回Exception，并且异步初始化
     if (!isJSFrameworkInit() && reInitCount == 1) {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       post(new Runnable() {
