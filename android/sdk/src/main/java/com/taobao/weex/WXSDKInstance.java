@@ -152,6 +152,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
+  private boolean mIsCommitedDomAtionExp = false;
+
+  public boolean getismIsCommitedDomAtionExp() {
+	return mIsCommitedDomAtionExp;
+  }
+
+  public void setmIsCommitedDomAtionExp(boolean mIsCommitedDomAtionExp) {
+	this.mIsCommitedDomAtionExp = mIsCommitedDomAtionExp;
+  }
+
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
