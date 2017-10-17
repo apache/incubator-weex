@@ -58,6 +58,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private int mScrollPositon = -1;
     private boolean mFlatUIEnabled = false;
 
+
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         super(instance, dom, parent);
@@ -194,7 +195,6 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     public boolean intendToBeFlatContainer() {
         return getInstance().getFlatUIContext().isFlatUIEnabled(this) && WXCell.class.equals(getClass()) && !isSticky();
     }
-
 
     public int getStickyOffset(){
         if(getDomObject() == null){

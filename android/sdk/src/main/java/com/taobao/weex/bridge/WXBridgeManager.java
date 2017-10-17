@@ -19,6 +19,8 @@
 package com.taobao.weex.bridge;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Looper;
@@ -1375,6 +1377,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       return;
     }
+
+    // 如果首次启动没初始化尽快返回Exception，并且异步初始化
+    if (!isJSFrameworkInit() && reInitCount == 1) {
+      instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
+      post(new Runnable() {
+        @Override
+        public void run() {
+          initFramework("");
+        }
+      }, instanceId);
+      return;
+    }
+
     WXModuleManager.createDomModule(instance);
     post(new Runnable() {
       @Override
@@ -1564,7 +1579,28 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
 
         long start = System.currentTimeMillis();
-        if(mWXBridge.initFramework(framework, assembleDefaultOptions())==INIT_FRAMEWORK_OK){
+        String crashFile="";
+        boolean installOnSdcard = false;
+        try {
+          crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+        try {
+          PackageManager pm = WXEnvironment.getApplication().getApplicationContext().getPackageManager();
+          String pkgName = WXEnvironment.getApplication().getPackageName();
+          ApplicationInfo appInfo = pm.getApplicationInfo(pkgName, 0);
+          if ((appInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0) {
+            // App on sdcard
+            installOnSdcard = true;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+        // extends initFramework
+        if(mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, installOnSdcard)==INIT_FRAMEWORK_OK){
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
           WXLogUtils.renderPerformanceLog("initFramework", WXEnvironment.sJSLibInitTime);
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;

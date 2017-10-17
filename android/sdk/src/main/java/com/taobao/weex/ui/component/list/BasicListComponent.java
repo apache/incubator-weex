@@ -475,7 +475,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         //Invalid position
         return;
       }
-
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
       view.scrollTo(smooth, pos, offset, getOrientation());
     }
