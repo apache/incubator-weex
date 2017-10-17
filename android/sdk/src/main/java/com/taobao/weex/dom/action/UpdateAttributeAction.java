@@ -28,6 +28,7 @@ import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 /**
  * Created by sospartan on 28/02/2017.
@@ -52,17 +53,16 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
     final WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATEATTRS);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS.getErrorCode(),
+				"updateAttr",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS.getErrorMsg() + "domObject is null",null);
       }
       return;
     }
 
     domObject.updateAttr(mData);
     context.postRenderTask(this);
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override
