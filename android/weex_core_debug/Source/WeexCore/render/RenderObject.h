@@ -55,8 +55,6 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void traverseTree();
-
     void addRenderObject(int index, RenderObject *child);
 
     void removeRenderObject(RenderObject *child);

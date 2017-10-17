@@ -68,6 +68,8 @@ namespace WeexCore {
 
     RenderObject *getRootRenderObject();
 
+    void traverseTree(RenderObject *render);
+
     std::string getPageId() {
       return mPageId;
     }

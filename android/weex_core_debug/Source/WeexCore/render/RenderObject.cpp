@@ -3,15 +3,6 @@
 
 namespace WeexCore {
 
-  inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
-    action->mTop = node->getLayoutPositionTop();
-    action->mBottom = node->getLayoutPositionBottom();
-    action->mRight = node->getLayoutPositionRight();
-    action->mLeft = node->getLayoutPositionLeft();
-    action->mHeight = node->getLayoutHeight();
-    action->mWidth = node->getLayoutWidth();
-  }
-
   RenderObject::RenderObject(RenderPage *page)
       : mPage(page) {
     mStyle = new std::map<std::string, std::string>();
@@ -55,21 +46,6 @@ namespace WeexCore {
     mChildren.clear();
   }
 
-  void RenderObject::traverseTree() {
-
-    RenderAction *action = new RelayoutRenderAction();
-    action->mPageId = mPage->getPageId();
-    action->mComponentType = getType();
-    action->mRef = getRef();
-    getLayoutInfo(action, getLayoutNode());
-    mPage->addRenderAction(action);
-
-    for (int i = 0; i < getChildCount(); i++) {
-      RenderObject *render = getChild(i);
-      render->traverseTree();
-    }
-  }
-
   void RenderObject::addRenderObject(int index, RenderObject *child) {
     // insert RenderObject child
 //    mChildren.insert(mChildren.begin() + mChildren.size() - 1, child);
@@ -102,7 +78,6 @@ namespace WeexCore {
     mAttributes->insert(pair<std::string, std::string>(key, value));
   }
 
-  // TODO: to recognize layout style or not
   void RenderObject::updateStyle(std::string key, std::string value) {
     if (mStyle == nullptr) {
       mStyle = new std::map<std::string, std::string>();

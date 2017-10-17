@@ -15,7 +15,21 @@ namespace WeexCore {
     if (pRoot == nullptr)
       return;
     pRoot->getLayoutNode()->calculateLayout();
-    pRoot->traverseTree();
+    traverseTree(pRoot);
+  }
+
+  void RenderPage::traverseTree(RenderObject *render) {
+    RenderAction *action = new RelayoutRenderAction();
+    action->mPageId = getPageId();
+    action->mComponentType = render->getType();
+    action->mRef = render->getRef();
+    getLayoutInfo(action, render->getLayoutNode());
+    addRenderAction(action);
+
+    for (int i = 0; i < render->getChildCount(); i++) {
+      RenderObject *child = render->getChild(i);
+      traverseTree(child);
+    }
   }
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
@@ -31,7 +45,7 @@ namespace WeexCore {
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
     setRootRenderObject(render);
 
-    // layout by YogaNode Tree
+    // layout by dom Tree
     calculateLayout();
 
     /**
@@ -127,14 +141,14 @@ namespace WeexCore {
 
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(child->getRef(), child));
 
-    // add child to YogaNode Tree
+    // add child to dom Tree
     parent->getLayoutNode()->addChildAt(child->getLayoutNode(), parent->getChildCount());
 
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosiotn, child);
 
-    // layout by YogaNode Tree
+    // layout by dom Tree
     calculateLayout();
 
     /**
@@ -204,7 +218,7 @@ namespace WeexCore {
     mRenderObjectMap.erase(child->getRef());
     delete child;
 
-    // layout by YogaNode Tree
+    // layout by dom Tree
 //    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
   }
 
@@ -223,7 +237,7 @@ namespace WeexCore {
     RenderObject *render = getRenderObject(ref);
     render->updateStyle(key, value);
 
-    // layout by YogaNode Tree
+    // layout by dom Tree
 //    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
   }
 
