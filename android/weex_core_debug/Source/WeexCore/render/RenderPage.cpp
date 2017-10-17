@@ -205,6 +205,8 @@ namespace WeexCore {
 //      addEventAction->mRef = child->getRef();
 //      addEventAction->mValue = *event_it_start;
 //      addRenderAction(addEventAction);
+
+      // TODO AddEventAction
     }
 
   }
@@ -218,8 +220,7 @@ namespace WeexCore {
     mRenderObjectMap.erase(child->getRef());
     delete child;
 
-    // layout by dom Tree
-//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+    // TODO calculateLayout
   }
 
   void RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
@@ -230,30 +231,35 @@ namespace WeexCore {
     oldParent->removeRenderObject(child);
     newParent->addRenderObject(stringToNum<int>(index), child);
 
-//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+    // TODO calculateLayout
   }
 
   void RenderPage::updateStyle(std::string ref, std::string key, std::string value) {
     RenderObject *render = getRenderObject(ref);
     render->updateStyle(key, value);
 
-    // layout by dom Tree
-//    YGNodeCalculateLayout(pRoot->getLayoutNode(), YGUndefined, YGUndefined, YGDirectionLTR);
+    // TODO calculateLayout
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {
     RenderObject *render = getRenderObject(ref);
     render->updateAttr(key, value);
+
+    // TODO calculateLayout
   }
 
   void RenderPage::addEvent(std::string ref, std::string event) {
     RenderObject *render = getRenderObject(ref);
     render->addEvent(event);
+
+    // TODO calculateLayout
   }
 
   void RenderPage::removeEvent(std::string ref, std::string event) {
     RenderObject *render = getRenderObject(ref);
     render->removeEvent(event);
+
+    // TODO calculateLayout
   }
 
   void RenderPage::addRenderAction(RenderAction *action) {
