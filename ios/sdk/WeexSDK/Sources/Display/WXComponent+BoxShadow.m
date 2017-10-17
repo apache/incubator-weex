@@ -22,6 +22,8 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXComponent_internal.h"
+#import "UIBezierPath+Weex.h"
+#import "WXRoundedRect.h"
 
 @implementation WXComponent (BoxShadow)
 
@@ -81,15 +83,20 @@
     if (!boxShadow) {
         return;
     }
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.view.bounds topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    // here is computed radii, do not use original style
+    WXRadii *radii = borderRect.radii;
+    CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
+    UIBezierPath *shadowPath = [UIBezierPath wx_bezierPathWithRoundedRect:self.view.bounds topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
     if (boxShadow.isInset) {
         if (boxShadow.innerLayer) {
             boxShadow.innerLayer.frame = self.view.bounds;
             if (![boxShadow.innerLayer superlayer] ){
+                self.view.layer.masksToBounds = YES;
                 [self.view.layer addSublayer:boxShadow.innerLayer];
             }
         }
     } else {
-        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds];
         self.view.layer.masksToBounds = NO;
         self.view.layer.shadowColor = boxShadow.shadowColor.CGColor;
         self.view.layer.shadowOffset = boxShadow.shadowOffset;
