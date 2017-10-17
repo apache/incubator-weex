@@ -24,7 +24,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.utils.WXLogUtils;
@@ -81,7 +81,7 @@ public class WXComponentFactory {
     return null;
   }
 
-  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     if (instance == null || TextUtils.isEmpty(action.mComponentType)) {
       return null;
     }

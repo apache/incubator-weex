@@ -16,28 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action.weexcore;
+package com.taobao.weex.ui.action;
 
-import android.graphics.Color;
-
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-/**
- * Created by miomin on 2017/8/15.
- */
-
-public class AddAlementActionByWeexCore extends WeexCoreAction {
-
-  static int count = 1;
+public class CreateBodyUIAction extends WXUIAction {
 
   @Override
   public void excuteAction() {
-
     //Create component in dom thread
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
@@ -51,34 +42,33 @@ public class AddAlementActionByWeexCore extends WeexCoreAction {
       return;
     }
 
-    if (instance == null || instance.getContext() == null) {
-      WXLogUtils.e("instance is null or instance is destroy!");
-      return;
-    }
     try {
-      WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
-
-      if (parent == null || component == null) {
-        return;
+      long start = System.currentTimeMillis();
+      component.createView();
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
       }
-
-      parent.addChild(component, mIndex);
-      parent.createChildViewAt(mIndex);
+      start = System.currentTimeMillis();
       component.applyLayoutAndEvent();
       component.bindData(component);
-//            if (count == 0) {
-//                component.getHostView().setBackgroundColor(Color.parseColor("#766556"));
-//            } else if (count == 1) {
-//                component.getHostView().setBackgroundColor(Color.parseColor("#898987"));
-//            } else if (count == 2) {
-//                component.getHostView().setBackgroundColor(Color.parseColor("#675645"));
-//            } else if (count == 3) {
-//                component.getHostView().setBackgroundColor(Color.parseColor("#755665"));
-//                count = 0;
+
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
+      }
+
+//            if (component instanceof WXScroller) {
+//                WXScroller scroller = (WXScroller) component;
+//                if (scroller.getInnerView() instanceof ScrollView) {
+//                    instance.setRootScrollView((ScrollView) scroller.getInnerView());
+//                }
 //            }
-//            count++;
+
+      instance.onRootCreated(component);
+      if (instance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
+        instance.onCreateFinish();
+      }
     } catch (Exception e) {
-      WXLogUtils.e("add component failed.", e);
+      WXLogUtils.e("create body failed.", e);
     }
   }
 }

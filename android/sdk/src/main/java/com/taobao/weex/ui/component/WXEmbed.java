@@ -35,8 +35,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -166,11 +165,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance,parent,action);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
     mListener = new EmbedRenderListener(this);
 

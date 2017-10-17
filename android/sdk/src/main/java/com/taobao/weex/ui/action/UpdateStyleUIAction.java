@@ -16,23 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action.weexcore;
+package com.taobao.weex.ui.action;
 
-/**
- * Created by miomin on 2017/8/15.
- */
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.component.WXComponent;
 
-public class WeexCorePosition {
+public class UpdateStyleUIAction extends WXUIAction {
 
-  public float mLeft;
-  public float mTop;
-  public float mRight;
-  public float mBottom;
-
-  public WeexCorePosition(float mLeft, float mTop, float mRight, float mBottom) {
-    this.mLeft = mLeft;
-    this.mTop = mTop;
-    this.mRight = mRight;
-    this.mBottom = mBottom;
+  @Override
+  public void excuteAction() {
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
+    if (component == null) {
+      return;
+    }
+    component.updateStyle(mKey, mValue);
   }
 }

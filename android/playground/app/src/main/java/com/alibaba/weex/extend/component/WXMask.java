@@ -30,8 +30,7 @@ import android.widget.PopupWindow;
 
 import com.alibaba.weex.extend.view.WXMaskView;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.component.WXVContainer;
 
 /**
@@ -43,7 +42,7 @@ public class WXMask extends WXVContainer {
   private PopupWindow mPopupWindow;
   private WXMaskView mContainerView;
 
-  public WXMask(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXMask(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

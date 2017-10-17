@@ -31,7 +31,6 @@ import android.os.Build;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -57,9 +56,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
-import com.taobao.weex.dom.action.weexcore.WeexCorePosition;
-import com.taobao.weex.dom.action.weexcore.WeexCoreRenderSize;
+import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.WXUIPosition;
+import com.taobao.weex.ui.action.WXUISize;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
@@ -130,12 +129,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
 
-  // WeexCoreAction
+  // WXUIAction
   public String mPageId = null;
   public String mComponentType = null;
   public String mParentRef = null;
-  public WeexCorePosition mPosition = new WeexCorePosition(0, 0, 0, 0);
-  public WeexCoreRenderSize mRenderSize = new WeexCoreRenderSize(0, 0);
+  public WXUIPosition mPosition = new WXUIPosition(0, 0, 0, 0);
+  public WXUISize mRenderSize = new WXUISize(0, 0);
 
 
   //Holding the animation bean when component is uninitialized
@@ -215,20 +214,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance,parent,isLazy,action);
   }
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
     this(instance,parent,action);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     this(instance, parent, TYPE_COMMON, action);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WeexCoreAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WXUIAction action) {
     //WeexCoreActionAttr
     mPageId = action.mPageId;
     mComponentType = action.mComponentType;
@@ -250,7 +249,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  public void requestLayout(WeexCoreAction action) {
+  public void requestLayout(WXUIAction action) {
     mPosition = action.mPosition;
     mRenderSize = action.mRenderSize;
     setLayout();

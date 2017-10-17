@@ -27,7 +27,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXTextView;
 
@@ -45,18 +45,18 @@ public class WXText extends WXComponent<WXTextView> {
   public static final int sDEFAULT_SIZE = 32;
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXText(instance, parent,action);
     }
   }
 
   @Deprecated
-  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance, parent,action);
   }
 
   public WXText(WXSDKInstance instance,
-                WXVContainer parent, WeexCoreAction action) {
+                WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

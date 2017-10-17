@@ -1,6 +1,4 @@
 #include "ExtendJSApi.h"
-#include "WeexCore.h"
-#include "BridgeAndroid.h"
 
 using namespace WeexCore;
 

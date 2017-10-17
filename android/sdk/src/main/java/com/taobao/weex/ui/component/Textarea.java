@@ -24,8 +24,7 @@ import android.view.Gravity;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
 
@@ -33,7 +32,7 @@ import com.taobao.weex.utils.WXUtils;
  * Created by sospartan on 7/11/16.
  */
 public class Textarea extends AbstractEditComponent {
-  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WeexCoreAction action) {
+  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
     super(instance, parent, isLazy,action);
   }
 

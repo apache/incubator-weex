@@ -35,9 +35,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
@@ -66,7 +65,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   private int initIndex = -1;
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXSlider(instance, parent,action);
     }
   }
@@ -93,11 +92,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   protected OnPageChangeListener mPageChangeListener = new SliderPageChangeListener();
 
   @Deprecated
-  public WXSlider(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXSlider(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance, parent,action);
   }
 
-  public WXSlider(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXSlider(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

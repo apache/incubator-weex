@@ -44,8 +44,7 @@ import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
@@ -84,18 +83,18 @@ public class WXImage extends WXComponent<ImageView> {
   };
 
   public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXImage(instance,parent,action);
     }
   }
 
 
   @Deprecated
-  public WXImage(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXImage(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance,parent,action);
   }
 
-  public WXImage(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXImage(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

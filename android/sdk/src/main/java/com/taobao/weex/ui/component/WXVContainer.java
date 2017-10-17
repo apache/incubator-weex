@@ -25,8 +25,7 @@ import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 
 import java.util.ArrayList;
 
@@ -39,16 +38,16 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance,parent,isLazy,action);
   }
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, WXUIAction action) {
     super(instance, parent,action);
   }
 
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

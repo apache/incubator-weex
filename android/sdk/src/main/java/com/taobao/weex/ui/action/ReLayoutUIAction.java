@@ -16,24 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action.weexcore;
+package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXLogUtils;
 
-/**
- * Created by miomin on 2017/8/22.
- */
-
-public class UpdateStyleActionByWeexCore extends WeexCoreAction {
+public class ReLayoutUIAction extends WXUIAction {
 
   @Override
   public void excuteAction() {
+    //Create component in dom thread
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
+    if (instance == null || instance.getContext() == null) {
+      WXLogUtils.e("instance is null or instance is destroy!");
+      return;
+    }
+
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
     if (component == null) {
       return;
     }
-    component.updateStyle(mKey, mValue);
+
+    component.requestLayout(this);
   }
 }

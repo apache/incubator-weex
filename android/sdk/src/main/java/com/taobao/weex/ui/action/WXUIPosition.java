@@ -16,19 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action.weexcore;
+package com.taobao.weex.ui.action;
 
-/**
- * Created by miomin on 2017/8/15.
- */
+public class WXUIPosition {
 
-public class WeexCoreRenderSize {
+  public float mLeft;
+  public float mTop;
+  public float mRight;
+  public float mBottom;
 
-  public float mWidth;
-  public float mHeight;
-
-  public WeexCoreRenderSize(float mWidth, float mHeight) {
-    this.mWidth = mWidth;
-    this.mHeight = mHeight;
+  public WXUIPosition(float mLeft, float mTop, float mRight, float mBottom) {
+    this.mLeft = mLeft;
+    this.mTop = mTop;
+    this.mRight = mRight;
+    this.mBottom = mBottom;
   }
 }

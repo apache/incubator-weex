@@ -23,8 +23,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.ATagUtil;
 import com.taobao.weex.utils.WXLogUtils;
@@ -33,11 +32,11 @@ import com.taobao.weex.utils.WXLogUtils;
 public class WXA extends WXDiv {
 
   @Deprecated
-  public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance, parent,action);
   }
 
-  public WXA(WXSDKInstance instance, WXVContainer parent, WeexCoreAction action) {
+  public WXA(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
   }
 

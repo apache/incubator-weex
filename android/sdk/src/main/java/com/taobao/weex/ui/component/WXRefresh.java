@@ -26,8 +26,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXRefreshLayout;
@@ -47,11 +46,11 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   public static final String HIDE = "hide";
 
   @Deprecated
-  public WXRefresh(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WeexCoreAction action) {
+  public WXRefresh(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
     this(instance,parent,isLazy,action);
   }
 
-  public WXRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, WeexCoreAction action) {
+  public WXRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, WXUIAction action) {
     super(instance, parent, lazy,action);
   }
 

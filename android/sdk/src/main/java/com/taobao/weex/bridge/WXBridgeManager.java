@@ -26,7 +26,6 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -52,11 +51,11 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.dom.action.weexcore.AddAlementActionByWeexCore;
-import com.taobao.weex.dom.action.weexcore.CreateBodyActionByWeexCore;
-import com.taobao.weex.dom.action.weexcore.ReLayoutActionByWeexCore;
-import com.taobao.weex.dom.action.weexcore.UpdateStyleActionByWeexCore;
-import com.taobao.weex.dom.action.weexcore.WeexCoreAction;
+import com.taobao.weex.ui.action.AddAlementUIAction;
+import com.taobao.weex.ui.action.CreateBodyUIAction;
+import com.taobao.weex.ui.action.ReLayoutUIAction;
+import com.taobao.weex.ui.action.UpdateStyleUIAction;
+import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1859,7 +1858,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WeexCoreAction action = new CreateBodyActionByWeexCore();
+        final WXUIAction action = new CreateBodyUIAction();
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
@@ -1908,7 +1907,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final WeexCoreAction action = new UpdateStyleActionByWeexCore();
+        final WXUIAction action = new UpdateStyleUIAction();
         action.mPageId = instanceId;
         action.mRef = ref;
         action.mKey = key;
@@ -1954,7 +1953,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WeexCoreAction action = new AddAlementActionByWeexCore();
+        final WXUIAction action = new AddAlementUIAction();
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
@@ -2006,7 +2005,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WeexCoreAction action = new ReLayoutActionByWeexCore();
+        final WXUIAction action = new ReLayoutUIAction();
         action.mPageId = pageId;
         action.mRef = ref;
         action.mPosition.mTop = top;

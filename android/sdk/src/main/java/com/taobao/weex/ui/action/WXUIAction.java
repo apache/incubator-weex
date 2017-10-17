@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action.weexcore;
+package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -24,19 +24,15 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 
-/**
- * Created by miomin on 2017/8/15.
- */
-
-public abstract class WeexCoreAction {
+public abstract class WXUIAction {
 
   public String mPageId = null;
   public String mComponentType = null;
   public String mParentRef = null;
   public String mRef = null;
   public int mIndex = -1;
-  public WeexCorePosition mPosition = new WeexCorePosition(0, 0, 0, 0);
-  public WeexCoreRenderSize mRenderSize = new WeexCoreRenderSize(0, 0);
+  public WXUIPosition mPosition = new WXUIPosition(0, 0, 0, 0);
+  public WXUISize mRenderSize = new WXUISize(0, 0);
   public String mKey = null;
   public String mValue = null;
 
