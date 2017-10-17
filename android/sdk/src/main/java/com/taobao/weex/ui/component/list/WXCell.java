@@ -59,6 +59,13 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private boolean mFlatUIEnabled = false;
 
 
+    private Object  renderData;
+
+    private boolean isSourceUsed = false;
+
+    private boolean hasLayout = false;
+
+
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         super(instance, dom, parent);
@@ -207,4 +214,29 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         float  offset = WXUtils.getFloat(domObject.getAttrs().get(STICKY_OFFSET));
         return (int)(WXViewUtils.getRealPxByWidth(offset,domObject.getViewPortWidth()));
     }
+
+    public Object getRenderData() {
+        return renderData;
+    }
+
+    public void setRenderData(Object renderData) {
+        this.renderData = renderData;
+    }
+
+    public boolean isSourceUsed() {
+        return isSourceUsed;
+    }
+
+    public void setSourceUsed(boolean sourceUsed) {
+        isSourceUsed = sourceUsed;
+    }
+
+    public boolean isHasLayout() {
+        return hasLayout;
+    }
+
+    public void setHasLayout(boolean hasLayout) {
+        this.hasLayout = hasLayout;
+    }
+
 }
