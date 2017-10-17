@@ -162,7 +162,11 @@ public class WXSDKEngine {
       if(WXEnvironment.isApkDebugable()){
         WXEnvironment.sLogLevel = LogLevel.DEBUG;
       }else{
-        WXEnvironment.sLogLevel = LogLevel.WARN;
+		if(WXEnvironment.sApplication != null){
+		  WXEnvironment.sLogLevel = LogLevel.WARN;
+		}else {
+		  WXLogUtils.e(TAG,"WXEnvironment.sApplication is " + WXEnvironment.sApplication);
+		}
       }
       doInitInternal(application,config);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
@@ -173,6 +177,9 @@ public class WXSDKEngine {
 
   private static void doInitInternal(final Application application,final InitConfig config){
     WXEnvironment.sApplication = application;
+	if(application == null){
+	  WXLogUtils.e(TAG, " doInitInternal application is null");
+	}
     WXEnvironment.JsFrameworkInit = false;
 
     WXBridgeManager.getInstance().post(new Runnable() {
