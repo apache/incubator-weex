@@ -71,13 +71,17 @@ public class WXLogUtils {
   }
 
   private static void log(String tag, String msg, LogLevel level){
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
-      Log.println(level.getPriority(),tag, msg);
-      writeConsoleLog(level.getName(), msg);
-      sendLog(level, msg);
-    }
-    if (sLogWatcher != null) {
-      sLogWatcher.onLog(level.getName(), tag, msg);
+    if (msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
+      if (sLogWatcher != null ) {
+        sLogWatcher.onLog(level.getName(), tag, msg);
+      }else{
+        Log.println(level.getPriority(),tag, msg);
+      }
+
+      if(WXEnvironment.isApkDebugable()){
+        writeConsoleLog(level.getName(), msg);
+        sendLog(level, msg);
+      }
     }
   }
 
@@ -214,15 +218,13 @@ public class WXLogUtils {
   }
 
   public static void w(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable()) {
       w(prefix + getStackTrace(e));
-    }
+
   }
 
   public static void e(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable()) {
       e(prefix + getStackTrace(e));
-    }
+
   }
 
   public static void wtf(String prefix, Throwable e){
