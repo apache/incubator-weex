@@ -28,10 +28,13 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
+import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
@@ -485,15 +488,29 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    ********************************************************/
 
   public @Nullable View getBoxShadowHost() {
-    if (mBoxShadowHost == null) {
-      mBoxShadowHost = new BoxShadowHost(getContext());
-      WXViewUtils.setBackGround(mBoxShadowHost, null);
-      mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      getHostView().addView(mBoxShadowHost);
+    ViewGroup hostView = getHostView();
+    if (hostView == null) {
+      return null;
     }
-    getHostView().removeView(mBoxShadowHost);
-    getHostView().addView(mBoxShadowHost);
-    return mBoxShadowHost;
+
+    if (hostView instanceof ScrollView || hostView instanceof HorizontalScrollView) {
+      return hostView;
+    }
+
+    try {
+      if (mBoxShadowHost == null) {
+        mBoxShadowHost = new BoxShadowHost(getContext());
+        WXViewUtils.setBackGround(mBoxShadowHost, null);
+        mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        hostView.addView(mBoxShadowHost);
+      }
+      hostView.removeView(mBoxShadowHost);
+      hostView.addView(mBoxShadowHost);
+      return mBoxShadowHost;
+    } catch (Throwable t) {
+      WXLogUtils.w("BoxShadow", t);
+    }
+    return hostView;
   }
 
   private class BoxShadowHost extends View {
