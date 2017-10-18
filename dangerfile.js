@@ -273,6 +273,14 @@ filesToVerifySrcHeader.forEach(filepath => {
       return;
     }
   }
+
+  // check cn for source code
+  var reg = /[\u4e00-\u9FA5]+/; 
+  var res = reg.test(content);
+  if(res){
+    fail("Code file "+ filepath +" has cn source code.");
+    return ;
+  }
 });
 
 
@@ -307,8 +315,8 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff',"user-agent": "node.js"}
   }, function (err, result) {
-    console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
+      console.log('result:'+result+', error:'+err);
       resolve()
       return
     }
@@ -366,6 +374,7 @@ function getContent(url) {
 
 function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormalLinesMap) {
   try {
+    console.log('diffData:'+diffData)
     var diffs = parseDiff(diffData)
     diffs.forEach(diff => {
       fileToDeletedLinesMap[diff.from] = [];

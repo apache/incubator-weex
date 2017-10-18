@@ -1378,8 +1378,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       return;
     }
 
-    // 如果没有初始化尽快返回Exception，并且异步初始化
-    if (!isJSFrameworkInit()) {
+    // 如果首次启动没初始化尽快返回Exception，并且异步初始化
+    if (!isJSFrameworkInit() && reInitCount == 1) {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       post(new Runnable() {
         @Override

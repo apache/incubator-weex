@@ -150,6 +150,15 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private WXStickyHelper stickyHelper;
 
 
+
+  /**
+   * keep positon
+   * */
+  private  WXComponent keepPositionCell = null;
+  private  Runnable keepPositionCellRunnable = null;
+  private  long keepPositionLayoutDelay = 150;
+
+
   public BasicListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
     super(instance, node, parent);
     stickyHelper = new WXStickyHelper(this);
@@ -236,6 +245,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (transforms != null) {
       bounceRecyclerView.getInnerView().addItemDecoration(RecyclerTransform.parseTransforms(getOrientation(), transforms));
     }
+    if(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY) != null){
+      keepPositionLayoutDelay = WXUtils.getNumberInt(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY), (int)keepPositionLayoutDelay);
+    }
 
     mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
 
@@ -245,6 +257,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
     bounceRecyclerView.getInnerView().clearOnScrollListeners();
     bounceRecyclerView.getInnerView().addOnScrollListener(mViewOnScrollListener);
+    if(getDomObject().getAttrs().get(Constants.Name.HAS_FIXED_SIZE) != null){
+      boolean hasFixedSize = WXUtils.getBoolean(getDomObject().getAttrs().get(Constants.Name.HAS_FIXED_SIZE), false);
+      bounceRecyclerView.getInnerView().setHasFixedSize(hasFixedSize);
+    }
     bounceRecyclerView.getInnerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -485,53 +501,54 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (stickyComponent != null && stickyComponent.getDomObject() != null
           && stickyComponent instanceof WXCell) {
 
-        WXCell cell = (WXCell) stickyComponent;
-        if (cell.getHostView() == null) {
-          return;
-        }
-
-          RecyclerView.LayoutManager layoutManager;
-          boolean beforeFirstVisibleItem = false;
-          boolean removeOldSticky = false;
-          layoutManager = getHostView().getInnerView().getLayoutManager();
-          if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
-            int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-            int pos = mChildren.indexOf(cell);
-            cell.setScrollPositon(pos);
-
-            if (pos <= fVisible) {
-              beforeFirstVisibleItem = true;
-              if(pos > currentStickyPos) {
-                currentStickyPos = pos;
-              }
-            }
-
-            if(pos > fVisible){
-              removeOldSticky = true;
-            }
-          } else if(layoutManager instanceof StaggeredGridLayoutManager){
-            int [] firstItems= new int[3];
-            int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
-            int pos = mChildren.indexOf(cell);
-
-            if (pos <= fVisible) {
-              beforeFirstVisibleItem = true;
-            }
-
-            if(pos > fVisible){
-              removeOldSticky = true;
-            }
+          WXCell cell = (WXCell) stickyComponent;
+          if (cell.getHostView() == null) {
+            return;
           }
 
           int[] location = new int[2];
           stickyComponent.getHostView().getLocationOnScreen(location);
           int[] parentLocation = new int[2];
           stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
-
           int top = location[1] - parentLocation[1];
 
-          boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
-          boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
+
+          RecyclerView.LayoutManager layoutManager;
+          boolean beforeFirstVisibleItem = false;
+          boolean removeOldSticky = false;
+          layoutManager = getHostView().getInnerView().getLayoutManager();
+          if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
+            int firstVisiblePosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            int lastVisiblePosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+            int pos = mChildren.indexOf(cell);
+            cell.setScrollPositon(pos);
+            if (pos <= firstVisiblePosition
+                    || (cell.getStickyOffset() > 0 && firstVisiblePosition < pos && pos <= lastVisiblePosition  &&
+                    top <= cell.getStickyOffset())) {
+              beforeFirstVisibleItem = true;
+              if(pos > currentStickyPos) {
+                currentStickyPos = pos;
+              }
+            }else{
+              removeOldSticky = true;
+            }
+          } else if(layoutManager instanceof StaggeredGridLayoutManager){
+            int [] firstItems= new int[3];
+            int firstVisiblePosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
+            int lastVisiblePosition = ((StaggeredGridLayoutManager)  layoutManager).findLastVisibleItemPositions(firstItems)[0];
+            int pos = mChildren.indexOf(cell);
+
+            if (pos <= firstVisiblePosition || (cell.getStickyOffset() > 0 && firstVisiblePosition < pos && pos <= lastVisiblePosition  &&
+                    top <= cell.getStickyOffset())) {
+              beforeFirstVisibleItem = true;
+            }else{
+              removeOldSticky = true;
+            }
+          }
+
+
+          boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= cell.getStickyOffset() && dy >= 0;
+          boolean removeSticky = cell.getLocationFromStart() <= cell.getStickyOffset() && top > cell.getStickyOffset() && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
           } else if (removeSticky || removeOldSticky) {
@@ -584,7 +601,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void addChild(WXComponent child, int index) {
     super.addChild(child, index);
-
     if (child == null || index < -1) {
       return;
     }
@@ -593,7 +609,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     bindViewType(child);
 
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
-    T view = getHostView();
+    final T view = getHostView();
     if (view != null) {
       boolean isAddAnimation = false;
       ImmutableDomObject domObject = child.getDomObject();
@@ -616,15 +632,59 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
       }
       if (isKeepScrollPosition) {
-        int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
-        view.getInnerView().getLayoutManager().scrollToPosition(last);
+        if(view.getInnerView().getLayoutManager() instanceof  LinearLayoutManager){
+            if(!view.getInnerView().isLayoutFrozen()){ //frozen, prevent layout when scroll
+                view.getInnerView().setLayoutFrozen(true);
+            }
+            if(keepPositionCell == null){
+              int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastCompletelyVisibleItemPosition();
+              ListBaseViewHolder holder = (ListBaseViewHolder) view.getInnerView().findViewHolderForAdapterPosition(last);
+              if(holder != null){
+                 keepPositionCell = holder.getComponent();
+              }
+              if(keepPositionCell != null) {
+                if(keepPositionCellRunnable != null){
+                  view.removeCallbacks(keepPositionCellRunnable);
+                }
+                keepPositionCellRunnable = new Runnable() {
+                  @Override
+                  public void run() {
+                    if(keepPositionCell != null){
+                      int keepPosition = indexOf(keepPositionCell);
+                      int offset = 0;
+                      if(keepPositionCell.getHostView() != null){
+                        offset = keepPositionCell.getHostView().getTop();
+                      }
+                      if(offset > 0) {
+                        ((LinearLayoutManager) view.getInnerView().getLayoutManager()).scrollToPositionWithOffset(keepPosition, offset);
+                      }else{
+                        view.getInnerView().getLayoutManager().scrollToPosition(keepPosition);
+
+                      }
+                      view.getInnerView().setLayoutFrozen(false);
+                      keepPositionCell = null;
+                      keepPositionCellRunnable = null;
+                    }
+                  }
+                };
+              }
+            }
+            if(keepPositionCellRunnable == null){
+               view.getInnerView().scrollToPosition(((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition());
+            }
+        }
         view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
+        if(keepPositionCellRunnable != null){
+          view.removeCallbacks(keepPositionCellRunnable);
+          view.postDelayed(keepPositionCellRunnable, keepPositionLayoutDelay);
+        }
       } else {
         view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
       }
     }
     relocateAppearanceHelper();
   }
+
 
 
 
