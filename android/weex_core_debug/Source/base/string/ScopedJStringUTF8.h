@@ -8,7 +8,7 @@
 #include <string.h>
 #include <thread>
 #include <type_traits>
-#include "./base64/base64.h"
+#include "../base64/base64.h"
 #include <jni.h>
 
 namespace WeexCore {

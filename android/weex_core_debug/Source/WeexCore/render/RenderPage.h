@@ -2,9 +2,9 @@
 #define RenderPage_H
 
 #include "RenderPage.h"
-#include "./base/LogUtils.h"
-#include "./rapidjson/weexjsontools.h"
-#include "./base/StringUtils.h"
+#include "base/LogUtils.h"
+#include "rapidjson/weexjsontools.h"
+#include "base/string/StringUtils.h"
 #include "action/AddElementAction.h"
 #include "action/CreateBodyAction.h"
 #include "action/UpdateStyleAction.h"

@@ -2,8 +2,8 @@
 #define _WEEX_CORE_H_
 
 #include <base/LogUtils.h>
-#include <base/ScopedJString.h>
-#include <base/ScopedJStringUTF8.h>
+#include <base/string/ScopedJString.h>
+#include <base/string/ScopedJStringUTF8.h>
 
 #include <IPC/Buffering/IPCBuffer.h>
 #include <IPC/IPCArguments.h>

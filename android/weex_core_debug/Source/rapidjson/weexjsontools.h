@@ -7,7 +7,7 @@
 #include <string>
 #include "../base/fpconv.h"
 #include "../base/LogUtils.h"
-#include "../base/StringUtils.h"
+#include "../base/string/StringUtils.h"
 #include "../WeexCore/render/RenderObject.h"
 #include "../WeexCore/render/RenderPage.h"
 

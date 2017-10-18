@@ -23,16 +23,9 @@ add_library(weexjsc SHARED
     ./base/Compatible.cpp
     ./base/base64/base64.cpp
     ./base/base64/modp_base64/modp_b64.cc
-    ./base/ScopedJString.cpp
-    ./base/ScopedJStringUTF8.cpp
+    ./base/string/ScopedJString.cpp
+    ./base/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
-    #./base/timer/timer.cpp
-    #./base/timer/time_utils.cpp
-    #./base/timer/timer_heap.cpp
-    #./base/threading/message_loop.cpp
-    #./base/threading/message_pump_android.cpp
-    #./base/threading/message_pump_posix.cpp
-    #./base/threading/thread.cpp
 
 
     ./WeexCore/platform/android/WeexJSConnection.cpp

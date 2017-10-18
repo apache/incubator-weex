@@ -1,6 +1,6 @@
 #include "WeexProxy.h"
 #include <base/LogUtils.h>
-#include <base/StringUtils.h>
+#include <base/string/StringUtils.h>
 #include "WeexCore.h"
 #include "ExtendJSApi.h"
 
