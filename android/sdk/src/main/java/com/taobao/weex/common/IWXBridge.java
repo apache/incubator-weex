@@ -45,7 +45,7 @@ public interface IWXBridge extends IWXObject {
    * @param framework assets/main.js
    * @return
    */
-  int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard);
+  int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
   /**
    * execute javascript function

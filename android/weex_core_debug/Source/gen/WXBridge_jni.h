@@ -24,6 +24,12 @@ jclass g_WXBridge_clazz = NULL;
 
 }  // namespace
 
+static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller,
+    jstring framework,
+    jobject params,
+    jstring cacheDir,
+    jboolean pieSupport);
+
 static jint InitFramework(JNIEnv* env, jobject jcaller,
     jstring framework,
     jobject params);
@@ -48,6 +54,14 @@ static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
 // Step 3: RegisterNatives.
 
 static const JNINativeMethod kMethodsWXBridge[] = {
+    { "nativeInitFrameworkEnv",
+"("
+"Ljava/lang/String;"
+"Lcom/taobao/weex/bridge/WXParams;"
+"Ljava/lang/String;"
+"Z"
+")"
+"I", reinterpret_cast<void*>(InitFrameworkEnv) },
     { "nativeInitFramework",
 "("
 "Ljava/lang/String;"

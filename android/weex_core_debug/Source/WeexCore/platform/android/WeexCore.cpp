@@ -23,6 +23,15 @@ JNIEnv *getJNIEnv() {
   return env;
 }
 
+static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller,
+                          jstring framework,
+                          jobject params,
+                          jstring cacheDir,
+                          jboolean pieSupport) {
+  jThis = env->NewGlobalRef(jcaller);
+  return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
+}
+
 static jint InitFramework(JNIEnv *env,
                    jobject object,
                    jstring script,

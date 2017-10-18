@@ -33,7 +33,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
 public class WXBridge implements IWXBridge {
 
-  private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard);
+  private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
   private native int nativeInitFramework(String framework, WXParams params);
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
   private native void nativeOnVsync(String instanceId);
@@ -49,9 +49,9 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard) {
+  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport) {
     if (MULTIPROCESS) {
-      return nativeInitFrameworkEnv(framework, params, cacheDir, onSdcard);
+      return nativeInitFrameworkEnv(framework, params, cacheDir, pieSupport);
     } else {
       return nativeInitFramework(framework, params);
     }

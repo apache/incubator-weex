@@ -40,27 +40,38 @@ public class WeexFrameRateControl {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public WeexFrameRateControl(VSyncListener listener) {
         mListener = new WeakReference<>(listener);
-        mChoreographer = Choreographer.getInstance();
-        mVSyncFrameCallback = new Choreographer.FrameCallback() {
-            @Override
-            public void doFrame(long frameTimeNanos) {
-                mChoreographer.postFrameCallback(mVSyncFrameCallback);
-                if (mListener != null && mListener.get() != null) {
-                    mListener.get().OnVSync();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            mChoreographer = Choreographer.getInstance();
+            mVSyncFrameCallback = new Choreographer.FrameCallback() {
+                @Override
+                public void doFrame(long frameTimeNanos) {
+                    mChoreographer.postFrameCallback(mVSyncFrameCallback);
+                    if (mListener != null && mListener.get() != null) {
+                        mListener.get().OnVSync();
+                    }
                 }
-            }
-        };
+            };
+        } else {
+            // only support on api 16
+            mChoreographer = null;
+            mVSyncFrameCallback = null;
+        }
+
 
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void start() {
-        mChoreographer.postFrameCallback(mVSyncFrameCallback);
+        if (mChoreographer != null) {
+            mChoreographer.postFrameCallback(mVSyncFrameCallback);
+        }
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void stop() {
-        mChoreographer.removeFrameCallback(mVSyncFrameCallback);
+        if (mChoreographer != null) {
+            mChoreographer.removeFrameCallback(mVSyncFrameCallback);
+        }
     }
-
 }

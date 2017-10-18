@@ -5,6 +5,7 @@
 #include "ExtendJSApi.h"
 
 const char *s_cacheDir;
+bool s_start_pie = true;
 
 static IPCSender *sSender;
 static std::unique_ptr<IPCHandler> sHandler;
@@ -17,14 +18,25 @@ namespace WeexCore {
     sHandler.reset();
   }
 
+  jint WeexProxy::doInitFramework(JNIEnv *env, jobject object, jstring script, jobject params, jstring cacheDir, jboolean pieSupport) {
+    const char* cache = env->GetStringUTFChars(reinterpret_cast<jstring>(cacheDir), nullptr);
+    if (strlen(cache) > 0) {
+      s_cacheDir = cache;
+    }
+    s_start_pie = pieSupport;
+    return doInitFramework(env, jThis, script, params);
+  }
+
   jint WeexProxy::doInitFramework(JNIEnv *env,
                                   jobject object,
                                   jstring script,
                                   jobject params) {
+    bool reinit = false;
+startInitFrameWork:
     try {
       sHandler = std::move(createIPCHandler());
       sConnection.reset(new WeexJSConnection());
-      sSender = sConnection->start(sHandler.get());
+      sSender = sConnection->start(sHandler.get(), reinit);
       // initHandler(sHandler.get());
 
       ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
@@ -40,12 +52,19 @@ namespace WeexCore {
       std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
       if (result->getType() != IPCType::INT32) {
         LOGE("initFramework Unexpected result type");
+        reportException("", "initFramework", "doInitFramework error, initFramework Unexpected result type");
         return false;
       }
       return result->get<jint>();
     } catch (IPCException &e) {
-      LOGE("%s", e.msg());
-      return false;
+      if (!reinit) {
+        reinit = true;
+        goto startInitFrameWork;
+      } else {
+        LOGE("%s", e.msg());
+        reportException("", "initFramework", e.msg());
+        return false;
+      }
     }
     return true;
   }
@@ -245,6 +264,19 @@ namespace WeexCore {
     env->DeleteLocalRef(options);
   }
 
+void WeexProxy::reportException(const char *instanceID, const char *func, const char *exception_string) {
+  JNIEnv* env = getJNIEnv();
+  jstring jExceptionString = env->NewStringUTF(exception_string);
+  jstring jInstanceId = env->NewStringUTF(instanceID);
+  jstring jFunc = env->NewStringUTF(func);
+  jmethodID tempMethodId = env->GetMethodID(jBridgeClazz,
+                                            "reportJSException",
+                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+  env->CallVoidMethod(jThis, tempMethodId, jInstanceId, jFunc, jExceptionString);
+  env->DeleteLocalRef(jExceptionString);
+  env->DeleteLocalRef(jInstanceId);
+  env->DeleteLocalRef(jFunc);
+}
 
   void WeexProxy::reportServerCrash(jstring jinstanceid) {
     JNIEnv *env = getJNIEnv();
@@ -262,7 +294,7 @@ namespace WeexCore {
     crashFile = env->NewStringUTF(crashFileStr.c_str());
     env->CallVoidMethod(jThis, reportMethodId, jinstanceid, crashFile);
     env->DeleteLocalRef(crashFile);
-    no_method:
+no_method:
     env->ExceptionClear();
   }
 

@@ -10,15 +10,17 @@
 
 namespace WeexCore {
 
-  class WeexProxy {
-  private:
-  public:
+class WeexProxy {
+private:
+public:
     static void reset();
+
+    static jint doInitFramework(JNIEnv *env, jobject object, jstring script, jobject params,
+                                jstring cacheDir, jboolean pieSupport);
 
     static jint doInitFramework(JNIEnv *env, jobject object, jstring script, jobject params);
 
-    static void
-    initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
+    static void initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
 
     static void initHandler(IPCHandler *handler);
 
@@ -36,6 +38,6 @@ namespace WeexCore {
     reportException(const char *instanceID, const char *func, const char *exception_string);
 
     static void reportServerCrash(jstring jinstanceid);
-  };
+};
 }
 #endif //_WEEX_PROXY_H_

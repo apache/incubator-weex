@@ -42,7 +42,7 @@ private:
     int m_tid;
     static const uint32_t m_finishTag = static_cast<uint32_t>(1);
     static const size_t m_pagesCount = 16;
-    static const int m_timeoutSec = 10;
+    static const int m_timeoutSec = 20;
 };
 
 #endif /* IPCFUTEXPAGEQUEUE_H */
