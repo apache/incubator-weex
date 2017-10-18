@@ -241,7 +241,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         Log.i(TAG, "into--[http:onSuccess] url:" + url);
         try {
           mConfigMap.put("bundleUrl", url);
-          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil.getDisplayHeight(WXPageActivity.this), WXRenderStrategy.APPEND_ASYNC);
+          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }

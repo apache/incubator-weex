@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -68,14 +67,13 @@ import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.view.WXScrollView;
-import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
-import com.taobao.weex.WXSDKEngine;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -92,7 +90,7 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
+public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
 
   //Performance
   public boolean mEnd = false;
@@ -117,14 +115,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
   private boolean mNeedReLoad = false;
-  private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
-
-//  private String mPackage;
-//  private String mTemplate;
-//  private Map<String, Object> mOptions;
-//  private String mJsonInitData;
-//  private WXRenderStrategy mFlag;
 
   /**
    * Render strategy.
@@ -140,7 +131,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private long mRefreshStartTime;
   private WXPerformance mWXPerformance;
   private ScrollView mScrollView;
-  private WXScrollViewListener mWXScrollViewListener;
 
   private List<OnWXScrollListener> mWXScrollListeners;
 
@@ -166,8 +156,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
     mRenderContainer = a;
   }
-
-
 
   private int mMaxDeepLayer;
 
@@ -212,23 +200,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setNeedLoad(boolean load) {
     mNeedReLoad = load;
-  }
-  /*
-  *  Warning: use setInstanceViewPortWidth instead.
-  *  store custom ViewPort Width
-  */
-  @Deprecated
-  public void setViewPortWidth(int viewPortWidth) {
-    mViewPortWidth = viewPortWidth;
-  }
-
-  /**
-   * Warning: use getInstanceViewPortWidth instead.
-   * @return
-   */
-  @Deprecated
-  public static int getViewPortWidth() {
-    return mViewPortWidth;
   }
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
@@ -328,65 +299,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setRootScrollView(ScrollView scrollView) {
     mScrollView = scrollView;
-    if (mWXScrollViewListener != null) {
-      ((WXScrollView) mScrollView).addScrollViewListener(mWXScrollViewListener);
-    }
-  }
-
-  @Deprecated
-  public void registerScrollViewListener(WXScrollViewListener scrollViewListener) {
-    mWXScrollViewListener = scrollViewListener;
-  }
-
-  @Deprecated
-  public WXScrollViewListener getScrollViewListener() {
-    return mWXScrollViewListener;
-  }
-
-  @Deprecated
-  public void setIWXUserTrackAdapter(IWXUserTrackAdapter adapter) {
-  }
-
-  /**
-   * Render template asynchronously, use {@link WXRenderStrategy#APPEND_ASYNC} as render strategy
-   * @param template bundle js
-   * @param options  os   iphone/android/ipad
-   *                 weexversion    Weex version(like 1.0.0)
-   *                 appversion     App version(like 1.0.0)
-   *                 devid        Device id(like Aqh9z8dRJNBhmS9drLG5BKCmXhecHUXIZoXOctKwFebH)
-   *                 sysversion    Device system version(like 5.4.4、7.0.4, should be used with os)
-   *                 sysmodel     Device model(like iOS:"MGA82J/A", android:"MI NOTE LTE")
-   *                 Time    UNIX timestamp, UTC+08:00
-   *                 TTID(Optional)
-   *                 MarkertId
-   *                 Appname(Optional)  tm,tb,qa
-   *                 Bundleurl(Optional)  template url
-   * @param jsonInitData Initial data for rendering
-   */
-  public void render(String template, Map<String, Object> options, String jsonInitData) {
-    render(template, options, jsonInitData, WXRenderStrategy.APPEND_ASYNC);
-  }
-
-  /**
-   * Render template asynchronously
-   * @param template bundle js
-   * @param options  os   iphone/android/ipad
-   *                 weexversion    Weex version(like 1.0.0)
-   *                 appversion     App version(like 1.0.0)
-   *                 devid        Device id(like Aqh9z8dRJNBhmS9drLG5BKCmXhecHUXIZoXOctKwFebH)
-   *                 sysversion    Device system version(like 5.4.4、7.0.4, should be used with os)
-   *                 sysmodel     Device model(like iOS:"MGA82J/A", android:"MI NOTE LTE")
-   *                 Time    UNIX timestamp, UTC+08:00
-   *                 TTID(Optional)
-   *                 MarkertId
-   *                 Appname(Optional)  tm,tb,qa
-   *                 Bundleurl(Optional)  template url
-   * @param jsonInitData Initial data for rendering
-   * @param flag     RenderStrategy {@link WXRenderStrategy}
-   */
-  @Deprecated
-  public void render(String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
-    render(WXPerformance.DEFAULT, template, options, jsonInitData, flag);
   }
 
   /**
@@ -442,18 +354,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       renderOptions = new HashMap<>();
     }
 
-    // for reload
-//    mPackage = pageName;
-//    mTemplate = template;
-//    mOptions = renderOptions;
-//    mJsonInitData = jsonInitData;
-//    mFlag = flag;
 
     if (WXEnvironment.sDynamicMode && !TextUtils.isEmpty(WXEnvironment.sDynamicUrl) && renderOptions.get("dynamicMode") == null) {
       renderOptions.put("dynamicMode", "true");
 
-      // add for reload
-//      mOptions = renderOptions;
 
       renderByUrl(pageName, WXEnvironment.sDynamicUrl, renderOptions, jsonInitData, flag);
       return;
@@ -517,52 +421,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /**
-   * Use {@link #render(String, String, Map, String, WXRenderStrategy)} instead.
-   * @param pageName
-   * @param template
-   * @param options
-   * @param jsonInitData
-   * @param width
-   * @param height
-   * @param flag
-   */
-  @Deprecated
-  public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, int width, int height, WXRenderStrategy flag) {
-    render(pageName,template,options,jsonInitData,flag);
-  }
-
-  /**
    * Render template asynchronously, use {@link WXRenderStrategy#APPEND_ASYNC} as render strategy
    * @param template bundle js
    */
   public void render(String template) {
     render(WXPerformance.DEFAULT, template, null, null, mRenderStrategy);
-  }
-
-  /**
-   * Use {@link #render(String)} instead.
-   * @param template
-   * @param width
-   * @param height
-   */
-  @Deprecated
-  public void render(String template, int width, int height) {
-    render(template);
-  }
-
-  /**
-   * Use {@link #renderByUrl(String, String, Map, String, WXRenderStrategy)} instead.
-   * @param pageName
-   * @param url
-   * @param options
-   * @param jsonInitData
-   * @param width
-   * @param height
-   * @param flag
-   */
-  @Deprecated
-  public void renderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag){
-    renderByUrl(pageName,url,options,jsonInitData,flag);
   }
 
   public void renderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final WXRenderStrategy flag) {
@@ -597,17 +460,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void reloadPage() {
     WXSDKEngine.reload(WXEnvironment.sApplication,null,WXEnvironment.sRemoteDebugMode);
 
-    // 可以发送广播吗？
     Intent intent = new Intent();
     intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
     intent.putExtra("url", mBundleUrl);
     mContext.sendBroadcast(intent);
-
-    // mRendered = false;
-    //    destroy();
-    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
-    // refreshInstance("{}");
-
   }
   /**
    * Refresh instance asynchronously.
@@ -729,10 +585,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mRenderListener = listener;
   }
 
-  @Deprecated
-  public void registerActivityStateListener(IWXActivityStateListener listener) {
-
-  }
 
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
@@ -761,7 +613,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *  begin hook Activity life cycle callback
    ********************************************************/
 
-  @Override
   public void onActivityCreate() {
 
     // module listen Activity onActivityCreate
@@ -777,7 +628,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
 
-  @Override
+
   public void onActivityStart() {
 
     // module listen Activity onActivityCreate
@@ -801,8 +652,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return true;
   }
 
-
-  @Override
   public void onActivityPause() {
     onViewDisappear();
     if(!isCommit){
@@ -835,8 +684,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
-
-  @Override
   public void onActivityResume() {
 
     // notify onActivityResume callback to module
@@ -859,10 +706,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     onViewAppear();
 
-    setViewPortWidth(mInstanceViewPortWidth);
+    setInstanceViewPortWidth(mInstanceViewPortWidth);
   }
 
-  @Override
   public void onActivityStop() {
 
     // notify onActivityResume callback to module
@@ -877,7 +723,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   }
 
-  @Override
   public void onActivityDestroy() {
     WXModuleManager.onActivityDestroy(getInstanceId());
 
@@ -890,7 +735,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     destroy();
   }
 
-  @Override
   public boolean onActivityBack() {
 
     WXModuleManager.onActivityBack(getInstanceId());
@@ -1537,7 +1381,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       this.flag = flag;
       this.startRequestTime = startRequestTime;
     }
-    
+
     public void setSDKInstance(WXSDKInstance instance) {
       this.instance = instance;
     }
@@ -1643,7 +1487,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   @Override
   public void OnVSync() {
     // add vSync code for refresh
-
 
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
