@@ -48,12 +48,10 @@ public class WXMetaModule extends WXModule {
                 Context cxt = mWXSDKInstance.getContext();
                 if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
                     int width = (int)(WXViewUtils.getScreenWidth(cxt)/WXViewUtils.getScreenDensity(cxt));
-                    mWXSDKInstance.setViewPortWidth(width);
                     mWXSDKInstance.setInstanceViewPortWidth(width);
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
-                        mWXSDKInstance.setViewPortWidth(width);
                         mWXSDKInstance.setInstanceViewPortWidth(width);
                     }
                 }

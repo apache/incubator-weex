@@ -57,7 +57,7 @@ public class DefautDebugAdapter implements IWXDebugAdapter {
       ScalpelFrameLayout scalpelFrameLayout = new ScalpelFrameLayout(wxView.getContext());
       WXDebugTool.updateScapleView(scalpelFrameLayout);
       scalpelFrameLayout.addView(wxView);
-      instance.registerActivityStateListener(new DebugActivityState(wxView));
+//      instance.registerActivityStateListener(new DebugActivityState(wxView));
       return scalpelFrameLayout;
     }
     return wxView;
@@ -79,7 +79,7 @@ public class DefautDebugAdapter implements IWXDebugAdapter {
     return null;
   }
 
-  static class DebugActivityState implements IWXActivityStateListener {
+  static class DebugActivityState {
 
     private View mWXView;
 
@@ -87,39 +87,39 @@ public class DefautDebugAdapter implements IWXDebugAdapter {
       mWXView = wxView;
     }
 
-    @Override
+
     public void onActivityCreate() {
 
     }
 
-    @Override
+
     public void onActivityStart() {
 
     }
 
-    @Override
+
     public void onActivityPause() {
       WXDebugTool.updateScapleView(null);
     }
 
-    @Override
+
     public void onActivityResume() {
       if (mWXView != null && mWXView.getParent() instanceof ScalpelFrameLayout) {
         WXDebugTool.updateScapleView(mWXView.getParent());
       }
     }
 
-    @Override
+
     public void onActivityStop() {
 
     }
 
-    @Override
+
     public void onActivityDestroy() {
 
     }
 
-    @Override
+
     public boolean onActivityBack() {
       return false;
     }

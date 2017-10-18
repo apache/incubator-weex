@@ -71,7 +71,7 @@ public class PlayDebugAdapter implements IWXDebugAdapter {
         Class cls = Class.forName("com.taobao.weex.WXDebugTool");
         Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
         m.invoke(null, new Object[]{container});
-        instance.registerActivityStateListener(new DebugActivityState(wxView));
+//        instance.registerActivityStateListener(new DebugActivityState(wxView));
         return container;
       }
     } catch (Exception e) {

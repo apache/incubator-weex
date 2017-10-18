@@ -123,8 +123,6 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
       template,
       options,
       jsonInitData,
-      ScreenUtil.getDisplayWidth(this),
-      ScreenUtil.getDisplayHeight(this),
       WXRenderStrategy.APPEND_ASYNC);
   }
 
@@ -142,8 +140,6 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
       url,
       options,
       jsonInitData,
-      ScreenUtil.getDisplayWidth(this),
-      ScreenUtil.getDisplayHeight(this),
       WXRenderStrategy.APPEND_ASYNC);
   }
 

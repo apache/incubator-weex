@@ -178,8 +178,6 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
                            WXFileUtils.loadAsset("hello.js", BenchmarkActivity.this),
                            options,
                            null,
-                           root.getWidth(),
-                           root.getHeight(),
                            WXRenderStrategy.APPEND_ASYNC);
         } else {
           root.removeAllViews();
@@ -214,8 +212,6 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
             url,
             options,
             null,
-            root.getWidth(),
-            root.getHeight(),
             WXRenderStrategy.APPEND_ASYNC);
       }
     });
