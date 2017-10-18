@@ -93,6 +93,7 @@ import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
+import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
@@ -158,6 +159,11 @@ public class WXSDKEngine {
       }
       long start = System.currentTimeMillis();
       WXEnvironment.sSDKInitStart = start;
+      if(WXEnvironment.isApkDebugable()){
+        WXEnvironment.sLogLevel = LogLevel.DEBUG;
+      }else{
+        WXEnvironment.sLogLevel = LogLevel.WARN;
+      }
       doInitInternal(application,config);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
