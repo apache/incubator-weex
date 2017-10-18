@@ -78,10 +78,11 @@ public class WXLogUtils {
         Log.println(level.getPriority(),tag, msg);
       }
 
-      if(WXEnvironment.isApkDebugable()){
-        writeConsoleLog(level.getName(), msg);
-        sendLog(level, msg);
-      }
+      // if not debug level then print log
+      if(WXEnvironment.isApkDebugable() && !level.getName().equals("debug")){
+		writeConsoleLog(level.getName(), msg);
+		sendLog(level, msg);
+	  }
     }
   }
 
