@@ -50,14 +50,15 @@
   }
 
   .doc-nav {
-    position: absolute;
+    position: fixed;
     top: 72px;
     left: 0;
     bottom: 0;
-    background: $bg-gray;
+    width: 260px;
+    padding: 40px 20px 60px 60px;
+    background: $bg-white;
     width: 300px;
     z-index: 999;
-    padding: 43px 15px 15px;
     overflow-x: hidden;
     overflow-y: auto;
   }

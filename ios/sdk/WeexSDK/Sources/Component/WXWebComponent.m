@@ -200,6 +200,9 @@ WX_EXPORT_METHOD(@selector(goForward))
         NSMutableDictionary *data = [self baseInfo];
         [data setObject:[error localizedDescription] forKey:@"errorMsg"];
         [data setObject:[NSString stringWithFormat:@"%ld", (long)error.code] forKey:@"errorCode"];
+        if(error.userInfo && ![error.userInfo[NSURLErrorFailingURLStringErrorKey] hasPrefix:@"http"]){
+            return;
+        }
         [self fireEvent:@"error" params:data];
     }
 }
