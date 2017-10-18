@@ -20,7 +20,8 @@ public:
 
     static jint doInitFramework(JNIEnv *env, jobject object, jstring script, jobject params);
 
-    static void initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
+    static void
+    initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
 
     static void initHandler(IPCHandler *handler);
 

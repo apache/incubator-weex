@@ -17,14 +17,14 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 add_library(weexjsc SHARED
 
     ./prebuild/jni_load.cc
-    ./base/android/android_jni.cpp
-    ./base/android/scoped_java_ref.cpp
+    ./base/android/jni/android_jni.cpp
+    ./base/android/jni/scoped_java_ref.cpp
 
     ./base/Compatible.cpp
-    ./base/base64/base64.cpp
-    ./base/base64/modp_base64/modp_b64.cc
-    ./base/string/ScopedJString.cpp
-    ./base/string/ScopedJStringUTF8.cpp
+    ./base/android/base64/base64.cpp
+    ./base/android/base64/modp_base64/modp_b64.cc
+    ./base/android/string/ScopedJString.cpp
+    ./base/android/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
 
 

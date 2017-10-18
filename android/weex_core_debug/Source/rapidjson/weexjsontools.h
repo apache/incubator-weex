@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 #include "../base/fpconv.h"
-#include "../base/LogUtils.h"
-#include "../base/string/StringUtils.h"
+#include "../base/android/LogUtils.h"
+#include "../base/android/string/StringUtils.h"
 #include "../WeexCore/render/RenderObject.h"
 #include "../WeexCore/render/RenderPage.h"
 

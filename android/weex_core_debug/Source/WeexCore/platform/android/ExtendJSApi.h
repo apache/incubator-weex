@@ -1,13 +1,13 @@
 #ifndef _EXTEND_JSAPI_H_
 #define _EXTEND_JSAPI_H_
 
-#include <base/LogUtils.h>
-#include "../../../IPC/IPCHandler.h"
-#include "../../../IPC/IPCMessageJS.h"
-#include "../../../IPC/IPCResult.h"
-#include "../../../IPC/IPCSender.h"
-#include "../../../IPC/IPCString.h"
-#include "../../../IPC/Serializing/IPCSerializer.h"
+#include <base/android/LogUtils.h>
+#include "IPC/IPCHandler.h"
+#include "IPC/IPCMessageJS.h"
+#include "IPC/IPCResult.h"
+#include "IPC/IPCSender.h"
+#include "IPC/IPCString.h"
+#include "IPC/Serializing/IPCSerializer.h"
 #include <WeexCore/render/RenderManager.h>
 #include "BridgeAndroid.h"
 
@@ -55,12 +55,12 @@ static void reportException(const char *instanceID, const char *func, const char
 
 namespace WeexCore {
 
-  class ExtendJSApi {
-  public:
+class ExtendJSApi {
+public:
     ExtendJSApi();
 
     void initFunction(IPCHandler *handler);
-  };
+};
 
 } //WeexCore
 

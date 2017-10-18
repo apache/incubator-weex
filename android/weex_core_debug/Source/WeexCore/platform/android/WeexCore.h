@@ -1,9 +1,9 @@
 #ifndef _WEEX_CORE_H_
 #define _WEEX_CORE_H_
 
-#include <base/LogUtils.h>
-#include <base/string/ScopedJString.h>
-#include <base/string/ScopedJStringUTF8.h>
+#include <base/android/LogUtils.h>
+#include <base/android/string/ScopedJString.h>
+#include <base/android/string/ScopedJStringUTF8.h>
 
 #include <IPC/Buffering/IPCBuffer.h>
 #include <IPC/IPCArguments.h>
@@ -32,7 +32,7 @@ extern JNIEnv *getJNIEnv();
 
 namespace WeexCore {
 
-bool RegisterJNIUtils(JNIEnv* env);
+bool RegisterJNIUtils(JNIEnv *env);
 
 jint OnLoad(JavaVM *vm, void *reserved);
 

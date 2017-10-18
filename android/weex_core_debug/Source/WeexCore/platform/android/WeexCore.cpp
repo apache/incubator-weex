@@ -1,6 +1,6 @@
 #include "WeexCore.h"
 #include "WeexProxy.h"
-#include <base/android/android_jni.h>
+#include <base/android/jni/android_jni.h>
 #include <gen/WXBridge_jni.h>
 
 using namespace WeexCore;
@@ -23,19 +23,19 @@ JNIEnv *getJNIEnv() {
   return env;
 }
 
-static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller,
-                          jstring framework,
-                          jobject params,
-                          jstring cacheDir,
-                          jboolean pieSupport) {
+static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
+                             jstring framework,
+                             jobject params,
+                             jstring cacheDir,
+                             jboolean pieSupport) {
   jThis = env->NewGlobalRef(jcaller);
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
 static jint InitFramework(JNIEnv *env,
-                   jobject object,
-                   jstring script,
-                   jobject params) {
+                          jobject object,
+                          jstring script,
+                          jobject params) {
   jThis = env->NewGlobalRef(object);
   return WeexProxy::doInitFramework(env, jThis, script, params);
 }
@@ -80,9 +80,9 @@ static jint ExecJS(JNIEnv *env,
 
 
 namespace WeexCore {
-  bool RegisterJNIUtils(JNIEnv* env) {
-    return RegisterNativesImpl(env);
-  }
+bool RegisterJNIUtils(JNIEnv *env) {
+  return RegisterNativesImpl(env);
+}
 
 jint OnLoad(JavaVM *vm, void *reserved) {
   LOGD("begin JNI_OnLoad");

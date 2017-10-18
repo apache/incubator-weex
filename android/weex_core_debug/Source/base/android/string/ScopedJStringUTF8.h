@@ -13,19 +13,19 @@
 
 namespace WeexCore {
 
-  class ScopedJStringUTF8 {
-  public:
+class ScopedJStringUTF8 {
+public:
     ScopedJStringUTF8(JNIEnv *env, jstring);
 
     ~ScopedJStringUTF8();
 
     const char *getChars();
 
-  private:
+private:
     JNIEnv *m_env;
     jstring m_jstring;
     const char *m_chars;
-  };
+};
 
 }
 #endif //_SCOPED_JSTRING_UTF_8_H_

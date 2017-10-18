@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <WeexCore/platform/android/WeexCore.h>
-#include <base/android/android_jni.h>
+#include <base/android/jni/android_jni.h>
 #include <android/log.h>
 
 

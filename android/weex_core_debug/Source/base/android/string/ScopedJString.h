@@ -6,8 +6,8 @@
 
 namespace WeexCore {
 
-  class ScopedJString {
-  public:
+class ScopedJString {
+public:
     ScopedJString(JNIEnv *env, jstring);
 
     ~ScopedJString();
@@ -16,12 +16,12 @@ namespace WeexCore {
 
     size_t getCharsLength();
 
-  private:
+private:
     JNIEnv *m_env;
     jstring m_jstring;
     const uint16_t *m_chars;
     size_t m_len;
-  };
+};
 
 }
 #endif //_SCOPED_JSTRING_H_

@@ -53,7 +53,7 @@ extern "C" {
  * \endcode
  *
  */
-int modp_b64_encode(char* dest, const char* str, int len);
+int modp_b64_encode(char *dest, const char *str, int len);
 
 /**
  * Decode a base64 encoded string
@@ -76,7 +76,7 @@ int modp_b64_encode(char* dest, const char* str, int len);
  * if (len == -1) { error }
  * \endcode
  */
-int modp_b64_decode(char* dest, const char* src, int len);
+int modp_b64_decode(char *dest, const char *src, int len);
 
 /**
  * Given a source string of length len, this returns the amount of
@@ -131,13 +131,12 @@ int modp_b64_decode(char* dest, const char* src, int len);
 
 #include <string>
 
-inline std::string& modp_b64_encode(std::string& s)
-{
-    std::string x(modp_b64_encode_len(s.size()), '\0');
-    int d = modp_b64_encode(const_cast<char*>(x.data()), s.data(), s.size());
-    x.erase(d, std::string::npos);
-    s.swap(x);
-    return s;
+inline std::string &modp_b64_encode(std::string &s) {
+  std::string x(modp_b64_encode_len(s.size()), '\0');
+  int d = modp_b64_encode(const_cast<char *>(x.data()), s.data(), s.size());
+  x.erase(d, std::string::npos);
+  s.swap(x);
+  return s;
 }
 
 /**
@@ -149,17 +148,16 @@ inline std::string& modp_b64_encode(std::string& s)
  * \param[in,out] s the string to be decoded
  * \return a reference to the input string
  */
-inline std::string& modp_b64_decode(std::string& s)
-{
-    std::string x(modp_b64_decode_len(s.size()), '\0');
-    int d = modp_b64_decode(const_cast<char*>(x.data()), s.data(), s.size());
-    if (d < 0) {
-        x.clear();
-    } else {
-        x.erase(d, std::string::npos);
-    }
-    s.swap(x);
-    return s;
+inline std::string &modp_b64_decode(std::string &s) {
+  std::string x(modp_b64_decode_len(s.size()), '\0');
+  int d = modp_b64_decode(const_cast<char *>(x.data()), s.data(), s.size());
+  if (d < 0) {
+    x.clear();
+  } else {
+    x.erase(d, std::string::npos);
+  }
+  s.swap(x);
+  return s;
 }
 
 #endif /* __cplusplus */

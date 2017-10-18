@@ -7,22 +7,22 @@
 
 namespace WeexCore {
 
-  class BridgeAndroid : public Bridge {
+class BridgeAndroid : public Bridge {
 
-  private:
+private:
     jobject jThis;
 
-  public:
+public:
     static BridgeAndroid *m_instance;
 
     //just to release singleton object
     class Garbo {
     public:
-      ~Garbo() {
-        if (BridgeAndroid::m_instance) {
-          delete BridgeAndroid::m_instance;
+        ~Garbo() {
+          if (BridgeAndroid::m_instance) {
+            delete BridgeAndroid::m_instance;
+          }
         }
-      }
     };
 
     static Garbo garbo;
@@ -106,6 +106,6 @@ namespace WeexCore {
                                int top, int bottom, int left, int right,
                                int height, int width);
 
-  };
+};
 } //end WeexCore
 #endif //BridgeAndroid_h

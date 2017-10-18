@@ -12,23 +12,36 @@ ExtendJSApi::ExtendJSApi() {
 
 void ExtendJSApi::initFunction(IPCHandler *handler) {
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION), handleSetJSVersion);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION), handleReportException);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION),
+                           handleReportException);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE), handleCallNative);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVEMODULE), handleCallNativeModule);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVECOMPONENT), handleCallNativeComponent);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDELEMENT), handleCallAddElement);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVEMODULE),
+                           handleCallNativeModule);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVECOMPONENT),
+                           handleCallNativeComponent);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDELEMENT),
+                           handleCallAddElement);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETTIMEOUT), handleSetTimeout);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::NATIVELOG), handleCallNativeLog);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEBODY), functionCallCreateBody);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEFINISH), functionCallUpdateFinish);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEFINISH), functionCallCreateFinish);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREFRESHFINISH), functionCallRefreshFinish);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEATTRS), functionCallUpdateAttrs);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATESTYLE), functionCallUpdateStyle);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEELEMENT), functionCallRemoveElement);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLMOVEELEMENT), functionCallMoveElement);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEBODY),
+                           functionCallCreateBody);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEFINISH),
+                           functionCallUpdateFinish);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEFINISH),
+                           functionCallCreateFinish);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREFRESHFINISH),
+                           functionCallRefreshFinish);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEATTRS),
+                           functionCallUpdateAttrs);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATESTYLE),
+                           functionCallUpdateStyle);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEELEMENT),
+                           functionCallRemoveElement);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLMOVEELEMENT),
+                           functionCallMoveElement);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDEVENT), functionCallAddEvent);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEEVENT), functionCallRemoveEvent);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEEVENT),
+                           functionCallRemoveEvent);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL), handleSetInterval);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL), handleClearInterval);
 }
@@ -402,7 +415,7 @@ std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
 }
 
 
-std::unique_ptr<IPCResult> handleSetInterval(IPCArguments* arguments) {
+std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
   //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
@@ -412,7 +425,8 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments* arguments) {
   jstring jTime = getArgumentAsJString(env, arguments, 2);
   const char *_time = env->GetStringUTFChars(jTime, NULL);
   long time_ = atoi(_time);
-  LOGE("functionSetIntervalWeex instanceId:%s time_:%ld callbackID:%s", instanceID, time_, callbackID);
+  LOGE("functionSetIntervalWeex instanceId:%s time_:%ld callbackID:%s", instanceID, time_,
+       callbackID);
   int _timerId = (atoi(instanceID) << 16) | (atoi(callbackID));
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jCallbackId);
@@ -420,13 +434,13 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments* arguments) {
   return createInt32Result(_timerId);
 }
 
-std::unique_ptr<IPCResult> handleClearInterval(IPCArguments* arguments) {
-  JNIEnv* env = getJNIEnv();
+std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
+  JNIEnv *env = getJNIEnv();
   //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  const char* instanceID = env->GetStringUTFChars(jInstanceId, NULL);
+  const char *instanceID = env->GetStringUTFChars(jInstanceId, NULL);
   jstring jCallbackId = getArgumentAsJString(env, arguments, 1);
-  const char* callbackID = env->GetStringUTFChars(jCallbackId, NULL);
+  const char *callbackID = env->GetStringUTFChars(jCallbackId, NULL);
   LOGE("functionClearIntervalWeex instanceID:%s, callbackID:%s", instanceID, callbackID);
   long id = atoi(callbackID);
 
