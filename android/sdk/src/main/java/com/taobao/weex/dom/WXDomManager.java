@@ -173,10 +173,9 @@ public final class WXDomManager {
 				  "executeActionError",
 				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg() + "|current action is" +className, null);
 		  instance.setmIsCommitedDomAtionExp(true);
-		  return;
 		}
-
-      }
+		return;
+	  }
     }
     long domStart = System.currentTimeMillis();
     long domNanos = System.nanoTime();
