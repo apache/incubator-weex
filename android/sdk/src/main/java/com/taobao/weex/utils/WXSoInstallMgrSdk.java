@@ -21,10 +21,9 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
-import android.text.TextUtils;
 
 import com.taobao.weex.IWXStatisticsListener;
-import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;

@@ -27,7 +27,7 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.taobao.weappplus_sdk.R;
+import com.taobao.weex.R;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;

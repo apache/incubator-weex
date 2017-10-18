@@ -595,7 +595,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void reloadPage() {
-    WXSDKEngine.reload();
+    WXSDKEngine.reload(WXEnvironment.sApplication,null,WXEnvironment.sRemoteDebugMode);
 
     // 可以发送广播吗？
     Intent intent = new Intent();

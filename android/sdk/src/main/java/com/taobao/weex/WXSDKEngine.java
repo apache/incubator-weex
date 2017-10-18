@@ -109,33 +109,6 @@ public class WXSDKEngine {
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
 
-  /**
-   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
-   */
-  @Deprecated
-  public static void init(Application application) {
-    init(application, null);
-  }
-
-  /**
-   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
-   */
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter) {
-    init(application, utAdapter, null);
-  }
-
-  /**
-   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
-   */
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
-    initialize(application,
-      new InitConfig.Builder()
-        .setUtAdapter(utAdapter)
-        .build()
-    );
-  }
 
 
   public static boolean isInitialized(){
@@ -193,17 +166,6 @@ public class WXSDKEngine {
       }
     });
     register();
-  }
-
-  @Deprecated
-  public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    initialize(application,
-      new InitConfig.Builder()
-        .setUtAdapter(utAdapter)
-        .setHttpAdapter(httpAdapter)
-        .setImgAdapter(imgLoaderAdapter)
-        .build()
-    );
   }
 
   public static void setJSExcetptionAdapter(IWXJSExceptionAdapter excetptionAdapter){
@@ -532,12 +494,5 @@ public class WXSDKEngine {
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(JS_FRAMEWORK_RELOAD));
       }
     }, 0);
-  }
-  public static void reload(final Context context, boolean remoteDebug) {
-   reload(context,null,remoteDebug);
-  }
-
-  public static void reload() {
-    reload(WXEnvironment.getApplication(), WXEnvironment.sRemoteDebugMode);
   }
 }

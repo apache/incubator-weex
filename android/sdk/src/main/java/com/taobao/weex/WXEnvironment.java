@@ -26,7 +26,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 
-import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
