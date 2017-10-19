@@ -173,7 +173,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  protected void addSubView(View view, int index) {
+  public void addSubView(View view, int index) {
     if (view == null || mAdapter == null) {
       return;
     }

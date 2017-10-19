@@ -378,7 +378,7 @@ public class WXViewUtils {
   public static void clipCanvasWithinBorderBox(View targetView, Canvas canvas) {
     Drawable drawable;
     if (clipCanvasDueToAndroidVersion(canvas) &&
-        clipCanvasIfAnimationExist() &&
+        clipCanvasIfAnimationExist(targetView) &&
         ((drawable = targetView.getBackground()) instanceof BorderDrawable)) {
       BorderDrawable borderDrawable = (BorderDrawable) drawable;
       if (borderDrawable.isRounded()) {
@@ -394,7 +394,7 @@ public class WXViewUtils {
   public static void clipCanvasWithinBorderBox(Widget widget, Canvas canvas) {
     BorderDrawable borderDrawable;
     if (clipCanvasDueToAndroidVersion(canvas) &&
-        clipCanvasIfAnimationExist() &&
+        clipCanvasIfAnimationExist(null) &&
         (borderDrawable=widget.getBackgroundAndBorder())!=null ) {
       if (borderDrawable.isRounded() && clipCanvasIfBackgroundImageExist(widget, borderDrawable)) {
           Path path = borderDrawable.getContentPath(
@@ -424,8 +424,25 @@ public class WXViewUtils {
    * As animation will not cause redraw if hardware-acceleration enabled, clipCanvas feature has
    * to be disabled when API level is 24 without considering the animation property.
    */
-  private static boolean clipCanvasIfAnimationExist() {
-    return Build.VERSION.SDK_INT != VERSION_CODES.N;
+  private static boolean clipCanvasIfAnimationExist(View targetView) {
+    if (Build.VERSION.SDK_INT != VERSION_CODES.N) {
+      return true;
+    }
+    if(targetView != null &&
+            targetView.getScaleX() == 1 &&
+            targetView.getScaleY() == 1 &&
+            targetView.getTranslationX() == 0 &&
+            targetView.getTranslationY() == 0 &&
+            targetView.getRotation() == 0 &&
+            targetView.getRotationX() == 0 &&
+            targetView.getRotationY() == 0) {
+      if(Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP && targetView.getTranslationZ() != 0 ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
