@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Pair;
@@ -29,9 +28,6 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 
@@ -42,7 +38,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   private static final String TAG="WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
-  private BoxShadowHost mBoxShadowHost;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -483,39 +478,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    ********************************************************/
 
   public @Nullable View getBoxShadowHost(boolean isClear) {
-    if (isClear) {
-      // Return existed host if want clear shadow
-      return mBoxShadowHost;
-    }
-
-    ViewGroup hostView = getHostView();
-    if (hostView == null) {
-      return null;
-    }
-
-    if (!(hostView instanceof WXFrameLayout)) {
-      return hostView;
-    }
-
-    try {
-      if (mBoxShadowHost == null) {
-        mBoxShadowHost = new BoxShadowHost(getContext());
-        WXViewUtils.setBackGround(mBoxShadowHost, null);
-        mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        hostView.addView(mBoxShadowHost);
-      }
-      hostView.removeView(mBoxShadowHost);
-      hostView.addView(mBoxShadowHost);
-      return mBoxShadowHost;
-    } catch (Throwable t) {
-      WXLogUtils.w("BoxShadow", t);
-    }
-    return hostView;
-  }
-
-  private class BoxShadowHost extends View {
-    public BoxShadowHost(Context context) {
-      super(context);
-    }
+    return getHostView();
   }
 }
