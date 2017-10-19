@@ -25,12 +25,11 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -483,13 +482,18 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    *  end hook Activity life cycle callback
    ********************************************************/
 
-  public @Nullable View getBoxShadowHost() {
+  public @Nullable View getBoxShadowHost(boolean isClear) {
+    if (isClear) {
+      // Return existed host if want clear shadow
+      return mBoxShadowHost;
+    }
+
     ViewGroup hostView = getHostView();
     if (hostView == null) {
       return null;
     }
 
-    if (hostView instanceof ScrollView || hostView instanceof HorizontalScrollView) {
+    if (!(hostView instanceof WXFrameLayout)) {
       return hostView;
     }
 
