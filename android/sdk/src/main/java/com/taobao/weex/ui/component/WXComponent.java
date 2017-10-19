@@ -866,7 +866,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
       View target = mHost;
       if (this instanceof WXVContainer) {
-        target = ((WXVContainer) this).getBoxShadowHost();
+        target = ((WXVContainer) this).getBoxShadowHost(false);
       }
 
       if (target == null) {
@@ -909,7 +909,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected void clearBoxShadow() {
     View target = mHost;
     if (this instanceof WXVContainer) {
-      target = ((WXVContainer) this).getBoxShadowHost();
+      target = ((WXVContainer) this).getBoxShadowHost(true);
     }
 
     if (target != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
