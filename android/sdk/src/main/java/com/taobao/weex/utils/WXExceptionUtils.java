@@ -44,25 +44,23 @@ public class WXExceptionUtils {
   public static void commitCriticalExceptionRT(@Nullable String instanceId, @Nullable String errCode, @Nullable String function, @Nullable String exception, @Nullable Map<String,String> extParams ){
 	IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
 	WXSDKInstance instance ;
-	WXJSExceptionInfo exceptionCommit  = null ;
-	String bundleULR = "Weex_SDK_Default_BundleUrl";
+	WXJSExceptionInfo exceptionCommit;
+	String bundleUrlCommit = "BundleUrlDefault";
+	String instanceIdCommit = "InstanceIdDefalut";
 
 	if(!TextUtils.isEmpty(instanceId)){
+	  instanceIdCommit = instanceId;
 	  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-	  if(instance.getContext() != null && instance.getBundleUrl() != null){
-		bundleULR = instance.getBundleUrl();
-		if(adapter != null){
-		  exceptionCommit = new WXJSExceptionInfo(instanceId, bundleULR, errCode, function, exception, extParams);
-		  adapter.onJSException(exceptionCommit);
-		}
-	  }
-	} else {
-	  WXLogUtils.e("Weex instance is Null");
-	  if(adapter != null ){
-		exceptionCommit = new WXJSExceptionInfo("instanceIdIsNull", bundleULR, errCode, function, exception, extParams);
-		adapter.onJSException(exceptionCommit);
+	  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
+		bundleUrlCommit = instance.getBundleUrl();
 	  }
 	}
-	WXLogUtils.e(exceptionCommit.toString());
+
+	if(adapter != null ){
+	  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, extParams);
+	  adapter.onJSException(exceptionCommit);
+	  WXLogUtils.e(exceptionCommit.toString());
+	}
+
   }
 }

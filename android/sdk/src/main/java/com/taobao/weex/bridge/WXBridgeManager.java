@@ -57,6 +57,7 @@ import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1559,6 +1560,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
         commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, "JS Framework is empty!");
+
         return;
       }
       try {
@@ -1789,6 +1791,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.execJSService(service);
     } catch (Throwable e) {
       WXLogUtils.e("[WXBridgeManager] invokeRegisterService:", e);
+	  WXExceptionUtils.commitCriticalExceptionRT("invokeExecJSService",
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE.getErrorCode(),
+			  "invokeExecJSService",
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE.getErrorMsg()
+					  + "[WXBridgeManager] invokeRegisterService:"
+					  + WXLogUtils.getStackTrace(e),
+			  null);
+
       commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_EXECUTE, "invokeRegisterService");
     }
   }
@@ -1838,6 +1848,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.execJS("", null, METHOD_REGISTER_COMPONENTS, args);
     } catch (Throwable e) {
       WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents ", e);
+	  WXExceptionUtils.commitCriticalExceptionRT(null,
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
+			  METHOD_REGISTER_COMPONENTS,
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
+					  + args.toString()
+					  + WXLogUtils.getStackTrace(e),
+			  null);
       commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_EXECUTE, "invokeRegisterComponents");
     }
   }
@@ -1938,11 +1955,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         bundleUrl = instance.getBundleUrl();
       }
 
-      WXJSExceptionInfo jsException = new WXJSExceptionInfo(exceptionId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
-      adapter.onJSException(jsException);
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d(jsException.toString());
-      }
+//      WXJSExceptionInfo jsException = new WXJSExceptionInfo(exceptionId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
+//      adapter.onJSException(jsException);
+
+	  WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION.getErrorCode(),
+			  function,
+			  WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION.getErrorMsg() + exception,
+			  null);
     }
   }
 
