@@ -18,8 +18,10 @@
  */
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
-import { registerElement } from '../vdom/WeexElement'
+import { registerModules } from './module'
+import { registerComponents } from './component'
 import { services, register, unregister } from './service'
+import WeexInstance from './WeexInstance'
 
 let frameworks
 let runtimeConfig
@@ -95,58 +97,61 @@ function createInstance (id, code, config, data) {
   config = JSON.parse(JSON.stringify(config || {}))
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
 
-  const context = {
-    config,
+  const weex = new WeexInstance(id, config)
+  Object.freeze(weex)
+
+  const runtimeEnv = {
+    weex,
+    config, // TODO: deprecated
     created: Date.now(),
     framework: bundleType
   }
-  context.services = createServices(id, context, runtimeConfig)
-  instanceMap[id] = context
+  runtimeEnv.services = createServices(id, runtimeEnv, runtimeConfig)
+  instanceMap[id] = runtimeEnv
 
-  if (process.env.NODE_ENV === 'development') {
-    console.debug(`[JS Framework] create an ${bundleType} instance`)
-  }
+  const runtimeContext = Object.create(null)
+  Object.assign(runtimeContext, runtimeEnv.services, { weex })
 
-  const fm = frameworks[bundleType]
-  if (!fm) {
+  const framework = runtimeConfig.frameworks[bundleType]
+  if (!framework) {
     return new Error(`invalid bundle type "${bundleType}".`)
   }
 
-  return fm.createInstance(id, code, config, data, context)
+  // run create instance
+  if (typeof framework.prepareInstanceContext === 'function') {
+    const instanceContext = framework.prepareInstanceContext(runtimeContext)
+    return runInContext(code, instanceContext)
+  }
+  return framework.createInstance(id, code, config, data, runtimeEnv)
+}
+
+/**
+ * Run js code in a specific context.
+ * @param {string} code
+ * @param {object} context
+ */
+function runInContext (code, context) {
+  const keys = []
+  const args = []
+  for (const key in context) {
+    keys.push(key)
+    args.push(context[key])
+  }
+
+  const bundle = `
+    (function (global) {
+      "use strict";
+      ${code}
+    })(Object.create(this))
+  `
+
+  return (new Function(...keys, bundle))(...args)
 }
 
 const methods = {
   createInstance,
   registerService: register,
   unregisterService: unregister
-}
-
-/**
- * Register methods which init each frameworks.
- * @param {string} methodName
- */
-function genInit (methodName) {
-  methods[methodName] = function (...args) {
-    if (methodName === 'registerComponents') {
-      checkComponentMethods(args[0])
-    }
-    for (const name in frameworks) {
-      const framework = frameworks[name]
-      if (framework && framework[methodName]) {
-        framework[methodName](...args)
-      }
-    }
-  }
-}
-
-function checkComponentMethods (components) {
-  if (Array.isArray(components)) {
-    components.forEach((name) => {
-      if (name && name.type && name.methods) {
-        registerElement(name.type, name.methods)
-      }
-    })
-  }
 }
 
 /**
@@ -203,6 +208,27 @@ function adaptInstance (methodName, nativeMethodName) {
   }
 }
 
+/**
+ * Register methods which init each frameworks.
+ * @param {string} methodName
+ * @param {function} sharedMethod
+ */
+function adaptMethod (methodName, sharedMethod) {
+  methods[methodName] = function (...args) {
+    if (typeof sharedMethod === 'function') {
+      sharedMethod(...args)
+    }
+
+    // TODO: deprecated
+    for (const name in runtimeConfig.frameworks) {
+      const framework = runtimeConfig.frameworks[name]
+      if (framework && framework[methodName]) {
+        framework[methodName](...args)
+      }
+    }
+  }
+}
+
 export default function init (config) {
   runtimeConfig = config || {}
   frameworks = runtimeConfig.frameworks || {}
@@ -216,8 +242,9 @@ export default function init (config) {
     framework.init(config)
   }
 
-  // @todo: The method `registerMethods` will be re-designed or removed later.
-  ; ['registerComponents', 'registerModules', 'registerMethods'].forEach(genInit)
+  adaptMethod('registerComponents', registerComponents)
+  adaptMethod('registerModules', registerModules)
+  adaptMethod('registerMethods')
 
   ; ['destroyInstance', 'refreshInstance', 'receiveTasks', 'getRoot'].forEach(genInstance)
 

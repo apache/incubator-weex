@@ -264,6 +264,10 @@
 		77E65A161C155EB5008B8775 /* WXTextComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E65A141C155EB5008B8775 /* WXTextComponent.m */; };
 		77E65A191C155F25008B8775 /* WXScrollerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E65A171C155F25008B8775 /* WXScrollerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77E65A1A1C155F25008B8775 /* WXScrollerComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E65A181C155F25008B8775 /* WXScrollerComponent.m */; };
+		841CD1031F9739890081196D /* WXExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CD1021F9739890081196D /* WXExceptionUtils.m */; };
+		841CD1051F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		841CD1061F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		841CD1071F974E000081196D /* WXExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CD1021F9739890081196D /* WXExceptionUtils.m */; };
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
@@ -851,6 +855,8 @@
 		77E65A141C155EB5008B8775 /* WXTextComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextComponent.m; sourceTree = "<group>"; };
 		77E65A171C155F25008B8775 /* WXScrollerComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXScrollerComponent.h; sourceTree = "<group>"; };
 		77E65A181C155F25008B8775 /* WXScrollerComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXScrollerComponent.m; sourceTree = "<group>"; };
+		841CD1021F9739890081196D /* WXExceptionUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExceptionUtils.m; sourceTree = "<group>"; };
+		841CD1041F97399C0081196D /* WXExceptionUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXExceptionUtils.h; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
@@ -1082,6 +1088,8 @@
 				2AAFC1B41C48DFF70026D2FE /* WXSDKError.h */,
 				749DC2791D40827B009E1C91 /* WXMonitor.h */,
 				749DC27A1D40827B009E1C91 /* WXMonitor.m */,
+				841CD1041F97399C0081196D /* WXExceptionUtils.h */,
+				841CD1021F9739890081196D /* WXExceptionUtils.m */,
 			);
 			name = Monitor;
 			path = WeexSDK/Sources/Monitor;
@@ -1602,6 +1610,7 @@
 				DCA0EF641D6EED6F00CB18B9 /* WXGlobalEventModule.h in Headers */,
 				2A837AB21CD9DE9200AEDF03 /* WXLoadingComponent.h in Headers */,
 				DCA446271EFA5DAF00D0CFA8 /* WeexSDK.h in Headers */,
+				841CD1051F974DFA0081196D /* WXExceptionUtils.h in Headers */,
 				C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */,
 				7423899F1C32733800D748CA /* WXType.h in Headers */,
 				59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */,
@@ -1793,6 +1802,7 @@
 				DCA445D51EFA598200D0CFA8 /* WXComponent+PseudoClassManagement.h in Headers */,
 				DCA4460E1EFA5A7E00D0CFA8 /* WXLength.h in Headers */,
 				DCA445FA1EFA5A3A00D0CFA8 /* WXNavigatorModule.h in Headers */,
+				841CD1061F974DFA0081196D /* WXExceptionUtils.h in Headers */,
 				DCA446081EFA5A6A00D0CFA8 /* NSArray+Weex.h in Headers */,
 				74B81AE51F73C3E900D3A61D /* WXRecycleListDataManager.h in Headers */,
 				DCA445F21EFA5A2300D0CFA8 /* WXHeaderComponent.h in Headers */,
@@ -2200,6 +2210,7 @@
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
+				841CD1031F9739890081196D /* WXExceptionUtils.m in Sources */,
 				C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */,
 				742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */,
 				7461F8931CFB373100F62D44 /* WXLayer.m in Sources */,
@@ -2278,6 +2289,7 @@
 				DCA4455E1EFA55B300D0CFA8 /* WXFooterComponent.m in Sources */,
 				DCA4455F1EFA55B300D0CFA8 /* WXNavigationDefaultImpl.m in Sources */,
 				74B81AF21F73C3E900D3A61D /* WXJSASTParser.mm in Sources */,
+				841CD1071F974E000081196D /* WXExceptionUtils.m in Sources */,
 				DCA445601EFA55B300D0CFA8 /* WXURLRewriteDefaultImpl.m in Sources */,
 				DCA445611EFA55B300D0CFA8 /* WXPrerenderManager.m in Sources */,
 				DCA445631EFA55B300D0CFA8 /* WXPickerModule.m in Sources */,

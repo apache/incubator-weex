@@ -59,11 +59,9 @@ public class WXComponentFactory {
 
     IFComponentHolder holder = WXComponentRegistry.getComponent(node.getType());
     if (holder == null) {
-      if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
                 node.getType() + "]" + " class not found";
         WXLogUtils.e(tag);
-      }
       //For compatible reason of JS framework, unregistered type will be treated as container.
       holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
       if(holder == null){

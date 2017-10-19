@@ -204,7 +204,7 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int initFrameworkEnv(String scriptsFramework,WXParams params, String cacheDir, boolean onSdcard) {
+    public int initFrameworkEnv(String scriptsFramework,WXParams params, String cacheDir, boolean pieSupport) {
         if (!mInit) {
             return -1;
         }

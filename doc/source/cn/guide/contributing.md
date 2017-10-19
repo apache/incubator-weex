@@ -25,23 +25,24 @@ version: 2.1
 ## 分支管理 (英)
 
 ```
-master
+release
  ↑
-dev         <--- PR(hotfix/typo/3rd-PR)
- ↑ PR
-{domain}-feature-{date}
+{version}
+ ↑
+master         <--- PR(feature/hotfix/typo)
 ```
 
 0. `master` branch
-    0. `master` is the latest (pre-)release branch.
-0. `dev` branch
-    0. `dev` is the stable developing branch.
-    0. ***It's RECOMMENDED to commit hotfix (like typo) or feature PR to `dev`***.
-0. `{domain}-feature-{date}` branch
-    0. The branch for a developing iteration, e.g. `android-feature-20160607` is an android developing iteration which is done at 2016.06.07. `{domain}` consists of `android`, `ios`, `jsfm` and `html5`. 
-    0. **DO NOT commit any PR to such a branch**.
+    0. `master` is the stable developing branch.
+    0. ***It's RECOMMENDED to commit hotfix (like typo) or feature PR to `master `***.
+0. `{version}` branch
+    0. `{version}` is used for every version which we consider for stable publish.
+    0. e.g. `v0.16`
+0. `release` branch
+    0. `release` is the latest release branch,we will make tag and publish version on this branch.
 
-### 分支命名
+### 用于PR的分支命名
+
 
 ```
 {module}-{action}-{shortName}
