@@ -1430,12 +1430,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             data == null ? "{}" : data);
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
             dataObj};
+        instance.setTemplate(template);
         invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
       } catch (Throwable e) {
         instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR,
             "createInstance failed!");
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
-            + " template md5 " + WXFileUtils.md5(template) + " length " + (template == null ? 0 : template.length());
+            + instance.getTemplateInfo();
         commitJSBridgeAlarmMonitor(instance.getInstanceId(), WXErrorCode.WX_ERR_INVOKE_NATIVE, err);
         WXLogUtils.e(err);
       }
@@ -1863,6 +1864,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         + exception);
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
+      exception +=  instance.getTemplateInfo();
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
       if (METHOD_CREATE_INSTANCE.equals(function)) {

@@ -81,6 +81,8 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +126,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
+
+
+  public WeakReference<String> templateRef;
+
+  public Map<String,List<String>> headers = new ConcurrentHashMap<>();
 
   /**
    * Render strategy.
@@ -1292,6 +1299,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mRenderListener = null;
       isDestroy = true;
       mStatisticsListener = null;
+      if(headers != null){
+          headers.clear();
+      }
+      if(templateRef != null){
+        templateRef = null;
+      }
     }
   }
 
@@ -1600,10 +1613,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     @Override
-    public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
+    public void onHeadersReceived(int statusCode, Map<String,List<String>> headers) {
       if (this.instance != null
           && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHeadersReceived();
+        if(this.instance.headers != null && headers != null){
+           this.instance.headers.putAll(headers);
+        }
       }
     }
 
@@ -1695,6 +1711,38 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
       }
     }
+  }
+
+  /**
+   * return md5, and bytes length
+   * */
+  public String getTemplateInfo() {
+    String template = getTemplate();
+    if(template == null){
+      return " template md5 null";
+    }
+    if(TextUtils.isEmpty(template)){
+      return " template md5  length 0";
+    }
+    try {
+      byte[] bts = template.getBytes("UTF-8");
+      return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
+               + "response header " + JSONObject.toJSONString(headers);
+    } catch (UnsupportedEncodingException e) {
+      return "template md5 getBytes error";
+    }
+
+  }
+
+  public String getTemplate() {
+    if(templateRef == null){
+      return  null;
+    }
+    return templateRef.get();
+  }
+
+  public void setTemplate(String template) {
+    this.templateRef = new WeakReference<String>(template);
   }
 
   public interface NestedInstanceInterceptor {
