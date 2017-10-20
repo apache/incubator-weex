@@ -29,6 +29,8 @@
         shouldNotifyLayout = YES;
     }
     
+
+    
     [super setFrame:frame];
     
     if (shouldNotifyLayout && _instance.onLayoutChange) {

@@ -25,6 +25,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 #import "WXTracingManager.h"
+#import "WXComponent+Layout.h"
 
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
@@ -90,6 +91,7 @@ do {\
     return (_view != nil);
 }
 
+
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssertMainThread();
@@ -97,7 +99,7 @@ do {\
     if (subcomponent.displayType == WXDisplayTypeNone) {
         return;
     }
-    
+  
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.rootView addSubview:subcomponent.view];

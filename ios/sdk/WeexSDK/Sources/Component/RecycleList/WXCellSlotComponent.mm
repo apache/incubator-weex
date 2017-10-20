@@ -23,7 +23,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXConvert.h"
 #import "WXAssert.h"
-#import "WXScrollerComponent.h"
+#import "WXScrollerComponent+Layout.h"
 
 static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplateType";
 
@@ -39,7 +39,7 @@ static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplate
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // TODO: isRecycle / insertAnimation / deleteAnimation / keepScrollPosition
-        _templateType = attributes[@"templateType"] ? [WXConvert NSString:attributes[@"templateType"]] : WXDefaultRecycleTemplateType;
+        _templateType = attributes[@"templateType"] ? [WXConvert NSString:attributes[@"templateType"]] : const_cast<NSString*>(WXDefaultRecycleTemplateType);
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -69,17 +69,40 @@ static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplate
 {
     WXAssertComponentThread();
     
-    //TODO: _isUseContainerWidth?
-    if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH])) {
-        self.cssNode->style.dimensions[CSS_WIDTH] = ((WXScrollerComponent *)(self.supercomponent)).scrollerCSSNode->style.dimensions[CSS_WIDTH];
-    }
-    
-    if ([self needsLayout]) {
-        layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-        if ([WXLog logLevel] >= WXLogLevelDebug) {
-            print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+        //TODO: _isUseContainerWidth?
+        if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH])) {
+            self.cssNode->style.dimensions[CSS_WIDTH] = ((WXScrollerComponent *)(self.supercomponent)).scrollerCSSNode->style.dimensions[CSS_WIDTH];
+        }
+        
+        if ([self needsLayout]) {
+            layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
+            if ([WXLog logLevel] >= WXLogLevelDebug) {
+                print_css_node(self.cssNode, (css_print_options_t)(CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN));
+            }
         }
     }
+
+//#else
+    else
+    {
+        if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
+            self.flexCssNode->setStyleWidth(((WXScrollerComponent *)(self.supercomponent)).flexScrollerCSSNode->getStyleWidth(),NO);
+        }
+        
+        if ([self needsLayout]) {
+            std::pair<float, float> renderPageSize;
+            renderPageSize.first = self.weexInstance.frame.size.width;
+            renderPageSize.second = self.weexInstance.frame.size.height;
+            self.flexCssNode->calculateLayout(renderPageSize);
+            if ([WXLog logLevel] >= WXLogLevelDebug) {
+                
+            }
+        }
+    }
+//#endif
     
     NSMutableSet<WXComponent *> *dirtyComponents = [NSMutableSet set];
     [self _calculateFrameWithSuperAbsolutePosition:CGPointZero gatherDirtyComponents:dirtyComponents];

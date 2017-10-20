@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.17.0"
+  s.version      = "0.17.0.16-flex-SNAPSHOT"
 
   s.summary      = "WeexSDK Source ."
 
@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios
   s.ios.deployment_target = '7.0'
   s.source =  { :path => '.' }
-  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
+  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c,cpp}'
   s.resources = 'pre-build/native-bundle-main.js', 'ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
 
   s.user_target_xcconfig  = { 'FRAMEWORK_SEARCH_PATHS' => "'$(PODS_ROOT)/WeexSDK'" }

@@ -29,6 +29,7 @@
 #import "WXRecycleListDataManager.h"
 #import "WXRecycleListTemplateManager.h"
 #import "WXRecycleListUpdateManager.h"
+#import "WXComponent+Layout.h"
 
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 

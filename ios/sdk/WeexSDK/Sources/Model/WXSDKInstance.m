@@ -70,6 +70,8 @@ typedef enum : NSUInteger {
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL  _performanceCommit;
+    
+    CGFloat _defaultPixelScaleFactor;
 }
 
 - (void)dealloc
@@ -90,7 +92,6 @@ typedef enum : NSUInteger {
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
-
         [WXSDKManager storeInstance:self forID:_instanceId];
         
         _bizType = @"";
@@ -103,7 +104,8 @@ typedef enum : NSUInteger {
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
         _trackComponent = NO;
         _performanceCommit = NO;
-       
+        _defaultPixelScaleFactor = CGFLOAT_MIN;
+        
         [self addObservers];
     }
     return self;
@@ -124,6 +126,9 @@ typedef enum : NSUInteger {
 
 - (void)setFrame:(CGRect)frame
 {
+#ifdef DEBUG
+    NSLog(@"test -> setFrame :%@,instance :%@",NSStringFromCGRect(frame),self);
+#endif
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;
         WXPerformBlockOnMainThread(^{
@@ -470,7 +475,12 @@ typedef enum : NSUInteger {
     if (self.viewportWidth > 0) {
         return [WXUtility portraitScreenSize].width / self.viewportWidth;
     } else {
-        return [WXUtility defaultPixelScaleFactor];
+        if (_defaultPixelScaleFactor != CGFLOAT_MIN) {
+            return _defaultPixelScaleFactor;
+        }
+        
+        _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
+        return _defaultPixelScaleFactor;
     }
 }
 

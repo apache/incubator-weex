@@ -38,6 +38,8 @@
 #import "WXUtility.h"
 #import "WXExtendCallNativeManager.h"
 #import "WXExceptionUtils.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXComponent+Layout.h"
 
 @implementation WXSDKEngine
 

@@ -63,6 +63,9 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     if ([value isKindOfClass:[NSString class]]) {
         NSString *valueString = (NSString *)value;
+        if (valueString.length <=0) {
+            return NAN;
+        }
         if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
             valueString = [valueString substringToIndex:(valueString.length - 2)];
         }
@@ -72,10 +75,29 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             value = [value substringWithRange:NSMakeRange(start, end-start)];
             return [self safeAreaInset:value];
         }
+        if (![WXConvert checkStringIsRealNum:valueString]) { //不是全为数字的时候，如：100%
+            return NAN;
+        }
         return [valueString doubleValue];
     }
     
     return [self double:value];
+}
+
++ (BOOL)checkStringIsRealNum:(NSString *)checkedNumString {
+    NSScanner* scan = [NSScanner scannerWithString:checkedNumString];
+    int intVal;
+    BOOL isInt = [scan scanInt:&intVal] && [scan isAtEnd];
+    if (isInt) {
+        return YES;
+    }
+    float floatVal;
+    BOOL isFloat = [scan scanFloat:&floatVal] && [scan isAtEnd];
+    if (isFloat) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 + (CGFloat)safeAreaInset:(NSString*)value

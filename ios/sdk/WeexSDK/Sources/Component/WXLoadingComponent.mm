@@ -17,31 +17,29 @@
  * under the License.
  */
 
-#import "WXRefreshComponent.h"
+#import "WXLoadingComponent.h"
 #import "WXScrollerComponent.h"
 #import "WXLoadingIndicator.h"
 #import "WXComponent_internal.h"
 #import "WXLog.h"
+#import "WXComponent+Layout.h"
 
-@interface WXRefreshComponent()
+@interface WXLoadingComponent()
 
-@property (nonatomic) BOOL displayState;
 @property (nonatomic) BOOL initFinished;
-@property (nonatomic) BOOL refreshEvent;
-@property (nonatomic) BOOL pullingdownEvent;
+@property (nonatomic) BOOL loadingEvent;
+@property (nonatomic) BOOL displayState;
 
 @property (nonatomic, weak) WXLoadingIndicator *indicator;
 
 @end
 
-@implementation WXRefreshComponent
+@implementation WXLoadingComponent
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        _refreshEvent = NO;
-        _pullingdownEvent = NO;
         if (attributes[@"display"]) {
             if ([attributes[@"display"] isEqualToString:@"show"]) {
                 _displayState = YES;
@@ -51,64 +49,30 @@
                 WXLogError(@"");
             }
         }
-        self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+//#ifndef USE_FLEX
+        if(![WXComponent isUseFlex])
+        {
+             self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+        }
+//#else
+        else
+        {
+             self.flexCssNode->setStylePositionType(WeexCore::kAbsolute);
+        }
+       
+//#endif
     }
     return self;
-}
-
-- (void)viewDidLoad
-{
-     _initFinished = YES;
-    
-    if (!_displayState) {
-        [_indicator.view setHidden:YES];
-    }
-}
-
-- (void)layoutDidFinish
-{
-    [self.view setFrame: (CGRect) {
-        .size = self.calculatedFrame.size,
-        .origin.x = self.calculatedFrame.origin.x,
-        .origin.y = self.view.frame.origin.y - CGRectGetHeight(self.calculatedFrame)
-    }];
 }
 
 - (void)viewWillUnload
 {
     _displayState = NO;
-    _refreshEvent = NO;
+    _loadingEvent = NO;
     _initFinished = NO;
 }
 
-- (void)refresh
-{
-    if (!_refreshEvent || _displayState) {
-        return;
-    }
-    [self fireEvent:@"refresh" params:nil];
-}
-
-- (void)pullingdown:(NSDictionary*)param
-{
-    if (!_pullingdownEvent) {
-        return ;
-    }
-    
-    [self fireEvent:@"pullingdown" params:param];
-}
-
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
-{
-    if (subcomponent) {
-        [super _insertSubcomponent:subcomponent atIndex:index];
-        if ([subcomponent isKindOfClass:[WXLoadingIndicator class]]) {
-            _indicator = (WXLoadingIndicator*)subcomponent;
-        }
-    }
-}
-
-- (void)updateAttributes:(NSDictionary *)attributes
+-(void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"display"]) {
         if ([attributes[@"display"] isEqualToString:@"show"]) {
@@ -122,47 +86,79 @@
     }
 }
 
-- (void)addEvent:(NSString *)eventName
+- (void)viewDidLoad
 {
-    if ([eventName isEqualToString:@"refresh"]) {
-        _refreshEvent = YES;
-    }
-    if ([eventName isEqualToString:@"pullingdown"]) {
-        _pullingdownEvent = YES;
+    _initFinished = YES;
+    
+    if (!_displayState) {
+        [_indicator.view setHidden:YES];
     }
 }
 
-- (void)removeEvent:(NSString *)evetName
+- (void)addEvent:(NSString *)eventName
 {
-    if ([evetName isEqualToString:@"refresh"]) {
-        _refreshEvent = NO;
+    if ([eventName isEqualToString:@"loading"]) {
+        _loadingEvent = YES;
     }
-    if ([evetName isEqualToString:@"pullingdown"]) {
-        _pullingdownEvent = NO;
+}
+
+- (void)removeEvent:(NSString *)eventName
+{
+    if ([eventName isEqualToString:@"loading"]) {
+        _loadingEvent = NO;
     }
+}
+
+- (void)loading
+{
+    if (!_loadingEvent || _displayState)
+        return;
+    
+    [self fireEvent:@"loading" params:nil];
 }
 
 - (void)setDisplay
 {
-    id<WXScrollerProtocol> scrollerProtocol = self.ancestorScroller;
+    id<WXScrollerProtocol> scrollerProtocol = [self ancestorScroller];
     if (scrollerProtocol == nil || !_initFinished)
         return;
-    
-    CGPoint offset = [scrollerProtocol contentOffset];
+    WXComponent *scroller = (WXComponent*)scrollerProtocol;
+    CGPoint contentOffset = [scrollerProtocol contentOffset];
     if (_displayState) {
-        offset.y = -self.calculatedFrame.size.height;
+        contentOffset.y = [scrollerProtocol contentSize].height - scroller.calculatedFrame.size.height + self.calculatedFrame.size.height;
         [_indicator start];
     } else {
-        offset.y = 0;
+        contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
         [_indicator stop];
     }
-    [scrollerProtocol setContentOffset:offset animated:YES];
-  
+    [scrollerProtocol setContentOffset:contentOffset animated:YES];
+}
+
+- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+{
+    if (subcomponent) {
+        [super _insertSubcomponent:subcomponent atIndex:index];
+        if ([subcomponent isKindOfClass:[WXLoadingIndicator class]]) {
+            _indicator = (WXLoadingIndicator*)subcomponent;
+        }
+    }
 }
 
 - (BOOL)displayState
 {
     return _displayState;
+}
+
+- (void)resizeFrame
+{
+    CGRect rect = self.calculatedFrame;
+    
+    id<WXScrollerProtocol> scrollerProtocol = self.ancestorScroller;
+    if (scrollerProtocol) {
+        rect.origin.y = [scrollerProtocol contentSize].height;
+    }
+    
+    [self.view setFrame:rect];
 }
 
 @end

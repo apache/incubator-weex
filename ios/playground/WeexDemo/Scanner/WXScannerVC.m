@@ -23,8 +23,7 @@
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXDemoViewController.h"
 #import "WXDebugTool.h"
-
-#import <TBWXDevTool/WXDevTool.h>
+//#import <TBWXDevTool/WXDevTool.h>
 #import <AudioToolbox/AudioToolbox.h>
 
 @interface WXScannerVC ()
@@ -209,8 +208,8 @@
             }
             return YES;
         } else if ([[elts firstObject] isEqualToString:@"_wx_devtool"]) {
-            NSString *devToolURL = [[elts lastObject]  stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-            [WXDevTool launchDevToolDebugWithUrl:devToolURL];
+        //    NSString *devToolURL = [[elts lastObject]  stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      //      [WXDevTool launchDevToolDebugWithUrl:devToolURL];
             if ([[[self.navigationController viewControllers] objectAtIndex:0] isKindOfClass:NSClassFromString(@"WXDemoViewController")]) {
                 WXDemoViewController * vc = (WXDemoViewController*)[[self.navigationController viewControllers] objectAtIndex:0];
                 [self.navigationController popToViewController:vc animated:NO];
