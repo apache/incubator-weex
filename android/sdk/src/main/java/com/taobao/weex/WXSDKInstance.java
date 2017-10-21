@@ -130,7 +130,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public WeakReference<String> templateRef;
 
-  public Map<String,List<String>> headers = new ConcurrentHashMap<>();
+  public Map<String,List<String>> responseHeaders = new HashMap<>();
 
   /**
    * Render strategy.
@@ -1299,8 +1299,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mRenderListener = null;
       isDestroy = true;
       mStatisticsListener = null;
-      if(headers != null){
-          headers.clear();
+      if(responseHeaders != null){
+          responseHeaders.clear();
       }
       if(templateRef != null){
         templateRef = null;
@@ -1617,9 +1617,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (this.instance != null
           && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHeadersReceived();
-        if(this.instance.headers != null && headers != null){
-           this.instance.headers.putAll(headers);
-        }
+      }
+      if(this.instance != null
+              && this.instance.responseHeaders != null
+              && headers != null){
+        this.instance.responseHeaders.putAll(headers);
       }
     }
 
@@ -1727,7 +1729,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     try {
       byte[] bts = template.getBytes("UTF-8");
       return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
-               + "response header " + JSONObject.toJSONString(headers);
+               + "response header " + JSONObject.toJSONString(responseHeaders);
     } catch (UnsupportedEncodingException e) {
       return "template md5 getBytes error";
     }
