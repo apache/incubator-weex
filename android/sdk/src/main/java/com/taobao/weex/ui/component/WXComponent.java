@@ -859,6 +859,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   protected void updateBoxShadow() {
+    if (!BoxShadowUtil.isBoxShadowEnabled()) {
+      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      return;
+    }
+
     if (getDomObject() != null && getDomObject().getStyles() != null) {
       Object boxShadow = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
       Object shadowQuality = getDomObject().getAttrs().get(Constants.Name.SHADOW_QUALITY);
@@ -922,6 +927,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   protected void clearBoxShadow() {
+    if (!BoxShadowUtil.isBoxShadowEnabled()) {
+      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      return;
+    }
+
     View target = mHost;
     if (this instanceof WXVContainer) {
       target = ((WXVContainer) this).getBoxShadowHost(true);

@@ -60,8 +60,23 @@ import java.util.List;
 
 public class BoxShadowUtil {
   private static final String TAG = "BoxShadowUtil";
+  private static boolean sBoxShadowEnabled = true;
+
+  public static void setBoxShadowEnabled(boolean enabled) {
+    sBoxShadowEnabled = enabled;
+    WXLogUtils.w(TAG, "Switch box-shadow status: " + enabled);
+  }
+
+  public static boolean isBoxShadowEnabled() {
+    return sBoxShadowEnabled;
+  }
 
   public static void setBoxShadow(final View target, String style, float[] radii, int viewPort, final float quality) {
+    if (!sBoxShadowEnabled) {
+      WXLogUtils.w(TAG, "box-shadow was disabled by config");
+      return;
+    }
+
     final BoxShadowOptions options = parseBoxShadow(style, viewPort);
     if (options == null) {
       WXLogUtils.w(TAG, "Failed to parse box-shadow: " + style);
