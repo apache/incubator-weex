@@ -85,6 +85,7 @@ public class Constants {
     String BORDER_LEFT_STYLE = "borderLeftStyle";
     String BORDER_TOP_STYLE = "borderTopStyle";
     String BOX_SHADOW = "boxShadow";
+    String SHADOW_QUALITY = "shadowQuality";
 
     String POSITION = "position";
 
