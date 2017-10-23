@@ -53,7 +53,6 @@
 #import "WXIndicatorComponent.h"
 #import "WXImgLoaderProtocol.h"
 #import "WXExtendCallNativeProtocol.h"
-#import "WXExceptionUtils.h"
 #import "WXEventModuleProtocol.h"
 #import "WXErrorView.h"
 #import "WXDefine.h"

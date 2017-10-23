@@ -113,7 +113,7 @@ public class WXSliderNeighbor extends WXSlider {
     }
 
     @Override
-    public void addSubView(View view, final int index) {
+    protected void addSubView(View view, final int index) {
         if (view == null || mAdapter == null) {
             return;
         }

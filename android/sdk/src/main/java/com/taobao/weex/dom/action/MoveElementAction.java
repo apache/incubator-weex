@@ -91,8 +91,5 @@ final class MoveElementAction implements DOMAction, RenderAction {
     WXVContainer oldParent = component.getParent();
     oldParent.remove(component,false);
     ((WXVContainer) newParent).addChild(component, mNewIndex);
-    if(!component.isVirtualComponent()){
-      ((WXVContainer) newParent).addSubView(component.getHostView(), mNewIndex);
-    }
   }
 }

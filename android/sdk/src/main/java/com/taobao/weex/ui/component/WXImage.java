@@ -19,7 +19,6 @@
 package com.taobao.weex.ui.component;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.RectF;
@@ -28,7 +27,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
@@ -73,7 +71,6 @@ public class WXImage extends WXComponent<ImageView> {
 
   public static final String SUCCEED = "success";
   public static final String ERRORDESC = "errorDesc";
-  private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 0x2;
 
   private String mSrc;
   private int mBlurRadius;
@@ -357,13 +354,6 @@ public class WXImage extends WXComponent<ImageView> {
    */
   @JSMethod(uiThread = false)
   public void save(final JSCallback saveStatuCallback) {
-
-    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-      if (getContext() instanceof Activity) {
-        ActivityCompat.requestPermissions((Activity) getContext(),
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
-      }
-    }
 
     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       if (saveStatuCallback != null) {

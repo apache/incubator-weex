@@ -20,9 +20,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
-import android.util.Pair;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.Menu;
@@ -312,8 +309,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
-  @RestrictTo(Scope.LIBRARY)
-  public void addSubView(View child, int index) {
+  protected void addSubView(View child, int index) {
     if (child == null || getRealView() == null) {
       return;
     }

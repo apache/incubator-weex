@@ -233,7 +233,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * Intercept refresh view and loading view
    */
   @Override
-  public void addSubView(View child, int index) {
+  protected void addSubView(View child, int index) {
     if (child == null || getRealView() == null) {
       return;
     }

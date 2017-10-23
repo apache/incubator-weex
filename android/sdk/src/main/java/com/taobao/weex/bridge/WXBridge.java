@@ -36,21 +36,12 @@ class WXBridge implements IWXBridge {
 
   public static final String TAG = "WXBridge";
 
-  public static final boolean MULTIPROCESS = true;
-
   /**
    * Init JSFrameWork
    *
    * @param framework assets/main.js
    */
   public native int initFramework(String framework, WXParams params);
-
-  /**
-   * Init JSFrameWork
-   *
-   * @param framework assets/main.js
-   */
-  public native int initFramework(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
 
   /**
@@ -77,14 +68,6 @@ class WXBridge implements IWXBridge {
    */
   public native void takeHeapSnapshot(String filename);
 
-
-  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
-    if (MULTIPROCESS) {
-      return initFramework(framework, params, cacheDir, pieSupport);
-    } else {
-      return  initFramework(framework, params);
-    }
-  }
   /**
    * JavaScript uses this methods to call Android code
    *

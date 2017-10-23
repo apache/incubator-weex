@@ -36,7 +36,6 @@
 #import "WXSDKManager.h"
 #import "WXExtendCallNativeManager.h"
 #import "WXTracingManager.h"
-#import "WXExceptionUtils.h"
 
 #import <dlfcn.h>
 
@@ -155,17 +154,14 @@
         
         _jsContext.exceptionHandler = ^(JSContext *context, JSValue *exception){
             context.exception = exception;
+            NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
+            id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
-            NSString *bundleUrl = [instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE";
-            NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];
-            NSString *message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",@"jsMainBundleStringContentLength",
-                instance.userInfo[@"jsMainBundleStringContentMd5"]?:@"",@"jsMainBundleStringContentMd5",nil];
-            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:userInfo];
-            
-            [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_ERR_JS_EXECUTE] functionName:@"" exception:[NSString stringWithFormat:@"[%@:%@] %@\n%@ \njsMainBundleStringContentLength:%@\njsMainBundleStringContentMd5:%@",exception[@"line"], exception[@"column"],[exception toString], exception[@"stack"], instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",instance.userInfo[@"jsMainBundleStringContentMd5"]?:@""] userInfo:nil];
+            if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
+                [jsExceptionHandler onJSException:jsExceptionInfo];
+            }
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
             if (instance.onJSRuntimeException) {
                 instance.onJSRuntimeException(jsExceptionInfo);

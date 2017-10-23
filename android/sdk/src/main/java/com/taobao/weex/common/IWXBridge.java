@@ -38,15 +38,6 @@ public interface IWXBridge extends IWXObject {
    */
   int initFramework(String framework, WXParams params);
 
-
-  /**
-   * init Weex
-   *
-   * @param framework assets/main.js
-   * @return
-   */
-  int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
-
   /**
    * execute javascript function
    */
