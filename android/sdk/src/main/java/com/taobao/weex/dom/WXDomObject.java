@@ -335,9 +335,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
     int index = mDomChildren.indexOf(child);
     if (index == -1) {
-      if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXDomObject] remove function error");
-      }
       return;
     }
     mDomChildren.remove(index).parent = null;
@@ -685,7 +683,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
             type = TextUtils.isEmpty(result.replacedComponent) ? WXBasicComponentType.DIV
                     : result.replacedComponent;
             json.put(TYPE, type);
-            if (WXEnvironment.isApkDebugable() && result.validateInfo != null) {
+            if (result.validateInfo != null) {
               String tag = "[WXDomObject]onComponentValidate failure. >>> " + result.validateInfo.toJSONString();
               WXLogUtils.e(tag);
             }

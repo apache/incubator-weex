@@ -20,10 +20,6 @@ matrix:
       - os: linux
         env: TEST_SUITE=android
     include:
-      - os: osx
-        env: TEST_SUITE=ios
-        osx_image: xcode8.1
-        language: objective-c
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8

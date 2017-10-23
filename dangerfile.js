@@ -273,6 +273,15 @@ filesToVerifySrcHeader.forEach(filepath => {
       return;
     }
   }
+
+  // check cn for source code
+  var reg = /[\u4e00-\u9FA5]+/; 
+  var res = reg.test(content);
+  if(res){
+    console.error("Code file "+ filepath +" has cn source code.");
+    fail("Code file "+ filepath +" has cn source code.");
+    return ;
+  }
 });
 
 
@@ -307,11 +316,12 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff',"user-agent": "node.js"}
   }, function (err, result) {
-    console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
+      console.log('result:'+result+', error:'+err);
       resolve()
       return
     }
+    console.log('result:'+result);
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
     console.log('getContent')
     var promises = danger.git.modified_files.map(function(file) {
@@ -366,21 +376,29 @@ function getContent(url) {
 
 function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormalLinesMap) {
   try {
+    console.log('parseDeleteAndNormalLines')
     var diffs = parseDiff(diffData)
-    diffs.forEach(diff => {
-      fileToDeletedLinesMap[diff.from] = [];
-      fileToNormalLinesMap[diff.from] = [];
-      diff.chunks.forEach(chunk => {
-        chunk.changes.forEach(change => {
-          if (change.del) {
-            fileToDeletedLinesMap[diff.from].push(change.ln)
-          }
-          if (change.normal) {
-            fileToNormalLinesMap[diff.from].push(change.ln1)
-          }
-        })
+    console.log('diffs:'+diffs)
+    if(diffs&&diffs instanceof Array){
+      diffs.forEach(diff => {
+        fileToDeletedLinesMap[diff.from] = [];
+        fileToNormalLinesMap[diff.from] = [];
+        if(diff&&diff.chunks&&diff.chunks instanceof Array){
+          diff.chunks.forEach(chunk => {
+            if(chunk&&chunk.changes&&chunk.changes instanceof Array){
+              chunk.changes.forEach(change => {
+                if (change&&change.del) {
+                  fileToDeletedLinesMap[diff.from].push(change.ln)
+                }
+                if (change&&change.normal) {
+                  fileToNormalLinesMap[diff.from].push(change.ln1)
+                }
+              })
+            }
+          })
+        }
       })
-    })
+    }
   } catch (error) {
     console.log(error)
   }
@@ -441,6 +459,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
 
   console.log('blame point:', reviewers)
   var names = Object.keys(reviewers)
+  if(!names||!names instanceof Array||names.length<=0)return;
   names.sort((name1, name2) => {
     return reviewers[name1] > reviewers[name2] ? -1 : 1
   })
