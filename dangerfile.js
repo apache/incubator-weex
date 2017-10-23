@@ -278,6 +278,7 @@ filesToVerifySrcHeader.forEach(filepath => {
   var reg = /[\u4e00-\u9FA5]+/; 
   var res = reg.test(content);
   if(res){
+    console.error("Code file "+ filepath +" has cn source code.");
     fail("Code file "+ filepath +" has cn source code.");
     return ;
   }
@@ -458,6 +459,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
 
   console.log('blame point:', reviewers)
   var names = Object.keys(reviewers)
+  if(!names||!names instanceof Array||names.length<=0)return;
   names.sort((name1, name2) => {
     return reviewers[name1] > reviewers[name2] ? -1 : 1
   })
