@@ -278,6 +278,7 @@ filesToVerifySrcHeader.forEach(filepath => {
   var reg = /[\u4e00-\u9FA5]+/; 
   var res = reg.test(content);
   if(res){
+    console.error("Code file "+ filepath +" has cn source code.");
     fail("Code file "+ filepath +" has cn source code.");
     return ;
   }
