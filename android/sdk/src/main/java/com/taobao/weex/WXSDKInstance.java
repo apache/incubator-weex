@@ -626,7 +626,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKEngine.reload();
 
     if (reloadThis) {
-      // 可以发送广播吗？
       if (mContext != null)  {
         Intent intent = new Intent();
         intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
