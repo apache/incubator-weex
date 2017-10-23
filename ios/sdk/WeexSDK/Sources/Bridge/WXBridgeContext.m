@@ -40,6 +40,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
+#import "WXExceptionUtils.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -506,8 +507,10 @@ _Pragma("clang diagnostic pop") \
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);
     
     if ([self.jsBridge exception]) {
-        NSString *message = [NSString stringWithFormat:@"JSFramework executes error: %@", [self.jsBridge exception]];
-        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_EXECUTE, message);
+        NSString *exception = [[self.jsBridge exception] toString];
+        NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] %@",exception];
+        [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"" exception:errMsg extParams:nil];
+        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
     } else {
         WX_MONITOR_SUCCESS(WXMTJSFramework);
         //the JSFramework has been load successfully.
@@ -568,8 +571,10 @@ _Pragma("clang diagnostic pop") \
         [self.jsBridge executeJavascript:script];
         
         if ([self.jsBridge exception]) {
-            NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];
-            WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, message);
+            NSString *exception = [[self.jsBridge exception] toString];
+            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] %@",exception];
+            [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"" exception:errMsg extParams:nil];
+            WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
         } else {
             // success
         }

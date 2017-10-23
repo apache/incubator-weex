@@ -999,7 +999,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param type
    */
   public void addEvent(String type) {
-    if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
+    if (TextUtils.isEmpty(type)
+            || mAppendEvents.contains(type)
+            || getRealView() == null) {
       return;
     }
     mAppendEvents.add(type);

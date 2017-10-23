@@ -662,8 +662,8 @@ typedef NS_ENUM(NSInteger, Direction) {
     
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
-        self.currentIndex = index;
     }
+    self.currentIndex = index;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
