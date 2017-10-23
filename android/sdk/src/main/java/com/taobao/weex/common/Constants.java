@@ -109,6 +109,7 @@ public class Constants {
     String SRC = "src";
     String PLACE_HOLDER = "placeHolder";
     String RESIZE_MODE = "resizeMode";
+    String AUTO_RECYCLE = "autoRecycle";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
     String SCROLL_DIRECTION = "scrollDirection";
