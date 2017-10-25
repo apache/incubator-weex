@@ -1791,13 +1791,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.execJSService(service);
     } catch (Throwable e) {
       WXLogUtils.e("[WXBridgeManager] invokeRegisterService:", e);
+
+	  Map<String, String> data = new HashMap<String, String>();
+	  data.put("inputParams",service + "||" + receiver.toString());
+
 	  WXExceptionUtils.commitCriticalExceptionRT("invokeExecJSService",
 			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE.getErrorCode(),
 			  "invokeExecJSService",
 			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE.getErrorMsg()
 					  + "[WXBridgeManager] invokeRegisterService:"
 					  + WXLogUtils.getStackTrace(e),
-			  null);
+			  data);
 
       commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_EXECUTE, "invokeRegisterService");
     }
