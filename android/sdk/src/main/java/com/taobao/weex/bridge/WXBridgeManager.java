@@ -1478,7 +1478,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
           instanceId);
       WXJSObject[] args = {instanceIdObj};
-      invokeExecJS(instanceId, null, METHOD_DESTROY_INSTANCE, args);
+      if (isJSFrameworkInit()) {
+        invokeExecJS(instanceId, null, METHOD_DESTROY_INSTANCE, args);
+      }
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeDestroyInstance " + e.getCause();
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, err);
@@ -1864,23 +1866,28 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         + exception);
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
-      exception +=  instance.getTemplateInfo();
-      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+
 
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
-          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+          if (mInit && reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
             WXDomModule domModule = getDomModule(instanceId);
             Action action = Actions.getReloadPage(instanceId, true);
             domModule.postAction((DOMAction) action, true);
             instance.setNeedLoad(true);
             return;
+          } else {
+            instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
+            return;
           }
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
+      exception +=  instance.getTemplateInfo();
+      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
     }
