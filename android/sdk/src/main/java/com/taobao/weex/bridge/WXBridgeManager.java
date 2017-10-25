@@ -1367,7 +1367,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    if (!isJSFrameworkInit() && reInitCount == 1) {
+    if (!isJSFrameworkInit() && (reInitCount == 1 || !WXEnvironment.isApkDebugable())) {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       post(new Runnable() {
         @Override
