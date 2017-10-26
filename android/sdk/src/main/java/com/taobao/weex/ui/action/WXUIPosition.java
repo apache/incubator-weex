@@ -18,17 +18,51 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.utils.WXViewUtils;
+
 public class WXUIPosition {
 
-  public float mLeft;
-  public float mTop;
-  public float mRight;
-  public float mBottom;
+  private float mLeft;
+  private float mTop;
+  private float mRight;
+  private float mBottom;
 
-  public WXUIPosition(float mLeft, float mTop, float mRight, float mBottom) {
+  public WXUIPosition(float left, float top, float right, float bottom) {
+    this.mLeft = left;
+    this.mTop =  top;
+    this.mRight =  right;
+    this.mBottom = bottom;
+  }
+
+  public float getLeft() {
+    return WXViewUtils.getRealPxByWidth(mLeft,750);
+  }
+
+  public void setLeft(float mLeft) {
     this.mLeft = mLeft;
+  }
+
+  public float getTop() {
+    return WXViewUtils.getRealPxByWidth(mTop,750);
+  }
+
+  public void setTop(float mTop) {
     this.mTop = mTop;
+  }
+
+  public float getRight() {
+    return WXViewUtils.getRealPxByWidth(mRight,750);
+  }
+
+  public void setRight(float mRight) {
     this.mRight = mRight;
+  }
+
+  public float getBottom() {
+    return WXViewUtils.getRealPxByWidth(mBottom,750);
+  }
+
+  public void setBottom(float mBottom) {
     this.mBottom = mBottom;
   }
 }

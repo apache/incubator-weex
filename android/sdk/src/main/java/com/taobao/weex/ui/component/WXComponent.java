@@ -132,10 +132,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   // WXUIAction
   public String mPageId = null;
   public String mComponentType = null;
-  public String mParentRef = null;
+  private String mParentRef = null;
   public WXUIPosition mPosition = new WXUIPosition(0, 0, 0, 0);
   public WXUISize mRenderSize = new WXUISize(0, 0);
 
+  public String getAttrByKey(String key){
+
+    return "default";
+  }
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -203,6 +207,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   protected void onInvokeUnknownMethod(String method, JSONArray args){
 
+  }
+
+  public String getParentRef() {
+    return mParentRef;
   }
 
   public interface OnClickListener{
@@ -436,19 +444,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     //offset by sibling
     int siblingOffset = nullParent?0:mParent.getChildrenLayoutTopOffset();
 
-    int realWidth = (int) mRenderSize.mWidth;
-    int realHeight = (int) mRenderSize.mHeight;
-    int realLeft = (int) mPosition.mLeft;
-    int realTop = (int) mPosition.mTop + siblingOffset;
-    int realRight = (int) mPosition.mRight;
-    int realBottom = (int) mPosition.mBottom;
-
+    int realWidth = (int) mRenderSize.getWidth();
+    int realHeight = (int) mRenderSize.getHeight();
+    int realLeft = (int) mPosition.getLeft();
+    int realTop = (int) mPosition.getTop() + siblingOffset;
+    int realRight = (int)mPosition.getRight();
+    int realBottom = (int) mPosition.getBottom();
     if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
       return;
     }
 
-    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mPosition.mTop);
-    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mPosition.mLeft);
+    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mPosition.getTop());
+    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mPosition.getLeft());
 
     //calculate first screen time
     if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {

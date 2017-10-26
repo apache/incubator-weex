@@ -18,13 +18,31 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.utils.WXViewUtils;
+
 public class WXUISize {
 
-  public float mWidth;
-  public float mHeight;
+  private float mWidth;
+  private float mHeight;
 
   public WXUISize(float mWidth, float mHeight) {
     this.mWidth = mWidth;
+    this.mHeight =  mHeight;
+  }
+
+  public float getWidth() {
+    return  WXViewUtils.getRealPxByWidth(mWidth,750);
+  }
+
+  public void setWidth(float mWidth) {
+    this.mWidth = mWidth;
+  }
+
+  public float getHeight() {
+    return WXViewUtils.getRealPxByWidth(mHeight,750);
+  }
+
+  public void setHeight(float mHeight) {
     this.mHeight = mHeight;
   }
 }

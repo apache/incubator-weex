@@ -283,7 +283,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   protected T initComponentHostView(@NonNull Context context) {
     T bounceRecyclerView = generateListView(context, getOrientation());
 
-    String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);
+    String transforms = getAttrByKey(TRANSFORM);
     if (transforms != null) {
       bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
     }
@@ -1111,8 +1111,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private int generateViewType(WXComponent component) {
     long id;
     try {
-      id = Integer.parseInt(component.getDomObject().getRef());
-      String type = component.getDomObject().getAttrs().getScope();
+      id = Integer.parseInt(component.getRef());
+      String type = component.getAttrByKey("scope");
 
       if (!TextUtils.isEmpty(type)) {
         if (mRefToViewType == null) {
@@ -1152,14 +1152,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public long getItemId(int position) {
-    long id;
-    try {
-      id = Long.parseLong(getChild(position).getDomObject().getRef());
-    } catch (RuntimeException e) {
-      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
-      id = RecyclerView.NO_ID;
-    }
-    return id;
+//    long id;
+//    try {
+//      id = Long.parseLong(getChild(position).getRef());
+//    } catch (RuntimeException e) {
+//      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+//      id = RecyclerView.NO_ID;
+//    }
+    return RecyclerView.NO_ID;
   }
 
   @Override

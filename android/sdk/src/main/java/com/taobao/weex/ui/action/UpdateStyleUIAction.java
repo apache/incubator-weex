@@ -24,7 +24,7 @@ import com.taobao.weex.ui.component.WXComponent;
 public class UpdateStyleUIAction extends WXUIAction {
 
   @Override
-  public void excuteAction() {
+  public void executeAction() {
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
     if (component == null) {
       return;

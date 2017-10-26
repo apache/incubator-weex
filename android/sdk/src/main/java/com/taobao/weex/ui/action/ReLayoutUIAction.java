@@ -26,7 +26,7 @@ import com.taobao.weex.utils.WXLogUtils;
 public class ReLayoutUIAction extends WXUIAction {
 
   @Override
-  public void excuteAction() {
+  public void executeAction() {
     //Create component in dom thread
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {

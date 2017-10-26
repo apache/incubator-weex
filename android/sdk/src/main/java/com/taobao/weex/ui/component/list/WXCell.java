@@ -41,10 +41,10 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
-    private boolean mLazy = true;
+    private boolean mLazy = false;
 
     /** used in list sticky detect **/
-    private int mScrollPositon = -1;
+    private int mScrollPosition = -1;
 
 
     @Deprecated
@@ -91,11 +91,11 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     }
 
     void setScrollPositon(int pos){
-        mScrollPositon = pos;
+        mScrollPosition = pos;
     }
 
     public int getScrollPositon() {
-        return mScrollPositon;
+        return mScrollPosition;
     }
 
     @Override

@@ -118,23 +118,23 @@ public class WXLogUtils {
       log(tag, msg, LogLevel.DEBUG);
     }
 
-    if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.d(tag, msg);
-      /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
-      writeConsoleLog("debug", tag + ":" + msg);
-      if(msg.contains(" | __")){
-        String[] msgs=msg.split(" | __");
-        LogLevel level;
-        if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
-          level=getLogLevel(msgs[2]);
-          sendLog(level,msgs[0]);
-          return;
-        }
-      }
-      sendLog(LogLevel.DEBUG, tag + ":" + msg);
-      log(tag, msg, LogLevel.DEBUG);
-    }
+//    if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
+//      msg = getLineNumber() + msg;
+//      Log.d(tag, msg);
+//      /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
+//      writeConsoleLog("debug", tag + ":" + msg);
+//      if(msg.contains(" | __")){
+//        String[] msgs=msg.split(" | __");
+//        LogLevel level;
+//        if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
+//          level=getLogLevel(msgs[2]);
+//          sendLog(level,msgs[0]);
+//          return;
+//        }
+//      }
+//      sendLog(LogLevel.DEBUG, tag + ":" + msg);
+//      log(tag, msg, LogLevel.DEBUG);
+//    }
   }
 
   private static LogLevel getLogLevel(String level) {

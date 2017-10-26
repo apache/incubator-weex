@@ -19,8 +19,6 @@
 package com.taobao.weex.bridge;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Handler.Callback;
@@ -54,7 +52,7 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.ui.action.AddAlementUIAction;
+import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.ReLayoutUIAction;
 import com.taobao.weex.ui.action.UpdateStyleUIAction;
@@ -1968,17 +1966,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
-        action.mPosition.mTop = top;
-        action.mPosition.mBottom = bottom;
-        action.mPosition.mLeft = left;
-        action.mPosition.mRight = right;
-        action.mRenderSize.mHeight = height;
-        action.mRenderSize.mWidth = width;
+        action.mPosition.setTop(top);
+        action.mPosition.setBottom(bottom);
+        action.mPosition.setLeft(left);
+        action.mPosition.setRight(right);
+        action.mRenderSize.setHeight(height);
+        action.mRenderSize.setWidth(width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            action.excuteAction();
+            action.executeAction();
           }
         });
       }
@@ -2022,7 +2020,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            action.excuteAction();
+            action.executeAction();
           }
         });
       }
@@ -2059,23 +2057,23 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new AddAlementUIAction();
+        final WXUIAction action = new AddElementUIAction();
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
         action.mParentRef = parentRef;
         action.mIndex = index;
-        action.mPosition.mTop = top;
-        action.mPosition.mBottom = bottom;
-        action.mPosition.mLeft = left;
-        action.mPosition.mRight = right;
-        action.mRenderSize.mHeight = height;
-        action.mRenderSize.mWidth = width;
+        action.mPosition.setTop(top);
+        action.mPosition.setBottom(bottom);
+        action.mPosition.setLeft(left);
+        action.mPosition.setRight(right);
+        action.mRenderSize.setHeight(height);
+        action.mRenderSize.setWidth(width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            action.excuteAction();
+            action.executeAction();
           }
         });
       }
@@ -2114,17 +2112,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         final WXUIAction action = new ReLayoutUIAction();
         action.mPageId = pageId;
         action.mRef = ref;
-        action.mPosition.mTop = top;
-        action.mPosition.mBottom = bottom;
-        action.mPosition.mLeft = left;
-        action.mPosition.mRight = right;
-        action.mRenderSize.mHeight = height;
-        action.mRenderSize.mWidth = width;
+        action.mPosition.setTop(top);
+        action.mPosition.setBottom(bottom);
+        action.mPosition.setLeft(left);
+        action.mPosition.setRight(right);
+        action.mRenderSize.setHeight(height);
+        action.mRenderSize.setWidth (width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            action.excuteAction();
+            action.executeAction();
           }
         });
       }

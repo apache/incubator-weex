@@ -36,7 +36,7 @@ public abstract class WXUIAction {
   public String mKey = null;
   public String mValue = null;
 
-  public abstract void excuteAction();
+  public abstract void executeAction();
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent) {
 

@@ -86,7 +86,6 @@ public class WXComponentFactory {
       return null;
     }
 
-
     if(sComponentTypes.get(instance.getInstanceId())==null){
       Set<String> types=new HashSet<>();
       sComponentTypes.put(instance.getInstanceId(),types);
