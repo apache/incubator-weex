@@ -48,7 +48,7 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   private float[] borderRadius;
   private boolean gif;
   private boolean isBitmapReleased = false;
-  private boolean enableBitmapAutoManage = true;
+  private boolean enableBitmapAutoManage = false;
 
 
   public WXImageView(Context context) {
