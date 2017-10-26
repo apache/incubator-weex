@@ -44,6 +44,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   private NestedScrollingChildHelper mNestedScrollingChildHelper;
   private final int[] mParentScrollConsumed = new int[2];
   private final int[] mParentOffsetInWindow = new int[2];
+  private boolean mNestedScrollInProgress;
   private WXOnRefreshListener onRefreshListener;
   private WXOnLoadingListener onLoadingListener;
 
@@ -210,6 +211,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     if ((!mPullRefreshEnable && !mPullLoadEnable)) {
       return false;
     }
+    if (!isEnabled() || canChildScrollUp()
+            || mRefreshing || mNestedScrollInProgress) {
+      // Fail fast if we're not in a state where a swipe is possible
+      return false;
+    }
+
     return super.onInterceptTouchEvent(ev);
   }
 
@@ -287,6 +294,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   public void onNestedScrollAccepted(View child, View target, int axes) {
     mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
     startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
+    mNestedScrollInProgress = true;
   }
 
   /**
@@ -297,6 +305,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   @Override
   public void onStopNestedScroll(View child) {
     mNestedScrollingParentHelper.onStopNestedScroll(child);
+    mNestedScrollInProgress = true;
     handlerAction();
     stopNestedScroll();
   }
