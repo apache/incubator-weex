@@ -96,9 +96,7 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     Stopwatch.split("parseDomObject");
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
-      }
+      WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
       instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
       return;
     }

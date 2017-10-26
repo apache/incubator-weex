@@ -70,6 +70,7 @@ public class WXSoInstallMgrSdk {
   private final static String X86 = "x86";
   private final static String MIPS = "mips";
   private final static String STARTUPSO = "/libweexjsb.so";
+  private final static String STARTUPSOANDROID15 = "/libweexjst.so";
 
   private final static int ARMEABI_Size = 3583820;
   private final static int X86_Size = 4340864;
@@ -192,28 +193,40 @@ public class WXSoInstallMgrSdk {
 //        }
 //      } catch (Throwable e) {
 //      }
+
       if (installOnSdcard) {
 
         String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
-        File newfile = new File(cacheFile + STARTUPSO);
+        // if android api < 16 copy libweexjst.so else copy libweexjsb.so
+        boolean pieSupport = true;
+        File newfile;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+          pieSupport = false;
+          newfile = new File(cacheFile + STARTUPSOANDROID15);
+        } else {
+          newfile = new File(cacheFile + STARTUPSO);
+        }
         if (newfile.exists()) {
           return;
         }
 
-        String path = "/data/data/" + pkgName + "/lib";;
+        String path = "/data/data/" + pkgName + "/lib";
         if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
           path = cacheFile.replace("/cache", "/lib");
         }
 
-        String soName = path + STARTUPSO;
+        String soName;
+        if (pieSupport) {
+          soName = path + STARTUPSO;
+        } else {
+          soName = path + STARTUPSOANDROID15;
+        }
+
         File oldfile = new File(soName);
         if (oldfile.exists()) {
-          //获得原文件流
           FileInputStream inputStream = new FileInputStream(oldfile);
           byte[] data = new byte[1024];
-          //输出流
           FileOutputStream outputStream =new FileOutputStream(newfile);
-          //开始处理流
           while (inputStream.read(data) != -1) {
             outputStream.write(data);
           }

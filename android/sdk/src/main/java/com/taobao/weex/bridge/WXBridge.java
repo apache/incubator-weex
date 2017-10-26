@@ -50,7 +50,7 @@ class WXBridge implements IWXBridge {
    *
    * @param framework assets/main.js
    */
-  public native int initFramework(String framework, WXParams params, String cacheDir, boolean onSdcard);
+  public native int initFramework(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
 
   /**
@@ -78,9 +78,9 @@ class WXBridge implements IWXBridge {
   public native void takeHeapSnapshot(String filename);
 
 
-  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard){
+  public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
     if (MULTIPROCESS) {
-      return initFramework(framework, params, cacheDir, onSdcard);
+      return initFramework(framework, params, cacheDir, pieSupport);
     } else {
       return  initFramework(framework, params);
     }
