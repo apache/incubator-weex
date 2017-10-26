@@ -42,6 +42,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   private NestedScrollingParentHelper mNestedScrollingParentHelper;
   private NestedScrollingChildHelper mNestedScrollingChildHelper;
+  private final int[] mParentScrollConsumed = new int[2];
   private final int[] mParentOffsetInWindow = new int[2];
   private WXOnRefreshListener onRefreshListener;
   private WXOnLoadingListener onLoadingListener;
@@ -278,13 +279,14 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-    return true;
+    return isEnabled()  && !mRefreshing
+            && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
   }
 
   @Override
   public void onNestedScrollAccepted(View child, View target, int axes) {
     mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
-    startNestedScroll(axes);
+    startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
   }
 
   /**
@@ -325,19 +327,30 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     if (moveSpinner(-dy)) {
-      consumed[1] += dy;
+       consumed[1] += dy;
     }
-  }
 
-  @Override
-  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-     dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
+    // Now let our nested parent consume the leftovers
+    final int[] parentConsumed = mParentScrollConsumed;
+    if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
+      consumed[0] += parentConsumed[0];
+      consumed[1] += parentConsumed[1];
+    }
   }
 
   @Override
   public int getNestedScrollAxes() {
     return mNestedScrollingParentHelper.getNestedScrollAxes();
   }
+
+
+
+  @Override
+  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+     dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
+  }
+
+
 
 
 
