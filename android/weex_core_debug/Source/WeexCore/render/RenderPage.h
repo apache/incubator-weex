@@ -44,7 +44,7 @@ namespace WeexCore {
 
     ~RenderPage();
 
-    void addRenderObject(std::string parentRef, int insertPosiotn, std::string data);
+    void addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 
     void removeRenderObject(std::string ref);
 
@@ -70,7 +70,7 @@ namespace WeexCore {
 
     void traverseTree(RenderObject *render);
 
-    std::string getPageId() {
+    inline std::string getPageId() {
       return mPageId;
     }
   };

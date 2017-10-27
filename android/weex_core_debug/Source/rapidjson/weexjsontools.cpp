@@ -312,7 +312,6 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
 
         RenderObject *child = new RenderObject(page);
         parseJsonObject(r, page, child);
-
         root->addRenderObject(index, child);
         index++;
       }
@@ -333,21 +332,4 @@ RenderObject *json2RenderObject(char *data, RenderPage *page) {
   JsonParser r(data);
   parseJsonObject(r, page, root);
   return root;
-}
-
-void json2SingleKeyValue(char *data, std::string &key, std::string &value) {
-  JsonParser r(data);
-  RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
-  r.EnterObject();
-  key = r.NextObjectKey();
-
-  if (r.PeekType() == kNumberType) {
-
-    char buffer[24 + 1];
-    int len = fpconv_dtoa(r.GetDouble(), buffer);
-    buffer[len] = '\0';
-    value = buffer;
-  } else if (r.PeekType() == kStringType) {
-    value = r.GetString();
-  }
 }

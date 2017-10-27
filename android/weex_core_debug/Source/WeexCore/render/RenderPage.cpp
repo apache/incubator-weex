@@ -128,13 +128,12 @@ namespace WeexCore {
     mRenderObjectMap.clear();
   }
 
-  void RenderPage::addRenderObject(std::string parentRef, int insertPosition, std::string data) {
+  void RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
     RenderObject *parent = getRenderObject(parentRef);
     if (parent == nullptr) {
       return;
     }
-    char *c_data = (char *) data.data();
-    RenderObject *child = json2RenderObject(c_data, this);
+
     if (child == nullptr) {
       return;
     }

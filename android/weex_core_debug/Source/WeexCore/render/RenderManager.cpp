@@ -24,7 +24,9 @@ namespace WeexCore {
                                       std::string data) {
     RenderPage *page = getPage(pageId);
     if (page != nullptr) {
-      page->addRenderObject(parentRef, index, data);
+      char *c_data = (char *) data.data();
+      RenderObject *child = json2RenderObject(c_data, page);
+      page->addRenderObject(parentRef, index, child);
     }
   }
 
