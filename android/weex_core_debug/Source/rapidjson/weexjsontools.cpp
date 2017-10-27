@@ -278,7 +278,7 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
           }
           memset(value, 0, sizeof(value));
         } else if (r.PeekType() == kStringType) {
-          const char *str = r.GetString();
+          const char* str = r.GetString();
           const int size = strlen(str) + 1;
           char value[size];
           if (0 == strcmp(key, "attr")) {
@@ -312,6 +312,7 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
 
         RenderObject *child = new RenderObject(page);
         parseJsonObject(r, page, child);
+
         root->addRenderObject(index, child);
         index++;
       }

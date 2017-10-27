@@ -2,6 +2,15 @@
 
 namespace WeexCore {
 
+  inline void getLayoutInfo(RenderAction *action, WXCoreLayoutNode *node) {
+    action->mTop = node->getLayoutPositionTop();
+    action->mBottom = node->getLayoutPositionBottom();
+    action->mRight = node->getLayoutPositionRight();
+    action->mLeft = node->getLayoutPositionLeft();
+    action->mHeight = node->getLayoutHeight();
+    action->mWidth = node->getLayoutWidth();
+  }
+
   void RenderPage::calculateLayout() {
     if (pRoot == nullptr)
       return;
@@ -10,7 +19,13 @@ namespace WeexCore {
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
-    sendReLayoutAction(render);
+    RenderAction *action = new RelayoutRenderAction();
+    action->mPageId = getPageId();
+    action->mComponentType = render->getType();
+    action->mRef = render->getRef();
+    getLayoutInfo(action, render->getLayoutNode());
+    addRenderAction(action);
+
     for (int i = 0; i < render->getChildCount(); i++) {
       RenderObject *child = render->getChild(i);
       traverseTree(child);
@@ -30,12 +45,62 @@ namespace WeexCore {
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
     setRootRenderObject(render);
 
+    // layout by dom Tree
     calculateLayout();
 
-    sendCreateBodyAction(render);
-    sendUpdateStyleAction(render);
-    sendUpdateAttrAction(render);
-    sendAddEventAction(render);
+    /**
+     * Generate RenderAction: ACTION_CREATE_BODY
+     */
+    RenderAction *createBodyAction = new CreateBodyAction();
+    createBodyAction->mPageId = mPageId;
+    createBodyAction->mComponentType = render->getType();
+    createBodyAction->mRef = render->getRef();
+    getLayoutInfo(createBodyAction, render->getLayoutNode());
+    addRenderAction(createBodyAction);
+
+    /**
+     * Generate RenderAction: ACTION_UPDATE_STYLE
+     */
+    STYLE_IT style_it_star = render->getStyleItBegin();
+    STYLE_IT style_it_end = render->getStyleItEnd();
+
+    for (; style_it_star != style_it_end; ++style_it_star) {
+      RenderAction *updateStyleAction = new UpdateStyleAction();
+      updateStyleAction->mPageId = mPageId;
+      updateStyleAction->mRef = render->getRef();
+      updateStyleAction->mKey = style_it_star->first;
+      updateStyleAction->mValue = style_it_star->second;
+      addRenderAction(updateStyleAction);
+    }
+
+    /**
+     * Generate RenderAction: ACTION_UPDATE_ATTR
+     */
+    ATTR_IT attr_it_star = render->getAttrItBegin();
+    ATTR_IT attr_it_end = render->getAttrItEnd();
+
+    for (; attr_it_star != attr_it_end; ++attr_it_star) {
+      RenderAction *updateAttrAction = new UpdateStyleAction();
+      updateAttrAction->mPageId = mPageId;
+      updateAttrAction->mRef = render->getRef();
+      updateAttrAction->mKey = attr_it_star->first;
+      updateAttrAction->mValue = attr_it_star->second;
+      addRenderAction(updateAttrAction);
+    }
+
+    /**
+     * Generate RenderAction: ACTION_ADD_EVENT
+     */
+    EVENT_IT event_it_start = render->getEventItBegin();
+    EVENT_IT event_it_end = render->getEventItEnd();
+
+    for (; event_it_start != event_it_end; ++event_it_start) {
+      RenderAction *addEventAction = new AddElementAction();
+      addEventAction->mPageId = mPageId;
+      addEventAction->mRef = render->getRef();
+      addEventAction->mValue = *event_it_start;
+      addRenderAction(addEventAction);
+    }
   }
 
   RenderPage::~RenderPage() {
@@ -63,12 +128,13 @@ namespace WeexCore {
     mRenderObjectMap.clear();
   }
 
-  void RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
+  void RenderPage::addRenderObject(std::string parentRef, int insertPosition, std::string data) {
     RenderObject *parent = getRenderObject(parentRef);
     if (parent == nullptr) {
       return;
     }
-
+    char *c_data = (char *) data.data();
+    RenderObject *child = json2RenderObject(c_data, this);
     if (child == nullptr) {
       return;
     }
@@ -85,10 +151,64 @@ namespace WeexCore {
     // layout by dom Tree
     calculateLayout();
 
-    sendAddElementAction(child, parent, insertPosition);
-    sendUpdateStyleAction(child);
-    sendUpdateAttrAction(child);
-    sendAddEventAction(child);
+    /**
+     * Generate RenderAction: ACTION_ADD_ELEMENT
+     */
+    RenderAction *addElementAction = new AddElementAction();
+    addElementAction->mPageId = mPageId;
+    addElementAction->mComponentType = child->getType();
+    addElementAction->mRef = child->getRef();
+    addElementAction->mParentRef = parent->getRef();
+    addElementAction->mIndex = insertPosition;
+    getLayoutInfo(addElementAction, child->getLayoutNode());
+    addRenderAction(addElementAction);
+
+    /**
+     * Generate RenderAction: ACTION_UPDATE_STYLE
+     */
+    STYLE_IT style_it_star = child->getStyleItBegin();
+    STYLE_IT style_it_end = child->getStyleItEnd();
+
+    for (; style_it_star != style_it_end; ++style_it_star) {
+      RenderAction *updateStyleAction = new UpdateStyleAction();
+      updateStyleAction->mPageId = mPageId;
+      updateStyleAction->mRef = child->getRef();
+      updateStyleAction->mKey = style_it_star->first;
+      updateStyleAction->mValue = style_it_star->second;
+      addRenderAction(updateStyleAction);
+    }
+
+    /**
+     * Generate RenderAction: ACTION_UPDATE_ATTR
+     */
+    ATTR_IT attr_it_star = child->getAttrItBegin();
+    ATTR_IT attr_it_end = child->getAttrItEnd();
+
+    for (; attr_it_star != attr_it_end; ++attr_it_star) {
+      RenderAction *updateAttrAction = new UpdateStyleAction();
+      updateAttrAction->mPageId = mPageId;
+      updateAttrAction->mRef = child->getRef();
+      updateAttrAction->mKey = attr_it_star->first;
+      updateAttrAction->mValue = attr_it_star->second;
+      addRenderAction(updateAttrAction);
+    }
+
+    /**
+     * Generate RenderAction: ACTION_ADD_EVENT
+     */
+    EVENT_IT event_it_start = child->getEventItBegin();
+    EVENT_IT event_it_end = child->getEventItEnd();
+
+    for (; event_it_start != event_it_end; ++event_it_start) {
+//      RenderAction *addEventAction = new RenderAction();
+//      addEventAction->mPageId = mPageId;
+//      addEventAction->mRef = child->getRef();
+//      addEventAction->mValue = *event_it_start;
+//      addRenderAction(addEventAction);
+
+      // TODO AddEventAction
+    }
+
   }
 
   void RenderPage::removeRenderObject(std::string ref) {

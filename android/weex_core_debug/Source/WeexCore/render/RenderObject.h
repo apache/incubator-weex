@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "base/android/LogUtils.h"
 #include "../layout/ConstantsName.h"
 #include "base/android/string/StringUtils.h"
 #include "action/RenderAction.h"
@@ -14,9 +15,9 @@
 
 namespace WeexCore {
 
-  class RenderPage;
-
   class RenderObject;
+
+  class RenderPage;
 
   typedef std::vector<RenderObject *> ChildrenList;
   typedef std::map<std::string, std::string>::const_iterator STYLE_IT;
