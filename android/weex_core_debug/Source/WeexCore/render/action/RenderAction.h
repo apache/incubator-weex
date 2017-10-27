@@ -24,6 +24,7 @@ namespace WeexCore {
     float mRight;
 
     virtual void ExecuteAction() {}
+
   };
 
 }

@@ -3,11 +3,16 @@
 
 #include "RenderAction.h"
 
-class UpdateStyleAction : public RenderAction {
+using namespace WeexCore;
 
-  void ExecuteAction() {
-    BridgeAndroid::getInstance()->callUpdateStyleByWeexCore(mPageId, mRef, mKey, mValue);
-  }
-};
+namespace WeexCore {
+
+  class UpdateStyleAction : public RenderAction {
+
+    void ExecuteAction() {
+      BridgeAndroid::getInstance()->callUpdateStyleByWeexCore(mPageId, mRef, mKey, mValue);
+    }
+  };
+}
 
 #endif //WEEX_PROJECT_UPDATESTYLEACTION_H

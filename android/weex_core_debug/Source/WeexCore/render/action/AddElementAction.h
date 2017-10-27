@@ -3,18 +3,23 @@
 
 #include "RenderAction.h"
 
-class AddElementAction : public RenderAction {
+using namespace WeexCore;
 
-  void ExecuteAction() {
-    BridgeAndroid::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
-                                                           mTop,
-                                                           mBottom, mLeft,
-                                                           mRight,
-                                                           mHeight,
-                                                           mWidth, mIndex,
-                                                           mParentRef);
-  }
+namespace WeexCore {
 
-};
+  class AddElementAction : public RenderAction {
+
+    void ExecuteAction() {
+      BridgeAndroid::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
+                                                             mTop,
+                                                             mBottom, mLeft,
+                                                             mRight,
+                                                             mHeight,
+                                                             mWidth, mIndex,
+                                                             mParentRef);
+    }
+
+  };
+}
 
 #endif //WEEX_PROJECT_ADDELEMENTACTION_H

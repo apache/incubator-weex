@@ -3,14 +3,19 @@
 
 #include "RenderAction.h"
 
-class RelayoutRenderAction : public RenderAction {
+using namespace WeexCore;
 
-  void ExecuteAction() {
-    BridgeAndroid::getInstance()->callReLayoutByWeexCore(mPageId, mRef,
-                                                         mTop, mBottom,
-                                                         mLeft, mRight,
-                                                         mHeight, mWidth);
-  }
-};
+namespace WeexCore {
+
+  class RelayoutRenderAction : public RenderAction {
+
+    void ExecuteAction() {
+      BridgeAndroid::getInstance()->callReLayoutByWeexCore(mPageId, mRef,
+                                                           mTop, mBottom,
+                                                           mLeft, mRight,
+                                                           mHeight, mWidth);
+    }
+  };
+}
 
 #endif //WEEX_PROJECT_RELAYOUTRENDERACTION_H

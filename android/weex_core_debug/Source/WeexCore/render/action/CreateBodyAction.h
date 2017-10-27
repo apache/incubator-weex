@@ -3,17 +3,21 @@
 
 #include "RenderAction.h"
 
-class CreateBodyAction : public RenderAction {
+using namespace WeexCore;
 
-  void ExecuteAction() {
-    BridgeAndroid::getInstance()->callCreateBodyByWeexCore(mPageId, mComponentType, mRef,
-                                                           mTop,
-                                                           mBottom, mLeft,
-                                                           mRight,
-                                                           mHeight,
-                                                           mWidth);
-  }
+namespace WeexCore {
+  class CreateBodyAction : public RenderAction {
 
-};
+    void ExecuteAction() {
+      BridgeAndroid::getInstance()->callCreateBodyByWeexCore(mPageId, mComponentType, mRef,
+                                                             mTop,
+                                                             mBottom, mLeft,
+                                                             mRight,
+                                                             mHeight,
+                                                             mWidth);
+    }
+
+  };
+}
 
 #endif //WEEX_PROJECT_CREATEBODYACTION_H
