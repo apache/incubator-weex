@@ -2,15 +2,32 @@
 #define WEEX_PROJECT_RELAYOUTRENDERACTION_H
 
 #include "RenderAction.h"
+#include <WeexCore/render/RenderPage.h>
+#include <WeexCore/render/RenderObject.h>
 
-class RelayoutRenderAction : public RenderAction {
+using namespace WeexCore;
 
-  void ExecuteAction() {
-    BridgeAndroid::getInstance()->callReLayoutByWeexCore(mPageId, mRef,
-                                                         mTop, mBottom,
-                                                         mLeft, mRight,
-                                                         mHeight, mWidth);
-  }
-};
+namespace WeexCore {
+
+  class RelayoutRenderAction : public RenderAction {
+
+    void ExecuteAction() {
+      BridgeAndroid::getInstance()->callReLayoutByWeexCore(mPageId, mRef,
+                                                           mTop, mBottom,
+                                                           mLeft, mRight,
+                                                           mHeight, mWidth);
+    }
+
+    void
+    GenerateAction(std::string pageId, RenderObject *render, RenderObject *parent, std::string key,
+                   std::string value, ...) {
+      this->mPageId = pageId;
+      this->mComponentType = render->getType();
+      this->mRef = render->getRef();
+      getLayoutInfo(render->getLayoutNode());
+    }
+  };
+
+}
 
 #endif //WEEX_PROJECT_RELAYOUTRENDERACTION_H

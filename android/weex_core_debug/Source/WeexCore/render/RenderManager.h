@@ -9,7 +9,6 @@
 #include "./rapidjson/weexjsontools.h"
 
 namespace WeexCore {
-  class RenderPage;
 
   class RenderManager {
 
