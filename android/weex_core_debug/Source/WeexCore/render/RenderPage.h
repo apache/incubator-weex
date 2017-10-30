@@ -1,8 +1,6 @@
 #ifndef RenderPage_H
 #define RenderPage_H
 
-#include "RenderPage.h"
-#include "base/android/LogUtils.h"
 #include "rapidjson/weexjsontools.h"
 #include "base/android/string/StringUtils.h"
 #include "action/AddElementAction.h"
@@ -19,9 +17,6 @@
 #include "action/RelayoutRenderAction.h"
 
 namespace WeexCore {
-  class RenderObject;
-
-  class RenderAction;
 
   typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
   typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
@@ -38,6 +33,64 @@ namespace WeexCore {
     std::map<std::string, RenderObject *> mRenderObjectMap;
 
     void calculateLayout();
+
+    inline void sendCreateBodyAction(RenderObject *render) {
+      CreateBodyAction *action = new CreateBodyAction();
+      action->GenerateAction(getPageId(), render);
+      addRenderAction(action);
+
+      for (int i = 0; i < render->getChildCount(); ++i) {
+        sendAddElementAction(render->getChild(i), render, i);
+      }
+    }
+
+    inline void sendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
+      AddElementAction *action = new AddElementAction();
+      action->GenerateAction(getPageId(), child, parent, index);
+      addRenderAction(action);
+
+      for (int i = 0; i < child->getChildCount(); ++i) {
+        sendAddElementAction(child->getChild(i), child, i);
+      }
+    }
+
+    inline void sendReLayoutAction(RenderObject *render) {
+      RelayoutRenderAction *action = new RelayoutRenderAction();
+      action->GenerateAction(getPageId(), render);
+      addRenderAction(action);
+    }
+
+    inline void sendUpdateStyleAction(RenderObject *render) {
+      STYLE_IT style_it_star = render->getStyleItBegin();
+      STYLE_IT style_it_end = render->getStyleItEnd();
+
+      for (; style_it_star != style_it_end; ++style_it_star) {
+        UpdateStyleAction *action = new UpdateStyleAction();
+        action->GenerateAction(getPageId(), render, style_it_star->first, style_it_star->second);
+        addRenderAction(action);
+      }
+    }
+
+    inline void sendUpdateAttrAction(RenderObject *render) {
+      ATTR_IT attr_it_star = render->getAttrItBegin();
+      ATTR_IT attr_it_end = render->getAttrItEnd();
+
+      for (; attr_it_star != attr_it_end; ++attr_it_star) {
+        UpdateStyleAction *action = new UpdateStyleAction();
+        action->GenerateAction(getPageId(), render, attr_it_star->first, attr_it_star->second);
+        addRenderAction(action);
+      }
+    }
+
+    inline void sendAddEventAction(RenderObject *render) {
+      EVENT_IT event_it_start = render->getEventItBegin();
+      EVENT_IT event_it_end = render->getEventItEnd();
+
+      for (; event_it_start != event_it_end; ++event_it_start) {
+        // TODO AddEventAction
+      }
+    }
+
 
   public:
     RenderPage(std::string pageID, std::string data);
