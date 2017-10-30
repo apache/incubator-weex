@@ -3,15 +3,14 @@
 
 #include <vector>
 #include <string>
-#include "base/android/LogUtils.h"
-#include "../layout/ConstantsName.h"
-#include "base/android/string/StringUtils.h"
-#include "action/RenderAction.h"
 #include <map>
 #include <set>
+#include <Layout/ConstantsName.h>
+#include <Layout/CssValueGetter.h>
 #include <Layout/WXCoreLayout.h>
 #include <Layout/WXCoreStyle.h>
-#include <Layout/CssValueGetter.h>
+#include <base/android/string/StringUtils.h>
+#include <base/android/LogUtils.h>
 
 namespace WeexCore {
 

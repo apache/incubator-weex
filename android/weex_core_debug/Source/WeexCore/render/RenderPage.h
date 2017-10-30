@@ -1,12 +1,13 @@
 #ifndef RenderPage_H
 #define RenderPage_H
 
-#include "rapidjson/weexjsontools.h"
-#include "base/android/string/StringUtils.h"
+#include <rapidjson/weexjsontools.h>
+#include <base/android/string/StringUtils.h>
 #include "action/AddElementAction.h"
 #include "action/CreateBodyAction.h"
 #include "action/UpdateStyleAction.h"
 #include "action/RenderAction.h"
+#include "action/RelayoutRenderAction.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
 #include <vector>
@@ -14,7 +15,6 @@
 #include <map>
 #include <Layout/WXCoreLayout.h>
 #include <Layout/WXCoreStyle.h>
-#include "action/RelayoutRenderAction.h"
 
 namespace WeexCore {
 

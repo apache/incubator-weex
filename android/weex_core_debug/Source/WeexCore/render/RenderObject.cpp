@@ -272,7 +272,7 @@ namespace WeexCore {
       }
     }
 
-    LOGE("[RenderObject::Render tree] \n %s", result.c_str());
+//    LOGE("[RenderObject::Render tree] \n %s", result.c_str());
 
     for (CHILD_LIST_IT it = getChildListItBegin();
          it != getChildListItEnd(); it++) {
@@ -283,11 +283,11 @@ namespace WeexCore {
   }
 
   void RenderObject::printYGNodeMsg() {
-    LOGE("yoga ref: %s\n", mRef.c_str());
-    LOGE("yoga type: %s\n", mType.c_str());
+//    LOGE("yoga ref: %s\n", mRef.c_str());
+//    LOGE("yoga type: %s\n", mType.c_str());
 //    YGNodePrint(mYGNode, YGPrintOptionsLayout);
 //    YGNodePrint(mYGNode, YGPrintOptionsStyle);
-    LOGE("\n\n");
+//    LOGE("\n\n");
 
     for (CHILD_LIST_IT it = getChildListItBegin();
          it != getChildListItEnd(); it++) {

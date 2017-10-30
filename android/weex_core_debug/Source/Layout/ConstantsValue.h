@@ -4,7 +4,6 @@
 
 #include <string>
 
-using namespace WXCoreFlexLayout;
 using namespace std;
 
 // flex-direction

@@ -5,8 +5,7 @@
 #include "RenderPage.h"
 #include <map>
 #include <string>
-#include "base/android/LogUtils.h"
-#include "./rapidjson/weexjsontools.h"
+#include <rapidjson/weexjsontools.h>
 
 namespace WeexCore {
   class RenderPage;
