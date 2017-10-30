@@ -932,6 +932,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
+    if (getDomObject() != null && getDomObject().getStyles() != null) {
+      Object obj = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
+      if (obj == null) {
+        WXLogUtils.d("BoxShadow", "no box-shadow");
+        return;
+      }
+    }
+
     View target = mHost;
     if (this instanceof WXVContainer) {
       target = ((WXVContainer) this).getBoxShadowHost(true);
