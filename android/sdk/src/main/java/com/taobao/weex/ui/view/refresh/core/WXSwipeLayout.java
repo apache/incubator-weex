@@ -297,18 +297,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     mNestedScrollInProgress = true;
   }
 
-  /**
-   * Callback on TouchEvent.ACTION_CANCLE or TouchEvent.ACTION_UP
-   * handler : refresh or loading
-   * @param child : child view of SwipeLayout,RecyclerView or Scroller
-   */
-  @Override
-  public void onStopNestedScroll(View child) {
-    mNestedScrollingParentHelper.onStopNestedScroll(child);
-    mNestedScrollInProgress = true;
-    handlerAction();
-    stopNestedScroll();
-  }
 
   /**
    * With child view to processing move events
@@ -320,6 +308,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   @Override
   public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
     if ((!mPullRefreshEnable && !mPullLoadEnable)) {
+      // Now let our nested parent consume the leftovers
+      final int[] parentConsumed = mParentScrollConsumed;
+      if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
+        consumed[0] += parentConsumed[0];
+        consumed[1] += parentConsumed[1];
+      }
       return;
     }
 
@@ -338,7 +332,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     if (moveSpinner(-dy)) {
        consumed[1] += dy;
     }
-
     // Now let our nested parent consume the leftovers
     final int[] parentConsumed = mParentScrollConsumed;
     if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
@@ -352,6 +345,19 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     return mNestedScrollingParentHelper.getNestedScrollAxes();
   }
 
+
+  /**
+   * Callback on TouchEvent.ACTION_CANCLE or TouchEvent.ACTION_UP
+   * handler : refresh or loading
+   * @param child : child view of SwipeLayout,RecyclerView or Scroller
+   */
+  @Override
+  public void onStopNestedScroll(View child) {
+    mNestedScrollingParentHelper.onStopNestedScroll(child);
+    mNestedScrollInProgress = true;
+    handlerAction();
+    stopNestedScroll();
+  }
 
 
   @Override
