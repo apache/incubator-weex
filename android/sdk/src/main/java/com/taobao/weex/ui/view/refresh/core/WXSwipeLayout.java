@@ -29,12 +29,15 @@ import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewParentCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
@@ -47,6 +50,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   private boolean mNestedScrollInProgress;
   private WXOnRefreshListener onRefreshListener;
   private WXOnLoadingListener onLoadingListener;
+
+  private ViewParent mNestedScrollAcceptedParent;
 
   /**
    * On refresh Callback, call on start refresh
@@ -151,7 +156,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
     mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
-    setNestedScrollingEnabled(true);
+    setNestedScrollingEnabled(false);
 
     if (isInEditMode() && attrs == null) {
       return;
@@ -234,12 +239,32 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public boolean startNestedScroll(int axes) {
-    return mNestedScrollingChildHelper.startNestedScroll(axes);
+    boolean result = mNestedScrollingChildHelper.startNestedScroll(axes);
+    if(result){
+       if(mNestedScrollAcceptedParent == null){
+            ViewParent parent  = this.getParent();
+            View child = this;
+            while (parent != null) {
+              if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
+                 mNestedScrollAcceptedParent = parent;
+                 break;
+              }
+              if(parent instanceof  View){
+                child = (View) parent;
+              }
+              parent = parent.getParent();
+            }
+       }
+    }
+    return result;
   }
 
   @Override
   public void stopNestedScroll() {
     mNestedScrollingChildHelper.stopNestedScroll();
+    if(mNestedScrollAcceptedParent != null){
+      mNestedScrollAcceptedParent = null;
+    }
   }
 
   @Override
@@ -260,17 +285,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
             dx, dy, consumed, offsetInWindow);
   }
 
-  @Override
-  public boolean onNestedPreFling(View target, float velocityX,
-                                  float velocityY) {
-    return dispatchNestedPreFling(velocityX, velocityY);
-  }
 
-  @Override
-  public boolean onNestedFling(View target, float velocityX, float velocityY,
-                               boolean consumed) {
-    return dispatchNestedFling(velocityX, velocityY, consumed);
-  }
 
   @Override
   public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed) {
@@ -284,17 +299,40 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   /*********************************** NestedScrollParent *************************************/
 
+
+  @Override
+  public boolean onNestedPreFling(View target, float velocityX,
+                                  float velocityY) {
+    if(isNestedScrollingEnabled()) {
+      return dispatchNestedPreFling(velocityX, velocityY);
+    }
+    return  false;
+  }
+
+  @Override
+  public boolean onNestedFling(View target, float velocityX, float velocityY,
+                               boolean consumed) {
+    if(isNestedScrollingEnabled()) {
+      return dispatchNestedFling(velocityX, velocityY, consumed);
+    }
+    return  false;
+  }
+
   @Override
   public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-    return isEnabled()  && !mRefreshing
+    boolean result =  isEnabled()  && !mRefreshing
             && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
+
+    return  result;
   }
 
   @Override
   public void onNestedScrollAccepted(View child, View target, int axes) {
     mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
-    startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
-    mNestedScrollInProgress = true;
+    if(isNestedScrollingEnabled()){
+      startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
+      mNestedScrollInProgress = true;
+    }
   }
 
 
@@ -307,36 +345,58 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
    */
   @Override
   public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-    if ((!mPullRefreshEnable && !mPullLoadEnable)) {
-      // Now let our nested parent consume the leftovers
-      final int[] parentConsumed = mParentScrollConsumed;
+    // Now let our nested parent consume the leftovers
+    final int[] parentConsumed = mParentScrollConsumed;
+    if(isNestedScrollingEnabled()){
       if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
         consumed[0] += parentConsumed[0];
         consumed[1] += parentConsumed[1];
+        return;
       }
+    }
+    if ((!mPullRefreshEnable && !mPullLoadEnable)) {
       return;
     }
 
-    dy = (int) calculateDistanceY(target, dy);
+    /**
+     * when in nest-scroll, list canChildScrollUp() false,
+     * maybe parent scroll can scroll up
+     * */
+    if(!canChildScrollUp() && isNestedScrollingEnabled()){
+      if(mNestedScrollAcceptedParent != null && mNestedScrollAcceptedParent != mTargetView){
+        ViewGroup group = (ViewGroup) mNestedScrollAcceptedParent;
+        if(group.getChildCount() > 0){
+          int count = group.getChildCount();
+          for(int i=0; i<count; i++){
+            View view  = group.getChildAt(i);
+            if(view.getVisibility() != View.GONE && view.getMeasuredHeight() > 0){
+              if(view.getTop() < 0){
+                return;
+              }else{
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    int spinnerDy = (int) calculateDistanceY(target, dy);
 
     if (!isConfirm) {
-      if (dy < 0 && !canChildScrollUp()) {
+      if (spinnerDy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;
         isConfirm = true;
-      } else if (dy > 0 && !canChildScrollDown() && (!mRefreshing)) {
+      } else if (spinnerDy > 0 && !canChildScrollDown() && (!mRefreshing)) {
         mCurrentAction = LOAD_MORE;
         isConfirm = true;
       }
     }
 
-    if (moveSpinner(-dy)) {
-       consumed[1] += dy;
-    }
-    // Now let our nested parent consume the leftovers
-    final int[] parentConsumed = mParentScrollConsumed;
-    if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
-      consumed[0] += parentConsumed[0];
-      consumed[1] += parentConsumed[1];
+    if (moveSpinner(-spinnerDy)) {
+       consumed[1] += spinnerDy;
     }
   }
 
@@ -354,15 +414,19 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   @Override
   public void onStopNestedScroll(View child) {
     mNestedScrollingParentHelper.onStopNestedScroll(child);
-    mNestedScrollInProgress = true;
-    handlerAction();
-    stopNestedScroll();
+    if(isNestedScrollingEnabled()) {
+      mNestedScrollInProgress = true;
+      handlerAction();
+      stopNestedScroll();
+    }
   }
 
 
   @Override
   public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-     dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
+    if(isNestedScrollingEnabled()) {
+      dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
+    }
   }
 
 
