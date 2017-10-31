@@ -4,25 +4,26 @@
 #include "../../bridge/Bridge.h"
 #include "WeexCore.h"
 #include <string>
+#include <map>
 
 namespace WeexCore {
 
-class BridgeAndroid : public Bridge {
+  class BridgeAndroid : public Bridge {
 
-private:
+  private:
     jobject jThis;
 
-public:
+  public:
     static BridgeAndroid *m_instance;
 
     //just to release singleton object
     class Garbo {
     public:
-        ~Garbo() {
-          if (BridgeAndroid::m_instance) {
-            delete BridgeAndroid::m_instance;
-          }
+      ~Garbo() {
+        if (BridgeAndroid::m_instance) {
+          delete BridgeAndroid::m_instance;
         }
+      }
     };
 
     static Garbo garbo;
@@ -92,12 +93,16 @@ public:
 
     int callCreateBodyByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
                                  int top,
-                                 int bottom, int left, int right, int height, int width);
+                                 int bottom, int left, int right, int height, int width,
+                                 std::map<std::string, std::string> *styles,
+                                 std::map<std::string, std::string> *attributes);
 
     int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
                                  int top,
                                  int bottom, int left, int right, int height, int width, int index,
-                                 std::string parentRef);
+                                 std::string parentRef,
+                                 std::map<std::string, std::string> *styles,
+                                 std::map<std::string, std::string> *attributes);
 
     int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
                                   std::string &value);
@@ -106,6 +111,6 @@ public:
                                int top, int bottom, int left, int right,
                                int height, int width);
 
-};
+  };
 } //end WeexCore
 #endif //BridgeAndroid_h

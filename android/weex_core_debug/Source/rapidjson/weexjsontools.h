@@ -5,11 +5,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "../base/fpconv.h"
-#include "../base/android/LogUtils.h"
-#include "../base/android/string/StringUtils.h"
-#include "../WeexCore/render/RenderObject.h"
-#include "../WeexCore/render/RenderPage.h"
+#include <base/fpconv.h>
+#include <base/android/string/StringUtils.h>
+#include <WeexCore/render/RenderObject.h>
+#include <WeexCore/render/RenderPage.h>
 
 using namespace rapidjson;
 using namespace std;
@@ -124,7 +123,5 @@ protected:
  * @return {@link RenderObject*}
  */
 RenderObject *json2RenderObject(char *data, RenderPage *page);
-
-void json2SingleKeyValue(char *data, std::string &key, std::string &value);
 
 #endif //WEEX_JSON_TOOLS

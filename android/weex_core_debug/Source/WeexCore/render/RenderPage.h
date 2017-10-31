@@ -115,13 +115,21 @@ namespace WeexCore {
 
     void batch();
 
-    RenderObject *getRenderObject(std::string ref);
-
-    void setRootRenderObject(RenderObject *root);
-
-    RenderObject *getRootRenderObject();
-
     void traverseTree(RenderObject *render);
+
+    inline RenderObject *getRenderObject(std::string ref) {
+      return mRenderObjectMap.find(ref)->second;
+    }
+
+    inline void setRootRenderObject(RenderObject *root) {
+      if (root != nullptr) {
+        pRoot = root;
+      }
+    }
+
+    inline RenderObject *getRootRenderObject() {
+      return pRoot;
+    }
 
     inline std::string getPageId() {
       return mPageId;

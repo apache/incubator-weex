@@ -41,6 +41,8 @@ public class AddElementUIAction extends WXUIAction {
       //stop redner, some fatal happened.
       return;
     }
+    component.updateStyle(mStyle);
+    component.updateAttr(mAttributes);
 
     if (instance == null || instance.getContext() == null) {
       WXLogUtils.e("instance is null or instance is destroy!");

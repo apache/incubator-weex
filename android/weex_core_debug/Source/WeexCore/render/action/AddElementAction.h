@@ -19,10 +19,12 @@ namespace WeexCore {
                                                              mRight,
                                                              mHeight,
                                                              mWidth, mIndex,
-                                                             mParentRef);
+                                                             mParentRef, mStyles, mAttributes);
     }
 
     void GenerateAction(std::string pageId, RenderObject *render, RenderObject *parent, int index) {
+      this->mAttributes = render->getAttributes();
+      this->mStyles = render->getStyles();
       this->mPageId = pageId;
       this->mComponentType = render->getType();
       this->mRef = render->getRef();

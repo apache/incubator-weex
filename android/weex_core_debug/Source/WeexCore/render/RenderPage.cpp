@@ -35,9 +35,6 @@ namespace WeexCore {
     calculateLayout();
 
     sendCreateBodyAction(render);
-    sendUpdateStyleAction(render);
-    sendUpdateAttrAction(render);
-    sendAddEventAction(render);
   }
 
   RenderPage::~RenderPage() {
@@ -77,9 +74,6 @@ namespace WeexCore {
 
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(child->getRef(), child));
 
-    // add child to dom Tree
-    parent->getLayoutNode()->addChildAt(child->getLayoutNode(), parent->getChildCount());
-
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
@@ -88,9 +82,6 @@ namespace WeexCore {
     calculateLayout();
 
     sendAddElementAction(child, parent, insertPosition);
-    sendUpdateStyleAction(child);
-    sendUpdateAttrAction(child);
-    sendAddEventAction(child);
   }
 
   void RenderPage::removeRenderObject(std::string ref) {
@@ -146,19 +137,4 @@ namespace WeexCore {
   void RenderPage::addRenderAction(RenderAction *action) {
     action->ExecuteAction();
   }
-
-  RenderObject *RenderPage::getRenderObject(std::string ref) {
-    return mRenderObjectMap.find(ref)->second;
-  }
-
-  void RenderPage::setRootRenderObject(RenderObject *root) {
-    if (root != nullptr) {
-      pRoot = root;
-    }
-  }
-
-  RenderObject *RenderPage::getRootRenderObject() {
-    return pRoot;
-  }
-
 } //namespace WeexCore

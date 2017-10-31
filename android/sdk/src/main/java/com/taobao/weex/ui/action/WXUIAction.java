@@ -24,6 +24,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 
+import java.util.HashMap;
+
 public abstract class WXUIAction {
 
   public String mPageId = null;
@@ -35,6 +37,8 @@ public abstract class WXUIAction {
   public WXUISize mRenderSize = new WXUISize(0, 0);
   public String mKey = null;
   public String mValue = null;
+  public HashMap<String,String> mStyle;
+  public HashMap<String,String> mAttributes;
 
   public abstract void executeAction();
 

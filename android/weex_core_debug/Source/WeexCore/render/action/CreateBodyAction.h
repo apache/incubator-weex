@@ -3,6 +3,7 @@
 
 #include "RenderAction.h"
 #include <WeexCore/render/RenderObject.h>
+#include <map>
 
 using namespace WeexCore;
 
@@ -17,10 +18,12 @@ namespace WeexCore {
                                                              mBottom, mLeft,
                                                              mRight,
                                                              mHeight,
-                                                             mWidth);
+                                                             mWidth, mStyles, mAttributes);
     }
 
     void GenerateAction(std::string pageId, RenderObject *render) {
+      this->mAttributes = render->getAttributes();
+      this->mStyles = render->getStyles();
       this->mPageId = pageId;
       this->mComponentType = render->getType();
       this->mRef = render->getRef();

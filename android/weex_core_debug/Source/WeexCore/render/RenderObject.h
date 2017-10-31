@@ -23,6 +23,9 @@ namespace WeexCore {
   typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
   typedef std::set<std::string>::const_iterator EVENT_IT;
   typedef ChildrenList::iterator CHILD_LIST_IT;
+  typedef std::map<std::string, std::string> STYLES;
+  typedef std::map<std::string, std::string> ATTRIBUTES;
+  typedef std::set<std::string> EVENTS;
 
   class RenderObject {
   public:
@@ -36,17 +39,15 @@ namespace WeexCore {
 
     RenderObject *mParentRender;
 
-    std::map<std::string, std::string> *mStyle;
+    STYLES *mStyles;
 
-    std::map<std::string, std::string> *mAttributes;
+    ATTRIBUTES *mAttributes;
 
-    std::set<std::string> *mEvents;
+    EVENTS *mEvents;
 
     ChildrenList mChildren;
 
     WXCoreLayoutNode *mLayoutNode;
-
-    int mLeft, mTop, mWidth, mHeight;
 
   public:
 
@@ -54,60 +55,143 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void addRenderObject(int index, RenderObject *child);
+    inline void addRenderObject(int index, RenderObject *child) {
+      // insert RenderObject child
+//    mChildren.insert(mChildren.begin() + mChildren.size() - 1, child);
+      mLayoutNode->addChildAt(child->getLayoutNode(), getChildCount());
+      mChildren.push_back(child);
+    }
 
-    void removeRenderObject(RenderObject *child);
+    inline void removeRenderObject(RenderObject *child) {
+      for (CHILD_LIST_IT it = getChildListItBegin();
+           it != getChildListItEnd(); it++) {
+        if ((*it)->getRef() == child->getRef()) {
+          mChildren.erase(it);
+          break;
+        }
+      }
+    }
 
-    void updateAttr(std::string key, std::string value);
+    inline void updateAttr(std::string key, std::string value) {
+      if (mAttributes == nullptr) {
+        mAttributes = new ATTRIBUTES();
+      }
 
-    void updateStyle(std::string key, std::string value);
+      mAttributes->insert(pair<std::string, std::string>(key, value));
+    }
 
-    void addEvent(std::string event);
+    inline void updateStyle(std::string key, std::string value) {
+      if (mStyles == nullptr) {
+        mStyles = new STYLES();
+      }
 
-    void removeEvent(std::string event);
+      mStyles->insert(pair<std::string, std::string>(key, value));
+      applyStyleToYGNode(key, value);
+    }
 
-    RenderObject *getChild(int index);
+    inline void addEvent(std::string event) {
+      if (mEvents == nullptr) {
+        mEvents = new EVENTS();
+      }
+      mEvents->insert(event);
+    }
 
-    int getChildCount();
+    inline void removeEvent(std::string event) {
+      if (mEvents == nullptr) {
+        return;
+      }
+      mEvents->erase(event);
+    }
 
-    void setRef(std::string ref);
+    inline RenderObject *getChild(int index) {
+      if (index < mChildren.size()) {
+        return mChildren.at(index);
+      } else {
+        return nullptr;
+      }
+    }
 
-    std::string getRef();
+    inline int getChildCount() {
+      return mChildren.size();
+    }
 
-    void setType(std::string type);
+    inline void setRef(std::string ref) {
+      mRef = ref;
+    }
 
-    std::string getType();
+    inline std::string getRef() {
+      return mRef;
+    }
 
-    WXCoreLayoutNode *getLayoutNode();
+    inline void setType(std::string type) {
+      mType = type;
+
+      if (type.compare("list") == 0) {
+        mLayoutNode->setFlex(1);
+      }
+    }
+
+    inline std::string getType() {
+      return mType;
+    }
+
+    inline WXCoreLayoutNode *getLayoutNode() {
+      return mLayoutNode;
+    }
+
+    inline void setParentRender(RenderObject *render) {
+      mParentRender = render;
+    }
+
+    inline RenderObject *getParentRender() {
+      return mParentRender;
+    }
+
+    inline STYLES *getStyles() {
+      return mStyles;
+    }
+
+    inline ATTRIBUTES *getAttributes() {
+      return mAttributes;
+    }
+
+    inline STYLE_IT getStyleItBegin() {
+      return mStyles->begin();
+    }
+
+    inline STYLE_IT getStyleItEnd() {
+      return mStyles->end();
+    }
+
+    inline ATTR_IT getAttrItBegin() {
+      return mAttributes->begin();
+    }
+
+    inline ATTR_IT getAttrItEnd() {
+      return mAttributes->end();
+    }
+
+    inline EVENT_IT getEventItBegin() {
+      return mEvents->begin();
+    }
+
+    inline EVENT_IT getEventItEnd() {
+      return mEvents->end();
+    }
+
+    inline CHILD_LIST_IT getChildListItBegin() {
+      return mChildren.begin();
+    }
+
+    inline CHILD_LIST_IT getChildListItEnd() {
+      return mChildren.end();
+    }
 
     void applyStyleToYGNode(std::string key, std::string value);
 
     void printRenderMsg();
 
     void printYGNodeMsg();
-
-    void setParentRender(RenderObject *render);
-
-    RenderObject *getParentRender();
-
-    STYLE_IT getStyleItBegin();
-
-    STYLE_IT getStyleItEnd();
-
-    ATTR_IT getAttrItBegin();
-
-    ATTR_IT getAttrItEnd();
-
-    EVENT_IT getEventItBegin();
-
-    EVENT_IT getEventItEnd();
-
-    CHILD_LIST_IT getChildListItBegin();
-
-    CHILD_LIST_IT getChildListItEnd();
-
-  private:
-    void setLayout(int, int, int, int);
   };
 } //end WeexCore
 #endif //RenderObject_h

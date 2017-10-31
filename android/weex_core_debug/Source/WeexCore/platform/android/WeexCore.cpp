@@ -8,7 +8,9 @@ using namespace WeexCore;
 jclass jBridgeClazz;
 jclass jWXJSObject;
 jclass jWXLogUtils;
-
+jclass jMapClazz;
+jmethodID jMapConstructorMethodId;
+jmethodID jMapPutMethodId;
 jmethodID jDoubleValueMethodId;
 // static
 jobject jThis;
@@ -106,6 +108,9 @@ jint OnLoad(JavaVM *vm, void *reserved) {
   tempClass = env->FindClass("com/taobao/weex/utils/WXLogUtils");
   jWXLogUtils = (jclass) env->NewGlobalRef(tempClass);
 
+  tempClass = env->FindClass("java/util/HashMap");
+  jMapClazz = (jclass) env->NewGlobalRef(tempClass);
+
   env->DeleteLocalRef(tempClass);
 
   LOGD("end JNI_OnLoad");
@@ -124,6 +129,7 @@ void Unload(JavaVM *vm, void *reserved) {
   env->DeleteGlobalRef(jBridgeClazz);
   env->DeleteGlobalRef(jWXJSObject);
   env->DeleteGlobalRef(jWXLogUtils);
+  env->DeleteGlobalRef(jMapClazz);
   if (jThis)
     env->DeleteGlobalRef(jThis);
   WeexProxy::reset();

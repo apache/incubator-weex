@@ -5,9 +5,9 @@ namespace WeexCore {
 
   RenderObject::RenderObject(RenderPage *page)
       : mPage(page) {
-    mStyle = new std::map<std::string, std::string>();
-    mAttributes = new std::map<std::string, std::string>();
-    mEvents = new std::set<std::string>();
+    mStyles = new STYLES();
+    mAttributes = new ATTRIBUTES();
+    mEvents = new EVENTS();
     mLayoutNode = WXCoreLayoutNode::newWXCoreNode();
   }
 
@@ -21,9 +21,9 @@ namespace WeexCore {
       mLayoutNode = nullptr;
     }
 
-    if (mStyle != nullptr) {
-      delete mStyle;
-      mStyle = nullptr;
+    if (mStyles != nullptr) {
+      delete mStyles;
+      mStyles = nullptr;
     }
     if (mAttributes != nullptr) {
       delete mAttributes;
@@ -46,105 +46,11 @@ namespace WeexCore {
     mChildren.clear();
   }
 
-  void RenderObject::addRenderObject(int index, RenderObject *child) {
-    // insert RenderObject child
-//    mChildren.insert(mChildren.begin() + mChildren.size() - 1, child);
-    mChildren.push_back(child);
-  }
-
-  void RenderObject::removeRenderObject(RenderObject *child) {
-    for (CHILD_LIST_IT it = getChildListItBegin();
-         it != getChildListItEnd(); it++) {
-      if ((*it)->getRef() == child->getRef()) {
-        mChildren.erase(it);
-        break;
-      }
-    }
-  }
-
-  RenderObject *RenderObject::getChild(int index) {
-    if (index < mChildren.size()) {
-      return mChildren.at(index);
-    } else {
-      return nullptr;
-    }
-  }
-
-  void RenderObject::updateAttr(std::string key, std::string value) {
-    if (mAttributes == nullptr) {
-      mAttributes = new std::map<std::string, std::string>();
-    }
-
-    mAttributes->insert(pair<std::string, std::string>(key, value));
-  }
-
-  void RenderObject::updateStyle(std::string key, std::string value) {
-    if (mStyle == nullptr) {
-      mStyle = new std::map<std::string, std::string>();
-    }
-
-    mStyle->insert(pair<std::string, std::string>(key, value));
-    applyStyleToYGNode(key, value);
-  }
-
-  void RenderObject::addEvent(std::string event) {
-    if (mEvents == nullptr) {
-      mEvents = new std::set<std::string>();
-    }
-    mEvents->insert(event);
-  }
-
-  void RenderObject::removeEvent(std::string event) {
-    if (mEvents == nullptr) {
-      return;
-    }
-    mEvents->erase(event);
-  }
-
-  void RenderObject::setLayout(int left, int top, int w, int h) {
-    if (mLeft == left && mTop == top && mWidth == w && mHeight == h) {
-
-      return;
-    }
-
-    mLeft = left;
-    mTop = top;
-    mWidth = w;
-    mHeight = h;
-  }
-
-  void RenderObject::setRef(std::string ref) {
-    mRef = ref;
-  }
-
-  std::string RenderObject::getRef() {
-    return mRef;
-  }
-
-  void RenderObject::setType(std::string type) {
-    mType = type;
-    if (type.compare("list") == 0) {
-      mLayoutNode->setFlex(1);
-    }
-  }
-
-  std::string RenderObject::getType() {
-    return mType;
-  }
-
-  int RenderObject::getChildCount() {
-    return mChildren.size();
-  }
-
-  WXCoreLayoutNode *RenderObject::getLayoutNode() {
-    return mLayoutNode;
-  }
-
 /**
  * Synchronize the style of RenderObject to YGNode
  */
   void RenderObject::applyStyleToYGNode(std::string key, std::string value) {
-    if (mStyle == nullptr)
+    if (mStyles == nullptr)
       return;
 
     if (key == ALIGN_ITEMS) {
@@ -213,14 +119,6 @@ namespace WeexCore {
       mLayoutNode->setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
     } else {
     }
-  }
-
-  void RenderObject::setParentRender(RenderObject *render) {
-    mParentRender = render;
-  }
-
-  RenderObject *RenderObject::getParentRender() {
-    return mParentRender;
   }
 
   void RenderObject::printRenderMsg() {
@@ -295,37 +193,5 @@ namespace WeexCore {
 //        (*it)->printYGNodeMsg();
       }
     }
-  }
-
-  STYLE_IT RenderObject::getStyleItBegin() {
-    return mStyle->begin();
-  }
-
-  STYLE_IT RenderObject::getStyleItEnd() {
-    return mStyle->end();
-  }
-
-  ATTR_IT RenderObject::getAttrItBegin() {
-    return mAttributes->begin();
-  }
-
-  ATTR_IT RenderObject::getAttrItEnd() {
-    return mAttributes->end();
-  }
-
-  EVENT_IT RenderObject::getEventItBegin() {
-    return mEvents->begin();
-  }
-
-  EVENT_IT RenderObject::getEventItEnd() {
-    return mEvents->end();
-  }
-
-  CHILD_LIST_IT RenderObject::getChildListItBegin() {
-    return mChildren.begin();
-  }
-
-  CHILD_LIST_IT RenderObject::getChildListItEnd() {
-    return mChildren.end();
   }
 } //end WeexCore

@@ -1,21 +1,18 @@
 #ifndef RenderManager_h
 #define RenderManager_h
 
-#include "RenderObject.h"
-#include "RenderPage.h"
 #include <map>
 #include <string>
 #include <rapidjson/weexjsontools.h>
 
 namespace WeexCore {
-  class RenderPage;
 
   class RenderManager {
 
   private:
-    RenderManager();
+    RenderManager() {}
 
-    ~RenderManager();
+    ~RenderManager() {}
 
     static RenderManager *m_pInstance;
 

@@ -1,4 +1,6 @@
 #include "RenderManager.h"
+#include "RenderObject.h"
+#include "RenderPage.h"
 
 namespace WeexCore {
 
@@ -6,9 +8,6 @@ namespace WeexCore {
   static std::map<std::string, RenderPage *> *mPages = nullptr;
 
   RenderManager *RenderManager::m_pInstance = nullptr;
-
-  RenderManager::RenderManager() {
-  }
 
   void RenderManager::createPage(std::string pageId, std::string data) {
     RenderPage *page = new RenderPage(pageId, data);

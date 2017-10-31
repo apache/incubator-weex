@@ -41,10 +41,13 @@ public class CreateBodyUIAction extends WXUIAction {
       //stop redner, some fatal happened.
       return;
     }
+    component.updateStyle(mStyle);
+    component.updateAttr(mAttributes);
 
     try {
       long start = System.currentTimeMillis();
       component.createView();
+
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
       }

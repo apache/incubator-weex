@@ -27,6 +27,8 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.HashMap;
+
 /**
  * Communication interface for Java code and JavaScript code.
  */
@@ -464,10 +466,10 @@ public class WXBridge implements IWXBridge {
     }
   }
 
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, HashMap<String,String> styles, HashMap<String,String> attributes) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width);
+      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, styles, attributes);
     }catch (Throwable e){
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
@@ -477,11 +479,11 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef) {
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef, HashMap<String,String> styles, HashMap<String,String> attributes) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
-      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef);
+      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef, styles, attributes);
     }catch (Throwable e){
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
