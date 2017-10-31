@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,40 +17,26 @@
  * under the License.
  */
 
-#import "WXRootView.h"
-#import "WXSDKInstance.h"
+#import "WXScrollerComponent.h"
+#import "WXComponent+Layout.h"
 
-@interface WXRootView()
 
-@property (nonatomic, assign) BOOL mHasEvent;
-
+@interface WXScrollerComponent ()
+{
+//#ifndef USE_FLEX
+    css_node_t *_scrollerCSSNode;
+//#else
+    WeexCore::WXCoreLayoutNode *_flexScrollerCSSNode;
+//#endif
+}
 @end
 
-@implementation WXRootView
+@interface WXScrollerComponent (FlexLayout)
 
-- (void)setFrame:(CGRect)frame
-{
-    BOOL shouldNotifyLayout = NO;
-    if (_instance.onLayoutChange && !CGRectEqualToRect(self.frame, frame)) {
-        shouldNotifyLayout = YES;
-    }
-    
-    [super setFrame:frame];
-    
-    if (shouldNotifyLayout && _instance.onLayoutChange) {
-        _instance.onLayoutChange(self);
-    }
-}
-
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
-{
-    _mHasEvent = TRUE;
-    return [super hitTest:point withEvent:event];
-}
-
-- (BOOL)isHasEvent
-{
-    return _mHasEvent;
-}
+//#ifndef USE_FLEX
+@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
+//#else
+@property (nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexScrollerCSSNode;
+//#endif
 
 @end

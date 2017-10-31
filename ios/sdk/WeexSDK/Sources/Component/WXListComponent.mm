@@ -30,6 +30,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
+#import "WXScrollerComponent+Layout.h"
 
 @interface WXTableView : UITableView
 
@@ -162,6 +163,11 @@
 {
     return [[WXTableView alloc] init];
 }
+
+//- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
+//{
+////    [super _insertChildCssNode:subcomponent atIndex:(uint32_t)index];
+//}
 
 - (void)viewDidLoad
 {
@@ -350,7 +356,16 @@
 
 - (float)headerWidthForLayout:(WXHeaderComponent *)cell
 {
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex]){
+        return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    }
+//#else
+    else
+    {
+        return self.flexScrollerCSSNode->getStyleWidth();
+    }
+//#endif
 }
 
 - (void)headerDidLayout:(WXHeaderComponent *)header
@@ -438,7 +453,15 @@
 
 - (float)containerWidthForLayout:(WXCellComponent *)cell
 {
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+//#ifndef USE_FLEX
+    if (![WXComponent isUseFlex]) {
+         return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    }
+//#else
+    else{
+        return self.flexScrollerCSSNode->getStyleWidth();
+    }
+//#endif
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell
@@ -446,6 +469,10 @@
     WXAssertComponentThread();
     
     NSIndexPath *indexPath = [self indexPathForCell:cell sections:_sections];
+    if(!indexPath){
+        //protect when cell not exist in sections
+        return;
+    }
     [self removeCellForIndexPath:indexPath withSections:_sections];
     
     [self.weexInstance.componentManager _addUITask:^{
