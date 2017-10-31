@@ -17,9 +17,7 @@
  * under the License.
  */
 import {
-  getHeadStyleMap,
-  getComponentStyle,
-  extractComponentStyle
+  getHeadStyleMap
 } from '../core'
 
 import {
@@ -56,7 +54,7 @@ function getIdentifiedBeforeCreate () {
      */
     if (((this === this.$root && this.$options)
       || (tagName
-      && !weex._components[tagName]
+      && (typeof weex._components[tagName] === 'undefined')
       && !disposed[tagName]))
       && !this._secondScanned) {
       disposed[tagName] = 1
@@ -93,22 +91,6 @@ export default {
         return
       }
       return normalizeStyle(camelizeKeys(style))
-    },
-
-    _extractComponentStyle () {
-      return extractComponentStyle(this)
-    },
-
-    /**
-     * get style from class, staticClass, style and staticStyle.
-     * merge styles priority: high -> low
-     *  1. data.style (bound style).
-     *  2. data.staticStyle (inline styles).
-     *  3. data.class style (bound class names).
-     *  4. data.staticClass style (scoped styles or static classes).
-     */
-    _getComponentStyle (data) {
-      return getComponentStyle(this)
     },
 
     _getParentRect () {

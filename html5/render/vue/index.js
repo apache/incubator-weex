@@ -46,7 +46,7 @@ function init (Vue/*, options = {}*/) {
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
 
   function isWeexTag (tag) {
-    return !!weex._components[tag]
+    return typeof weex._components[tag] !== 'undefined'
   }
   const oldGetTagNamespace = Vue.config.getTagNamespace
   Vue.config.getTagNamespace = function (tag) {

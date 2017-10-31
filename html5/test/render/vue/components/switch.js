@@ -30,7 +30,6 @@ init('<switch> component', (Vue, helper) => {
     const vm = compile(`<switch></switch>`)
     expect(vm.$el.tagName.toLowerCase()).to.be.equal('span')
     expect(utils.toArray(vm.$el.classList)).to.include('weex-switch')
-    expect(vm.$el.innerHTML).to.be.equal('<small class="weex-switch-inner"></small>')
   })
 
   it('disabled <switch>', () => {
@@ -46,8 +45,8 @@ init('<switch> component', (Vue, helper) => {
     const vmA = compile(`<switch></switch>`)
     const vmB = compile(`<switch disabled="false"></switch>`)
 
-    expect(vmA.$el.className).to.be.equal('weex-switch')
-    expect(vmB.$el.className).to.be.equal('weex-switch')
+    expect(vmA.$el.className).to.match(/weex-switch/)
+    expect(vmB.$el.className).to.match(/weex-switch/)
   })
 
   it('checked <switch>', () => {
@@ -82,8 +81,8 @@ init('<switch> component', (Vue, helper) => {
     const vmA = compile(`<switch></switch>`)
     const vmB = compile(`<switch checked="false"></switch>`)
 
-    expect(vmA.$el.className).to.be.equal('weex-switch')
-    expect(vmB.$el.className).to.be.equal('weex-switch')
+    expect(vmA.$el.className).to.match(/weex-switch/)
+    expect(vmB.$el.className).to.match(/weex-switch/)
   })
 
   it('disabled & checked <switch>', () => {
