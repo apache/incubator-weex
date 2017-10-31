@@ -172,13 +172,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   @Override
   public void createViewImpl() {
     super.createViewImpl();
-//    int count = childCount();
-//    for (int i = 0; i < count; ++i) {
-//      createChildViewAt(i);
-//    }
-//    if(getHostView()!=null){
-//       getHostView().setClipToPadding(false);
-//    }
+    int count = childCount();
+    for (int i = 0; i < count; ++i) {
+      createChildViewAt(i);
+    }
+    if(getHostView()!=null){
+       getHostView().setClipToPadding(false);
+    }
   }
 
   @Override
@@ -197,7 +197,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    * recycle component resources
    */
   public void recycled() {
-    if (mChildren != null && !getDomObject().isFixed() && getDomObject().getAttrs().canRecycled()) {
+    if (mChildren != null && !isFixed() && getAttrs().canRecycled()) {
       int count = mChildren.size();
       for (int i = 0; i < count; ++i) {
         mChildren.get(i).recycled();
@@ -289,7 +289,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     mChildren.remove(child);
     if(getInstance()!=null
             &&getInstance().getRootView()!=null
-            && child.getDomObject().isFixed()){
+            && child.isFixed()){
       getInstance().removeFixedView(child.getHostView());
     }else if(getRealView() != null) {
       if(!child.isVirtualComponent()){

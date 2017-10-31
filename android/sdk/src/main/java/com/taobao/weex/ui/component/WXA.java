@@ -47,14 +47,9 @@ public class WXA extends WXDiv {
       @Override
       public void onHostViewClick() {
         String href;
-        ImmutableDomObject domObject = getDomObject();
-        if (domObject != null) {
-          WXAttr attr = domObject.getAttrs();
-          if (attr !=null && (href = (String)attr.get("href")) != null) {
-            ATagUtil.onClick(null, getInstanceId(), href);
-          }
-        } else {
-          WXLogUtils.d("WXA", "Property href is empty.");
+        WXAttr attr = getAttrs();
+        if (attr !=null && (href = (String)attr.get("href")) != null) {
+          ATagUtil.onClick(null, getInstanceId(), href);
         }
       }
     });

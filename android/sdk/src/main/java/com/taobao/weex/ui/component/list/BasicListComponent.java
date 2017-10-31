@@ -178,7 +178,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
     });
 
-    mTriggerType = getTriggerType(getDomObject());
+    mTriggerType = getTriggerType(this);
   }
 
   /**
@@ -570,8 +570,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       entry = iterator.next();
       stickyComponent = entry.getValue();
 
-      if (stickyComponent != null && stickyComponent.getDomObject() != null
-          && stickyComponent instanceof WXCell) {
+      if (stickyComponent != null && stickyComponent instanceof WXCell) {
 
         WXCell cell = (WXCell) stickyComponent;
         if (cell.getHostView() == null) {
@@ -698,9 +697,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @return
    */
   private boolean isAddAnimation(WXComponent child) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
+    if (child != null) {
+      Object attr = child.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
       if (Constants.Value.DEFAULT.equals(attr)) {
         return true;
       }
@@ -714,9 +712,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @return fixed=true
    */
   private boolean isKeepScrollPosition(WXComponent child,int index) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
+    if (child != null) {
+      Object attr = child.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
       if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
         return true;
       }
@@ -788,9 +785,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @return
    */
   private boolean isRemoveAnimation(WXComponent child) {
-    ImmutableDomObject domObject = child.getDomObject();
-    if (domObject != null) {
-      Object attr = domObject.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
+    if (child != null) {
+      Object attr = child.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
       if (Constants.Value.DEFAULT.equals(attr)) {
         return true;
       }
@@ -853,7 +849,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (component == null
         || (component instanceof WXRefresh)
         || (component instanceof WXLoading)
-          || (component.getDomObject() != null && component.getDomObject().isFixed())
+          || (component.isFixed())
         ) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
@@ -871,7 +867,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       mTriggerType = (mTriggerType == null) ? DEFAULT_TRIGGER_TYPE : mTriggerType;
 
       WXCell cell = (WXCell) holder.getComponent();
-      boolean isExcluded = isDragExcluded(cell.getDomObject());
+      boolean isExcluded = isDragExcluded(cell);
       mDragHelper.setDragExcluded(holder, isExcluded);
 
       //NOTICE: event maybe consumed by other views
@@ -938,7 +934,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             || component.isUsing()) {
           continue;
         }
-        if (component.getDomObject() != null && component.getDomObject().isFixed()) {
+        if (component.isFixed()) {
           return createVHForFakeComponent(viewType);
         } else {
           if (component instanceof WXCell) {
@@ -1016,9 +1012,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     deque.add(root);
     while (!deque.isEmpty()) {
       WXComponent curComponent = deque.removeFirst();
-      ImmutableDomObject object = curComponent.getDomObject();
-      if (object != null) {
-        String isAnchorSet = WXUtils.getString(object.getAttrs().get(anchorName), null);
+      if (curComponent != null) {
+        String isAnchorSet = WXUtils.getString(curComponent.getAttrs().get(anchorName), null);
 
         //hit
         if (isAnchorSet != null && isAnchorSet.equals("true")) {
@@ -1044,12 +1039,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   }
 
-  private String getTriggerType(@Nullable ImmutableDomObject domObject) {
+  private String getTriggerType(@Nullable ImmutableDomObject component) {
     String triggerType = DEFAULT_TRIGGER_TYPE;
-    if (domObject == null) {
+    if (component == null) {
       return triggerType;
     }
-    triggerType = WXUtils.getString(domObject.getAttrs().get(DRAG_TRIGGER_TYPE), DEFAULT_TRIGGER_TYPE);
+    triggerType = WXUtils.getString(component.getAttrs().get(DRAG_TRIGGER_TYPE), DEFAULT_TRIGGER_TYPE);
     if (!DragTriggerType.LONG_PRESS.equals(triggerType) && !DragTriggerType.PAN.equals(triggerType)) {
       triggerType = DEFAULT_TRIGGER_TYPE;
     }
@@ -1152,20 +1147,20 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public long getItemId(int position) {
-//    long id;
-//    try {
-//      id = Long.parseLong(getChild(position).getRef());
-//    } catch (RuntimeException e) {
-//      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
-//      id = RecyclerView.NO_ID;
-//    }
-    return RecyclerView.NO_ID;
+    long id;
+    try {
+      id = Long.parseLong(getChild(position).getRef());
+    } catch (RuntimeException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+      id = RecyclerView.NO_ID;
+    }
+    return id;
   }
 
   @Override
   public void onLoadMore(int offScreenY) {
     try {
-      String offset = getDomObject().getAttrs().getLoadMoreOffset();
+      String offset = getAttrs().getLoadMoreOffset();
 
       if (TextUtils.isEmpty(offset)) {
         offset = "0";

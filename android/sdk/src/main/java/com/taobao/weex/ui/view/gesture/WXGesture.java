@@ -449,7 +449,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     if (component.containsGesture(HighLevelGesture.LONG_PRESS)) {
       List<Map<String, Object>> list = createMultipleFireEventParam(e,null);
       component.getInstance().fireEvent(
-          component.getDomObject().getRef(),
+          component.getRef(),
           HighLevelGesture.LONG_PRESS.toString(),
           list.get(list.size() - 1));
       mIsTouchEventConsumed = true;
@@ -510,7 +510,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
         } else {
           param.put(GestureInfo.DIRECTION, distanceY > 0 ? UP : DOWN);
         }
-        component.getInstance().fireEvent(component.getDomObject().getRef(),
+        component.getInstance().fireEvent(component.getRef(),
             HighLevelGesture.SWIPE.toString(), param);
         result = true;
       }

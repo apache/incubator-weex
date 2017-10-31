@@ -104,8 +104,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
     // init view pager
-    if (getDomObject() != null && getDomObject().getAttrs() != null) {
-      Object obj = getDomObject().getAttrs().get(INFINITE);
+    if (getAttrs() != null) {
+      Object obj = getAttrs().get(INFINITE);
       isInfinite = WXUtils.getBoolean(obj, true);
     }
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
@@ -402,11 +402,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
 
-      if (getDomObject().getEvents().size() == 0) {
+      if (getEvents().size() == 0) {
         return;
       }
-      WXEvent event = getDomObject().getEvents();
-      String ref = getDomObject().getRef();
+      WXEvent event = getEvents();
+      String ref = getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
         params.put(INDEX, realPosition);
 

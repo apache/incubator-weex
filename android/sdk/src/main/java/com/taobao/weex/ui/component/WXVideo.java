@@ -77,7 +77,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         mPrepared = false;
         mError = true;
 
-        if ( getDomObject().getEvents().contains(Constants.Event.FAIL)) {
+        if (getEvents().contains(Constants.Event.FAIL)) {
           WXVideo.this.notify(Constants.Event.FAIL, Constants.Value.STOP);
         }
         return true;
@@ -120,7 +120,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onCompletion");
         }
-        if ( getDomObject().getEvents().contains(Constants.Event.FINISH)) {
+        if (getEvents().contains(Constants.Event.FINISH)) {
           WXVideo.this.notify(Constants.Event.FINISH, Constants.Value.STOP);
         }
       }
@@ -133,7 +133,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onPause");
         }
-        if ( getDomObject().getEvents().contains(Constants.Event.PAUSE)) {
+        if (getEvents().contains(Constants.Event.PAUSE)) {
           WXVideo.this.notify(Constants.Event.PAUSE, Constants.Value.PAUSE);
         }
       }
@@ -144,7 +144,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onStart");
         }
 
-        if ( getDomObject().getEvents().contains(Constants.Event.START)) {
+        if (getEvents().contains(Constants.Event.START)) {
           WXVideo.this.notify(Constants.Event.START, Constants.Value.PLAY);
         }
       }

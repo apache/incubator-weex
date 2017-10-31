@@ -142,7 +142,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    * @param editText
    */
   protected void appleStyleAfterCreated(WXEditText editText) {
-    String alignStr = (String) getDomObject().getStyles().get(Constants.Name.TEXT_ALIGN);
+    String alignStr = (String) getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
       textAlign = Gravity.START;
@@ -153,7 +153,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       editText.setHintTextColor(colorInt);
     }
 
-    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
+    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getStyles(),getInstance().getInstanceViewPortWidth()));
   }
 
 
@@ -265,13 +265,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       attrsChanges.put("value", value);
       domChanges.put("attrs", attrsChanges);
 
-      WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), event, params, domChanges);
+      WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), event, params, domChanges);
     }
   }
 
   public void performOnChange(String value) {
-    if (getDomObject() != null && getDomObject().getEvents() != null) {
-      String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+    if (getEvents() != null) {
+      String event = getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
       fireEvent(event, value);
     }
   }
@@ -456,7 +456,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
     if (getHostView() != null && fontSize != null ) {
-      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
+      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getStyles(),getInstance().getInstanceViewPortWidth()));
     }
   }
 

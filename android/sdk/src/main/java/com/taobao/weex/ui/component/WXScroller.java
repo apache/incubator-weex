@@ -348,10 +348,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   protected ViewGroup initComponentHostView(@NonNull Context context) {
     String scroll;
-    if (getDomObject() == null || getDomObject().getAttrs().isEmpty()) {
+    if (getAttrs().isEmpty()) {
       scroll = "vertical";
     } else {
-      scroll = getDomObject().getAttrs().getScrollDirection();
+      scroll = getAttrs().getScrollDirection();
     }
 
     ViewGroup host;
@@ -689,7 +689,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   protected void onLoadMore(WXScrollView scrollView, int x, int y) {
     try {
-      String offset = getDomObject().getAttrs().getLoadMoreOffset();
+      String offset = getAttrs().getLoadMoreOffset();
       if (TextUtils.isEmpty(offset)) {
         return;
       }

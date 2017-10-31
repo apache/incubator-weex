@@ -763,7 +763,7 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   public boolean onBackPressed() {
     WXComponent comp = getRootComponent();
     if(comp != null) {
-      WXEvent events= comp.getDomObject().getEvents();
+      WXEvent events= comp.getEvents();
       boolean hasBackPressed = events.contains(Constants.Event.CLICKBACKITEM);
       if (hasBackPressed) {
         fireEvent(comp.getRef(), Constants.Event.CLICKBACKITEM,null, null);

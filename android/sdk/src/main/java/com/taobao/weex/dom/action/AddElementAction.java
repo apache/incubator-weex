@@ -100,8 +100,8 @@ final class AddElementAction extends AbstractAddElementAction {
 
       parent.addChild(component, mAddIndex);
       parent.createChildViewAt(mAddIndex);
-      component.applyLayoutAndEvent();
-      component.bindData(component);
+//      component.applyLayoutAndEvent(component);
+//      component.bindData(component);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

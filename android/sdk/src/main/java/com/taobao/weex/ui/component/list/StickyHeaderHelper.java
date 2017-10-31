@@ -98,7 +98,7 @@ public class StickyHeaderHelper {
       headerView.setTranslationY(translationY);
 
     }
-    if (headComponent.getDomObject().getEvents().contains("sticky")) {
+    if (headComponent.getEvents().contains("sticky")) {
       headComponent.fireEvent("sticky");
     }
   }
@@ -124,7 +124,7 @@ public class StickyHeaderHelper {
         component.recoverySticky();
       }
     }));
-    if (component.getDomObject().getEvents().contains("unsticky")) {
+    if (component.getEvents().contains("unsticky")) {
       component.fireEvent("unsticky");
     }
   }

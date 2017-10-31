@@ -18,12 +18,14 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
@@ -45,7 +47,7 @@ public class Textarea extends AbstractEditComponent {
   @Override
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
-    String rowsStr = (String) getDomObject().getStyles().get(Constants.Name.ROWS);
+    String rowsStr = (String) getStyles().get(Constants.Name.ROWS);
 
     int rows = TextAreaEditTextDomObject.DEFAULT_ROWS;
     try{

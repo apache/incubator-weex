@@ -32,6 +32,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.ui.action.WXUIAction;
@@ -67,11 +68,11 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
 
   public WXParallax(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
-//    initTransform(dom.getAttrs().get(WX_TRANSFORM));
-//    initOpacity(dom.getAttrs().get(Constants.Name.OPACITY));
-//    initBackgroundColor(dom.getAttrs().get(Constants.Name.BACKGROUND_COLOR));
-//
-//    mBindingRef = (String) (dom.getAttrs().get(BINDING_SCROLLER));
+    initTransform(getAttrs().get(WX_TRANSFORM));
+    initOpacity(getAttrs().get(Constants.Name.OPACITY));
+    initBackgroundColor(getAttrs().get(Constants.Name.BACKGROUND_COLOR));
+
+    mBindingRef = (String) (getAttrs().get(BINDING_SCROLLER));
     instance.registerOnWXScrollListener(this);
   }
 
@@ -129,7 +130,7 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
   @Override
   public boolean isNeedScroller(String ref, Object option) {
 
-    mBindingRef = (String) (getDomObject().getAttrs().get(BINDING_SCROLLER));
+    mBindingRef = (String) (getAttrs().get(BINDING_SCROLLER));
     if (TextUtils.isEmpty(mBindingRef)) {
       WXComponent root = getInstance().getRootComponent();
       if (root != null && root instanceof WXVContainer) {

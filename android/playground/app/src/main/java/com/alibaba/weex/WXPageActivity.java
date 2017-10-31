@@ -297,12 +297,10 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if(comp == null){
       return;
     }
-    ImmutableDomObject dom;
     String id;
     View view;
     if((view = comp.getHostView())!=null &&
-        (dom = comp.getDomObject()) != null &&
-        (id = (String) dom.getAttrs().get("testId"))!=null &&
+        (id = (String) comp.getAttrs().get("testId"))!=null &&
         !map.containsKey(id)){
       Pair<String,Integer> pair = Utility.nextID();
       view.setId(pair.second);

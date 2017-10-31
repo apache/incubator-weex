@@ -146,7 +146,7 @@ public class WXImage extends WXComponent<ImageView> {
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXImage) {
-      setSrc(component.getDomObject().getAttrs().getImageSrc());
+      setSrc(component.getAttrs().getImageSrc());
     }
   }
 
@@ -212,10 +212,8 @@ public class WXImage extends WXComponent<ImageView> {
       setLocalSrc(rewrited);
     } else {
       int blur = 0;
-      if(getDomObject() != null) {
-        String blurStr = getDomObject().getStyles().getBlur();
-        blur = parseBlurRadius(blurStr);
-      }
+      String blurStr = getStyles().getBlur();
+      blur = parseBlurRadius(blurStr);
       setRemoteSrc(rewrited, blur);
     }
   }
@@ -266,7 +264,7 @@ public class WXImage extends WXComponent<ImageView> {
       WXImageStrategy imageStrategy = new WXImageStrategy();
       imageStrategy.isClipping = true;
 
-      WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
+      WXImageSharpen imageSharpen = getAttrs().getImageSharpen();
       imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
       imageStrategy.blurRadius = Math.max(0, blurRadius);
@@ -275,7 +273,7 @@ public class WXImage extends WXComponent<ImageView> {
       imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
         @Override
         public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-          if (getDomObject() != null && getDomObject().getEvents().contains(Constants.Event.ONLOAD)) {
+          if (getEvents().contains(Constants.Event.ONLOAD)) {
             Map<String, Object> params = new HashMap<String, Object>();
             Map<String, Object> size = new HashMap<>(2);
             if (imageView != null && imageView instanceof Measurable) {
@@ -286,7 +284,7 @@ public class WXImage extends WXComponent<ImageView> {
               size.put("naturalHeight", 0);
             }
 
-            if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
+            if (containsEvent(Constants.Event.ONLOAD)) {
               params.put("success", result);
               params.put("size", size);
               fireEvent(Constants.Event.ONLOAD, params);
@@ -296,10 +294,10 @@ public class WXImage extends WXComponent<ImageView> {
       });
 
         String placeholder=null;
-        if(getDomObject().getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
-            placeholder= (String) getDomObject().getAttrs().get(Constants.Name.PLACEHOLDER);
-        }else if(getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
-            placeholder=(String)getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
+        if(getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
+            placeholder= (String) getAttrs().get(Constants.Name.PLACEHOLDER);
+        }else if(getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+            placeholder=(String) getAttrs().get(Constants.Name.PLACE_HOLDER);
         }
         if(placeholder!=null){
             imageStrategy.placeHolder = getInstance().rewriteUri(Uri.parse(placeholder),URIAdapter.IMAGE).toString();
@@ -308,7 +306,7 @@ public class WXImage extends WXComponent<ImageView> {
       IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
       if (imgLoaderAdapter != null) {
         imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-            getDomObject().getAttrs().getImageQuality(), imageStrategy);
+            getAttrs().getImageQuality(), imageStrategy);
       }
   }
 
@@ -316,14 +314,12 @@ public class WXImage extends WXComponent<ImageView> {
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
     WXImageView imageView;
-    ImmutableDomObject imageDom;
-    if ((imageDom = getDomObject()) != null &&
-        getHostView() instanceof WXImageView) {
+    if (getHostView() instanceof WXImageView) {
       imageView = (WXImageView) getHostView();
       BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
       float[] borderRadius;
       if (borderDrawable != null) {
-        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
+        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(this), WXDomUtils.getContentHeight(this));
         borderRadius = borderDrawable.getBorderRadius(borderBox);
       } else {
         borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};

@@ -71,7 +71,6 @@ class RemoveEventAction implements DOMAction, RenderAction {
     WXComponent comp = context.getComponent(mRef);
     if(comp != null){
       //sync dom change to component
-      comp.updateDom(mUpdatedDomObject);
       comp.removeEvent(mEvent);
     }
   }

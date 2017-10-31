@@ -56,16 +56,14 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   @Override
   public void onLoading() {
-    ImmutableDomObject domObject = getDomObject();
-    if (domObject != null && domObject.getEvents().contains(Constants.Event.ONLOADING)) {
+    if (getEvents().contains(Constants.Event.ONLOADING)) {
       fireEvent(Constants.Event.ONLOADING);
     }
   }
 
   @Override
   public void onPullingUp(float dy, int pullOutDistance, float viewHeight) {
-    ImmutableDomObject domObject = getDomObject();
-    if (domObject != null && domObject.getEvents().contains(Constants.Event.ONPULLING_UP)) {
+    if (getEvents().contains(Constants.Event.ONPULLING_UP)) {
       Map<String, Object> data = new HashMap<>();
       data.put(Constants.Name.DISTANCE_Y, dy);
       data.put(Constants.Name.PULLING_DISTANCE, pullOutDistance);

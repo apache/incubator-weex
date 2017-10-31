@@ -119,11 +119,10 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         if (swipeLayout != null) {
             WXRefreshView refreshView = swipeLayout.getHeaderView();
             if (refreshView != null) {
-                ImmutableDomObject immutableDomObject = refresh.getDomObject();
-                if (immutableDomObject != null) {
-                    int refreshHeight = (int) immutableDomObject.getLayoutHeight();
+                if (refresh != null) {
+                    int refreshHeight = (int) refresh.getLayoutHeight();
                     swipeLayout.setRefreshHeight(refreshHeight);
-                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String colorStr = (String) refresh.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {
@@ -148,11 +147,10 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         if (swipeLayout != null) {
             WXRefreshView refreshView = swipeLayout.getFooterView();
             if (refreshView != null) {
-                ImmutableDomObject immutableDomObject = loading.getDomObject();
-                if (immutableDomObject != null) {
-                    int loadingHeight = (int) immutableDomObject.getLayoutHeight();
+                if (loading != null) {
+                    int loadingHeight = (int) loading.getLayoutHeight();
                     swipeLayout.setLoadingHeight(loadingHeight);
-                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String colorStr = (String) loading.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {

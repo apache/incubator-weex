@@ -320,7 +320,7 @@ class DOMActionContextImpl implements DOMActionContext {
       return;
     }
     domObject.old();
-    component.updateDom(domObject);
+//    component.updateDom(domObject);
     if (component instanceof WXVContainer) {
       WXVContainer container = (WXVContainer) component;
       int count = container.childCount();

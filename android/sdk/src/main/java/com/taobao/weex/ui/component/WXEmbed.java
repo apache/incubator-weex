@@ -176,10 +176,10 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
     ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
     if(instance instanceof EmbedManager) {
-//      Object itemId = node.getAttrs().get(ITEM_ID);
-//      if (itemId != null) {
-//        ((EmbedManager) instance).putEmbed(itemId.toString(), this);
-//      }
+      Object itemId = getAttrs().get(ITEM_ID);
+      if (itemId != null) {
+        ((EmbedManager) instance).putEmbed(itemId.toString(), this);
+      }
     }
   }
 

@@ -83,7 +83,7 @@ final class RemoveElementAction implements DOMAction, RenderAction {
   }
 
   private void clearRegistryForComponent(RenderActionContext context, WXComponent component) {
-    WXComponent removedComponent = context.unregisterComponent(component.getDomObject().getRef());
+    WXComponent removedComponent = context.unregisterComponent(component.getRef());
     if (removedComponent != null) {
       removedComponent.removeAllEvent();
       removedComponent.removeStickyStyle();

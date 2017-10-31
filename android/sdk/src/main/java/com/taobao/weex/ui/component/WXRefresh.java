@@ -70,8 +70,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
       return;
     }
     
-    ImmutableDomObject dom;
-    if ((dom = getDomObject())!= null && dom.getEvents().contains(Constants.Event.ONREFRESH)) {
+    if (getEvents().contains(Constants.Event.ONREFRESH)) {
       fireEvent(Constants.Event.ONREFRESH);
     }
   }
@@ -79,12 +78,12 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   @Override
   public int getLayoutTopOffsetForSibling() {
     //offset siblings
-    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getLayoutHeight()) : 0;
+    return getParent() instanceof Scrollable ? -Math.round(getLayoutHeight()) : 0;
   }
 
   @Override
   public void onPullingDown(float dy, int pullOutDistance, float viewHeight) {
-    if (getDomObject().getEvents() != null && getDomObject().getEvents().contains(Constants.Event.ONPULLING_DOWN)) {
+    if (getEvents() != null && getEvents().contains(Constants.Event.ONPULLING_DOWN)) {
       Map<String, Object> data = new HashMap<>();
       data.put(Constants.Name.DISTANCE_Y, dy);
       data.put(Constants.Name.PULLING_DISTANCE, pullOutDistance);

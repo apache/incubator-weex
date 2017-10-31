@@ -69,7 +69,7 @@ public class WXWeb extends WXComponent {
         mWebView.setOnPageListener(new IWebView.OnPageListener() {
             @Override
             public void onReceivedTitle(String title) {
-                if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
+                if (getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
                     fireEvent(Constants.Event.RECEIVEDTITLE, params);
@@ -78,7 +78,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageStart(String url) {
-                if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
+                if (getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     fireEvent(Constants.Event.PAGESTART, params);
@@ -87,7 +87,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
-                if ( getDomObject().getEvents().contains(Constants.Event.PAGEFINISH)) {
+                if (getEvents().contains(Constants.Event.PAGEFINISH)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
@@ -150,7 +150,7 @@ public class WXWeb extends WXComponent {
     }
 
     private void fireEvent(String type, Object message) {
-        if (getDomObject().getEvents().contains(Constants.Event.ERROR)) {
+        if (getEvents().contains(Constants.Event.ERROR)) {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);

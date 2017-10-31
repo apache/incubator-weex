@@ -89,7 +89,7 @@ public class WXText extends WXComponent<WXTextView> {
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXText) {
-      updateExtra(component.getDomObject().getExtra());
+      updateExtra(component.getExtra());
     }
   }
 

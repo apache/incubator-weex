@@ -56,7 +56,7 @@ public class WXMask extends WXVContainer {
     mPopupWindow.setContentView(mContainerView);
     mPopupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
     mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getDomObject().getLayoutX(), (int) getDomObject().getLayoutY());
+    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getLayoutX(), (int) getLayoutY());
 
     return mContainerView;
   }
