@@ -235,7 +235,8 @@ public class WXPerformance {
   }
 
   public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"};
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"
+    ,"wxdim1","wxdim2","wxdim3","wxdim4","wxdim5"};
   }
 
   public static String[] getMeasures(){
@@ -258,7 +259,13 @@ public class WXPerformance {
         "actualNetworkTime",
         "firstScreenJSFExecuteTime",
         "maxDeepViewLayer",
-        "useScroller"};
+        "useScroller",
+		"measureTime1",
+		"measureTime2",
+		"measureTime3",
+		"measureTime4",
+		"measureTime5"
+	};
   }
 
   @Override
