@@ -23,7 +23,6 @@ const _css = `
   text-decoration: none;
 }
 `
-let cnt = 0
 
 function getA (weex) {
   const {
@@ -41,11 +40,9 @@ function getA (weex) {
       // if (process.env.NODE_ENV === 'development') {
       //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
       // }
-      const id = cnt++
       return createElement('html:a', {
         attrs: {
           'weex-type': 'a',
-          'id': `weex-a-${id}`,
           href: this.href
         },
         staticClass: 'weex-a weex-ct',

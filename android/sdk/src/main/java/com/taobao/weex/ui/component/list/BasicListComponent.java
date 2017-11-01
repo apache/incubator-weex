@@ -1170,11 +1170,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       boolean visible = (!outOfVisibleRange) && item.isViewVisible(true);
 
       int result = item.setAppearStatus(visible);
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
-      }
       if (result == AppearanceHelper.RESULT_NO_CHANGE) {
         continue;
+      }
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
       }
       component.notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
     }
