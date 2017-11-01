@@ -131,7 +131,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *for network tracker
    */
   public String mwxDims[] = new String [5];
-  public Double measureTimes[] = new Double [5];
+  public long measureTimes[] = new long [5];
 
   public WeakReference<String> templateRef;
   public Map<String,List<String>> responseHeaders = new HashMap<>();

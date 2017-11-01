@@ -181,7 +181,7 @@ public class WXPerformance {
    */
 
   public String wxDims[] = new String [5];
-  public Double measureTimes[] = new Double [5];
+  public long measureTimes[] = new long [5];
 
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
@@ -209,11 +209,11 @@ public class WXPerformance {
     quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
     quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
     quotas.put("useScroller", (double) useScroller);
-	quotas.put("measureTime1", measureTimes[0]);
-	quotas.put("measureTime2", measureTimes[1]);
-	quotas.put("measureTime3", measureTimes[2]);
-	quotas.put("measureTime4", measureTimes[3]);
-	quotas.put("measureTime5", measureTimes[4]);
+	quotas.put("measureTime1", (double) measureTimes[0]);
+	quotas.put("measureTime2", (double) measureTimes[1]);
+	quotas.put("measureTime3", (double) measureTimes[2]);
+	quotas.put("measureTime4", (double) measureTimes[3]);
+	quotas.put("measureTime5", (double) measureTimes[4]);
 	return quotas;
   }
 
