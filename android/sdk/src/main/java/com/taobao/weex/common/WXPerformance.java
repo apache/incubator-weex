@@ -176,6 +176,12 @@ public class WXPerformance {
   public String connectionType;
   public String requestType;
 
+  /**
+   *for network tracker
+   */
+
+  public String wxDims[] = new String [5];
+  public Double measureTimes[] = new Double [5];
 
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
@@ -203,7 +209,12 @@ public class WXPerformance {
     quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
     quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
     quotas.put("useScroller", (double) useScroller);
-    return quotas;
+	quotas.put("measureTime1", measureTimes[0]);
+	quotas.put("measureTime2", measureTimes[1]);
+	quotas.put("measureTime3", measureTimes[2]);
+	quotas.put("measureTime4", measureTimes[3]);
+	quotas.put("measureTime5", measureTimes[4]);
+	return quotas;
   }
 
   public Map<String,String> getDimensionMap(){
@@ -215,8 +226,12 @@ public class WXPerformance {
     quotas.put("WXSDKVersion", WXSDKVersion);
     quotas.put("connectionType",connectionType);
     quotas.put("requestType",requestType);
-
-    return quotas;
+	quotas.put("wxdim1", wxDims[0]);
+	quotas.put("wxdim2", wxDims[1]);
+	quotas.put("wxdim3", wxDims[2]);
+	quotas.put("wxdim4", wxDims[3]);
+	quotas.put("wxdim5", wxDims[4]);
+	return quotas;
   }
 
   public static String[] getDimensions(){

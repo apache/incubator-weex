@@ -127,19 +127,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
 
+  /**
+   *for network tracker
+   */
+  public String mwxDims[] = new String [5];
+  public Double measureTimes[] = new Double [5];
 
   public WeakReference<String> templateRef;
-
   public Map<String,List<String>> responseHeaders = new HashMap<>();
 
   /**
    * Render strategy.
    */
   private WXRenderStrategy mRenderStrategy = WXRenderStrategy.APPEND_ASYNC;
+
   /**
    * Render start time
    */
-  private long mRenderStartTime;
+  public long mRenderStartTime;
   /**
    * Refresh start time
    */
@@ -840,6 +845,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
+	  mWXPerformance.wxDims = mwxDims;
+	  mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
