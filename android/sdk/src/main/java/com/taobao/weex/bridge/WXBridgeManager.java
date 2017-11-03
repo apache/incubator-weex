@@ -426,12 +426,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    // if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
         .append(", tasks:").append(tasks).append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
