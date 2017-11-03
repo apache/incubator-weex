@@ -426,12 +426,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    // if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
         .append(", tasks:").append(tasks).append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -1367,7 +1367,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    if (!isJSFrameworkInit() && reInitCount == 1) {
+    if (!isJSFrameworkInit() && reInitCount == 1 && !WXEnvironment.sDebugServerConnectable) {
       instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
       post(new Runnable() {
         @Override
@@ -1430,12 +1430,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             data == null ? "{}" : data);
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
             dataObj};
+        instance.setTemplate(template);
         invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
       } catch (Throwable e) {
         instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR,
             "createInstance failed!");
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
-            + " template md5 " + WXFileUtils.md5(template) + " length " + (template == null ? 0 : template.length());
+            + instance.getTemplateInfo();
         commitJSBridgeAlarmMonitor(instance.getInstanceId(), WXErrorCode.WX_ERR_INVOKE_NATIVE, err);
         WXLogUtils.e(err);
       }
@@ -1477,7 +1478,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
           instanceId);
       WXJSObject[] args = {instanceIdObj};
-      invokeExecJS(instanceId, null, METHOD_DESTROY_INSTANCE, args);
+      if (isJSFrameworkInit()) {
+        invokeExecJS(instanceId, null, METHOD_DESTROY_INSTANCE, args);
+      }
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeDestroyInstance " + e.getCause();
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, err);
@@ -1863,22 +1866,28 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         + exception);
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
-      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+
 
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
-          if (reInitCount > 1 && !instance.isNeedReLoad()) {
+          if (mInit && reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
             WXDomModule domModule = getDomModule(instanceId);
             Action action = Actions.getReloadPage(instanceId, true);
             domModule.postAction((DOMAction) action, true);
             instance.setNeedLoad(true);
             return;
+          } else {
+            instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR, "createInstance fail!");
+            return;
           }
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
+      exception +=  instance.getTemplateInfo();
+      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
     }

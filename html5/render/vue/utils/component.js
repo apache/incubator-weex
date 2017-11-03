@@ -97,7 +97,7 @@ export function isElementVisible (el, container, dir, offset) {
     bottom: window.innerHeight,
     right: window.innerWidth
   }
-  const ctRect = (container === document.body)
+  const ctRect = (container === window || container === document.body)
     ? bodyRect : container
     ? container.getBoundingClientRect() : bodyRect
   return hasIntersection(el.getBoundingClientRect(), ctRect, dir, offset)
@@ -163,7 +163,7 @@ export function watchAppear (context, fireNow) {
   }
 
   let isWindow = false
-  let container = document.body
+  let container = window
   const scroller = getParentScroller(context)
   if (scroller && scroller.$el) {
     container = scroller.$el
@@ -214,6 +214,13 @@ export function watchAppear (context, fireNow) {
     }
   }, 25, true)
   container.addEventListener('scroll', scrollHandler, false)
+  /**
+   * In case the users use the body's overflow to scroll. Then the scroll
+   * event would not be handled on the window object but on the body.
+   */
+  if (isWindow) {
+    document.body.addEventListener('scroll', scrollHandler, false)
+  }
 }
 
 /**

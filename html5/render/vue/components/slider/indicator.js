@@ -118,7 +118,9 @@ function _getLtbr (context, mergedStyle) {
 function _getIndicatorRect (el) {
   let width, height
   if (el.children.length === 1) {
-    width = height = window.getComputedStyle(el.children[0])
+    const itemComputedStyle = window.getComputedStyle(el.children[0])
+    width = parseFloat(itemComputedStyle.width)
+    height = parseFloat(itemComputedStyle.height)
   }
   else {
     const itemComputedStyle = window.getComputedStyle(el.children[1])

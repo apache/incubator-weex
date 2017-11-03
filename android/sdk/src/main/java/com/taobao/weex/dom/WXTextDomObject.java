@@ -334,9 +334,14 @@ public class WXTextDomObject extends WXDomObject {
       lastLineStart = layout.getLineStart(mNumberOfLines - 1);
       lastLineEnd = layout.getLineEnd(mNumberOfLines - 1);
       if (lastLineStart < lastLineEnd) {
-        SpannableStringBuilder builder = new SpannableStringBuilder(spanned.subSequence(0, lastLineStart));
+        SpannableStringBuilder builder = null;
+        if(lastLineStart > 0) {
+          builder = new SpannableStringBuilder(spanned.subSequence(0, lastLineStart));
+        }else{
+          builder = new SpannableStringBuilder();
+        }
         Editable lastLine = new SpannableStringBuilder(spanned.subSequence(lastLineStart, lastLineEnd));
-        builder.append(truncate(lastLine, mTextPaint, layout.getWidth(), textOverflow));
+        builder.append(truncate(lastLine, mTextPaint, (int) Math.ceil(textWidth), textOverflow));
         adjustSpansRange(spanned, builder);
         spanned = builder;
         return new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
@@ -364,6 +369,15 @@ public class WXTextDomObject extends WXDomObject {
     if (!TextUtils.isEmpty(source) && source.length() > 0) {
       if (truncateAt != null) {
         source.append(ELLIPSIS);
+        Object[] spans = source.getSpans(0, source.length(), Object.class);
+        for(Object span:spans){
+          int start = source.getSpanStart(span);
+          int end = source.getSpanEnd(span);
+          if(start == 0 && end == source.length()-1){
+             source.removeSpan(span);
+             source.setSpan(span, 0, source.length(), source.getSpanFlags(span));
+          }
+        }
       }
 
       StaticLayout layout;
@@ -375,7 +389,7 @@ public class WXTextDomObject extends WXDomObject {
           startOffset -= 1;
         }
         source.delete(startOffset, startOffset+1);
-        layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
+        layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
         if (layout.getLineCount() <= 1) {
           ret = source;
           break;
