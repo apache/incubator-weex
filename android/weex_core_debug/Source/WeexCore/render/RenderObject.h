@@ -23,9 +23,12 @@ namespace WeexCore {
   typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
   typedef std::set<std::string>::const_iterator EVENT_IT;
   typedef ChildrenList::iterator CHILD_LIST_IT;
-  typedef std::map<std::string, std::string> STYLES;
-  typedef std::map<std::string, std::string> ATTRIBUTES;
+  typedef std::map<std::string, std::string> STYLES_MAP;
+  typedef std::map<std::string, std::string> ATTRIBUTES_MAP;
   typedef std::set<std::string> EVENTS;
+  typedef std::map<std::string, std::string> MARGIN_MAP;
+  typedef std::map<std::string, std::string> PADDING_MAP;
+  typedef std::map<std::string, std::string> BORDER_MAP;
 
   class RenderObject {
   public:
@@ -39,9 +42,15 @@ namespace WeexCore {
 
     RenderObject *mParentRender;
 
-    STYLES *mStyles;
+    STYLES_MAP *mStyles;
 
-    ATTRIBUTES *mAttributes;
+    ATTRIBUTES_MAP *mAttributes;
+
+    MARGIN_MAP *mMargins;
+
+    PADDING_MAP *mPaddings;
+
+    BORDER_MAP *mBorders;
 
     EVENTS *mEvents;
 
@@ -73,33 +82,18 @@ namespace WeexCore {
     }
 
     inline void updateAttr(std::string key, std::string value) {
-      if (mAttributes == nullptr) {
-        mAttributes = new ATTRIBUTES();
-      }
-
       mAttributes->insert(pair<std::string, std::string>(key, value));
     }
 
     inline void updateStyle(std::string key, std::string value) {
-      if (mStyles == nullptr) {
-        mStyles = new STYLES();
-      }
-
-      mStyles->insert(pair<std::string, std::string>(key, value));
-      applyStyleToYGNode(key, value);
+      applyStyle(key, value);
     }
 
     inline void addEvent(std::string event) {
-      if (mEvents == nullptr) {
-        mEvents = new EVENTS();
-      }
       mEvents->insert(event);
     }
 
     inline void removeEvent(std::string event) {
-      if (mEvents == nullptr) {
-        return;
-      }
       mEvents->erase(event);
     }
 
@@ -147,12 +141,24 @@ namespace WeexCore {
       return mParentRender;
     }
 
-    inline STYLES *getStyles() {
+    inline STYLES_MAP *getStyles() {
       return mStyles;
     }
 
-    inline ATTRIBUTES *getAttributes() {
+    inline ATTRIBUTES_MAP *getAttributes() {
       return mAttributes;
+    }
+
+    inline PADDING_MAP *getPaddings() {
+      return mPaddings;
+    }
+
+    inline MARGIN_MAP *getMargins() {
+      return mMargins;
+    }
+
+    inline BORDER_MAP *getBorders() {
+      return mBorders;
     }
 
     inline STYLE_IT getStyleItBegin() {
@@ -187,7 +193,7 @@ namespace WeexCore {
       return mChildren.end();
     }
 
-    void applyStyleToYGNode(std::string key, std::string value);
+    void applyStyle(std::string key, std::string value);
 
     void printRenderMsg();
 

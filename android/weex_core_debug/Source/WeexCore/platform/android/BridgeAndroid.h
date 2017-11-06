@@ -95,14 +95,20 @@ namespace WeexCore {
                                  int top,
                                  int bottom, int left, int right, int height, int width,
                                  std::map<std::string, std::string> *styles,
-                                 std::map<std::string, std::string> *attributes);
+                                 std::map<std::string, std::string> *attributes,
+                                 std::map<std::string, std::string> *paddings,
+                                 std::map<std::string, std::string> *margins,
+                                 std::map<std::string, std::string> *borders);
 
     int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
                                  int top,
                                  int bottom, int left, int right, int height, int width, int index,
                                  std::string parentRef,
                                  std::map<std::string, std::string> *styles,
-                                 std::map<std::string, std::string> *attributes);
+                                 std::map<std::string, std::string> *attributes,
+                                 std::map<std::string, std::string> *paddings,
+                                 std::map<std::string, std::string> *margins,
+                                 std::map<std::string, std::string> *borders);
 
     int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
                                   std::string &value);

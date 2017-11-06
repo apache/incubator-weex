@@ -41,8 +41,6 @@ public class CreateBodyUIAction extends WXUIAction {
       //stop redner, some fatal happened.
       return;
     }
-    component.updateStyle(mStyle);
-    component.updateAttr(mAttributes);
 
     try {
       long start = System.currentTimeMillis();

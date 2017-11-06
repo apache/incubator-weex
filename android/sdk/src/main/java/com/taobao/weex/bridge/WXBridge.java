@@ -466,29 +466,37 @@ public class WXBridge implements IWXBridge {
     }
   }
 
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, HashMap<String,String> styles, HashMap<String,String> attributes) {
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, styles, attributes);
-    }catch (Throwable e){
+      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width,
+              styles, attributes, paddings, margins, borders);
+    } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callCreateBody throw exception:" + e.getMessage());
       }
     }
     return errorCode;
   }
 
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef, HashMap<String,String> styles, HashMap<String,String> attributes) {
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
-      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef, styles, attributes);
-    }catch (Throwable e){
+      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef,
+              styles, attributes, paddings, margins, borders);
+    } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
+      if (WXEnvironment.isApkDebugable()) {
         e.printStackTrace();
-        WXLogUtils.e(TAG,"callNative throw error:"+e.getMessage());
+        WXLogUtils.e(TAG, "callNative throw error:" + e.getMessage());
       }
     }
 
@@ -502,8 +510,8 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, key, value);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callUpdateStyle throw exception:" + e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callUpdateStyle throw exception:" + e.getMessage());
       }
     }
     return errorCode;
@@ -513,10 +521,10 @@ public class WXBridge implements IWXBridge {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callReLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
-    }catch (Throwable e){
+    } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callReLayoutByWeexCore throw exception:"+e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callReLayoutByWeexCore throw exception:" + e.getMessage());
       }
     }
     return errorCode;

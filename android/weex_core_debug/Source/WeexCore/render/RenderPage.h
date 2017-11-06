@@ -60,37 +60,21 @@ namespace WeexCore {
       addRenderAction(action);
     }
 
-    inline void sendUpdateStyleAction(RenderObject *render) {
-      STYLE_IT style_it_star = render->getStyleItBegin();
-      STYLE_IT style_it_end = render->getStyleItEnd();
-
-      for (; style_it_star != style_it_end; ++style_it_star) {
-        UpdateStyleAction *action = new UpdateStyleAction();
-        action->GenerateAction(getPageId(), render, style_it_star->first, style_it_star->second);
-        addRenderAction(action);
-      }
+    inline void sendUpdateStyleAction(std::string key, std::string value, std::string ref) {
+      UpdateStyleAction *action = new UpdateStyleAction();
+      action->GenerateAction(getPageId(), ref, key, value);
+      addRenderAction(action);
     }
 
-    inline void sendUpdateAttrAction(RenderObject *render) {
-      ATTR_IT attr_it_star = render->getAttrItBegin();
-      ATTR_IT attr_it_end = render->getAttrItEnd();
-
-      for (; attr_it_star != attr_it_end; ++attr_it_star) {
-        UpdateStyleAction *action = new UpdateStyleAction();
-        action->GenerateAction(getPageId(), render, attr_it_star->first, attr_it_star->second);
-        addRenderAction(action);
-      }
+    inline void sendUpdateAttrAction(std::string key, std::string value, std::string ref) {
+      UpdateStyleAction *action = new UpdateStyleAction();
+      action->GenerateAction(getPageId(), ref, key, value);
+      addRenderAction(action);
     }
 
     inline void sendAddEventAction(RenderObject *render) {
-      EVENT_IT event_it_start = render->getEventItBegin();
-      EVENT_IT event_it_end = render->getEventItEnd();
-
-      for (; event_it_start != event_it_end; ++event_it_start) {
-        // TODO AddEventAction
-      }
+      // TODO AddEventAction
     }
-
 
   public:
     RenderPage(std::string pageID, std::string data);

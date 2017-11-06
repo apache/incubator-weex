@@ -14,8 +14,11 @@ namespace WeexCore {
 
   class RenderAction {
   public:
-    STYLES *mStyles;
-    ATTRIBUTES *mAttributes;
+    STYLES_MAP *mStyles;
+    ATTRIBUTES_MAP *mAttributes;
+    PADDING_MAP *mPaddings;
+    MARGIN_MAP *mMargins;
+    BORDER_MAP *mBorders;
     std::string mPageId;
     std::string mComponentType;
     std::string mParentRef;

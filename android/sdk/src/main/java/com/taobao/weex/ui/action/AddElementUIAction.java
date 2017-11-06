@@ -36,21 +36,18 @@ public class AddElementUIAction extends WXUIAction {
       return;
     }
 
-    WXComponent component = createComponent(instance, null);
+    WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
+    WXComponent component = createComponent(instance, parent);
     if (component == null) {
       //stop redner, some fatal happened.
       return;
     }
-    component.updateStyle(mStyle);
-    component.updateAttr(mAttributes);
 
     if (instance == null || instance.getContext() == null) {
       WXLogUtils.e("instance is null or instance is destroy!");
       return;
     }
     try {
-      WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
-
       if (parent == null || component == null) {
         return;
       }

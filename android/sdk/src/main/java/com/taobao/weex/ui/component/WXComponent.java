@@ -67,6 +67,7 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
+import com.taobao.weex.ui.layout.WXLayoutBridge;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -140,6 +141,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public WXStyle mStyles;
   public WXAttr mAttributes;
   public WXEvent mEvents;
+  public Spacing mMargins = new Spacing();
+  public Spacing mPaddings = new Spacing();
+  public Spacing mBorders = new Spacing();
 
   public @NonNull WXStyle getStyles(){
     if(mStyles == null ){
@@ -163,7 +167,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mEvents;
   }
 
-  public void updateAttr(Map<String, Object> attrs) {
+  public void setAttr(Map<String, Object> attrs) {
     if (attrs == null || attrs.isEmpty()) {
       return;
     }
@@ -173,11 +177,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mAttributes.putAll(attrs);
   }
 
-  public void updateStyle(Map<String, Object> styles){
-    updateStyle(styles,false);
+  public void setStyle(Map<String, Object> styles){
+    setStyle(styles,false);
   }
 
-  public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
+  public void setStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
@@ -187,8 +191,95 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mStyles.putAll(styles,byPesudo);
   }
 
-  public String getAttrByKey(String key){
+  public void setSpacing(Map<String, String> spacing) {
+    if (!spacing.isEmpty()) {
+      for (Map.Entry<String, String> item : spacing.entrySet()) {
+        String key = item.getKey();
+        switch (key) {
+          case Constants.Name.MARGIN:
+            setMargin(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.MARGIN_LEFT:
+            setMargin(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.MARGIN_TOP:
+            setMargin(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.MARGIN_RIGHT:
+            setMargin(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.MARGIN_BOTTOM:
+            setMargin(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.BORDER_WIDTH:
+            setBorder(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.BORDER_TOP_WIDTH:
+            setBorder(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.BORDER_RIGHT_WIDTH:
+            setBorder(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.BORDER_BOTTOM_WIDTH:
+            setBorder(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.BORDER_LEFT_WIDTH:
+            setBorder(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.PADDING:
+            setPadding(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.PADDING_LEFT:
+            setPadding(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.PADDING_TOP:
+            setPadding(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.PADDING_RIGHT:
+            setPadding(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+          case Constants.Name.PADDING_BOTTOM:
+            setPadding(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key),750));
+            break;
+        }
+      }
+    }
+  }
 
+  /**
+   * Get this node's margin, as defined by cssstyle + default margin.
+   */
+  public @NonNull Spacing getMargin() {
+    return mMargins;
+  }
+
+  public void setMargin(int spacingType, float margin) {
+    mMargins.set(spacingType, margin);
+  }
+
+  /**
+   * Get this node's padding, as defined by cssstyle + default padding.
+   */
+  public @NonNull Spacing getPadding() {
+    return mPaddings;
+  }
+
+  public void setPadding(int spacingType, float padding) {
+    mPaddings.set(spacingType, padding);
+  }
+
+  /**
+   * Get this node's border, as defined by cssstyle.
+   */
+  public @NonNull Spacing getBorder() {
+    return mBorders;
+  }
+
+  public void setBorder(int spacingType, float border) {
+    mBorders.set(spacingType, border);
+  }
+
+  public String getAttrByKey(String key){
     return "default";
   }
 
@@ -483,6 +574,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * layout view
    */
   public final void setLayout() {
+
+    new WXLayoutBridge().layout();
+
     if (TextUtils.isEmpty(mPageId) || TextUtils.isEmpty(mComponentType)
             || TextUtils.isEmpty(mRef) || mPosition == null || mRenderSize == null) {
       return;
@@ -491,14 +585,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     boolean nullParent = mParent == null;//parent is nullable
 
     //offset by sibling
-    int siblingOffset = nullParent?0:mParent.getChildrenLayoutTopOffset();
+    int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
     int realWidth = (int) mRenderSize.getWidth();
     int realHeight = (int) mRenderSize.getHeight();
-    int realLeft = (int) mPosition.getLeft();
-    int realTop = (int) mPosition.getTop() + siblingOffset;
-    int realRight = (int)mPosition.getRight();
-    int realBottom = (int) mPosition.getBottom();
+    int realLeft = (int) (mPosition.getLeft() - mPaddings.get(Spacing.LEFT) -
+            mBorders.get(Spacing.LEFT));
+    int realTop = (int) (mPosition.getTop() - mPaddings.get(Spacing.TOP) -
+            mBorders.get(Spacing.TOP)) + siblingOffset;
+    int realRight = (int) mMargins.get(Spacing.RIGHT);
+    int realBottom = (int) mMargins.get(Spacing.BOTTOM);
+
     if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
       return;
     }
@@ -1560,7 +1657,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public boolean canRecycled(){
     return (!isFixed() || !isSticky()) && getAttrs().canRecycled();
   }
-  
+
   /**
    * Sets the offset for the sticky
    * @param stickyOffset child[y]-parent[y]
@@ -1613,12 +1710,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 
-  @NonNull
-  @Override
-  public Spacing getMargin() {
-    return null;
-  }
-
   @Override
   public float getLayoutX() {
     return mPosition.getLeft();
@@ -1627,18 +1718,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   @Override
   public float getLayoutY() {
     return mPosition.getTop();
-  }
-
-  @NonNull
-  @Override
-  public Spacing getPadding() {
-    return null;
-  }
-
-  @NonNull
-  @Override
-  public Spacing getBorder() {
-    return null;
   }
 
   @Override

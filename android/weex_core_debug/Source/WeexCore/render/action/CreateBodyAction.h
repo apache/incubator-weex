@@ -18,12 +18,16 @@ namespace WeexCore {
                                                              mBottom, mLeft,
                                                              mRight,
                                                              mHeight,
-                                                             mWidth, mStyles, mAttributes);
+                                                             mWidth, mStyles, mAttributes,
+                                                             mPaddings, mMargins, mBorders);
     }
 
     void GenerateAction(std::string pageId, RenderObject *render) {
       this->mAttributes = render->getAttributes();
       this->mStyles = render->getStyles();
+      this->mPaddings = render->getPaddings();
+      this->mMargins = render->getMargins();
+      this->mBorders = render->getBorders();
       this->mPageId = pageId;
       this->mComponentType = render->getType();
       this->mRef = render->getRef();

@@ -17,9 +17,9 @@ namespace WeexCore {
     }
 
     void
-    GenerateAction(std::string pageId, RenderObject *render, std::string key, std::string value) {
+    GenerateAction(std::string pageId, std::string ref, std::string key, std::string value) {
       this->mPageId = pageId;
-      this->mRef = render->getRef();
+      this->mRef = ref;
       this->mKey = key;
       this->mValue = value;
     }

@@ -1944,7 +1944,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     msg.sendToTarget();
   }
 
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, HashMap<String,String> styles, HashMap<String,String> attributes) {
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width,
+                                      HashMap<String,String> styles, HashMap<String,String> attributes,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callCreateBodyByWeexCore: call CreateBody args is null");
@@ -1971,6 +1974,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         final WXUIAction action = new CreateBodyUIAction();
         action.mStyle = styles;
         action.mAttributes = attributes;
+        action.mPaddings = paddings;
+        action.mMargins = margins;
+        action.mBorders = borders;
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
@@ -1991,6 +1997,67 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody exception "+e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef,
+                                      HashMap<String,String> styles, HashMap<String,String> attributes,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
+    if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callAddElement: call callAddElement args is null");
+      }
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement: call callAddElement args is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", top:").append(top)
+              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
+              .append(", height:").append(height).append(", width:").append(width).append(", index:").append(index)
+              .append(", parentRef:").append(parentRef);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
+        final WXUIAction action = new AddElementUIAction();
+        action.mStyle = styles;
+        action.mAttributes = attributes;
+        action.mPaddings = paddings;
+        action.mMargins = margins;
+        action.mBorders = borders;
+        action.mPageId = pageId;
+        action.mComponentType = componentType;
+        action.mRef = ref;
+        action.mParentRef = parentRef;
+        action.mIndex = index;
+        action.mPosition.setTop(top);
+        action.mPosition.setBottom(bottom);
+        action.mPosition.setLeft(left);
+        action.mPosition.setRight(right);
+        action.mRenderSize.setHeight(height);
+        action.mRenderSize.setWidth(width);
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            action.executeAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement exception "+e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;
@@ -2035,61 +2102,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyleByWeexCore exception " + e.getCause());
-    }
-
-    return IWXBridge.INSTANCE_RENDERING;
-  }
-
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef, HashMap<String,String> styles, HashMap<String,String> attributes) {
-    if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[WXBridgeManager] callAddElement: call callAddElement args is null");
-      }
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement: call callAddElement args is null");
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-
-    if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
-              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", top:").append(top)
-              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
-              .append(", height:").append(height).append(", width:").append(width).append(", index:").append(index)
-              .append(", parentRef:").append(parentRef);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
-
-    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new AddElementUIAction();
-        action.mStyle = styles;
-        action.mAttributes = attributes;
-        action.mPageId = pageId;
-        action.mComponentType = componentType;
-        action.mRef = ref;
-        action.mParentRef = parentRef;
-        action.mIndex = index;
-        action.mPosition.setTop(top);
-        action.mPosition.setBottom(bottom);
-        action.mPosition.setLeft(left);
-        action.mPosition.setRight(right);
-        action.mRenderSize.setHeight(height);
-        action.mRenderSize.setWidth(width);
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement exception "+e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;

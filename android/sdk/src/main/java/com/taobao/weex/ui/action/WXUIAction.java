@@ -39,6 +39,9 @@ public abstract class WXUIAction {
   public String mValue = null;
   public HashMap<String,String> mStyle;
   public HashMap<String,String> mAttributes;
+  public HashMap<String,String> mPaddings;
+  public HashMap<String,String> mMargins;
+  public HashMap<String,String> mBorders;
 
   public abstract void executeAction();
 
@@ -46,6 +49,14 @@ public abstract class WXUIAction {
 
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, this);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(mPageId, mRef, component);
+
+    if (component != null) {
+      component.setStyle(mStyle);
+      component.setAttr(mAttributes);
+      component.setSpacing(mPaddings);
+      component.setSpacing(mMargins);
+      component.setSpacing(mBorders);
+    }
 
     return component;
   }
