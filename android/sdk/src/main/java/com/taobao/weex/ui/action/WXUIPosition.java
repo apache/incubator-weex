@@ -35,7 +35,7 @@ public class WXUIPosition {
   }
 
   public float getLeft() {
-    return WXViewUtils.getRealPxByWidth(mLeft,750);
+    return mLeft;
   }
 
   public void setLeft(float mLeft) {
@@ -43,7 +43,7 @@ public class WXUIPosition {
   }
 
   public float getTop() {
-    return WXViewUtils.getRealPxByWidth(mTop,750);
+    return mTop;
   }
 
   public void setTop(float mTop) {
@@ -51,7 +51,7 @@ public class WXUIPosition {
   }
 
   public float getRight() {
-    return WXViewUtils.getRealPxByWidth(mRight,750);
+    return mRight;
   }
 
   public void setRight(float mRight) {
@@ -59,7 +59,7 @@ public class WXUIPosition {
   }
 
   public float getBottom() {
-    return WXViewUtils.getRealPxByWidth(mBottom,750);
+    return mBottom;
   }
 
   public void setBottom(float mBottom) {

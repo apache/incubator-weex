@@ -31,7 +31,7 @@ public class WXUISize {
   }
 
   public float getWidth() {
-    return  WXViewUtils.getRealPxByWidth(mWidth,750);
+    return  mWidth;
   }
 
   public void setWidth(float mWidth) {
@@ -39,7 +39,7 @@ public class WXUISize {
   }
 
   public float getHeight() {
-    return WXViewUtils.getRealPxByWidth(mHeight,750);
+    return mHeight;
   }
 
   public void setHeight(float mHeight) {
