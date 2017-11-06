@@ -137,12 +137,12 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   private int mViewPortWidth = 750;
 
   // WXUIAction
-  public String mPageId;
-  public String mComponentType;
+  private String mPageId;
+  private String mComponentType;
   private String mParentRef;
   private String mRef;
-  public WXUIPosition mPosition = new WXUIPosition(0, 0, 0, 0);
-  public WXUISize mRenderSize = new WXUISize(0, 0);
+  private WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
+  private WXUISize mLayoutSize = new WXUISize(0, 0);
 
   private WXStyle mStyles;
   private WXAttr mAttributes;
@@ -396,8 +396,8 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mComponentType = action.mComponentType;
     mParentRef = action.mParentRef;
     mRef = action.mRef;
-    mPosition = action.mPosition;
-    mRenderSize = action.mRenderSize;
+    mLayoutPosition = action.mLayoutPosition;
+    mLayoutSize = action.mLayoutSize;
 
     mInstance = instance;
     mContext = mInstance.getContext();
@@ -416,8 +416,8 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public void requestLayout(WXUIAction action) {
-    mPosition = action.mPosition;
-    mRenderSize = action.mRenderSize;
+    mLayoutPosition = action.mLayoutPosition;
+    mLayoutSize = action.mLayoutSize;
     setLayout();
   }
 
@@ -596,7 +596,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     new WXLayoutBridge().layout();
 
     if (TextUtils.isEmpty(mPageId) || TextUtils.isEmpty(mComponentType)
-            || TextUtils.isEmpty(mRef) || mPosition == null || mRenderSize == null) {
+            || TextUtils.isEmpty(mRef) || mLayoutPosition == null || mLayoutSize == null) {
       return;
     }
 
@@ -605,11 +605,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
-    int realWidth = (int) WXViewUtils.getRealPxByWidth(mRenderSize.getWidth(),mViewPortWidth);
-    int realHeight = (int) WXViewUtils.getRealPxByWidth(mRenderSize.getHeight(),mViewPortWidth);
-    int realLeft = (int) (WXViewUtils.getRealPxByWidth(mPosition.getLeft(),mViewPortWidth) - mPaddings.get(Spacing.LEFT) -
+    int realWidth = (int) WXViewUtils.getRealPxByWidth(mLayoutSize.getWidth(),mViewPortWidth);
+    int realHeight = (int) WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(),mViewPortWidth);
+    int realLeft = (int) (WXViewUtils.getRealPxByWidth(mLayoutPosition.getLeft(),mViewPortWidth) - mPaddings.get(Spacing.LEFT) -
             mBorders.get(Spacing.LEFT));
-    int realTop = (int) (WXViewUtils.getRealPxByWidth(mPosition.getTop(),mViewPortWidth) - mPaddings.get(Spacing.TOP) -
+    int realTop = (int) (WXViewUtils.getRealPxByWidth(mLayoutPosition.getTop(),mViewPortWidth) - mPaddings.get(Spacing.TOP) -
             mBorders.get(Spacing.TOP)) + siblingOffset;
     int realRight = (int) mMargins.get(Spacing.RIGHT);
     int realBottom = (int) mMargins.get(Spacing.BOTTOM);
@@ -618,8 +618,8 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       return;
     }
 
-    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + mPosition.getTop());
-    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + mPosition.getLeft());
+    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + mLayoutPosition.getTop());
+    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + mLayoutPosition.getLeft());
 
     //calculate first screen time
     if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
@@ -695,11 +695,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public float getLayoutWidth() {
-    return mRenderSize == null ? 0 : WXViewUtils.getRealPxByWidth(mRenderSize.getWidth(), mViewPortWidth);
+    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getWidth(), mViewPortWidth);
   }
 
   public float getLayoutHeight() {
-    return mRenderSize == null ? 0 : WXViewUtils.getRealPxByWidth(mRenderSize.getHeight(), mViewPortWidth);
+    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(), mViewPortWidth);
   }
 
   public void setPadding(Spacing padding, Spacing border) {
@@ -1280,7 +1280,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if ("".equals(bgImage.trim())) {
       getOrCreateBorder().setImage(null);
     } else {
-      Shader shader = WXResourceUtils.getShader(bgImage, mRenderSize.getWidth(), mRenderSize.getHeight());
+      Shader shader = WXResourceUtils.getShader(bgImage, mLayoutSize.getWidth(), mLayoutSize.getHeight());
       getOrCreateBorder().setImage(shader);
     }
   }
@@ -1747,14 +1747,22 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     this.mViewPortWidth = mViewPortWidth;
   }
 
+  public WXUISize getLayoutSize() {
+    return mLayoutSize;
+  }
+
+  public WXUIPosition getLayoutPosition() {
+    return mLayoutPosition;
+  }
+
   @Override
   public float getLayoutX() {
-    return mPosition.getLeft();
+    return mLayoutPosition.getLeft();
   }
 
   @Override
   public float getLayoutY() {
-    return mPosition.getTop();
+    return mLayoutPosition.getTop();
   }
 
   @Override

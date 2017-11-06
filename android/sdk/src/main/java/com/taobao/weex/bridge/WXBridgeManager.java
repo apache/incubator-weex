@@ -1980,12 +1980,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mPageId = pageId;
         action.mComponentType = componentType;
         action.mRef = ref;
-        action.mPosition.setTop(top);
-        action.mPosition.setBottom(bottom);
-        action.mPosition.setLeft(left);
-        action.mPosition.setRight(right);
-        action.mRenderSize.setHeight(height);
-        action.mRenderSize.setWidth(width);
+        action.mLayoutPosition.setTop(top);
+        action.mLayoutPosition.setBottom(bottom);
+        action.mLayoutPosition.setLeft(left);
+        action.mLayoutPosition.setRight(right);
+        action.mLayoutSize.setHeight(height);
+        action.mLayoutSize.setWidth(width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
@@ -2041,12 +2041,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mRef = ref;
         action.mParentRef = parentRef;
         action.mIndex = index;
-        action.mPosition.setTop(top);
-        action.mPosition.setBottom(bottom);
-        action.mPosition.setLeft(left);
-        action.mPosition.setRight(right);
-        action.mRenderSize.setHeight(height);
-        action.mRenderSize.setWidth(width);
+        action.mLayoutPosition.setTop(top);
+        action.mLayoutPosition.setBottom(bottom);
+        action.mLayoutPosition.setLeft(left);
+        action.mLayoutPosition.setRight(right);
+        action.mLayoutSize.setHeight(height);
+        action.mLayoutSize.setWidth(width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
@@ -2134,12 +2134,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         final WXUIAction action = new ReLayoutUIAction();
         action.mPageId = pageId;
         action.mRef = ref;
-        action.mPosition.setTop(top);
-        action.mPosition.setBottom(bottom);
-        action.mPosition.setLeft(left);
-        action.mPosition.setRight(right);
-        action.mRenderSize.setHeight(height);
-        action.mRenderSize.setWidth (width);
+        action.mLayoutPosition.setTop(top);
+        action.mLayoutPosition.setBottom(bottom);
+        action.mLayoutPosition.setLeft(left);
+        action.mLayoutPosition.setRight(right);
+        action.mLayoutSize.setHeight(height);
+        action.mLayoutSize.setWidth (width);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override

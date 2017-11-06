@@ -114,8 +114,8 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         getHostView().removeView(mHeadView);
         mRealView = (ViewGroup) mHeadView;
         mTempStickyView = new FrameLayout(getContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) mRenderSize.getWidth(),
-                (int) mRenderSize.getHeight());
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getLayoutSize().getWidth(),
+                (int) getLayoutSize().getHeight());
         getHostView().addView(mTempStickyView, lp);
         mHeadView.setTranslationX(headerViewOffsetX);
         mHeadView.setTranslationY(headerViewOffsetY);

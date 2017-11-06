@@ -33,8 +33,8 @@ public abstract class WXUIAction {
   public String mParentRef = null;
   public String mRef = null;
   public int mIndex = -1;
-  public WXUIPosition mPosition = new WXUIPosition(0, 0, 0, 0);
-  public WXUISize mRenderSize = new WXUISize(0, 0);
+  public WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
+  public WXUISize mLayoutSize = new WXUISize(0, 0);
   public String mKey = null;
   public String mValue = null;
   public HashMap<String,String> mStyle;
