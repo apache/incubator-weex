@@ -61,7 +61,7 @@ namespace WeexCore {
 
     void setTimeout(jstring &jCallbackID, jstring &jTime);
 
-    void callNativeLog(jstring &str_msg);
+    void callNativeLog(jbyteArray &str_msg);
 
     int callCreateBody(jstring &instanceId, jbyteArray &taskString, jstring &callback);
 

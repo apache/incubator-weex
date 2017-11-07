@@ -180,12 +180,12 @@ namespace WeexCore {
     env->DeleteLocalRef(jTime);
   }
 
-  void BridgeAndroid::callNativeLog(jstring &str_msg) {
+  void BridgeAndroid::callNativeLog(jbyteArray &str_msg) {
     JNIEnv *env = getJNIEnv();
     if (jWXLogUtils != NULL) {
       if (jLogMethodId == NULL) {
         jLogMethodId = env->GetStaticMethodID(jWXLogUtils, "d",
-                                              "(Ljava/lang/String;Ljava/lang/String;)V");
+                                              "(Ljava/lang/String;[B)V");
       }
       if (jLogMethodId != NULL) {
         jstring str_tag = env->NewStringUTF("jsLog");

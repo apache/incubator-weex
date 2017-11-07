@@ -28,7 +28,7 @@ namespace WeexCore {
 
     virtual void setTimeout(jstring &jCallbackID, jstring &jTime) = 0;
 
-    virtual void callNativeLog(jstring &str_msg) = 0;
+    virtual void callNativeLog(jbyteArray &str_msg) = 0;
 
 
     virtual int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,

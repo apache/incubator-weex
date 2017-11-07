@@ -408,9 +408,8 @@ std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  jstring str_msg = getArgumentAsJString(env, arguments, 0);
-  BridgeAndroid::getInstance()->callNativeLog(str_msg);
-
+  jbyteArray str_array = getArgumentAsJByteArray(env, arguments, 0);
+  BridgeAndroid::getInstance()->callNativeLog(str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
