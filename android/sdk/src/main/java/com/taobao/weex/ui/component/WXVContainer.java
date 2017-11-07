@@ -92,13 +92,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   @Override
-  public void applyLayoutAndEvent() {
+  public void applyLayoutAndEvent(WXComponent component) {
     if(!isLazy()) {
-      super.applyLayoutAndEvent();
+      super.applyLayoutAndEvent(component);
       int count = childCount();
       for (int i = 0; i < count; i++) {
         WXComponent child = getChild(i);
-        child.applyLayoutAndEvent();
+        child.applyLayoutAndEvent(component);
       }
     }
   }

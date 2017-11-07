@@ -50,7 +50,7 @@ public class CreateBodyUIAction extends WXUIAction {
         WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
       }
       start = System.currentTimeMillis();
-      component.applyLayoutAndEvent();
+      component.applyLayoutAndEvent(component);
       component.bindData(component);
 
       if (WXEnvironment.isApkDebugable()) {

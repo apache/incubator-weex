@@ -52,10 +52,10 @@ public class ComponentTest {
       parent.createChildViewAt(-1);
     }
 
-    comp.setLayout(domObject);
+    comp.setLayout(comp);
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
+//    domObject = new TestDomObject();
+//    comp.updateDom(domObject);
     comp.applyLayoutAndEvent(comp);
 
     addEvent(comp);

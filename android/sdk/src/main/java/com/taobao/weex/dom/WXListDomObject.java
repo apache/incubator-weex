@@ -33,8 +33,8 @@ public class WXListDomObject extends WXDomObject {
 
         boolean isVertical = true;
         if (parent != null) {
-            if (parent.getType() != null) {
-                if (parent.getType().equals(WXBasicComponentType.HLIST)) {
+            if (parent.getComponentType() != null) {
+                if (parent.getComponentType().equals(WXBasicComponentType.HLIST)) {
                     isVertical = false;
                 }
             }

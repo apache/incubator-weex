@@ -54,7 +54,7 @@ public class AddElementUIAction extends WXUIAction {
 
       parent.addChild(component, mIndex);
       parent.createChildViewAt(mIndex);
-      component.applyLayoutAndEvent();
+      component.applyLayoutAndEvent(component);
       component.bindData(component);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);

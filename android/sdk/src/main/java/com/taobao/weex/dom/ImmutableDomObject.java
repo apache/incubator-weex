@@ -42,7 +42,7 @@ public interface ImmutableDomObject {
   @NonNull Spacing getPadding();
   @NonNull Spacing getBorder();
   Object getExtra();
-  String getType();
+  String getComponentType();
 
   public final ImmutableDomObject DESTROYED = WXDomObject.DESTROYED;
 }

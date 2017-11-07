@@ -63,7 +63,7 @@ public class WXRecyclerDomObject extends WXDomObject{
     public void add(WXDomObject child, int index) {
         super.add(child, index);
 
-        if (WXBasicComponentType.CELL.equals(child.getType())) {
+        if (WXBasicComponentType.CELL.equals(child.getComponentType())) {
             if (!mIsPreCalculateCellWidth) {
                 preCalculateCellWidth();
             }
@@ -117,7 +117,7 @@ public class WXRecyclerDomObject extends WXDomObject{
         int count = getChildCount();
         for(int i=0;i<count; i++){
             WXDomObject domObject = getChild(i);
-            if(WXBasicComponentType.CELL.equals(domObject.getType())) {
+            if(WXBasicComponentType.CELL.equals(domObject.getComponentType())) {
                 getChild(i).getStyles().put(Constants.Name.WIDTH, mColumnWidth);
             }
         }

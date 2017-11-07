@@ -116,7 +116,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return mRef;
   }
 
-  public String getType(){
+  public String getComponentType(){
     return mType;
   }
 

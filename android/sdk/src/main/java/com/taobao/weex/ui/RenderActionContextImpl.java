@@ -79,7 +79,7 @@ class RenderActionContextImpl implements RenderActionContext {
     if (component == null) {
       return;
     }
-    component.setLayout();
+    component.setLayout(component);
   }
 
   /**

@@ -47,7 +47,7 @@ public class WXComponentFactory {
   }
 
   public static WXComponent newInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    if (instance == null || node == null || TextUtils.isEmpty(node.getType()) ) {
+    if (instance == null || node == null || TextUtils.isEmpty(node.getComponentType()) ) {
       return null;
     }
 
@@ -56,13 +56,13 @@ public class WXComponentFactory {
       Set<String> types=new HashSet<>();
       sComponentTypes.put(instance.getInstanceId(),types);
     }
-    sComponentTypes.get(instance.getInstanceId()).add(node.getType());
+    sComponentTypes.get(instance.getInstanceId()).add(node.getComponentType());
 
-    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getType());
+    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getComponentType());
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
-                node.getType() + "]" + " class not found";
+                node.getComponentType() + "]" + " class not found";
         WXLogUtils.e(tag);
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
@@ -75,7 +75,7 @@ public class WXComponentFactory {
     try {
 //      return holder.createInstance(instance, node, parent);
     } catch (Exception e) {
-      WXLogUtils.e("WXComponentFactory Exception type:[" + node.getType() + "] ", e);
+      WXLogUtils.e("WXComponentFactory Exception type:[" + node.getComponentType() + "] ", e);
     }
 
     return null;

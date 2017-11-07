@@ -99,6 +99,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   private int mFixedProp = 0;
   public static int mComponentNum = 0;
+
   /**
    * package
    **/
@@ -136,7 +137,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   private int mViewPortWidth = 750;
 
-  // WXUIAction
   private String mPageId;
   private String mComponentType;
   private String mParentRef;
@@ -187,6 +187,12 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public void setStyle(Map<String, Object> styles) {
+    if (styles == null || styles.isEmpty()) {
+      return;
+    }
+    if (mStyles == null) {
+      mStyles = new WXStyle();
+    }
     setStyle(styles, false);
   }
 
@@ -198,6 +204,16 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       mStyles = new WXStyle();
     }
     mStyles.putAll(styles, byPesudo);
+  }
+
+  public void setEvent(List<String> events) {
+    if (events == null || events.isEmpty()) {
+      return;
+    }
+    if (mEvents == null) {
+      mEvents = new WXEvent();
+    }
+    mEvents.addAll(events);
   }
 
   public void setSpacing(Map<String, String> spacing) {
@@ -391,7 +407,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WXUIAction action) {
-    //WeexCoreActionAttr
     mPageId = action.mPageId;
     mComponentType = action.mComponentType;
     mParentRef = action.mParentRef;
@@ -415,10 +430,13 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     }
   }
 
-  public void requestLayout(WXUIAction action) {
-    mLayoutPosition = action.mLayoutPosition;
-    mLayoutSize = action.mLayoutSize;
-    setLayout();
+  private void copyData(WXComponent component) {
+    mPageId = component.getPageId();
+    mComponentType = component.getComponentType();
+    mParentRef = component.getParentRef();
+    mRef = component.getRef();
+    mParent = component.getParent();
+    mType = component.getType();
   }
 
   protected void onCreate() {
@@ -476,14 +494,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     return mParent != null && mParent.isLazy();
   }
 
-  public void applyLayoutAndEvent() {
-    if (!isLazy()) {
-      setLayout();
-      setPadding(getPadding(), getBorder());
-      addEvents();
-    }
-  }
-
   protected final void addFocusChangeListener(OnFocusChangeListener l) {
     View view;
     if (l != null && (view = getRealView()) != null) {
@@ -539,14 +549,31 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       if (component == null) {
         component = this;
       }
-      mRef = component.getRef();
+      copyData(component);
       updateStyle(component);
       updateAttrs(component);
       updateExtra(component.getExtra());
     }
   }
 
-  public void updateStyle(WXComponent component) {
+  public void applyLayoutAndEvent(WXComponent component) {
+    if (!isLazy()) {
+      if (component == null) {
+        component = this;
+      }
+      setLayout(component);
+      setPadding(component.getPadding(), component.getBorder());
+      addEvents();
+    }
+  }
+
+  public void requestLayout(WXUIAction action) {
+    mLayoutPosition = action.mLayoutPosition;
+    mLayoutSize = action.mLayoutSize;
+    setLayout(this);
+  }
+
+  private void updateStyle(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
     }
@@ -557,7 +584,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       setProperty(key, value);
   }
 
-  public void updateAttrs(WXComponent component) {
+  private void updateAttrs(WXComponent component) {
     if (component != null) {
       updateProperties(component.getAttrs());
     }
@@ -591,35 +618,40 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   /**
    * layout view
    */
-  public final void setLayout() {
+  public final void setLayout(WXComponent component) {
 
     new WXLayoutBridge().layout();
 
-    if (TextUtils.isEmpty(mPageId) || TextUtils.isEmpty(mComponentType)
-            || TextUtils.isEmpty(mRef) || mLayoutPosition == null || mLayoutSize == null) {
+    if (TextUtils.isEmpty(component.getPageId()) || TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
       return;
     }
+
+    mLayoutPosition = component.getLayoutPosition();
+    mLayoutSize = component.getLayoutSize();
+    mViewPortWidth = component.getViewPortWidth();
 
     boolean nullParent = mParent == null;//parent is nullable
 
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
-    int realWidth = (int) WXViewUtils.getRealPxByWidth(mLayoutSize.getWidth(),mViewPortWidth);
-    int realHeight = (int) WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(),mViewPortWidth);
-    int realLeft = (int) (WXViewUtils.getRealPxByWidth(mLayoutPosition.getLeft(),mViewPortWidth) - mPaddings.get(Spacing.LEFT) -
-            mBorders.get(Spacing.LEFT));
-    int realTop = (int) (WXViewUtils.getRealPxByWidth(mLayoutPosition.getTop(),mViewPortWidth) - mPaddings.get(Spacing.TOP) -
-            mBorders.get(Spacing.TOP)) + siblingOffset;
-    int realRight = (int) mMargins.get(Spacing.RIGHT);
-    int realBottom = (int) mMargins.get(Spacing.BOTTOM);
+    int realWidth = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getWidth(), mViewPortWidth);
+    int realHeight = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getHeight(), mViewPortWidth);
+    int realLeft = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getLeft(), mViewPortWidth) -
+            getPadding().get(Spacing.LEFT) - getBorder().get(Spacing.LEFT));
+    int realTop = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getTop(), mViewPortWidth) -
+            getPadding().get(Spacing.TOP) - getBorder().get(Spacing.TOP)) + siblingOffset;
+    int realRight = (int) getMargin().get(Spacing.RIGHT);
+    int realBottom = (int) getMargin().get(Spacing.BOTTOM);
 
     if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
       return;
     }
 
-    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + mLayoutPosition.getTop());
-    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + mLayoutPosition.getLeft());
+    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getLayoutY());
+    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getLayoutX());
 
     //calculate first screen time
     if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
@@ -1583,6 +1615,10 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mType = type;
   }
 
+  public int getType() {
+    return mType;
+  }
+
   public boolean hasScrollParent(WXComponent component) {
     if (component.getParent() == null) {
       return true;
@@ -1771,7 +1807,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   @Override
-  public String getType() {
+  public String getComponentType() {
     return mComponentType;
+  }
+
+  public String getPageId() {
+    return mPageId;
   }
 }
