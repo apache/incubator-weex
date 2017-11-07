@@ -41,7 +41,7 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
-    private boolean mLazy = false;
+    private boolean mLazy = true;
 
     /** used in list sticky detect **/
     private int mScrollPosition = -1;
