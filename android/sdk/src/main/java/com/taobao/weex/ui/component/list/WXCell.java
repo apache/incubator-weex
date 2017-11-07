@@ -177,6 +177,9 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             if(mHeadView.getVisibility() != View.VISIBLE){
                 mHeadView.setVisibility(View.VISIBLE);
             }
+            if(mHeadView.getParent() != null){
+                ((ViewGroup)mHeadView.getParent()).removeView(mHeadView);
+            }
             getHostView().removeView(mTempStickyView);
             getHostView().addView(mHeadView);
             mHeadView.setTranslationX(0);
