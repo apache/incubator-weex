@@ -206,7 +206,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mStyles.putAll(styles, byPesudo);
   }
 
-  public void setEvent(List<String> events) {
+  public void setEvent(Set<String> events) {
     if (events == null || events.isEmpty()) {
       return;
     }
@@ -748,9 +748,10 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   private void addEvents() {
-    int count = getEvents().size();
-    for (int i = 0; i < count; ++i) {
-      addEvent(getEvents().get(i));
+    if (mEvents == null || mEvents.isEmpty())
+      return;
+    for (String type : mEvents) {
+      addEvent(type);
     }
     setActiveTouchListener();
   }
@@ -1002,14 +1003,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
-    if (mEvents == null) {
-      mEvents = new WXEvent();
-    }
-    if (containsEvent(type)) {
-      return;
-    }
 
-    mEvents.add(type);
     mAppendEvents.add(type);
 
     View view = getRealView();

@@ -20,11 +20,12 @@ package com.taobao.weex.dom;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Store value of component event
  */
-public class WXEvent extends ArrayList<String> implements Serializable, Cloneable {
+public class WXEvent extends HashSet<String> implements Serializable, Cloneable {
 
   private static final long serialVersionUID = -8186587029452440107L;
 

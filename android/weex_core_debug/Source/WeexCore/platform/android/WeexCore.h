@@ -28,9 +28,7 @@ extern jclass jWXLogUtils;
 extern jmethodID jDoubleValueMethodId;
 extern jobject jThis;
 extern jclass jMapClazz;
-extern jmethodID jMapConstructorMethodId;
-extern jmethodID jMapPutMethodId;
-
+extern jclass jSetClazz;
 extern JNIEnv *getJNIEnv();
 
 namespace WeexCore {

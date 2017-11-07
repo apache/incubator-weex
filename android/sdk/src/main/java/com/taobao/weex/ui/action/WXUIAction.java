@@ -25,6 +25,8 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public abstract class WXUIAction {
 
@@ -37,11 +39,12 @@ public abstract class WXUIAction {
   public WXUISize mLayoutSize = new WXUISize(0, 0);
   public String mKey = null;
   public String mValue = null;
-  public HashMap<String,String> mStyle;
-  public HashMap<String,String> mAttributes;
-  public HashMap<String,String> mPaddings;
-  public HashMap<String,String> mMargins;
-  public HashMap<String,String> mBorders;
+  public HashMap<String, String> mStyle;
+  public HashMap<String, String> mAttributes;
+  public Set<String> mEvents;
+  public HashMap<String, String> mPaddings;
+  public HashMap<String, String> mMargins;
+  public HashMap<String, String> mBorders;
 
   public abstract void executeAction();
 
@@ -53,6 +56,7 @@ public abstract class WXUIAction {
     if (component != null) {
       component.setStyle(mStyle);
       component.setAttr(mAttributes);
+      component.setEvent(mEvents);
       component.setSpacing(mPaddings);
       component.setSpacing(mMargins);
       component.setSpacing(mBorders);

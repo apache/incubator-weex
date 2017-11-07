@@ -16,6 +16,7 @@ namespace WeexCore {
   public:
     STYLES_MAP *mStyles;
     ATTRIBUTES_MAP *mAttributes;
+    EVENTS_SET *mEvents;
     PADDING_MAP *mPaddings;
     MARGIN_MAP *mMargins;
     BORDER_MAP *mBorders;

@@ -28,6 +28,7 @@ import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Communication interface for Java code and JavaScript code.
@@ -467,13 +468,14 @@ public class WXBridge implements IWXBridge {
   }
 
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
+
     try {
       errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width,
-              styles, attributes, paddings, margins, borders);
+              styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -484,14 +486,14 @@ public class WXBridge implements IWXBridge {
   }
 
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef,
-              styles, attributes, paddings, margins, borders);
+              styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -499,7 +501,6 @@ public class WXBridge implements IWXBridge {
         WXLogUtils.e(TAG, "callNative throw error:" + e.getMessage());
       }
     }
-
     return errorCode;
   }
 

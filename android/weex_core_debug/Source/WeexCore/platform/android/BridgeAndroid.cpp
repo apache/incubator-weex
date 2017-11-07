@@ -22,6 +22,11 @@ static jmethodID jCallMoveElementMethodId;
 static jmethodID jCallAddEventMethodId;
 static jmethodID jCallRemoveEventMethodId;
 
+static jmethodID jMapConstructorMethodId;
+static jmethodID jMapPutMethodId;
+static jmethodID jSetConstructorMethodId;
+static jmethodID jSetAddMethodId;
+
 namespace WeexCore {
 
   BridgeAndroid *BridgeAndroid::m_instance = nullptr;
@@ -33,7 +38,6 @@ namespace WeexCore {
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject jMap, JNIEnv *env) {
-
     std::map<std::string, std::string>::const_iterator it = cMap->begin();
     std::map<std::string, std::string>::const_iterator end = cMap->end();
     jstring jKey;
@@ -44,6 +48,19 @@ namespace WeexCore {
       jValue = env->NewStringUTF(it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
       env->DeleteLocalRef(jKey);
+      env->DeleteLocalRef(jValue);
+    }
+  }
+
+  void static cpyCSet2JSet(std::set<std::string> *cSet, jobject jSet, JNIEnv *env) {
+    jstring jValue;
+
+    std::set<std::string>::const_iterator it = cSet->begin();
+    std::set<std::string>::const_iterator end = cSet->end();
+
+    for (; it != end; ++it) {
+      jValue = env->NewStringUTF((*it).c_str());
+      env->CallBooleanMethod(jSet, jSetAddMethodId, jValue);
       env->DeleteLocalRef(jValue);
     }
   }
@@ -390,34 +407,40 @@ namespace WeexCore {
                                               int left, int right, int height, int width,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
+                                              std::set<std::string> *events,
                                               std::map<std::string, std::string> *paddings,
                                               std::map<std::string, std::string> *margins,
                                               std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallCreateBodyByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callCreateBodyByWeexCore",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIILjava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIILjava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
     jstring jRef = env->NewStringUTF(ref.c_str());
 
-    if (jMapConstructorMethodId == NULL) {
+    if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    }
-    if (jMapPutMethodId == NULL) {
+    if (jMapPutMethodId == NULL)
       jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
                                          "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-    }
+    if (jSetConstructorMethodId == NULL)
+      jSetConstructorMethodId = env->GetMethodID(jSetClazz, "<init>", "()V");
+    if (jSetAddMethodId == NULL)
+      jSetAddMethodId = env->GetMethodID(jSetClazz, "add",
+                                         "(Ljava/lang/Object;)Z");
 
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
+    jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
     jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jBorders = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
     cpyCMap2JMap(styles, jStyles, env);
     cpyCMap2JMap(attributes, jAttributes, env);
+    cpyCSet2JSet(events, jEvents, env);
     cpyCMap2JMap(paddings, jPaddings, env);
     cpyCMap2JMap(margins, jMargins, env);
     cpyCMap2JMap(borders, jBorders, env);
@@ -425,6 +448,7 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallCreateBodyByWeexCoreMethodId, jPageId, jComponentType,
                               jRef, top, bottom, left, right, height, width, jStyles, jAttributes,
+                              jEvents,
                               jPaddings, jMargins, jBorders);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callCreateBody");
@@ -435,6 +459,7 @@ namespace WeexCore {
     env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
+    env->DeleteLocalRef(jEvents);
     env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jBorders);
@@ -447,35 +472,41 @@ namespace WeexCore {
                                               std::string parentRef,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
+                                              std::set<std::string> *events,
                                               std::map<std::string, std::string> *paddings,
                                               std::map<std::string, std::string> *margins,
                                               std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallAddElementByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callAddElementByWeexCore",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIIILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIIILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
     jstring jRef = env->NewStringUTF(ref.c_str());
     jstring jParentRef = env->NewStringUTF(parentRef.c_str());
 
-    if (jMapConstructorMethodId == NULL) {
+    if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    }
-    if (jMapPutMethodId == NULL) {
+    if (jMapPutMethodId == NULL)
       jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
                                          "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-    }
+    if (jSetConstructorMethodId == NULL)
+      jSetConstructorMethodId = env->GetMethodID(jSetClazz, "<init>", "()V");
+    if (jSetAddMethodId == NULL)
+      jSetAddMethodId = env->GetMethodID(jSetClazz, "add",
+                                         "(Ljava/lang/Object;)Z");
 
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
+    jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
     jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jBorders = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
     cpyCMap2JMap(styles, jStyles, env);
     cpyCMap2JMap(attributes, jAttributes, env);
+    cpyCSet2JSet(events, jEvents, env);
     cpyCMap2JMap(paddings, jPaddings, env);
     cpyCMap2JMap(margins, jMargins, env);
     cpyCMap2JMap(borders, jBorders, env);
@@ -483,7 +514,7 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementByWeexCoreMethodId, jPageId, jComponentType,
                               jRef, top, bottom, left, right, height, width, index, jParentRef,
-                              jStyles, jAttributes, jPaddings, jMargins, jBorders);
+                              jStyles, jAttributes, jEvents, jPaddings, jMargins, jBorders);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callAddElement");
     }
@@ -494,6 +525,7 @@ namespace WeexCore {
     env->DeleteLocalRef(jParentRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
+    env->DeleteLocalRef(jEvents);
     env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jBorders);

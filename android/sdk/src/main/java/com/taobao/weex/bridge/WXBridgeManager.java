@@ -82,6 +82,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -1945,14 +1946,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width,
-                                      HashMap<String,String> styles, HashMap<String,String> attributes,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callCreateBodyByWeexCore: call CreateBody args is null");
       }
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody: call CreateBody args is null");
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callCreateBody: call CreateBody args is null");
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
@@ -1965,7 +1966,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       mLodBuilder.setLength(0);
     }
 
-    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
       return IWXBridge.DESTROY_INSTANCE;
     }
 
@@ -1974,6 +1975,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         final WXUIAction action = new CreateBodyUIAction();
         action.mStyle = styles;
         action.mAttributes = attributes;
+        action.mEvents = events;
         action.mPaddings = paddings;
         action.mMargins = margins;
         action.mBorders = borders;
@@ -1996,21 +1998,21 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody exception "+e.getCause());
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callCreateBody exception " + e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef,
-                                      HashMap<String,String> styles, HashMap<String,String> attributes,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callAddElement: call callAddElement args is null");
       }
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement: call callAddElement args is null");
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT, "[WXBridgeManager] callAddElement: call callAddElement args is null");
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
@@ -2024,7 +2026,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       mLodBuilder.setLength(0);
     }
 
-    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)){
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
       return IWXBridge.DESTROY_INSTANCE;
     }
 
@@ -2033,6 +2035,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         final WXUIAction action = new AddElementUIAction();
         action.mStyle = styles;
         action.mAttributes = attributes;
+        action.mEvents = events;
         action.mPaddings = paddings;
         action.mMargins = margins;
         action.mBorders = borders;
@@ -2057,7 +2060,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
-      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT,"[WXBridgeManager] callAddElement exception "+e.getCause());
+      commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT, "[WXBridgeManager] callAddElement exception " + e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;

@@ -9,8 +9,7 @@ jclass jBridgeClazz;
 jclass jWXJSObject;
 jclass jWXLogUtils;
 jclass jMapClazz;
-jmethodID jMapConstructorMethodId;
-jmethodID jMapPutMethodId;
+jclass jSetClazz;
 jmethodID jDoubleValueMethodId;
 // static
 jobject jThis;
@@ -110,6 +109,9 @@ jint OnLoad(JavaVM *vm, void *reserved) {
 
   tempClass = env->FindClass("java/util/HashMap");
   jMapClazz = (jclass) env->NewGlobalRef(tempClass);
+
+  tempClass = env->FindClass("java/util/HashSet");
+  jSetClazz = (jclass) env->NewGlobalRef(tempClass);
 
   env->DeleteLocalRef(tempClass);
 

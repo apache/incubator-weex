@@ -10,7 +10,7 @@ namespace WeexCore {
     mPaddings = new PADDING_MAP();
     mMargins = new MARGIN_MAP();
     mBorders = new BORDER_MAP();
-    mEvents = new EVENTS();
+    mEvents = new EVENTS_SET();
     mLayoutNode = WXCoreLayoutNode::newWXCoreNode();
   }
 

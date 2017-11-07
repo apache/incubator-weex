@@ -5,6 +5,7 @@
 #include "WeexCore.h"
 #include <string>
 #include <map>
+#include <set>
 
 namespace WeexCore {
 
@@ -96,6 +97,7 @@ namespace WeexCore {
                                  int bottom, int left, int right, int height, int width,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
+                                 std::set<std::string> *events,
                                  std::map<std::string, std::string> *paddings,
                                  std::map<std::string, std::string> *margins,
                                  std::map<std::string, std::string> *borders);
@@ -106,6 +108,7 @@ namespace WeexCore {
                                  std::string parentRef,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
+                                 std::set<std::string> *events,
                                  std::map<std::string, std::string> *paddings,
                                  std::map<std::string, std::string> *margins,
                                  std::map<std::string, std::string> *borders);

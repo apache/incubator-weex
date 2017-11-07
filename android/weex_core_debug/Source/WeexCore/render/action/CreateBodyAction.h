@@ -19,12 +19,14 @@ namespace WeexCore {
                                                              mRight,
                                                              mHeight,
                                                              mWidth, mStyles, mAttributes,
+                                                             mEvents,
                                                              mPaddings, mMargins, mBorders);
     }
 
     void GenerateAction(std::string pageId, RenderObject *render) {
       this->mAttributes = render->getAttributes();
       this->mStyles = render->getStyles();
+      this->mEvents = render->getEvents();
       this->mPaddings = render->getPaddings();
       this->mMargins = render->getMargins();
       this->mBorders = render->getBorders();

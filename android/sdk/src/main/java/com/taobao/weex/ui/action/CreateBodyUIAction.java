@@ -18,11 +18,14 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.widget.ScrollView;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.utils.WXLogUtils;
 
 public class CreateBodyUIAction extends WXUIAction {
@@ -57,12 +60,12 @@ public class CreateBodyUIAction extends WXUIAction {
         WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
       }
 
-//            if (component instanceof WXScroller) {
-//                WXScroller scroller = (WXScroller) component;
-//                if (scroller.getInnerView() instanceof ScrollView) {
-//                    instance.setRootScrollView((ScrollView) scroller.getInnerView());
-//                }
-//            }
+      if (component instanceof WXScroller) {
+        WXScroller scroller = (WXScroller) component;
+        if (scroller.getInnerView() instanceof ScrollView) {
+          instance.setRootScrollView((ScrollView) scroller.getInnerView());
+        }
+      }
 
       instance.onRootCreated(component);
       if (instance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {

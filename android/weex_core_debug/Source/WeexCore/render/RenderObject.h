@@ -25,7 +25,7 @@ namespace WeexCore {
   typedef ChildrenList::iterator CHILD_LIST_IT;
   typedef std::map<std::string, std::string> STYLES_MAP;
   typedef std::map<std::string, std::string> ATTRIBUTES_MAP;
-  typedef std::set<std::string> EVENTS;
+  typedef std::set<std::string> EVENTS_SET;
   typedef std::map<std::string, std::string> MARGIN_MAP;
   typedef std::map<std::string, std::string> PADDING_MAP;
   typedef std::map<std::string, std::string> BORDER_MAP;
@@ -52,7 +52,7 @@ namespace WeexCore {
 
     BORDER_MAP *mBorders;
 
-    EVENTS *mEvents;
+    EVENTS_SET *mEvents;
 
     ChildrenList mChildren;
 
@@ -147,6 +147,10 @@ namespace WeexCore {
 
     inline ATTRIBUTES_MAP *getAttributes() {
       return mAttributes;
+    }
+
+    inline EVENTS_SET *getEvents() {
+      return mEvents;
     }
 
     inline PADDING_MAP *getPaddings() {
