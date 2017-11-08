@@ -39,7 +39,7 @@ public class WXMetaModule extends WXModule {
     public static final String WIDTH = "width";
     public static final String DEVICE_WIDTH = "device-width";
 
-    @JSMethod
+    @JSMethod(uiThread = false)
     public void setViewport(String param) {
         if (!TextUtils.isEmpty(param)) {
             try {
