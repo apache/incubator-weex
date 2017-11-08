@@ -1,0 +1,10 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+
+target 'AppShell' do
+    pod 'SDWebImage', '~>4'
+    pod 'SocketRocket', '~>0.5'
+    pod 'WeexSDK', '~>0.15'
+    pod 'WXDevtool', '~>0.15'
+end
+
