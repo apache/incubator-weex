@@ -58,8 +58,8 @@ namespace WXCoreFlexLayout {
   WXBFCDimension WXCoreLayoutNode::calculateBFCDimension() {
     MeasureMode bfcWidthMeasureMode, bfcHeightMeasureMode;
     float width, height;
-    width = isnan(mCssStyle->mStyleWidth) ? MAXFLOAT / 2 : mCssStyle->mStyleWidth;
-    height = isnan(mCssStyle->mStyleHeight) ? MAXFLOAT / 2 : mCssStyle->mStyleHeight;
+    width = isnan(mCssStyle->mStyleWidth) ? MAXFLOAT / 2.0f : mCssStyle->mStyleWidth;
+    height = isnan(mCssStyle->mStyleHeight) ? MAXFLOAT / 2.0f : mCssStyle->mStyleHeight;
     bfcWidthMeasureMode =
             isnan(mCssStyle->mStyleWidth) ? AT_MOST : EXACTLY;
     bfcHeightMeasureMode =
@@ -163,12 +163,12 @@ namespace WXCoreFlexLayout {
     memset(mChildrenFrozen, false, getChildCount(NON_BFC));
   }
 
-/**
- * Sub method for {@link WXCoreLayoutNode #onMeasure(int, int)}, when the main axis direction is horizontal
- *
- * @param width  horizontal space requirements as imposed by the parent
- * @param height vertical space requirements as imposed by the parent
- */
+  /**
+   * Sub method for {@link WXCoreLayoutNode #onMeasure(int, int)}, when the main axis direction is horizontal
+   *
+   * @param width  horizontal space requirements as imposed by the parent
+   * @param height vertical space requirements as imposed by the parent
+   */
   void WXCoreLayoutNode::measureHorizontal(float width, MeasureMode widthMeasureMode, float height,
                                            MeasureMode heightMeasureMode) {
 
@@ -176,8 +176,8 @@ namespace WXCoreFlexLayout {
 
     uint32_t childCount = getChildCount(NON_BFC);
 
-    float largestHeightInRow = 0;
-    float totalCrossSize = 0;
+    float largestHeightInRow = 0.0f;
+    float totalCrossSize = 0.0f;
     WXCoreFlexLine *flexLine = new WXCoreFlexLine();
 
     flexLine->mMainSize = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
@@ -255,21 +255,21 @@ namespace WXCoreFlexLayout {
     setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
   }
 
-/**
- * Sub method for {@link WXCoreLayoutNode #onMeasure(int, int)} when the main axis direction is vertical
- * (either from mStyleTop to mStyleBottom or mStyleBottom to mStyleTop).
- *
- * @param width  horizontal space requirements as imposed by the parent
- * @param height vertical space requirements as imposed by the parent
- */
+  /**
+   * Sub method for {@link WXCoreLayoutNode #onMeasure(int, int)} when the main axis direction is vertical
+   * (either from mStyleTop to mStyleBottom or mStyleBottom to mStyleTop).
+   *
+   * @param width  horizontal space requirements as imposed by the parent
+   * @param height vertical space requirements as imposed by the parent
+   */
   void WXCoreLayoutNode::measureVertical(float width, MeasureMode widthMeasureMode, float height,
                                          MeasureMode heightMeasureMode) {
 
     mFlexLines.clear();
 
     uint32_t childCount = getChildCount(NON_BFC);
-    float largestWidthInColumn = 0;
-    float totalCrossSize = 0;
+    float largestWidthInColumn = 0.0f;
+    float totalCrossSize = 0.0f;
 
     WXCoreFlexLine *flexLine = new WXCoreFlexLine();
     flexLine->mMainSize = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
@@ -346,11 +346,11 @@ namespace WXCoreFlexLayout {
     setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
   }
 
-/**
- * Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
- * imposed by the {@link WXCoreLayoutNode #mMinWidth}, {@link WXCoreLayoutNode #mMinHeight},
- * {@link WXCoreLayoutNode #mMaxWidth} and {@link WXCoreLayoutNode #mMaxHeight} attributes.
- */
+  /**
+   * Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
+   * imposed by the {@link WXCoreLayoutNode #mMinWidth}, {@link WXCoreLayoutNode #mMinHeight},
+   * {@link WXCoreLayoutNode #mMaxWidth} and {@link WXCoreLayoutNode #mMaxHeight} attributes.
+   */
   void WXCoreLayoutNode::checkSizeConstraints(WXCoreLayoutNode *node) {
     bool needReMeasure = false;
     float childWidth = node->mLayoutResult->mLayoutSize.width;
@@ -377,9 +377,9 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Determine the main size by expanding the individual flexGrow attribute.
- */
+  /**
+   * Determine the main size by expanding the individual flexGrow attribute.
+   */
   void WXCoreLayoutNode::determineMainSize(WXCoreFlexDirection flexDirection,
                                            float width, MeasureMode widthMeasureMode,
                                            float height, MeasureMode heightMeasureMode) {
@@ -409,19 +409,19 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Expand the flex items along the main axis based on the individual flexGrow attribute.
- *
- * @param flexLine             the flex line to which flex items belong
- * @param flexDirection        the flexDirection value for this item
- * @param maxMainSize          the maximum main size. Expanded main size will be this size
- * @param paddingAlongMainAxis the padding value along the main axis
- * @param startIndex           the start index of the children views to be expanded. This index
- *                             needs to be an absolute index in the flex container,
- *                             not the relative index in the flex line.
- * @param calledRecursively    true if this method is called recursively, false otherwise
- * @return the next startIndex, the next flex line's first flex item starts from the returned index
- */
+  /**
+   * Expand the flex items along the main axis based on the individual flexGrow attribute.
+   *
+   * @param flexLine             the flex line to which flex items belong
+   * @param flexDirection        the flexDirection value for this item
+   * @param maxMainSize          the maximum main size. Expanded main size will be this size
+   * @param paddingAlongMainAxis the padding value along the main axis
+   * @param startIndex           the start index of the children views to be expanded. This index
+   *                             needs to be an absolute index in the flex container,
+   *                             not the relative index in the flex line.
+   * @param calledRecursively    true if this method is called recursively, false otherwise
+   * @return the next startIndex, the next flex line's first flex item starts from the returned index
+   */
   uint32_t WXCoreLayoutNode::expandFlexItems(WXCoreFlexLine *flexLine,
                                              WXCoreFlexDirection flexDirection, float maxMainSize,
                                              float paddingAlongMainAxis,
@@ -439,10 +439,10 @@ namespace WXCoreFlexLayout {
     flexLine->mMainSize = paddingAlongMainAxis;
 
     if (!calledRecursively) {
-      flexLine->mCrossSize = 0;
+      flexLine->mCrossSize = 0.0f;
     }
 
-    float largestCrossSize = 0;
+    float largestCrossSize = 0.0f;
 
     for (uint32_t i = 0; i < flexLine->mItemCount; i++) {
       WXCoreLayoutNode *child = getChildAt(NON_BFC, childIndex);
@@ -505,12 +505,12 @@ namespace WXCoreFlexLayout {
     return childIndex;
   }
 
-/**
- * @param flexDirection         the flex direction attribute
- * @param width                 stylewidth by this node
- * @param height                styleheight by this node
- * @param paddingAlongCrossAxis the padding value for this node along the cross axis
- */
+  /**
+   * @param flexDirection         the flex direction attribute
+   * @param width                 stylewidth by this node
+   * @param height                styleheight by this node
+   * @param paddingAlongCrossAxis the padding value for this node along the cross axis
+   */
   void
   WXCoreLayoutNode::determineCrossSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
                                        float height, MeasureMode heightMeasureMode, float paddingAlongCrossAxis) {
@@ -545,13 +545,13 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Expand the view if the {@link #WXCoreAlignItems} attribute is set to {@link WXCoreAlignItems #STRETCH}
- * or {@link WXCoreAlignItems #STRETCH} is set to an individual child view.
- *
- * @param flexDirection the flex direction attribute
- * @param alignItems    the align items attribute
- */
+  /**
+   * Expand the view if the {@link #WXCoreAlignItems} attribute is set to {@link WXCoreAlignItems #STRETCH}
+   * or {@link WXCoreAlignItems #STRETCH} is set to an individual child view.
+   *
+   * @param flexDirection the flex direction attribute
+   * @param alignItems    the align items attribute
+   */
   void WXCoreLayoutNode::stretchViews(WXCoreFlexDirection flexDirection, WXCoreAlignItems alignItems) {
     if (alignItems == WXCore_AlignItems_Stretch) {
       // WXCoreAlignItems is STRETCH
@@ -599,12 +599,12 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Expand the view vertically to the size of the crossSize (considering the view margins)
- *
- * @param node      the item to be stretched
- * @param crossSize the cross size
- */
+  /**
+   * Expand the view vertically to the size of the crossSize (considering the view margins)
+   *
+   * @param node      the item to be stretched
+   * @param crossSize the cross size
+   */
   void WXCoreLayoutNode::stretchViewVertically(WXCoreLayoutNode *node, float crossSize) {
     if (node->heightMeasureMode != EXACTLY) {
       float newHeight = crossSize - node->getMarginTop() - node->getMarginBottom();
@@ -613,12 +613,12 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Expand the view horizontally to the size of the crossSize (considering the view margins)
- *
- * @param node      the item to be stretched
- * @param crossSize the cross size
- */
+  /**
+   * Expand the view horizontally to the size of the crossSize (considering the view margins)
+   *
+   * @param node      the item to be stretched
+   * @param crossSize the cross size
+   */
   void WXCoreLayoutNode::stretchViewHorizontally(WXCoreLayoutNode *node, float crossSize) {
     if (node->widthMeasureMode != EXACTLY) {
       float newWidth = crossSize - node->getMarginLeft() - node->getMarginRight();
@@ -757,18 +757,18 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Sub method for {@link WXCoreLayoutNode #onLayout(int, int, int, int)} when the
- * {@link #mFlexDirection} is either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row} or
- * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row_REVERSE}.
- *
- * @param isRtl  {@code true} if the horizontal layout direction is mStyleRight to mStyleLeft, {@code
- *               false} otherwise.
- * @param left   the mStyleLeft position of this View
- * @param top    the mStyleTop position of this View
- * @param right  the mStyleRight position of this View
- * @param bottom the mStyleBottom position of this View
- */
+  /**
+   * Sub method for {@link WXCoreLayoutNode #onLayout(int, int, int, int)} when the
+   * {@link #mFlexDirection} is either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row} or
+   * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row_REVERSE}.
+   *
+   * @param isRtl  {@code true} if the horizontal layout direction is mStyleRight to mStyleLeft, {@code
+   *               false} otherwise.
+   * @param left   the mStyleLeft position of this View
+   * @param top    the mStyleTop position of this View
+   * @param right  the mStyleRight position of this View
+   * @param bottom the mStyleBottom position of this View
+   */
   void WXCoreLayoutNode::layoutHorizontal(bool isRtl, float left, float top, float right, float bottom) {
 
     float childLeft;
@@ -790,7 +790,7 @@ namespace WXCoreFlexLayout {
     for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
 
-      float spaceBetweenItem = 0;
+      float spaceBetweenItem = 0.0f;
 
       switch (mCssStyle->mJustifyContent) {
         case WXCore_Justify_Flex_Start:
@@ -817,9 +817,15 @@ namespace WXCoreFlexLayout {
           break;
         case WXCore_Justify_Space_Between:
           childLeft = getPaddingLeft() + getBorderWidthLeft();
-          uint32_t visibleItem = flexLine->mItemCount;
-          float denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
+          uint32_t visibleItem;
+          visibleItem = flexLine->mItemCount;
+          float denominator;
+          denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
           spaceBetweenItem = (width - flexLine->mMainSize) / denominator;
+          childRight = width - getPaddingRight() - getBorderWidthRight();
+          break;
+        default:
+          childLeft = getPaddingLeft() + getBorderWidthLeft();
           childRight = width - getPaddingRight() - getBorderWidthRight();
           break;
       }
@@ -872,26 +878,26 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Place a single View when the layout direction is horizontal ({@link #mFlexDirection} is
- * either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row} or
- * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row_REVERSE}).
- *
- * @param node       the View to be placed
- * @param flexLine   the {@link WXCoreFlexLine} where the View belongs to
- * @param flexWrap   the flex wrap attribute of this BasicLayoutNode
- * @param alignItems the align items attribute of this BasicLayoutNode
- * @param left       the mStyleLeft position of the View, which the View's margin is already taken
- *                   into account
- * @param top        the mStyleTop position of the flex line where the View belongs to. The actual
- *                   View's mStyleTop position is shifted depending on the flexWrap and alignItems
- *                   attributes
- * @param right      the mStyleRight position of the View, which the View's margin is already taken
- *                   into account
- * @param bottom     the mStyleBottom position of the flex line where the View belongs to. The actual
- *                   View's mStyleBottom position is shifted depending on the flexWrap and alignItems
- *                   attributes
- */
+  /**
+   * Place a single View when the layout direction is horizontal ({@link #mFlexDirection} is
+   * either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row} or
+   * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Row_REVERSE}).
+   *
+   * @param node       the View to be placed
+   * @param flexLine   the {@link WXCoreFlexLine} where the View belongs to
+   * @param flexWrap   the flex wrap attribute of this BasicLayoutNode
+   * @param alignItems the align items attribute of this BasicLayoutNode
+   * @param left       the mStyleLeft position of the View, which the View's margin is already taken
+   *                   into account
+   * @param top        the mStyleTop position of the flex line where the View belongs to. The actual
+   *                   View's mStyleTop position is shifted depending on the flexWrap and alignItems
+   *                   attributes
+   * @param right      the mStyleRight position of the View, which the View's margin is already taken
+   *                   into account
+   * @param bottom     the mStyleBottom position of the flex line where the View belongs to. The actual
+   *                   View's mStyleBottom position is shifted depending on the flexWrap and alignItems
+   *                   attributes
+   */
   void WXCoreLayoutNode::layoutSingleChildHorizontal(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine,
                                                      WXCoreFlexWrap flexWrap, WXCoreAlignItems alignItems,
                                                      float left, float top, float right, float bottom) {
@@ -938,24 +944,24 @@ namespace WXCoreFlexLayout {
     }
   }
 
-/**
- * Sub method for {@link WXCoreLayoutNode #onLayout(int, int, int, int)} when the
- * {@link #mFlexDirection} is either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column} or
- * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column_Reverse}.
- *
- * @param isRtl           {@code true} if the horizontal layout direction is mStyleRight to mStyleLeft,
- *                        {@code false}
- *                        otherwise
- * @param fromBottomToTop {@code true} if the layout direction is mStyleBottom to mStyleTop, {@code false}
- *                        otherwise
- * @param left            the mStyleLeft position of this View
- * @param top             the mStyleTop position of this View
- * @param right           the mStyleRight position of this View
- * @param bottom          the mStyleBottom position of this View
- */
+  /**
+   * Sub method for {@link WXCoreLayoutNode #onLayout(int, int, int, int)} when the
+   * {@link #mFlexDirection} is either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column} or
+   * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column_Reverse}.
+   *
+   * @param isRtl           {@code true} if the horizontal layout direction is mStyleRight to mStyleLeft,
+   *                        {@code false}
+   *                        otherwise
+   * @param fromBottomToTop {@code true} if the layout direction is mStyleBottom to mStyleTop, {@code false}
+   *                        otherwise
+   * @param left            the mStyleLeft position of this View
+   * @param top             the mStyleTop position of this View
+   * @param right           the mStyleRight position of this View
+   * @param bottom          the mStyleBottom position of this View
+   */
   void
   WXCoreLayoutNode::layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top, float right, float bottom) {
-    float childLeft = getPaddingLeft() + getBorderWidthLeft();
+    float childLeft = getPaddingLeft();
     uint32_t currentViewIndex = 0;
 
     float width = right - left;
@@ -974,7 +980,7 @@ namespace WXCoreFlexLayout {
 
     for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
-      float spaceBetweenItem = 0;
+      float spaceBetweenItem = 0.0f;
 
       switch (mCssStyle->mJustifyContent) {
         case WXCore_Justify_Flex_Start:
@@ -1001,9 +1007,15 @@ namespace WXCoreFlexLayout {
           break;
         case WXCore_Justify_Space_Between:
           childTop = getPaddingTop() + getBorderWidthTop();
-          uint32_t visibleItem = flexLine->mItemCount;
-          float denominator = visibleItem != 1 ? visibleItem - 1 : 1;
+          uint32_t visibleItem;
+          visibleItem = flexLine->mItemCount;
+          float denominator;
+          denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
           spaceBetweenItem = (height - flexLine->mMainSize) / denominator;
+          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
+          break;
+        default:
+          childTop = getPaddingTop() + getBorderWidthTop();
           childBottom = height - getPaddingBottom() - getBorderWidthBottom();
           break;
       }
@@ -1054,27 +1066,27 @@ namespace WXCoreFlexLayout {
   }
 
 
-/**
- * Place a single View when the layout direction is vertical ({@link #mFlexDirection} is
- * either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column} or
- * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column_Reverse}).
- *
- * @param node       the View to be placed
- * @param flexLine   the {@link FlexLine} where the View belongs to
- * @param isRtl      {@code true} if the layout direction is mStyleRight to mStyleLeft, {@code false}
- *                   otherwise
- * @param alignItems the align items attribute of this BasicLayoutNode
- * @param left       the mStyleLeft position of the flex line where the View belongs to. The actual
- *                   View's mStyleLeft position is shifted depending on the isRtl and alignItems
- *                   attributes
- * @param top        the mStyleTop position of the View, which the View's margin is already taken
- *                   into account
- * @param right      the mStyleRight position of the flex line where the View belongs to. The actual
- *                   View's mStyleRight position is shifted depending on the isRtl and alignItems
- *                   attributes
- * @param bottom     the mStyleBottom position of the View, which the View's margin is already taken
- *                   into account
- */
+  /**
+   * Place a single View when the layout direction is vertical ({@link #mFlexDirection} is
+   * either {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column} or
+   * {@link WXCoreFlexDirection #WXCore_Flex_Direction_Column_Reverse}).
+   *
+   * @param node       the View to be placed
+   * @param flexLine   the {@link FlexLine} where the View belongs to
+   * @param isRtl      {@code true} if the layout direction is mStyleRight to mStyleLeft, {@code false}
+   *                   otherwise
+   * @param alignItems the align items attribute of this BasicLayoutNode
+   * @param left       the mStyleLeft position of the flex line where the View belongs to. The actual
+   *                   View's mStyleLeft position is shifted depending on the isRtl and alignItems
+   *                   attributes
+   * @param top        the mStyleTop position of the View, which the View's margin is already taken
+   *                   into account
+   * @param right      the mStyleRight position of the flex line where the View belongs to. The actual
+   *                   View's mStyleRight position is shifted depending on the isRtl and alignItems
+   *                   attributes
+   * @param bottom     the mStyleBottom position of the View, which the View's margin is already taken
+   *                   into account
+   */
   void WXCoreLayoutNode::layoutSingleChildVertical(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine, bool isRtl,
                                                    WXCoreAlignItems alignItems, float left, float top, float right,
                                                    float bottom) {
@@ -1111,7 +1123,7 @@ namespace WXCoreFlexLayout {
       case WXCore_AlignItems_Center:
         float leftFromCrossAxis = (crossSize - node->mLayoutResult->mLayoutSize.width
                                    + node->getMarginLeft()
-                                   - node->getMarginRight()) / 2;
+                                   - node->getMarginRight()) / 2.0f;
         if (!isRtl) {
           node->layout(left + leftFromCrossAxis, top, right + leftFromCrossAxis, bottom);
         } else {
@@ -1193,16 +1205,15 @@ namespace WXCoreFlexLayout {
   }
 
   /**
- * Determine if a wrap is required (add a new flexline).
- *
- * @param maxSize       the max size along the main axis direction
- * @param currentLength the accumulated current length
- * @param childLength   the length of a child view which is to be collected to the flex line
- * @return {@code true} if a wrap is required, {@code false} otherwise
- */
+   * Determine if a wrap is required (add a new flexline).
+   *
+   * @param maxSize       the max size along the main axis direction
+   * @param currentLength the accumulated current length
+   * @param childLength   the length of a child view which is to be collected to the flex line
+   * @return {@code true} if a wrap is required, {@code false} otherwise
+   */
   bool WXCoreLayoutNode::isWrapRequired(float mainSize, float currentLength, float childLength) {
-    return mCssStyle->mFlexWrap != WXCore_Wrap_NoWrap && !isnan(mainSize)
-           && mainSize < currentLength + childLength;
+    return mCssStyle->mFlexWrap != WXCore_Wrap_NoWrap && mainSize < currentLength + childLength;
   }
 
   bool WXCoreLayoutNode::isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection) {

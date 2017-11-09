@@ -31,10 +31,14 @@ namespace WeexCore {
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
     setRootRenderObject(render);
 
+
+    Java_crateCom();
+
     // layout by dom Tree
     calculateLayout();
 
     sendCreateBodyAction(render);
+
   }
 
   RenderPage::~RenderPage() {

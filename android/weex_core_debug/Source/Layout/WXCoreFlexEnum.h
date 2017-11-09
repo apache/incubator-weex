@@ -1,11 +1,13 @@
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
 namespace WXCoreFlexLayout {
 
-/**
- * MainAxis direction
- */
+  /**
+   * MainAxis direction
+   */
   typedef enum WXCoreFlexDirection {
     WXCore_Flex_Direction_Column,
     WXCore_Flex_Direction_Column_Reverse,
@@ -13,9 +15,9 @@ namespace WXCoreFlexLayout {
     WXCore_Flex_Direction_Row_Reverse,
   } WXCoreFlexDirection;
 
-/**
- * Controls the position of the element on the MainAxis
- */
+  /**
+   * Controls the position of the element on the MainAxis
+   */
   typedef enum WXCoreJustifyContent {
     WXCore_Justify_Flex_Start,
     WXCore_Justify_Center,
@@ -24,9 +26,9 @@ namespace WXCoreFlexLayout {
     WXCore_Justify_Space_Around,
   } WXCoreJustifyContent;
 
-/**
- * Controls the position of the element on the CrossAxis and whether Stretch
- */
+  /**
+   * Controls the position of the element on the CrossAxis and whether Stretch
+   */
   typedef enum WXCoreAlignItems {
     WXCore_AlignItems_Flex_Start,
     WXCore_AlignItems_Center,
@@ -34,19 +36,19 @@ namespace WXCoreFlexLayout {
     WXCore_AlignItems_Stretch,
   } WXCoreAlignItems;
 
-/**
- * Controls the count of flexlines
- */
+  /**
+   * Controls the count of flexlines
+   */
   typedef enum WXCoreFlexWrap {
     WXCore_Wrap_NoWrap,
     WXCore_Wrap_Wrap,
     WXCore_Wrap_WrapReverse,
   } WXCoreFlexWrap;
 
-/**
- * The align-self will overrides the align-items specified by the Flex container.
- * The two attributes have the same range of values.
- */
+  /**
+   * The align-self will overrides the align-items specified by the Flex container.
+   * The two attributes have the same range of values.
+   */
   typedef enum WXCoreAlignSelf {
     WXCore_AlignSelf_Auto = -1,
     WXCore_AlignSelf_Flex_Start = WXCore_AlignItems_Flex_Start,
@@ -91,5 +93,7 @@ namespace WXCoreFlexLayout {
     WXCore_Border_Width_Left,
     WXCore_Border_Width_Right,
   } WXCoreBorderWidthEdge;
+
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
+#endif
