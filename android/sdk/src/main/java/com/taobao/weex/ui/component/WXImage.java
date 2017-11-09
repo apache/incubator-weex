@@ -77,6 +77,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   private String mSrc;
   private int mBlurRadius;
+  private boolean mAutoRecycle = true;
 
   private static SingleFunctionParser.FlatMapper<Integer> BLUR_RADIUS_MAPPER = new SingleFunctionParser.FlatMapper<Integer>() {
     @Override
@@ -132,6 +133,9 @@ public class WXImage extends WXComponent<ImageView> {
             setSrc(src);
           return true;
         case Constants.Name.IMAGE_QUALITY:
+          return true;
+        case Constants.Name.AUTO_RECYCLE:
+          mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
           return true;
         case Constants.Name.FILTER:
           int blurRadius = 0;
@@ -269,6 +273,22 @@ public class WXImage extends WXComponent<ImageView> {
         throw new WXRuntimeException("getImgLoaderAdapter() == null");
       }
       WXLogUtils.e("Error getImgLoaderAdapter() == null");
+    }
+  }
+
+  public void autoReleaseImage(){
+    if(mAutoRecycle){
+      if(getHostView() != null){
+        if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+        }
+      }
+    }
+  }
+
+  public void autoRecoverImage() {
+    if(mAutoRecycle) {
+      setSrc(mSrc);
     }
   }
 
@@ -415,6 +435,16 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
     });
+  }
+
+
+  public void destroy() {
+    if(getHostView() instanceof WXImageView){
+      if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+      }
+    }
+    super.destroy();
   }
 
   public interface Measurable {

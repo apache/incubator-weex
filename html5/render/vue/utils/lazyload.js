@@ -37,7 +37,7 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
   function finallCb () {
     delete item._src_loading
   }
-  if (item._src_loading) {
+  if (item._src_loading === src) {
     return
   }
   /**
@@ -50,7 +50,7 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
    * 2. then load the img src with Image constructor (but would not post
    *  a request again), just to trigger the load event.
    */
-  item._src_loading = true
+  item._src_loading = src
   preLoadImg(src, function (evt) {
     item.style.backgroundImage = `url(${src || ''})`
     const { width: naturalWidth, height: naturalHeight } = this
@@ -75,6 +75,24 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
   })
 }
 
+function getCtScroller (el: any) {
+  if (!el) { return }
+  let scroller = el._ptScroller
+  if (!scroller) {
+    let pt = el.parentElement
+    while (pt && pt !== document.body) {
+      if ((pt.className + '' || '').match(/weex-list|weex-scroller|weex-waterfall/)) {
+        scroller = pt
+        break
+      }
+      pt = pt.parentElement
+    }
+    scroller = pt
+    el._ptScroller = pt
+  }
+  return scroller
+}
+
 export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?boolean): void {
   if (Array.isArray(el)) {
     return el.forEach(ct => fireLazyload(ct))
@@ -88,7 +106,7 @@ export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?bo
     if (typeof ignoreVisibility === 'boolean' && ignoreVisibility) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
-    else if (isElementVisible(img, el)) {
+    else if (isElementVisible(img, getCtScroller(el))[0]) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
   }

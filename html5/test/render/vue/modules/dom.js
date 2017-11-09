@@ -86,6 +86,7 @@ describe('dom module', () => {
       height: 100
     }).height)
     expect(callback.callCount).to.be.equal(1)
+
     // while node is a viewport
     message = getComponentRect('viewport', callback)
     expect(message.result).to.be.true

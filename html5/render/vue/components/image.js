@@ -17,7 +17,7 @@
  * under the License.
  */
 
-let extractComponentStyle, createEventMap, extend
+let extractComponentStyle, createEventMap, extend, isArray
 
 const IMG_NAME_BITS = 15
 
@@ -28,9 +28,28 @@ const _css = `
 }
 `
 /**
- * get resize (stetch|cover|contain) related styles.
+ * 1. get sprite style if spritePosition is set.
+ * 2. else get resize (stetch|cover|contain) related styles.
  */
-function getResizeStyle (context) {
+function getCustomStyle (context, mergedStyle) {
+  let spritePosition = context.spritePosition
+  if (spritePosition && !isArray(spritePosition)) {
+    spritePosition = (spritePosition + '').split(',').map(function (val) {
+      return val.replace(/[[\]]/g, '').replace(/^\s*(\S[\s\S]*?)\s*$/g, function ($0, $1) {
+        return parseInt($1)
+      })
+    })
+  }
+  if (spritePosition) {
+    const posX = -spritePosition[0]
+    const posY = -spritePosition[1]
+    const scale = weex.config.env.scale
+    const sizeScale = parseFloat(context.spriteWidth) / parseFloat(mergedStyle.width) * weex.config.env.scale
+    return {
+      'background-position': `${posX * scale}px ${posY * scale}px`,
+      'background-size': `${sizeScale * 100}%`
+    }
+  }
   const stretch = '100% 100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
@@ -107,7 +126,10 @@ const image = {
     resize: String,
     quality: String,
     sharpen: String,
-    original: [String, Boolean]
+    original: [String, Boolean],
+    spriteSrc: String,
+    spritePosition: [String, Array],
+    spriteWidth: [String, Number]
   },
 
   updated () {
@@ -125,17 +147,20 @@ const image = {
   },
 
   render (createElement) {
-    const resizeStyle = getResizeStyle(this)
     const style = extractComponentStyle(this)
+    const customStyle = getCustomStyle(this, style)
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': preProcessSrc(this, this.src, style),
-        'img-placeholder': preProcessSrc(this, this.placeholder, style)
+        'img-src': this.spriteSrc || preProcessSrc(this, this.src, style),
+        'img-placeholder': preProcessSrc(this, this.placeholder, style),
+        'sprite-src': this.spriteSrc,
+        'sprite-position': this.spritePosition,
+        'sprite-width': this.spriteWidth
       },
       on: createEventMap(this, ['load', 'error']),
       staticClass: 'weex-image weex-el',
-      staticStyle: extend(style, resizeStyle)
+      staticStyle: extend(style, customStyle)
     })
   },
   _css
@@ -146,6 +171,7 @@ export default {
     extractComponentStyle = weex.extractComponentStyle
     createEventMap = weex.createEventMap
     extend = weex.utils.extend
+    isArray = weex.utils.isArray
 
     weex.registerComponent('image', image)
     weex.registerComponent('img', image)
