@@ -25,7 +25,7 @@
 
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD(@selector(setViewport:))
+WX_EXPORT_METHOD_SYNC(@selector(setViewport:))
 
 - (void)setViewport:(NSDictionary *)viewportArguments
 {

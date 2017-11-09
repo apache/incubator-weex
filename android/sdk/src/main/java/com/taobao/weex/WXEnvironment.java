@@ -68,6 +68,7 @@ public class WXEnvironment {
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
+  public static boolean sDebugNetworkEventReporterEnable = false;//debugtool network switch
   public static long sJSLibInitTime = 0;
 
   public static long sSDKInitStart = 0;// init start timestamp
