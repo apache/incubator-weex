@@ -71,6 +71,10 @@ public class WXLogUtils {
   }
 
   private static void log(String tag, String msg, LogLevel level){
+	if(msg != null && tag != null && sLogWatcher !=null){
+	  sLogWatcher.onLog(level.getName(), tag, msg);
+	}
+
     if (msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
       if (sLogWatcher != null ) {
         sLogWatcher.onLog(level.getName(), tag, msg);
