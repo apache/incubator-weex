@@ -31,6 +31,21 @@ function callback (document, callbackId, data, ifKeepAlive) {
   return document.taskCenter.callback(callbackId, data, ifKeepAlive)
 }
 
+function componentHook (document, componentId, type, hook, options) {
+  if (!document || !document.taskCenter) {
+    console.error(`[JS Framework] Can't find "document" or "taskCenter".`)
+    return null
+  }
+  let result = null
+  try {
+    result = document.taskCenter.triggerHook(componentId, type, hook, options)
+  }
+  catch (e) {
+    console.error(`[JS Framework] Failed to trigger the "${type}@${hook}" hook on ${componentId}.`)
+  }
+  return result
+}
+
 /**
  * Accept calls from native (event or callback).
  *
@@ -47,6 +62,7 @@ export function receiveTasks (id, tasks) {
       switch (task.method) {
         case 'callback': return callback(document, ...task.args)
         case 'fireEvent': return fireEvent(document, ...task.args)
+        case 'componentHook': return componentHook(document, ...task.args)
       }
     })
   }
