@@ -204,6 +204,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)dealloc
 {
+    ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
     
