@@ -22,6 +22,7 @@ import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
+import { createTracker } from '../utils'
 import WeexInstance from './WeexInstance'
 
 let frameworks
@@ -99,6 +100,7 @@ function createInstance (id, code, config, data) {
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
 
   const weex = new WeexInstance(id, config)
+  const tracker = createTracker(weex)
   Object.freeze(weex)
 
   const runtimeEnv = {
@@ -117,6 +119,15 @@ function createInstance (id, code, config, data) {
   if (!framework) {
     return new Error(`invalid bundle type "${bundleType}".`)
   }
+  if (bundleType === 'Weex') {
+    console.error(`[JS Framework] COMPATIBILITY WARNING: `
+      + `Weex DSL 1.0 (.we) framework is no longer supported! `
+      + `It will be removed in the next version of WeexSDK, `
+      + `your page would be crash if you still using the ".we" framework. `
+      + `Please upgrade it to Vue.js or Rax.`)
+  }
+
+  tracker('bundleType', bundleType)
 
   // run create instance
   if (typeof framework.prepareInstanceContext === 'function') {

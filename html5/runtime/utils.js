@@ -52,3 +52,25 @@ export function base64ToBuffer (base64) {
   })
   return array.buffer
 }
+
+export function createTracker (weex, options = {}) {
+  if (!weex || typeof weex.requireModule !== 'function') {
+    console.error(`[JS Framework] Failed to create tracker!`)
+  }
+  return function WeexJSFrameworkTracker (type, value) {
+    if (type && value) {
+      const label = `jsfm.${type}.${value}`
+      try {
+        const userTrack = weex.requireModule('userTrack')
+        if (userTrack && userTrack.addPerfPoint) {
+          const message = Object.create(null)
+          message[label] = '4'
+          userTrack.addPerfPoint(message)
+        }
+      }
+      catch (err) {
+        console.error(`[JS Framework] Failed to trace "${label}"!`)
+      }
+    }
+  }
+}
