@@ -247,7 +247,7 @@ class DOMActionContextImpl implements DOMActionContext {
     mNormalTasks.clear();
   }
 
-  private class ApplyUpdateConsumer implements WXDomObject.Consumer{
+  private class ApplyUpdateConsumer implements WXDomObject.Consumer {
 
     @Override
     public void accept(WXDomObject dom) {

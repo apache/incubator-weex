@@ -1003,7 +1003,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
-
     mAppendEvents.add(type);
 
     View view = getRealView();

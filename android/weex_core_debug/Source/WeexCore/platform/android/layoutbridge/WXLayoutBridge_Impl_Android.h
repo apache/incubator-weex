@@ -1,0 +1,9 @@
+#ifndef WEEX_PROJECT_WXANDROIDLAYOUTBRIDGE_H
+#define WEEX_PROJECT_WXANDROIDLAYOUTBRIDGE_H
+
+#include <jni.h>
+namespace WeexCore {
+  bool RegisterJNILayout(JNIEnv *env);
+}
+
+#endif //WEEX_PROJECT_WXANDROIDLAYOUTBRIDGE_H

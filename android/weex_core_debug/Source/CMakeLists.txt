@@ -27,12 +27,15 @@ add_library(weexjsc SHARED
     ./base/android/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
 
-
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/BridgeAndroid.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
     ./WeexCore/platform/android/WeexProxy.cpp
     ./WeexCore/platform/android/WeexCore.cpp
+    ./WeexCore/platform/android/layoutbridge/WXLayoutBridge_Impl_Android.cpp
+    ./WeexCore/platform/android/layoutbridge/MeasureMode_Impl_Android.cpp
+    ./WeexCore/platform/android/layoutbridge/ContentBoxMeasurement_Impl_Android.cpp
+
     ./WeexCore/render/RenderManager.cpp
     ./WeexCore/render/RenderObject.cpp
     ./WeexCore/render/RenderPage.cpp
