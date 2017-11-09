@@ -620,8 +620,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
    */
   public final void setLayout(WXComponent component) {
 
-    new WXLayoutBridge().layout();
-
     if (TextUtils.isEmpty(component.getPageId()) || TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
