@@ -1,5 +1,8 @@
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
+
 
 #include "WXCoreFlexEnum.h"
 #include <math.h>
@@ -86,6 +89,8 @@ namespace WXCoreFlexLayout {
           break;
         case WXCore_Margin_Bottom:
           margin = mMarginBottom;
+          break;
+        default:
           break;
       }
       return margin;
@@ -174,6 +179,8 @@ namespace WXCoreFlexLayout {
         case WXCore_Padding_Bottom:
           padding = mPaddingBottom;
           break;
+        default:
+          break;
       }
       return padding;
     }
@@ -260,6 +267,8 @@ namespace WXCoreFlexLayout {
           break;
         case WXCore_Border_Width_Bottom:
           borderWidth = mBorderWidthBottom;
+          break;
+        default:
           break;
       }
       return borderWidth;
@@ -457,5 +466,5 @@ namespace WXCoreFlexLayout {
     }
   };
 }
-
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
+#endif

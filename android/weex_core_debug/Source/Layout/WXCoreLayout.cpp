@@ -3,7 +3,6 @@
 using namespace WXCoreFlexLayout;
 
 const float WXCoreCSSStyle::FLEX_GROW_DEFAULT = 0;
-const float WXCoreCSSStyle::MAX_SIZE = MAXFLOAT;
 const WXCoreFlexDirection WXCoreCSSStyle::FLEX_DIRECTION_DEFAULT = WXCore_Flex_Direction_Column;
 const WXCoreFlexWrap WXCoreCSSStyle::FLEX_WRAP_DEFAULT = WXCore_Wrap_NoWrap;
 const WXCoreJustifyContent WXCoreCSSStyle::FLEX_JUSTIFY_CONTENT_DEFAULT = WXCore_Justify_Flex_Start;
@@ -22,26 +21,146 @@ static T min_num(T a, T b) {
 
 namespace WXCoreFlexLayout {
 
-  void WXCoreLayoutNode::onMeasure(float width, float height) {
-    if (mChildrenFrozen == nullptr || mChildrenFrozen_oldlength < getChildCount()) {
-      mChildrenFrozen = new bool[getChildCount()];
-      mChildrenFrozen_oldlength = getChildCount();
+  /**
+   * Entry function to calculate layout
+   */
+  void WXCoreLayoutNode::calculateLayout() {
+    BFCs.clear();
+    initFormatingContext(BFCs);
+    initMeasureMode();
+    reset();
+    WXBFCDimension bfcDimension = calculateBFCDimension();
+    measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height, bfcDimension.heightMeasureMode,
+            true);
+    layout(mCssStyle->mMargin.getMargin(WXCore_Margin_Left),
+           mCssStyle->mMargin.getMargin(WXCore_Margin_Top),
+           mCssStyle->mMargin.getMargin(WXCore_Margin_Left) + getLayoutWidth(),
+           mCssStyle->mMargin.getMargin(WXCore_Margin_Top) + getLayoutHeight());
+    for (int i = 0; i < getChildCount(BFC); ++i) {
+      WXCoreLayoutNode *child = getChildAt(BFC, i);
+      child->calculateLayout();
+    }
+  }
+
+  void WXCoreLayoutNode::initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs) {
+    NonBFCs.clear();
+    for (int i = 0; i < getChildCount(ALL); i++) {
+      WXCoreLayoutNode *child = getChildAt(ALL, i);
+      if (isBFC(child)) {
+        BFCs.push_back(child);
+      } else {
+        NonBFCs.push_back(child);
+        child->initFormatingContext(BFCs);
+      }
+    }
+  }
+
+  WXBFCDimension WXCoreLayoutNode::calculateBFCDimension() {
+    MeasureMode bfcWidthMeasureMode, bfcHeightMeasureMode;
+    float width, height;
+    width = isnan(mCssStyle->mStyleWidth) ? MAXFLOAT / 2 : mCssStyle->mStyleWidth;
+    height = isnan(mCssStyle->mStyleHeight) ? MAXFLOAT / 2 : mCssStyle->mStyleHeight;
+    bfcWidthMeasureMode =
+            isnan(mCssStyle->mStyleWidth) ? AT_MOST : EXACTLY;
+    bfcHeightMeasureMode =
+            isnan(mCssStyle->mStyleHeight) ? AT_MOST : EXACTLY;
+
+    if (mCssStyle->mPositionType == WXCore_PositionType_Absolute) {
+      if (isnan(mCssStyle->mStyleWidth) &&
+          mParent != nullptr &&
+          !isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left)) &&
+          !isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right))) {
+        width = mParent->mLayoutResult->mLayoutSize.width -
+                mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left) -
+                mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
+        bfcWidthMeasureMode = EXACTLY;
+      }
+
+      if (isnan(mCssStyle->mStyleHeight) &&
+          mParent != nullptr &&
+          !isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top)) &&
+          !isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom))) {
+        height = mParent->mLayoutResult->mLayoutSize.height -
+                 mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top) -
+                 mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
+        bfcHeightMeasureMode = EXACTLY;
+      }
+    }
+
+    WXBFCDimension bfcDimension;
+    bfcDimension.width = width;
+    bfcDimension.height = height;
+    bfcDimension.widthMeasureMode = bfcWidthMeasureMode;
+    bfcDimension.heightMeasureMode = bfcHeightMeasureMode;
+    return bfcDimension;
+  }
+
+  void WXCoreLayoutNode::initMeasureMode() {
+    widthMeasureMode =
+            isnan(mCssStyle->mStyleWidth) ? AT_MOST : EXACTLY;
+    heightMeasureMode =
+            isnan(mCssStyle->mStyleHeight) ? AT_MOST : EXACTLY;
+    for (int i = 0; i < getChildCount(NON_BFC); i++) {
+      WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
+      child->initMeasureMode();
+    }
+  }
+
+  void WXCoreLayoutNode::measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
+                                 bool useMeasureFunc) {
+    if (getChildCount(NON_BFC) > 0) {
+      onMeasure(width, widthMeasureMode, height, heightMeasureMode);
+    } else {
+      if (useMeasureFunc && measureFunc != nullptr &&
+          (isnan(mCssStyle->mStyleWidth) || isnan(mCssStyle->mStyleHeight))) {
+        WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height, heightMeasureMode);
+//          onMeasure(dimension.width, dimension.height);
+        width = widthMeasureMode == EXACTLY ? dimension.width :
+                min_num<float>(dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
+                               mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
+                               mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
+                               mCssStyle->mBorderWidth.getBorderWidth(
+                                   WXCore_Border_Width_Left),
+                               width);
+        height = heightMeasureMode == EXACTLY ? dimension.height :
+                 min_num<float>(dimension.height + mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
+                                mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
+                                mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
+                                mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom),
+                                height);
+      } else {
+        if (widthMeasureMode == AT_MOST) {
+          width = 0;
+        }
+        if (heightMeasureMode == AT_MOST) {
+          height = 0;
+        }
+      }
+      setMeasuredDimension(width, height);
+    }
+  }
+
+  void
+  WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode) {
+    if (mChildrenFrozen == nullptr || mChildrenFrozen_oldlength < getChildCount(NON_BFC)) {
+      mChildrenFrozen = new bool[getChildCount(NON_BFC)];
+      mChildrenFrozen_oldlength = getChildCount(NON_BFC);
     }
 
     // Only calculate the children views which are affected from the last measure.
     switch (mCssStyle->mFlexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        measureHorizontal(width, height);
+        measureHorizontal(width, widthMeasureMode, height, heightMeasureMode);
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
       default:
-        measureVertical(width, height);
+        measureVertical(width, widthMeasureMode, height, heightMeasureMode);
         break;
     }
 
-    memset(mChildrenFrozen, false, getChildCount());
+    memset(mChildrenFrozen, false, getChildCount(NON_BFC));
   }
 
 /**
@@ -50,11 +169,12 @@ namespace WXCoreFlexLayout {
  * @param width  horizontal space requirements as imposed by the parent
  * @param height vertical space requirements as imposed by the parent
  */
-  void WXCoreLayoutNode::measureHorizontal(float width, float height) {
+  void WXCoreLayoutNode::measureHorizontal(float width, MeasureMode widthMeasureMode, float height,
+                                           MeasureMode heightMeasureMode) {
 
     mFlexLines.clear();
 
-    uint32_t childCount = getChildCount();
+    uint32_t childCount = getChildCount(NON_BFC);
 
     float largestHeightInRow = 0;
     float totalCrossSize = 0;
@@ -64,7 +184,7 @@ namespace WXCoreFlexLayout {
 
     // Determine how many flex lines are needed in this layout by measuring each child.
     for (uint32_t i = 0; i < childCount; i++) {
-      WXCoreLayoutNode *child = getChildAt(i);
+      WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
 
       // Record stretch child's index
       if (child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Stretch ||
@@ -73,15 +193,12 @@ namespace WXCoreFlexLayout {
         flexLine->mIndicesAlignSelfStretch.push_back(i);
       }
 
-      float childHeight = (isnan(child->mCssStyle->mStyleHeight) && !isnan(height)) ? height - getPaddingTop() +
-                                                                                      getBorderWidthTop() +
-                                                                                      child->getMarginTop() +
-                                                                                      getPaddingBottom() +
-                                                                                      getBorderWidthBottom() +
-                                                                                      child->getMarginBottom()
-                                                                                    : child->mCssStyle->mStyleHeight;
+      WXCoreSize measureDimension = getChildDimension(width, height, child,
+                                                      totalCrossSize);
+
       // Measure child based on its MeasureSpec
-      child->measure(child->mCssStyle->mStyleWidth, childHeight, true);
+      child->measure(measureDimension.width, child->widthMeasureMode,
+                     measureDimension.height, child->heightMeasureMode, true);
 
       // Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
       checkSizeConstraints(child);
@@ -125,17 +242,17 @@ namespace WXCoreFlexLayout {
     }
 
     // Determine the main size by expanding the individual flexGrow attribute.
-    determineMainSize(mCssStyle->mFlexDirection, width, height);
+    determineMainSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle->mFlexDirection, width, height,
+    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
                        getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
     stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
-    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, height);
+    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
   }
 
 /**
@@ -145,11 +262,12 @@ namespace WXCoreFlexLayout {
  * @param width  horizontal space requirements as imposed by the parent
  * @param height vertical space requirements as imposed by the parent
  */
-  void WXCoreLayoutNode::measureVertical(float width, float height) {
+  void WXCoreLayoutNode::measureVertical(float width, MeasureMode widthMeasureMode, float height,
+                                         MeasureMode heightMeasureMode) {
 
     mFlexLines.clear();
 
-    uint32_t childCount = getChildCount();
+    uint32_t childCount = getChildCount(NON_BFC);
     float largestWidthInColumn = 0;
     float totalCrossSize = 0;
 
@@ -158,7 +276,7 @@ namespace WXCoreFlexLayout {
 
     // Determine how many flex lines are needed in this layout by measuring each child.
     for (uint32_t i = 0; i < childCount; i++) {
-      WXCoreLayoutNode *child = getChildAt(i);
+      WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
 
       // Record stretch child's index
       if (child->mCssStyle->mAlignSelf == WXCore_AlignSelf_Stretch ||
@@ -167,15 +285,11 @@ namespace WXCoreFlexLayout {
         flexLine->mIndicesAlignSelfStretch.push_back(i);
       }
 
-      float childWidth = (isnan(child->mCssStyle->mStyleWidth) && !isnan(width)) ? width - getPaddingLeft() +
-                                                                                   getBorderWidthLeft() +
-                                                                                   child->getMarginLeft() +
-                                                                                   getPaddingRight() +
-                                                                                   getBorderWidthRight() +
-                                                                                   child->getMarginRight()
-                                                                                 : child->mCssStyle->mStyleWidth;
+      WXCoreSize measureDimension = getChildDimension(width, height, child,
+                                                      totalCrossSize);
       // Measure child based on its MeasureSpec
-      child->measure(childWidth, child->mCssStyle->mStyleHeight, true);
+      child->measure(measureDimension.width, child->widthMeasureMode,
+                     measureDimension.height, child->heightMeasureMode, true);
 
       // Checks if the view's mStyleWidth/mStyleHeight don't violate the minimum/maximum size constraints
       checkSizeConstraints(child);
@@ -219,17 +333,17 @@ namespace WXCoreFlexLayout {
     }
 
     // Determine the main size by expanding the individual flexGrow attribute.
-    determineMainSize(mCssStyle->mFlexDirection, width, height);
+    determineMainSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle->mFlexDirection, width, height,
+    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
                        getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
     stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
-    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, height);
+    setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
   }
 
 /**
@@ -259,41 +373,29 @@ namespace WXCoreFlexLayout {
     }
 
     if (needReMeasure) {
-      node->measure(childWidth, childHeight, false);
+      node->measure(childWidth, EXACTLY, childHeight, EXACTLY, false);
     }
-  }
-
-  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
-                                                   float usedCrossSizeSoFar) {
-    if (childIndex == childCount - 1 && flexLine->mItemCount != 0) {
-      // Add the flex line if this item is the last item
-      addFlexLine(flexLine, usedCrossSizeSoFar);
-    }
-  }
-
-  void WXCoreLayoutNode::addFlexLine(WXCoreFlexLine *flexLine, float usedCrossSizeSoFar) {
-    flexLine->mSumCrossSizeBefore = usedCrossSizeSoFar;
-    mFlexLines.push_back(flexLine);
   }
 
 /**
  * Determine the main size by expanding the individual flexGrow attribute.
  */
-  void WXCoreLayoutNode::determineMainSize(WXCoreFlexDirection flexDirection, float width,
-                                           float height) {
+  void WXCoreLayoutNode::determineMainSize(WXCoreFlexDirection flexDirection,
+                                           float width, MeasureMode widthMeasureMode,
+                                           float height, MeasureMode heightMeasureMode) {
     float maxMainSize;
     float paddingAlongMainAxis;
 
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        maxMainSize = isnan(width) ? getLargestMainSize() : width;
+        maxMainSize = widthMeasureMode == AT_MOST ? getLargestMainSize() : width;
         paddingAlongMainAxis = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
       default:
-        maxMainSize = isnan(height) ? getLargestMainSize() : height;
+        maxMainSize = heightMeasureMode == AT_MOST ? getLargestMainSize() : height;
         paddingAlongMainAxis = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
         break;
     }
@@ -333,7 +435,7 @@ namespace WXCoreFlexLayout {
     float sizeBeforeExpand = flexLine->mMainSize;
     bool needReExpand = false;
     float unitSpace = (maxMainSize - flexLine->mMainSize + flexLine->mTotalFlexibleSize) /
-                      (flexLine->mTotalFlexibleSize > 1 ? flexLine->mTotalFlexGrow : 1);
+                      (flexLine->mTotalFlexGrow > 1 ? flexLine->mTotalFlexGrow : 1);
     flexLine->mMainSize = paddingAlongMainAxis;
 
     if (!calledRecursively) {
@@ -343,7 +445,7 @@ namespace WXCoreFlexLayout {
     float largestCrossSize = 0;
 
     for (uint32_t i = 0; i < flexLine->mItemCount; i++) {
-      WXCoreLayoutNode *child = getChildAt(childIndex);
+      WXCoreLayoutNode *child = getChildAt(NON_BFC, childIndex);
 
       if (isMainAxisDirectionHorizontal(flexDirection)) {
         // The direction of the main axis is horizontal
@@ -360,7 +462,7 @@ namespace WXCoreFlexLayout {
             rawCalculatedWidth = child->mCssStyle->mMinWidth;
           }
 
-          child->measure(rawCalculatedWidth, child->mLayoutResult->mLayoutSize.height, false);
+          child->measure(rawCalculatedWidth, EXACTLY, child->mLayoutResult->mLayoutSize.height, EXACTLY, false);
           largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult->mLayoutSize.height
                                                               + child->getMarginTop() + child->getMarginBottom());
         }
@@ -381,7 +483,7 @@ namespace WXCoreFlexLayout {
             rawCalculatedHeight = child->mCssStyle->mMinHeight;
           }
 
-          child->measure(child->mLayoutResult->mLayoutSize.width, rawCalculatedHeight, false);
+          child->measure(child->mLayoutResult->mLayoutSize.width, EXACTLY, rawCalculatedHeight, EXACTLY, false);
           largestCrossSize = max_num<float>(largestCrossSize, child->mLayoutResult->mLayoutSize.width
                                                               + child->getMarginLeft() + child->getMarginRight());
         }
@@ -409,22 +511,36 @@ namespace WXCoreFlexLayout {
  * @param height                styleheight by this node
  * @param paddingAlongCrossAxis the padding value for this node along the cross axis
  */
-  void WXCoreLayoutNode::determineCrossSize(WXCoreFlexDirection flexDirection, float width,
-                                            float height, float paddingAlongCrossAxis) {
+  void
+  WXCoreLayoutNode::determineCrossSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
+                                       float height, MeasureMode heightMeasureMode, float paddingAlongCrossAxis) {
     float size;
+    bool crossMeasureModeIsExactly;
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        size = height;
+        if (heightMeasureMode == EXACTLY) {
+          size = height;
+          crossMeasureModeIsExactly = true;
+        } else {
+          size = getSumOfCrossSize();
+          crossMeasureModeIsExactly = false;
+        }
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
       default:
-        size = width;
+        if (widthMeasureMode == EXACTLY) {
+          size = width;
+          crossMeasureModeIsExactly = true;
+        } else {
+          size = getSumOfCrossSize();
+          crossMeasureModeIsExactly = false;
+        }
         break;
     }
 
-    if (mFlexLines.size() == 1 && !isnan(size)) {
+    if (mFlexLines.size() == 1 && crossMeasureModeIsExactly) {
       mFlexLines[0]->mCrossSize = size - paddingAlongCrossAxis;
     }
   }
@@ -442,7 +558,7 @@ namespace WXCoreFlexLayout {
       uint32_t viewIndex = 0;
       for (WXCoreFlexLine *flexLine : mFlexLines) {
         for (uint32_t i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
-          WXCoreLayoutNode *child = getChildAt(viewIndex);
+          WXCoreLayoutNode *child = getChildAt(NON_BFC, viewIndex);
 
           if (child->mCssStyle->mAlignSelf != WXCore_AlignSelf_Auto &&
               child->mCssStyle->mAlignSelf != WXCore_AlignSelf_Stretch) {
@@ -466,7 +582,7 @@ namespace WXCoreFlexLayout {
       // WXCoreAlignItems is STRETCH
       for (WXCoreFlexLine *flexLine : mFlexLines) {
         for (uint32_t index : flexLine->mIndicesAlignSelfStretch) {
-          WXCoreLayoutNode *child = getChildAt(index);
+          WXCoreLayoutNode *child = getChildAt(NON_BFC, index);
           switch (flexDirection) {
             case WXCore_Flex_Direction_Row:
             case WXCore_Flex_Direction_Row_Reverse:
@@ -490,10 +606,10 @@ namespace WXCoreFlexLayout {
  * @param crossSize the cross size
  */
   void WXCoreLayoutNode::stretchViewVertically(WXCoreLayoutNode *node, float crossSize) {
-    if (isnan(node->mCssStyle->mStyleHeight)) {
+    if (node->heightMeasureMode != EXACTLY) {
       float newHeight = crossSize - node->getMarginTop() - node->getMarginBottom();
       newHeight = max_num<float>(newHeight, 0);
-      node->measure(node->mLayoutResult->mLayoutSize.width, newHeight, false);
+      node->measure(node->mLayoutResult->mLayoutSize.width, EXACTLY, newHeight, EXACTLY, false);
     }
   }
 
@@ -504,14 +620,16 @@ namespace WXCoreFlexLayout {
  * @param crossSize the cross size
  */
   void WXCoreLayoutNode::stretchViewHorizontally(WXCoreLayoutNode *node, float crossSize) {
-    if (isnan(node->mCssStyle->mStyleWidth)) {
+    if (node->widthMeasureMode != EXACTLY) {
       float newWidth = crossSize - node->getMarginLeft() - node->getMarginRight();
       newWidth = max_num<float>(newWidth, 0);
-      node->measure(newWidth, node->mLayoutResult->mLayoutSize.height, false);
+      node->measure(newWidth, EXACTLY, node->mLayoutResult->mLayoutSize.height, EXACTLY, false);
     }
   }
 
-  void WXCoreLayoutNode::setMeasuredDimensionForFlex(WXCoreFlexDirection flexDirection, float width, float height) {
+  void WXCoreLayoutNode::setMeasuredDimensionForFlex(WXCoreFlexDirection flexDirection, float width,
+                                                     MeasureMode widthMeasureMode,
+                                                     float height, MeasureMode heightMeasureMode) {
     float calculatedMaxHeight, calculatedMaxWidth;
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row: // Intentional fall through
@@ -530,27 +648,95 @@ namespace WXCoreFlexLayout {
     }
 
     float actualWidth, actualHeight;
-    actualWidth = isnan(width) ? calculatedMaxWidth : width;
-    actualHeight = isnan(height) ? calculatedMaxHeight : height;
+    actualWidth = widthMeasureMode == EXACTLY ? width : calculatedMaxWidth;
+    actualHeight = heightMeasureMode == EXACTLY ? height : calculatedMaxHeight;
     setMeasuredDimension(actualWidth, actualHeight);
   }
 
-/**
- * Determine if a wrap is required (add a new flexline).
- *
- * @param maxSize       the max size along the main axis direction
- * @param currentLength the accumulated current length
- * @param childLength   the length of a child view which is to be collected to the flex line
- * @return {@code true} if a wrap is required, {@code false} otherwise
- */
-  bool WXCoreLayoutNode::isWrapRequired(float mainSize, float currentLength, float childLength) {
-    return mCssStyle->mFlexWrap != WXCore_Wrap_NoWrap && !isnan(mainSize)
-           && mainSize < currentLength + childLength;
+  void WXCoreLayoutNode::layout(float left, float top, float right, float bottom) {
+    switch (mCssStyle->mPositionType) {
+      case WXCore_PositionType_Absolute:
+        calcAbsoluteOffset(left, top, right, bottom);
+        break;
+      default:
+      case WXCore_PositionType_Relative:
+        calcRelativeOffset(left, top, right, bottom);
+        break;
+    }
+    setFrame(left, top, right, bottom);
+    onLayout(left, top, right, bottom);
   }
 
-  bool WXCoreLayoutNode::isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection) {
-    return flexDirection == WXCore_Flex_Direction_Row
-           || flexDirection == WXCore_Flex_Direction_Row_Reverse;
+  void WXCoreLayoutNode::calcRelativeOffset(float &left, float &top, float &right, float &bottom) {
+    if (!isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left))) {
+      left += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+      right += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+    } else if (!isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right))) {
+      left -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
+      right -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
+    }
+
+    if (!isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top))) {
+      top += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+      bottom += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+    } else if (!isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom))) {
+      top -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
+      bottom -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
+    }
+  }
+
+  void WXCoreLayoutNode::calcAbsoluteOffset(float &left, float &top, float &right, float &bottom) {
+    WXCorePadding parentPadding;
+    WXCoreBorderWidth parentBorder;
+    WXCoreSize parentSize;
+
+    if (mParent != nullptr) {
+      parentPadding = mParent->mCssStyle->mPadding;
+      parentBorder = mParent->mCssStyle->mBorderWidth;
+      parentSize = mParent->mLayoutResult->mLayoutSize;
+    }
+
+    if (isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left))) {
+      if (isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right))) {
+        left += parentBorder.getBorderWidth(WXCore_Border_Width_Left) + parentPadding.getPadding(WXCore_Padding_Left);
+        right += parentBorder.getBorderWidth(WXCore_Border_Width_Left) + parentPadding.getPadding(WXCore_Padding_Left);
+      } else {
+        right += parentSize.width -
+                 (parentBorder.getBorderWidth(WXCore_Border_Width_Right) +
+                  mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right)
+                  + mLayoutResult->mLayoutSize.width);
+        left += parentSize.width -
+                (parentBorder.getBorderWidth(WXCore_Border_Width_Right) +
+                 mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right)
+                 + mLayoutResult->mLayoutSize.width);
+      }
+    } else {
+      left += parentBorder.getBorderWidth(WXCore_Border_Width_Left) +
+              mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+      right += parentBorder.getBorderWidth(WXCore_Border_Width_Left) +
+               mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
+    }
+
+    if (isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top))) {
+      if (isnan(mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom))) {
+        top += parentBorder.getBorderWidth(WXCore_Border_Width_Top) + parentPadding.getPadding(WXCore_Padding_Top);
+        bottom += parentBorder.getBorderWidth(WXCore_Border_Width_Top) + parentPadding.getPadding(WXCore_Padding_Top);
+      } else {
+        top += parentSize.height -
+               (parentBorder.getBorderWidth(WXCore_Border_Width_Bottom) +
+                mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom)
+                + mLayoutResult->mLayoutSize.height);
+        bottom += parentSize.height -
+                  (parentBorder.getBorderWidth(WXCore_Border_Width_Bottom) +
+                   mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom)
+                   + mLayoutResult->mLayoutSize.height);
+      }
+    } else {
+      top += parentBorder.getBorderWidth(WXCore_Border_Width_Top) +
+             mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+      bottom += parentBorder.getBorderWidth(WXCore_Border_Width_Top) +
+                mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
+    }
   }
 
   void WXCoreLayoutNode::onLayout(float left, float top, float right, float bottom) {
@@ -568,26 +754,6 @@ namespace WXCoreFlexLayout {
       default:
         layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right, bottom);
         break;
-    }
-  }
-
-  void WXCoreLayoutNode::determinePositionRelative(float &left, float &top, float &right, float &bottom) {
-    if (mCssStyle->mPositionType == WXCore_PositionType_Relative) {
-      if (mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left) == 0) {
-        left -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
-        right -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Right);
-      } else {
-        left += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
-        right += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Left);
-      }
-
-      if (mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top) == 0) {
-        top -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
-        bottom -= mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Bottom);
-      } else {
-        top += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
-        bottom += mCssStyle->mStylePosition.getPosition(WXCore_PositionEdge_Top);
-      }
     }
   }
 
@@ -621,7 +787,7 @@ namespace WXCoreFlexLayout {
     // SPACE_BETWEEN or SPACE_AROUND
     float childRight;
 
-    for (uint32_t i = 0, size = mFlexLines.size(); i < size; i++) {
+    for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
 
       float spaceBetweenItem = 0;
@@ -662,7 +828,7 @@ namespace WXCoreFlexLayout {
 
       for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
 
-        WXCoreLayoutNode *child = getChildAt(currentViewIndex);
+        WXCoreLayoutNode *child = getChildAt(NON_BFC, currentViewIndex);
 
         if (child == nullptr) {
           continue;
@@ -806,7 +972,7 @@ namespace WXCoreFlexLayout {
     // Used only for if the direction is from mStyleBottom to mStyleTop
     float childBottom;
 
-    for (uint32_t i = 0, size = mFlexLines.size(); i < size; i++) {
+    for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
       float spaceBetweenItem = 0;
 
@@ -845,7 +1011,7 @@ namespace WXCoreFlexLayout {
       spaceBetweenItem = max_num<float>(spaceBetweenItem, 0);
 
       for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
-        WXCoreLayoutNode *child = getChildAt(currentViewIndex);
+        WXCoreLayoutNode *child = getChildAt(NON_BFC, currentViewIndex);
         if (child == nullptr) {
           continue;
         }
@@ -955,12 +1121,93 @@ namespace WXCoreFlexLayout {
     }
   }
 
+  WXCoreSize WXCoreLayoutNode::getChildDimension(float width, float height, WXCoreLayoutNode *child,
+                                                 float totalCrossSize) {
+    float availableWidth, availableHeight;
+    switch (child->widthMeasureMode) {
+      case AT_MOST:
+        availableWidth =
+            width - (mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
+                     mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Left) +
+                     child->mCssStyle->mMargin
+                         .getMargin(WXCore_Margin_Left) +
+                     mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
+                     mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
+                     child->mCssStyle->mMargin
+                         .getMargin(WXCore_Margin_Right));
+        if (!isMainAxisDirectionHorizontal(mCssStyle->mFlexDirection)) {
+          availableWidth -= totalCrossSize;
+        }
+        break;
+      default:
+      case EXACTLY:
+        availableWidth = child->mCssStyle->mStyleWidth;
+        break;
+    }
+
+    switch (child->heightMeasureMode) {
+      case AT_MOST:
+        availableHeight =
+            height - (mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
+                      mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
+                      child->mCssStyle->mMargin
+                          .getMargin(WXCore_Margin_Top) +
+                      mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
+                      mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom) +
+                      child->mCssStyle->mMargin
+                          .getMargin(WXCore_Margin_Bottom));
+        if (isMainAxisDirectionHorizontal(mCssStyle->mFlexDirection)) {
+          availableHeight -= totalCrossSize;
+        }
+        break;
+      default:
+      case EXACTLY:
+        availableHeight = child->mCssStyle->mStyleHeight;
+        break;
+    }
+    WXCoreSize dimension;
+    dimension.width = availableWidth;
+    dimension.height = availableHeight;
+    return dimension;
+  }
+
   float WXCoreLayoutNode::getLargestMainSize() {
     float largestSize = 0;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
       largestSize = max_num<float>(largestSize, flexLine->mMainSize);
     }
     return largestSize;
+  }
+
+  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
+                                                   float usedCrossSizeSoFar) {
+    if (childIndex == childCount - 1 && flexLine->mItemCount != 0) {
+      // Add the flex line if this item is the last item
+      addFlexLine(flexLine, usedCrossSizeSoFar);
+    }
+  }
+
+  void WXCoreLayoutNode::addFlexLine(WXCoreFlexLine *flexLine, float usedCrossSizeSoFar) {
+    flexLine->mSumCrossSizeBefore = usedCrossSizeSoFar;
+    mFlexLines.push_back(flexLine);
+  }
+
+  /**
+ * Determine if a wrap is required (add a new flexline).
+ *
+ * @param maxSize       the max size along the main axis direction
+ * @param currentLength the accumulated current length
+ * @param childLength   the length of a child view which is to be collected to the flex line
+ * @return {@code true} if a wrap is required, {@code false} otherwise
+ */
+  bool WXCoreLayoutNode::isWrapRequired(float mainSize, float currentLength, float childLength) {
+    return mCssStyle->mFlexWrap != WXCore_Wrap_NoWrap && !isnan(mainSize)
+           && mainSize < currentLength + childLength;
+  }
+
+  bool WXCoreLayoutNode::isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection) {
+    return flexDirection == WXCore_Flex_Direction_Row
+           || flexDirection == WXCore_Flex_Direction_Row_Reverse;
   }
 }
 
