@@ -45,11 +45,6 @@ import java.util.Map.Entry;
 
 public class WXAnimationBean {
 
-  public final static String LINEAR = "linear";
-  public final static String EASE_IN_OUT = "ease-in-out";
-  public final static String EASE_IN = "ease-in";
-  public final static String EASE_OUT = "ease-out";
-  public final static String CUBIC_BEZIER = "cubic-bezier";
   public final static int NUM_CUBIC_PARAM = 4;
   public long delay;
   public long duration;
