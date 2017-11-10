@@ -18,6 +18,7 @@
  */
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
+import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
@@ -151,7 +152,14 @@ function runInContext (code, context) {
 const methods = {
   createInstance,
   registerService: register,
-  unregisterService: unregister
+  unregisterService: unregister,
+  callJS (id, tasks) {
+    const framework = frameworks[getFrameworkType(id)]
+    if (framework && typeof framework.receiveTasks === 'function') {
+      return framework.receiveTasks(id, tasks)
+    }
+    return receiveTasks(id, tasks)
+  }
 }
 
 /**
@@ -186,23 +194,6 @@ function genInstance (methodName) {
       }
 
       return result
-    }
-    return new Error(`invalid instance id "${id}"`)
-  }
-}
-
-/**
- * Adapt some legacy method(s) which will be called for each instance. These
- * methods should be deprecated and removed later.
- * @param {string} methodName
- * @param {string} nativeMethodName
- */
-function adaptInstance (methodName, nativeMethodName) {
-  methods[nativeMethodName] = function (...args) {
-    const id = args[0]
-    const type = getFrameworkType(id)
-    if (type && frameworks[type]) {
-      return frameworks[type][methodName](...args)
     }
     return new Error(`invalid instance id "${id}"`)
   }
@@ -246,9 +237,7 @@ export default function init (config) {
   adaptMethod('registerModules', registerModules)
   adaptMethod('registerMethods')
 
-  ; ['destroyInstance', 'refreshInstance', 'receiveTasks', 'getRoot'].forEach(genInstance)
-
-  adaptInstance('receiveTasks', 'callJS')
+  ; ['destroyInstance', 'refreshInstance', 'getRoot'].forEach(genInstance)
 
   return methods
 }
