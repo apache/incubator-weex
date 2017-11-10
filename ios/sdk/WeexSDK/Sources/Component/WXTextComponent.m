@@ -874,6 +874,14 @@ do {\
     CTFramesetterRef ctframesetterRef = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(attributedStringCpy));
     suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(ctframesetterRef, CFRangeMake(0, 0), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
     
+    CGFloat totalHeight = 0;
+    CGSize suggestSize = CGSizeZero;
+    NSAttributedString * attributedStringCpy = [self ctAttributedString];
+    CTFramesetterRef framesetterRef = NULL;
+    framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
+        
+    suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
+        
     CGMutablePathRef path = NULL;
     path = CGPathCreateMutable();
         // sufficient height to draw text
