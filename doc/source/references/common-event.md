@@ -24,7 +24,7 @@ The onclick attribute fires on a click gesture on the element.
 ## Longpress event
 
 If a `longpress` event is bound to a component, the event will be triggered when user long press on it.    
-**Notes: ** The `input` and `switch` component does not currently support the `click` event, please use `change` or `input` event instead.    
+**Notes: ** The `input` and `switch` component does not currently support the `longpress` event, please use `change` or `input` event instead.    
 
 ### event object
 
