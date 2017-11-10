@@ -124,6 +124,12 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
+	if(!WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg)){
+	  if(sLogWatcher != null){//sLogWatcher designed to track analyse log
+		log(tag, msg, LogLevel.DEBUG);
+	  }
+	}
+
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       if ("jsLog".equals(tag) && jsLogWatcher != null) {
         if (msg.endsWith("__DEBUG")) {
