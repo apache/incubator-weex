@@ -101,7 +101,7 @@ didReceiveResponse:(NSURLResponse *)response
     [_delegates removeObjectForKey:task];
 }
 
-#ifdef __IPHONE_10_0
+#ifdef __IPHONE_10_1
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics
 {
     id<WXResourceRequestDelegate> delegate = [_delegates objectForKey:task];

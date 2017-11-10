@@ -40,7 +40,7 @@
 - (void)request:(WXResourceRequest *)request didFailWithError:(NSError *)error;
     
 // Tells the delegate that when complete statistics information has been collected for the task.
-#ifdef __IPHONE_10_0
+#ifdef __IPHONE_10_1
 - (void)request:(WXResourceRequest *)request didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics API_AVAILABLE(macosx(10.12), ios(10.0), watchos(3.0), tvos(10.0));
 #endif
 
