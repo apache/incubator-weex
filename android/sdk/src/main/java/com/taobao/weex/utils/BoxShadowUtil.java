@@ -66,6 +66,8 @@ public class BoxShadowUtil {
   private static final String TAG = "BoxShadowUtil";
   private static boolean sBoxShadowEnabled = true;
 
+  private static Pattern sColorPattern;
+
   public static void setBoxShadowEnabled(boolean enabled) {
     sBoxShadowEnabled = enabled;
     WXLogUtils.w(TAG, "Switch box-shadow status: " + enabled);
@@ -294,8 +296,11 @@ public class BoxShadowUtil {
 
   public static BoxShadowOptions[] parseBoxShadows(String boxShadowStyle, int viewport) {
     // normalization color expression to #AARRGGBB
-    Pattern colorPattern = Pattern.compile("([rR][gG][bB][aA]?)\\((\\d+\\s*),\\s*(\\d+\\s*),\\s*(\\d+\\s*)(?:,\\s*(\\d+(?:\\.\\d+)?))?\\)");
-    Matcher matcher = colorPattern.matcher(boxShadowStyle);
+    if (sColorPattern == null) {
+      sColorPattern = Pattern.compile("([rR][gG][bB][aA]?)\\((\\d+\\s*),\\s*(\\d+\\s*),\\s*(\\d+\\s*)(?:,\\s*(\\d+(?:\\.\\d+)?))?\\)");
+    }
+
+    Matcher matcher = sColorPattern.matcher(boxShadowStyle);
 
     String processedStyle = boxShadowStyle;
     while (matcher.find()) {
