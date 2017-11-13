@@ -37,7 +37,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -53,6 +55,7 @@ import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
@@ -853,6 +856,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           t.printStackTrace();
         }
         return true;
+      case Constants.Name.ROLE:
+        setRole(WXUtils.getString(param, ""));
+        return true;
       default:
         return false;
     }
@@ -965,6 +971,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     View host = getHostView();
     if(host != null){
       host.setContentDescription(label);
+    }
+  }
+
+  protected void setRole(String roleKey) {
+    View host = getHostView();
+    String role = roleKey;
+    if (host != null && !TextUtils.isEmpty(roleKey)) {
+      IWXAccessibilityRoleAdapter roleAdapter = WXSDKManager.getInstance().getAccessibilityRoleAdapter();
+      if (roleAdapter != null) {
+        role = roleAdapter.getRole(roleKey);
+      }
+      final String finalRole = role;
+      AccessibilityDelegateCompat delegate = new AccessibilityDelegateCompat() {
+        @Override
+        public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+          super.onInitializeAccessibilityNodeInfo(host, info);
+          info.setRoleDescription(finalRole);
+        }
+      };
+      ViewCompat.setAccessibilityDelegate(host, delegate);
     }
   }
 
