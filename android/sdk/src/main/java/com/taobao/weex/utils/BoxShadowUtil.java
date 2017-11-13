@@ -47,6 +47,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.common.WXThread;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +123,7 @@ public class BoxShadowUtil {
       }
     }
 
-    target.post(new Runnable() {
+    target.post(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -136,7 +137,7 @@ public class BoxShadowUtil {
           }
         }
       }
-    });
+    }));
   }
 
   private static void drawShadow(Canvas canvas, BoxShadowOptions options) {

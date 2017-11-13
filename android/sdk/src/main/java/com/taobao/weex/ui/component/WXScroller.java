@@ -640,7 +640,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       return;
     }
 
-    getInnerView().postDelayed(new Runnable() {
+    getInnerView().postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         if (mOrientation == Constants.Orientation.VERTICAL) {
@@ -658,7 +658,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
         getInnerView().invalidate();
       }
-    }, 16);
+    }), 16);
   }
 
   @Override

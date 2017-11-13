@@ -25,7 +25,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
@@ -38,11 +37,6 @@ public class WXHorizontalScrollView extends HorizontalScrollView implements IWXS
   private ScrollViewListener mScrollViewListener;
   private List<ScrollViewListener> mScrollViewListeners;
   private boolean scrollable = true;
-
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
 
   public WXHorizontalScrollView(Context context) {
     super(context);
