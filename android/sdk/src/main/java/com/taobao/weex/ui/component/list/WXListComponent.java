@@ -24,6 +24,7 @@ import android.util.Pair;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -98,22 +99,22 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
     if (child instanceof WXRefresh && getHostView() != null) {
         getHostView().setOnRefreshListener((WXRefresh) child);
-        getHostView().postDelayed(new Runnable() {
+        getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setHeaderView(child);
         }
-      }, 100);
+      }), 100);
     }
 
     if (child instanceof WXLoading && getHostView() != null) {
         getHostView().setOnLoadingListener((WXLoading) child);
-        getHostView().postDelayed(new Runnable() {
+        getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setFooterView(child);
         }
-      }, 100);
+      }), 100);
     }
 
     // Synchronize DomObject's attr to Component and Native View
@@ -201,20 +202,20 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         child.createView();
         if (child instanceof WXRefresh) {
           getHostView().setOnRefreshListener((WXRefresh) child);
-          getHostView().postDelayed(new Runnable() {
+          getHostView().postDelayed(WXThread.secure(new Runnable() {
             @Override
             public void run() {
               getHostView().setHeaderView(child);
             }
-          }, 100);
+          }), 100);
         } else if (child instanceof WXLoading) {
           getHostView().setOnLoadingListener((WXLoading) child);
-          getHostView().postDelayed(new Runnable() {
+          getHostView().postDelayed(WXThread.secure(new Runnable() {
             @Override
             public void run() {
               getHostView().setFooterView(child);
             }
-          }, 100);
+          }), 100);
         }
       } else {
         super.createChildViewAt(ret.second);
