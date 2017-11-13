@@ -75,14 +75,18 @@ public class WXLogUtils {
 	  sLogWatcher.onLog(level.getName(), tag, msg);
 	}
 
-    if (msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
+	if (WXEnvironment.isApkDebugable()) {
         Log.println(level.getPriority(),tag, msg);
       // if not debug level then print log
-      if(WXEnvironment.isApkDebugable() && !level.getName().equals("debug")){
+      if(!level.getName().equals("debug")){
 		writeConsoleLog(level.getName(), msg);
 		sendLog(level, msg);
 	  }
-    }
+    }else {
+	  if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
+		Log.println(level.getPriority(),tag, msg);
+	  }
+	}
   }
 
   public static void d(String msg) {
@@ -120,10 +124,8 @@ public class WXLogUtils {
   public static void d(String tag, String msg) {
 
 	log(tag, msg, LogLevel.DEBUG);
-	sendLog(LogLevel.DEBUG, tag + ":" + msg);// WXDebugTool sendLog
 
-	if(WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0){//sLogLevel in debug mode is "LogLevel.DEBUG"
-	  if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg)) {
+	if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
 		if ("jsLog".equals(tag) && jsLogWatcher != null) {
 		  if (msg.endsWith("__DEBUG")) {
 			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
@@ -149,7 +151,7 @@ public class WXLogUtils {
 			return;
 		  }
 		}
-	  }
+	  sendLog(LogLevel.DEBUG, tag + ":" + msg);// WXDebugTool sendLog
 	}
   }
 

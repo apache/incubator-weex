@@ -1074,13 +1074,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             }
 
             WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-
           }
         }
       });
     }
     if(!WXEnvironment.isApkDebugable()){
-      Log.e("weex_perf",mWXPerformance.getPerfData());
+      WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
 
