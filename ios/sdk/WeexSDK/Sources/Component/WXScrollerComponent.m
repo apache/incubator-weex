@@ -488,6 +488,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 #pragma mark UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self fireEvent:@"scrollstart" params:nil domChanges:nil];
+}
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -569,6 +573,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [scrollView setContentInset:inset];
+    [self fireEvent:@"scrollend" params:nil domChanges:nil];
+
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
