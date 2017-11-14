@@ -1529,7 +1529,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-     if (WXEnvironment.isApkDebugable()) {
+//     if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
         .append("function:").append(function);
     if (logTaskDetail)
@@ -1538,7 +1538,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mLodBuilder.setLength(0);
      }
     mWXBridge.execJS(instanceId, namespace, function, args);
-  }
+//  }
 
   private void invokeInitFramework(Message msg) {
     String framework = "";
