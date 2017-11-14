@@ -19,21 +19,21 @@ Besides Weex dev mailing list, we also have some other mailing lists for you. Yo
 ```
 release
  ↑
-master         <--- PR(hotfix/typo/3rd-PR)
- ↑ PR
-{domain}-feature-{point}
+{version}
+ ↑
+master         <--- PR(feature/hotfix/typo)
 ```
 
-0. `release` branch
-    0. `release ` is the latest release branch.
-0. `master ` branch
-    0. `master ` is the stable developing branch.
+0. `master` branch
+    0. `master` is the stable developing branch.
     0. ***It's RECOMMENDED to commit hotfix (like typo) or feature PR to `master `***.
-0. `{domain}-feature-{point}` branch
-    0. The branch for a developing iteration, e.g. `android-feature-list-update` is an android developing iteration which is for list update. `{domain}` consists of `android`, `ios`, `jsfm` and `html5`. 
-    0. **DO NOT commit any PR to such a branch**.
+0. `{version}` branch
+    0. `{version}` is used for every version which we consider for stable publish.
+    0. e.g. `v0.16`
+0. `release` branch
+    0. `release` is the latest release branch,we will make tag and publish version on this branch.
 
-### Branch Name 
+### Branch Name For PR
 
 ```
 {module}-{action}-{shortName}

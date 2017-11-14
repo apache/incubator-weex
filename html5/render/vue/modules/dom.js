@@ -39,6 +39,10 @@ function now () {
 }
 
 function scrollElement (dSuffix, position) {
+  if ((this === document.body) || (this === window)
+    && window.scrollTo) {
+    return window.scrollTo(0, position)
+  }
   this[`scroll${dSuffix}`] = position
 }
 /**
@@ -133,7 +137,7 @@ const dom = {
         scrollable: ct,
         startTime: now(),
         frame: null,
-        startPosition: ct[`scroll${dSuffix}`],
+        startPosition: isWindow ? window.pageYOffset : ct[`scroll${dSuffix}`],
         position: offset,
         method: scrollElement,
         dSuffix: dSuffix

@@ -43,6 +43,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.ViewOverlay;
 import android.widget.FrameLayout;
 
 import com.alibaba.fastjson.JSONArray;
@@ -142,6 +143,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
+  private String mLastBoxShadowId;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -509,6 +511,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       setWidgetParams(widget, UIImp, rawOffset, realWidth, realHeight, realLeft, realRight, realTop,
           realBottom);
     } else if (mHost != null) {
+      // clear box shadow before host's size changed
+      clearBoxShadow();
       if (mDomObj.isFixed()) {
         setFixedHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop,
             realBottom);
@@ -520,6 +524,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mPreRealLeft = realLeft;
       mPreRealTop = realTop;
       onFinishLayout();
+      // restore box shadow
+      updateBoxShadow();
     }
   }
 
@@ -759,22 +765,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
       case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-        final Float radius = WXUtils.getFloat(param,null);
-        final String finalKey = key;
+        Float radius = WXUtils.getFloat(param,null);
         if (radius != null) {
-          if (this instanceof WXDiv && mHost != null) {
-            /* Hacked by moxun
-               Set border radius on ViewGroup will cause the Overlay to be cut and don't know why
-               Delay setting border radius can avoid the problem, and don't know why too, dog science…… */
-            mHost.postDelayed(new Runnable() {
-              @Override
-              public void run() {
-                setBorderRadius(finalKey, radius);
-              }
-            }, 64);
-          } else {
-            setBorderRadius(finalKey, radius);
-          }
+          setBorderRadius(key, radius);
         }
         return true;
       case Constants.Name.BORDER_WIDTH:
@@ -866,9 +859,36 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   protected void updateBoxShadow() {
+    if (!BoxShadowUtil.isBoxShadowEnabled()) {
+      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      return;
+    }
+
     if (getDomObject() != null && getDomObject().getStyles() != null) {
       Object boxShadow = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
+      Object shadowQuality = getDomObject().getAttrs().get(Constants.Name.SHADOW_QUALITY);
       if (boxShadow == null) {
+        return;
+      }
+
+      View target = mHost;
+      if (this instanceof WXVContainer) {
+        target = ((WXVContainer) this).getBoxShadowHost(false);
+      }
+
+      if (target == null) {
+        return;
+      }
+
+      float quality = WXUtils.getFloat(shadowQuality, 0.5f);
+      int viewPort = getInstance().getInstanceViewPortWidth();
+      String token = new StringBuilder(boxShadow.toString()).append(" / [")
+          .append(getDomObject().getStyles().getWidth(viewPort)).append(",")
+          .append(getDomObject().getStyles().getHeight(viewPort)).append("] / ")
+          .append(quality).toString();
+
+      if (mLastBoxShadowId != null && mLastBoxShadowId.equals(token)) {
+        WXLogUtils.d("BoxShadow", "box-shadow style was not modified. " + token);
         return;
       }
 
@@ -898,9 +918,38 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           }
         }
       }
-      BoxShadowUtil.setBoxShadow(mHost, boxShadow.toString(), radii, getInstance().getInstanceViewPortWidth());
+
+      BoxShadowUtil.setBoxShadow(target, boxShadow.toString(), radii, viewPort, quality);
+      mLastBoxShadowId = token;
     } else {
       WXLogUtils.w("Can not resolve styles");
+    }
+  }
+
+  protected void clearBoxShadow() {
+    if (!BoxShadowUtil.isBoxShadowEnabled()) {
+      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      return;
+    }
+
+    if (getDomObject() != null && getDomObject().getStyles() != null) {
+      Object obj = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
+      if (obj == null) {
+        WXLogUtils.d("BoxShadow", "no box-shadow");
+        return;
+      }
+    }
+
+    View target = mHost;
+    if (this instanceof WXVContainer) {
+      target = ((WXVContainer) this).getBoxShadowHost(true);
+    }
+
+    if (target != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      ViewOverlay overlay = target.getOverlay();
+      if (overlay != null) {
+        overlay.clear();
+      }
     }
   }
 
@@ -968,7 +1017,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param type
    */
   public void addEvent(String type) {
-    if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
+    if (TextUtils.isEmpty(type)
+            || mAppendEvents.contains(type)
+            || getRealView() == null) {
       return;
     }
     mAppendEvents.add(type);

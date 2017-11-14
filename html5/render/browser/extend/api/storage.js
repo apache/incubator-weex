@@ -20,11 +20,32 @@
 
 'use strict'
 
-const supportLocalStorage = typeof localStorage !== 'undefined'
+let supportLocalStorage = false
+try {
+  supportLocalStorage = typeof localStorage !== 'undefined'
+}
+catch (err) {
+  // not support.
+}
+
 const SUCCESS = 'success'
 const FAILED = 'failed'
 const INVALID_PARAM = 'invalid_param'
 const UNDEFINED = 'undefined'
+
+function callFail (sender, callbackId, errorMsg) {
+  sender.performCallback(callbackId, {
+    result: FAILED,
+    data: errorMsg || UNDEFINED
+  })
+}
+
+function callNotSupportFail (sender, callbackId) {
+  sender.performCallback(callbackId, {
+    result: FAILED,
+    data: 'localStorage is disabled or not supported.'
+  })
+}
 
 const storage = {
 
@@ -36,11 +57,10 @@ const storage = {
    * @param {function} callbackId
    */
   setItem: function (key, value, callbackId) {
-    if (!supportLocalStorage) {
-      console.error('your browser is not support localStorage yet.')
-      return
-    }
     const sender = this.sender
+    if (!supportLocalStorage) {
+      return callNotSupportFail(sender, callbackId)
+    }
     if (!key || (!value && value !== 0)) {
       sender.performCallback(callbackId, {
         result: 'failed',
@@ -57,10 +77,7 @@ const storage = {
     }
     catch (e) {
       // accept any exception thrown during a storage attempt as a quota error
-      sender.performCallback(callbackId, {
-        result: FAILED,
-        data: UNDEFINED
-      })
+      callFail(sender, callbackId)
     }
   },
 
@@ -70,11 +87,10 @@ const storage = {
    * @param {function} callbackId
    */
   getItem: function (key, callbackId) {
-    if (!supportLocalStorage) {
-      console.error('your browser is not support localStorage yet.')
-      return
-    }
     const sender = this.sender
+    if (!supportLocalStorage) {
+      return callNotSupportFail(sender, callbackId)
+    }
     if (!key) {
       sender.performCallback(callbackId, {
         result: FAILED,
@@ -82,11 +98,17 @@ const storage = {
       })
       return
     }
-    const val = localStorage.getItem(key)
-    sender.performCallback(callbackId, {
-      result: val ? SUCCESS : FAILED,
-      data: val || UNDEFINED
-    })
+    try {
+      const val = localStorage.getItem(key)
+      sender.performCallback(callbackId, {
+        result: val ? SUCCESS : FAILED,
+        data: val || UNDEFINED
+      })
+    }
+    catch (e) {
+      // accept any exception thrown during a storage attempt as a quota error
+      callFail(sender, callbackId)
+    }
   },
 
   /**
@@ -95,11 +117,10 @@ const storage = {
    * @param {function} callbackId
    */
   removeItem: function (key, callbackId) {
-    if (!supportLocalStorage) {
-      console.error('your browser is not support localStorage yet.')
-      return
-    }
     const sender = this.sender
+    if (!supportLocalStorage) {
+      return callNotSupportFail(sender, callbackId)
+    }
     if (!key) {
       sender.performCallback(callbackId, {
         result: FAILED,
@@ -107,11 +128,17 @@ const storage = {
       })
       return
     }
-    localStorage.removeItem(key)
-    sender.performCallback(callbackId, {
-      result: SUCCESS,
-      data: UNDEFINED
-    })
+    try {
+      localStorage.removeItem(key)
+      sender.performCallback(callbackId, {
+        result: SUCCESS,
+        data: UNDEFINED
+      })
+    }
+    catch (e) {
+      // accept any exception thrown during a storage attempt as a quota error
+      callFail(sender, callbackId)
+    }
   },
 
   /**
@@ -119,16 +146,21 @@ const storage = {
    * @param {function} callbackId
    */
   length: function (callbackId) {
-    if (!supportLocalStorage) {
-      console.error('your browser is not support localStorage yet.')
-      return
-    }
     const sender = this.sender
-    const len = localStorage.length
-    sender.performCallback(callbackId, {
-      result: SUCCESS,
-      data: len
-    })
+    if (!supportLocalStorage) {
+      return callNotSupportFail(sender, callbackId)
+    }
+    try {
+      const len = localStorage.length
+      sender.performCallback(callbackId, {
+        result: SUCCESS,
+        data: len
+      })
+    }
+    catch (e) {
+      // accept any exception thrown during a storage attempt as a quota error
+      callFail(sender, callbackId)
+    }
   },
 
   /**
@@ -136,19 +168,24 @@ const storage = {
    * @param {function} callbackId
    */
   getAllKeys: function (callbackId) {
-    if (!supportLocalStorage) {
-      console.error('your browser is not support localStorage yet.')
-      return
-    }
     const sender = this.sender
-    const _arr = []
-    for (let i = 0; i < localStorage.length; i++) {
-      _arr.push(localStorage.key(i))
+    if (!supportLocalStorage) {
+      return callNotSupportFail(sender, callbackId)
     }
-    sender.performCallback(callbackId, {
-      result: SUCCESS,
-      data: _arr
-    })
+    try {
+      const _arr = []
+      for (let i = 0; i < localStorage.length; i++) {
+        _arr.push(localStorage.key(i))
+      }
+      sender.performCallback(callbackId, {
+        result: SUCCESS,
+        data: _arr
+      })
+    }
+    catch (e) {
+      // accept any exception thrown during a storage attempt as a quota error
+      callFail(sender, callbackId)
+    }
   }
 }
 

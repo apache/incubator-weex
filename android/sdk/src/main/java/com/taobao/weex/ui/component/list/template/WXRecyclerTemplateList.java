@@ -593,7 +593,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
      * com.taobao.weex.ui.view.listview.WXRecyclerView}
      */
     @Override
-    protected void addSubView(View child, int index) {
+    public void addSubView(View child, int index) {
 
     }
 
@@ -1306,7 +1306,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     continue;
                 }
                 TemplateViewHolder itemHolder = (TemplateViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-                if(itemHolder == null){
+                if(itemHolder == null || itemHolder.getComponent() == null){
                     break;
                 }
                 List<WXComponent> childListeners = findChildListByRef(itemHolder.getComponent(), helper.getAwareChild().getRef());

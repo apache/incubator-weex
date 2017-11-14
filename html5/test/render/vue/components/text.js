@@ -31,7 +31,7 @@ init('<text> component', (Vue, helper) => {
     const vm = compile(`<text>abc</text>`)
 
     expect(vm.$el.tagName.toLowerCase()).to.be.equal('p')
-    expect(vm.$el.innerHTML).to.be.equal('abc')
+    expect(vm.$el.textContent).to.be.equal('abc')
   })
 
   it('empty text component', () => {

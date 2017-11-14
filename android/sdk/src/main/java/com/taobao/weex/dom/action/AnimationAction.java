@@ -61,6 +61,13 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.taobao.weex.common.Constants.TimeFunction.CUBIC_BEZIER;
+import static com.taobao.weex.common.Constants.TimeFunction.EASE;
+import static com.taobao.weex.common.Constants.TimeFunction.EASE_IN;
+import static com.taobao.weex.common.Constants.TimeFunction.EASE_IN_OUT;
+import static com.taobao.weex.common.Constants.TimeFunction.EASE_OUT;
+import static com.taobao.weex.common.Constants.TimeFunction.LINEAR;
+
 
 class AnimationAction implements DOMAction, RenderAction {
 
@@ -245,29 +252,31 @@ class AnimationAction implements DOMAction, RenderAction {
     String interpolator = mAnimationBean.timingFunction;
     if (!TextUtils.isEmpty(interpolator)) {
       switch (interpolator) {
-        case WXAnimationBean.EASE_IN:
-          return new AccelerateInterpolator();
-        case WXAnimationBean.EASE_OUT:
-          return new DecelerateInterpolator();
-        case WXAnimationBean.EASE_IN_OUT:
-          return new AccelerateDecelerateInterpolator();
-        case WXAnimationBean.LINEAR:
-          return new LinearInterpolator();
+        case EASE_IN:
+          return PathInterpolatorCompat.create(0.42f,0f, 1f,1f);
+        case EASE_OUT:
+          return PathInterpolatorCompat.create(0f,0f, 0.58f,1f);
+        case EASE_IN_OUT:
+          return PathInterpolatorCompat.create(0.42f,0f, 0.58f,1f);
+        case EASE:
+          return PathInterpolatorCompat.create(0.25f,0.1f, 0.25f,1f);
+        case LINEAR:
+          return PathInterpolatorCompat.create(0.0f,0f, 1f,1f);
         default:
           //Parse cubic-bezier
           try {
             SingleFunctionParser<Float> parser = new SingleFunctionParser<>(
-                mAnimationBean.timingFunction,
-                new SingleFunctionParser.FlatMapper<Float>() {
-                  @Override
-                  public Float map(String raw) {
-                    return Float.parseFloat(raw);
-                  }
-                });
-            List<Float> params = parser.parse(WXAnimationBean.CUBIC_BEZIER);
+                    mAnimationBean.timingFunction,
+                    new SingleFunctionParser.FlatMapper<Float>() {
+                      @Override
+                      public Float map(String raw) {
+                        return Float.parseFloat(raw);
+                      }
+                    });
+            List<Float> params = parser.parse(CUBIC_BEZIER);
             if (params != null && params.size() == WXAnimationBean.NUM_CUBIC_PARAM) {
               return PathInterpolatorCompat.create(
-                  params.get(0), params.get(1), params.get(2), params.get(3));
+                      params.get(0), params.get(1), params.get(2), params.get(3));
             } else {
               return null;
             }

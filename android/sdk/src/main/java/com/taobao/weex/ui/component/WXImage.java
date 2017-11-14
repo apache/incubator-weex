@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.RectF;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
@@ -71,9 +73,11 @@ public class WXImage extends WXComponent<ImageView> {
 
   public static final String SUCCEED = "success";
   public static final String ERRORDESC = "errorDesc";
+  private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 0x2;
 
   private String mSrc;
   private int mBlurRadius;
+  private boolean mAutoRecycle = true;
 
   private static SingleFunctionParser.FlatMapper<Integer> BLUR_RADIUS_MAPPER = new SingleFunctionParser.FlatMapper<Integer>() {
     @Override
@@ -129,6 +133,9 @@ public class WXImage extends WXComponent<ImageView> {
             setSrc(src);
           return true;
         case Constants.Name.IMAGE_QUALITY:
+          return true;
+        case Constants.Name.AUTO_RECYCLE:
+          mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
           return true;
         case Constants.Name.FILTER:
           int blurRadius = 0;
@@ -269,6 +276,22 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
+  public void autoReleaseImage(){
+    if(mAutoRecycle){
+      if(getHostView() != null){
+        if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+        }
+      }
+    }
+  }
+
+  public void autoRecoverImage() {
+    if(mAutoRecycle) {
+      setSrc(mSrc);
+    }
+  }
+
   private void setRemoteSrc(Uri rewrited,int blurRadius) {
 
       WXImageStrategy imageStrategy = new WXImageStrategy();
@@ -356,6 +379,13 @@ public class WXImage extends WXComponent<ImageView> {
   public void save(final JSCallback saveStatuCallback) {
 
     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      if (getContext() instanceof Activity) {
+        ActivityCompat.requestPermissions((Activity) getContext(),
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
+      }
+    }
+
+    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       if (saveStatuCallback != null) {
         Map<String, Object> result = new HashMap<>();
         result.put(SUCCEED, false);
@@ -405,6 +435,16 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
     });
+  }
+
+
+  public void destroy() {
+    if(getHostView() instanceof WXImageView){
+      if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+      }
+    }
+    super.destroy();
   }
 
   public interface Measurable {

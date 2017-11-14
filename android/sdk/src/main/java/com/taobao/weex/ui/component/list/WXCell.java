@@ -37,6 +37,9 @@ import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
+
+import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
 
 /**
  * Root component for components in {@link WXListComponent}
@@ -55,11 +58,13 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private int mScrollPositon = -1;
     private boolean mFlatUIEnabled = false;
 
+
     private Object  renderData;
 
     private boolean isSourceUsed = false;
 
     private boolean hasLayout = false;
+
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -142,28 +147,44 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     }
 
     public void removeSticky() {
-        mHeadView = getHostView().getChildAt(0);
-        int[] location = new int[2];
-        int[] parentLocation = new int[2];
-        getHostView().getLocationOnScreen(location);
-        getParentScroller().getView().getLocationOnScreen(parentLocation);
-        int headerViewOffsetX = location[0] - parentLocation[0];
-        int headerViewOffsetY = getParent().getHostView().getTop();
-        getHostView().removeView(mHeadView);
-        mRealView = (ViewGroup) mHeadView;
-        mTempStickyView = new FrameLayout(getContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().getLayoutWidth(),
-                (int) getDomObject().getLayoutHeight());
-        getHostView().addView(mTempStickyView, lp);
-        mHeadView.setTranslationX(headerViewOffsetX);
-        mHeadView.setTranslationY(headerViewOffsetY);
+        if(getHostView().getChildCount() > 0) {
+            mHeadView = getHostView().getChildAt(0);
+            int[] location = new int[2];
+            int[] parentLocation = new int[2];
+            getHostView().getLocationOnScreen(location);
+            getParentScroller().getView().getLocationOnScreen(parentLocation);
+            int headerViewOffsetX = location[0] - parentLocation[0];
+            int headerViewOffsetY = getParent().getHostView().getTop();
+            getHostView().removeView(mHeadView);
+            mRealView = (ViewGroup) mHeadView;
+            mTempStickyView = new FrameLayout(getContext());
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().getLayoutWidth(),
+                    (int) getDomObject().getLayoutHeight());
+            getHostView().addView(mTempStickyView, lp);
+            mHeadView.setTranslationX(headerViewOffsetX);
+            mHeadView.setTranslationY(headerViewOffsetY);
+        }
     }
 
     public void recoverySticky() {
-        getHostView().removeView(mTempStickyView);
-        getHostView().addView(mHeadView);
-        mHeadView.setTranslationX(0);
-        mHeadView.setTranslationY(0);
+        if(mHeadView != null){
+            if(mHeadView.getLayoutParams() != null){
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mHeadView.getLayoutParams();
+                if(params.topMargin > 0){
+                    params.topMargin = 0;
+                }
+            }
+            if(mHeadView.getVisibility() != View.VISIBLE){
+                mHeadView.setVisibility(View.VISIBLE);
+            }
+            if(mHeadView.getParent() != null){
+                ((ViewGroup)mHeadView.getParent()).removeView(mHeadView);
+            }
+            getHostView().removeView(mTempStickyView);
+            getHostView().addView(mHeadView);
+            mHeadView.setTranslationX(0);
+            mHeadView.setTranslationY(0);
+        }
     }
 
     @Override
@@ -183,6 +204,18 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     @Override
     public boolean intendToBeFlatContainer() {
         return getInstance().getFlatUIContext().isFlatUIEnabled(this) && WXCell.class.equals(getClass()) && !isSticky();
+    }
+
+    public int getStickyOffset(){
+        if(getDomObject() == null){
+            return  0;
+        }
+        WXDomObject domObject = (WXDomObject) getDomObject();
+        if(domObject.getAttrs().get(STICKY_OFFSET) == null){
+            return 0;
+        }
+        float  offset = WXUtils.getFloat(domObject.getAttrs().get(STICKY_OFFSET));
+        return (int)(WXViewUtils.getRealPxByWidth(offset,domObject.getViewPortWidth()));
     }
 
     public Object getRenderData() {
