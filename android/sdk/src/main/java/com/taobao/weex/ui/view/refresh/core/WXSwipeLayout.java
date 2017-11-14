@@ -414,9 +414,9 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   @Override
   public void onStopNestedScroll(View child) {
     mNestedScrollingParentHelper.onStopNestedScroll(child);
+    handlerAction();
     if(isNestedScrollingEnabled()) {
       mNestedScrollInProgress = true;
-      handlerAction();
       stopNestedScroll();
     }
   }
