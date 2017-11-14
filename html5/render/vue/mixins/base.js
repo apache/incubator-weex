@@ -27,15 +27,20 @@ let lazyloadWatched = false
 function watchLazyload () {
   lazyloadWatched = true
   ; [
-    'scroll'
+    'scroll',
     // 'transitionend',
     // 'webkitTransitionEnd',
     // 'animationend',
     // 'webkitAnimationEnd',
-    // 'resize'
+    'resize'
   ].forEach(evt => {
     window.addEventListener(evt, getThrottleLazyload(25, document.body))
   })
+  /**
+   * In case the users use the body's overflow to scroll. Then the scroll
+   * event would not be triggered on the window object but on the body.
+   */
+  document.body.addEventListener('scroll', getThrottleLazyload(25, document.body))
 }
 
 let warned = false
@@ -49,6 +54,8 @@ function warnProcessStyle () {
   }
 }
 
+let idCnt = 0
+
 export default {
   beforeCreate () {
     if (!lazyloadWatched) {
@@ -56,10 +63,53 @@ export default {
     }
   },
 
+  updated () {
+    if (this._rootId) {
+      const el = this.$el
+      if (el.nodeType === 1
+        && el.className.indexOf('weex-root') <= -1) {
+        el.classList.add('weex-root')
+        el.setAttribute('data-wx-root-id', this._rootId)
+      }
+    }
+
+    const tagName = this.$options && this.$options._componentTag
+    const metaUp = weex._meta.updated
+    if (!metaUp[tagName]) {
+      metaUp[tagName] = 0
+    }
+    metaUp[tagName]++
+    /**
+     * since the updating of component may affect the layout, the lazyloading should
+     * be fired.
+     */
+    this._fireLazyload()
+  },
+
   mounted () {
-    if (!weex._root) {
-      weex._root = this.$root.$el
-      weex._root.classList.add('weex-root')
+    const tagName = this.$options && this.$options._componentTag
+    if (typeof weex._components[tagName] !== 'undefined') {
+      weex._components[tagName]++
+    }
+    const metaMt = weex._meta.mounted
+    if (!metaMt[tagName]) {
+      metaMt[tagName] = 0
+    }
+    metaMt[tagName]++
+    if (this === this.$root) {
+      const rootId = `wx-root-${idCnt++}`
+      if (!weex._root) {
+        weex._root = {}
+      }
+      weex._root[rootId] = this
+      this._rootId = rootId
+      const el = this.$el
+      if (el.nodeType !== 1) {
+        return
+      }
+      el.classList.add('weex-root')
+      el.setAttribute('data-wx-root-id', rootId)
+      this._fireLazyload(el)
     }
 
     // give warning for not using $processStyle in vue-loader config.
@@ -76,12 +126,31 @@ export default {
   },
 
   destroyed () {
+    /**
+     * if the destroyed element is above another panel with images inside, and the images
+     * moved into the viewport, then the lazyloading should be triggered.
+     */
+    if (this._rootId) {
+      delete weex._root[this._rootId]
+      delete this._rootId
+    }
+    const tagName = this.$options && this.$options._componentTag
+    if (typeof weex._components[tagName] !== 'undefined') {
+      weex._components[tagName]--
+    }
+    const metaDs = weex._meta.destroyed
+    if (!metaDs[tagName]) {
+      metaDs[tagName] = 0
+    }
+    metaDs[tagName]++
+
+    this._fireLazyload()
     triggerDisappear(this)
   },
 
   methods: {
     _fireLazyload (el) {
-      getThrottleLazyload(25)()
+      getThrottleLazyload(25, el || document.body)()
     }
   }
 }

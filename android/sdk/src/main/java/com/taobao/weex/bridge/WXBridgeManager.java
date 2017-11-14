@@ -427,12 +427,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    // if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
         .append(", tasks:").append(tasks).append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -1530,16 +1530,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-    // if (WXEnvironment.isApkDebugable()) {
+//     if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
         .append("function:").append(function);
     if (logTaskDetail)
       mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+     }
     mWXBridge.execJS(instanceId, namespace, function, args);
-  }
+//  }
 
   private void invokeInitFramework(Message msg) {
     String framework = "";

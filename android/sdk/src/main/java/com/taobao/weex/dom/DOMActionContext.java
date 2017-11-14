@@ -60,6 +60,8 @@ public interface DOMActionContext {
 
   boolean isDestory();
 
+  void markDirty();
+
   WXSDKInstance getInstance();
 
   WXDomObject getDomByRef(String ref);
