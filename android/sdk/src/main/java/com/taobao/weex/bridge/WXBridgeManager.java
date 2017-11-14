@@ -1536,9 +1536,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-     }
+//     }
     mWXBridge.execJS(instanceId, namespace, function, args);
-//  }
+  }
 
   private void invokeInitFramework(Message msg) {
     String framework = "";
