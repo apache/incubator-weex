@@ -81,24 +81,29 @@ class GetComponentRectAction implements RenderAction {
     }
   }
 
-  private void callbackViewport(RenderActionContext context, JSCallback jsCallback) {
-    WXSDKInstance instance = context.getInstance();
-    View container;
+  private void callbackViewport(RenderActionContext context, final JSCallback jsCallback) {
+    final WXSDKInstance instance = context.getInstance();
+    final View container;
     if ((container = instance.getContainerView()) != null) {
-      Map<String, Object> options = new HashMap<>();
-      Map<String, Float> sizes = new HashMap<>();
-      int[] location = new int[2];
-      instance.getContainerView().getLocationOnScreen(location);
-      int viewport = instance.getInstanceViewPortWidth();
-      sizes.put("left", 0f);
-      sizes.put("top", 0f);
-      sizes.put("right", getWebPxValue(container.getWidth(),viewport));
-      sizes.put("bottom", getWebPxValue(container.getHeight(),viewport));
-      sizes.put("width", getWebPxValue(container.getWidth(),viewport));
-      sizes.put("height", getWebPxValue(container.getHeight(),viewport));
-      options.put("size", sizes);
-      options.put("result", true);
-      jsCallback.invoke(options);
+      container.post(new Runnable() {
+        @Override
+        public void run() {
+          Map<String, Object> options = new HashMap<>();
+          Map<String, Float> sizes = new HashMap<>();
+          int[] location = new int[2];
+          instance.getContainerView().getLocationOnScreen(location);
+          int viewport = instance.getInstanceViewPortWidth();
+          sizes.put("left", 0f);
+          sizes.put("top", 0f);
+          sizes.put("right", getWebPxValue(container.getWidth(),viewport));
+          sizes.put("bottom", getWebPxValue(container.getHeight(),viewport));
+          sizes.put("width", getWebPxValue(container.getWidth(),viewport));
+          sizes.put("height", getWebPxValue(container.getHeight(),viewport));
+          options.put("size", sizes);
+          options.put("result", true);
+          jsCallback.invoke(options);
+        }
+      });
     } else {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
