@@ -264,10 +264,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = YES;
     }
-    if ([eventName isEqualToString:@"scrollStart"]) {
+    if ([eventName isEqualToString:@"scrollstart"]) {
         _scrollStartEvent = YES;
     }
-    if ([eventName isEqualToString:@"scrollEnd"]) {
+    if ([eventName isEqualToString:@"scrollend"]) {
         _scrollEndEvent = YES;
     }
 }
@@ -280,10 +280,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = NO;
     }
-    if ([eventName isEqualToString:@"scrollStart"]) {
+    if ([eventName isEqualToString:@"scrollstart"]) {
         _scrollStartEvent = NO;
     }
-    if ([eventName isEqualToString:@"scrollEnd"]) {
+    if ([eventName isEqualToString:@"scrollend"]) {
         _scrollEndEvent = NO;
     }
 }
