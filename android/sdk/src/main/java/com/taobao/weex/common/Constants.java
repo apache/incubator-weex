@@ -278,6 +278,8 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
     String ONPULLING_UP = "pullingup";
     String SCROLL = "scroll";
+    String SCROLL_START = "scrollstart";
+    String SCROLL_END = "scrollend";
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
