@@ -73,16 +73,22 @@ class UpdateStyleAction extends TraceableAction implements DOMAction, RenderActi
     mPadding = domObject.getPadding();
     mBorder = domObject.getBorder();
 
-    Map<String, Object> animationMap = new ArrayMap<>(2);
-    animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));
-    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.get(WXDomObject.TRANSFORM_ORIGIN));
+    if(mData.get(WXDomObject.TRANSFORM) != null || mData.get(WXDomObject.TRANSFORM_ORIGIN) != null){
+      if(domObject.getTransition() == null) {
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));
+        animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.get(WXDomObject.TRANSFORM_ORIGIN));
+        context.addAnimationForElement(mRef, animationMap);
+      }
+    }
 
-    context.addAnimationForElement(mRef, animationMap);
 
     if (!mData.isEmpty()) {
-      domObject.updateStyle(mData, mIsCausedByPesudo);
-      domObject.traverseTree(context.getApplyStyleConsumer());
-      context.postRenderTask(this);
+      domObject.updateStyle(mData);
+      domObject.applyStyle(mData);
+      if(!mData.isEmpty()) {
+        context.postRenderTask(this);
+      }
     }
 
     if (instance != null) {
