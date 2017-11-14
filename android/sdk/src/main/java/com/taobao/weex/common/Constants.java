@@ -287,6 +287,8 @@ public class Constants {
     String UNSTICKY = "unsticky";
     String STICKY = "sticky";
 
+    String ON_TRANSITION_END = "transitionEnd";
+
     interface SLOT_LIFECYCLE{
       String CREATE = "create";
       String ATTACH = "attach";
@@ -317,5 +319,14 @@ public class Constants {
     String PATH = "codeCachePath";
     String BANNER_DIGEST = "digest";
     String SAVE_PATH = "v8";
+  }
+
+  public interface  TimeFunction{
+    String LINEAR = "linear";
+    String EASE_IN_OUT = "ease-in-out";
+    String EASE_IN = "ease-in";
+    String EASE_OUT = "ease-out";
+    String EASE = "ease";
+    String CUBIC_BEZIER = "cubic-bezier";
   }
 }
