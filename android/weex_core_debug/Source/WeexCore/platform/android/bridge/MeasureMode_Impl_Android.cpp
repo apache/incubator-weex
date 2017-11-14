@@ -9,9 +9,9 @@ namespace WeexCore {
 }
 
 jint getEXACTLY(JNIEnv *env) {
-  return Java_MeasureMode_getEXACTLY(env,Java_MeasureMode_GET(env).Get());
+  return Java_MeasureMode_getEXACTLY(env);
 }
 
 jint getATMOST(JNIEnv *env) {
-  return Java_MeasureMode_getATMOST(env, Java_MeasureMode_GET(env).Get());
+  return Java_MeasureMode_getATMOST(env);
 }

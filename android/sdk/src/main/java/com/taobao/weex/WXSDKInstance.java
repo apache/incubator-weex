@@ -41,6 +41,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -227,6 +228,11 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   WXSDKInstance(Context context,String id) {
     mInstanceId = id;
     init(context);
+  }
+
+  @CalledByNative
+  private static WXSDKInstance getInstanceByID(String instanceId) {
+    return WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(instanceId);
   }
 
   public WXComponent getRootComponent() {

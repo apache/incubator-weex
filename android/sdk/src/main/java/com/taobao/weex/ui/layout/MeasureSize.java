@@ -18,26 +18,27 @@
  */
 package com.taobao.weex.ui.layout;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.taobao.weex.base.CalledByNative;
-import com.taobao.weex.bridge.WXJSObject;
 
-public class WXLayoutBridge {
+public class MeasureSize {
+  private int width;
+  private int height;
 
-  private native void nativeLayout();
+  @CalledByNative
+  public int getWidth() {
+    return width;
+  }
 
-  public void layout() {
-    nativeLayout();
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public int getHeight() {
+    return height;
   }
 
   @CalledByNative
-  public static void measure(int widthMeasureMode, int heightMeasureMode) {
-
+  public void setHeight(int height) {
+    this.height = height;
   }
-
-
-  public static native void registerMeasurement(ContentBoxMeasurement measurement, String type);
 }

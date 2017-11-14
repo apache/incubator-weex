@@ -10,6 +10,5 @@ namespace WeexCore {
 }
 
 void measure(JNIEnv *env) {
-  Java_ContentBoxMeasurement_measure(env, Java_ContentBoxMeasurement_Generate(env).Get(), 1.1, 2.2,
-                                     getEXACTLY(env), getATMOST(env));
+
 }

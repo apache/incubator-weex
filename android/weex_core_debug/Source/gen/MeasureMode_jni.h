@@ -27,14 +27,14 @@ jclass g_MeasureMode_clazz = NULL;
 // Step 2: method stubs.
 
 static intptr_t g_MeasureMode_getEXACTLY = 0;
-static jint Java_MeasureMode_getEXACTLY(JNIEnv* env, jobject obj) {
+static jint Java_MeasureMode_getEXACTLY(JNIEnv* env) {
   /* Must call RegisterNativesImpl()  */
-  //CHECK_CLAZZ(env, obj,
+  //CHECK_CLAZZ(env, MeasureMode_clazz(env),
   //    MeasureMode_clazz(env), 0);
   jmethodID method_id =
       base::android::GetMethod(
       env, MeasureMode_clazz(env),
-      base::android::INSTANCE_METHOD,
+      base::android::STATIC_METHOD,
       "getEXACTLY",
 
 "("
@@ -43,21 +43,21 @@ static jint Java_MeasureMode_getEXACTLY(JNIEnv* env, jobject obj) {
       &g_MeasureMode_getEXACTLY);
 
   jint ret =
-      env->CallIntMethod(obj,
+      env->CallStaticIntMethod(MeasureMode_clazz(env),
           method_id);
   base::android::CheckException(env);
   return ret;
 }
 
 static intptr_t g_MeasureMode_getATMOST = 0;
-static jint Java_MeasureMode_getATMOST(JNIEnv* env, jobject obj) {
+static jint Java_MeasureMode_getATMOST(JNIEnv* env) {
   /* Must call RegisterNativesImpl()  */
-  //CHECK_CLAZZ(env, obj,
+  //CHECK_CLAZZ(env, MeasureMode_clazz(env),
   //    MeasureMode_clazz(env), 0);
   jmethodID method_id =
       base::android::GetMethod(
       env, MeasureMode_clazz(env),
-      base::android::INSTANCE_METHOD,
+      base::android::STATIC_METHOD,
       "getATMOST",
 
 "("
@@ -66,34 +66,10 @@ static jint Java_MeasureMode_getATMOST(JNIEnv* env, jobject obj) {
       &g_MeasureMode_getATMOST);
 
   jint ret =
-      env->CallIntMethod(obj,
+      env->CallStaticIntMethod(MeasureMode_clazz(env),
           method_id);
   base::android::CheckException(env);
   return ret;
-}
-
-static intptr_t g_MeasureMode_GET = 0;
-static base::android::ScopedLocalJavaRef<jobject> Java_MeasureMode_GET(JNIEnv*
-    env) {
-  /* Must call RegisterNativesImpl()  */
-  //CHECK_CLAZZ(env, MeasureMode_clazz(env),
-  //    MeasureMode_clazz(env), NULL);
-  jmethodID method_id =
-      base::android::GetMethod(
-      env, MeasureMode_clazz(env),
-      base::android::STATIC_METHOD,
-      "GET",
-
-"("
-")"
-"Lcom/taobao/weex/ui/layout/MeasureMode;",
-      &g_MeasureMode_GET);
-
-  jobject ret =
-      env->CallStaticObjectMethod(MeasureMode_clazz(env),
-          method_id);
-  base::android::CheckException(env);
-  return base::android::ScopedLocalJavaRef<jobject>(env, ret);
 }
 
 // Step 3: RegisterNatives.

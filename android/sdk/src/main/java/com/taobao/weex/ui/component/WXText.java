@@ -29,9 +29,13 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.layout.ContentBoxMeasurement;
+import com.taobao.weex.ui.layout.MeasureMode;
+import com.taobao.weex.ui.layout.MeasureSize;
 import com.taobao.weex.ui.view.WXTextView;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 /**
  * Text component
@@ -58,6 +62,22 @@ public class WXText extends WXComponent<WXTextView> {
   public WXText(WXSDKInstance instance,
                 WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
+    setContentBoxMeasurement(new ContentBoxMeasurement() {
+      @Override
+      public MeasureSize measure(float width, float height, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode) {
+        return null;
+      }
+
+      @Override
+      public void layoutBefore() {
+
+      }
+
+      @Override
+      public void layoutAfter() {
+
+      }
+    });
   }
 
   @Override

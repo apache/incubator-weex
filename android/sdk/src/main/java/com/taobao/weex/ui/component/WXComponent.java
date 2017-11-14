@@ -47,6 +47,7 @@ import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
@@ -68,7 +69,7 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
-import com.taobao.weex.ui.layout.WXLayoutBridge;
+import com.taobao.weex.ui.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -150,6 +151,17 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   private Spacing mMargins = new Spacing();
   private Spacing mPaddings = new Spacing();
   private Spacing mBorders = new Spacing();
+
+  private ContentBoxMeasurement contentBoxMeasurement;
+
+  protected void setContentBoxMeasurement(ContentBoxMeasurement contentBoxMeasurement) {
+    this.contentBoxMeasurement = contentBoxMeasurement;
+  }
+
+  @CalledByNative
+  private ContentBoxMeasurement getContentBoxMeasurement() {
+    return contentBoxMeasurement;
+  }
 
   public @NonNull
   WXStyle getStyles() {

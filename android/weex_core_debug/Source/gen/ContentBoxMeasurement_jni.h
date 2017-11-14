@@ -28,14 +28,14 @@ jclass g_ContentBoxMeasurement_clazz = NULL;
 // Step 2: method stubs.
 
 static intptr_t g_ContentBoxMeasurement_measure = 0;
-static void Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat
-    width,
+static base::android::ScopedLocalJavaRef<jobject>
+    Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat width,
     jfloat height,
-    int widthMeasureMode,
-    int heightMeasureMode) {
+    jobject widthMeasureMode,
+    jobject heightMeasureMode) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
-  //    ContentBoxMeasurement_clazz(env));
+  //    ContentBoxMeasurement_clazz(env), NULL);
   jmethodID method_id =
       base::android::GetMethod(
       env, ContentBoxMeasurement_clazz(env),
@@ -45,17 +45,17 @@ static void Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat
 "("
 "F"
 "F"
-"I"
-"I"
+"Lcom/taobao/weex/ui/layout/MeasureMode;"
+"Lcom/taobao/weex/ui/layout/MeasureMode;"
 ")"
-"V",
+"Lcom/taobao/weex/ui/layout/MeasureSize;",
       &g_ContentBoxMeasurement_measure);
 
-     env->CallVoidMethod(obj,
-          method_id, width, height, int(widthMeasureMode),
-              int(heightMeasureMode));
+  jobject ret =
+      env->CallObjectMethod(obj,
+          method_id, width, height, widthMeasureMode, heightMeasureMode);
   base::android::CheckException(env);
-
+  return base::android::ScopedLocalJavaRef<jobject>(env, ret);
 }
 
 static intptr_t g_ContentBoxMeasurement_layoutBefore = 0;
@@ -100,30 +100,6 @@ static void Java_ContentBoxMeasurement_layoutAfter(JNIEnv* env, jobject obj) {
           method_id);
   base::android::CheckException(env);
 
-}
-
-static intptr_t g_ContentBoxMeasurement_Generate = 0;
-static base::android::ScopedLocalJavaRef<jobject>
-    Java_ContentBoxMeasurement_Generate(JNIEnv* env) {
-  /* Must call RegisterNativesImpl()  */
-  //CHECK_CLAZZ(env, ContentBoxMeasurement_clazz(env),
-  //    ContentBoxMeasurement_clazz(env), NULL);
-  jmethodID method_id =
-      base::android::GetMethod(
-      env, ContentBoxMeasurement_clazz(env),
-      base::android::STATIC_METHOD,
-      "Generate",
-
-"("
-")"
-"Lcom/taobao/weex/ui/layout/ContentBoxMeasurement;",
-      &g_ContentBoxMeasurement_Generate);
-
-  jobject ret =
-      env->CallStaticObjectMethod(ContentBoxMeasurement_clazz(env),
-          method_id);
-  base::android::CheckException(env);
-  return base::android::ScopedLocalJavaRef<jobject>(env, ret);
 }
 
 // Step 3: RegisterNatives.

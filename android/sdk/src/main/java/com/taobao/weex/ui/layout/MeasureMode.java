@@ -22,40 +22,17 @@ import com.taobao.weex.base.CalledByNative;
 
 public class MeasureMode {
 
-  private static int EXACTLY = 0;
+  public static int EXACTLY = 0;
 
-  private static int ATMOST = 1;
-
-  private int MEASURE_MODE = ATMOST;
-
-  public boolean isEXACTLY() {
-    return MEASURE_MODE == EXACTLY ? true : false;
-  }
-
-  public boolean isATMOST() {
-    return MEASURE_MODE == ATMOST ? true : false;
-  }
-
-  public void EXACTLY() {
-    MEASURE_MODE = EXACTLY;
-  }
-
-  public void ATMOST() {
-    MEASURE_MODE = ATMOST;
-  }
+  public static int ATMOST = 1;
 
   @CalledByNative
-  public int getEXACTLY() {
+  public static int getEXACTLY() {
     return EXACTLY;
   }
 
   @CalledByNative
-  public int getATMOST() {
+  public static int getATMOST() {
     return ATMOST;
-  }
-
-  @CalledByNative
-  public static MeasureMode GET() {
-    return new MeasureMode();
   }
 }

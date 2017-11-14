@@ -32,9 +32,11 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/ExtendJSApi.cpp
     ./WeexCore/platform/android/WeexProxy.cpp
     ./WeexCore/platform/android/WeexCore.cpp
-    ./WeexCore/platform/android/layoutbridge/WXLayoutBridge_Impl_Android.cpp
-    ./WeexCore/platform/android/layoutbridge/MeasureMode_Impl_Android.cpp
-    ./WeexCore/platform/android/layoutbridge/ContentBoxMeasurement_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/MeasureMode_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/ContentBoxMeasurement_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/WXSDKInstance_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/WXComponent_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/MeasureSize_Impl_Android.cpp
 
     ./WeexCore/render/RenderManager.cpp
     ./WeexCore/render/RenderObject.cpp

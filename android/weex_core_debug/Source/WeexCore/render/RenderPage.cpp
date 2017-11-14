@@ -1,4 +1,5 @@
 #include "RenderPage.h"
+#include <WeexCore/platform/android/bridge/WXSDKInstance_Impl_Android.h>
 
 namespace WeexCore {
 
@@ -20,6 +21,10 @@ namespace WeexCore {
 
   RenderPage::RenderPage(std::string pageID, std::string data) {
     mPageId = pageID;
+
+    JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(mPageId.c_str());
+    mSDKInstance_Impl = getSDKInstanceByID(env,jPageId);
 
     int alen = data.length();
     char *c_data = (char *) malloc(alen + 1);

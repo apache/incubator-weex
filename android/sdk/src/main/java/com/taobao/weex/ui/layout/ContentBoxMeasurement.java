@@ -18,34 +18,23 @@
  */
 package com.taobao.weex.ui.layout;
 
-import android.icu.util.Measure;
 import android.support.annotation.NonNull;
 import android.text.Layout;
-import android.util.Log;
 import android.util.Pair;
 
 import com.taobao.weex.base.CalledByNative;
+import com.taobao.weex.dom.WXStyle;
 
-public class ContentBoxMeasurement {
+import java.util.HashMap;
 
-  @CalledByNative
-  private Pair<Float, Float> measure(float width, float height, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode) {
-    Log.i("ContentBoxMeasurement", "measure");
-    return new Pair<Float, Float>(0.0f, 0.0f);
-  }
+public abstract class ContentBoxMeasurement {
 
   @CalledByNative
-  private void layoutBefore() {
-    Log.i("ContentBoxMeasurement", "layoutBefore");
-  }
+  public abstract MeasureSize measure(float width, float height, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode);
 
   @CalledByNative
-  private void layoutAfter(Layout layout) {
-    Log.i("ContentBoxMeasurement", "layoutBefore");
-  }
+  public abstract void layoutBefore();
 
   @CalledByNative
-  private static ContentBoxMeasurement Generate() {
-    return new ContentBoxMeasurement();
-  }
+  public abstract void layoutAfter();
 }
