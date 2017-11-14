@@ -3,28 +3,43 @@
     {
       "extent" : "full-screen",
       "idiom" : "iphone",
-      "subtype" : "736h",
-      "filename" : "Default@3x.png",
-      "minimum-system-version" : "8.0",
+      "subtype" : "2436h",
+      "filename" : "iPhoneX@3x.png",
+      "minimum-system-version" : "11.0",
       "orientation" : "portrait",
       "scale" : "3x"
     },
     {
       "extent" : "full-screen",
       "idiom" : "iphone",
-      "subtype" : "736h",
-      "filename" : "Default@3x-1.png",
-      "minimum-system-version" : "8.0",
+      "subtype" : "2436h",
+      "filename" : "iPhoneX@3x-1.png",
+      "minimum-system-version" : "11.0",
       "orientation" : "landscape",
       "scale" : "3x"
     },
     {
-      "extent" : "full-screen",
-      "idiom" : "iphone",
-      "subtype" : "667h",
-      "filename" : "Default-4.7@2x.png",
-      "minimum-system-version" : "8.0",
       "orientation" : "portrait",
+      "idiom" : "iphone",
+      "extent" : "full-screen",
+      "minimum-system-version" : "8.0",
+      "subtype" : "736h",
+      "scale" : "3x"
+    },
+    {
+      "orientation" : "landscape",
+      "idiom" : "iphone",
+      "extent" : "full-screen",
+      "minimum-system-version" : "8.0",
+      "subtype" : "736h",
+      "scale" : "3x"
+    },
+    {
+      "orientation" : "portrait",
+      "idiom" : "iphone",
+      "extent" : "full-screen",
+      "minimum-system-version" : "8.0",
+      "subtype" : "667h",
       "scale" : "2x"
     },
     {
@@ -140,6 +155,36 @@
       "orientation" : "landscape",
       "idiom" : "ipad",
       "extent" : "full-screen",
+      "scale" : "2x"
+    },
+    {
+      "extent" : "full-screen",
+      "idiom" : "iphone",
+      "subtype" : "736h",
+      "filename" : "Default@3x.png",
+      "minimum-system-version" : "8.0",
+      "orientation" : "portrait",
+      "unassigned" : true,
+      "scale" : "3x"
+    },
+    {
+      "extent" : "full-screen",
+      "idiom" : "iphone",
+      "subtype" : "736h",
+      "filename" : "Default@3x-1.png",
+      "minimum-system-version" : "8.0",
+      "orientation" : "landscape",
+      "unassigned" : true,
+      "scale" : "3x"
+    },
+    {
+      "extent" : "full-screen",
+      "idiom" : "iphone",
+      "subtype" : "667h",
+      "filename" : "Default-4.7@2x.png",
+      "minimum-system-version" : "8.0",
+      "orientation" : "portrait",
+      "unassigned" : true,
       "scale" : "2x"
     }
   ],
