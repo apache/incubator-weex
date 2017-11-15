@@ -31,8 +31,8 @@ static intptr_t g_ContentBoxMeasurement_measure = 0;
 static base::android::ScopedLocalJavaRef<jobject>
     Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat width,
     jfloat height,
-    jobject widthMeasureMode,
-    jobject heightMeasureMode) {
+    int widthMeasureMode,
+    int heightMeasureMode) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
   //    ContentBoxMeasurement_clazz(env), NULL);
@@ -45,15 +45,16 @@ static base::android::ScopedLocalJavaRef<jobject>
 "("
 "F"
 "F"
-"Lcom/taobao/weex/ui/layout/MeasureMode;"
-"Lcom/taobao/weex/ui/layout/MeasureMode;"
+"I"
+"I"
 ")"
 "Lcom/taobao/weex/ui/layout/MeasureSize;",
       &g_ContentBoxMeasurement_measure);
 
   jobject ret =
       env->CallObjectMethod(obj,
-          method_id, width, height, widthMeasureMode, heightMeasureMode);
+          method_id, width, height, int(widthMeasureMode),
+              int(heightMeasureMode));
   base::android::CheckException(env);
   return base::android::ScopedLocalJavaRef<jobject>(env, ret);
 }
