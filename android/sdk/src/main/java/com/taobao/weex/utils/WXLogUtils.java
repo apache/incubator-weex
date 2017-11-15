@@ -73,18 +73,17 @@ public class WXLogUtils {
 	  sLogWatcher.onLog(level.getName(), tag, msg);
 	}
 
-    if (msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
-      if (sLogWatcher != null ) {
-        sLogWatcher.onLog(level.getName(), tag, msg);
-      }else{
+	if (WXEnvironment.isApkDebugable()) {
         Log.println(level.getPriority(),tag, msg);
-      }
-
       // if not debug level then print log
-      if(WXEnvironment.isApkDebugable() && !level.getName().equals("debug")){
+      if(!level.getName().equals("debug")){
 		writeConsoleLog(level.getName(), msg);
 	  }
-    }
+    }else {
+	  if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
+		Log.println(level.getPriority(),tag, msg);
+	  }
+	}
   }
 
   public static void d(String msg) {
@@ -121,33 +120,36 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
-    if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
-      if ("jsLog".equals(tag) && jsLogWatcher != null) {
-        if (msg.endsWith("__DEBUG")) {
-          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
-        } else if (msg.endsWith("__INFO")) {
-          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__INFO", ""));
-        } else if (msg.endsWith("__WARN")) {
-          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__WARN", ""));
-        } else if (msg.endsWith("__ERROR")) {
-          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__ERROR", ""));
-        } else {
-          jsLogWatcher.onJsLog(Log.DEBUG, msg);
-        }
-      }
+	if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
+	  log(tag, msg, LogLevel.DEBUG);
 
-      /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
-      writeConsoleLog("debug", tag + ":" + msg);
-      if(msg.contains(" | __")){
-        String[] msgs=msg.split(" | __");
-        LogLevel level;
-        if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
-          level=getLogLevel(msgs[2]);
-          return;
-        }
-      }
-      log(tag, msg, LogLevel.DEBUG);
-    }
+	  if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
+		if ("jsLog".equals(tag) && jsLogWatcher != null) {
+		  if (msg.endsWith("__DEBUG")) {
+			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
+		  } else if (msg.endsWith("__INFO")) {
+			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__INFO", ""));
+		  } else if (msg.endsWith("__WARN")) {
+			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__WARN", ""));
+		  } else if (msg.endsWith("__ERROR")) {
+			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__ERROR", ""));
+		  } else {
+			jsLogWatcher.onJsLog(Log.DEBUG, msg);
+		  }
+		}
+
+		/** This log method will be invoked from jni code, so try to extract loglevel from message. **/
+		writeConsoleLog("debug", tag + ":" + msg);
+		if(msg.contains(" | __")){
+		  String[] msgs=msg.split(" | __");
+		  LogLevel level;
+		  if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
+			level=getLogLevel(msgs[2]);
+			return;
+		  }
+		}
+	  }
+	}
   }
 
   private static LogLevel getLogLevel(String level) {
