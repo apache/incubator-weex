@@ -154,6 +154,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)_addEventOnMainThread:(NSString *)addEventName
 {
+    if (![self isViewLoaded]) {
+        //This action will be ignored While the view is loaded,
+        //then it will initEvent according to the records in _events
+        return;
+    }
     WX_ADD_EVENT(appear, addAppearEvent)
     WX_ADD_EVENT(disappear, addDisappearEvent)
     

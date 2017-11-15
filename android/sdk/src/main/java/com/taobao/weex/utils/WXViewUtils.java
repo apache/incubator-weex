@@ -136,6 +136,11 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
+  @Deprecated
+  public static int setScreenWidth(int screenWidth) {
+     return mScreenWidth = screenWidth;
+  }
+
   public static float getScreenDensity(Context ctx){
     if(ctx != null){
       try{
