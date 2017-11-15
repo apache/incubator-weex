@@ -27,7 +27,7 @@ jclass g_MeasureSize_clazz = NULL;
 // Step 2: method stubs.
 
 static intptr_t g_MeasureSize_getWidth = 0;
-static jint Java_MeasureSize_getWidth(JNIEnv* env, jobject obj) {
+static jfloat Java_MeasureSize_getWidth(JNIEnv* env, jobject obj) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
   //    MeasureSize_clazz(env), 0);
@@ -39,11 +39,11 @@ static jint Java_MeasureSize_getWidth(JNIEnv* env, jobject obj) {
 
 "("
 ")"
-"I",
+"F",
       &g_MeasureSize_getWidth);
 
-  jint ret =
-      env->CallIntMethod(obj,
+  jfloat ret =
+      env->CallFloatMethod(obj,
           method_id);
   base::android::CheckException(env);
   return ret;

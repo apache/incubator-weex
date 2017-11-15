@@ -21,11 +21,11 @@ package com.taobao.weex.ui.layout;
 import com.taobao.weex.base.CalledByNative;
 
 public class MeasureSize {
-  private int width;
-  private int height;
+  private float width;
+  private float height;
 
   @CalledByNative
-  public int getWidth() {
+  public float getWidth() {
     return width;
   }
 
@@ -33,7 +33,7 @@ public class MeasureSize {
     this.width = width;
   }
 
-  public int getHeight() {
+  public float getHeight() {
     return height;
   }
 
