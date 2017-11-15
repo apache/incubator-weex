@@ -123,9 +123,10 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
-	log(tag, msg, LogLevel.DEBUG);
+	if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
+	  log(tag, msg, LogLevel.DEBUG);
 
-	if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
+	  if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
 		if ("jsLog".equals(tag) && jsLogWatcher != null) {
 		  if (msg.endsWith("__DEBUG")) {
 			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
@@ -151,7 +152,8 @@ public class WXLogUtils {
 			return;
 		  }
 		}
-	  sendLog(LogLevel.DEBUG, tag + ":" + msg);// WXDebugTool sendLog
+		sendLog(LogLevel.DEBUG, tag + ":" + msg);// WXDebugTool sendLog
+	  }
 	}
   }
 
