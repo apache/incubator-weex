@@ -54,7 +54,9 @@
     NSMutableDictionary *_styles;
     NSMutableDictionary *_attributes;
     NSMutableArray *_events;
-    
+    // To make sure view's gestureRecognizers won't be lost.
+    NSArray<UIGestureRecognizer*>* _gestureEnsurance;
+
     // Protects properties styles/attributes/events/subcomponents which will be accessed from multiple threads.
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
@@ -313,9 +315,8 @@
         }
         
         [self viewWillLoad];
-        
         _view = [self loadView];
-        
+        _gestureEnsurance = _view.gestureRecognizers;
         _layer = _view.layer;
         _view.frame = _calculatedFrame;
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
@@ -380,6 +381,11 @@
         
         [self setNeedsDisplay];
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
+        if(_gestureEnsurance && !_view.gestureRecognizers) {
+            for(UIGestureRecognizer* rec in _gestureEnsurance) {
+                [_view addGestureRecognizer:rec];
+            }
+        }
         [self viewDidLoad];
         
         if (_lazyCreateView) {
