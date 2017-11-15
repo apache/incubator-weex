@@ -21,6 +21,6 @@ package com.taobao.weex.ui.component.pesudo;
 /**
  * Created by sospartan on 05/01/2017.
  */
-public interface OnActivePseudoListner {
+public interface OnActivePseudoListener {
   void updateActivePseudo(boolean isSet);
 }
