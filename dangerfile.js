@@ -290,15 +290,15 @@ filesToVerifySrcHeader.forEach(filepath => {
  * will be seperated to a danger plugin
  */
 
-console.log('findReviewer')
-schedule(new Promise((resolve, reject) => {
-  try {
-    findReviewer(resolve, reject)
-  } catch (e) {
-    console.log(e)
-    resolve()
-  }
-}));
+// console.log('findReviewer')
+// schedule(new Promise((resolve, reject) => {
+//   try {
+//     findReviewer(resolve, reject)
+//   } catch (e) {
+//     console.log(e)
+//     resolve()
+//   }
+// }));
 
 function findReviewer(resolve, reject) {
   var github = new GitHubApi({
