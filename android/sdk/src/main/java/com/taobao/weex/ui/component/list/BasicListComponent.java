@@ -58,13 +58,13 @@ import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
-import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -78,7 +78,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -113,6 +112,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
+  private boolean mHasAddScrollEvent = false;
 
   private RecyclerView.ItemAnimator mItemAnimator;
 
@@ -148,6 +148,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    **/
   private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
   private WXStickyHelper stickyHelper;
+
+
+  /**
+   * scroll start and scroll end event
+   * */
+  private ScrollStartEndHelper mScrollStartEndHelper;
 
 
 
@@ -1204,7 +1210,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
+    if (ScrollStartEndHelper.isScrollEvent(type)
+            && getHostView() != null
+            && getHostView().getInnerView() != null
+            && !mHasAddScrollEvent) {
+      mHasAddScrollEvent = true;
       WXRecyclerView innerView = getHostView().getInnerView();
       innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
         private int offsetXCorrection, offsetYCorrection;
@@ -1230,7 +1240,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             offsetX = offsetX - offsetXCorrection;
             offsetY = offsetY - offsetYCorrection;
           }
-
+          getScrollStartEndHelper().onScrolled(offsetX, offsetY);
+          if(!getDomObject().getEvents().contains(Constants.Event.SCROLL)){
+            return;
+          }
           if (mFirstEvent) {
             //skip first event
             mFirstEvent = false;
@@ -1251,6 +1264,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+    fireEvent(Constants.Event.SCROLL, getScrollEvent(recyclerView, offsetX, offsetY));
+  }
+
+  public Map<String, Object> getScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY){
     if(getOrientation() == Constants.Orientation.VERTICAL){
       offsetY = - calcContentOffset(recyclerView);
     }
@@ -1274,8 +1291,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
     event.put(Constants.Name.CONTENT_SIZE, contentSize);
     event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-    fireEvent(Constants.Event.SCROLL, event);
+    return event;
   }
 
   private boolean shouldReport(int offsetX, int offsetY) {
@@ -1355,5 +1371,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
     //Unhandled LayoutManager type
     return -1;
+  }
+
+  public ScrollStartEndHelper getScrollStartEndHelper() {
+    if(mScrollStartEndHelper == null){
+       mScrollStartEndHelper = new ScrollStartEndHelper(this);
+    }
+    return mScrollStartEndHelper;
   }
 }
