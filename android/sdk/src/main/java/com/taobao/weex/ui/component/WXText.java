@@ -63,8 +63,9 @@ public class WXText extends WXComponent<WXTextView> {
                 WXVContainer parent, WXUIAction action) {
     super(instance, parent,action);
     setContentBoxMeasurement(new ContentBoxMeasurement() {
+
       @Override
-      public MeasureSize measure(float width, float height, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode) {
+      public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         return null;
       }
 
@@ -74,7 +75,7 @@ public class WXText extends WXComponent<WXTextView> {
       }
 
       @Override
-      public void layoutAfter() {
+      public void layoutAfter(float computedWidth, float computedHeight) {
 
       }
     });

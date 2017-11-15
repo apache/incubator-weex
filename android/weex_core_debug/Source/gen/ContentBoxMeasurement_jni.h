@@ -82,7 +82,9 @@ static void Java_ContentBoxMeasurement_layoutBefore(JNIEnv* env, jobject obj) {
 }
 
 static intptr_t g_ContentBoxMeasurement_layoutAfter = 0;
-static void Java_ContentBoxMeasurement_layoutAfter(JNIEnv* env, jobject obj) {
+static void Java_ContentBoxMeasurement_layoutAfter(JNIEnv* env, jobject obj,
+    jfloat computedWidth,
+    jfloat computedHeight) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
   //    ContentBoxMeasurement_clazz(env));
@@ -93,12 +95,14 @@ static void Java_ContentBoxMeasurement_layoutAfter(JNIEnv* env, jobject obj) {
       "layoutAfter",
 
 "("
+"F"
+"F"
 ")"
 "V",
       &g_ContentBoxMeasurement_layoutAfter);
 
      env->CallVoidMethod(obj,
-          method_id);
+          method_id, computedWidth, computedHeight);
   base::android::CheckException(env);
 
 }
