@@ -236,6 +236,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(itemViewCacheSize != 2) {
             bounceRecyclerView.getInnerView().setItemViewCacheSize(itemViewCacheSize);
         }
+        if(bounceRecyclerView.getSwipeLayout()  != null){
+            if(WXUtils.getBoolean(getDomObject().getAttrs().get("nestedScrollingEnabled"), false)) {
+                bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
+            }
+        }
         bounceRecyclerView.getInnerView().setHasFixedSize(hasFixedSize);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
         bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
