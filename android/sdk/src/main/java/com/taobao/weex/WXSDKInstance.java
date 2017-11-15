@@ -18,8 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +36,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -80,6 +79,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -89,6 +89,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -1003,9 +1005,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           if ( mContext != null) {
             onViewAppear();
             View wxView= mRenderContainer;
-            if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
-              wxView = WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
-            }
             if(mRenderListener != null) {
               mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
             }
