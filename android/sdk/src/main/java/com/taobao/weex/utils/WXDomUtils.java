@@ -21,6 +21,7 @@ package com.taobao.weex.utils;
 
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.Spacing;
 
@@ -78,5 +79,24 @@ public class WXDomUtils {
       rawHeight -= bottomBorder;
     }
     return rawHeight;
+  }
+
+  public static float getContentWidth(WXStyle style, float layoutWidth, int viewport){
+    float leftPadding, rightPadding, leftBorder, rightBorder;
+
+    if (!CSSConstants.isUndefined((leftPadding = style.getPaddingLeft(viewport)))) {
+      layoutWidth -= leftPadding;
+    }
+    if (!CSSConstants.isUndefined((rightPadding = style.getPaddingRight(viewport)))) {
+      layoutWidth -= rightPadding;
+    }
+
+    if (!CSSConstants.isUndefined(leftBorder = style.getBorderLeftWidth(viewport))) {
+      layoutWidth -= leftBorder;
+    }
+    if (!CSSConstants.isUndefined(rightBorder = style.getBorderRightWidth(viewport))) {
+      layoutWidth -= rightBorder;
+    }
+    return layoutWidth;
   }
 }
