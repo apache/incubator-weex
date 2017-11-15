@@ -29,7 +29,7 @@ public class MeasureSize {
     return width;
   }
 
-  public void setWidth(int width) {
+  public void setWidth(float width) {
     this.width = width;
   }
 
@@ -38,7 +38,7 @@ public class MeasureSize {
   }
 
   @CalledByNative
-  public void setHeight(int height) {
+  public void setHeight(float height) {
     this.height = height;
   }
 }
