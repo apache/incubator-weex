@@ -26,6 +26,8 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
 
 @interface WXScrollerComponnetView:UIScrollView
 @end
@@ -78,6 +80,8 @@
     NSString *_direction;
     BOOL _showScrollBar;
     BOOL _pagingEnabled;
+    
+    BOOL _shouldNotifiAppearDescendantView;
 
     css_node_t *_scrollerCSSNode;
     
@@ -141,6 +145,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
               isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]))) &&
              self.cssNode->style.flex <= 0.0) {
             self.cssNode->style.flex = 1.0;
+        }
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
+            _shouldNotifiAppearDescendantView = shouldNotifiAppearDescendantView;
+            
         }
     }
     
@@ -604,7 +614,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     // notify action for appear
     NSArray *listenerArrayCopy = [self.listenerArray copy];
     for(WXScrollToTarget *target in listenerArrayCopy){
-        [self scrollToTarget:target scrollRect:scrollRect];
+        if (_shouldNotifiAppearDescendantView) {
+            // if target component is descendant of scrollerview, it should notify the appear event handler, or here will skip this appear calculation.
+            if ([target.target isViewLoaded] && [target.target.view isDescendantOfView:self.view]) {
+                [self scrollToTarget:target scrollRect:scrollRect];
+            }
+        } else {
+            [self scrollToTarget:target scrollRect:scrollRect];
+        }
     }
 }
 
