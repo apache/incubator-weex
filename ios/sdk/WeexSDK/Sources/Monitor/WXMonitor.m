@@ -165,6 +165,8 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         commitDict[commitKey] = @([end integerValue] - [start integerValue]);
     }
     
+    commitDict[@"instanceId"] = [instance instanceId]?:@"";
+    
     id<WXAppMonitorProtocol> appMonitor = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
     if (appMonitor && [appMonitor respondsToSelector:@selector(commitAppMonitorArgs:)]){
         [appMonitor commitAppMonitorArgs:commitDict];

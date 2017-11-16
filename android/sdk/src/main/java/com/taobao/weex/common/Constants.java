@@ -184,6 +184,9 @@ public class Constants {
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
 
+    String DIRECTION = "direction";
+    String RTL = "rtl";
+    
     String STICKY_OFFSET = "stickyOffset";
     String HAS_FIXED_SIZE = "hasFixedSize";
     String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
@@ -204,6 +207,7 @@ public class Constants {
     String VIF_FALSE = "ifFalse";
     String UNDEFINED = "undefined";
     String FLAT = "flat";
+    String RIPPLE_ENABLED = "rippleEnabled";
   }
 
   public interface Value {
@@ -278,6 +282,8 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
     String ONPULLING_UP = "pullingup";
     String SCROLL = "scroll";
+    String SCROLL_START = "scrollstart";
+    String SCROLL_END = "scrollend";
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
@@ -286,6 +292,8 @@ public class Constants {
 
     String UNSTICKY = "unsticky";
     String STICKY = "sticky";
+
+    String ON_TRANSITION_END = "transitionEnd";
 
     interface SLOT_LIFECYCLE{
       String CREATE = "create";
@@ -317,5 +325,14 @@ public class Constants {
     String PATH = "codeCachePath";
     String BANNER_DIGEST = "digest";
     String SAVE_PATH = "v8";
+  }
+
+  public interface  TimeFunction{
+    String LINEAR = "linear";
+    String EASE_IN_OUT = "ease-in-out";
+    String EASE_IN = "ease-in";
+    String EASE_OUT = "ease-out";
+    String EASE = "ease";
+    String CUBIC_BEZIER = "cubic-bezier";
   }
 }
