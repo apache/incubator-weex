@@ -23,12 +23,16 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -80,6 +84,8 @@ public class WXEnvironment {
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
+
+  private static String sGlobalFontFamily;
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -279,4 +285,21 @@ public class WXEnvironment {
     return path;
   }
 
+  public static String getGlobalFontFamilyName() {
+    return sGlobalFontFamily;
+  }
+
+  public static void setGlobalFontFamily(String fontFamilyName, Typeface typeface) {
+    WXLogUtils.d("GlobalFontFamily", "Set global font family: " + fontFamilyName);
+    sGlobalFontFamily = fontFamilyName;
+    if (!TextUtils.isEmpty(fontFamilyName)) {
+      if (typeface == null) {
+        TypefaceUtil.removeFontDO(fontFamilyName);
+      } else {
+        FontDO nativeFontDO = new FontDO(fontFamilyName, typeface);
+        TypefaceUtil.putFontDO(nativeFontDO);
+        WXLogUtils.d("TypefaceUtil", "Add new font: " + fontFamilyName);
+      }
+    }
+  }
 }

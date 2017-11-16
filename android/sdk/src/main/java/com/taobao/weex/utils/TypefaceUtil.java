@@ -57,6 +57,11 @@ public class TypefaceUtil {
     return sCacheMap.get(fontFamilyName);
   }
 
+  public static void removeFontDO(String fontFamilyName) {
+    WXLogUtils.d(TAG, fontFamilyName + " has removed");
+    sCacheMap.remove(fontFamilyName);
+  }
+
   public static void applyFontStyle(Paint paint, int style, int weight, String family) {
     int oldStyle;
     Typeface typeface = paint.getTypeface();
