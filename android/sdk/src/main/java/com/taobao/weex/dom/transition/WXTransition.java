@@ -315,6 +315,7 @@ public class WXTransition {
             switch (property){
                 case Constants.Name.OPACITY:{
                     holders.add(PropertyValuesHolder.ofFloat(View.ALPHA, taregtView.getAlpha(), WXUtils.getFloat(value, 1.0f)));
+                    taregtView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //hardware or none has bug on some platform
                 }
                 break;
                 case Constants.Name.BACKGROUND_COLOR:{
