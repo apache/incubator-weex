@@ -35,7 +35,6 @@ public class WXLogUtils {
   public static final String WEEX_TAG = "weex";
   public static final String WEEX_PERF_TAG = "weex_perf";
 
-  private static final String CLAZZ_NAME_DEBUG_TOOL = "com.taobao.weex.WXDebugTool";
   private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
 
   private static StringBuilder builder = new StringBuilder(50);
@@ -44,7 +43,6 @@ public class WXLogUtils {
   private static LogWatcher sLogWatcher;
 
   static {
-    clazzMaps.put(CLAZZ_NAME_DEBUG_TOOL, loadClass(CLAZZ_NAME_DEBUG_TOOL));
     clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
   }
 
@@ -80,7 +78,6 @@ public class WXLogUtils {
       // if not debug level then print log
       if(!level.getName().equals("debug")){
 		writeConsoleLog(level.getName(), msg);
-		sendLog(level, msg);
 	  }
     }else {
 	  if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
@@ -123,9 +120,10 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
-	log(tag, msg, LogLevel.DEBUG);
+	if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
+	  log(tag, msg, LogLevel.DEBUG);
 
-	if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
+	  if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
 		if ("jsLog".equals(tag) && jsLogWatcher != null) {
 		  if (msg.endsWith("__DEBUG")) {
 			jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
@@ -147,11 +145,10 @@ public class WXLogUtils {
 		  LogLevel level;
 		  if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
 			level=getLogLevel(msgs[2]);
-			sendLog(level,msgs[0]);
 			return;
 		  }
 		}
-	  sendLog(LogLevel.DEBUG, tag + ":" + msg);// WXDebugTool sendLog
+	  }
 	}
   }
 
@@ -287,20 +284,6 @@ public class WXLogUtils {
         }
       } catch (Exception e) {
         Log.d(WEEX_TAG, "LogUtil not found!");
-      }
-    }
-  }
-
-  private static void sendLog(LogLevel level, String msg) {
-    if(WXEnvironment.isApkDebugable()){
-      try {
-        Class<?> clazz = clazzMaps.get(CLAZZ_NAME_DEBUG_TOOL);
-        if (clazz != null) {
-          Method m = clazz.getMethod("sendLog", LogLevel.class,String.class);
-          m.invoke(clazz, level,msg);
-        }
-      } catch (Exception e) {
-        Log.d(WEEX_TAG, "WXDebugTool not found!");
       }
     }
   }
