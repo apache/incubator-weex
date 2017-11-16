@@ -65,6 +65,7 @@
     BOOL _scrollEvent;
     BOOL _scrollStartEvent;
     BOOL _scrollEndEvent;
+    BOOL _isScrolling;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
@@ -544,7 +545,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
              @"type":@"pullingdown"
     }];
     _lastContentOffset = scrollView.contentOffset;
-    
     // check sticky
     [self adjustSticky];
     [self handleAppear];
@@ -592,16 +592,20 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else {
         inset.bottom = 0;
     }
-    
     [scrollView setContentInset:inset];
-    if (_scrollEndEvent) {
-        CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-        NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
-        NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
-        [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
-    }
 }
 
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (_scrollEndEvent) {
+        if (!_isScrolling) {
+            CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+            NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
+            NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
+            [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        }
+    }
+}
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     [_loadingComponent.view setHidden:NO];
@@ -616,6 +620,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (_loadingComponent && scrollView.contentOffset.y > 0 &&
         scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
         [_loadingComponent loading];
+    }
+    if (!decelerate) {
+        _isScrolling = NO;
     }
 }
 
