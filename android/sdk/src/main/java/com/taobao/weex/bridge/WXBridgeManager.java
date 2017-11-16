@@ -1752,7 +1752,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         post(new Runnable() {
           @Override
           public void run() {
-            invokeRegisterModules(modules, mRegisterComponentFailList);
+            (modules, mRegisterComponentFailList);
           }
         }, null);
       }
@@ -1817,7 +1817,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private void invokeRegisterModules(Map<String, Object> modules, List<Map<String, Object>> failReceiver) {
     if (modules == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.d("[WXBridgeManager] invokeRegisterModules: framework.js uninitialized.");
+        WXLogUtils.d("[WXinvokeRegisterModulesBridgeManager] invokeRegisterModules: framework.js uninitialized.");
       }
       failReceiver.add(modules);
       return;
@@ -1828,6 +1828,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args);
     } catch (Throwable e) {
+	  WXExceptionUtils.commitCriticalExceptionRT(null,
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES.getErrorCode(),
+			  "invokeRegisterModules", WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES.getErrorMsg() +
+			  " \n " + e.getMessage() + modules.entrySet().toString(),
+			  null );
+
       WXLogUtils.e("[WXBridgeManager] invokeRegisterModules:", e);
       commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_EXECUTE, "invokeRegisterModules");
     }

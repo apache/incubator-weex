@@ -205,7 +205,7 @@ public class WXSDKEngine {
 		  WXExceptionUtils.commitCriticalExceptionRT(null,
 				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
 				  "doInitInternal",
-				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInitSuccess false",
+				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
 				  null);
 
           return;

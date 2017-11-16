@@ -28,7 +28,9 @@ import android.telephony.TelephonyManager;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -166,8 +168,8 @@ public class WXEnvironment {
    */
   public static boolean isSupport() {
     boolean isInitialized = WXSDKEngine.isInitialized();
-    if(WXEnvironment.isApkDebugable()){
-      WXLogUtils.d("WXSDKEngine.isInitialized():" + isInitialized);
+    if(!isInitialized){
+      WXLogUtils.e("WXSDKEngine.isInitialized():" + isInitialized);
     }
     return isHardwareSupport() && isInitialized;
   }
@@ -182,6 +184,12 @@ public class WXEnvironment {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("isTableDevice:" + WXUtils.isTabletDevice());
     }
+    if(!WXUtils.isTabletDevice()){
+	  WXExceptionUtils.commitCriticalExceptionRT(null,
+			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT.getErrorCode(),
+			  "isHardwareSupport", WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT.getErrorMsg(),
+			  null);
+	}
     return isCPUSupport() && !WXUtils.isTabletDevice();
   }
 
