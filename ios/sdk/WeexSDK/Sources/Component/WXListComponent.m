@@ -58,6 +58,12 @@
     if (fabs(contentOffset.y) < 0.5) {
         contentOffset.y = 0;
     }
+    if (isnan(contentOffset.x)) {
+        contentOffset.x = 0;
+    }
+    if(isnan(contentOffset.y)) {
+        contentOffset.y = 0;
+    }
     
     [super setContentOffset:contentOffset];
 }

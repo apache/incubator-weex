@@ -166,10 +166,10 @@
     _cssNode->layout.should_update = false;
     _isLayoutDirty = NO;
     
-    CGRect newFrame = CGRectMake(WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]),
-                                 WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
+    CGRect newFrame = CGRectMake(isnan(WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]))?0:WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]),
+                                 isnan(WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]))?0:WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]),
+                                 isnan(WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]))?0:WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
+                                 isnan(WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]))?0:WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
     
     BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
