@@ -348,16 +348,14 @@
 - (void)parseTranslate:(NSArray *)value
 {
     [self parseTranslatex:value[0]];
-    if ([value count] > 1) {
-        [self parseTranslatey:value[1]];
-    }
+    [self parseTranslatey:value[1]];
 }
 
-- (void)parseTranslatex:(id)value
+- (void)parseTranslatex:(NSArray *)value
 {
     WXLength *translateX;
-    double x = [value doubleValue];
-    if ([value hasSuffix:@"%"]) {
+    double x = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
         translateX = [WXLength lengthWithFloat:x type:WXLengthTypePercent];
     } else {
         x = WXPixelScale(x, self.weexInstance.pixelScaleFactor);
@@ -366,11 +364,11 @@
     _translateX = translateX;
 }
 
-- (void)parseTranslatey:(id)value
+- (void)parseTranslatey:(NSArray *)value
 {
     WXLength *translateY;
-    double y = [value doubleValue];
-    if ([value hasSuffix:@"%"]) {
+    double y = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
         translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
     } else {
         y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
