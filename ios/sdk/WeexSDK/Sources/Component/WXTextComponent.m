@@ -249,8 +249,8 @@ do {\
 - (void)fillAttributes:(NSDictionary *)attributes
 {
     id text = attributes[@"value"];
-    if (text) {
-        _text = [WXConvert NSString:text];
+    if (text && ![[self text] isEqualToString:text]) {
+        [self setText:[WXConvert NSString:text]];
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
@@ -360,6 +360,12 @@ do {\
 - (NSString *)text
 {
     return _text;
+}
+- (void)setText:(NSString*)text
+{
+    pthread_mutex_lock(&(_ctAttributedStringMutex));
+    _text = text;
+    pthread_mutex_unlock(&(_ctAttributedStringMutex));
 }
 
 - (NSAttributedString *)ctAttributedString
