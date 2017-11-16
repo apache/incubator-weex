@@ -63,6 +63,9 @@
     CGSize _contentSize;
     BOOL _listenLoadMore;
     BOOL _scrollEvent;
+    BOOL _scrollStartEvent;
+    BOOL _scrollEndEvent;
+    BOOL _isScrolling;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
@@ -116,6 +119,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _stickyArray = [NSMutableArray array];
         _listenerArray = [NSMutableArray array];
         _scrollEvent = NO;
+        _scrollStartEvent = NO;
+        _scrollEndEvent = NO;
         _lastScrollEventFiredOffset = CGPointMake(0, 0);
         _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
         _showScrollBar = attributes[@"showScrollbar"] ? [WXConvert BOOL:attributes[@"showScrollbar"]] : YES;
@@ -261,6 +266,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = YES;
     }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _scrollStartEvent = YES;
+    }
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _scrollEndEvent = YES;
+    }
 }
 
 - (void)removeEvent:(NSString *)eventName
@@ -270,6 +281,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _scrollStartEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _scrollEndEvent = NO;
     }
 }
 
@@ -489,6 +506,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 #pragma mark UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if (_scrollStartEvent) {
+        CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+        NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
+        NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
+        [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+    }
+}
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -520,7 +546,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
              @"type":@"pullingdown"
     }];
     _lastContentOffset = scrollView.contentOffset;
-    
     // check sticky
     [self adjustSticky];
     [self handleAppear];
@@ -568,10 +593,20 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else {
         inset.bottom = 0;
     }
-    
     [scrollView setContentInset:inset];
 }
 
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (_scrollEndEvent) {
+        if (!_isScrolling) {
+            CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+            NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
+            NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
+            [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        }
+    }
+}
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     [_loadingComponent.view setHidden:NO];
@@ -586,6 +621,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (_loadingComponent && scrollView.contentOffset.y > 0 &&
         scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
         [_loadingComponent loading];
+    }
+    if (!decelerate) {
+        _isScrolling = NO;
     }
 }
 

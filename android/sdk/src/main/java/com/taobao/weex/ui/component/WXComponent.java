@@ -1349,7 +1349,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  private RippleDrawable prepareBackgroundRipple() {
+  private Drawable prepareBackgroundRipple() {
     try {
       if (getDomObject().getStyles() != null && getDomObject().getStyles().getPesudoResetStyles() != null) {
         Map<String, Object> resetStyles = getDomObject().getStyles().getPesudoResetStyles();

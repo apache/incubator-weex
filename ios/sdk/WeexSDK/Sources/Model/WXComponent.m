@@ -126,6 +126,9 @@
         if(attributes[@"accessibilityHint"]) {
             _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         }
+        if (attributes[@"groupAccessibilityChildren"]) {
+            _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
+        }
         
         if (attributes[@"testId"]) {
             _testId = [WXConvert NSString:attributes[@"testId"]];
@@ -365,6 +368,9 @@
         
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+        }
+        if (_groupAccessibilityChildren) {
+            [_view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
         }
         
         [self _initEvents:self.events];
@@ -735,6 +741,12 @@
         _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         [self.view setAccessibilityHint:_accessibilityHintContent];
     }
+    
+    if (attributes[@"groupAccessibilityChildren"]) {
+        _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
+        [self.view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
+    }
+
     
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
