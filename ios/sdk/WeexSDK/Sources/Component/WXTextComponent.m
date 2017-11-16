@@ -317,6 +317,16 @@ do {\
     return ^CGSize (CGSize constrainedSize) {
         CGSize computedSize = CGSizeZero;
         NSTextStorage *textStorage = nil;
+        
+        //TODO:more elegant way to use max and min constrained size
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            constrainedSize.width = MAX(constrainedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            constrainedSize.width = MIN(constrainedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        }
+        
         if (![self useCoreText]) {
             textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
@@ -324,15 +334,6 @@ do {\
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
         } else {
             computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
-        }
-    
-        //TODO:more elegant way to use max and min constrained size
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-        }
-        
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {

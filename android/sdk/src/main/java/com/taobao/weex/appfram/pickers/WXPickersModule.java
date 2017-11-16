@@ -148,8 +148,8 @@ public class WXPickersModule extends WXModule {
                             callback.invoke(ret);
                         }
                     }
-                }
-        );
+                },
+                options);
     }
 
     private void performPickDate(Map<String, Object> options, final JSCallback callback) {
@@ -176,7 +176,8 @@ public class WXPickersModule extends WXModule {
                             callback.invoke(ret);
                         }
                     }
-                });
+                },
+                options);
 
     }
 

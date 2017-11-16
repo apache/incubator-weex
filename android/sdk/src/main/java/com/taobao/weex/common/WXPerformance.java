@@ -176,6 +176,12 @@ public class WXPerformance {
   public String connectionType;
   public String requestType;
 
+  /**
+   *for network tracker
+   */
+
+  public String wxDims[] = new String [5];
+  public long measureTimes[] = new long [5];
 
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
@@ -203,7 +209,12 @@ public class WXPerformance {
     quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
     quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
     quotas.put("useScroller", (double) useScroller);
-    return quotas;
+	quotas.put("measureTime1", (double) measureTimes[0]);
+	quotas.put("measureTime2", (double) measureTimes[1]);
+	quotas.put("measureTime3", (double) measureTimes[2]);
+	quotas.put("measureTime4", (double) measureTimes[3]);
+	quotas.put("measureTime5", (double) measureTimes[4]);
+	return quotas;
   }
 
   public Map<String,String> getDimensionMap(){
@@ -215,12 +226,17 @@ public class WXPerformance {
     quotas.put("WXSDKVersion", WXSDKVersion);
     quotas.put("connectionType",connectionType);
     quotas.put("requestType",requestType);
-
-    return quotas;
+	quotas.put("wxdim1", wxDims[0]);
+	quotas.put("wxdim2", wxDims[1]);
+	quotas.put("wxdim3", wxDims[2]);
+	quotas.put("wxdim4", wxDims[3]);
+	quotas.put("wxdim5", wxDims[4]);
+	return quotas;
   }
 
   public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"};
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"
+    ,"wxdim1","wxdim2","wxdim3","wxdim4","wxdim5"};
   }
 
   public static String[] getMeasures(){
@@ -243,7 +259,13 @@ public class WXPerformance {
         "actualNetworkTime",
         "firstScreenJSFExecuteTime",
         "maxDeepViewLayer",
-        "useScroller"};
+        "useScroller",
+		"measureTime1",
+		"measureTime2",
+		"measureTime3",
+		"measureTime4",
+		"measureTime5"
+	};
   }
 
   @Override
