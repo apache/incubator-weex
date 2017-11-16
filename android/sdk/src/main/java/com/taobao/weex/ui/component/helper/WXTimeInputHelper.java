@@ -45,7 +45,8 @@ public class WXTimeInputHelper {
                             component.performOnChange(result);
                         }
                     }
-                });
+                },
+                null);
     }
 
     public static void pickTime(final AbstractEditComponent component) {
@@ -62,7 +63,8 @@ public class WXTimeInputHelper {
                             component.performOnChange(result);
                         }
                     }
-                }
+                },
+                null
         );
     }
 }

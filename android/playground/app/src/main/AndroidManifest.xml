@@ -116,29 +116,6 @@ under the License.
                 android:name="com.google.zxing.client.android.history.HistoryActivity"
                 android:label="@string/history_title"
                 android:stateNotNeeded="true"/>
-        <activity
-                android:name=".WXDebugActivity"
-                android:label="@string/title_activity_dynamic"
-                android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="weex.intent.action.dynamic"/>
-
-                <category android:name="weex.intent.category.dynamic"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="http"
-                      android:host="weex-remote-debugger"
-                      android:path="/dynamic/replace/framework"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="weex.intent.action.dynamic"/>
-
-                <category android:name="weex.intent.category.dynamic"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="http"
-                      android:host="weex-remote-debugger"
-                      android:path="/dynamic/replace/bundle"/>
-            </intent-filter>
-        </activity>
         <activity android:name="com.alibaba.weex.BenchmarkActivity"
                   android:screenOrientation="portrait"/>
     </application>

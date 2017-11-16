@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -89,6 +88,7 @@ import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
+import com.taobao.weex.ui.module.WXLocalModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
@@ -98,7 +98,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -190,9 +189,6 @@ public class WXSDKEngine {
         sm.onSDKEngineInitialize();
         if(config != null ) {
           sm.setInitConfig(config);
-          if(config.getDebugAdapter()!=null){
-            config.getDebugAdapter().initDebug(application);
-          }
         }
         WXSoInstallMgrSdk.init(application,
                               sm.getIWXSoLoaderAdapter(),
@@ -314,6 +310,7 @@ public class WXSDKEngine {
       registerModule("picker", WXPickersModule.class);
       registerModule("meta", WXMetaModule.class,true);
       registerModule("webSocket", WebSocketModule.class);
+      registerModule("local", WXLocalModule.class);
 
 
       registerDomObject(simpleList, WXListDomObject.class);
@@ -508,36 +505,6 @@ public class WXSDKEngine {
     WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
   }
 
-  public static void show3DLayer(boolean show){
-    WXEnvironment.sShow3DLayer=show;
-  }
-
-  public static void switchDebugModel(boolean debug, String debugUrl) {
-    if (!WXEnvironment.isApkDebugable()) {
-      return;
-    }
-    if (debug) {
-      WXEnvironment.sDebugMode = true;
-      WXEnvironment.sDebugWsUrl = debugUrl;
-      try {
-        Class<?> cls = Class.forName("com.taobao.weex.WXDebugTool");
-        Method m = cls.getMethod("connect", String.class);
-        m.invoke(cls, debugUrl);
-      } catch (Exception e) {
-        Log.d("weex","WXDebugTool not found!");
-      }
-    } else {
-      WXEnvironment.sDebugMode = false;
-      WXEnvironment.sDebugWsUrl = null;
-      try {
-        Class<?> cls = Class.forName("com.taobao.weex.WXDebugTool");
-        Method m = cls.getMethod("close");
-        m.invoke(cls);
-      } catch (Exception e) {
-        Log.d("weex","WXDebugTool not found!");
-      }
-    }
-  }
   public static void reload(final Context context,String framework, boolean remoteDebug) {
     WXEnvironment.sRemoteDebugMode = remoteDebug;
     WXBridgeManager.getInstance().restart();
