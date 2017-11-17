@@ -27,7 +27,6 @@ import android.animation.ValueAnimator;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.support.v4.util.ArrayMap;
-import android.support.v4.util.ArraySet;
 import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.text.TextUtils;
 import android.util.Property;
@@ -51,6 +50,7 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +84,7 @@ public class WXTransition {
     /**
      * layout animation property
      * */
-    private static final Set<String> LAYOUT_PROPERTIES = new ArraySet<>();
+    private static final Set<String> LAYOUT_PROPERTIES = new HashSet<>();
     static {
         LAYOUT_PROPERTIES.add(Constants.Name.WIDTH);
         LAYOUT_PROPERTIES.add(Constants.Name.HEIGHT);
@@ -97,7 +97,7 @@ public class WXTransition {
     /**
      * transform animation property, use android system animaton ability
      * */
-    private static final Set<String> TRANSFORM_PROPERTIES = new ArraySet<>();
+    private static final Set<String> TRANSFORM_PROPERTIES = new HashSet<>();
     static {
         TRANSFORM_PROPERTIES.add(Constants.Name.OPACITY);
         TRANSFORM_PROPERTIES.add(Constants.Name.BACKGROUND_COLOR);
