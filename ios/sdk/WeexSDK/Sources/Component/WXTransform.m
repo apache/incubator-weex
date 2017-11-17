@@ -312,7 +312,6 @@
             }
         }
     }
-    
     _originX = [WXLength lengthWithFloat:originX type:typeX];
     _originY = [WXLength lengthWithFloat:originY type:typeY];
 }
@@ -368,14 +367,12 @@
 - (void)parseTranslatey:(NSArray *)value
 {
     WXLength *translateY;
-    if (value.count > 1) {
-        double y = [value[0] doubleValue];
-        if ([value[0] hasSuffix:@"%"]) {
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
-        } else {
-            y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
-        }
+    double y = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
+    } else {
+        y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
     }
     _translateY = translateY;
 }
