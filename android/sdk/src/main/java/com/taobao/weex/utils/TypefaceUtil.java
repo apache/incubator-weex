@@ -53,6 +53,16 @@ public class TypefaceUtil {
     }
   }
 
+  public static void registerNativeFont(Map<String, Typeface> fonts) {
+    if (fonts != null && fonts.size() > 0) {
+      for (Map.Entry<String, Typeface> font : fonts.entrySet()) {
+        FontDO fontDO = new FontDO(font.getKey(), font.getValue());
+        putFontDO(fontDO);
+        WXLogUtils.d("TypefaceUtil", "register new typeface: " + font.getKey());
+      }
+    }
+  }
+
   public static FontDO getFontDO(String fontFamilyName) {
     return sCacheMap.get(fontFamilyName);
   }
