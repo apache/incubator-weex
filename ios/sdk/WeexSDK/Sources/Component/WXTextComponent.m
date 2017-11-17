@@ -120,6 +120,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
+    NSString *_direction;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
@@ -232,6 +233,7 @@ do {\
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
+    WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
     
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
@@ -438,6 +440,20 @@ do {\
     
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
+    // handle text direction style, default ltr
+    if ([_direction isEqualToString:@"rtl"]) {
+        if (0 == _textAlign) {
+            //force text right-align if don't specified any align.
+            _textAlign = NSTextAlignmentRight;
+        }
+        paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
+    } else {
+        //if you specify NSWritingDirectionNaturalDirection, the receiver resolves the writing
+        //directionto eitherNSWritingDirectionLeftToRight or NSWritingDirectionRightToLeft,
+        //depending on the direction for the user’s language preference setting.
+        paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
+    }
+    
     if (_textAlign) {
         paragraphStyle.alignment = _textAlign;
     }
@@ -513,6 +529,20 @@ do {\
     
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
+    // handle text direction style, default ltr
+    if ([_direction isEqualToString:@"rtl"]) {
+        if (0 == _textAlign) {
+            //force text right-align if don't specified any align.
+            _textAlign = NSTextAlignmentRight;
+        }
+        paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
+    } else {
+        //if you specify NSWritingDirectionNaturalDirection, the receiver resolves the writing
+        //directionto eitherNSWritingDirectionLeftToRight or NSWritingDirectionRightToLeft,
+        //depending on the direction for the user’s language preference setting.
+        paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
+    }
+    
     if (_textAlign) {
         paragraphStyle.alignment = _textAlign;
     }
