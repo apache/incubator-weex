@@ -157,7 +157,7 @@
             context.exception = exception;
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
-            NSString *bundleUrl = [instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE";
+            NSString *bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
             NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];
             NSString *message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
