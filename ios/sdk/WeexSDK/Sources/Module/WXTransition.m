@@ -243,21 +243,20 @@
                 info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
                 [_propertyArray addObject:info];
             }
-            
             if (wxTransform.translateX && [wxTransform.translateX floatValue] !=[oldTransform.translateX floatValue]) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.translation.x";
-                info.fromValue = @([oldTransform.translateX valueForMaximum:_targetComponent.view.bounds.size.width]);
-                info.toValue = @([wxTransform.translateX valueForMaximum:_targetComponent.view.bounds.size.width]);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.fromValue = @([oldTransform.translateX floatValue]);
+                info.toValue = @([wxTransform.translateX floatValue]);
+                info.perValue = @([wxTransform.translateX floatValue] - [oldTransform.translateX floatValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.translateY && [wxTransform.translateY floatValue] !=[oldTransform.translateY floatValue]) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.translation.y";
-                info.fromValue = @([oldTransform.translateY valueForMaximum:_targetComponent.view.bounds.size.height]);
-                info.toValue = @([wxTransform.translateY valueForMaximum:_targetComponent.view.bounds.size.height]);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.fromValue = @([oldTransform.translateY floatValue]);
+                info.toValue = @([wxTransform.translateY floatValue]);
+                info.perValue = @([wxTransform.translateY floatValue] - [oldTransform.translateY floatValue]);
                 [_propertyArray addObject:info];
             }
             _targetComponent->_transform = wxTransform;
