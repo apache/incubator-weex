@@ -128,6 +128,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     
     BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
+    NSString *_wordWrap;
     
     pthread_mutex_t _ctAttributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
@@ -232,6 +233,7 @@ do {\
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
+    WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
     
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
@@ -442,8 +444,14 @@ do {\
         paragraphStyle.alignment = _textAlign;
     }
     
-    // set default lineBreakMode
-    paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    } else if ([[_wordWrap lowercaseString] isEqualToString:@"normal"]){
+        paragraphStyle.lineBreakMode = NSLineBreakByClipping;
+    } else {
+         // set default lineBreakMode
+        paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    }
     _truncationLine = NO;
     if (_textOverflow && [_textOverflow length] > 0) {
         if (_lines && [_textOverflow isEqualToString:@"ellipsis"])
@@ -563,7 +571,15 @@ do {\
     NSTextContainer *textContainer = [NSTextContainer new];
     textContainer.lineFragmentPadding = 0.0;
     
-    textContainer.lineBreakMode = NSLineBreakByClipping;
+    if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
+        textContainer.lineBreakMode = NSLineBreakByWordWrapping;
+    } else if ([[_wordWrap lowercaseString] isEqualToString:@"normal"]){
+        textContainer.lineBreakMode = NSLineBreakByClipping;
+    } else {
+        // set default lineBreakMode
+        textContainer.lineBreakMode = NSLineBreakByCharWrapping;
+    }
+    
     if (_textOverflow && [_textOverflow length] > 0) {
         if ([_textOverflow isEqualToString:@"ellipsis"])
             textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
