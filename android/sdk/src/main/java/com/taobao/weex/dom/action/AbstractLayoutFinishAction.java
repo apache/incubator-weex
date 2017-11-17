@@ -41,6 +41,9 @@ abstract class AbstractLayoutFinishAction extends TraceableAction implements DOM
     }
 
     WXDomObject root = context.getDomByRef(WXDomObject.ROOT);
+    if(root == null){
+      return;
+    }
     mLayoutHeight = (int)root.getLayoutHeight();
     mLayoutWidth = (int)root.getLayoutWidth();
     context.postRenderTask(this);
