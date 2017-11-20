@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.animation;
 
-import org.junit.Test;
+import android.util.Property;
+import android.view.View;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
+
+import java.util.Map;
 
 /**
- * To work on unit tests, switch the Test Artifact in the Build Variants view.
+ * Created by furture on 2017/10/24.
  */
-public class ExampleUnitTest {
 
-  @Test
-  public void addition_isCorrect() throws Exception {
-    assertEquals(4, 2 + 2);
-  }
+public class TransformParserTest extends TestCase {
+
+    public void testParseTransform(){
+        Map<Property<View,Float>, Float> transforms =  TransformParser.parseTransForm("rotate(7deg) translate(1, 2)", 100, 100, 750);
+        System.out.println(transforms.size());
+    }
 }
