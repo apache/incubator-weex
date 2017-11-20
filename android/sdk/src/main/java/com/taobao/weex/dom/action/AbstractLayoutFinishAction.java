@@ -25,6 +25,7 @@ import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by sospartan on 02/03/2017.
@@ -41,13 +42,19 @@ abstract class AbstractLayoutFinishAction extends TraceableAction implements DOM
     }
 
     WXDomObject root = context.getDomByRef(WXDomObject.ROOT);
-    mLayoutHeight = (int)root.getLayoutHeight();
-    mLayoutWidth = (int)root.getLayoutWidth();
-    context.postRenderTask(this);
-    WXSDKInstance instance = context.getInstance();
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    if(root!=null) {
+      mLayoutHeight = (int) root.getLayoutHeight();
+      mLayoutWidth = (int) root.getLayoutWidth();
+      context.postRenderTask(this);
+      WXSDKInstance instance = context.getInstance();
+      if (instance != null) {
+        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      }
+    }
+    else{
+      WXLogUtils.e("AbstractLayoutFinishAction", "Root Component is null for unknown reason");
     }
   }
 
 }
+
