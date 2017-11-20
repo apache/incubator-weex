@@ -157,7 +157,7 @@
             context.exception = exception;
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
-            NSString *bundleUrl = [instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE";
+            NSString *bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
             NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];
             NSString *message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -473,21 +473,20 @@
 }
 
 
-- (void)callBackInterval:(NSDictionary *)dic functon:(void(^)())block
+- (void)callBackInterval:(NSDictionary *)dic
 {
-    if([dic objectForKey:@"appId"] && [_intervaltimers objectForKey:[dic objectForKey:@"appId"]]){
+    if(dic[@"function"] && [dic objectForKey:@"appId"] && [_intervaltimers objectForKey:[dic objectForKey:@"appId"]]){
         NSMutableArray *timers = [_intervaltimers objectForKey:[dic objectForKey:@"appId"]];
-        if([timers containsObject:[dic objectForKey:@"timerId"]]){
+        void(^block)() = ((void(^)())dic[@"function"]);
+        if(block && [timers containsObject:[dic objectForKey:@"timerId"]]){
             block();
             [self executeInterval:[dic objectForKey:@"appId"] function:block arg:[dic objectForKey:@"arg"] timerId:[[dic objectForKey:@"timerId"] longLongValue]];
         }
     }
 }
 
-
 - (void)triggerTimeout:(NSString *)appId ret:(NSString *)ret arg:(NSString *)arg
 {
-    
     double interval = [arg doubleValue]/1000.0f;
     if(WXFloatEqual(interval,0)) {
         return;
@@ -496,21 +495,19 @@
         [_timers addObject:ret];
         [self addInstance:appId callback:ret];
     }
-    __weak typeof(self) weakSelf = self;
-    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
-    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableDictionary *dic = [NSMutableDictionary new];
-        [dic setObject:appId forKey:@"appId"];
-        [dic setObject:ret forKey:@"ret"];
-        [dic setObject:arg forKey:@"arg"];
-        [weakSelf performSelector:@selector(callBack:) withObject:dic ];
-    });
+    
+    NSMutableDictionary *timeoutInfo = [NSMutableDictionary new];
+    [timeoutInfo setObject:appId forKey:@"appId"];
+    [timeoutInfo setObject:ret forKey:@"ret"];
+    [timeoutInfo setObject:arg forKey:@"arg"];
+    [self performSelector:@selector(callBack:) withObject:timeoutInfo afterDelay:interval inModes:@[NSRunLoopCommonModes]];
 }
 
 - (long long)triggerInterval:(NSString *)appId function:(void(^)())block arg:(NSString *)arg
 {
     double interval = [arg doubleValue]/1000.0f;
-    long long timerId = _intervalTimerId + 1;
+    _intervalTimerId = _intervalTimerId + 1; // timerId must auto-increment.
+    long long timerId = _intervalTimerId;
     if(WXFloatEqual(interval,0)) {
         return timerId;
     }
@@ -530,23 +527,20 @@
 -(void)executeInterval:(NSString *)appId function:(void(^)())block arg:(NSString *)arg timerId:(long long)timerId
 {
     double interval = [arg doubleValue]/1000.0f;
-    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
-    __weak typeof(self) weakSelf = self;
-    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableDictionary *dic = [NSMutableDictionary new];
-        [dic setObject:appId forKey:@"appId"];
-        [dic setObject:arg forKey:@"arg"];
-        [dic setObject:@(timerId) forKey:@"timerId"];
-        [weakSelf performSelector:@selector(callBackInterval:functon:) withObject:dic withObject:block];
-    });
+    NSMutableDictionary *intervalInfo = [NSMutableDictionary new];
+    [intervalInfo setObject:appId forKey:@"appId"];
+    [intervalInfo setObject:arg forKey:@"arg"];
+    [intervalInfo setObject:@(timerId) forKey:@"timerId"];
+    [intervalInfo setObject:[block copy] forKey:@"function"];
+    [self performSelector:@selector(callBackInterval:) withObject:intervalInfo afterDelay:interval inModes:@[NSRunLoopCommonModes]];
 }
 
-- (void)triggerClearInterval:(NSString *)appId ret:(long long)ret
+- (void)triggerClearInterval:(NSString *)instanceId ret:(long long)timerId
 {
-    if(_intervaltimers && [_intervaltimers objectForKey:@"appId"]){
-        NSMutableArray *timers = [_intervaltimers objectForKey:@"appId"];
-        if(timers && [timers containsObject:@(ret)]){
-            [timers removeObject:@(ret)];
+    if(_intervaltimers && [_intervaltimers objectForKey:instanceId]){
+        NSMutableArray *timers = [_intervaltimers objectForKey:instanceId];
+        if(timers && [timers containsObject:@(timerId)]){
+            [timers removeObject:@(timerId)];
         }
     }
 }

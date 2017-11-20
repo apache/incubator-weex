@@ -16,19 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex;
-
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+package com.taobao.weex.ui.component.pesudo;
 
 /**
- * To work on unit tests, switch the Test Artifact in the Build Variants view.
+ * Created by sospartan on 05/01/2017.
  */
-public class ExampleUnitTest {
-
-  @Test
-  public void addition_isCorrect() throws Exception {
-    assertEquals(4, 2 + 2);
-  }
+public interface OnActivePseudoListener {
+  void updateActivePseudo(boolean isSet);
 }

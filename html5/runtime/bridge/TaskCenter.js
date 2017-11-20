@@ -42,6 +42,14 @@ export class TaskCenter {
     return this.callbackManager.consume(callbackId, data, ifKeepAlive)
   }
 
+  registerHook (...args) {
+    return this.callbackManager.registerHook(...args)
+  }
+
+  triggerHook (...args) {
+    return this.callbackManager.triggerHook(...args)
+  }
+
   destroyCallback () {
     return this.callbackManager.close()
   }

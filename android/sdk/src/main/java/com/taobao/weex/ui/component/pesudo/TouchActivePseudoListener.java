@@ -25,22 +25,22 @@ import android.view.View;
  * Created by sospartan on 05/01/2017.
  */
 public class TouchActivePseudoListener implements View.OnTouchListener {
-  private OnActivePseudoListner mOnActivePseudoListner;
+  private OnActivePseudoListener mOnActivePseudoListener;
   private boolean mIsConsumeOnTouch;
 
-  public TouchActivePseudoListener(OnActivePseudoListner l, boolean consumeInTouch) {
-    mOnActivePseudoListner = l;
+  public TouchActivePseudoListener(OnActivePseudoListener l, boolean consumeInTouch) {
+    mOnActivePseudoListener = l;
     mIsConsumeOnTouch = consumeInTouch;
   }
 
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     int action = event.getAction();
-    if (mOnActivePseudoListner != null) {
+    if (mOnActivePseudoListener != null) {
       if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-        mOnActivePseudoListner.updateActivePseudo(true);
+        mOnActivePseudoListener.updateActivePseudo(true);
       } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
-        mOnActivePseudoListner.updateActivePseudo(false);
+        mOnActivePseudoListener.updateActivePseudo(false);
       }
     }
     return mIsConsumeOnTouch;

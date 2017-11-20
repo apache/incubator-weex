@@ -37,7 +37,7 @@
         instanceIdCommit = instanceId;
         WXSDKInstance * instance = [WXSDKManager instanceForID:instanceId];
         if(instance){
-            bundleUrlCommit = [instance.scriptURL absoluteString]?:bundleUrlCommit;
+            bundleUrlCommit = instance.pageName?:([instance.scriptURL absoluteString]?:bundleUrlCommit);
         }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
             bundleUrlCommit = instanceId;
         }

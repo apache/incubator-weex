@@ -26,6 +26,8 @@
 #import "WXUtility.h"
 #import "WXLoadingComponent.h"
 #import "WXRefreshComponent.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
 
 @interface WXScrollerComponnetView:UIScrollView
 @end
@@ -63,6 +65,9 @@
     CGSize _contentSize;
     BOOL _listenLoadMore;
     BOOL _scrollEvent;
+    BOOL _scrollStartEvent;
+    BOOL _scrollEndEvent;
+    BOOL _isScrolling;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
@@ -78,6 +83,8 @@
     NSString *_direction;
     BOOL _showScrollBar;
     BOOL _pagingEnabled;
+    
+    BOOL _shouldNotifiAppearDescendantView;
 
     css_node_t *_scrollerCSSNode;
     
@@ -116,6 +123,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _stickyArray = [NSMutableArray array];
         _listenerArray = [NSMutableArray array];
         _scrollEvent = NO;
+        _scrollStartEvent = NO;
+        _scrollEndEvent = NO;
         _lastScrollEventFiredOffset = CGPointMake(0, 0);
         _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
         _showScrollBar = attributes[@"showScrollbar"] ? [WXConvert BOOL:attributes[@"showScrollbar"]] : YES;
@@ -141,6 +150,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
               isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]))) &&
              self.cssNode->style.flex <= 0.0) {
             self.cssNode->style.flex = 1.0;
+        }
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
+            _shouldNotifiAppearDescendantView = shouldNotifiAppearDescendantView;
+            
         }
     }
     
@@ -204,6 +219,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)dealloc
 {
+    ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
     
@@ -260,6 +276,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = YES;
     }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _scrollStartEvent = YES;
+    }
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _scrollEndEvent = YES;
+    }
 }
 
 - (void)removeEvent:(NSString *)eventName
@@ -269,6 +291,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if ([eventName isEqualToString:@"scroll"]) {
         _scrollEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _scrollStartEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _scrollEndEvent = NO;
     }
 }
 
@@ -488,6 +516,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 #pragma mark UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if (_scrollStartEvent) {
+        CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+        NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
+        NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
+        [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+    }
+}
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -519,7 +556,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
              @"type":@"pullingdown"
     }];
     _lastContentOffset = scrollView.contentOffset;
-    
     // check sticky
     [self adjustSticky];
     [self handleAppear];
@@ -567,10 +603,20 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else {
         inset.bottom = 0;
     }
-    
     [scrollView setContentInset:inset];
 }
 
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (_scrollEndEvent) {
+        if (!_isScrolling) {
+            CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+            NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
+            NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
+            [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        }
+    }
+}
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     [_loadingComponent.view setHidden:NO];
@@ -585,6 +631,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (_loadingComponent && scrollView.contentOffset.y > 0 &&
         scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
         [_loadingComponent loading];
+    }
+    if (!decelerate) {
+        _isScrolling = NO;
     }
 }
 
@@ -603,7 +652,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     // notify action for appear
     NSArray *listenerArrayCopy = [self.listenerArray copy];
     for(WXScrollToTarget *target in listenerArrayCopy){
-        [self scrollToTarget:target scrollRect:scrollRect];
+        if (_shouldNotifiAppearDescendantView) {
+            // if target component is descendant of scrollerview, it should notify the appear event handler, or here will skip this appear calculation.
+            if ([target.target isViewLoaded] && [target.target.view isDescendantOfView:self.view]) {
+                [self scrollToTarget:target scrollRect:scrollRect];
+            }
+        } else {
+            [self scrollToTarget:target scrollRect:scrollRect];
+        }
     }
 }
 
