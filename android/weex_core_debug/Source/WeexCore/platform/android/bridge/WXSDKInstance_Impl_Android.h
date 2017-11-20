@@ -5,8 +5,6 @@
 
 namespace WeexCore {
   bool RegisterJNISDKInstance(JNIEnv *env);
-
-  jobject getSDKInstanceByID(JNIEnv* env, jstring pageID);
 }
 
 #endif //WEEX_PROJECT_WXSDKINSTANCE_IMPL_ANDROID_H

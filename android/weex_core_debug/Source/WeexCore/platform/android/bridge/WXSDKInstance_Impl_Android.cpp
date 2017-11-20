@@ -6,8 +6,4 @@ namespace WeexCore {
   bool RegisterJNISDKInstance(JNIEnv *env) {
     return RegisterNativesImpl(env);
   }
-
-  jobject getSDKInstanceByID(JNIEnv *env, jstring pageID) {
-    return Java_WXSDKInstance_getInstanceByID(env, pageID).Get();
-  }
 }

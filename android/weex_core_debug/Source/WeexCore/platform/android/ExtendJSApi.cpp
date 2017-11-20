@@ -2,8 +2,6 @@
 
 using namespace WeexCore;
 
-static bool isWeexCore = true;
-
 /**
 * This class aim to extend JS Api
 **/
@@ -111,13 +109,11 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   //callback args[2]
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
-  if (isWeexCore) {
-    RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
-                                             jByteArray2Str(env, jTaskString));
-  } else {
-    flag = BridgeAndroid::getInstance()->callCreateBody(jInstanceId, jTaskString, jCallback);
-  }
-
+  RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
+                                           jByteArray2Str(env, jTaskString));
+  env->DeleteLocalRef(jInstanceId);
+  env->DeleteLocalRef(jTaskString);
+  env->DeleteLocalRef(jCallback);
   return createInt32Result(flag);
 }
 
@@ -376,19 +372,19 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
 
   int flag = 0;
 
-  if (isWeexCore) {
-    std::string pageId = jString2Str(env, jInstanceId);
-    std::string parentRef = jString2Str(env, jref);
-    std::string str_index = jString2Str(env, jindex);
-    int index = stringToNum<int>(str_index);
-    std::string data = jByteArray2Str(env, jdomString);
+  std::string pageId = jString2Str(env, jInstanceId);
+  std::string parentRef = jString2Str(env, jref);
+  std::string str_index = jString2Str(env, jindex);
+  int index = stringToNum<int>(str_index);
+  std::string data = jByteArray2Str(env, jdomString);
 
-    RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
-    RenderManager::getInstance()->printRenderAndLayoutTree(jString2Str(env, jInstanceId));
-  } else {
-    flag = BridgeAndroid::getInstance()->callAddElement(jInstanceId, jref, jdomString, jindex,
-                                                        jCallback);
-  }
+  RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
+
+  env->DeleteLocalRef(jInstanceId);
+  env->DeleteLocalRef(jref);
+  env->DeleteLocalRef(jdomString);
+  env->DeleteLocalRef(jindex);
+  env->DeleteLocalRef(jCallback);
 
   return createInt32Result(flag);
 }

@@ -32,8 +32,6 @@ namespace WeexCore {
 
     std::map<std::string, RenderObject *> mRenderObjectMap;
 
-    jobject mSDKInstance_Impl;
-
     void calculateLayout();
 
     inline void sendCreateBodyAction(RenderObject *render) {

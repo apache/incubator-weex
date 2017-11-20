@@ -8,7 +8,3 @@ namespace WeexCore {
     RegisterNativesImpl(env);
   }
 }
-
-void measure(JNIEnv *env) {
-
-}

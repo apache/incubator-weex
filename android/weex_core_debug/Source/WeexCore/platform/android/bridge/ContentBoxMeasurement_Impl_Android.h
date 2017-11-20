@@ -6,7 +6,4 @@
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env);
 }
-
-void measure(JNIEnv *env);
-
 #endif //WEEX_PROJECT_CONTENTBOXMEASUREMENT_IMPL_ANDROID_H
