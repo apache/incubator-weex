@@ -1806,7 +1806,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         post(new Runnable() {
           @Override
           public void run() {
-            (modules, mRegisterComponentFailList);
+			invokeRegisterModules(modules, mRegisterComponentFailList);
           }
         }, null);
       }
