@@ -49,19 +49,14 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
-import com.taobao.weex.ui.action.ReLayoutUIAction;
+import com.taobao.weex.ui.action.LayoutUIAction;
 import com.taobao.weex.ui.action.UpdateStyleUIAction;
 import com.taobao.weex.ui.action.WXUIAction;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -75,7 +70,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1989,7 +1983,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mLayoutSize.setHeight(height);
         action.mLayoutSize.setWidth(width);
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -2051,7 +2045,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mLayoutSize.setHeight(height);
         action.mLayoutSize.setWidth(width);
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -2095,7 +2089,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mKey = key;
         action.mValue = value;
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -2110,7 +2104,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callReLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callReLayout: call ReLayout args is null");
@@ -2134,7 +2128,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new ReLayoutUIAction();
+        final WXUIAction action = new LayoutUIAction();
         action.mPageId = pageId;
         action.mRef = ref;
         action.mLayoutPosition.setTop(top);
@@ -2144,7 +2138,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         action.mLayoutSize.setHeight(height);
         action.mLayoutSize.setWidth (width);
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();

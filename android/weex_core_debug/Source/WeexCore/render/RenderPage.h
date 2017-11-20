@@ -7,7 +7,7 @@
 #include "action/CreateBodyAction.h"
 #include "action/UpdateStyleAction.h"
 #include "action/RenderAction.h"
-#include "action/RelayoutRenderAction.h"
+#include "WeexCore/render/action/LayoutRenderAction.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
 #include <vector>
@@ -54,8 +54,8 @@ namespace WeexCore {
       }
     }
 
-    inline void sendReLayoutAction(RenderObject *render) {
-      RelayoutRenderAction *action = new RelayoutRenderAction();
+    inline void sendLayoutAction(RenderObject *render) {
+      LayoutRenderAction *action = new LayoutRenderAction();
       action->GenerateAction(getPageId(), render);
       addRenderAction(action);
     }

@@ -579,10 +579,9 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     }
   }
 
-  public void requestLayout(WXUIAction action) {
+  public void updateDemission(WXUIAction action) {
     mLayoutPosition = action.mLayoutPosition;
     mLayoutSize = action.mLayoutSize;
-    setLayout(this);
   }
 
   private void updateStyle(WXComponent component) {

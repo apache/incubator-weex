@@ -116,7 +116,7 @@ namespace WeexCore {
     int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
                                   std::string &value);
 
-    int callReLayoutByWeexCore(std::string &pageId, std::string &ref,
+    int callLayoutByWeexCore(std::string &pageId, std::string &ref,
                                int top, int bottom, int left, int right,
                                int height, int width);
 

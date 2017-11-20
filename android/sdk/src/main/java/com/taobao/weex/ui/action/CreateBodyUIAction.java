@@ -33,32 +33,19 @@ public class CreateBodyUIAction extends WXUIAction {
   @Override
   public void executeAction() {
     //Create component in dom thread
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
+    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
-      WXLogUtils.e("instance is null or instance is destroy!");
       return;
     }
 
-    WXComponent component = createComponent(instance, null);
+    final WXComponent component = createComponent(instance, null);
     if (component == null) {
-      //stop redner, some fatal happened.
       return;
     }
 
     try {
-      long start = System.currentTimeMillis();
+
       component.createView();
-
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
-      }
-      start = System.currentTimeMillis();
-      component.applyLayoutAndEvent(component);
-      component.bindData(component);
-
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
-      }
 
       if (component instanceof WXScroller) {
         WXScroller scroller = (WXScroller) component;
@@ -68,6 +55,7 @@ public class CreateBodyUIAction extends WXUIAction {
       }
 
       instance.onRootCreated(component);
+
       if (instance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
         instance.onCreateFinish();
       }

@@ -32,30 +32,19 @@ public class AddElementUIAction extends WXUIAction {
     //Create component in dom thread
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
-      WXLogUtils.e("instance is null or instance is destroy!");
       return;
     }
 
-    WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
+    final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
     WXComponent component = createComponent(instance, parent);
-    if (component == null) {
-      //stop redner, some fatal happened.
+
+    if (component == null || parent == null) {
       return;
     }
 
-    if (instance == null || instance.getContext() == null) {
-      WXLogUtils.e("instance is null or instance is destroy!");
-      return;
-    }
     try {
-      if (parent == null || component == null) {
-        return;
-      }
-
       parent.addChild(component, mIndex);
       parent.createChildViewAt(mIndex);
-      component.applyLayoutAndEvent(component);
-      component.bindData(component);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

@@ -8,12 +8,12 @@ using namespace WeexCore;
 
 namespace WeexCore {
 
-  class RelayoutRenderAction : public RenderAction {
+  class LayoutRenderAction : public RenderAction {
 
   public:
 
     void ExecuteAction() {
-      BridgeAndroid::getInstance()->callReLayoutByWeexCore(mPageId, mRef,
+      BridgeAndroid::getInstance()->callLayoutByWeexCore(mPageId, mRef,
                                                            mTop, mBottom,
                                                            mLeft, mRight,
                                                            mHeight, mWidth);

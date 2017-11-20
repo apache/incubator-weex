@@ -10,7 +10,7 @@ namespace WeexCore {
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
-    sendReLayoutAction(render);
+    sendLayoutAction(render);
 
     for (int i = 0; i < render->getChildCount(); i++) {
       RenderObject *child = render->getChild(i);
@@ -33,12 +33,9 @@ namespace WeexCore {
     c_data = nullptr;
     mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
     setRootRenderObject(render);
-
+    sendCreateBodyAction(render);
     // layout by dom Tree
     calculateLayout();
-
-    sendCreateBodyAction(render);
-
   }
 
   RenderPage::~RenderPage() {
@@ -81,11 +78,9 @@ namespace WeexCore {
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
-
+    sendAddElementAction(child, parent, insertPosition);
     // layout by dom Tree
     calculateLayout();
-
-    sendAddElementAction(child, parent, insertPosition);
   }
 
   void RenderPage::removeRenderObject(std::string ref) {
