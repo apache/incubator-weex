@@ -138,9 +138,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static final int CRASHREINIT = 50;
   static volatile WXBridgeManager mBridgeManager;
   private static long LOW_MEM_VALUE = 120;
-  private static int reInitCount = 1;
+  private volatile static int reInitCount = 1;
   private static String crashUrl = null;
   private static long lastCrashTime = 0;
+
+  /**
+   * Whether JS Framework(main.js) has been initialized.
+   */
+  private volatile static boolean mInit = false;
   /**
    * package
    **/
@@ -157,10 +162,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private IWXDebugProxy mWxDebugProxy;
 
   private boolean mMock = false;
-  /**
-   * Whether JS Framework(main.js) has been initialized.
-   */
-  private boolean mInit = false;
+
   private List<Map<String, Object>> mRegisterComponentFailList = new ArrayList<>(8);
   private List<Map<String, Object>> mRegisterModuleFailList = new ArrayList<>(8);
   private List<String> mRegisterServiceFailList = new ArrayList<>(8);
@@ -186,8 +188,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return mBridgeManager;
   }
 
+  // setJSFrameworkInit and isJSFrameworkInit may use on diff thread
+  // use volatile
   private boolean isJSFrameworkInit() {
-    return mInit;
+      return mInit;
+  }
+
+  private void setJSFrameworkInit(boolean init) {
+      mInit = init;
   }
 
   private void initWXBridge(boolean remoteDebug) {
@@ -316,7 +324,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * Model switch. For now, debug model and release model are supported
    */
   public void restart() {
-    mInit = false;
+    setJSFrameworkInit(false);
     initWXBridge(WXEnvironment.sRemoteDebugMode);
   }
 
@@ -996,7 +1004,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       reInitCount++;
       // reinit frame work
-      mInit = false;
+      setJSFrameworkInit(false);
       initScriptsFramework("");
 
       if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
@@ -1434,8 +1442,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         final long totalTime = System.currentTimeMillis() - start;
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
 
-          @Override
-          public void run() {
+            @Override
+            public void run() {
             instance.createInstanceFinished(totalTime);
           }
         }, 0);
@@ -1607,7 +1615,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
       }
       if (TextUtils.isEmpty(framework)) {
-        mInit = false;
+        setJSFrameworkInit(false);
         commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, "JS Framework is empty!");
 
         return;
@@ -1639,7 +1647,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXLogUtils.renderPerformanceLog("initFramework", WXEnvironment.sJSLibInitTime);
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
           WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
-          mInit = true;
+          setJSFrameworkInit(true);
 
           if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
             WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkReady();
@@ -1943,7 +1951,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
-          if (mInit && reInitCount > 1 && !instance.isNeedReLoad()) {
+          if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
             WXDomModule domModule = getDomModule(instanceId);
             Action action = Actions.getReloadPage(instanceId, true);
