@@ -81,6 +81,8 @@ public class WXEnvironment {
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
 
+  public static boolean sShow3DLayer=true;
+
   private static Map<String, String> options = new HashMap<>();
   static {
     options.put(WXConfig.os, OS);

@@ -37,7 +37,6 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
-import com.taobao.weex.utils.WXUtils;
 
 import java.util.Map;
 
@@ -80,13 +79,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
-    BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
-    if(bounceRecyclerView.getSwipeLayout()  != null){
-      if(WXUtils.getBoolean(getDomObject().getAttrs().get("nestedScrollingEnabled"), false)) {
-          bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
-      }
-    }
-    return  bounceRecyclerView;
+
+    return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
   }
 
   @Override

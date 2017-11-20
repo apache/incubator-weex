@@ -249,8 +249,8 @@ do {\
 - (void)fillAttributes:(NSDictionary *)attributes
 {
     id text = attributes[@"value"];
-    if (text && ![[self text] isEqualToString:text]) {
-        [self setText:[WXConvert NSString:text]];
+    if (text) {
+        _text = [WXConvert NSString:text];
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
@@ -317,16 +317,6 @@ do {\
     return ^CGSize (CGSize constrainedSize) {
         CGSize computedSize = CGSizeZero;
         NSTextStorage *textStorage = nil;
-        
-        //TODO:more elegant way to use max and min constrained size
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-            constrainedSize.width = MAX(constrainedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-        }
-        
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-            constrainedSize.width = MIN(constrainedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
-        }
-        
         if (![self useCoreText]) {
             textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
@@ -334,6 +324,15 @@ do {\
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
         } else {
             computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
+        }
+    
+        //TODO:more elegant way to use max and min constrained size
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
@@ -360,12 +359,6 @@ do {\
 - (NSString *)text
 {
     return _text;
-}
-- (void)setText:(NSString*)text
-{
-    pthread_mutex_lock(&(_ctAttributedStringMutex));
-    _text = text;
-    pthread_mutex_unlock(&(_ctAttributedStringMutex));
 }
 
 - (NSAttributedString *)ctAttributedString

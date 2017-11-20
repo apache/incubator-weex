@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * 
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,9 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex;
 
-#import <Foundation/Foundation.h>
+import android.app.Application;
 
-@interface WXTestBridgeMethodDummy : NSObject
+import com.taobao.prettyfish.PrettyFishCommon;
+import com.taobao.prettyfish.core.comp.AbstractBaseComp;
+import com.taobao.prettyfish.core.fab.FloatWndManager;
+import com.taobao.prettyfish_base.R;
 
-@end
+/**
+ * Created by lixinke on 16/5/4.
+ */
+public class WXPrettyFish {
+
+  public static void init(Application application) {
+    PrettyFishCommon.init(application);
+    AbstractBaseComp wxBaseComp=new AbstractBaseComp() {
+      @Override
+      public int iconRes() {
+        return R.drawable.ic_action_weex;
+      }
+
+      @Override
+      public String title() {
+        return "WEEX";
+      }
+    };
+    wxBaseComp.registerComp(new WXPFComponent(application));
+    FloatWndManager.registerBaseComp(wxBaseComp);
+  }
+
+}
