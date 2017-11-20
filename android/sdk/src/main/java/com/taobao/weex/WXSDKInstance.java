@@ -18,8 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +36,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -80,6 +79,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -89,6 +89,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -127,19 +129,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
 
+  /**
+   *for network tracker
+   */
+  public String mwxDims[] = new String [5];
+  public long measureTimes[] = new long [5];
 
   public WeakReference<String> templateRef;
-
   public Map<String,List<String>> responseHeaders = new HashMap<>();
 
   /**
    * Render strategy.
    */
   private WXRenderStrategy mRenderStrategy = WXRenderStrategy.APPEND_ASYNC;
+
   /**
    * Render start time
    */
-  private long mRenderStartTime;
+  public long mRenderStartTime;
   /**
    * Refresh start time
    */
@@ -840,6 +847,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
+	  mWXPerformance.wxDims = mwxDims;
+	  mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
@@ -1003,9 +1012,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           if ( mContext != null) {
             onViewAppear();
             View wxView= mRenderContainer;
-            if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
-              wxView = WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
-            }
             if(mRenderListener != null) {
               mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
             }
@@ -1067,13 +1073,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             }
 
             WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-
           }
         }
       });
     }
     if(!WXEnvironment.isApkDebugable()){
-      Log.e("weex_perf",mWXPerformance.getPerfData());
+      WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
 
