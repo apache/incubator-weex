@@ -224,6 +224,11 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
+        
+        //handler pixel round
+        BOOL shouldRoudPixel = [[configCenter configForKey:@"iOS_weex_ext_config.utilityShouldRoundPixel" defaultValue:@(NO) isDefault:NULL] boolValue];
+        [WXUtility setShouldRoudPixel:shouldRoudPixel];
+        
         id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXCycleSliderComponent" isDefault:NULL];
         if(sliderConfig){
             NSString *sliderClassName = [WXConvert NSString:sliderConfig];
