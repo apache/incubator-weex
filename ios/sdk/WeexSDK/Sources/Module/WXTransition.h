@@ -38,7 +38,7 @@ typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
 };
 
 
-@interface WXTransitionInfo : NSObject
+@interface WXLayoutAnimationInfo : NSObject
 @property (nonatomic, strong) id fromValue;
 @property (nonatomic, strong) id toValue;
 @property (nonatomic, strong) id perValue;
