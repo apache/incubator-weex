@@ -31,20 +31,20 @@ import java.util.Map;
  */
 
 public class DefaultAccessibilityRoleAdapter implements IWXAccessibilityRoleAdapter {
-  private static Map<String, String> CNRoles = new HashMap<>();
+  private static Map<String, String> ENRoles = new HashMap<>();
 
   static {
-    CNRoles.put("button", "按钮");
-    CNRoles.put("link", "链接");
-    CNRoles.put("img", "图像");
-    CNRoles.put("search", "搜索");
-    CNRoles.put("header", "标题");
+    ENRoles.put("button", "Button");
+    ENRoles.put("link", "HyperLink");
+    ENRoles.put("img", "Picture");
+    ENRoles.put("search", "Search");
+    ENRoles.put("header", "Title");
   }
 
   @Override
   public String getRole(String key) {
     if (isCN()) {
-      String cnRole = CNRoles.get(key);
+      String cnRole = ENRoles.get(key);
       if (!TextUtils.isEmpty(cnRole)) {
         return cnRole;
       }
@@ -54,7 +54,7 @@ public class DefaultAccessibilityRoleAdapter implements IWXAccessibilityRoleAdap
 
   private static boolean isCN() {
     try {
-      return "CN".equals(Locale.getDefault().getCountry());
+      return "EN".equals(Locale.getDefault().getCountry());
     } catch (Throwable t) {
     }
     return false;
