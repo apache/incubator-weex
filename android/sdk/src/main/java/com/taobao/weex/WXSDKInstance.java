@@ -74,6 +74,7 @@ import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1704,13 +1705,32 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             performance.appendErrMsg(response.errorCode);
             performance.appendErrMsg("|");
             performance.appendErrMsg(response.errorMsg);
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+					"\n response.errorCode " + response.errorCode +
+					"\n response.errorMsg" +  response.errorMsg +
+					"\n response." + getTemplateInfo(),
+					null);
+
           }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
             performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
             performance.appendErrMsg(response.statusCode);
             performance.appendErrMsg("|template is null!");
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED_TEMPLATE_NULL", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+							"\n response.errorCode " + response.errorCode +
+							"\n response.errorMsg" +  response.errorMsg +
+							"\n response." + getTemplateInfo(),
+					null);
+
           }else {
             performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
-          }
+		  }
+
           if (mUserTrackAdapter != null) {
             mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
           }
