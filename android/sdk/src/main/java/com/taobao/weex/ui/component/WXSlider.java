@@ -390,6 +390,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityResume() {
+    super.onActivityResume();
     if (mViewPager != null && mViewPager.isAutoScroll()) {
       mViewPager.startAutoScroll();
     }
@@ -397,6 +398,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityStop() {
+    super.onActivityStop();
     if (mViewPager != null) {
       mViewPager.pauseAutoScroll();
     }
