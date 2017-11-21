@@ -164,16 +164,16 @@ public final class WXDomManager {
         mDomRegistries.put(instanceId, oldStatement);
         context = oldStatement;
       }else{
-//		WXSDKInstance instance =  WXSDKManager.getInstance().getSDKInstance(instanceId);
-//		if(action != null && instance!= null && !instance.getismIsCommitedDomAtionExp()){
-//		  String className = action.getClass().getSimpleName();
-//		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
-//		  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-//				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorCode(),
-//				  "executeAction",
-//				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg() + "|current action is" +className, null);
-//		  instance.setmIsCommitedDomAtionExp(true);
-//		}
+		WXSDKInstance instance =  WXSDKManager.getInstance().getSDKInstance(instanceId);
+		if(action != null && instance!= null && !instance.getismIsCommitedDomAtionExp()){
+		  String className = action.getClass().getSimpleName();
+		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
+		  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorCode(),
+				  "executeAction",
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorMsg() + "|current action is" +className, null);
+		  instance.setmIsCommitedDomAtionExp(true);
+		}
 		return;
 	  }
     }
