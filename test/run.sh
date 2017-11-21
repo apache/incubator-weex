@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 port="${serport:-12581}"
-
+xxxxx
 function startMacacaServer {
     macaca server --verbose &
     while ! nc -z 127.0.0.1 3456; do sleep 5; done
