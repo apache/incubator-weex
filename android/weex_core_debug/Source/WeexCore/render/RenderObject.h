@@ -52,13 +52,41 @@ namespace WeexCore {
 
     EVENTS_SET *mEvents;
 
-    jobject mComponent_android;
+    jobject mComponent_Impl_Android;
+
+    jobject mMeasureFunc_Impl_Android;
+
+    void *mComponent_Impl_iOS;
 
   public:
 
     RenderObject(RenderPage *page);
 
     ~RenderObject();
+
+    void bindComponent_Impl_Android(jobject component_Impl_Android);
+
+    void bindComponent_Impl_iOS(void *component_Impl_iOS);
+
+    void bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
+
+    void bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
+
+    void onLayoutBefore();
+
+    void onLayoutAfter(float width, float height);
+
+    inline jobject getComponent_Impl_Android() {
+      return mComponent_Impl_Android;
+    }
+
+    inline jobject getMeasureFunc_Impl_Android() {
+      return mMeasureFunc_Impl_Android;
+    }
+
+    inline RenderObject *getChild(uint32_t index) {
+      return (RenderObject *) getChildAt(index);
+    }
 
     inline void addRenderObject(int index, RenderObject *child) {
       // insert RenderObject child
@@ -162,14 +190,6 @@ namespace WeexCore {
     void printRenderMsg();
 
     void printYGNodeMsg();
-
-    inline void bindComponent_Impl_Android(jobject component) {
-      this->mComponent_android = component;
-    }
-
-    inline RenderObject* getChild(uint32_t index) {
-      return (RenderObject *) getChildAt(index);
-    }
   };
 } //end WeexCore
 #endif //RenderObject_h

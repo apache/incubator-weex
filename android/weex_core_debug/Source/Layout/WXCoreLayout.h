@@ -60,7 +60,8 @@ namespace WXCoreFlexLayout {
     }
   } WXBFCDimension;
 
-  typedef WXCoreSize(*WXCoreMeasureFunc)(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+  typedef WXCoreSize(*WXCoreMeasureFunc)(WXCoreLayoutNode *node, float width,
+                                         MeasureMode widthMeasureMode,
                                          float height, MeasureMode heightMeasureMode);
 
   /**
@@ -268,19 +269,24 @@ namespace WXCoreFlexLayout {
       mLayoutResult->mLayoutSize.height = height;
     }
 
-    void measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
-                 bool useMeasureFunc);
+    void
+    measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
+            bool useMeasureFunc);
 
-    void onMeasure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode);
+    void onMeasure(float width, MeasureMode widthMeasureMode, float height,
+                   MeasureMode heightMeasureMode);
 
-    void measureHorizontal(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode);
+    void measureHorizontal(float width, MeasureMode widthMeasureMode, float height,
+                           MeasureMode heightMeasureMode);
 
-    void measureVertical(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode);
+    void measureVertical(float width, MeasureMode widthMeasureMode, float height,
+                         MeasureMode heightMeasureMode);
 
     void checkSizeConstraints(WXCoreLayoutNode *node);
 
-    void determineMainSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
-                           float height, MeasureMode heightMeasureMode);
+    void
+    determineMainSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
+                      float height, MeasureMode heightMeasureMode);
 
     uint32_t expandFlexItems(WXCoreFlexLine *flexLine,
                              WXCoreFlexDirection flexDirection, float maxMainSize,
@@ -291,8 +297,9 @@ namespace WXCoreFlexLayout {
                                      float width, MeasureMode widthMeasureMode,
                                      float height, MeasureMode heightMeasureMode);
 
-    void determineCrossSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
-                            float height, MeasureMode heightMeasureMode, float paddingAlongCrossAxis);
+    void
+    determineCrossSize(WXCoreFlexDirection flexDirection, float width, MeasureMode widthMeasureMode,
+                       float height, MeasureMode heightMeasureMode, float paddingAlongCrossAxis);
 
     void stretchViews(WXCoreFlexDirection flexDirection, WXCoreAlignItems alignItems);
 
@@ -307,13 +314,15 @@ namespace WXCoreFlexLayout {
 
     bool isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection);
 
-    void addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
-                                   float usedCrossSizeSoFar);
+    void
+    addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
+                              float usedCrossSizeSoFar);
 
     void addFlexLine(WXCoreFlexLine *flexLine, float usedCrossSizeSoFar);
 
     inline bool
-    obeyConstrainsDuringExpandMainAxis(WXCoreFlexLine *flexLine, uint32_t childIndex, float flexGrow) {
+    obeyConstrainsDuringExpandMainAxis(WXCoreFlexLine *flexLine, uint32_t childIndex,
+                                       float flexGrow) {
       // This means the child can't expand beyond the value of the
       // maxWidth/minWidth/maxHeight/minHeight attribute.
       // To adjust the flex line length to the size of mainSize, remaining
@@ -363,6 +372,14 @@ namespace WXCoreFlexLayout {
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Top, t);
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Right, r);
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Bottom, b);
+    }
+
+    virtual void onLayoutBefore() {
+
+    }
+
+    virtual void onLayoutAfter(float width, float height) {
+
     }
 
 

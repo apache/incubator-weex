@@ -113,21 +113,26 @@ namespace WXCoreFlexLayout {
     } else {
       if (useMeasureFunc && measureFunc != nullptr &&
           (isnan(mCssStyle->mStyleWidth) || isnan(mCssStyle->mStyleHeight))) {
-        WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height, heightMeasureMode);
+        onLayoutBefore();
+        WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height,
+                                           heightMeasureMode);
 //          onMeasure(dimension.width, dimension.height);
         width = widthMeasureMode == EXACTLY ? dimension.width :
-                min_num<float>(dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
-                               mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
-                               mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
-                               mCssStyle->mBorderWidth.getBorderWidth(
-                                   WXCore_Border_Width_Left),
-                               width);
+                min_num<float>(
+                    dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
+                    mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
+                    mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
+                    mCssStyle->mBorderWidth.getBorderWidth(
+                        WXCore_Border_Width_Left),
+                    width);
         height = heightMeasureMode == EXACTLY ? dimension.height :
-                 min_num<float>(dimension.height + mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
-                                mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
-                                mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
-                                mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom),
-                                height);
+                 min_num<float>(
+                     dimension.height + mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
+                     mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
+                     mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
+                     mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom),
+                     height);
+        onLayoutAfter(width, height);
       } else {
         if (widthMeasureMode == AT_MOST) {
           width = 0;

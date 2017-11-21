@@ -33,11 +33,11 @@ public class MeasureSize {
     this.width = width;
   }
 
+  @CalledByNative
   public float getHeight() {
     return height;
   }
 
-  @CalledByNative
   public void setHeight(float height) {
     this.height = height;
   }

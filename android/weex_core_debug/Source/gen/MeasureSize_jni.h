@@ -49,28 +49,27 @@ static jfloat Java_MeasureSize_getWidth(JNIEnv* env, jobject obj) {
   return ret;
 }
 
-static intptr_t g_MeasureSize_setHeight = 0;
-static void Java_MeasureSize_setHeight(JNIEnv* env, jobject obj, jfloat height)
-    {
+static intptr_t g_MeasureSize_getHeight = 0;
+static jfloat Java_MeasureSize_getHeight(JNIEnv* env, jobject obj) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
-  //    MeasureSize_clazz(env));
+  //    MeasureSize_clazz(env), 0);
   jmethodID method_id =
       base::android::GetMethod(
       env, MeasureSize_clazz(env),
       base::android::INSTANCE_METHOD,
-      "setHeight",
+      "getHeight",
 
 "("
-"F"
 ")"
-"V",
-      &g_MeasureSize_setHeight);
+"F",
+      &g_MeasureSize_getHeight);
 
-     env->CallVoidMethod(obj,
-          method_id, height);
+  jfloat ret =
+      env->CallFloatMethod(obj,
+          method_id);
   base::android::CheckException(env);
-
+  return ret;
 }
 
 // Step 3: RegisterNatives.

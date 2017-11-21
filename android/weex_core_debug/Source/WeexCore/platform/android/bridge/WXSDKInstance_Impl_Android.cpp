@@ -2,6 +2,8 @@
 #include "WXSDKInstance_Impl_Android.h"
 #include <gen/WXSDKInstance_jni.h>
 #include <WeexCore/render/RenderManager.h>
+#include <WeexCore/render/RenderPage.h>
+#include <WeexCore/render/RenderObject.h>
 #include <base/android/string/StringUtils.h>
 
 namespace WeexCore {

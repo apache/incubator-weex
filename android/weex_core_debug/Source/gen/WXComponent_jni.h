@@ -24,38 +24,40 @@ jclass g_WXComponent_clazz = NULL;
 
 }  // namespace
 
+static void BindMeasurementToWXCore(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jobject contentBoxMeasurement);
+
 // Step 2: method stubs.
 
-static intptr_t g_WXComponent_getContentBoxMeasurement = 0;
-static base::android::ScopedLocalJavaRef<jobject>
-    Java_WXComponent_getContentBoxMeasurement(JNIEnv* env, jobject obj) {
-  /* Must call RegisterNativesImpl()  */
-  //CHECK_CLAZZ(env, obj,
-  //    WXComponent_clazz(env), NULL);
-  jmethodID method_id =
-      base::android::GetMethod(
-      env, WXComponent_clazz(env),
-      base::android::INSTANCE_METHOD,
-      "getContentBoxMeasurement",
-
-"("
-")"
-"Lcom/taobao/weex/ui/layout/ContentBoxMeasurement;",
-      &g_WXComponent_getContentBoxMeasurement);
-
-  jobject ret =
-      env->CallObjectMethod(obj,
-          method_id);
-  base::android::CheckException(env);
-  return base::android::ScopedLocalJavaRef<jobject>(env, ret);
-}
-
 // Step 3: RegisterNatives.
+
+static const JNINativeMethod kMethodsWXComponent[] = {
+    { "nativeBindMeasurementToWXCore",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Lcom/taobao/weex/ui/layout/ContentBoxMeasurement;"
+")"
+"V", reinterpret_cast<void*>(BindMeasurementToWXCore) },
+};
 
 static bool RegisterNativesImpl(JNIEnv* env) {
 
   g_WXComponent_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
       base::android::GetClass(env, kWXComponentClassPath).Get()));
+
+  const int kMethodsWXComponentSize =
+      sizeof(kMethodsWXComponent)/sizeof(kMethodsWXComponent[0]);
+
+  if (env->RegisterNatives(WXComponent_clazz(env),
+                           kMethodsWXComponent,
+                           kMethodsWXComponentSize) < 0) {
+    //jni_generator::HandleRegistrationError(
+    //    env, WXComponent_clazz(env), __FILE__);
+    return false;
+  }
 
   return true;
 }

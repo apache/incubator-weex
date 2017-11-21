@@ -190,7 +190,6 @@ public class WXText extends WXComponent<WXTextView> {
         ret.setWidth(measureWidth);
         ret.setHeight(measureHeight);
         return ret;
-
       }
 
       @Override

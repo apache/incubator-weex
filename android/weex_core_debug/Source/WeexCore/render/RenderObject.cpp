@@ -1,5 +1,9 @@
 #include "RenderObject.h"
 #include "RenderPage.h"
+#include <WeexCore/platform/android/bridge/ContentBoxMeasurement_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/MeasureSize_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/MeasureMode_Impl_Android.h>
+#include <base/android/jni/scoped_java_ref.h>
 
 namespace WeexCore {
 
@@ -11,9 +15,13 @@ namespace WeexCore {
     mMargins = new MARGIN_MAP();
     mBorders = new BORDER_MAP();
     mEvents = new EVENTS_SET();
+    mComponent_Impl_Android = nullptr;
+    mMeasureFunc_Impl_Android = nullptr;
   }
 
   RenderObject::~RenderObject() {
+
+    JNIEnv *env = getJNIEnv();
 
     mPage = nullptr;
     mParentRender = nullptr;
@@ -31,15 +39,89 @@ namespace WeexCore {
       mEvents = nullptr;
     }
 
+    if (mComponent_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mComponent_Impl_Android);
+      mComponent_Impl_Android = nullptr;
+    }
+
+    if (mMeasureFunc_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mMeasureFunc_Impl_Android);
+      mMeasureFunc_Impl_Android = nullptr;
+    }
+
     freeWXCoreNode();
 
     for (int i = 0; i < getChildCount(); i++) {
-      RenderObject* render = getChild(i);
+      RenderObject *render = getChild(i);
       if (nullptr != render) {
         delete render;
         render = nullptr;
       }
     }
+  }
+
+  void RenderObject::bindComponent_Impl_Android(jobject component_Impl_Android) {
+    if (component_Impl_Android == nullptr)
+      return;
+    this->mComponent_Impl_Android = getJNIEnv()->NewGlobalRef(component_Impl_Android);
+  }
+
+  void RenderObject::bindComponent_Impl_iOS(void *component_Impl_iOS) {
+    if (component_Impl_iOS == nullptr)
+      return;
+    this->mComponent_Impl_iOS = component_Impl_iOS;
+  }
+
+  WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+                              float height, MeasureMode heightMeasureMode) {
+    JNIEnv *env = getJNIEnv();
+    WXCoreSize size;
+    size.height = 0;
+    size.width = 0;
+
+    if (node == nullptr || ((RenderObject *) node)->getMeasureFunc_Impl_Android() == nullptr)
+      return size;
+
+    int widthMode = getATMOST(env);
+    int heightMode = getATMOST(env);
+    if (widthMeasureMode == EXACTLY)
+      widthMode = getEXACTLY(env);
+    if (heightMeasureMode == EXACTLY)
+      heightMode = getEXACTLY(env);
+    base::android::ScopedLocalJavaRef<jobject> jsize = cumsmeasure_Imple_Android(env,
+                                                                                 ((RenderObject *) node)->getMeasureFunc_Impl_Android(),
+                                                                                 width, height,
+                                                                                 widthMode,
+                                                                                 heightMode);
+    if (jsize.Get() == nullptr)
+      return size;
+    size.height = getMeasureHeight(env, jsize.Get());
+    size.width = getMeasureWidth(env, jsize.Get());
+
+    return size;
+  }
+
+  void RenderObject::bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android) {
+    if (measureFunc_Impl_Android == nullptr)
+      return;
+    this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_Impl_Android);
+    setMeasureFunc(measureFunc_Impl);
+  }
+
+  void RenderObject::bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS) {
+    if (measureFunc_Impl_iOS == nullptr)
+      return;
+    setMeasureFunc(measureFunc_Impl_iOS);
+  }
+
+  void RenderObject::onLayoutBefore() {
+    JNIEnv *env = getJNIEnv();
+    layoutBefore_Impl_Android(env, this->getMeasureFunc_Impl_Android());
+  }
+
+  void RenderObject::onLayoutAfter(float width, float height) {
+    JNIEnv *env = getJNIEnv();
+    layoutAfter_Impl_Android(env, this->getMeasureFunc_Impl_Android(), width, height);
   }
 
 /**

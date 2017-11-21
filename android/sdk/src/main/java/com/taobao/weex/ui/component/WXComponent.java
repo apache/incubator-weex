@@ -156,12 +156,10 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   protected void setContentBoxMeasurement(ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
+    nativeBindMeasurementToWXCore(getInstanceId(),getRef(),this.contentBoxMeasurement);
   }
 
-  @CalledByNative
-  private ContentBoxMeasurement getContentBoxMeasurement() {
-    return contentBoxMeasurement;
-  }
+  public native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
   public @NonNull
   WXStyle getStyles() {
