@@ -41,26 +41,33 @@ public class WXExceptionUtils {
    * @param exception
    * @param extParams
    */
-  public static void commitCriticalExceptionRT(@Nullable String instanceId, @Nullable String errCode, @Nullable String function, @Nullable String exception, @Nullable Map<String,String> extParams ){
-	IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
-	WXSDKInstance instance ;
-	WXJSExceptionInfo exceptionCommit;
-	String bundleUrlCommit = "BundleUrlDefault";
-	String instanceIdCommit = "InstanceIdDefalut";
+  public static void commitCriticalExceptionRT(@Nullable final String instanceId, @Nullable final String errCode, @Nullable final String function, @Nullable final String exception, @Nullable final Map<String,String> extParams ){
 
-	if(!TextUtils.isEmpty(instanceId)){
-	  instanceIdCommit = instanceId;
-	  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-	  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
-		bundleUrlCommit = instance.getBundleUrl();
+	WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+	  @Override
+	  public void run() {
+
+		IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+		WXSDKInstance instance ;
+		WXJSExceptionInfo exceptionCommit;
+		String bundleUrlCommit = "BundleUrlDefault";
+		String instanceIdCommit = "InstanceIdDefalut";
+
+		if(!TextUtils.isEmpty(instanceId)){
+		  instanceIdCommit = instanceId;
+		  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+		  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
+			bundleUrlCommit = instance.getBundleUrl();
+		  }
+		}
+
+		if(adapter != null ){
+		  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, extParams);
+		  adapter.onJSException(exceptionCommit);
+		  WXLogUtils.e(exceptionCommit.toString());
+		}
+
 	  }
-	}
-
-	if(adapter != null ){
-	  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, extParams);
-	  adapter.onJSException(exceptionCommit);
-	  WXLogUtils.e(exceptionCommit.toString());
-	}
-
+	}, 0);
   }
 }

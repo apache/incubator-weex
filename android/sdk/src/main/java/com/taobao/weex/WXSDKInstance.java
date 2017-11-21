@@ -1225,38 +1225,38 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /**
-   * UserTrack Log
+   * UserTrack Log instead by {@code WXExceptionUtils#commitCriticalExceptionRT}
    */
-  public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (TextUtils.isEmpty(type) || errorCode == null) {
-      return;
-    }
-
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        // Record exception if a render error happened.
-        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
-          mStatisticsListener.onException(mInstanceId,
-                                          errorCode.getErrorCode(),
-                                          errorCode.getErrorMsg());
-        }
-
-        WXPerformance performance = new WXPerformance();
-        performance.errCode = errorCode.getErrorCode();
-        performance.args = errorCode.getArgs();
-        if (errorCode != WXErrorCode.WX_SUCCESS) {
-          performance.errMsg = errorCode.getErrorMsg();
-          if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(performance.toString());
-          }
-        }
-        if( mUserTrackAdapter!= null) {
-          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
-        }
-      }
-    });
-  }
+//  public void commitUTStab(final String type, final WXErrorCode errorCode) {
+//    if (TextUtils.isEmpty(type) || errorCode == null) {
+//      return;
+//    }
+//
+//    runOnUiThread(new Runnable() {
+//      @Override
+//      public void run() {
+//        // Record exception if a render error happened.
+//        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
+//          mStatisticsListener.onException(mInstanceId,
+//                                          errorCode.getErrorCode(),
+//                                          errorCode.getErrorMsg());
+//        }
+//
+//        WXPerformance performance = new WXPerformance();
+//        performance.errCode = errorCode.getErrorCode();
+//        performance.args = errorCode.getArgs();
+//        if (errorCode != WXErrorCode.WX_SUCCESS) {
+//          performance.errMsg = errorCode.getErrorMsg();
+//          if (WXEnvironment.isApkDebugable()) {
+//            WXLogUtils.d(performance.toString());
+//          }
+//        }
+//        if( mUserTrackAdapter!= null) {
+//          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
+//        }
+//      }
+//    });
+//  }
 
   private void destroyView(View rootView) {
     try {

@@ -41,6 +41,7 @@ import android.view.animation.LinearInterpolator;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
@@ -54,6 +55,7 @@ import com.taobao.weex.ui.animation.WidthProperty;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.SingleFunctionParser;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -125,6 +127,10 @@ class AnimationAction implements DOMAction, RenderAction {
         }
       }
     } catch (RuntimeException e) {
+	  WXExceptionUtils.commitCriticalExceptionRT(context.getInstance().getInstanceId(),
+			  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorCode(),
+			  "animationAction",
+			  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorMsg() + WXLogUtils.getStackTrace(e),null);
       WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
     }
   }
@@ -167,8 +173,11 @@ class AnimationAction implements DOMAction, RenderAction {
             animator.start();
           }
         } catch (RuntimeException e) {
-          WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
-        }
+		  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorCode(),
+				  "animationAction",
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorMsg() + WXLogUtils.getStackTrace(e),null);
+		  WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));        }
       }
     }
   }

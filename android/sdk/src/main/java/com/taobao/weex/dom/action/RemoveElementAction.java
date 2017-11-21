@@ -28,6 +28,7 @@ import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 /**
  * Created by sospartan on 27/02/2017.
@@ -48,14 +49,22 @@ final class RemoveElementAction implements DOMAction, RenderAction {
     WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+//        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorCode(),
+				"removeElement",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorMsg() + "domObject is null",null);
       }
       return;
     }
     WXDomObject parent = domObject.parent;
     if (parent == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+//        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorCode(),
+				"removeElement",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorMsg() + "parent is null",null);
       }
       return;
     }
@@ -64,10 +73,6 @@ final class RemoveElementAction implements DOMAction, RenderAction {
     context.unregisterDOMObject(mRef);
 
     context.postRenderTask(this);
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override

@@ -30,6 +30,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 /**
  * Created by sospartan on 02/03/2017.
@@ -55,16 +56,16 @@ class RemoveEventAction implements DOMAction, RenderAction {
     WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEEVENT);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_EVENT.getErrorCode(),
+				"updateAttr",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_EVENT.getErrorMsg() + "domObject is null",null);
       }
       return;
     }
     domObject.removeEvent(mEvent);
     mUpdatedDomObject = domObject;
     context.postRenderTask(this);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override

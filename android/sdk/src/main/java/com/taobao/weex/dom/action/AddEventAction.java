@@ -31,6 +31,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 import java.util.List;
 
@@ -59,8 +60,10 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
     WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDEVENT);
-      }
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorCode(),
+				"addEvent",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorMsg() + "domObject is null",null);      }
       return;
     }
 
@@ -71,10 +74,6 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
     }
 
     context.postRenderTask(this);
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override

@@ -170,7 +170,7 @@ public final class WXDomManager {
 		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
 		  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
 				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorCode(),
-				  "executeActionError",
+				  "executeAction",
 				  WXErrorCode.WX_ERR_FIRST_DOM_ACTION_EXCEPTION.getErrorMsg() + "|current action is" +className, null);
 		  instance.setmIsCommitedDomAtionExp(true);
 		}
