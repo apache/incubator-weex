@@ -18,7 +18,6 @@ namespace WXCoreFlexLayout {
   typedef enum FormatingContext {
     BFC,
     NON_BFC,
-    ALL,
   } FormatingContext;
 
   typedef enum MeasureMode {
@@ -377,10 +376,13 @@ namespace WXCoreFlexLayout {
           return NonBFCs.size();
         case BFC:
           return BFCs.size();
-        case ALL:
         default:
           return mChildList.size();
       }
+    }
+
+    inline uint32_t getChildCount() {
+      return mChildList.size();
     }
 
     inline void removeChildAt(uint32_t index) {
@@ -407,10 +409,13 @@ namespace WXCoreFlexLayout {
           return NonBFCs[index];
         case BFC:
           return BFCs[index];
-        case ALL:
         default:
           return mChildList[index];
       }
+    }
+
+    inline WXCoreLayoutNode *getChildAt(uint32_t index) {
+      return mChildList[index];
     }
 
     inline WXCoreLayoutNode *getParent() {

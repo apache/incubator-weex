@@ -24,6 +24,11 @@ jclass g_WXSDKInstance_clazz = NULL;
 
 }  // namespace
 
+static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jobject component,
+    jstring ref);
+
 // Step 2: method stubs.
 
 static intptr_t g_WXSDKInstance_getInstanceByID = 0;
@@ -53,10 +58,31 @@ static base::android::ScopedLocalJavaRef<jobject>
 
 // Step 3: RegisterNatives.
 
+static const JNINativeMethod kMethodsWXSDKInstance[] = {
+    { "nativeBindComponentToWXCore",
+"("
+"Ljava/lang/String;"
+"Lcom/taobao/weex/ui/component/WXComponent;"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(BindComponentToWXCore) },
+};
+
 static bool RegisterNativesImpl(JNIEnv* env) {
 
   g_WXSDKInstance_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
       base::android::GetClass(env, kWXSDKInstanceClassPath).Get()));
+
+  const int kMethodsWXSDKInstanceSize =
+      sizeof(kMethodsWXSDKInstance)/sizeof(kMethodsWXSDKInstance[0]);
+
+  if (env->RegisterNatives(WXSDKInstance_clazz(env),
+                           kMethodsWXSDKInstance,
+                           kMethodsWXSDKInstanceSize) < 0) {
+    //jni_generator::HandleRegistrationError(
+    //    env, WXSDKInstance_clazz(env), __FILE__);
+    return false;
+  }
 
   return true;
 }

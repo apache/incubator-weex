@@ -23,7 +23,7 @@ namespace WeexCore {
       this->mPageId = pageId;
       this->mComponentType = render->getType();
       this->mRef = render->getRef();
-      getLayoutInfo(render->getLayoutNode());
+      getLayoutInfo(render);
     }
   };
 }

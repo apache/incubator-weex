@@ -36,14 +36,16 @@ public class AddElementUIAction extends WXUIAction {
     }
 
     final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
-    WXComponent component = createComponent(instance, parent);
+    WXComponent child = createComponent(instance, parent);
 
-    if (component == null || parent == null) {
+    if (child == null || parent == null) {
       return;
     }
 
+    WXSDKManager.getInstance().getSDKInstance(mPageId).nativeBindComponentToWXCore(mPageId, child, mRef);
+
     try {
-      parent.addChild(component, mIndex);
+      parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);

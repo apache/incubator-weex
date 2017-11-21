@@ -1511,6 +1511,7 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
         WXBridgeManager.getInstance().onVsync(getInstanceId());
       }
     });
-
   }
+
+  public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 }

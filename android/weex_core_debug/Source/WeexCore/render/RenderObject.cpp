@@ -11,18 +11,12 @@ namespace WeexCore {
     mMargins = new MARGIN_MAP();
     mBorders = new BORDER_MAP();
     mEvents = new EVENTS_SET();
-    mLayoutNode = WXCoreLayoutNode::newWXCoreNode();
   }
 
   RenderObject::~RenderObject() {
 
     mPage = nullptr;
     mParentRender = nullptr;
-
-    if (mLayoutNode != nullptr) {
-      delete mLayoutNode;
-      mLayoutNode = nullptr;
-    }
 
     if (mStyles != nullptr) {
       delete mStyles;
@@ -37,117 +31,116 @@ namespace WeexCore {
       mEvents = nullptr;
     }
 
-    mLayoutNode->freeWXCoreNode();
+    freeWXCoreNode();
 
-    for (CHILD_LIST_IT it = getChildListItBegin();
-         it != getChildListItEnd(); it++) {
-      if (nullptr != *it) {
-        delete *it;
-        *it = nullptr;
+    for (int i = 0; i < getChildCount(); i++) {
+      RenderObject* render = getChild(i);
+      if (nullptr != render) {
+        delete render;
+        render = nullptr;
       }
     }
-    mChildren.clear();
   }
 
 /**
- * Synchronize the style of RenderObject to YGNode
+ * Synchronize the style of RenderObject to LayoutNode
  */
   void RenderObject::applyStyle(std::string key, std::string value) {
     if (key == ALIGN_ITEMS) {
-      mLayoutNode->setAlignItems(getWXCoreAlignItem(value));
+      setAlignItems(getWXCoreAlignItem(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == ALIGN_SELF) {
-      mLayoutNode->setAlignSelf(getWXCoreAlignSelf(value));
+      setAlignSelf(getWXCoreAlignSelf(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == FLEX) {
-      mLayoutNode->setFlex(stringToNum<float>(value));
+      setFlex(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == FLEX_DIRECTION) {
-      mLayoutNode->setFlexDirection(getWXCoreFlexDirection(value));
+      setFlexDirection(getWXCoreFlexDirection(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == JUSTIFY_CONTENT) {
-      mLayoutNode->setJustifyContent(getWXCoreJustifyContent(value));
+      setJustifyContent(getWXCoreJustifyContent(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == FLEX_WRAP) {
-      mLayoutNode->setFlexWrap(getWXCoreFlexWrap(value));
+      setFlexWrap(getWXCoreFlexWrap(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == MIN_WIDTH) {
-      mLayoutNode->setMinWidth(stringToNum<float>(value));
+      setMinWidth(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == MIN_HEIGHT) {
-      mLayoutNode->setMinHeight(stringToNum<float>(value));
+      setMinHeight(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == MAX_WIDTH) {
-      mLayoutNode->setMaxWidth(stringToNum<float>(value));
+      setMaxWidth(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == MAX_HEIGHT) {
-      mLayoutNode->setMaxHeight(stringToNum<float>(value));
+      setMaxHeight(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
-      mLayoutNode->setStyleHeight(stringToNum<float>(value));
+      setStyleHeight(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
-      mLayoutNode->setStyleWidth(stringToNum<float>(value));
+      setStyleWidth(stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == POSITION) {
-      mLayoutNode->setStylePositionType(getWXCorePositionType(value));
+      setStylePositionType(getWXCorePositionType(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == LEFT) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
+      setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == TOP) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
+      setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == RIGHT) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
+      setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == BOTTOM) {
-      mLayoutNode->setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
+      setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
       mStyles->insert(pair<std::string, std::string>(key, value));
     } else if (key == MARGIN) {
-      mLayoutNode->setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
+      setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
       mMargins->insert(pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_LEFT) {
-      mLayoutNode->setMargin(WXCore_Margin_Left, stringToNum<float>(value));
+      setMargin(WXCore_Margin_Left, stringToNum<float>(value));
       mMargins->insert(pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_TOP) {
-      mLayoutNode->setMargin(WXCore_Margin_Top, stringToNum<float>(value));
+      setMargin(WXCore_Margin_Top, stringToNum<float>(value));
       mMargins->insert(pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_RIGHT) {
-      mLayoutNode->setMargin(WXCore_Margin_Right, stringToNum<float>(value));
+      setMargin(WXCore_Margin_Right, stringToNum<float>(value));
       mMargins->insert(pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_BOTTOM) {
-      mLayoutNode->setMargin(WXCore_Margin_Bottom, stringToNum<float>(value));
+      setMargin(WXCore_Margin_Bottom, stringToNum<float>(value));
       mMargins->insert(pair<std::string, std::string>(key, value));
     } else if (key == BORDER_WIDTH) {
-      mLayoutNode->setBorderWidth(WXCore_Border_Width_ALL, stringToNum<float>(value));
+      setBorderWidth(WXCore_Border_Width_ALL, stringToNum<float>(value));
       mBorders->insert(pair<std::string, std::string>(key, value));
     } else if (key == BORDER_TOP_WIDTH) {
-      mLayoutNode->setBorderWidth(WXCore_Border_Width_Top, stringToNum<float>(value));
+      setBorderWidth(WXCore_Border_Width_Top, stringToNum<float>(value));
       mBorders->insert(pair<std::string, std::string>(key, value));
     } else if (key == BORDER_RIGHT_WIDTH) {
-      mLayoutNode->setBorderWidth(WXCore_Border_Width_Right, stringToNum<float>(value));
+      setBorderWidth(WXCore_Border_Width_Right, stringToNum<float>(value));
       mBorders->insert(pair<std::string, std::string>(key, value));
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      mLayoutNode->setBorderWidth(WXCore_Border_Width_Bottom, stringToNum<float>(value));
+      setBorderWidth(WXCore_Border_Width_Bottom, stringToNum<float>(value));
       mBorders->insert(pair<std::string, std::string>(key, value));
     } else if (key == BORDER_LEFT_WIDTH) {
-      mLayoutNode->setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
+      setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
       mBorders->insert(pair<std::string, std::string>(key, value));
     } else if (key == PADDING) {
-      mLayoutNode->setPadding(WXCore_Padding_ALL, stringToNum<float>(value));
+      setPadding(WXCore_Padding_ALL, stringToNum<float>(value));
       mPaddings->insert(pair<std::string, std::string>(key, value));
     } else if (key == PADDING_LEFT) {
-      mLayoutNode->setPadding(WXCore_Padding_Left, stringToNum<float>(value));
+      setPadding(WXCore_Padding_Left, stringToNum<float>(value));
       mPaddings->insert(pair<std::string, std::string>(key, value));
     } else if (key == PADDING_TOP) {
-      mLayoutNode->setPadding(WXCore_Padding_Top, stringToNum<float>(value));
+      setPadding(WXCore_Padding_Top, stringToNum<float>(value));
       mPaddings->insert(pair<std::string, std::string>(key, value));
     } else if (key == PADDING_RIGHT) {
-      mLayoutNode->setPadding(WXCore_Padding_Right, stringToNum<float>(value));
+      setPadding(WXCore_Padding_Right, stringToNum<float>(value));
       mPaddings->insert(pair<std::string, std::string>(key, value));
     } else if (key == PADDING_BOTTOM) {
-      mLayoutNode->setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
+      setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
       mPaddings->insert(pair<std::string, std::string>(key, value));
     } else {
       mStyles->insert(pair<std::string, std::string>(key, value));
@@ -205,12 +198,12 @@ namespace WeexCore {
 
 //    LOGE("[RenderObject::Render tree] \n %s", result.c_str());
 
-    for (CHILD_LIST_IT it = getChildListItBegin();
-         it != getChildListItEnd(); it++) {
-      if (nullptr != *it) {
+//    for (CHILD_LIST_IT it = getChildListItBegin();
+//         it != getChildListItEnd(); it++) {
+//      if (nullptr != *it) {
 //        (*it)->printRenderMsg();
-      }
-    }
+//      }
+//    }
   }
 
   void RenderObject::printYGNodeMsg() {
@@ -220,11 +213,11 @@ namespace WeexCore {
 //    YGNodePrint(mYGNode, YGPrintOptionsStyle);
 //    LOGE("\n\n");
 
-    for (CHILD_LIST_IT it = getChildListItBegin();
-         it != getChildListItEnd(); it++) {
-      if (nullptr != *it) {
+//    for (CHILD_LIST_IT it = getChildListItBegin();
+//         it != getChildListItEnd(); it++) {
+//      if (nullptr != *it) {
 //        (*it)->printYGNodeMsg();
-      }
-    }
+//      }
+//    }
   }
 } //end WeexCore

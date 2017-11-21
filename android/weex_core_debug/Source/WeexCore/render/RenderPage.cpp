@@ -5,7 +5,7 @@ namespace WeexCore {
   void RenderPage::calculateLayout() {
     if (pRoot == nullptr)
       return;
-    pRoot->getLayoutNode()->calculateLayout();
+    pRoot->calculateLayout();
     traverseTree(pRoot);
   }
 
@@ -31,7 +31,8 @@ namespace WeexCore {
     RenderObject *render = json2RenderObject(c_data, this);
     free(c_data);
     c_data = nullptr;
-    mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
+
+    pushRenderToMap(render);
     setRootRenderObject(render);
     sendCreateBodyAction(render);
     // layout by dom Tree
@@ -73,7 +74,7 @@ namespace WeexCore {
       return;
     }
 
-    mRenderObjectMap.insert(pair<std::string, RenderObject *>(child->getRef(), child));
+    pushRenderToMap(child);
 
     // add child to Render Tree
     child->setParentRender(parent);

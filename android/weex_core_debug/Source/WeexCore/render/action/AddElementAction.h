@@ -36,7 +36,7 @@ namespace WeexCore {
       this->mRef = render->getRef();
       this->mParentRef = parent->getRef();
       this->mIndex = index;
-      getLayoutInfo(render->getLayoutNode());
+      getLayoutInfo(render);
     }
   };
 }

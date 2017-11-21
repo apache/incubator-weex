@@ -18,11 +18,9 @@ namespace WeexCore {
 
   class RenderPage;
 
-  typedef std::vector<RenderObject *> ChildrenList;
   typedef std::map<std::string, std::string>::const_iterator STYLE_IT;
   typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
   typedef std::set<std::string>::const_iterator EVENT_IT;
-  typedef ChildrenList::iterator CHILD_LIST_IT;
   typedef std::map<std::string, std::string> STYLES_MAP;
   typedef std::map<std::string, std::string> ATTRIBUTES_MAP;
   typedef std::set<std::string> EVENTS_SET;
@@ -30,7 +28,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> PADDING_MAP;
   typedef std::map<std::string, std::string> BORDER_MAP;
 
-  class RenderObject {
+  class RenderObject : public WXCoreLayoutNode {
   public:
 
   private:
@@ -54,9 +52,7 @@ namespace WeexCore {
 
     EVENTS_SET *mEvents;
 
-    ChildrenList mChildren;
-
-    WXCoreLayoutNode *mLayoutNode;
+    jobject mComponent_android;
 
   public:
 
@@ -66,19 +62,11 @@ namespace WeexCore {
 
     inline void addRenderObject(int index, RenderObject *child) {
       // insert RenderObject child
-//    mChildren.insert(mChildren.begin() + mChildren.size() - 1, child);
-      mLayoutNode->addChildAt(child->getLayoutNode(), getChildCount());
-      mChildren.push_back(child);
+      addChildAt(child, getChildCount());
     }
 
     inline void removeRenderObject(RenderObject *child) {
-      for (CHILD_LIST_IT it = getChildListItBegin();
-           it != getChildListItEnd(); it++) {
-        if ((*it)->getRef() == child->getRef()) {
-          mChildren.erase(it);
-          break;
-        }
-      }
+      removeChild(child);
     }
 
     inline void updateAttr(std::string key, std::string value) {
@@ -97,18 +85,6 @@ namespace WeexCore {
       mEvents->erase(event);
     }
 
-    inline RenderObject *getChild(int index) {
-      if (index < mChildren.size()) {
-        return mChildren.at(index);
-      } else {
-        return nullptr;
-      }
-    }
-
-    inline int getChildCount() {
-      return mChildren.size();
-    }
-
     inline void setRef(std::string ref) {
       mRef = ref;
     }
@@ -119,18 +95,10 @@ namespace WeexCore {
 
     inline void setType(std::string type) {
       mType = type;
-
-      if (type.compare("list") == 0) {
-        mLayoutNode->setFlex(1);
-      }
     }
 
     inline std::string getType() {
       return mType;
-    }
-
-    inline WXCoreLayoutNode *getLayoutNode() {
-      return mLayoutNode;
     }
 
     inline void setParentRender(RenderObject *render) {
@@ -189,19 +157,19 @@ namespace WeexCore {
       return mEvents->end();
     }
 
-    inline CHILD_LIST_IT getChildListItBegin() {
-      return mChildren.begin();
-    }
-
-    inline CHILD_LIST_IT getChildListItEnd() {
-      return mChildren.end();
-    }
-
     void applyStyle(std::string key, std::string value);
 
     void printRenderMsg();
 
     void printYGNodeMsg();
+
+    inline void bindComponent_Impl_Android(jobject component) {
+      this->mComponent_android = component;
+    }
+
+    inline RenderObject* getChild(uint32_t index) {
+      return (RenderObject *) getChildAt(index);
+    }
   };
 } //end WeexCore
 #endif //RenderObject_h

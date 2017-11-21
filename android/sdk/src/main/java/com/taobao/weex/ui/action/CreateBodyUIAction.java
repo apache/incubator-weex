@@ -43,8 +43,9 @@ public class CreateBodyUIAction extends WXUIAction {
       return;
     }
 
-    try {
+    WXSDKManager.getInstance().getSDKInstance(mPageId).nativeBindComponentToWXCore(mPageId, component, mRef);
 
+    try {
       component.createView();
 
       if (component instanceof WXScroller) {

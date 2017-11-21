@@ -34,6 +34,14 @@ namespace WeexCore {
 
     void calculateLayout();
 
+    inline void pushRenderToMap(RenderObject *render) {
+      mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
+
+      for (int i = 0; i < render->getChildCount(); ++i) {
+        pushRenderToMap(render->getChild(i));
+      }
+    }
+
     inline void sendCreateBodyAction(RenderObject *render) {
       CreateBodyAction *action = new CreateBodyAction();
       action->GenerateAction(getPageId(), render);

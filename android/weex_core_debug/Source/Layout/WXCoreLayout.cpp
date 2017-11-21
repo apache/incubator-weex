@@ -44,8 +44,8 @@ namespace WXCoreFlexLayout {
 
   void WXCoreLayoutNode::initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs) {
     NonBFCs.clear();
-    for (int i = 0; i < getChildCount(ALL); i++) {
-      WXCoreLayoutNode *child = getChildAt(ALL, i);
+    for (int i = 0; i < getChildCount(); i++) {
+      WXCoreLayoutNode *child = getChildAt(i);
       if (isBFC(child)) {
         BFCs.push_back(child);
       } else {
