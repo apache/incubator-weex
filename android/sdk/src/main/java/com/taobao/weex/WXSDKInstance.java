@@ -479,7 +479,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
+	mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
+	if (TextUtils.isEmpty(mBundleUrl)) {
+	  mBundleUrl = mWXPerformance.pageName;
+	}
+
+	WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
@@ -504,7 +509,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    mWXPerformance.pageName = pageName;
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
     mRenderStartTime = System.currentTimeMillis();
@@ -514,10 +518,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
-
-    if (TextUtils.isEmpty(mBundleUrl)) {
-      mBundleUrl = pageName;
-    }
   }
 
   private void renderByUrlInternal(String pageName,

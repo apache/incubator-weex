@@ -120,8 +120,8 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     if (component == null) {
 //      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
       //stop redner, some fatal happened.
-	  errMsg = "component == null";
-	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+//	  errMsg = "component == null";
+//	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
 	  return;
     }
     Stopwatch.split("createComponent");
