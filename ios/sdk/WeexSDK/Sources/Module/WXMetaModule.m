@@ -20,6 +20,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
+#import "WXSDKInstance.h"
 
 @implementation WXMetaModule
 
@@ -41,6 +42,31 @@ WX_EXPORT_METHOD_SYNC(@selector(setViewport:))
         }
     } else {
         viewportWidthFloat = [WXConvert CGFloat:viewportWidth];
+    }
+    NSString *viewportFit = viewportArguments[@"viewport-fit"];
+    if (viewportFit) {
+        // handle viewport-fit for iPhone X
+        // viewportFit can be `cover`,`contain`
+        
+        //handle cover
+        if ([viewportFit isEqualToString:@"cover"]) {
+            WXPerformBlockSyncOnMainThread(^{
+                weexInstance.frame = [UIScreen mainScreen].bounds;
+            });
+        }else if ([viewportFit isEqualToString:@"contain"]) {
+            WXPerformBlockSyncOnMainThread(^{
+                CGRect newFrame = weexInstance.rootView.frame;
+                // here we only handle the full screen case.
+                if (CGRectEqualToRect(newFrame, [UIScreen mainScreen].bounds)) {
+                    if (@available(iOS 11.0, *)) {
+                        newFrame = UIEdgeInsetsInsetRect(weexInstance.rootView.frame, weexInstance.rootView.safeAreaInsets);
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    weexInstance.frame = newFrame;
+                }
+            });
+        }
     }
     
     if (viewportWidthFloat > 0) {
