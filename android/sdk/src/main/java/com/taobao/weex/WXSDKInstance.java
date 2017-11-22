@@ -1740,11 +1740,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
-      } else if (TextUtils.equals(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR, response.statusCode)) {
-        WXLogUtils.d("user intercept");
-        onRenderError(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,response.errorMsg);
+      } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+			  response.statusCode)) {
+        WXLogUtils.d("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+				response.errorMsg);
       } else {
-        onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode(),
+				response.errorMsg);
       }
     }
   }

@@ -184,12 +184,6 @@ public class WXEnvironment {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("isTableDevice:" + WXUtils.isTabletDevice());
     }
-    if(!WXUtils.isTabletDevice()){
-	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT.getErrorCode(),
-			  "isHardwareSupport", WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT.getErrorMsg(),
-			  null);
-	}
     return isCPUSupport() && !WXUtils.isTabletDevice();
   }
 
