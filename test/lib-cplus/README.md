@@ -6,7 +6,7 @@ For testing we rely on [gtest](https://github.com/google/googletest) as a submod
 
 For coverage we rely on [lcov](https://github.com/linux-test-project/lcov) as a submodule. After cloning weex run `git submodule init` followed by `git submodule update`.
 
-For any changes you make you should ensure that all the tests are passing. In case you make any fixes or additions to the library please also add tests for that change to ensure we don't break anything in the future. Tests are located in the `test` directory. Run the tests by executing `sh ./test/run.sh`.
+For any changes you make you should ensure that all the tests are passing. In case you make any fixes or additions to the library please also add tests for that change to ensure we don't break anything in the future. Tests are located in the `${currentDir}/case` directory. Run the tests by executing `sh ${currentDir}/runTest.sh`.
 
 ## USE IDE 
 ### Xcode
