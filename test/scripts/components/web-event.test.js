@@ -28,7 +28,7 @@ describe('weex '+goal+' test @ignore-android', function () {
       .waitForElementByName(goal, maxW, 2000)
       .waitForElementByName('txtStart:https://www.baidu.com/', maxW, 2000)
       .waitForElementByName('txtFinish:https://www.baidu.com/', maxW, 2000)
-      .waitForElementByName('txtError:http://www.error.com/', maxW, 2000)
+      .waitForElementByName('txtError:https://error.aneverexistssitefortestcaseinweex.com/', maxW, 2000)
       .waitForElementByName('reload', maxW, 2000)
       .click().sleep(500)
       .waitForElementByName('txtFinish:https://www.baidu.com/', maxW, 2000)
