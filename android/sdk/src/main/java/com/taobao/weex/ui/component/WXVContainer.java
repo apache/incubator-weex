@@ -355,11 +355,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if(getHostView()==null || mChildren==null){
       return;
     }
-    for(WXComponent component:mChildren){
-      if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
-        wxEventType= Constants.Event.DISAPPEAR;
+    //appear should not notify child
+    if(getDomObject().getAttrs().containsKey("appearNotifyChild")){
+      for(WXComponent component:mChildren){
+        if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
+          wxEventType= Constants.Event.DISAPPEAR;
+        }
+        component.notifyAppearStateChange(wxEventType,direction);
       }
-      component.notifyAppearStateChange(wxEventType,direction);
     }
   }
 

@@ -1,8 +1,8 @@
 <template>
   <div>
     <panel title = 'web-event' :padding-body='0'>
-      <div style='flex-direction:row'> 
-        <web ref='web-ref' class="mr-base web" :src = "src"  @pagestart = "pagestartEvt" @pagefinish = "pagefinishEvt" @error = "errorEvt"></web> 
+      <div style='flex-direction:row'>
+        <web ref='web-ref' class="mr-base web" :src = "src"  @pagestart = "pagestartEvt" @pagefinish = "pagefinishEvt" @error = "errorEvt"></web>
       </div>
       <div style='flex-direction:row'>
         <button class='mr-base' type="info" size="middle" value="reload" @click.native="reload"></button>
@@ -18,11 +18,11 @@
     <wxc-desc>
       <text class='desc'>
 测试点：
-  * 
+  *
 
 测试方式：
-  * 
-  * 
+  *
+  *
       </text>
     </wxc-desc>
   </div>
@@ -33,7 +33,7 @@
 
   module.exports = {
     data : {
-      src:'http://www.error.com',
+      src:'https://error.aneverexistssitefortestcaseinweex.com',
       txtStart:'',
       txtFinish:'',
       txtError:''
