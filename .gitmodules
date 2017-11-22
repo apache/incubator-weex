@@ -1,0 +1,6 @@
+[submodule "test/lib-cplus/lcov"]
+	path = test/lib-cplus/lcov
+	url = git@github.com:linux-test-project/lcov.git
+[submodule "test/lib-cplus/gtest"]
+	path = test/lib-cplus/gtest
+	url = git@github.com:google/googletest.git
