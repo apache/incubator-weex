@@ -41,17 +41,23 @@ public class WXRenderErrorCode {
 	WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED("-1002", "|wx_network_error|js bundle download failed"),
 
 	/**
+	 * degrade for network failed for bundlejs is unbroken , once this case occured,network requist response header
+	 * and statuscode need track into errmsg.
+	 */
+	WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED("-1003", "degradeToH5|wx_network_error|js bundle content-length check failed"),
+
+	/**
 	 * degrade for Response header Content-Type is null or not "application/javascript".
 	 * once this case occured,network requist response header and statuscode need track into errmsg.
 	 */
-	WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR("-1003", "degradeToH5|wx_user_intercept_error |Content-Type is not application/javascript, " +
+	WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR("-1004", "degradeToH5|wx_user_intercept_error |Content-Type is not application/javascript, " +
 			"Weex render template must be javascript, please check your request!"),
 
 	/**
 	 * degrade for other reason. such as white screen which block error for some unknown reason.
 	 * once this case occured,detail msg need track.
 	 */
-	WX_DEGRAD_ERR_OTHER_CAUSE_DEGRADTOH5("-1004", "degradeToH5|for other reason|");
+	WX_DEGRAD_ERR_OTHER_CAUSE_DEGRADTOH5("-1005", "degradeToH5|for other reason|");
 
 	private String degradCode;
 	private String degradMsg;

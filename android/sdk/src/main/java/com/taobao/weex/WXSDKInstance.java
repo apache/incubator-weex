@@ -1740,12 +1740,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
+
+		// check content-type
       } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
 			  response.statusCode)) {
         WXLogUtils.d("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
         onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
 				response.errorMsg);
-      } else {
+
+		// check content-length
+      } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
+		WXLogUtils.e("user intercept: WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED");
+		onRenderError(
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorCode(),
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorMsg() +
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+	  }
+      else {
         onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode(),
 				response.errorMsg);
       }
