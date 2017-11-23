@@ -616,7 +616,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private String wrapPageName(String pageName, String url) {
     if(TextUtils.equals(pageName, WXPerformance.DEFAULT)){
-      pageName=url;
+      pageName = url;
+	  WXExceptionUtils.degradeUrl = pageName;
       try {
         Uri uri=Uri.parse(url);
         if(uri!=null){

@@ -33,6 +33,12 @@ import java.util.Map;
  */
 
 public class WXExceptionUtils {
+
+  /**
+   * degradeUrl for degrade case
+   */
+  public static String degradeUrl = "BundleUrlDefaultDegradeUrl";
+
   /**
    * commitCriticalExceptionRT eg:JsRuntime Exception or JsFramework Init Exception
    * @param instanceId
@@ -58,6 +64,9 @@ public class WXExceptionUtils {
 		  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
 		  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
 			bundleUrlCommit = instance.getBundleUrl();
+			if(!TextUtils.equals(degradeUrl,"BundleUrlDefaultDegradeUrl")){
+			  bundleUrlCommit = degradeUrl;
+			}
 		  }
 		}
 
