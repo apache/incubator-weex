@@ -225,13 +225,13 @@ export function getComponentStyle (context, extract) {
     }
     return {}
   }
-  let style = {}
+  const style = {}
   let vnode = context.$vnode
   while (vnode) {
     extend(style, getStyle(vnode, extract))
     vnode = vnode.parent
   }
-  style = autoPrefix(style)
+  const prefixedStyle = autoPrefix(style)
   /**
    * when prefixed value is a array, it should be applied to element
    * during the next tick.
@@ -245,9 +245,9 @@ export function getComponentStyle (context, extract) {
    *      "linear-gradient(to top,#f5fefd,#ffffff)"]
    *  }
    */
-  for (const k in style) {
-    if (Array.isArray(style[k])) {
-      const vals = style[k]
+  for (const k in prefixedStyle) {
+    if (Array.isArray(prefixedStyle[k])) {
+      const vals = prefixedStyle[k]
       context.$nextTick(function () {
         const el = context.$el
         if (el) {
@@ -256,14 +256,20 @@ export function getComponentStyle (context, extract) {
           }
         }
       })
-      if (k !== 'position') { delete style[k] }
+      if (k !== 'position') {
+        /**
+         * Should not delete prefixedStyle[k] directly. Otherwise will
+         * trigger issue: https://issues.apache.org/jira/projects/WEEX/issues/WEEX-97
+         */
+        prefixedStyle[k] = style[k]
+      }
     }
   }
 
   /**
    * If position is 'sticky', then add it to the stickyChildren of the parent scroller.
    */
-  const pos = style.position
+  const pos = prefixedStyle.position
   const reg = /sticky$/
   if (pos === 'fixed') {
     context.$nextTick(function () {
@@ -274,7 +280,7 @@ export function getComponentStyle (context, extract) {
     })
   }
   else if (isArray(pos) && pos[0].match(reg) || (pos + '').match(reg)) {
-    delete style.position
+    delete prefixedStyle.position
     // use native sticky.
     if (supportSticky()) {
       context.$nextTick(function () {
@@ -304,7 +310,7 @@ export function getComponentStyle (context, extract) {
     }
   }
 
-  return style
+  return prefixedStyle
 }
 
 export function extractComponentStyle (context) {
