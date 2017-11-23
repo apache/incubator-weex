@@ -88,7 +88,7 @@ class UpdateStyleAction extends TraceableAction implements DOMAction, RenderActi
 
 
     if (!mData.isEmpty()) {
-      domObject.updateStyle(mData);
+      domObject.updateStyle(mData, mIsCausedByPesudo);
       domObject.applyStyle(mData);
       if(!mData.isEmpty()) {
         context.postRenderTask(this);

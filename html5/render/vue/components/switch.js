@@ -115,6 +115,27 @@ function getSwitch (weex) {
       }
     },
 
+    mounted () {
+      const el = this.$el
+      if (el && el.nodeType === 1) {
+        if (!this._removeClickHandler) {
+          const handler = evt => {
+            this.toggle()
+          }
+          this._removeClickHandler = el.removeEventListener.bind(el, 'click', handler)
+          el.addEventListener('click', handler)
+        }
+      }
+    },
+
+    beforeDestroy () {
+      const rm = this._removeClickHandler
+      if (rm) {
+        rm()
+        delete this._removeClickHandler
+      }
+    },
+
     render (createElement) {
       /* istanbul ignore next */
       // if (process.env.NODE_ENV === 'development') {
@@ -122,12 +143,6 @@ function getSwitch (weex) {
       // }
       return createElement('span', {
         attrs: { 'weex-type': 'switch' },
-        on: {
-          click: event => {
-            this.$emit('click', event)
-            this.toggle()
-          }
-        },
         staticClass: this.wrapperClass,
         staticStyle: extractComponentStyle(this)
       }, [createElement('small', { staticClass: 'weex-switch-inner' })])
