@@ -53,7 +53,7 @@ public final class WXDomModule extends WXModule {
   public static final String REMOVE_ELEMENT = "removeElement";
   public static final String ADD_ELEMENT = "addElement";
   public static final String MOVE_ELEMENT = "moveElement";
-  public static final String ADD_EVENT = "addEvent";
+  public static final String ADD_EVENT = "applyEvent";
   public static final String REMOVE_EVENT = "removeEvent";
   public static final String CREATE_FINISH = "createFinish";
   public static final String REFRESH_FINISH = "refreshFinish";

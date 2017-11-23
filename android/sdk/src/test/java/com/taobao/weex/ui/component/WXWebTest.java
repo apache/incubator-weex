@@ -35,8 +35,6 @@ import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by sospartan on 28/09/2016.
  */
@@ -138,10 +136,10 @@ public class WXWebTest {
 
   @Test
   public void testListener() throws Exception {
-    component.addEvent(Constants.Event.RECEIVEDTITLE);
-    component.addEvent(Constants.Event.PAGESTART);
-    component.addEvent(Constants.Event.PAGEFINISH);
-    component.addEvent(Constants.Event.ERROR);
+    component.applyEvent(Constants.Event.RECEIVEDTITLE);
+    component.applyEvent(Constants.Event.PAGESTART);
+    component.applyEvent(Constants.Event.PAGEFINISH);
+    component.applyEvent(Constants.Event.ERROR);
     mWebView.mOnPageListener.onPageFinish("http://taobao.com",true,true);
     mWebView.mOnPageListener.onReceivedTitle("test");
     mWebView.mOnPageListener.onPageStart("http://taobao.com");

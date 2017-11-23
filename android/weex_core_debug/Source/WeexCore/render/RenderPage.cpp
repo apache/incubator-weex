@@ -108,14 +108,14 @@ namespace WeexCore {
 
   void RenderPage::updateStyle(std::string ref, std::string key, std::string value) {
     RenderObject *render = getRenderObject(ref);
-    render->updateStyle(key, value);
+    render->addStyle(key, value);
 
     // TODO calculateLayout
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {
     RenderObject *render = getRenderObject(ref);
-    render->updateAttr(key, value);
+    render->addAttr(key, value);
 
     // TODO calculateLayout
   }

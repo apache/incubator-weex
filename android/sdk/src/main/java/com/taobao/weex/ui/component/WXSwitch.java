@@ -54,8 +54,8 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
 
 
   @Override
-  public void addEvent(String type) {
-    super.addEvent(type);
+  public void applyEvent(String type) {
+    super.applyEvent(type);
     if (type != null && type.equals(Constants.Event.CHANGE) && getHostView() != null) {
       if (mListener == null) {
         mListener = new CompoundButton.OnCheckedChangeListener() {

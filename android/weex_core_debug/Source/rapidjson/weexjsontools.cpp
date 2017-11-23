@@ -270,11 +270,11 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
           if (0 == strcmp(key, "attr")) {
             int len = fpconv_dtoa(r.GetDouble(), value);
             value[len] = '\0';
-            root->updateAttr(key2, value);
+            root->addAttr(key2, value);
           } else if (0 == strcmp(key, "style")) {
             int len = fpconv_dtoa(r.GetDouble(), value);
             value[len] = '\0';
-            root->updateStyle(key2, value);
+            root->addStyle(key2, value);
           }
           memset(value, 0, sizeof(value));
         } else if (r.PeekType() == kStringType) {
@@ -283,10 +283,10 @@ void parseJsonObject(JsonParser &r, RenderPage *page, RenderObject *root) {
           char value[size];
           if (0 == strcmp(key, "attr")) {
             strcpy(value, str);
-            root->updateAttr(key2, value);
+            root->addAttr(key2, value);
           } else if (0 == strcmp(key, "style")) {
             strcpy(value, str);
-            root->updateStyle(key2, value);
+            root->addStyle(key2, value);
           }
           memset(value, 0, sizeof(value));
         } else {

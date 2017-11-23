@@ -6,8 +6,8 @@
 #include "WXCoreStyle.h"
 #include "WXCoreFlexEnum.h"
 #include <vector>
-#include <memory.h>
-#include <string.h>
+#include <iostream>
+#include <string>
 
 namespace WXCoreFlexLayout {
 
@@ -151,6 +151,7 @@ namespace WXCoreFlexLayout {
     void *context;
 
     MeasureMode widthMeasureMode;
+
     MeasureMode heightMeasureMode;
 
   public:
@@ -224,9 +225,25 @@ namespace WXCoreFlexLayout {
       mLayoutResult->reset();
     }
 
-    inline void copyStyle(const WXCoreLayoutNode *srcNode) {
-      if (memcmp(mCssStyle, &srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
-        memcpy(mCssStyle, &srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+    inline void copyStyle(WXCoreLayoutNode *srcNode) {
+      if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
+        memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+      }
+    }
+
+    inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
+      if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
+        memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
+      }
+    }
+
+    inline void copyNode(WXCoreLayoutNode *srcNode) {
+      copyStyle(srcNode);
+      copyMeasureFunc(srcNode);
+      for (WXCoreLayoutNode *node : mChildList) {
+        WXCoreLayoutNode *temp = newWXCoreNode();
+        memcpy(&node, &temp, sizeof(WXCoreLayoutNode));
+        srcNode->appendChild(temp);
       }
     }
 
@@ -417,6 +434,11 @@ namespace WXCoreFlexLayout {
 
     inline void addChildAt(WXCoreLayoutNode *child, uint32_t index) {
       mChildList.insert(mChildList.begin() + index, child);
+      child->mParent = this;
+    }
+
+    inline void appendChild(WXCoreLayoutNode *child) {
+      mChildList.push_back(child);
       child->mParent = this;
     }
 
@@ -761,10 +783,13 @@ namespace WXCoreFlexLayout {
       mVisible = visible;
     }
 
+    inline bool isUndefined(float value) {
+      return isnan(value);
+    }
+
   private:
     float getLargestMainSize();
   };
-
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 #endif

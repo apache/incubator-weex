@@ -1246,8 +1246,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   @Override
-  public void addEvent(String type) {
-    super.addEvent(type);
+  public void applyEvent(String type) {
+    super.applyEvent(type);
     if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
       WXRecyclerView innerView = getHostView().getInnerView();
       innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

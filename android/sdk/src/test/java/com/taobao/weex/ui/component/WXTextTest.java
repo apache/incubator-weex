@@ -143,7 +143,7 @@ public class WXTextTest {
     @Test
     public void testAddEvent(){
         testBind();
-        mWXText.addEvent(Constants.Event.CLICK);
+        mWXText.applyEvent(Constants.Event.CLICK);
         assertTrue(mWXText.getHostView().isEnabled());
         mWXText.getHostView().performClick();
     }

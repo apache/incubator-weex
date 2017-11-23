@@ -20,7 +20,7 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.view.border.BorderDrawable;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,6 +109,6 @@ public class WXComponentTest {
 
   @Test
   public void testAddEvent() throws Exception {
-    component.addEvent(Constants.Event.FOCUS);
+    component.applyEvent(Constants.Event.FOCUS);
   }
 }

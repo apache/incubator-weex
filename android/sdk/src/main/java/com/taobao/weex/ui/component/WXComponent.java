@@ -47,7 +47,6 @@ import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
@@ -186,7 +185,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     return mEvents;
   }
 
-  public void setAttr(Map<String, Object> attrs) {
+  public void addAttr(Map<String, Object> attrs) {
     if (attrs == null || attrs.isEmpty()) {
       return;
     }
@@ -196,17 +195,17 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mAttributes.putAll(attrs);
   }
 
-  public void setStyle(Map<String, Object> styles) {
+  public void addStyle(Map<String, Object> styles) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
     if (mStyles == null) {
       mStyles = new WXStyle();
     }
-    setStyle(styles, false);
+    addStyle(styles, false);
   }
 
-  public void setStyle(Map<String, Object> styles, boolean byPesudo) {
+  public void addStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
@@ -315,6 +314,98 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   public void setBorder(int spacingType, float border) {
     mBorders.set(spacingType, border);
+  }
+
+  public void setPadding(Spacing padding, Spacing border) {
+    int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
+    int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
+    int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
+    int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
+
+    if (mHost == null) {
+      return;
+    }
+
+    mHost.setPadding(left, top, right, bottom);
+  }
+
+  private void applyEvents() {
+    if (mEvents == null || mEvents.isEmpty())
+      return;
+    for (String type : mEvents) {
+      applyEvent(type);
+    }
+    setActiveTouchListener();
+  }
+
+  /**
+   * Do not use this method to add event, this only apply event already add to DomObject.
+   *
+   * @param type
+   */
+  public void applyEvent(String type) {
+
+    if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
+      return;
+    }
+    mAppendEvents.add(type);
+
+    View view = getRealView();
+    if (type.equals(Constants.Event.CLICK) && view != null) {
+      addClickListener(mClickEventListener);
+    } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
+      addFocusChangeListener(new OnFocusChangeListener() {
+        public void onFocusChange(boolean hasFocus) {
+          Map<String, Object> params = new HashMap<>();
+          params.put("timeStamp", System.currentTimeMillis());
+          fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
+        }
+      });
+    } else if (view != null &&
+            needGestureDetector(type)) {
+      if (view instanceof WXGestureObservable) {
+        if (mGesture == null) {
+          mGesture = new WXGesture(this, mContext);
+          boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
+          mGesture.setPreventMoveEvent(isPreventMove);
+        }
+        mGestureType.add(type);
+        ((WXGestureObservable) view).registerGestureListener(mGesture);
+      } else {
+        WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
+                "WXGestureObservable, so no gesture is supported.");
+      }
+    } else {
+      Scrollable scroller = getParentScroller();
+      if (type.equals(Constants.Event.APPEAR) && scroller != null) {
+        scroller.bindAppearEvent(this);
+      }
+      if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
+        scroller.bindDisappearEvent(this);
+      }
+    }
+  }
+
+  private void updateStyle(WXComponent component) {
+    if (component != null) {
+      updateProperties(component.getStyles());
+    }
+  }
+
+  public void updateStyle(String key, String value) {
+    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
+      setProperty(key, value);
+  }
+
+  private void updateAttrs(WXComponent component) {
+    if (component != null) {
+      updateProperties(component.getAttrs());
+    }
+  }
+
+  public void updateAttr(String key, String value) {
+    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
+      setProperty(key, value);
   }
 
   public String getAttrByKey(String key) {
@@ -573,35 +664,13 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       }
       setLayout(component);
       setPadding(component.getPadding(), component.getBorder());
-      addEvents();
+      applyEvents();
     }
   }
 
   public void updateDemission(WXUIAction action) {
     mLayoutPosition = action.mLayoutPosition;
     mLayoutSize = action.mLayoutSize;
-  }
-
-  private void updateStyle(WXComponent component) {
-    if (component != null) {
-      updateProperties(component.getStyles());
-    }
-  }
-
-  public void updateStyle(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
-  }
-
-  private void updateAttrs(WXComponent component) {
-    if (component != null) {
-      updateProperties(component.getAttrs());
-    }
-  }
-
-  public void updateAttr(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
   }
 
   public void refreshData(WXComponent component) {
@@ -739,28 +808,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   public float getLayoutHeight() {
     return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(), mViewPortWidth);
-  }
-
-  public void setPadding(Spacing padding, Spacing border) {
-    int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
-    int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
-    int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
-    int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
-
-    if (mHost == null) {
-      return;
-    }
-
-    mHost.setPadding(left, top, right, bottom);
-  }
-
-  private void addEvents() {
-    if (mEvents == null || mEvents.isEmpty())
-      return;
-    for (String type : mEvents) {
-      addEvent(type);
-    }
-    setActiveTouchListener();
   }
 
   public void updateExtra(Object extra) {
@@ -998,54 +1045,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
    */
   protected void appendEventToDOM(String type) {
     WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(), type), false);
-  }
-
-  /**
-   * Do not use this method to add event, this only apply event already add to DomObject.
-   *
-   * @param type
-   */
-  public void addEvent(String type) {
-
-    if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
-      return;
-    }
-    mAppendEvents.add(type);
-
-    View view = getRealView();
-    if (type.equals(Constants.Event.CLICK) && view != null) {
-      addClickListener(mClickEventListener);
-    } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
-      addFocusChangeListener(new OnFocusChangeListener() {
-        public void onFocusChange(boolean hasFocus) {
-          Map<String, Object> params = new HashMap<>();
-          params.put("timeStamp", System.currentTimeMillis());
-          fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
-        }
-      });
-    } else if (view != null &&
-            needGestureDetector(type)) {
-      if (view instanceof WXGestureObservable) {
-        if (mGesture == null) {
-          mGesture = new WXGesture(this, mContext);
-          boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
-          mGesture.setPreventMoveEvent(isPreventMove);
-        }
-        mGestureType.add(type);
-        ((WXGestureObservable) view).registerGestureListener(mGesture);
-      } else {
-        WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
-                "WXGestureObservable, so no gesture is supported.");
-      }
-    } else {
-      Scrollable scroller = getParentScroller();
-      if (type.equals(Constants.Event.APPEAR) && scroller != null) {
-        scroller.bindAppearEvent(this);
-      }
-      if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
-        scroller.bindDisappearEvent(this);
-      }
-    }
   }
 
   public View getRealView() {

@@ -40,10 +40,10 @@ namespace WXCoreFlexLayout {
               || mMarginTop != margin
               || mMarginRight != margin
               || mMarginBottom != margin) {
-            mMarginLeft += margin;
-            mMarginTop += margin;
-            mMarginRight += margin;
-            mMarginBottom += margin;
+            mMarginLeft = margin;
+            mMarginTop = margin;
+            mMarginRight = margin;
+            mMarginBottom = margin;
             dirty = true;
           }
           break;
@@ -129,10 +129,10 @@ namespace WXCoreFlexLayout {
               || mPaddingTop != padding
               || mPaddingRight != padding
               || mPaddingBottom != padding) {
-            mPaddingLeft += padding;
-            mPaddingTop += padding;
-            mPaddingRight += padding;
-            mPaddingBottom += padding;
+            mPaddingLeft = padding;
+            mPaddingTop = padding;
+            mPaddingRight = padding;
+            mPaddingBottom = padding;
             dirty = true;
           }
           break;
@@ -218,10 +218,10 @@ namespace WXCoreFlexLayout {
               || mBorderWidthTop != borderWidth
               || mBorderWidthRight != borderWidth
               || mBorderWidthBottom != borderWidth) {
-            mBorderWidthLeft += borderWidth;
-            mBorderWidthTop += borderWidth;
-            mBorderWidthRight += borderWidth;
-            mBorderWidthBottom += borderWidth;
+            mBorderWidthLeft = borderWidth;
+            mBorderWidthTop = borderWidth;
+            mBorderWidthRight = borderWidth;
+            mBorderWidthBottom = borderWidth;
             dirty = true;
           }
           break;

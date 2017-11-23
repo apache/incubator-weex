@@ -36,8 +36,6 @@ import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by sospartan on 28/09/2016.
  */
@@ -65,7 +63,7 @@ public class WXSwitchTest {
 
   @Test
   public void testAddEvent() throws Exception {
-    component.addEvent(Constants.Event.CHANGE);
+    component.applyEvent(Constants.Event.CHANGE);
   }
 
   @Test

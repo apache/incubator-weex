@@ -97,12 +97,24 @@ namespace WeexCore {
       removeChild(child);
     }
 
-    inline void updateAttr(std::string key, std::string value) {
+    inline void addAttr(std::string key, std::string value) {
       mAttributes->insert(pair<std::string, std::string>(key, value));
     }
 
-    inline void updateStyle(std::string key, std::string value) {
+    inline void addAttr(std::map<std::string, std::string> attr) {
+//      mAttributes->insert(attr);
+    }
+
+    inline void addStyle(std::string key, std::string value) {
       applyStyle(key, value);
+    }
+
+    inline void addStyle(std::map<std::string, std::string> style) {
+      STYLE_IT style_begin = style.begin();
+      STYLE_IT style_end = style.end();
+      for (; style_begin != style_end; ++style_begin) {
+        applyStyle(style_begin->first, style_begin->second);
+      }
     }
 
     inline void addEvent(std::string event) {

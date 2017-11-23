@@ -94,9 +94,9 @@ public enum WXErrorCode {
    */
   WX_ERR_DOM_MOVEELEMENT("-2105", "moveElement error"),
   /**
-   * Failure for addEvent
+   * Failure for applyEvent
    */
-  WX_ERR_DOM_ADDEVENT("-2106", "addEvent error"),
+  WX_ERR_DOM_ADDEVENT("-2106", "applyEvent error"),
   /**
    * Failure for removeEvent
    */

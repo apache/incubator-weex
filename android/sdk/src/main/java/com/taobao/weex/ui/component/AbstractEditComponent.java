@@ -158,8 +158,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
 
   @Override
-  public void addEvent(final String type) {
-    super.addEvent(type);
+  public void applyEvent(final String type) {
+    super.applyEvent(type);
     if (getHostView() == null || TextUtils.isEmpty(type)) {
       return;
     }

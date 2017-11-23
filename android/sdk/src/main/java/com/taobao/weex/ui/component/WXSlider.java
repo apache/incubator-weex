@@ -152,8 +152,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
 
   @Override
-  public void addEvent(String type) {
-    super.addEvent(type);
+  public void applyEvent(String type) {
+    super.applyEvent(type);
     if (Constants.Event.SCROLL.equals(type)) {
       if (mViewPager == null) {
         return;

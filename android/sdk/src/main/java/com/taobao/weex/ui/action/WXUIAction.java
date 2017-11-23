@@ -25,7 +25,6 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public abstract class WXUIAction {
@@ -54,8 +53,8 @@ public abstract class WXUIAction {
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(mPageId, mRef, component);
 
     if (component != null) {
-      component.setStyle(mStyle);
-      component.setAttr(mAttributes);
+      component.addStyle(mStyle);
+      component.addAttr(mAttributes);
       component.setEvent(mEvents);
       component.setSpacing(mPaddings);
       component.setSpacing(mMargins);

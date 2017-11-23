@@ -69,7 +69,7 @@ class AddEventAction implements DOMAction, RenderAction {
     WXComponent comp = context.getComponent(mRef);
     if(comp != null){
       //sync dom change to component
-      comp.addEvent(mEvent);
+      comp.applyEvent(mEvent);
     }
   }
 }

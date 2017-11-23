@@ -23,7 +23,6 @@ import android.view.View;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -81,7 +80,7 @@ public class ComponentTest {
   public static void addEvent(WXComponent comp){
     for (String event :
         TestConstants.Events) {
-      comp.addEvent(event);
+      comp.applyEvent(event);
     }
   }
 
