@@ -1315,7 +1315,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
 
 
-  private int calcContentOffset(RecyclerView recyclerView) {
+  public int calcContentOffset(RecyclerView recyclerView) {
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     if (layoutManager instanceof LinearLayoutManager) {
       int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
