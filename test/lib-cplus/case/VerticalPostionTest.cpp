@@ -4,22 +4,24 @@
 
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
+
 using namespace WXCoreFlexLayout;
 
-class Vertical: public ::testing::Test{
+class Vertical : public ::testing::Test {
 protected:
-    virtual void SetUp(){
-        root  = WXCoreLayoutNode::newWXCoreNode();
+    virtual void SetUp() {
+        root = WXCoreLayoutNode::newWXCoreNode();
         root->setStyleHeight(300);
     }
-    virtual void TearDown(){
-        root -> freeWXCoreNode();
+
+    virtual void TearDown() {
+        root->freeWXCoreNode();
     }
 
     WXCoreLayoutNode *root;
 };
 
-TEST_F(Vertical, RelativeLNullRNullWNull){
+TEST_F(Vertical, RelativeLNullRNullWNull) {
     root->calculateLayout();
     EXPECT_FLOAT_EQ(0, root->getLayoutWidth());
     EXPECT_FLOAT_EQ(300, root->getLayoutHeight());

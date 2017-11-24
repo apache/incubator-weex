@@ -4,27 +4,29 @@
 
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
+
 using namespace WXCoreFlexLayout;
 
-class Dimension : public ::testing::Test{
-    protected:
-        virtual void SetUp(){
-            root  = WXCoreLayoutNode::newWXCoreNode();
-            child = WXCoreLayoutNode::newWXCoreNode();
-            grandChild = WXCoreLayoutNode::newWXCoreNode();
-            root -> addChildAt(child, 0);
-            child -> addChildAt(grandChild, 0);
-        }
-        virtual void TearDown(){
-            root -> freeWXCoreNode();
-            child -> freeWXCoreNode();
-            grandChild ->freeWXCoreNode();
-        }
+class Dimension : public ::testing::Test {
+protected:
+    virtual void SetUp() {
+        root = WXCoreLayoutNode::newWXCoreNode();
+        child = WXCoreLayoutNode::newWXCoreNode();
+        grandChild = WXCoreLayoutNode::newWXCoreNode();
+        root->addChildAt(child, 0);
+        child->addChildAt(grandChild, 0);
+    }
 
-        WXCoreLayoutNode *root, *child, *grandChild;
+    virtual void TearDown() {
+        root->freeWXCoreNode();
+        child->freeWXCoreNode();
+        grandChild->freeWXCoreNode();
+    }
+
+    WXCoreLayoutNode *root, *child, *grandChild;
 };
 
-TEST_F(Dimension, W0H0){
+TEST_F(Dimension, W0H0) {
     root->setStyleWidth(0);
     root->setStyleHeight(0);
     root->calculateLayout();
@@ -32,7 +34,7 @@ TEST_F(Dimension, W0H0){
     EXPECT_FLOAT_EQ(0, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W0H1){
+TEST_F(Dimension, W0H1) {
     root->setStyleWidth(0);
     root->setStyleHeight(1);
     root->calculateLayout();
@@ -40,7 +42,7 @@ TEST_F(Dimension, W0H1){
     EXPECT_FLOAT_EQ(1, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W0H100){
+TEST_F(Dimension, W0H100) {
     root->setStyleWidth(0);
     root->setStyleHeight(100);
     root->calculateLayout();
@@ -48,7 +50,7 @@ TEST_F(Dimension, W0H100){
     EXPECT_FLOAT_EQ(100, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W1H0){
+TEST_F(Dimension, W1H0) {
     root->setStyleWidth(1);
     root->setStyleHeight(0);
     root->calculateLayout();
@@ -56,7 +58,7 @@ TEST_F(Dimension, W1H0){
     EXPECT_FLOAT_EQ(0, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W1H1){
+TEST_F(Dimension, W1H1) {
     root->setStyleWidth(1);
     root->setStyleHeight(1);
     root->calculateLayout();
@@ -64,7 +66,7 @@ TEST_F(Dimension, W1H1){
     EXPECT_FLOAT_EQ(1, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W1H300){
+TEST_F(Dimension, W1H300) {
     root->setStyleWidth(1);
     root->setStyleHeight(300);
     root->calculateLayout();
@@ -72,7 +74,7 @@ TEST_F(Dimension, W1H300){
     EXPECT_FLOAT_EQ(300, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W100H0){
+TEST_F(Dimension, W100H0) {
     root->setStyleWidth(100);
     root->setStyleHeight(0);
     root->calculateLayout();
@@ -80,7 +82,7 @@ TEST_F(Dimension, W100H0){
     EXPECT_FLOAT_EQ(0, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W100H1){
+TEST_F(Dimension, W100H1) {
     root->setStyleWidth(100);
     root->setStyleHeight(1);
     root->calculateLayout();
@@ -88,7 +90,7 @@ TEST_F(Dimension, W100H1){
     EXPECT_FLOAT_EQ(1, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W100H300){
+TEST_F(Dimension, W100H300) {
     root->setStyleWidth(100);
     root->setStyleHeight(300);
     root->calculateLayout();
@@ -96,21 +98,21 @@ TEST_F(Dimension, W100H300){
     EXPECT_FLOAT_EQ(300, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, WInvalidH300){
+TEST_F(Dimension, WInvalidH300) {
     root->setStyleWidth(-10);
     root->setStyleHeight(300);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(300, root->getLayoutHeight());
 }
 
-TEST_F(Dimension, W100HInvalid){
+TEST_F(Dimension, W100HInvalid) {
     root->setStyleWidth(100);
     root->setStyleHeight(-20);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(100, root->getLayoutWidth());
 }
 
-TEST_F(Dimension, ChildOverflow){
+TEST_F(Dimension, ChildOverflow) {
     root->setStyleWidth(200);
     root->setStyleHeight(300);
     child->setStyleWidth(100);
@@ -122,7 +124,7 @@ TEST_F(Dimension, ChildOverflow){
     EXPECT_FLOAT_EQ(400, child->getLayoutHeight());
 }
 
-TEST_F(Dimension, GrandChildOverflow){
+TEST_F(Dimension, GrandChildOverflow) {
     root->setStyleWidth(200);
     root->setStyleHeight(300);
     child->setStyleWidth(100);
