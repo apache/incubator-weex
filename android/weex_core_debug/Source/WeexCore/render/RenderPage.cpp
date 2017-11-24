@@ -18,25 +18,8 @@ namespace WeexCore {
     }
   }
 
-  RenderPage::RenderPage(std::string pageID, std::string data) {
+  RenderPage::RenderPage(std::string pageID) {
     mPageId = pageID;
-
-    JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(mPageId.c_str());
-
-    int alen = data.length();
-    char *c_data = (char *) malloc(alen + 1);
-    strcpy(c_data, data.c_str());
-    c_data[alen] = 0;
-    RenderObject *render = json2RenderObject(c_data, this);
-    free(c_data);
-    c_data = nullptr;
-
-    pushRenderToMap(render);
-    setRootRenderObject(render);
-    sendCreateBodyAction(render);
-    // layout by dom Tree
-    calculateLayout();
   }
 
   RenderPage::~RenderPage() {
@@ -62,6 +45,22 @@ namespace WeexCore {
     }
 
     mRenderObjectMap.clear();
+  }
+
+  void RenderPage::createRootRender(std::string data) {
+    int alen = data.length();
+    char *c_data = (char *) malloc(alen + 1);
+    strcpy(c_data, data.c_str());
+    c_data[alen] = 0;
+    RenderObject *render = json2RenderObject(c_data, this);
+    free(c_data);
+    c_data = nullptr;
+
+    setRootRenderObject(render);
+    pushRenderToMap(render);
+    sendCreateBodyAction(render);
+    // layout by dom Tree
+    calculateLayout();
   }
 
   void RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {

@@ -5,18 +5,12 @@
 namespace WeexCore {
 
   // save all pages info with RenderPage;
-  static std::map<std::string, RenderPage *> *mPages = nullptr;
-
   RenderManager *RenderManager::m_pInstance = nullptr;
 
   void RenderManager::createPage(std::string pageId, std::string data) {
-    RenderPage *page = new RenderPage(pageId, data);
-    if (page != nullptr) {
-      if (mPages == nullptr) {
-        mPages = new std::map<std::string, RenderPage *>();
-      }
-      (*mPages)[pageId] = page;
-    }
+    RenderPage *page = new RenderPage(pageId);
+    mPages.insert(pair<std::string, RenderPage *>(pageId, page));
+    page->createRootRender(data);
   }
 
   void RenderManager::addRenderObject(std::string pageId, std::string parentRef, int index,
@@ -75,12 +69,7 @@ namespace WeexCore {
   }
 
   RenderPage *RenderManager::getPage(std::string id) {
-    if (mPages == nullptr) {
-      return nullptr;
-    }
-
-    mPages->find(id);
-    RenderPage *page = mPages->find(id)->second;
+    RenderPage *page = mPages.find(id)->second;
     return page;
   }
 

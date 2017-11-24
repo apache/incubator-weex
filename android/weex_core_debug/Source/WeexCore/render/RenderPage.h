@@ -85,9 +85,11 @@ namespace WeexCore {
     }
 
   public:
-    RenderPage(std::string pageID, std::string data);
+    RenderPage(std::string pageID);
 
     ~RenderPage();
+
+    void createRootRender(std::string data);
 
     void addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 

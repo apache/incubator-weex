@@ -362,6 +362,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     float top = border.get(CSSShorthand.EDGE.TOP);
     float right = border.get(CSSShorthand.EDGE.RIGHT);
     float bottom = border.get(CSSShorthand.EDGE.BOTTOM);
+
+    if (mHost == null) {
+      return;
+    }
+
     setBorderWidth(Constants.Name.BORDER_LEFT_WIDTH, left);
     setBorderWidth(Constants.Name.BORDER_TOP_WIDTH, top);
     setBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, right);
