@@ -13,8 +13,6 @@ file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 add_library(WXCoreLayout_lib ${HEAD_FILES} ${SOURCE_FILES})
 
 include_directories(${SOURCE_DIR})
-#add_executable(WeexCore_FlexLayout sample/main.cpp)
-#target_link_libraries(WeexCore_FlexLayout WXCoreLayout_lib)
 
 ################################
 # Testing
