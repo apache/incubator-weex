@@ -79,6 +79,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -389,7 +391,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXDomModule.WXDOM.equals(module)) {
         WXDomModule dom = getDomModule(instanceId);
-        return dom.callDomMethod(method, arguments);
+		if(dom != null){
+		  return dom.callDomMethod(method, arguments);
+		} else {
+		  createDomModule(WXSDKManager.getInstance().getSDKInstance(instanceId));
+		}
       } else {
         return callModuleMethod(instanceId, module,
             method, arguments, options);

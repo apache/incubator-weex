@@ -60,10 +60,18 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
     WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
+		StringBuilder sbErr = new StringBuilder()
+				.append("|mRef==" + mRef)
+				.append("|mEvent=" + JSONObject.toJSONString(mEvent))
+				.append("|instance id = " + instance.getInstanceId())
+				.append("|context = " + context.toString());
+
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorCode(),
 				"addEvent",
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorMsg() + "domObject is null",null);      }
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorMsg() + "| domObject is null |"
+						+sbErr.toString(),null);
+      }
       return;
     }
 
