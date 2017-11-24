@@ -5,7 +5,7 @@ rm -rf build/
 mkdir build
 cd build
 ../lcov/bin/lcov -d ./CMakeFiles/WXCoreLayout_lib.dir/ -z -b . --initial -o tmp.info
-cmake -DTEST=ON -DCOVERAGE=ON ..
+cmake -DCOVERAGE=ON ..
 make
 ./runUnitTests
 ../lcov/bin/lcov -q -d ./CMakeFiles/WXCoreLayout_lib.dir/ -t 'Layout Coverage Detail' -o 'tmp.info' --rc lcov_branch_coverage=1 -b . -c

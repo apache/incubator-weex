@@ -1,4 +1,3 @@
-#include <base/android/LogUtils.h>
 #include "WXCoreLayout.h"
 
 using namespace WXCoreFlexLayout;
