@@ -78,9 +78,9 @@ public enum WXErrorCode {
    */
   WX_ERR_DOM_UPDATEATTRS("-2101", "updateAttrs error"),
   /**
-   * Failure for updateAttr
+   * Failure for applyAttr
    */
-  WX_ERR_DOM_UPDATESTYLE("-2102", "updateStyle error"),
+  WX_ERR_DOM_UPDATESTYLE("-2102", "applyStyle error"),
   /**
    * Failure for addElement
    */

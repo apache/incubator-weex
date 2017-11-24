@@ -116,7 +116,7 @@ public class WXTextTest {
     @Test
     public void testSetPadding(){
         testCreateView();
-        mWXText.setPadding(mDomObject.getPadding(), mDomObject.getBorder());
+        mWXText.applyPadding(mDomObject.getPadding(), mDomObject.getBorder());
         assertEquals(0, mWXText.getHostView().getPaddingLeft());
         assertEquals(0, mWXText.getHostView().getPaddingTop());
         assertEquals(0, mWXText.getHostView().getPaddingRight());

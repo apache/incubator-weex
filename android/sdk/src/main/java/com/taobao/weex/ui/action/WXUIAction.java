@@ -55,10 +55,10 @@ public abstract class WXUIAction {
     if (component != null) {
       component.addStyle(mStyle);
       component.addAttr(mAttributes);
-      component.setEvent(mEvents);
-      component.setSpacing(mPaddings);
-      component.setSpacing(mMargins);
-      component.setSpacing(mBorders);
+      component.addEvent(mEvents);
+      component.addShorthand(mPaddings);
+      component.addShorthand(mMargins);
+      component.addShorthand(mBorders);
     }
 
     return component;

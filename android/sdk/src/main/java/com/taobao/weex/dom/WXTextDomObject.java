@@ -168,23 +168,23 @@ public class WXTextDomObject extends WXDomObject {
 
   @Override
   public void layoutAfter() {
-    if (hasBeenMeasured) {
-      if (layout != null &&
-          !FloatUtil.floatsEqual(WXDomUtils.getContentWidth(this), previousWidth)) {
-        recalculateLayout();
-      }
-    } else {
-      updateStyleAndText();
-      recalculateLayout();
-    }
-    hasBeenMeasured = false;
-    if (layout != null && !layout.equals(atomicReference.get()) &&
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      //TODO Warm up, a profile should be used to see the improvement.
-      warmUpTextLayoutCache(layout);
-    }
-    swap();
-    super.layoutAfter();
+//    if (hasBeenMeasured) {
+//      if (layout != null &&
+//          !FloatUtil.floatsEqual(WXDomUtils.getContentWidth(this), previousWidth)) {
+//        recalculateLayout();
+//      }
+//    } else {
+//      updateStyleAndText();
+//      recalculateLayout();
+//    }
+//    hasBeenMeasured = false;
+//    if (layout != null && !layout.equals(atomicReference.get()) &&
+//        Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//      //TODO Warm up, a profile should be used to see the improvement.
+//      warmUpTextLayoutCache(layout);
+//    }
+//    swap();
+//    super.layoutAfter();
   }
 
   @Override
@@ -231,12 +231,12 @@ public class WXTextDomObject extends WXDomObject {
    * RecalculateLayout.
    */
   private void recalculateLayout() {
-    float contentWidth = WXDomUtils.getContentWidth(this);
-    if (contentWidth > 0) {
-      spanned = createSpanned(mText);
-      layout = createLayout(contentWidth, true, layout);
-      previousWidth = layout.getWidth();
-    }
+//    float contentWidth = WXDomUtils.getContentWidth(this);
+//    if (contentWidth > 0) {
+//      spanned = createSpanned(mText);
+//      layout = createLayout(contentWidth, true, layout);
+//      previousWidth = layout.getWidth();
+//    }
   }
 
   /**

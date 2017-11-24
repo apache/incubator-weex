@@ -29,6 +29,6 @@ public class UpdateStyleUIAction extends WXUIAction {
     if (component == null) {
       return;
     }
-    component.updateStyle(mKey, mValue);
+    component.applyStyle(mKey, mValue);
   }
 }

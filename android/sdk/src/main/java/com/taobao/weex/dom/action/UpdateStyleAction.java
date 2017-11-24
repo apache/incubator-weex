@@ -104,9 +104,9 @@ class UpdateStyleAction implements DOMAction, RenderAction {
         mData.containsKey(Constants.Name.PADDING_RIGHT) ||
         mData.containsKey(Constants.Name.PADDING_BOTTOM) ||
         mData.containsKey(Constants.Name.BORDER_WIDTH)) {
-      Spacing padding = mPadding;
-      Spacing border = mBorder;
-      component.setPadding(padding,border);
+//      Spacing padding = mPadding;
+//      Spacing border = mBorder;
+//      component.applyPadding(padding,border);
     }
   }
 }

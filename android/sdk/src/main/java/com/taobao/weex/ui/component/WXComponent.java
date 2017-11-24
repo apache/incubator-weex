@@ -68,6 +68,7 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
+import com.taobao.weex.ui.layout.CSSShorthand;
 import com.taobao.weex.ui.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
@@ -91,7 +92,7 @@ import java.util.Set;
 /**
  * abstract component
  */
-public abstract class WXComponent<T extends View> implements IWXObject, IWXActivityStateListener, OnActivePseudoListner, ImmutableDomObject {
+public abstract class WXComponent<T extends View> implements IWXObject, IWXActivityStateListener, OnActivePseudoListner {
 
   public static final String PROP_FIXED_SIZE = "fixedSize";
   public static final String PROP_FS_MATCH_PARENT = "m";
@@ -147,15 +148,15 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   private WXStyle mStyles;
   private WXAttr mAttributes;
   private WXEvent mEvents;
-  private Spacing mMargins = new Spacing();
-  private Spacing mPaddings = new Spacing();
-  private Spacing mBorders = new Spacing();
+  private CSSShorthand mMargins;
+  private CSSShorthand mPaddings;
+  private CSSShorthand mBorders;
 
   private ContentBoxMeasurement contentBoxMeasurement;
 
   protected void setContentBoxMeasurement(ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    nativeBindMeasurementToWXCore(getInstanceId(),getRef(),this.contentBoxMeasurement);
+    nativeBindMeasurementToWXCore(getInstanceId(), getRef(), this.contentBoxMeasurement);
   }
 
   public native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
@@ -181,8 +182,40 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if (mEvents == null) {
       mEvents = new WXEvent();
     }
-
     return mEvents;
+  }
+
+  /**
+   * Get this node's margin, as defined by cssstyle + default margin.
+   */
+  public @NonNull
+  CSSShorthand getMargin() {
+    if (mMargins == null) {
+      mMargins = new CSSShorthand();
+    }
+    return mMargins;
+  }
+
+  /**
+   * Get this node's padding, as defined by cssstyle + default padding.
+   */
+  public @NonNull
+  CSSShorthand getPadding() {
+    if (mPaddings == null) {
+      mPaddings = new CSSShorthand();
+    }
+    return mPaddings;
+  }
+
+  /**
+   * Get this node's border, as defined by cssstyle.
+   */
+  public @NonNull
+  CSSShorthand getBorder() {
+    if (mBorders == null) {
+      mBorders = new CSSShorthand();
+    }
+    return mBorders;
   }
 
   public void addAttr(Map<String, Object> attrs) {
@@ -215,7 +248,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mStyles.putAll(styles, byPesudo);
   }
 
-  public void setEvent(Set<String> events) {
+  public void addEvent(Set<String> events) {
     if (events == null || events.isEmpty()) {
       return;
     }
@@ -225,102 +258,121 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mEvents.addAll(events);
   }
 
-  public void setSpacing(Map<String, String> spacing) {
-    if (!spacing.isEmpty()) {
-      for (Map.Entry<String, String> item : spacing.entrySet()) {
+  public void addShorthand(Map<String, String> shorthand) {
+    if (!shorthand.isEmpty()) {
+      for (Map.Entry<String, String> item : shorthand.entrySet()) {
         String key = item.getKey();
         switch (key) {
           case Constants.Name.MARGIN:
-            setMargin(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.MARGIN_LEFT:
-            setMargin(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.MARGIN_TOP:
-            setMargin(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.MARGIN_RIGHT:
-            setMargin(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.MARGIN_BOTTOM:
-            setMargin(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.BORDER_WIDTH:
-            setBorder(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.BORDER_TOP_WIDTH:
-            setBorder(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.BORDER_RIGHT_WIDTH:
-            setBorder(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.BORDER_BOTTOM_WIDTH:
-            setBorder(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.BORDER_LEFT_WIDTH:
-            setBorder(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.PADDING:
-            setPadding(Spacing.ALL, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.PADDING_LEFT:
-            setPadding(Spacing.LEFT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.PADDING_TOP:
-            setPadding(Spacing.TOP, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.PADDING_RIGHT:
-            setPadding(Spacing.RIGHT, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
           case Constants.Name.PADDING_BOTTOM:
-            setPadding(Spacing.BOTTOM, WXUtils.getFloatByViewport(spacing.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
             break;
         }
       }
     }
   }
 
-  /**
-   * Get this node's margin, as defined by cssstyle + default margin.
-   */
-  public @NonNull
-  Spacing getMargin() {
-    return mMargins;
-  }
-
-  public void setMargin(int spacingType, float margin) {
+  public void addMargin(CSSShorthand.EDGE spacingType, float margin) {
+    if (mMargins == null) {
+      mMargins = new CSSShorthand();
+    }
     mMargins.set(spacingType, margin);
   }
 
-  /**
-   * Get this node's padding, as defined by cssstyle + default padding.
-   */
-  public @NonNull
-  Spacing getPadding() {
-    return mPaddings;
-  }
-
-  public void setPadding(int spacingType, float padding) {
+  public void addPadding(CSSShorthand.EDGE spacingType, float padding) {
+    if (mPaddings == null) {
+      mPaddings = new CSSShorthand();
+    }
     mPaddings.set(spacingType, padding);
   }
 
-  /**
-   * Get this node's border, as defined by cssstyle.
-   */
-  public @NonNull
-  Spacing getBorder() {
-    return mBorders;
-  }
-
-  public void setBorder(int spacingType, float border) {
+  public void addBorder(CSSShorthand.EDGE spacingType, float border) {
+    if (mBorders == null) {
+      mBorders = new CSSShorthand();
+    }
     mBorders.set(spacingType, border);
   }
 
-  public void setPadding(Spacing padding, Spacing border) {
-    int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
-    int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
-    int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
-    int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
+  private void applyStyles(WXComponent component) {
+    if (component != null) {
+      updateProperties(component.getStyles());
+    }
+  }
+
+  public void applyStyle(String key, String value) {
+    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
+      setProperty(key, value);
+  }
+
+  private void applyAttrs(WXComponent component) {
+    if (component != null) {
+      updateProperties(component.getAttrs());
+    }
+  }
+
+  public void applyAttr(String key, String value) {
+    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
+      setProperty(key, value);
+  }
+
+  private void applyBorder(WXComponent component) {
+    CSSShorthand border = component.getBorder();
+    float left = border.get(CSSShorthand.EDGE.LEFT);
+    float top = border.get(CSSShorthand.EDGE.TOP);
+    float right = border.get(CSSShorthand.EDGE.RIGHT);
+    float bottom = border.get(CSSShorthand.EDGE.BOTTOM);
+    setBorderWidth(Constants.Name.BORDER_LEFT_WIDTH, left);
+    setBorderWidth(Constants.Name.BORDER_TOP_WIDTH, top);
+    setBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, right);
+    setBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, bottom);
+  }
+
+  public void applyPadding(CSSShorthand padding, CSSShorthand border) {
+    int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
+    int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
+    int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
+    int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
 
     if (mHost == null) {
       return;
@@ -384,28 +436,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         scroller.bindDisappearEvent(this);
       }
     }
-  }
-
-  private void updateStyle(WXComponent component) {
-    if (component != null) {
-      updateProperties(component.getStyles());
-    }
-  }
-
-  public void updateStyle(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
-  }
-
-  private void updateAttrs(WXComponent component) {
-    if (component != null) {
-      updateProperties(component.getAttrs());
-    }
-  }
-
-  public void updateAttr(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
   }
 
   public String getAttrByKey(String key) {
@@ -651,8 +681,9 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         component = this;
       }
       copyData(component);
-      updateStyle(component);
-      updateAttrs(component);
+      applyStyles(component);
+      applyAttrs(component);
+      applyBorder(component);
       updateExtra(component.getExtra());
     }
   }
@@ -663,7 +694,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         component = this;
       }
       setLayout(component);
-      setPadding(component.getPadding(), component.getBorder());
+      applyPadding(component.getPadding(), component.getBorder());
       applyEvents();
     }
   }
@@ -707,6 +738,9 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mLayoutPosition = component.getLayoutPosition();
     mLayoutSize = component.getLayoutSize();
     mViewPortWidth = component.getViewPortWidth();
+    mPaddings = component.getPadding();
+    mMargins = component.getMargin();
+    mBorders = component.getBorder();
 
     boolean nullParent = mParent == null;//parent is nullable
 
@@ -716,11 +750,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     int realWidth = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getWidth(), mViewPortWidth);
     int realHeight = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getHeight(), mViewPortWidth);
     int realLeft = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getLeft(), mViewPortWidth) -
-            getPadding().get(Spacing.LEFT) - getBorder().get(Spacing.LEFT));
+            getPadding().get(CSSShorthand.EDGE.LEFT) - getBorder().get(CSSShorthand.EDGE.LEFT));
     int realTop = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getTop(), mViewPortWidth) -
-            getPadding().get(Spacing.TOP) - getBorder().get(Spacing.TOP)) + siblingOffset;
-    int realRight = (int) getMargin().get(Spacing.RIGHT);
-    int realBottom = (int) getMargin().get(Spacing.BOTTOM);
+            getPadding().get(CSSShorthand.EDGE.TOP) - getBorder().get(CSSShorthand.EDGE.TOP)) + siblingOffset;
+    int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
+    int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
 
     if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
       return;
@@ -918,15 +952,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         if (radius != null)
           setBorderRadius(key, radius);
         return true;
-      case Constants.Name.BORDER_WIDTH:
-      case Constants.Name.BORDER_TOP_WIDTH:
-      case Constants.Name.BORDER_RIGHT_WIDTH:
-      case Constants.Name.BORDER_BOTTOM_WIDTH:
-      case Constants.Name.BORDER_LEFT_WIDTH:
-        Float width = WXUtils.getFloat(param, null);
-        if (width != null)
-          setBorderWidth(key, width);
-        return true;
       case Constants.Name.BORDER_STYLE:
       case Constants.Name.BORDER_RIGHT_STYLE:
       case Constants.Name.BORDER_BOTTOM_STYLE:
@@ -989,6 +1014,11 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       case Constants.Name.PADDING_LEFT:
       case Constants.Name.PADDING_RIGHT:
       case Constants.Name.PADDING_BOTTOM:
+      case Constants.Name.BORDER_WIDTH:
+      case Constants.Name.BORDER_TOP_WIDTH:
+      case Constants.Name.BORDER_RIGHT_WIDTH:
+      case Constants.Name.BORDER_BOTTOM_WIDTH:
+      case Constants.Name.BORDER_LEFT_WIDTH:
       case Constants.Name.LEFT:
       case Constants.Name.TOP:
       case Constants.Name.RIGHT:
@@ -1746,7 +1776,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   /**
-   * Trigger a updateStyle invoke to relayout current page
+   * Trigger a applyStyles invoke to relayout current page
    */
   public void notifyNativeSizeChanged(int w, int h) {
     if (!mNeedLayoutOnAnimation) {
@@ -1790,22 +1820,18 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     return mLayoutPosition;
   }
 
-  @Override
   public float getLayoutX() {
     return mLayoutPosition.getLeft();
   }
 
-  @Override
   public float getLayoutY() {
     return mLayoutPosition.getTop();
   }
 
-  @Override
   public Object getExtra() {
     return null;
   }
 
-  @Override
   public String getComponentType() {
     return mComponentType;
   }

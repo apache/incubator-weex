@@ -24,6 +24,8 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.layout.CSSShorthand;
 
 public class WXDomUtils {
 
@@ -32,23 +34,23 @@ public class WXDomUtils {
    * @return the width of the dom that excludes left-padding, left-border-width,
    * right-border-width and right-padding.
    */
-  public static float getContentWidth(ImmutableDomObject domObject) {
-    float rawWidth = domObject.getLayoutWidth();
+  public static float getContentWidth(WXComponent component) {
+    float rawWidth = component.getLayoutWidth();
     float leftPadding, rightPadding, leftBorder, rightBorder;
-    Spacing padding = domObject.getPadding();
-    Spacing border = domObject.getBorder();
+    CSSShorthand padding = component.getPadding();
+    CSSShorthand border = component.getBorder();
 
-    if (!CSSConstants.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
+    if (!CSSConstants.isUndefined((leftPadding = padding.get(CSSShorthand.EDGE.LEFT)))) {
       rawWidth -= leftPadding;
     }
-    if (!CSSConstants.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
+    if (!CSSConstants.isUndefined((rightPadding = padding.get(CSSShorthand.EDGE.RIGHT)))) {
       rawWidth -= rightPadding;
     }
 
-    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
+    if (!CSSConstants.isUndefined(leftBorder = border.get(CSSShorthand.EDGE.LEFT))) {
       rawWidth -= leftBorder;
     }
-    if (!CSSConstants.isUndefined(rightBorder = border.get(Spacing.RIGHT))) {
+    if (!CSSConstants.isUndefined(rightBorder = border.get(CSSShorthand.EDGE.RIGHT))) {
       rawWidth -= rightBorder;
     }
     return rawWidth;
@@ -59,23 +61,23 @@ public class WXDomUtils {
    * @return the height of the dom that excludes top-padding, top-border-width, bottom-padding
    * and bottom-border-width.
    */
-  public static float getContentHeight(ImmutableDomObject domObject) {
-    float rawHeight = domObject.getLayoutHeight();
+  public static float getContentHeight(WXComponent component) {
+    float rawHeight = component.getLayoutHeight();
     float topPadding, bottomPadding, topBorder, bottomBorder;
-    Spacing padding = domObject.getPadding();
-    Spacing border = domObject.getBorder();
+    CSSShorthand padding = component.getPadding();
+    CSSShorthand border = component.getBorder();
 
-    if (!CSSConstants.isUndefined((topPadding = padding.get(Spacing.TOP)))) {
+    if (!CSSConstants.isUndefined((topPadding = padding.get(CSSShorthand.EDGE.TOP)))) {
       rawHeight -= topPadding;
     }
-    if (!CSSConstants.isUndefined((bottomPadding = padding.get(Spacing.BOTTOM)))) {
+    if (!CSSConstants.isUndefined((bottomPadding = padding.get(CSSShorthand.EDGE.BOTTOM)))) {
       rawHeight -= bottomPadding;
     }
 
-    if (!CSSConstants.isUndefined(topBorder = border.get(Spacing.TOP))) {
+    if (!CSSConstants.isUndefined(topBorder = border.get(CSSShorthand.EDGE.TOP))) {
       rawHeight -= topBorder;
     }
-    if (!CSSConstants.isUndefined(bottomBorder = border.get(Spacing.BOTTOM))) {
+    if (!CSSConstants.isUndefined(bottomBorder = border.get(CSSShorthand.EDGE.BOTTOM))) {
       rawHeight -= bottomBorder;
     }
     return rawHeight;

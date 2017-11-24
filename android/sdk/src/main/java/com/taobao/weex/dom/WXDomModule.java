@@ -49,7 +49,7 @@ public final class WXDomModule extends WXModule {
   // method
   public static final String CREATE_BODY = "createBody";
   public static final String UPDATE_ATTRS = "updateAttrs";
-  public static final String UPDATE_STYLE = "updateStyle";
+  public static final String UPDATE_STYLE = "applyStyle";
   public static final String REMOVE_ELEMENT = "removeElement";
   public static final String ADD_ELEMENT = "addElement";
   public static final String MOVE_ELEMENT = "moveElement";

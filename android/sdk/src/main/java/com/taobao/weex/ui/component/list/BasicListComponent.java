@@ -1039,7 +1039,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   }
 
-  private String getTriggerType(@Nullable ImmutableDomObject component) {
+  private String getTriggerType(@Nullable WXComponent component) {
     String triggerType = DEFAULT_TRIGGER_TYPE;
     if (component == null) {
       return triggerType;
@@ -1056,11 +1056,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     return triggerType;
   }
 
-  private boolean isDragExcluded(@Nullable ImmutableDomObject domObject) {
-    if (domObject == null) {
+  private boolean isDragExcluded(@Nullable WXComponent component) {
+    if (component == null) {
       return DEFAULT_EXCLUDED;
     }
-    WXAttr cellAttrs = domObject.getAttrs();
+    WXAttr cellAttrs = component.getAttrs();
     return WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
   }
 
