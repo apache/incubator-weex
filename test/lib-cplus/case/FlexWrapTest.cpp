@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../../android/weex_core_debug/Source/Layout/WXCoreLayout.h"
+#include "WXCoreLayout.h"
 using namespace WXCoreFlexLayout;
 
 class FlexWrap : public ::testing::Test{

@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../../android/weex_core_debug/Source/Layout/WXCoreLayout.h"
-#include "../../../android/weex_core_debug/Source/Layout/WXCoreFlexEnum.h"
+#include "WXCoreLayout.h"
+#include "WXCoreFlexEnum.h"
 using namespace WXCoreFlexLayout;
 
 class Border : public ::testing::Test{
