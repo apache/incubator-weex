@@ -14,7 +14,7 @@ has_chapter_content: true
 
 该变量包含了当前 Weex 页面的所有环境信息，包括不仅限于：
 
-* `bundleUrl: string`: JS bundle 的 URL。
+* `bundleUrl: string`: JS bundle 的 URL，和页面的 URL 一致。
 * `env: Object`: 环境对象。
     * `weexVersion: string`: Weex sdk 版本。
     * `appName: string`: 应用名字。
