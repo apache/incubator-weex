@@ -27,6 +27,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,10 +55,14 @@ public class WXExceptionUtils {
 		WXJSExceptionInfo exceptionCommit;
 		String bundleUrlCommit = "BundleUrlDefault";
 		String instanceIdCommit = "InstanceIdDefalut";
+		Map <String, String> commitMap = extParams;
 
 		if(!TextUtils.isEmpty(instanceId)){
 		  instanceIdCommit = instanceId;
 		  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+		  if(instance.isDestroy()){
+			return;
+		  }
 		  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
 			bundleUrlCommit = instance.getBundleUrl();
 			if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)){
@@ -68,9 +73,20 @@ public class WXExceptionUtils {
 			}
 		  }
 		}
+		else {//instance is null for instance id is null
+		  if(!TextUtils.isEmpty(WXSDKInstance.requestUrl)){
+			bundleUrlCommit = WXSDKInstance.requestUrl;
+		  }
+
+		  if(extParams.get("weexUrl") != null){
+			bundleUrlCommit = extParams.get("weexUrl");
+		  }else if (extParams.get("bundleUrl") != null){
+			bundleUrlCommit = extParams.get("bundleUrl");
+		  }
+		}
 
 		if(adapter != null ){
-		  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, extParams);
+		  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, commitMap);
 		  adapter.onJSException(exceptionCommit);
 		  WXLogUtils.e(exceptionCommit.toString());
 		}

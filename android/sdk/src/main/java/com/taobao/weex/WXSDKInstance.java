@@ -554,7 +554,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     wxRequest.url = rewriteUri(Uri.parse(url),URIAdapter.BUNDLE).toString();
 	if(wxRequest != null && !TextUtils.isEmpty(wxRequest.url)){
 	  requestUrl = wxRequest.url;
+	}else {
+	  requestUrl = pageName;
 	}
+
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
