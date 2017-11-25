@@ -25,6 +25,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXJSExceptionInfo;
+import com.taobao.weex.common.WXPerformance;
 
 import java.util.Map;
 
@@ -48,11 +49,6 @@ public class WXExceptionUtils {
    * @param extParams
    */
   public static void commitCriticalExceptionRT(@Nullable final String instanceId, @Nullable final String errCode, @Nullable final String function, @Nullable final String exception, @Nullable final Map<String,String> extParams ){
-
-	WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-	  @Override
-	  public void run() {
-
 		IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
 		WXSDKInstance instance ;
 		WXJSExceptionInfo exceptionCommit;
@@ -64,8 +60,11 @@ public class WXExceptionUtils {
 		  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
 		  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
 			bundleUrlCommit = instance.getBundleUrl();
-			if(!TextUtils.equals(degradeUrl,"BundleUrlDefaultDegradeUrl")){
-			  bundleUrlCommit = degradeUrl;
+			if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)){
+			  if(!TextUtils.equals(degradeUrl,"BundleUrlDefaultDegradeUrl")){
+				bundleUrlCommit = degradeUrl;
+			  }else
+				bundleUrlCommit = WXSDKInstance.requestUrl;
 			}
 		  }
 		}
@@ -75,8 +74,5 @@ public class WXExceptionUtils {
 		  adapter.onJSException(exceptionCommit);
 		  WXLogUtils.e(exceptionCommit.toString());
 		}
-
 	  }
-	}, 0);
-  }
 }

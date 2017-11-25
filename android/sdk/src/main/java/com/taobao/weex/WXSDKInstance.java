@@ -113,6 +113,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private WXRefreshData mLastRefreshData;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
+  public static String requestUrl = "requestUrl";
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
@@ -551,6 +552,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = rewriteUri(Uri.parse(url),URIAdapter.BUNDLE).toString();
+	if(wxRequest != null && !TextUtils.isEmpty(wxRequest.url)){
+	  requestUrl = wxRequest.url;
+	}
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
@@ -1710,9 +1714,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
 					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
 					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
-					"\n response.errorCode " + response.errorCode +
-					"\n response.errorMsg" +  response.errorMsg +
-					"\n response." + getTemplateInfo(),
+					"\n response.errorCode=" + response.errorCode +
+					"\n response.errorMsg=" +  response.errorMsg +
+					"\n response=" + getTemplateInfo(),
 					null);
 
           }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
@@ -1723,9 +1727,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
 					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
 					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED_TEMPLATE_NULL", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
-							"\n response.errorCode " + response.errorCode +
-							"\n response.errorMsg" +  response.errorMsg +
-							"\n response." + getTemplateInfo(),
+							"\n response.errorCode=" + response.errorCode +
+							"\n response.errorMsg=" +  response.errorMsg +
+							"\n response=" + getTemplateInfo(),
 					null);
 
           }else {
@@ -1745,9 +1749,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 		// check content-type
       } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
 			  response.statusCode)) {
-        WXLogUtils.d("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
+        WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
         onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
-				response.errorMsg);
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
+				"|instance bundleUrl = \n" + instance.getBundleUrl() +
+				"|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
+		);
 
 		// check content-length
       } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
