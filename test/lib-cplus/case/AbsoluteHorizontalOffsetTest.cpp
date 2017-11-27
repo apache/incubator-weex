@@ -174,7 +174,7 @@ TEST_F(HorizontalAbsolute, WNullR70L0) {
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, rvalue);
     root->calculateLayout();
-    EXPECT_FLOAT_EQ(rootWidth - rvalue - lvalue, root->getLayoutWidth());
+    EXPECT_FLOAT_EQ(rootWidth - rvalue - lvalue, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue, target->getLayoutPositionLeft());
     EXPECT_FLOAT_EQ(rootWidth - rvalue, target->getLayoutPositionRight());
@@ -229,7 +229,7 @@ TEST_F(HorizontalAbsolute, WNullRN20L0) {
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, rvalue);
     root->calculateLayout();
-    EXPECT_FLOAT_EQ(rootWidth - rvalue - lvalue, root->getLayoutWidth());
+    EXPECT_FLOAT_EQ(rootWidth - rvalue - lvalue, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue, target->getLayoutPositionLeft());
     EXPECT_FLOAT_EQ(rootWidth - rvalue, target->getLayoutPositionRight());
