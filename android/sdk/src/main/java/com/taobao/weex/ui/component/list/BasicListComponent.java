@@ -1106,10 +1106,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private int generateViewType(WXComponent component) {
     long id;
     try {
+      // TODO default scope
       id = Integer.parseInt(component.getRef());
       String type = component.getAttrByKey("scope");
 
-      if (!TextUtils.isEmpty(type)) {
+      if (!TextUtils.isEmpty(type) && !TextUtils.equals(type,"default")) {
         if (mRefToViewType == null) {
           mRefToViewType = new ArrayMap<>();
         }
@@ -1117,7 +1118,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           mRefToViewType.put(type, id);
         }
         id = mRefToViewType.get(type);
-
       }
     } catch (RuntimeException e) {
       WXLogUtils.eTag(TAG, e);

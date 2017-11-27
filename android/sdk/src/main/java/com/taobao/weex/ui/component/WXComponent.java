@@ -698,6 +698,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
       if (component == null) {
         component = this;
       }
+      copyData(component);
       setLayout(component);
       applyPadding(component.getPadding(), component.getBorder());
       applyEvents();
