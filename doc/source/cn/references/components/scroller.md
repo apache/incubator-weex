@@ -72,6 +72,10 @@ version: 2.1
     - `x {number}`: x轴上的偏移量
     - `y {number}`: y轴上的偏移量
 
+- `scrollstart` <sup class="wx-v">v0.17+</sup>：列表刚开始发生滚动的时候会触发该事件，可以在此执行滚动开始的逻辑。
+
+- `scrollend` <sup class="wx-v">v0.17+</sup>：列表结束滚动的时候会触发该事件，可以在此执行滚动结束的逻辑。
+
 - 通用事件
 
   支持所有通用事件：
