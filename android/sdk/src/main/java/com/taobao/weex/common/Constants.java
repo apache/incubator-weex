@@ -183,6 +183,7 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+    String ROLE = "role";
 
     String DIRECTION = "direction";
     String RTL = "rtl";

@@ -58,12 +58,6 @@
     if (fabs(contentOffset.y) < 0.5) {
         contentOffset.y = 0;
     }
-    if (isnan(contentOffset.x)) {
-        contentOffset.x = 0;
-    }
-    if(isnan(contentOffset.y)) {
-        contentOffset.y = 0;
-    }
     
     [super setContentOffset:contentOffset];
 }
@@ -161,10 +155,6 @@
     _tableView.delegate = self;
     _tableView.dataSource = self;
     _tableView.userInteractionEnabled = YES;
-    
-    _tableView.estimatedRowHeight = 0;
-    _tableView.estimatedSectionFooterHeight = 0;
-    _tableView.estimatedSectionHeaderHeight = 0;
 }
 
 - (void)viewWillUnload
