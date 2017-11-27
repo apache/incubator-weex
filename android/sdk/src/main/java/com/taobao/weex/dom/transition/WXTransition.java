@@ -92,6 +92,14 @@ public class WXTransition {
         LAYOUT_PROPERTIES.add(Constants.Name.MARGIN_BOTTOM);
         LAYOUT_PROPERTIES.add(Constants.Name.MARGIN_LEFT);
         LAYOUT_PROPERTIES.add(Constants.Name.MARGIN_RIGHT);
+        LAYOUT_PROPERTIES.add(Constants.Name.LEFT);
+        LAYOUT_PROPERTIES.add(Constants.Name.RIGHT);
+        LAYOUT_PROPERTIES.add(Constants.Name.TOP);
+        LAYOUT_PROPERTIES.add(Constants.Name.BOTTOM);
+        LAYOUT_PROPERTIES.add(Constants.Name.PADDING_LEFT);
+        LAYOUT_PROPERTIES.add(Constants.Name.PADDING_RIGHT);
+        LAYOUT_PROPERTIES.add(Constants.Name.PADDING_TOP);
+        LAYOUT_PROPERTIES.add(Constants.Name.PADDING_BOTTOM);
     }
 
     /**
@@ -395,12 +403,12 @@ public class WXTransition {
         switch (property){
             case Constants.Name.WIDTH:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.WIDTH, domObject.getLayoutWidth(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value), domObject.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), domObject.getViewPortWidth()));
             }
             break;
             case Constants.Name.HEIGHT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.HEIGHT, domObject.getLayoutHeight(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value), domObject.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), domObject.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_TOP:{
@@ -420,6 +428,46 @@ public class WXTransition {
             break;
             case Constants.Name.MARGIN_BOTTOM:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_BOTTOM,  domObject.getMargin().get(Spacing.BOTTOM),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.LEFT:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  domObject.getPositionLeft(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.RIGHT:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  domObject.getPositionRight(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.BOTTOM:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  domObject.getPositionBottom(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.TOP:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPositionTop(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.PADDING_TOP:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_TOP,  domObject.getPadding().get(Spacing.TOP),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.PADDING_BOTTOM:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_BOTTOM,  domObject.getPadding().get(Spacing.BOTTOM),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.PADDING_LEFT:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.LEFT),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+            }
+            break;
+            case Constants.Name.PADDING_RIGHT:{
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.RIGHT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
             }
             break;
@@ -463,6 +511,38 @@ public class WXTransition {
                         break;
                         case Constants.Name.MARGIN_BOTTOM:{
                             domObject.setMargin(Spacing.BOTTOM, (Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.LEFT:{
+                            domObject.setPositionLeft((Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.RIGHT:{
+                            domObject.setPositionRight((Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.BOTTOM:{
+                            domObject.setPositionBottom((Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.TOP:{
+                            domObject.setPositionTop((Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.PADDING_TOP:{
+                            domObject.setPadding(Spacing.TOP, (Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.PADDING_BOTTOM:{
+                            domObject.setPadding(Spacing.BOTTOM, (Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.PADDING_LEFT:{
+                            domObject.setPadding(Spacing.LEFT, (Float) animation.getAnimatedValue(property));
+                        }
+                        break;
+                        case Constants.Name.PADDING_RIGHT:{
+                            domObject.setPadding(Spacing.RIGHT, (Float) animation.getAnimatedValue(property));
                         }
                         break;
                         default:
