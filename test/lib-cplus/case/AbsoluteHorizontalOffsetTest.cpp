@@ -103,7 +103,7 @@ TEST_F(HorizontalAbsolute, WNullRNullLN10) {
 TEST_F(HorizontalAbsolute, WNullR0LNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = 0;
-    root->setStylePosition(right, rvalue);
+    target->setStylePosition(right, rvalue);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
@@ -158,7 +158,7 @@ TEST_F(HorizontalAbsolute, WNullR0LN10) {
 TEST_F(HorizontalAbsolute, WNullR70LNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = 70;
-    root->setStylePosition(right, rvalue);
+    target->setStylePosition(right, rvalue);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
@@ -213,7 +213,7 @@ TEST_F(HorizontalAbsolute, WNullR70LN10) {
 TEST_F(HorizontalAbsolute, WNullRN20LNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = -20;
-    root->setStylePosition(right, rvalue);
+    target->setStylePosition(right, rvalue);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
