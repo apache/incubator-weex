@@ -43,16 +43,16 @@ public class DefaultAccessibilityRoleAdapter implements IWXAccessibilityRoleAdap
 
   @Override
   public String getRole(String key) {
-    if (isCN()) {
-      String cnRole = ENRoles.get(key);
-      if (!TextUtils.isEmpty(cnRole)) {
-        return cnRole;
+    if (isEN()) {
+      String enRole = ENRoles.get(key);
+      if (!TextUtils.isEmpty(enRole)) {
+        return enRole;
       }
     }
     return key;
   }
 
-  private static boolean isCN() {
+  private static boolean isEN() {
     try {
       return "EN".equals(Locale.getDefault().getCountry());
     } catch (Throwable t) {
