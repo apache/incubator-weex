@@ -54,7 +54,7 @@ protected:
 
 TEST_F(HorizontalRelative, LNullRNullWNull) {
     constexpr float lvalue = 0;
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -66,7 +66,7 @@ TEST_F(HorizontalRelative, LNullRNullWNull) {
 TEST_F(HorizontalRelative, L0RNullWNull) {
     constexpr float lvalue = 0;
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -78,7 +78,7 @@ TEST_F(HorizontalRelative, L0RNullWNull) {
 TEST_F(HorizontalRelative, L30RNullWNull) {
     constexpr float lvalue = 30;
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -90,7 +90,7 @@ TEST_F(HorizontalRelative, L30RNullWNull) {
 TEST_F(HorizontalRelative, LN10RNullWNull) {
     constexpr float lvalue = -10;
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -103,7 +103,7 @@ TEST_F(HorizontalRelative, LNullR0WNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = 0;
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -116,7 +116,7 @@ TEST_F(HorizontalRelative, L0R0WNull) {
     constexpr float lvalue = 0;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -129,7 +129,7 @@ TEST_F(HorizontalRelative, L30R0WNull) {
     constexpr float lvalue = 30;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -142,7 +142,7 @@ TEST_F(HorizontalRelative, LN10R0WNull) {
     constexpr float lvalue = -10;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -155,7 +155,7 @@ TEST_F(HorizontalRelative, LNullR70WNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = 70;
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -168,7 +168,7 @@ TEST_F(HorizontalRelative, L0R70WNull) {
     constexpr float lvalue = 0;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -181,7 +181,7 @@ TEST_F(HorizontalRelative, L30R70WNull) {
     constexpr float lvalue = 30;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -194,7 +194,7 @@ TEST_F(HorizontalRelative, LN10R70WNull) {
     constexpr float lvalue = -10;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -207,7 +207,7 @@ TEST_F(HorizontalRelative, LNullRN20WNull) {
     constexpr float lvalue = 0;
     constexpr float rvalue = -20;
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue - rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -220,7 +220,7 @@ TEST_F(HorizontalRelative, L0RN20WNull) {
     constexpr float lvalue = 0;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -233,7 +233,7 @@ TEST_F(HorizontalRelative, L30RN20WNull) {
     constexpr float lvalue = 30;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -246,7 +246,7 @@ TEST_F(HorizontalRelative, LN10RN20WNull) {
     constexpr float lvalue = -10;
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -258,7 +258,7 @@ TEST_F(HorizontalRelative, LN10RN20WNull) {
 TEST_F(HorizontalRelative, LNullRNullW100) {
     constexpr float lvalue = 0;
     target->setStyleWidth(valid_width);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -271,7 +271,7 @@ TEST_F(HorizontalRelative, L0RNullW100) {
     constexpr float lvalue = 0;
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -284,7 +284,7 @@ TEST_F(HorizontalRelative, L30RNullW100) {
     constexpr float lvalue = 30;
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -297,7 +297,7 @@ TEST_F(HorizontalRelative, LN10RNullW100) {
     constexpr float lvalue = -10;
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -311,7 +311,7 @@ TEST_F(HorizontalRelative, LNullR0W100) {
     constexpr float rvalue = 0;
     target->setStyleWidth(valid_width);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -325,7 +325,7 @@ TEST_F(HorizontalRelative, L0R0W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, 0);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -339,7 +339,7 @@ TEST_F(HorizontalRelative, L30R0W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -353,7 +353,7 @@ TEST_F(HorizontalRelative, LN10R0W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -367,7 +367,7 @@ TEST_F(HorizontalRelative, LNullR70W100) {
     constexpr float rvalue = 70;
     target->setStyleWidth(valid_width);
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -381,7 +381,7 @@ TEST_F(HorizontalRelative, L0R70W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, 0);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -395,7 +395,7 @@ TEST_F(HorizontalRelative, L30R70W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -409,7 +409,7 @@ TEST_F(HorizontalRelative, LN10R70W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -423,7 +423,7 @@ TEST_F(HorizontalRelative, LNullRN20W100) {
     constexpr float rvalue = -20;
     target->setStyleWidth(valid_width);
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue - rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -437,7 +437,7 @@ TEST_F(HorizontalRelative, L0RN20W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, 0);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -451,7 +451,7 @@ TEST_F(HorizontalRelative, L30RN20W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -465,7 +465,7 @@ TEST_F(HorizontalRelative, LN10RN20W100) {
     target->setStyleWidth(valid_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -478,7 +478,7 @@ TEST_F(HorizontalRelative, LN10RN20W100) {
 TEST_F(HorizontalRelative, LNullRNullW0) {
     constexpr float lvalue = 0;
     target->setStyleWidth(boundary_width);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -491,7 +491,7 @@ TEST_F(HorizontalRelative, L0RNullW0) {
     constexpr float lvalue = 0;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -504,7 +504,7 @@ TEST_F(HorizontalRelative, L30RNullW0) {
     constexpr float lvalue = 30;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -517,7 +517,7 @@ TEST_F(HorizontalRelative, LN10RNullW0) {
     constexpr float lvalue = -10;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -531,7 +531,7 @@ TEST_F(HorizontalRelative, LNullR0W0) {
     constexpr float rvalue = 0;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -545,7 +545,7 @@ TEST_F(HorizontalRelative, L0R0W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -559,7 +559,7 @@ TEST_F(HorizontalRelative, L30R0W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -573,7 +573,7 @@ TEST_F(HorizontalRelative, LN10R0W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 0);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -587,7 +587,7 @@ TEST_F(HorizontalRelative, LNullR70W0) {
     constexpr float rvalue = 70;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -601,7 +601,7 @@ TEST_F(HorizontalRelative, L0R70W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -615,7 +615,7 @@ TEST_F(HorizontalRelative, L30R70W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -629,7 +629,7 @@ TEST_F(HorizontalRelative, LN10R70W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, 70);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -643,7 +643,7 @@ TEST_F(HorizontalRelative, LNullRN20W0) {
     constexpr float rvalue = -20;
     target->setStyleWidth(boundary_width);
     target->setStylePosition(right, rvalue);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue - rvalue + fooWidth, target->getLayoutPositionLeft());
@@ -657,7 +657,7 @@ TEST_F(HorizontalRelative, L0RN20W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, 0);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -671,7 +671,7 @@ TEST_F(HorizontalRelative, L30RN20W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
@@ -685,7 +685,7 @@ TEST_F(HorizontalRelative, LN10RN20W0) {
     target->setStyleWidth(boundary_width);
     target->setStylePosition(left, lvalue);
     target->setStylePosition(right, -20);
-    target->calculateLayout();
+    root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
     EXPECT_FLOAT_EQ(lvalue + fooWidth, target->getLayoutPositionLeft());
