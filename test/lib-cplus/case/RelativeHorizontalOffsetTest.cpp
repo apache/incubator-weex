@@ -158,8 +158,8 @@ TEST_F(HorizontalRelative, LNullR70WNull) {
     root->calculateLayout();
     EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth + targetWidth, target->getLayoutPositionRight());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue, target->getLayoutPositionLeft());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue + targetWidth, target->getLayoutPositionRight());
     EXPECT_FLOAT_EQ(0, target->getLayoutPositionTop());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutPositionBottom());
 }
@@ -370,8 +370,8 @@ TEST_F(HorizontalRelative, LNullR70W100) {
     root->calculateLayout();
     EXPECT_FLOAT_EQ(valid_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth + valid_width, target->getLayoutPositionRight());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue, target->getLayoutPositionLeft());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue + valid_width, target->getLayoutPositionRight());
     EXPECT_FLOAT_EQ(0, target->getLayoutPositionTop());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutPositionBottom());
 }
@@ -590,8 +590,8 @@ TEST_F(HorizontalRelative, LNullR70W0) {
     root->calculateLayout();
     EXPECT_FLOAT_EQ(boundary_width, target->getLayoutWidth());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutHeight());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth, target->getLayoutPositionLeft());
-    EXPECT_FLOAT_EQ(lvalue + rvalue + fooWidth + boundary_width, target->getLayoutPositionRight());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue, target->getLayoutPositionLeft());
+    EXPECT_FLOAT_EQ(fooWidth - rvalue + boundary_width, target->getLayoutPositionRight());
     EXPECT_FLOAT_EQ(0, target->getLayoutPositionTop());
     EXPECT_FLOAT_EQ(targetHeight, target->getLayoutPositionBottom());
 }
