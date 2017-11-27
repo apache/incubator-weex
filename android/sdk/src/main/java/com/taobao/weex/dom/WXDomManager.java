@@ -168,11 +168,13 @@ public final class WXDomManager {
 		if(action != null && instance!= null && !instance.getismIsCommitedDomAtionExp()){
 		  String className = action.getClass().getSimpleName();
 		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
-		  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorCode(),
-				  "executeAction",
-				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorMsg() + "|current action is" +className, null);
-		  instance.setmIsCommitedDomAtionExp(true);
+		  if(className.contains("CreateFinishAction")){
+			WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+					WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorCode(),
+					"executeAction",
+					WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorMsg() + "|current action is" +className, null);
+			instance.setmIsCommitedDomAtionExp(true);
+		  }
 		}
 		return;
 	  }
