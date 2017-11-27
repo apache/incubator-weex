@@ -13,7 +13,7 @@ Each Weex page has a separate weex variable, which exists in the JS context. The
 
 This variable contains all the environment information for the current Weex page, including not only:       
 
-+ `BundleUrl`: string: The URL of the JS bundle.
++ `BundleUrl`: string: The URL of the JS bundle, the same as URL of the page.
 + `Env: Object`: environment object.
 + `WeexVersion: string`: Weex sdk version.
 + `AppName: string`: application name.
