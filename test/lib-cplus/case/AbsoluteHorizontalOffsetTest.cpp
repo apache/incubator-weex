@@ -44,6 +44,9 @@ protected:
 
     virtual void TearDown() {
         root->freeWXCoreNode();
+        foo->freeWXCoreNode();
+        target->freeWXCoreNode();
+        targetChild->freeWXCoreNode();
     }
 
     WXCoreLayoutNode *root, *foo, *targetChild, *target;
