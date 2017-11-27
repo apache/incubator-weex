@@ -7,8 +7,8 @@
 
 using namespace WXCoreFlexLayout;
 
-static const int valid_width = 100;
-static const int boundary_width = 0;
+static constexpr float valid_width = 100;
+static constexpr float boundary_width = 0;
 
 class HorizontalRelative : public ::testing::Test {
 protected:
