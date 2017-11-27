@@ -6,6 +6,35 @@ layout: post
 
 # Release Note
 
+## v0.17
+-----
+
+* `feature` `Android/iOS` Support `writing direction style:direction=rtl`([#782](https://github.com/apache/incubator-weex/pull/782)[#886](https://github.com/apache/incubator-weex/pull/886))
+* `feature` `Android/iOS` Support scroll start and scroll end event on scroller and list ([#858](https://github.com/apache/incubator-weex/pull/858)[856](https://github.com/apache/incubator-weex/pull/856))
+* `feature` `iOS` support text max-width （[#834](https://github.com/apache/incubator-weex/pull/834)）
+* `feature` `Android` CSS Transiton Animation Supported component ([#851](https://github.com/apache/incubator-weex/pull/851))
+* `feature` `Android` New `local` module ([#781](https://github.com/apache/incubator-weex/pull/781))
+* `feature` `Android` Support ripple background on Android 5.0 and higher ([#792](https://github.com/apache/incubator-weex/pull/792))
+* `feature` `Android` Support multi language on dialog ([#831](https://github.com/apache/incubator-weex/pull/831))
+* `feature` `H5` Support lazyload and appear watcher when body height set to 100% ([#827](https://github.com/apache/incubator-weex/pull/827)).
+* `feature` `H5` Add try catch for storage accessing incase user disabled the related function in a browser ([#827](https://github.com/apache/incubator-weex/pull/827)).
+* `feature` `H5` image support css sprite (sprite-src, sprite-position, sprite-width) ([#827](https://github.com/apache/incubator-weex/pull/827)).
+* `feature` `JSFM` Support batch update styles and attributes in Vue.js ([#819](https://github.com/apache/incubator-weex/pull/819) [#7046](https://github.com/vuejs/vue/pull/7046))
+* `feature` `JSFM` Stop trimming CSS units in richtext component. ([#6927](https://github.com/vuejs/vue/pull/6927))
+* `feature` `JSFM` Stop rethrow the captured error on Weex platform. ([#7024](https://github.com/vuejs/vue/pull/7024))
+* `feature` `JSFM` Upgrade weex-vue-framework to 2.5.3 ([release nodes](https://github.com/vuejs/vue/releases/tag/v2.5.3))
+* `feature` `JSFM` Adjust the behavior of `nextTick` to improve compatibility.
+* `bugfix` `iOS` bugfix boxshadow render abnormal （[#791](https://github.com/apache/incubator-weex/pull/791)）
+* `bugfix` `iOS` bugfix timer exposed on JSContxt （[#839](https://github.com/apache/incubator-weex/pull/839)）
+* `bugfix` `iOS` fix iOS8 scrollview’s assign delegate crash （[#838](https://github.com/apache/incubator-weex/pull/838)）
+* `bugfix` `iOS` fix setViewport：sometimes doesn’t work（[#843](https://github.com/apache/incubator-weex/pull/843)）
+* `bugfix` `iOS` fix addEvent lead to generate a new view while it as been recycled （[#837](https://github.com/apache/incubator-weex/pull/837)）
+* `bugfix` `iOS` fix about setting nan frame crash （[#853](https://github.com/apache/incubator-weex/pull/853)）
+* `bugfix` `iOS` disable tableview estimation row or section height which make list component behavior abnormal （[#867](https://github.com/apache/incubator-weex/pull/867)）
+* `bugfix` `Android` Fix that moveElement doesn’t work when parent is not a list ([#805](https://github.com/apache/incubator-weex/pull/805))
+* `bugfix` `Android` Fix flicker caused by coexistence of box-shadow and border-radius (#[780](https://github.com/apache/incubator-weex/pull/780))
+* `bugfix` `Android` Fix android new Date() cannot get accuracy time ([#753](https://github.com/apache/incubator-weex/pull/753))
+* `bugfix` `H5` Fix scroll event listenning and scrollToElement on chrome for the latest version ([#827](https://github.com/apache/incubator-weex/pull/827)).
 
 ## v0.16
 -----

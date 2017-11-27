@@ -1687,20 +1687,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void notifyAppearStateChange(String wxEventType,String direction){
-    if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("direction", direction);
-      fireEvent(wxEventType, params);
+    if(containsEvent(wxEventType)) {
+       Map<String, Object> params = new HashMap<>();
+       params.put("direction", direction);
+       fireEvent(wxEventType, params);
     }
   }
 
-  public void notifyWatchAppearDisappearEvent(String wxEventType,String direction){
-    if(containsEvent(wxEventType)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("direction", direction);
-      fireEvent(wxEventType, params);
-    }
-  }
 
   public boolean isUsing() {
     return isUsing;

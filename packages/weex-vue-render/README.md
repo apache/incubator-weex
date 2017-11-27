@@ -193,10 +193,14 @@ vue: {
 
 * fix image lazyloading.
 
-#### 0.12.23
+#### 0.12.24
 
 * add try catch to accessing localStorage.
 * support image sprite.
+
+#### 0.12.25
+
+* fix indicator position in one page slider.
 
 ## component -> dom map
 
