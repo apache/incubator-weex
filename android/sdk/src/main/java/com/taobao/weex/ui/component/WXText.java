@@ -515,11 +515,13 @@ public class WXText extends WXComponent<WXTextView> {
 
   @Override
   public void updateExtra(Object extra) {
+    super.updateExtra(extra);
     if (extra instanceof Layout &&
         getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
       final Layout layout = (Layout) extra;
       getHostView().setTextLayout(layout);
       getHostView().invalidate();
+
     }
   }
 

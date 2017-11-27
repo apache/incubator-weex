@@ -136,6 +136,8 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
 
+  private Object mExtra;
+
   private int mViewPortWidth = 750;
 
   private String mPageId;
@@ -851,7 +853,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public void updateExtra(Object extra) {
-
+    this.mExtra = extra;
   }
 
   /**
@@ -1835,7 +1837,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public Object getExtra() {
-    return null;
+    return mExtra;
   }
 
   public String getComponentType() {
