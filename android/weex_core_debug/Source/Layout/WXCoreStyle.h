@@ -287,10 +287,10 @@ namespace WXCoreFlexLayout {
     float mRight;
 
   public:
-    WXCorePosition() : mTop(0),
-                       mBottom(0),
-                       mLeft(0),
-                       mRight(0) {}
+    WXCorePosition() : mTop(NAN),
+                       mBottom(NAN),
+                       mLeft(NAN),
+                       mRight(NAN) {}
 
     ~WXCorePosition() {
       reset();
