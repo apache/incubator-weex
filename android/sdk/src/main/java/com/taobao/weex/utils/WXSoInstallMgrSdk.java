@@ -112,7 +112,7 @@ public class WXSoInstallMgrSdk {
     String cpuType = _cpuType();
     if (cpuType.equalsIgnoreCase(MIPS) ) {
 	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  "-9001",
+			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
 			  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is MIPS",
 			  null);
       return false;
@@ -140,7 +140,7 @@ public class WXSoInstallMgrSdk {
       } catch (Exception | Error e2) {
         if (cpuType.contains(ARMEABI) || cpuType.contains(X86)) {
 		  WXExceptionUtils.commitCriticalExceptionRT(null,
-				  "-9001",
+				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
 				  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
 				  "\n Detail Error is: " +e2.getMessage(),
 				  null);
@@ -295,7 +295,7 @@ public class WXSoInstallMgrSdk {
       }
     }catch(Throwable e ){
 	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  "-9001",
+			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
 			  "checkSoIsValid", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for " +
 					  "weex so size check fail exception :"+e.getMessage(),
 			  null);

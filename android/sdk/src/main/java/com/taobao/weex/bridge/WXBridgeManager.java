@@ -2020,9 +2020,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //      WXJSExceptionInfo jsException = new WXJSExceptionInfo(exceptionId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
 //      adapter.onJSException(jsException);
 
-	  WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION.getErrorCode(),
+	  WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorCode(),
 			  function,
-			  WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION.getErrorMsg() + exception,
+			  WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
 			  null);
     }
   }
