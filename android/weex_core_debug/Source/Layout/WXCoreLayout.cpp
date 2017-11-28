@@ -28,9 +28,9 @@ namespace WXCoreFlexLayout {
     BFCs.clear();
     initFormatingContext(BFCs);
     initMeasureMode();
-    reset();
     WXBFCDimension bfcDimension = calculateBFCDimension();
-    measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height, bfcDimension.heightMeasureMode,
+    measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height,
+            bfcDimension.heightMeasureMode,
             true);
     layout(mCssStyle->mMargin.getMargin(WXCore_Margin_Left),
            mCssStyle->mMargin.getMargin(WXCore_Margin_Top),
@@ -106,48 +106,68 @@ namespace WXCoreFlexLayout {
     }
   }
 
-  void WXCoreLayoutNode::measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
+  void WXCoreLayoutNode::measure(float width, MeasureMode widthMeasureMode, float height,
+                                 MeasureMode heightMeasureMode,
                                  bool useMeasureFunc) {
-    if (getChildCount(NON_BFC) > 0) {
-      onMeasure(width, widthMeasureMode, height, heightMeasureMode);
-    } else {
-      if (useMeasureFunc && measureFunc != nullptr) {
-        onLayoutBefore();
-        if ((isnan(mCssStyle->mStyleWidth) || isnan(mCssStyle->mStyleHeight))) {
-          WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height,
-                                             heightMeasureMode);
-//          onMeasure(dimension.width, dimension.height);
-          width = widthMeasureMode == EXACTLY ? dimension.width :
-                  min_num<float>(
-                      dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
-                      mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
-                      mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
-                      mCssStyle->mBorderWidth.getBorderWidth(
-                          WXCore_Border_Width_Left),
-                      width);
-          height = heightMeasureMode == EXACTLY ? dimension.height :
-                   min_num<float>(
-                       dimension.height + mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
-                       mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
-                       mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
-                       mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom),
-                       height);
-        }
-        onLayoutAfter(width, height);
+
+    bool isNeedMeasure = false;
+    if (mLastSize == nullptr || mLastAvailableSize == nullptr || mLastAvailableSize->width != width ||
+        mLastAvailableSize->height != height || mLastWidthMode != widthMeasureMode ||
+        mLastHeightMode != heightMeasureMode || isDirty())
+      isNeedMeasure = true;
+
+    if (isNeedMeasure) {
+      if (getChildCount(NON_BFC) > 0) {
+        onMeasure(width, widthMeasureMode, height, heightMeasureMode);
       } else {
-        if (widthMeasureMode == AT_MOST) {
-          width = 0;
+        if (useMeasureFunc && measureFunc != nullptr) {
+          onLayoutBefore();
+          if ((isnan(mCssStyle->mStyleWidth) || isnan(mCssStyle->mStyleHeight))) {
+            WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height,
+                                               heightMeasureMode);
+            width = widthMeasureMode == EXACTLY ? dimension.width :
+                    min_num<float>(
+                        dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
+                        mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Right) +
+                        mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
+                        mCssStyle->mBorderWidth.getBorderWidth(
+                            WXCore_Border_Width_Left),
+                        width);
+            height = heightMeasureMode == EXACTLY ? dimension.height :
+                     min_num<float>(
+                         dimension.height + mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
+                         mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
+                         mCssStyle->mPadding.getPadding(WXCore_Padding_Bottom) +
+                         mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Bottom),
+                         height);
+          }
+          onLayoutAfter(width, height);
+        } else {
+          if (widthMeasureMode == AT_MOST) {
+            width = 0;
+          }
+          if (heightMeasureMode == AT_MOST) {
+            height = 0;
+          }
         }
-        if (heightMeasureMode == AT_MOST) {
-          height = 0;
-        }
+        setMeasuredDimension(width, height);
       }
-      setMeasuredDimension(width, height);
+
+      resetDirty();
+      if (mLastAvailableSize == nullptr)
+        mLastAvailableSize = new WXCoreSize();
+      mLastAvailableSize->width = width;
+      mLastAvailableSize->height = height;
+      mLastWidthMode = widthMeasureMode;
+      mLastHeightMode = heightMeasureMode;
+    } else {
+      setMeasuredDimension(mLastSize->width, mLastSize->height);
     }
   }
 
   void
-  WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode) {
+  WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height,
+                              MeasureMode heightMeasureMode) {
     if (mChildrenFrozen == nullptr || mChildrenFrozen_oldlength < getChildCount(NON_BFC)) {
       mChildrenFrozen = new bool[getChildCount(NON_BFC)];
       mChildrenFrozen_oldlength = getChildCount(NON_BFC);
@@ -754,11 +774,13 @@ namespace WXCoreFlexLayout {
         layoutHorizontal(true, left, top, right, bottom);
         break;
       case WXCore_Flex_Direction_Column_Reverse:
-        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right, bottom);
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right,
+                       bottom);
         break;
       case WXCore_Flex_Direction_Column:
       default:
-        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right, bottom);
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right,
+                       bottom);
         break;
     }
   }

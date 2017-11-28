@@ -138,6 +138,10 @@ namespace WXCoreFlexLayout {
 
     WXCoreCSSStyle *mCssStyle;
 
+    MeasureMode widthMeasureMode;
+
+    MeasureMode heightMeasureMode;
+
     WXCorelayoutResult *mLayoutResult;
 
     bool mHasNewLayout;
@@ -150,14 +154,22 @@ namespace WXCoreFlexLayout {
 
     void *context;
 
-    MeasureMode widthMeasureMode;
+    /** ================================ Cache：Last calculate result =================================== **/
 
-    MeasureMode heightMeasureMode;
+    WXCoreSize *mLastSize;
+
+    WXCoreSize *mLastAvailableSize;
+
+    WXCorePosition *mLastPosition;
+
+    MeasureMode mLastWidthMode;
+
+    MeasureMode mLastHeightMode;
 
   public:
 
 
-    /** ================================ Entry =================================== **/
+    /** ================================ Engine Entry Function =================================== **/
 
     void calculateLayout();
 
@@ -165,7 +177,9 @@ namespace WXCoreFlexLayout {
     /** ================================ lifeCycle =================================== **/
 
     inline static WXCoreLayoutNode *newWXCoreNode() {
-      return new WXCoreLayoutNode();
+      WXCoreLayoutNode *node = new WXCoreLayoutNode();
+      node->dirty();
+      return node;
     }
 
     WXCoreLayoutNode() :
@@ -178,6 +192,9 @@ namespace WXCoreFlexLayout {
         measureFunc(nullptr) {
       mCssStyle = new WXCoreCSSStyle();
       mLayoutResult = new WXCorelayoutResult();
+      mLastSize = nullptr;
+      mLastAvailableSize = nullptr;
+      mLastPosition = nullptr;
     }
 
     inline void freeWXCoreNode() {
@@ -211,10 +228,26 @@ namespace WXCoreFlexLayout {
         delete mLayoutResult;
         mLayoutResult = nullptr;
       }
+
+      if (mLastSize != nullptr) {
+        delete mLastSize;
+        mLastSize = nullptr;
+      }
+
+      if (mLastAvailableSize != nullptr) {
+        delete mLastAvailableSize;
+        mLastAvailableSize = nullptr;
+      }
+
+      if (mLastPosition != nullptr) {
+        delete mLastPosition;
+        mLastPosition = nullptr;
+      }
     }
 
     inline void reset() {
       mLayoutResult->reset();
+      dirty();
       for (int i = 0; i < getChildCount(NON_BFC); i++) {
         WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
         child->reset();
@@ -223,17 +256,20 @@ namespace WXCoreFlexLayout {
 
     inline void resetLayoutResult() {
       mLayoutResult->reset();
+      dirty();
     }
 
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+        dirty();
       }
     }
 
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
       if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
         memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
+        dirty();
       }
     }
 
@@ -245,12 +281,14 @@ namespace WXCoreFlexLayout {
         memcpy(&node, &temp, sizeof(WXCoreLayoutNode));
         srcNode->appendChild(temp);
       }
+      dirty();
     }
 
     /** ================================ measureFunc =================================== **/
 
     inline void setMeasureFunc(WXCoreMeasureFunc measure) {
       measureFunc = measure;
+      dirty();
     }
 
     inline WXCoreMeasureFunc getMeasureFunc() {
@@ -279,10 +317,16 @@ namespace WXCoreFlexLayout {
     void initMeasureMode();
 
     inline void setLayoutWidth(float width) {
+      if (mLastSize == nullptr)
+        mLastSize = new WXCoreSize();
+      mLastSize->width = width;
       mLayoutResult->mLayoutSize.width = width;
     }
 
     inline void setLayoutHeight(float height) {
+      if (mLastSize == nullptr)
+        mLastSize = new WXCoreSize();
+      mLastSize->height = height;
       mLayoutResult->mLayoutSize.height = height;
     }
 
@@ -389,6 +433,12 @@ namespace WXCoreFlexLayout {
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Top, t);
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Right, r);
       mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Bottom, b);
+      if (mLastPosition == nullptr)
+        mLastPosition = new WXCorePosition();
+      mLastPosition->setPosition(WXCore_PositionEdge_Left, l);
+      mLastPosition->setPosition(WXCore_PositionEdge_Top, t);
+      mLastPosition->setPosition(WXCore_PositionEdge_Right, r);
+      mLastPosition->setPosition(WXCore_PositionEdge_Bottom, b);
     }
 
     virtual void onLayoutBefore() {
@@ -421,6 +471,7 @@ namespace WXCoreFlexLayout {
 
     inline void removeChildAt(uint32_t index) {
       mChildList.erase(mChildList.begin() + index);
+      dirty();
     }
 
     inline void removeChild(WXCoreLayoutNode *child) {
@@ -430,16 +481,19 @@ namespace WXCoreFlexLayout {
           break;
         }
       }
+      dirty();
     }
 
     inline void addChildAt(WXCoreLayoutNode *child, uint32_t index) {
       mChildList.insert(mChildList.begin() + index, child);
       child->mParent = this;
+      dirty();
     }
 
     inline void appendChild(WXCoreLayoutNode *child) {
       mChildList.push_back(child);
       child->mParent = this;
+      dirty();
     }
 
     inline WXCoreLayoutNode *getChildAt(FormatingContext formatingContext, uint32_t index) {
@@ -747,8 +801,8 @@ namespace WXCoreFlexLayout {
   private:
 
     inline void setMeasuredDimension(float width, float height) {
-      mLayoutResult->mLayoutSize.width = width;
-      mLayoutResult->mLayoutSize.height = height;
+      setLayoutWidth(width);
+      setLayoutHeight(height);
     }
 
 
@@ -759,22 +813,25 @@ namespace WXCoreFlexLayout {
       return mHasNewLayout;
     }
 
+    inline bool resetDirty() {
+      mIsDirty = false;
+    }
+
+  public:
+
     inline bool isDirty() {
       return mIsDirty;
     }
 
     inline void dirty() {
-      requestLayout();
-    }
-
-    inline void requestLayout() {
-      mIsDirty = true;
-      if (getParent() != nullptr) {
-        getParent()->requestLayout();
+      if (!isDirty()) {
+        mIsDirty = true;
+        if (getParent() != nullptr) {
+          getParent()->dirty();
+        }
       }
     }
 
-  public:
     inline bool isVisible() {
       return mVisible;
     }
