@@ -28,7 +28,6 @@ namespace WXCoreFlexLayout {
     BFCs.clear();
     initFormatingContext(BFCs);
     initMeasureMode();
-    reset();
     WXBFCDimension bfcDimension = calculateBFCDimension();
     measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height,
             bfcDimension.heightMeasureMode,
