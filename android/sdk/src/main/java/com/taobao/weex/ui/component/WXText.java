@@ -156,17 +156,11 @@ public class WXText extends WXComponent<WXTextView> {
         }
 
         boolean forceWidth = false;
-        if(width > 0){
-          if(getParent() != null && mAlignment == Layout.Alignment.ALIGN_CENTER){
-            forceWidth = (width == getParent().getLayoutWidth());
-          }
-        }
-
         hasBeenMeasured = true;
         float textWidth = getTextWidth(mTextPaint, width, forceWidth);
 
         if(textWidth > 0 && mText != null) {
-          layout = createLayout(width, false, null);
+          layout = createLayout(textWidth, false, null);
           previousWidth = layout.getWidth();
 
           if(widthMeasureMode == MeasureMode.ATMOST){
