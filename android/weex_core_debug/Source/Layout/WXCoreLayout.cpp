@@ -160,8 +160,6 @@ namespace WXCoreFlexLayout {
       mLastAvailableSize->height = height;
       mLastWidthMode = widthMeasureMode;
       mLastHeightMode = heightMeasureMode;
-    } else {
-      setMeasuredDimension(mLastSize->width, mLastSize->height);
     }
   }
 
@@ -680,17 +678,28 @@ namespace WXCoreFlexLayout {
   }
 
   void WXCoreLayoutNode::layout(float left, float top, float right, float bottom) {
-    switch (mCssStyle->mPositionType) {
-      case WXCore_PositionType_Absolute:
-        calcAbsoluteOffset(left, top, right, bottom);
-        break;
-      default:
-      case WXCore_PositionType_Relative:
-        calcRelativeOffset(left, top, right, bottom);
-        break;
+
+    bool isNeedLayout = false;
+    if (getLastPosition() == nullptr ||
+        getLastPosition()->getPosition(WXCore_PositionEdge_Left) == left
+        || getLastPosition()->getPosition(WXCore_PositionEdge_Top) == top
+        || getLastPosition()->getPosition(WXCore_PositionEdge_Right) == right
+        || getLastPosition()->getPosition(WXCore_PositionEdge_Bottom) == bottom)
+      isNeedLayout = true;
+
+    if (true) {
+      switch (mCssStyle->mPositionType) {
+        case WXCore_PositionType_Absolute:
+          calcAbsoluteOffset(left, top, right, bottom);
+          break;
+        default:
+        case WXCore_PositionType_Relative:
+          calcRelativeOffset(left, top, right, bottom);
+          break;
+      }
+      setFrame(left, top, right, bottom);
+      onLayout(left, top, right, bottom);
     }
-    setFrame(left, top, right, bottom);
-    onLayout(left, top, right, bottom);
   }
 
   void WXCoreLayoutNode::calcRelativeOffset(float &left, float &top, float &right, float &bottom) {

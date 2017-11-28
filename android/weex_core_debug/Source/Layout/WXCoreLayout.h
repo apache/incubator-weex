@@ -832,6 +832,10 @@ namespace WXCoreFlexLayout {
       }
     }
 
+    inline WXCorePosition *getLastPosition() {
+      return mLastPosition;
+    }
+
     inline bool isVisible() {
       return mVisible;
     }
