@@ -1935,8 +1935,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         + exception);
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
-
-
+	  exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
           if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
@@ -1960,7 +1959,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      exception +=  instance.getTemplateInfo();
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 	}
 

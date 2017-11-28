@@ -26,8 +26,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
-
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,6 +53,7 @@ public class WXExceptionUtils {
 		WXJSExceptionInfo exceptionCommit;
 		String bundleUrlCommit = "BundleUrlDefault";
 		String instanceIdCommit = "InstanceIdDefalut";
+		String exceptionMsgCommit  = exception;
 		Map <String, String> commitMap = extParams;
 
 		if(!TextUtils.isEmpty(instanceId)){
@@ -65,6 +64,7 @@ public class WXExceptionUtils {
 		  }
 		  if(null != instance && instance.getContext() != null && instance.getBundleUrl() != null){
 			bundleUrlCommit = instance.getBundleUrl();
+			exceptionMsgCommit += "\n instance.getTemplateInfo()==" + instance.getTemplateInfo();
 			if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)){
 			  if(!TextUtils.equals(degradeUrl,"BundleUrlDefaultDegradeUrl")){
 				bundleUrlCommit = degradeUrl;
@@ -86,7 +86,7 @@ public class WXExceptionUtils {
 		}
 
 		if(adapter != null ){
-		  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exception, commitMap);
+		  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
 		  adapter.onJSException(exceptionCommit);
 		  WXLogUtils.e(exceptionCommit.toString());
 		}
