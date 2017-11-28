@@ -30,12 +30,20 @@ namespace WXCoreFlexLayout {
     initMeasureMode();
     reset();
     WXBFCDimension bfcDimension = calculateBFCDimension();
-    measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height, bfcDimension.heightMeasureMode,
-            true);
-    layout(mCssStyle->mMargin.getMargin(WXCore_Margin_Left),
-           mCssStyle->mMargin.getMargin(WXCore_Margin_Top),
-           mCssStyle->mMargin.getMargin(WXCore_Margin_Left) + getLayoutWidth(),
-           mCssStyle->mMargin.getMargin(WXCore_Margin_Top) + getLayoutHeight());
+    bool isNeedToMeasure = false;
+    if (isDirty()) {
+      isNeedToMeasure = true;
+    }
+//    if (isNeedToMeasure) {
+      measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height,
+              bfcDimension.heightMeasureMode,
+              true);
+      layout(mCssStyle->mMargin.getMargin(WXCore_Margin_Left),
+             mCssStyle->mMargin.getMargin(WXCore_Margin_Top),
+             mCssStyle->mMargin.getMargin(WXCore_Margin_Left) + getLayoutWidth(),
+             mCssStyle->mMargin.getMargin(WXCore_Margin_Top) + getLayoutHeight());
+//      resetDirty();
+//    }
     for (int i = 0; i < getChildCount(BFC); ++i) {
       WXCoreLayoutNode *child = getChildAt(BFC, i);
       child->calculateLayout();

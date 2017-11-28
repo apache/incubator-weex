@@ -165,7 +165,9 @@ namespace WXCoreFlexLayout {
     /** ================================ lifeCycle =================================== **/
 
     inline static WXCoreLayoutNode *newWXCoreNode() {
-      return new WXCoreLayoutNode();
+      WXCoreLayoutNode *node = new WXCoreLayoutNode();
+      node->dirty();
+      return node;
     }
 
     WXCoreLayoutNode() :
@@ -215,25 +217,30 @@ namespace WXCoreFlexLayout {
 
     inline void reset() {
       mLayoutResult->reset();
+      dirty();
       for (int i = 0; i < getChildCount(NON_BFC); i++) {
         WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
         child->reset();
+        child->dirty();
       }
     }
 
     inline void resetLayoutResult() {
       mLayoutResult->reset();
+      dirty();
     }
 
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+        dirty();
       }
     }
 
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
       if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
         memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
+        dirty();
       }
     }
 
@@ -245,12 +252,14 @@ namespace WXCoreFlexLayout {
         memcpy(&node, &temp, sizeof(WXCoreLayoutNode));
         srcNode->appendChild(temp);
       }
+      dirty();
     }
 
     /** ================================ measureFunc =================================== **/
 
     inline void setMeasureFunc(WXCoreMeasureFunc measure) {
       measureFunc = measure;
+      dirty();
     }
 
     inline WXCoreMeasureFunc getMeasureFunc() {
@@ -421,6 +430,7 @@ namespace WXCoreFlexLayout {
 
     inline void removeChildAt(uint32_t index) {
       mChildList.erase(mChildList.begin() + index);
+      dirty();
     }
 
     inline void removeChild(WXCoreLayoutNode *child) {
@@ -430,16 +440,19 @@ namespace WXCoreFlexLayout {
           break;
         }
       }
+      dirty();
     }
 
     inline void addChildAt(WXCoreLayoutNode *child, uint32_t index) {
       mChildList.insert(mChildList.begin() + index, child);
       child->mParent = this;
+      dirty();
     }
 
     inline void appendChild(WXCoreLayoutNode *child) {
       mChildList.push_back(child);
       child->mParent = this;
+      dirty();
     }
 
     inline WXCoreLayoutNode *getChildAt(FormatingContext formatingContext, uint32_t index) {
@@ -759,22 +772,25 @@ namespace WXCoreFlexLayout {
       return mHasNewLayout;
     }
 
+    inline bool resetDirty() {
+      mIsDirty = false;
+    }
+
+  public:
+
     inline bool isDirty() {
       return mIsDirty;
     }
 
     inline void dirty() {
-      requestLayout();
-    }
-
-    inline void requestLayout() {
-      mIsDirty = true;
-      if (getParent() != nullptr) {
-        getParent()->requestLayout();
+      if (!isDirty()) {
+        mIsDirty = true;
+        if (getParent() != nullptr) {
+          getParent()->dirty();
+        }
       }
     }
 
-  public:
     inline bool isVisible() {
       return mVisible;
     }
