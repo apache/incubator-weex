@@ -29,6 +29,11 @@ public class WXRenderErrorCode {
   public enum DegradPassivityCode{
 
 	/**
+	 * degrade code.
+	 */
+	WX_DEGRAD_ERR("-1000", "degradeToH5|Weex DegradPassivity \n"),
+
+	/**
 	 * degrade for instance create failed, once this case occured,detail js stack and other specific
 	 * cause need track into errmsg.
 	 */
