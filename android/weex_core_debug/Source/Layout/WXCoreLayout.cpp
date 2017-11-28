@@ -30,11 +30,7 @@ namespace WXCoreFlexLayout {
     initMeasureMode();
     reset();
     WXBFCDimension bfcDimension = calculateBFCDimension();
-    bool isNeedToMeasure = false;
     if (isDirty()) {
-      isNeedToMeasure = true;
-    }
-//    if (isNeedToMeasure) {
       measure(bfcDimension.width, bfcDimension.widthMeasureMode, bfcDimension.height,
               bfcDimension.heightMeasureMode,
               true);
@@ -42,8 +38,8 @@ namespace WXCoreFlexLayout {
              mCssStyle->mMargin.getMargin(WXCore_Margin_Top),
              mCssStyle->mMargin.getMargin(WXCore_Margin_Left) + getLayoutWidth(),
              mCssStyle->mMargin.getMargin(WXCore_Margin_Top) + getLayoutHeight());
-//      resetDirty();
-//    }
+      resetDirty();
+    }
     for (int i = 0; i < getChildCount(BFC); ++i) {
       WXCoreLayoutNode *child = getChildAt(BFC, i);
       child->calculateLayout();
@@ -114,7 +110,8 @@ namespace WXCoreFlexLayout {
     }
   }
 
-  void WXCoreLayoutNode::measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
+  void WXCoreLayoutNode::measure(float width, MeasureMode widthMeasureMode, float height,
+                                 MeasureMode heightMeasureMode,
                                  bool useMeasureFunc) {
     if (getChildCount(NON_BFC) > 0) {
       onMeasure(width, widthMeasureMode, height, heightMeasureMode);
@@ -124,7 +121,6 @@ namespace WXCoreFlexLayout {
         if ((isnan(mCssStyle->mStyleWidth) || isnan(mCssStyle->mStyleHeight))) {
           WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height,
                                              heightMeasureMode);
-//          onMeasure(dimension.width, dimension.height);
           width = widthMeasureMode == EXACTLY ? dimension.width :
                   min_num<float>(
                       dimension.width + mCssStyle->mPadding.getPadding(WXCore_Padding_Right) +
@@ -155,23 +151,35 @@ namespace WXCoreFlexLayout {
   }
 
   void
-  WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode) {
+  WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height,
+                              MeasureMode heightMeasureMode) {
     if (mChildrenFrozen == nullptr || mChildrenFrozen_oldlength < getChildCount(NON_BFC)) {
       mChildrenFrozen = new bool[getChildCount(NON_BFC)];
       mChildrenFrozen_oldlength = getChildCount(NON_BFC);
     }
 
+    bool isNeedMeasure = false;
+    if (mLastSize == nullptr || mLastSize->width != width ||
+        mLastSize->height != height || mLastWidthMode != widthMeasureMode ||
+        mLastHeightMode != heightMeasureMode)
+      isNeedMeasure = true;
+
     // Only calculate the children views which are affected from the last measure.
-    switch (mCssStyle->mFlexDirection) {
-      case WXCore_Flex_Direction_Row:
-      case WXCore_Flex_Direction_Row_Reverse:
-        measureHorizontal(width, widthMeasureMode, height, heightMeasureMode);
-        break;
-      case WXCore_Flex_Direction_Column:
-      case WXCore_Flex_Direction_Column_Reverse:
-      default:
-        measureVertical(width, widthMeasureMode, height, heightMeasureMode);
-        break;
+    if (isNeedMeasure) {
+      switch (mCssStyle->mFlexDirection) {
+        case WXCore_Flex_Direction_Row:
+        case WXCore_Flex_Direction_Row_Reverse:
+          measureHorizontal(width, widthMeasureMode, height, heightMeasureMode);
+          break;
+        case WXCore_Flex_Direction_Column:
+        case WXCore_Flex_Direction_Column_Reverse:
+        default:
+          measureVertical(width, widthMeasureMode, height, heightMeasureMode);
+          break;
+      }
+
+      mLastWidthMode = widthMeasureMode;
+      mLastHeightMode = heightMeasureMode;
     }
 
     memset(mChildrenFrozen, false, getChildCount(NON_BFC));
@@ -762,11 +770,13 @@ namespace WXCoreFlexLayout {
         layoutHorizontal(true, left, top, right, bottom);
         break;
       case WXCore_Flex_Direction_Column_Reverse:
-        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right, bottom);
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, true, left, top, right,
+                       bottom);
         break;
       case WXCore_Flex_Direction_Column:
       default:
-        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right, bottom);
+        layoutVertical(mCssStyle->mFlexWrap == WXCore_Wrap_WrapReverse, false, left, top, right,
+                       bottom);
         break;
     }
   }
