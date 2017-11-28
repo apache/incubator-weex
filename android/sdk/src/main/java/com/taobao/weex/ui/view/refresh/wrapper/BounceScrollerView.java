@@ -20,16 +20,10 @@ package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
 
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.view.WXScrollView;
 
 public class BounceScrollerView extends BaseBounceView<WXScrollView> {
-
-    @Override
-    public boolean postDelayed(Runnable action, long delayMillis) {
-        return super.postDelayed(WXThread.secure(action), delayMillis);
-    }
 
     public BounceScrollerView(Context context, int orientation, WXScroller waScroller) {
         super(context,orientation);

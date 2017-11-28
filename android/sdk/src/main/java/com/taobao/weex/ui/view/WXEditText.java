@@ -24,7 +24,6 @@ import android.view.MotionEvent;
 import android.view.ViewParent;
 import android.widget.EditText;
 
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
@@ -92,11 +91,6 @@ public class WXEditText extends EditText implements WXGestureObservable {
     } else {
       setMovementMethod(getDefaultMovementMethod());
     }
-  }
-  
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
   }
 
   public void setAllowDisableMovement(boolean allow) {
