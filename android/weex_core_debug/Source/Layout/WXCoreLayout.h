@@ -158,7 +158,7 @@ namespace WXCoreFlexLayout {
 
     WXCoreSize *mLastSize;
 
-    WXCoreSize *mAvailableSize;
+    WXCoreSize *mLastAvailableSize;
 
     WXCorePosition *mLastPosition;
 
@@ -193,7 +193,7 @@ namespace WXCoreFlexLayout {
       mCssStyle = new WXCoreCSSStyle();
       mLayoutResult = new WXCorelayoutResult();
       mLastSize = nullptr;
-      mAvailableSize = nullptr;
+      mLastAvailableSize = nullptr;
       mLastPosition = nullptr;
     }
 
@@ -234,9 +234,9 @@ namespace WXCoreFlexLayout {
         mLastSize = nullptr;
       }
 
-      if (mAvailableSize != nullptr) {
-        delete mAvailableSize;
-        mAvailableSize = nullptr;
+      if (mLastAvailableSize != nullptr) {
+        delete mLastAvailableSize;
+        mLastAvailableSize = nullptr;
       }
 
       if (mLastPosition != nullptr) {
