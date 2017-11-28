@@ -895,8 +895,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       float quality = WXUtils.getFloat(shadowQuality, 0.5f);
       int viewPort = getInstance().getInstanceViewPortWidth();
       String token = new StringBuilder(boxShadow.toString()).append(" / [")
-          .append(getDomObject().getStyles().getWidth(viewPort)).append(",")
-          .append(getDomObject().getStyles().getHeight(viewPort)).append("] / ")
+          .append(target.getMeasuredWidth()).append(",")
+          .append(target.getMeasuredHeight()).append("] / ")
           .append(quality).toString();
 
       if (mLastBoxShadowId != null && mLastBoxShadowId.equals(token)) {
@@ -947,7 +947,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (getDomObject() != null && getDomObject().getStyles() != null) {
       Object obj = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
       if (obj == null) {
-        WXLogUtils.d("BoxShadow", "no box-shadow");
         return;
       }
     }
@@ -963,6 +962,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         overlay.clear();
       }
     }
+    mLastBoxShadowId = null;
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -1606,10 +1606,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+  @CallSuper
   public void recycled() {
     if(mDomObj.isFixed())
       return;
 
+    clearBoxShadow();
   }
 
   public void destroy() {
