@@ -240,3 +240,14 @@ TEST_F(Padding, PaddingWidthEdgeOverrideShorthand) {
     EXPECT_FLOAT_EQ(200, root->getPaddingRight());
     EXPECT_FLOAT_EQ(200, root->getPaddingBottom());
 }
+
+TEST_F(Padding, PaddingDimension){
+    root->setPadding(paddingAll, 200);
+    root->calculateLayout();
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), 100);
+    EXPECT_FLOAT_EQ(root->getLayoutHeight(), 300);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionLeft(), 0);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionRight(), 100);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionTop(), 0);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionBottom(), 300);
+}

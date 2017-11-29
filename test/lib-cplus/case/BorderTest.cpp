@@ -240,3 +240,15 @@ TEST_F(Border, BorderWidthEdgeOverrideShorthand) {
     EXPECT_FLOAT_EQ(200, root->getBorderWidthRight());
     EXPECT_FLOAT_EQ(200, root->getBorderWidthBottom());
 }
+
+
+TEST_F(Border, BorderDimension){
+    root->setBorderWidth(borderAll, 200);
+    root->calculateLayout();
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), 100);
+    EXPECT_FLOAT_EQ(root->getLayoutHeight(), 300);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionLeft(), 0);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionRight(), 100);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionTop(), 0);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionBottom(), 300);
+}
