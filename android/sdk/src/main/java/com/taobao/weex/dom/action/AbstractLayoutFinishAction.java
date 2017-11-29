@@ -47,10 +47,6 @@ abstract class AbstractLayoutFinishAction extends TraceableAction implements DOM
     mLayoutHeight = (int)root.getLayoutHeight();
     mLayoutWidth = (int)root.getLayoutWidth();
     context.postRenderTask(this);
-    WXSDKInstance instance = context.getInstance();
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
 }

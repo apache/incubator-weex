@@ -23,7 +23,9 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.action.AbstractAddElementAction;
@@ -31,6 +33,8 @@ import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.WXRenderManager;
+import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -160,9 +164,20 @@ public final class WXDomManager {
         mDomRegistries.put(instanceId, oldStatement);
         context = oldStatement;
       }else{
-        //Instance not existed.
-        return;
-      }
+		WXSDKInstance instance =  WXSDKManager.getInstance().getSDKInstance(instanceId);
+		if(action != null && instance!= null && !instance.getismIsCommitedDomAtionExp()){
+		  String className = action.getClass().getSimpleName();
+		  WXLogUtils.e("WXDomManager", className + " Is Invalid Action");
+		  if(className.contains("CreateFinishAction")){
+			WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+					WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorCode(),
+					"executeAction",
+					WXErrorCode.WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION.getErrorMsg() + "|current action is" +className, null);
+			instance.setmIsCommitedDomAtionExp(true);
+		  }
+		}
+		return;
+	  }
     }
     long domStart = System.currentTimeMillis();
     long domNanos = System.nanoTime();
