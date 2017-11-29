@@ -33,6 +33,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -63,6 +64,10 @@ public class WXExceptionUtilsTest {
 
   @Test
   public void testExpCommitString(){
-	Exp.commitCriticalExceptionRT("test","test","test","test",new HashMap<String, String>());
+	Map testMap =  new HashMap<String, String>();
+	testMap.put("weexUrl","weexurltest");
+	testMap.put("bundleUrl","bundleUrltest");
+	Exp.commitCriticalExceptionRT("1","test","test","test",testMap);
+	Exp.commitCriticalExceptionRT("1","test","test","test",null);
   }
 }
