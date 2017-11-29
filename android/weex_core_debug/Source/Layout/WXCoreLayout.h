@@ -813,7 +813,7 @@ namespace WXCoreFlexLayout {
       return mHasNewLayout;
     }
 
-    inline bool resetDirty() {
+    inline void resetDirty() {
       mIsDirty = false;
     }
 
