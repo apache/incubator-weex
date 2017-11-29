@@ -65,6 +65,7 @@ public enum WXErrorCode {
    */
   WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!"),
 
+
   /*
    * domModule
    **/
@@ -125,6 +126,11 @@ public enum WXErrorCode {
   WX_ERR_JSC_CRASH("-2112", "weexjscCrash"),
 
   /**
+   *dom actions invalid for native
+   */
+  WX_ERR_FIRST_DOM_ACTION_EXCEPTION("-2113", "dom action is invalid "),
+
+  /**
    * JS Bundle download error
    */
 
@@ -141,7 +147,59 @@ public enum WXErrorCode {
    */
   WX_ERR_JS_FRAMEWORK("-1002", "js framework error"),
 
-  WX_ERR_JS_REINIT_FRAMEWORK("-1003", "js reinit framework error");
+  WX_ERR_JS_REINIT_FRAMEWORK("-1003", "js reinit framework error"),
+
+
+  /**
+   * WX Key Exception Commit RT SDK Init
+   */
+  WX_KEY_EXCEPTION_SDK_INIT("-9000", "[WX_KEY_EXCEPTION_SDK_INIT]"),
+  WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT("-9001", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpu is x86"),
+  WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT("-9002", "[WX_KEY_EXCEPTION_SDK_INIT_TABLE_NOT_SUPPORT] for device isTabletDevice"),
+  WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED("-9003", "[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] for jsfm init failed|detail error is:"),
+
+  /**
+   * WX Key Exception Commit RT Register
+   */
+  WX_KEY_EXCEPTION_INVOKE("-9100", "[WX_KEY_EXCEPTION_INVOKE]"),
+  WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED("-9101", "[WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED] details"),
+  WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE("-9102", "[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] details"),
+  WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES("-9103", "[WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES] details"),
+
+  /**
+   * WX Key Exception Commit Bundle Js Download
+   */
+  WX_KEY_EXCEPTION_JS_DOWNLOAD("-9200", "[WX_KEY_EXCEPTION_JS_DOWNLOAD]|"),
+  WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED("-9201", "[WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED] | details"),
+
+  /**
+   * WX Key Exception Commit RT DomAction Excute
+   */
+  WX_KEY_EXCEPTION_DOM("-9300", "[WX_KEY_EXCEPTION_DOM]"),
+  WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION("-9301", "[WX_KEY_EXCEPTION dom action exception] details: ACTION_FIRST_ACTION"),
+  WX_KEY_EXCEPTION_DOM_CREATE_BODY("-9302", "[WX_KEY_EXCEPTION dom action exception] details:CREATE_BODY"),
+  WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS("-9303", "[WX_KEY_EXCEPTION dom action exception] details:UPDATE_ATTRS"),
+  WX_KEY_EXCEPTION_DOM_UPDATE_STYLE("-9304", "[WX_KEY_EXCEPTION dom action exception] details:UPDATE_STYLE"),
+  WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT("-9305", "[WX_KEY_EXCEPTION dom action exception] details:REMOVE_ELEMENT"),
+  WX_KEY_EXCEPTION_DOM_ADD_ELEMENT("-9306", "[WX_KEY_EXCEPTION dom action exception] details:ADD_ELEMENT"),
+  WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT("-9307", "[WX_KEY_EXCEPTION dom action exception] details:MOVE_ELEMENT"),
+  WX_KEY_EXCEPTION_DOM_ADD_EVENT("-9308", "[WX_KEY_EXCEPTION dom action exception] details:DOM_ADD_EVENT"),
+  WX_KEY_EXCEPTION_DOM_REMOVE_EVENT("-9309", "[WX_KEY_EXCEPTION dom action exception] details:DOM_REMOVE_EVENT"),
+  WX_KEY_EXCEPTION_DOM_CREATE_FINISH("-9310", "[WX_KEY_EXCEPTION dom action exception] details:CREATE_FINISH"),
+  WX_KEY_EXCEPTION_DOM_REFRESH_FINISH("-9311", "[WX_KEY_EXCEPTION dom action exception] details:REFRESH_FINISH"),
+  WX_KEY_EXCEPTION_DOM_ADD_RULE("-9313", "[WX_KEY_EXCEPTION_DOM_ADD_RULE] details"),
+  WX_KEY_EXCEPTION_DOM_GET_COMPONENT_RECT("-9314", "[WX_KEY_EXCEPTION_DOM_GET_COMPONENT_RECT] details"),
+  WX_KEY_EXCEPTION_DOM_INVOKE_METHOD("-9315", "[WX_KEY_EXCEPTION_DOM_INVOKE_METHOD] details"),
+  WX_KEY_EXCEPTION_DOM_ANIMATION("-9316", "[WX_KEY_EXCEPTION_DOM_ANIMATION] details"),
+  WX_KEY_EXCEPTION_DOM_MODULEINVO("-9317", "[WX_KEY_EXCEPTION_DOM_MODULEINVO] details"),
+
+
+
+  /**
+   * WX Key Exception Commit RT JsBridge eg. js excute runtime error
+   */
+  WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack \n"),
+  WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack \n");
 
   private String errorCode;
   private String errorMsg;

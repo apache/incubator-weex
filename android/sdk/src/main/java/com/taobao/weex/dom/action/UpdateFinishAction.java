@@ -37,11 +37,6 @@ final class UpdateFinishAction implements DOMAction, RenderAction {
       return;
     }
     context.postRenderTask(this);
-
-    WXSDKInstance instance = context.getInstance();
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override
