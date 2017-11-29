@@ -78,9 +78,9 @@ public class WXExceptionUtils {
 			bundleUrlCommit = WXSDKInstance.requestUrl;
 		  }
 
-		  if(extParams.get("weexUrl") != null){
+		  if(extParams!=null && extParams.size() >0  && extParams.get("weexUrl") != null){
 			bundleUrlCommit = extParams.get("weexUrl");
-		  }else if (extParams.get("bundleUrl") != null){
+		  }else if (extParams!=null && extParams.size() > 0 && extParams.get("bundleUrl") != null){
 			bundleUrlCommit = extParams.get("bundleUrl");
 		  }
 		}
