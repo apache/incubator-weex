@@ -49,6 +49,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
@@ -938,23 +939,23 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private boolean setRefreshOrLoading(final WXComponent child) {
         if (child instanceof WXRefresh && getHostView() != null) {
             getHostView().setOnRefreshListener((WXRefresh) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setHeaderView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
 
         if (child instanceof WXLoading && getHostView() != null) {
             getHostView().setOnLoadingListener((WXLoading) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setFooterView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
         return false;
@@ -1450,7 +1451,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return totalHeight;
     }
 
-    private int calcContentOffset(RecyclerView recyclerView) {
+    public int calcContentOffset(RecyclerView recyclerView) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();

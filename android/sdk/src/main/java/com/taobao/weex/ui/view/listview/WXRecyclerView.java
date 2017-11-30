@@ -28,7 +28,6 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
@@ -57,10 +56,6 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     this.scrollable = scrollable;
   }
 
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
   public void initView(Context context, int type,int orientation) {
     initView(context,type, Constants.Value.COLUMN_COUNT_NORMAL,Constants.Value.COLUMN_GAP_NORMAL,orientation);
   }
@@ -118,7 +113,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
         setOnSmoothScrollEndListener(new ExtendedLinearLayoutManager.OnSmoothScrollEndListener() {
           @Override
           public void onStop() {
-            post(new Runnable() {
+            post(WXThread.secure(new Runnable() {
               @Override
               public void run() {
                 if (orientation == Constants.Orientation.VERTICAL) {
@@ -127,7 +122,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
                   smoothScrollBy(offset, 0);
                 }
               }
-            });
+            }));
           }
         });
       }

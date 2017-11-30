@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.text.ParseException;
@@ -180,7 +181,7 @@ public class DatePickerImpl {
             return;
         }
         try {
-            dialog.getWindow().getDecorView().post(new Runnable() {
+            dialog.getWindow().getDecorView().post(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     Button button = dialog.getButton(which);
@@ -189,7 +190,7 @@ public class DatePickerImpl {
                         button.setText(text);
                     }
                 }
-            });
+            }));
         } catch (Throwable t) {
             t.printStackTrace();
         }

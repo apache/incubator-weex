@@ -578,8 +578,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
-    
-    for (id<UIScrollViewDelegate> delegate in _delegates) {
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
         if ([delegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
             [delegate scrollViewDidScroll:scrollView];
         }
@@ -634,6 +634,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if (!decelerate) {
         _isScrolling = NO;
+        [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:nil afterDelay:0.1];
     }
 }
 
