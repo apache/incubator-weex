@@ -10,7 +10,10 @@ namespace WeexCore {
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
-    sendLayoutAction(render);
+    if (render->hasNewLayout()) {
+      sendLayoutAction(render);
+      render->setHasNewLayout(false);
+    }
 
     for (int i = 0; i < render->getChildCount(); i++) {
       RenderObject *child = render->getChild(i);

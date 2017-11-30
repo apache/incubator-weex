@@ -156,11 +156,7 @@ namespace WXCoreFlexLayout {
 
     /** ================================ Cache：Last calculate result =================================== **/
 
-    WXCoreSize *mLastSize;
-
     WXCoreSize *mLastAvailableSize;
-
-    WXCorePosition *mLastPosition;
 
     MeasureMode mLastWidthMode;
 
@@ -187,19 +183,17 @@ namespace WXCoreFlexLayout {
         mChildrenFrozen_oldlength(0),
         mParent(nullptr),
         mHasNewLayout(true),
-        mIsDirty(false),
+        mIsDirty(true),
         mVisible(true),
         measureFunc(nullptr) {
       mCssStyle = new WXCoreCSSStyle();
       mLayoutResult = new WXCorelayoutResult();
-      mLastSize = nullptr;
       mLastAvailableSize = nullptr;
-      mLastPosition = nullptr;
     }
 
     inline void freeWXCoreNode() {
       mHasNewLayout = true;
-      mIsDirty = false;
+      mIsDirty = true;
       mVisible = true;
       measureFunc = nullptr;
       mParent = nullptr;
@@ -229,19 +223,9 @@ namespace WXCoreFlexLayout {
         mLayoutResult = nullptr;
       }
 
-      if (mLastSize != nullptr) {
-        delete mLastSize;
-        mLastSize = nullptr;
-      }
-
       if (mLastAvailableSize != nullptr) {
         delete mLastAvailableSize;
         mLastAvailableSize = nullptr;
-      }
-
-      if (mLastPosition != nullptr) {
-        delete mLastPosition;
-        mLastPosition = nullptr;
       }
     }
 
@@ -317,17 +301,17 @@ namespace WXCoreFlexLayout {
     void initMeasureMode();
 
     inline void setLayoutWidth(float width) {
-      if (mLastSize == nullptr)
-        mLastSize = new WXCoreSize();
-      mLastSize->width = width;
-      mLayoutResult->mLayoutSize.width = width;
+      if (mLayoutResult->mLayoutSize.width != width) {
+        mLayoutResult->mLayoutSize.width = width;
+        setHasNewLayout(true);
+      }
     }
 
     inline void setLayoutHeight(float height) {
-      if (mLastSize == nullptr)
-        mLastSize = new WXCoreSize();
-      mLastSize->height = height;
-      mLayoutResult->mLayoutSize.height = height;
+      if (mLayoutResult->mLayoutSize.height != height) {
+        mLayoutResult->mLayoutSize.height = height;
+        setHasNewLayout(true);
+      }
     }
 
     void
@@ -429,16 +413,16 @@ namespace WXCoreFlexLayout {
                                    float bottom);
 
     inline void setFrame(float l, float t, float r, float b) {
-      mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Left, l);
-      mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Top, t);
-      mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Right, r);
-      mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Bottom, b);
-      if (mLastPosition == nullptr)
-        mLastPosition = new WXCorePosition();
-      mLastPosition->setPosition(WXCore_PositionEdge_Left, l);
-      mLastPosition->setPosition(WXCore_PositionEdge_Top, t);
-      mLastPosition->setPosition(WXCore_PositionEdge_Right, r);
-      mLastPosition->setPosition(WXCore_PositionEdge_Bottom, b);
+      if (mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Left) != l
+          || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Top) != t
+          || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Right) != r
+          || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Bottom) != b) {
+        mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Left, l);
+        mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Top, t);
+        mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Right, r);
+        mLayoutResult->mLayoutPosition.setPosition(WXCore_PositionEdge_Bottom, b);
+        setHasNewLayout(true);
+      }
     }
 
     virtual void onLayoutBefore() {
@@ -543,8 +527,10 @@ namespace WXCoreFlexLayout {
     }
 
     inline void setMargin(WXCoreMarginEdge edge, float margin) {
-      if (mCssStyle->mMargin.setMargin(edge, margin))
+      if (mCssStyle->mMargin.setMargin(edge, margin)) {
         dirty();
+        setHasNewLayout(true);
+      }
     }
 
     /** ================================ padding =================================== **/
@@ -566,8 +552,10 @@ namespace WXCoreFlexLayout {
     }
 
     inline void setPadding(WXCorePaddingEdge edge, float padding) {
-      if (mCssStyle->mPadding.setPadding(edge, padding))
+      if (mCssStyle->mPadding.setPadding(edge, padding)) {
         dirty();
+        setHasNewLayout(true);
+      }
     }
 
 
@@ -590,8 +578,10 @@ namespace WXCoreFlexLayout {
     }
 
     inline void setBorderWidth(WXCoreBorderWidthEdge edge, float borderWidth) {
-      if (mCssStyle->mBorderWidth.setBorderWidth(edge, borderWidth))
+      if (mCssStyle->mBorderWidth.setBorderWidth(edge, borderWidth)) {
         dirty();
+        setHasNewLayout(true);
+      }
     }
 
 
@@ -809,15 +799,16 @@ namespace WXCoreFlexLayout {
     /** ================================ other =================================== **/
 
   private:
-    inline bool hasNewLayout() {
-      return mHasNewLayout;
-    }
 
     inline void resetDirty() {
       mIsDirty = false;
     }
 
   public:
+
+    inline bool hasNewLayout() {
+      return mHasNewLayout;
+    }
 
     inline bool isDirty() {
       return mIsDirty;
@@ -832,8 +823,8 @@ namespace WXCoreFlexLayout {
       }
     }
 
-    inline WXCorePosition *getLastPosition() {
-      return mLastPosition;
+    inline void setHasNewLayout(bool hasNewLayout) {
+      this->mHasNewLayout = hasNewLayout;
     }
 
     inline bool isVisible() {

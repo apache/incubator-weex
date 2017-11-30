@@ -111,7 +111,7 @@ namespace WXCoreFlexLayout {
                                  bool useMeasureFunc) {
 
     bool isNeedMeasure = false;
-    if (mLastSize == nullptr || mLastAvailableSize == nullptr || mLastAvailableSize->width != width ||
+    if (mLastAvailableSize == nullptr || mLastAvailableSize->width != width ||
         mLastAvailableSize->height != height || mLastWidthMode != widthMeasureMode ||
         mLastHeightMode != heightMeasureMode || isDirty())
       isNeedMeasure = true;
@@ -1050,6 +1050,7 @@ namespace WXCoreFlexLayout {
 
       for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
         WXCoreLayoutNode *child = getChildAt(NON_BFC, currentViewIndex);
+
         if (child == nullptr) {
           continue;
         }
