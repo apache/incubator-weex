@@ -12,7 +12,7 @@ namespace WeexCore {
   void RenderPage::traverseTree(RenderObject *render) {
     if (render->hasNewLayout()) {
       sendLayoutAction(render);
-      render->setHasNewLayout(false);
+//      render->setHasNewLayout(false);
     }
 
     for (int i = 0; i < render->getChildCount(); i++) {
