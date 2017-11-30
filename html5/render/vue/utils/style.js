@@ -90,10 +90,10 @@ export function normalizeUnitsNum (val: string): string {
 }
 
 function getUnitScaleMap () {
-  const { scale, dpr } = getViewportInfo()
+  const { scale } = getViewportInfo()
   return {
     px: scale,
-    wx: scale * dpr
+    wx: 1 // use px straight, not adaptable to screens.
   }
 }
 
