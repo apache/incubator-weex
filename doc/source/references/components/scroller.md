@@ -50,7 +50,7 @@ common styles: check out [common styles for components](../common-style.html)
 
 - `loadmore`  used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
 - `scroll`  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.  See details in [scroll event demo](http://dotwe.org/vue/9ef0e52bacaa20182a693f2187d851aa).
-  - contentSize {Object}`：The content size of the list
+  - `contentSize {Object}`：The content size of the list
     - `width {number}`: List content width
     - `height {number}`: List content height
   - `contentOffset {Object}`: Offset size of the list
