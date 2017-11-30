@@ -231,7 +231,7 @@ Currently supported format:
 </style>
 ```
 
-## transition <span class="api-version">v0.16.0+</span>
+## transition <span class="api-version">v0.17.0+</span>
 
 Now you can use the transition attribute in CSS to enhance the interactivity and visual experience of your application. The transition includes the layout animation, that is, LayoutAnimation, which now changes the layout and uses the fluent animation of the transition. Transition allows the CSS attribute values to transition smoothly over a certain time interval.
 

@@ -48,15 +48,23 @@ common styles: check out [common styles for components](../common-style.html)
 
 ## Events
 
-`loadmore`  used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
+- `loadmore`  used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
+- `scroll`  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.  See details in [scroll event demo](http://dotwe.org/vue/9ef0e52bacaa20182a693f2187d851aa).
+  - `contentSize {Object}`：The content size of the list
+    - `width {number}`: List content width
+    - `height {number}`: List content height
+  - `contentOffset {Object}`: Offset size of the list
+    - `x {number}`: Offset on x-axis
+    - `y {number}`: Offset on y-axis
+- `scrollstart` <sup class="wx-v">v0.17+</sup>：This event is triggered when the list starts to scroll, where you can start the logic of the start of the scrolling.
+- `scrollend` <sup class="wx-v">v0.17+</sup>：This event is triggered when the list has finished scrolling, where you can execute the logic that the scroll ends.
+- common events: check out the [common events](../common-event.html)
+  - `click`
+  - `longpress`
+  - `appear`
+  - `disappear`
 
-`scroll`  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.  See details in [scroll event demo](http://dotwe.org/vue/9ef0e52bacaa20182a693f2187d851aa).
-
-common events: check out the [common events](../common-event.html)
-
-* support onclick event. Check out [common events](../common-event.html)
-* support onappear / ondisappear event. Check out [common events](../common-event.html)
-
+## event.html)
 
 
 ## Restrictions
