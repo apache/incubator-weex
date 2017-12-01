@@ -1,6 +1,7 @@
-#include "RenderManager.h"
-#include "RenderObject.h"
-#include "RenderPage.h"
+#include <rapidjson/weexjsontools.h>
+#include <WeexCore/render/RenderManager.h>
+#include <WeexCore/render/RenderPage.h>
+#include <WeexCore/render/RenderObject.h>
 
 namespace WeexCore {
 
@@ -9,7 +10,7 @@ namespace WeexCore {
 
   void RenderManager::createPage(std::string pageId, std::string data) {
     RenderPage *page = new RenderPage(pageId);
-    mPages.insert(pair<std::string, RenderPage *>(pageId, page));
+    mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
     page->createRootRender(data);
   }
 

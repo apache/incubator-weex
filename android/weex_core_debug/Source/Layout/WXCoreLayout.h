@@ -301,6 +301,10 @@ namespace WXCoreFlexLayout {
     void initMeasureMode();
 
     inline void setLayoutWidth(float width) {
+      if (mLayoutResult == nullptr) {
+        mLayoutResult = new WXCorelayoutResult();
+        setHasNewLayout(true);
+      }
       if (mLayoutResult->mLayoutSize.width != width) {
         mLayoutResult->mLayoutSize.width = width;
         setHasNewLayout(true);
@@ -308,6 +312,10 @@ namespace WXCoreFlexLayout {
     }
 
     inline void setLayoutHeight(float height) {
+      if (mLayoutResult == nullptr) {
+        mLayoutResult = new WXCorelayoutResult();
+        setHasNewLayout(true);
+      }
       if (mLayoutResult->mLayoutSize.height != height) {
         mLayoutResult->mLayoutSize.height = height;
         setHasNewLayout(true);
@@ -413,6 +421,10 @@ namespace WXCoreFlexLayout {
                                    float bottom);
 
     inline void setFrame(float l, float t, float r, float b) {
+      if (mLayoutResult == nullptr) {
+        mLayoutResult = new WXCorelayoutResult();
+        setHasNewLayout(true);
+      }
       if (mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Left) != l
           || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Top) != t
           || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Right) != r

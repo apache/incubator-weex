@@ -1,6 +1,19 @@
+#include <rapidjson/weexjsontools.h>
+#include <WeexCore/render/action/AddElementAction.h>
+#include <WeexCore/render/action/CreateBodyAction.h>
+#include <WeexCore/render/action/UpdateStyleAction.h>
+#include <WeexCore/render/action/LayoutRenderAction.h>
+#include <WeexCore/render/action/RenderAction.h>
+#include <Layout/WXCoreLayout.h>
+#include <base/android/string/StringUtils.h>
 #include "RenderPage.h"
+#include "RenderManager.h"
+#include "RenderObject.h"
 
 namespace WeexCore {
+
+  typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
+  typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
 
   void RenderPage::calculateLayout() {
     if (pRoot == nullptr)
@@ -138,5 +151,55 @@ namespace WeexCore {
 
   void RenderPage::addRenderAction(RenderAction *action) {
     action->ExecuteAction();
+  }
+
+  void RenderPage::pushRenderToMap(RenderObject *render) {
+    mRenderObjectMap.insert(std::pair<std::string, RenderObject *>(render->getRef(), render));
+
+    for (int i = 0; i < render->getChildCount(); ++i) {
+      pushRenderToMap(render->getChild(i));
+    }
+  }
+
+  void RenderPage::sendCreateBodyAction(RenderObject *render) {
+    CreateBodyAction *action = new CreateBodyAction();
+    action->GenerateAction(getPageId(), render);
+    addRenderAction(action);
+
+    for (int i = 0; i < render->getChildCount(); ++i) {
+      sendAddElementAction(render->getChild(i), render, i);
+    }
+  }
+
+  void RenderPage::sendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
+    AddElementAction *action = new AddElementAction();
+    action->GenerateAction(getPageId(), child, parent, index);
+    addRenderAction(action);
+
+    for (int i = 0; i < child->getChildCount(); ++i) {
+      sendAddElementAction(child->getChild(i), child, i);
+    }
+  }
+
+  void RenderPage::sendLayoutAction(RenderObject *render) {
+    LayoutRenderAction *action = new LayoutRenderAction();
+    action->GenerateAction(getPageId(), render);
+    addRenderAction(action);
+  }
+
+  void RenderPage::sendUpdateStyleAction(std::string key, std::string value, std::string ref) {
+    UpdateStyleAction *action = new UpdateStyleAction();
+    action->GenerateAction(getPageId(), ref, key, value);
+    addRenderAction(action);
+  }
+
+  void RenderPage::sendUpdateAttrAction(std::string key, std::string value, std::string ref) {
+    UpdateStyleAction *action = new UpdateStyleAction();
+    action->GenerateAction(getPageId(), ref, key, value);
+    addRenderAction(action);
+  }
+
+  void RenderPage::sendAddEventAction(RenderObject *render) {
+
   }
 } //namespace WeexCore

@@ -2,10 +2,6 @@
 #define WEEX_PROJECT_CREATEBODYACTION_H
 
 #include "RenderAction.h"
-#include <WeexCore/render/RenderObject.h>
-#include <map>
-
-using namespace WeexCore;
 
 namespace WeexCore {
   class CreateBodyAction : public RenderAction {

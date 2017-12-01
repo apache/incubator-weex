@@ -2,119 +2,114 @@
 #define WEEX_JSON_TOOLS
 
 #include "pointer.h"
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <base/fpconv.h>
-#include <base/android/string/StringUtils.h>
-#include <WeexCore/render/RenderObject.h>
-#include <WeexCore/render/RenderPage.h>
 
-using namespace rapidjson;
-using namespace std;
-using namespace WeexCore;
+namespace WeexCore {
+
+  class RenderObject;
+
+  class RenderPage;
 
 /**
  * Use to handler json parser result
  */
-class JsonParserHandler {
-public:
-  bool Null();
+  class JsonParserHandler {
+  public:
+    bool Null();
 
-  bool Bool(bool b);
+    bool Bool(bool b);
 
-  bool Int(int i);
+    bool Int(int i);
 
-  bool Uint(unsigned u);
+    bool Uint(unsigned u);
 
-  bool Int64(int64_t i);
+    bool Int64(int64_t i);
 
-  bool Uint64(uint64_t u);
+    bool Uint64(uint64_t u);
 
-  bool Double(double d);
+    bool Double(double d);
 
-  bool RawNumber(const char *, SizeType, bool);
+    bool RawNumber(const char *, rapidjson::SizeType, bool);
 
-  bool String(const char *str, SizeType length, bool);
+    bool String(const char *str, rapidjson::SizeType length, bool);
 
-  bool StartObject();
+    bool StartObject();
 
-  bool Key(const char *str, SizeType length, bool);
+    bool Key(const char *str, rapidjson::SizeType length, bool);
 
-  bool EndObject(SizeType);
+    bool EndObject(rapidjson::SizeType);
 
-  bool StartArray();
+    bool StartArray();
 
-  bool EndArray(SizeType);
+    bool EndArray(rapidjson::SizeType);
 
-protected:
-  JsonParserHandler(char *str);
+  protected:
+    JsonParserHandler(char *str);
 
-  void ParseNext();
+    void ParseNext();
 
-protected:
-  enum JsonParsingState {
-    kInit,
-    kError,
-    kHasNull,
-    kHasBool,
-    kHasNumber,
-    kHasString,
-    kHasKey,
-    kEnteringObject,
-    kExitingObject,
-    kEnteringArray,
-    kExitingArray
+  protected:
+    enum JsonParsingState {
+      kInit,
+      kError,
+      kHasNull,
+      kHasBool,
+      kHasNumber,
+      kHasString,
+      kHasKey,
+      kEnteringObject,
+      kExitingObject,
+      kEnteringArray,
+      kExitingArray
+    };
+
+    rapidjson::Value v_;
+    JsonParsingState st_;
+    rapidjson::Reader r_;
+    rapidjson::InsituStringStream ss_;
+
+    static const int parseFlags = rapidjson::kParseDefaultFlags | rapidjson::kParseInsituFlag;
   };
-
-  Value v_;
-  JsonParsingState st_;
-  Reader r_;
-  InsituStringStream ss_;
-
-  static const int parseFlags = kParseDefaultFlags | kParseInsituFlag;
-};
 
 /**
  * Use to parse json data
  */
-class JsonParser : protected JsonParserHandler {
-public:
-  JsonParser(char *str) : JsonParserHandler(str) {}
+  class JsonParser : protected JsonParserHandler {
+  public:
+    JsonParser(char *str) : JsonParserHandler(str) {}
 
-  bool EnterObject();
+    bool EnterObject();
 
-  bool EnterArray();
+    bool EnterArray();
 
-  const char *NextObjectKey();
+    const char *NextObjectKey();
 
-  bool NextArrayValue();
+    bool NextArrayValue();
 
-  int GetInt();
+    int GetInt();
 
-  double GetDouble();
+    double GetDouble();
 
-  const char *GetString();
+    const char *GetString();
 
-  bool GetBool();
+    bool GetBool();
 
-  void GetNull();
+    void GetNull();
 
-  void SkipObject();
+    void SkipObject();
 
-  void SkipArray();
+    void SkipArray();
 
-  void SkipValue();
+    void SkipValue();
 
-  Value *PeekValue();
+    rapidjson::Value *PeekValue();
 
-  int PeekType(); // returns a rapidjson::Type, or -1 for no value (at end of object/array)
+    int PeekType(); // returns a rapidjson::Type, or -1 for no value (at end of object/array)
 
-  bool IsValid() { return st_ != kError; }
+    bool IsValid() { return st_ != kError; }
 
-protected:
-  void SkipOut(int depth);
-};
+  protected:
+    void SkipOut(int depth);
+  };
 
 /**
  * Parse json data to RenderObject
@@ -122,6 +117,7 @@ protected:
  * @param page : {@link RenderPage*}
  * @return {@link RenderObject*}
  */
-RenderObject *json2RenderObject(char *data, RenderPage *page);
+  RenderObject *json2RenderObject(char *data, RenderPage *page);
+}
 
 #endif //WEEX_JSON_TOOLS

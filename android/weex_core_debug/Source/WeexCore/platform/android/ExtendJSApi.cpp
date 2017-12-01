@@ -1,3 +1,4 @@
+#include <base/android/string/StringUtils.h>
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;

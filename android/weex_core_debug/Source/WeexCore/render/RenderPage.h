@@ -1,25 +1,15 @@
 #ifndef RenderPage_H
 #define RenderPage_H
 
-#include <rapidjson/weexjsontools.h>
-#include <base/android/string/StringUtils.h>
-#include "action/AddElementAction.h"
-#include "action/CreateBodyAction.h"
-#include "action/UpdateStyleAction.h"
-#include "action/RenderAction.h"
-#include "WeexCore/render/action/LayoutRenderAction.h"
-#include "RenderManager.h"
-#include "RenderObject.h"
 #include <vector>
 #include <string>
 #include <map>
-#include <Layout/WXCoreLayout.h>
-#include <Layout/WXCoreStyle.h>
 
 namespace WeexCore {
 
-  typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
-  typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
+  class RenderAction;
+
+  class RenderObject;
 
   class RenderPage {
 
@@ -32,62 +22,26 @@ namespace WeexCore {
 
     std::map<std::string, RenderObject *> mRenderObjectMap;
 
-    void calculateLayout();
+    void pushRenderToMap(RenderObject *render);
 
-    inline void pushRenderToMap(RenderObject *render) {
-      mRenderObjectMap.insert(pair<std::string, RenderObject *>(render->getRef(), render));
+    void sendCreateBodyAction(RenderObject *render);
 
-      for (int i = 0; i < render->getChildCount(); ++i) {
-        pushRenderToMap(render->getChild(i));
-      }
-    }
+    void sendAddElementAction(RenderObject *child, RenderObject *parent, int index);
 
-    inline void sendCreateBodyAction(RenderObject *render) {
-      CreateBodyAction *action = new CreateBodyAction();
-      action->GenerateAction(getPageId(), render);
-      addRenderAction(action);
+    void sendLayoutAction(RenderObject *render);
 
-      for (int i = 0; i < render->getChildCount(); ++i) {
-        sendAddElementAction(render->getChild(i), render, i);
-      }
-    }
+    void sendUpdateStyleAction(std::string key, std::string value, std::string ref);
 
-    inline void sendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
-      AddElementAction *action = new AddElementAction();
-      action->GenerateAction(getPageId(), child, parent, index);
-      addRenderAction(action);
+    void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
 
-      for (int i = 0; i < child->getChildCount(); ++i) {
-        sendAddElementAction(child->getChild(i), child, i);
-      }
-    }
-
-    inline void sendLayoutAction(RenderObject *render) {
-      LayoutRenderAction *action = new LayoutRenderAction();
-      action->GenerateAction(getPageId(), render);
-      addRenderAction(action);
-    }
-
-    inline void sendUpdateStyleAction(std::string key, std::string value, std::string ref) {
-      UpdateStyleAction *action = new UpdateStyleAction();
-      action->GenerateAction(getPageId(), ref, key, value);
-      addRenderAction(action);
-    }
-
-    inline void sendUpdateAttrAction(std::string key, std::string value, std::string ref) {
-      UpdateStyleAction *action = new UpdateStyleAction();
-      action->GenerateAction(getPageId(), ref, key, value);
-      addRenderAction(action);
-    }
-
-    inline void sendAddEventAction(RenderObject *render) {
-      // TODO AddEventAction
-    }
+    void sendAddEventAction(RenderObject *render);
 
   public:
     RenderPage(std::string pageID);
 
     ~RenderPage();
+
+    void calculateLayout();
 
     void createRootRender(std::string data);
 

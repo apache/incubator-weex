@@ -5,6 +5,9 @@
 #include <WeexCore/render/RenderManager.h>
 #include <WeexCore/render/RenderPage.h>
 #include <WeexCore/render/RenderObject.h>
+#include <base/android/string/StringUtils.h>
+
+using namespace WeexCore;
 
 namespace WeexCore {
   bool RegisterJNIWXComponent(JNIEnv *env) {

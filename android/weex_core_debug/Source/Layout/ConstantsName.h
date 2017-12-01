@@ -4,49 +4,47 @@
 
 #include <string>
 
-using namespace std;
+const std::string FLEX = "flex";
+const std::string ALIGN_ITEMS = "alignItems";
+const std::string ALIGN_SELF = "alignSelf";
+const std::string FLEX_DIRECTION = "flexDirection";
+const std::string JUSTIFY_CONTENT = "justifyContent";
+const std::string FLEX_WRAP = "flexWrap";
 
-const string FLEX = "flex";
-const string ALIGN_ITEMS = "alignItems";
-const string ALIGN_SELF = "alignSelf";
-const string FLEX_DIRECTION = "flexDirection";
-const string JUSTIFY_CONTENT = "justifyContent";
-const string FLEX_WRAP = "flexWrap";
+const std::string MIN_WIDTH = "minWidth";
+const std::string MIN_HEIGHT = "minHeight";
+const std::string MAX_WIDTH = "maxWidth";
+const std::string MAX_HEIGHT = "maxHeight";
 
-const string MIN_WIDTH = "minWidth";
-const string MIN_HEIGHT = "minHeight";
-const string MAX_WIDTH = "maxWidth";
-const string MAX_HEIGHT = "maxHeight";
+const std::string DEFAULT_HEIGHT = "defaultHeight";
+const std::string HEIGHT = "height";
 
-const string DEFAULT_HEIGHT = "defaultHeight";
-const string HEIGHT = "height";
+const std::string DEFAULT_WIDTH = "defaultWidth";
+const std::string WIDTH = "width";
 
-const string DEFAULT_WIDTH = "defaultWidth";
-const string WIDTH = "width";
+const std::string POSITION = "position";
 
-const string POSITION = "position";
+const std::string LEFT = "left";
+const std::string TOP = "top";
+const std::string RIGHT = "right";
+const std::string BOTTOM = "bottom";
 
-const string LEFT = "left";
-const string TOP = "top";
-const string RIGHT = "right";
-const string BOTTOM = "bottom";
+const std::string MARGIN = "margin";
+const std::string MARGIN_LEFT = "marginLeft";
+const std::string MARGIN_TOP = "marginTop";
+const std::string MARGIN_RIGHT = "marginRight";
+const std::string MARGIN_BOTTOM = "marginBottom";
 
-const string MARGIN = "margin";
-const string MARGIN_LEFT = "marginLeft";
-const string MARGIN_TOP = "marginTop";
-const string MARGIN_RIGHT = "marginRight";
-const string MARGIN_BOTTOM = "marginBottom";
+const std::string BORDER_WIDTH = "borderWidth";
+const std::string BORDER_TOP_WIDTH = "borderTopWidth";
+const std::string BORDER_RIGHT_WIDTH = "borderRightWidth";
+const std::string BORDER_BOTTOM_WIDTH = "borderBottomWidth";
+const std::string BORDER_LEFT_WIDTH = "borderLeftWidth";
 
-const string BORDER_WIDTH = "borderWidth";
-const string BORDER_TOP_WIDTH = "borderTopWidth";
-const string BORDER_RIGHT_WIDTH = "borderRightWidth";
-const string BORDER_BOTTOM_WIDTH = "borderBottomWidth";
-const string BORDER_LEFT_WIDTH = "borderLeftWidth";
-
-const string PADDING = "padding";
-const string PADDING_LEFT = "paddingLeft";
-const string PADDING_TOP = "paddingTop";
-const string PADDING_RIGHT = "paddingRight";
-const string PADDING_BOTTOM = "paddingBottom";
+const std::string PADDING = "padding";
+const std::string PADDING_LEFT = "paddingLeft";
+const std::string PADDING_TOP = "paddingTop";
+const std::string PADDING_RIGHT = "paddingRight";
+const std::string PADDING_BOTTOM = "paddingBottom";
 
 #endif //WEEXV8_CONSTANTSNAME_H

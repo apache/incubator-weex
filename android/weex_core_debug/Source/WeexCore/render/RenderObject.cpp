@@ -4,6 +4,12 @@
 #include <WeexCore/platform/android/bridge/MeasureSize_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/MeasureMode_Impl_Android.h>
 #include <base/android/jni/scoped_java_ref.h>
+#include <WeexCore/platform/android/WeexCore.h>
+#include <base/android/string/StringUtils.h>
+#include <Layout/ConstantsName.h>
+#include <Layout/CssValueGetter.h>
+
+using namespace WXCoreFlexLayout;
 
 namespace WeexCore {
 
@@ -130,102 +136,102 @@ namespace WeexCore {
   void RenderObject::applyStyle(std::string key, std::string value) {
     if (key == ALIGN_ITEMS) {
       setAlignItems(getWXCoreAlignItem(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == ALIGN_SELF) {
       setAlignSelf(getWXCoreAlignSelf(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == FLEX) {
       setFlex(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == FLEX_DIRECTION) {
       setFlexDirection(getWXCoreFlexDirection(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == JUSTIFY_CONTENT) {
       setJustifyContent(getWXCoreJustifyContent(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == FLEX_WRAP) {
       setFlexWrap(getWXCoreFlexWrap(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MIN_WIDTH) {
       setMinWidth(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MIN_HEIGHT) {
       setMinHeight(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MAX_WIDTH) {
       setMaxWidth(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MAX_HEIGHT) {
       setMaxHeight(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
       setStyleHeight(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
       setStyleWidth(stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == POSITION) {
       setStylePositionType(getWXCorePositionType(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == LEFT) {
       setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == TOP) {
       setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == RIGHT) {
       setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BOTTOM) {
       setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MARGIN) {
       setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
-      mMargins->insert(pair<std::string, std::string>(key, value));
+      mMargins->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_LEFT) {
       setMargin(WXCore_Margin_Left, stringToNum<float>(value));
-      mMargins->insert(pair<std::string, std::string>(key, value));
+      mMargins->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_TOP) {
       setMargin(WXCore_Margin_Top, stringToNum<float>(value));
-      mMargins->insert(pair<std::string, std::string>(key, value));
+      mMargins->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_RIGHT) {
       setMargin(WXCore_Margin_Right, stringToNum<float>(value));
-      mMargins->insert(pair<std::string, std::string>(key, value));
+      mMargins->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == MARGIN_BOTTOM) {
       setMargin(WXCore_Margin_Bottom, stringToNum<float>(value));
-      mMargins->insert(pair<std::string, std::string>(key, value));
+      mMargins->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BORDER_WIDTH) {
       setBorderWidth(WXCore_Border_Width_ALL, stringToNum<float>(value));
-      mBorders->insert(pair<std::string, std::string>(key, value));
+      mBorders->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BORDER_TOP_WIDTH) {
       setBorderWidth(WXCore_Border_Width_Top, stringToNum<float>(value));
-      mBorders->insert(pair<std::string, std::string>(key, value));
+      mBorders->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BORDER_RIGHT_WIDTH) {
       setBorderWidth(WXCore_Border_Width_Right, stringToNum<float>(value));
-      mBorders->insert(pair<std::string, std::string>(key, value));
+      mBorders->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BORDER_BOTTOM_WIDTH) {
       setBorderWidth(WXCore_Border_Width_Bottom, stringToNum<float>(value));
-      mBorders->insert(pair<std::string, std::string>(key, value));
+      mBorders->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == BORDER_LEFT_WIDTH) {
       setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
-      mBorders->insert(pair<std::string, std::string>(key, value));
+      mBorders->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == PADDING) {
       setPadding(WXCore_Padding_ALL, stringToNum<float>(value));
-      mPaddings->insert(pair<std::string, std::string>(key, value));
+      mPaddings->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == PADDING_LEFT) {
       setPadding(WXCore_Padding_Left, stringToNum<float>(value));
-      mPaddings->insert(pair<std::string, std::string>(key, value));
+      mPaddings->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == PADDING_TOP) {
       setPadding(WXCore_Padding_Top, stringToNum<float>(value));
-      mPaddings->insert(pair<std::string, std::string>(key, value));
+      mPaddings->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == PADDING_RIGHT) {
       setPadding(WXCore_Padding_Right, stringToNum<float>(value));
-      mPaddings->insert(pair<std::string, std::string>(key, value));
+      mPaddings->insert(std::pair<std::string, std::string>(key, value));
     } else if (key == PADDING_BOTTOM) {
       setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
-      mPaddings->insert(pair<std::string, std::string>(key, value));
+      mPaddings->insert(std::pair<std::string, std::string>(key, value));
     } else {
-      mStyles->insert(pair<std::string, std::string>(key, value));
+      mStyles->insert(std::pair<std::string, std::string>(key, value));
     }
   }
 

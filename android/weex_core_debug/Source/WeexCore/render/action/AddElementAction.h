@@ -2,9 +2,6 @@
 #define WEEX_PROJECT_ADDELEMENTACTION_H
 
 #include "RenderAction.h"
-#include <WeexCore/render/RenderObject.h>
-
-using namespace WeexCore;
 
 namespace WeexCore {
 

@@ -3,9 +3,10 @@
 
 #include <map>
 #include <string>
-#include <rapidjson/weexjsontools.h>
 
 namespace WeexCore {
+
+  class RenderPage;
 
   class RenderManager {
 
@@ -31,12 +32,6 @@ namespace WeexCore {
     static Garbo garbo;
 
   public:
-    static RenderManager *getInstance() {
-      if (!m_pInstance) {
-        m_pInstance = new RenderManager();
-      }
-      return m_pInstance;
-    }
 
     //TODO: how to triggle a Frame event
     void batch();
@@ -62,6 +57,13 @@ namespace WeexCore {
     RenderPage *getPage(std::string id);
 
     void printRenderAndLayoutTree(std::string pageId);
+
+    static RenderManager *getInstance() {
+      if (!m_pInstance) {
+        m_pInstance = new RenderManager();
+      }
+      return m_pInstance;
+    }
   };
 }
 

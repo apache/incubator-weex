@@ -1,16 +1,11 @@
 #ifndef RenderObject_h
 #define RenderObject_h
 
-#include <vector>
 #include <string>
 #include <map>
 #include <set>
-#include <Layout/ConstantsName.h>
-#include <Layout/CssValueGetter.h>
+#include <jni.h>
 #include <Layout/WXCoreLayout.h>
-#include <Layout/WXCoreStyle.h>
-#include <base/android/string/StringUtils.h>
-#include <base/android/LogUtils.h>
 
 namespace WeexCore {
 
@@ -28,7 +23,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> PADDING_MAP;
   typedef std::map<std::string, std::string> BORDER_MAP;
 
-  class RenderObject : public WXCoreLayoutNode {
+  class RenderObject : public WXCoreFlexLayout::WXCoreLayoutNode {
   public:
 
   private:
@@ -70,11 +65,17 @@ namespace WeexCore {
 
     void bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
 
-    void bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
+    void bindMeasureFunc_Impl_iOS(WXCoreFlexLayout::WXCoreMeasureFunc measureFunc_Impl_iOS);
 
     void onLayoutBefore();
 
     void onLayoutAfter(float width, float height);
+
+    void applyStyle(std::string key, std::string value);
+
+    void printRenderMsg();
+
+    void printYGNodeMsg();
 
     inline jobject getComponent_Impl_Android() {
       return mComponent_Impl_Android;
@@ -98,7 +99,7 @@ namespace WeexCore {
     }
 
     inline void addAttr(std::string key, std::string value) {
-      mAttributes->insert(pair<std::string, std::string>(key, value));
+      mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
     inline void addAttr(std::map<std::string, std::string> attr) {
@@ -196,12 +197,6 @@ namespace WeexCore {
     inline EVENT_IT getEventItEnd() {
       return mEvents->end();
     }
-
-    void applyStyle(std::string key, std::string value);
-
-    void printRenderMsg();
-
-    void printYGNodeMsg();
   };
 } //end WeexCore
 #endif //RenderObject_h

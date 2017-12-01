@@ -1,16 +1,12 @@
 #ifndef WEEXV8_RENDERACTION_H
 #define WEEXV8_RENDERACTION_H
 
-#include "../../platform/android/BridgeAndroid.h"
 #include <Layout/WXCoreLayout.h>
+#include <WeexCore/render/RenderObject.h>
+#include <WeexCore/platform/android/BridgeAndroid.h>
 #include <string>
 
-using namespace WeexCore;
-using namespace WXCoreFlexLayout;
-
 namespace WeexCore {
-
-  class RenderObject;
 
   class RenderAction {
   public:
@@ -36,7 +32,7 @@ namespace WeexCore {
 
     virtual void ExecuteAction() {}
 
-    void getLayoutInfo(WXCoreLayoutNode *node) {
+    void getLayoutInfo(WXCoreFlexLayout::WXCoreLayoutNode *node) {
       mTop = node->getLayoutPositionTop();
       mBottom = node->getLayoutPositionBottom();
       mRight = node->getLayoutPositionRight();

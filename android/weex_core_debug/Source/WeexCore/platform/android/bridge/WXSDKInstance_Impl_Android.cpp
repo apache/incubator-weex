@@ -6,6 +6,8 @@
 #include <WeexCore/render/RenderObject.h>
 #include <base/android/string/StringUtils.h>
 
+using namespace WeexCore;
+
 namespace WeexCore {
   bool RegisterJNISDKInstance(JNIEnv *env) {
     return RegisterNativesImpl(env);
