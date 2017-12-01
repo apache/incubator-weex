@@ -163,7 +163,7 @@
     WXTransitionInfo *info = [WXTransitionInfo new];
     info.fromValue = @(_fromStyles[singleProperty] ? [WXConvert CGFloat:_fromStyles[singleProperty]] : 0);
     info.toValue = @(_toStyles[singleProperty] ? [WXConvert CGFloat:_toStyles[singleProperty]] : 0 );
-    info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+    info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
     info.propertyName = singleProperty;
     if (!_propertyArray) {
         _propertyArray = [NSMutableArray new];
@@ -195,7 +195,7 @@
                 info.propertyName = @"transform.rotation";
                 info.fromValue = @(oldTransform.rotateAngle);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateX != oldTransform.rotateX)
@@ -204,7 +204,7 @@
                 info.propertyName = @"transform.rotation.x";
                 info.fromValue = @(oldTransform.rotateX);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateY != oldTransform.rotateY)
@@ -213,7 +213,7 @@
                 info.propertyName = @"transform.rotation.y";
                 info.fromValue = @(oldTransform.rotateY);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateZ != oldTransform.rotateZ)
@@ -222,25 +222,23 @@
                 info.propertyName = @"transform.rotation.z";
                 info.fromValue = @(oldTransform.rotateZ);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
-            
             if (wxTransform.scaleX != oldTransform.scaleX) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.scale.x";
                 info.fromValue = @(oldTransform.scaleX);
                 info.toValue = @(wxTransform.scaleX);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
-            
             if (wxTransform.scaleY != oldTransform.scaleY) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.scale.y";
                 info.fromValue = @(oldTransform.scaleY);
                 info.toValue = @(wxTransform.scaleX);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.translateX && [wxTransform.translateX floatValue] !=[oldTransform.translateX floatValue]) {
