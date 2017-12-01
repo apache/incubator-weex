@@ -47,12 +47,12 @@
     double by;
     double cy;
     
-    float _layoutAnimationDuration;
-    float _layoutAnimationDelay;
-    NSUInteger _layoutAnimationCount;
+    float _transitionDuration;
+    float _transitionDelay;
+    NSUInteger _transitionCount;
     
-    CAMediaTimingFunction *_layoutAnimationTimingFunction;
-    CADisplayLink *_layoutAnimationDisplayLink;
+    CAMediaTimingFunction *_transitionTimingFunction;
+    CADisplayLink *_transitionDisplayLink;
 
     NSMutableDictionary *_toStyles;
     NSMutableDictionary *_fromStyles;
@@ -68,34 +68,28 @@
 {
     if (self = [super init]) {
         NSString *property = styles[kWXTransitionProperty];
-        if (property) {
-            _transitionOptions |= [property containsString:@"width"]? WXTransitionOptionsWidth:0;
-            _transitionOptions |= [property containsString:@"height"]? WXTransitionOptionsHeight:0;
-            _transitionOptions |= [property containsString:@"right"]? WXTransitionOptionsRight:0;
-            _transitionOptions |= [property containsString:@"left"]? WXTransitionOptionsLeft:0;
-            _transitionOptions |= [property containsString:@"bottom"]? WXTransitionOptionsBottom:0;
-            _transitionOptions |= [property containsString:@"top"]? WXTransitionOptionsTop:0;
-            _transitionOptions |= [property containsString:@"backgroundColor"]? WXTransitionOptionsBackgroundColor:0;
-            _transitionOptions |= [property containsString:@"transform"]? WXTransitionOptionsTransform:0;
-            _transitionOptions |= [property containsString:@"opacity"]? WXTransitionOptionsOpacity:0;
-        }
-        else
-        {
-            return self;
-        }
+        _transitionOptions |= [property containsString:@"width"]? WXTransitionOptionsWidth:0;
+        _transitionOptions |= [property containsString:@"height"]? WXTransitionOptionsHeight:0;
+        _transitionOptions |= [property containsString:@"right"]? WXTransitionOptionsRight:0;
+        _transitionOptions |= [property containsString:@"left"]? WXTransitionOptionsLeft:0;
+        _transitionOptions |= [property containsString:@"bottom"]? WXTransitionOptionsBottom:0;
+        _transitionOptions |= [property containsString:@"top"]? WXTransitionOptionsTop:0;
+        _transitionOptions |= [property containsString:@"backgroundColor"]? WXTransitionOptionsBackgroundColor:0;
+        _transitionOptions |= [property containsString:@"transform"]? WXTransitionOptionsTransform:0;
+        _transitionOptions |= [property containsString:@"opacity"]? WXTransitionOptionsOpacity:0;
     }
     return self;
 }
 
 #pragma mark - HandleStyle
-- (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent
+- (void)_handleTransitionWithStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles target:(WXComponent *)targetComponent
 {
-    if ([self _isLayoutAnimationRunning]) {
+    if ([self _isTransitionRunning]) {
         [self _rollBackTransitionWithStyles:styles];
     }
     else
     {
-        [self _suspendLayoutAnimationDisplayLink];
+        [self _suspendTransitionDisplayLink];
     }
     
     _targetComponent = targetComponent;
@@ -110,65 +104,47 @@
     _toStyles = [NSMutableDictionary dictionaryWithDictionary:_fromStyles];
     [_toStyles addEntriesFromDictionary:_addStyles];
     
-    _layoutAnimationDuration = _fromStyles[kWXTransitionDuration] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDuration]] : 0;
-    _layoutAnimationDelay = _fromStyles[kWXTransitionDelay] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDelay]] : 0;
-    _layoutAnimationTimingFunction = [WXConvert CAMediaTimingFunction:_fromStyles[kWXTransitionTimingFunction]];
+    _transitionDuration = _fromStyles[kWXTransitionDuration] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDuration]] : 0;
+    _transitionDelay = _fromStyles[kWXTransitionDelay] ? [WXConvert CGFloat:_fromStyles[kWXTransitionDelay]] : 0;
+    _transitionTimingFunction = [WXConvert CAMediaTimingFunction:_fromStyles[kWXTransitionTimingFunction]];
     
-    if (_layoutAnimationDuration == 0 ) {
+    if (_transitionDuration == 0 ) {
         [targetComponent _updateCSSNodeStyles:styles];
+        [targetComponent _resetCSSNodeStyles:resetStyles];
         WXPerformBlockOnMainThread(^{
             [targetComponent _updateViewStyles:styles];
         });
         return;
     }
     
-    if (![[NSString stringWithFormat:@"%@",_layoutAnimationTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+    if (![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
         float vec[4] = {0.};
-        [_layoutAnimationTimingFunction getControlPointAtIndex:1 values:&vec[0]];
-        [_layoutAnimationTimingFunction getControlPointAtIndex:2 values:&vec[2]];
+        [_transitionTimingFunction getControlPointAtIndex:1 values:&vec[0]];
+        [_transitionTimingFunction getControlPointAtIndex:2 values:&vec[2]];
         [self unitBezierp1x:vec[0] p1y:vec[1] p2x:vec[2] p2y:vec[3]];
     }
     
-    NSString *layoutAnimationProperty = _fromStyles[kWXTransitionProperty];
-    [self _resloveTransitionProperty:layoutAnimationProperty withStyles:styles];
-    [self performSelector:@selector(_startLayoutAnimationDisplayLink) withObject:self afterDelay:_layoutAnimationDelay/1000];
+    NSString *transitionProperty = _fromStyles[kWXTransitionProperty];
+    [self _resloveTransitionProperty:transitionProperty withStyles:styles];
+    [self performSelector:@selector(_startTransitionDisplayLink) withObject:self afterDelay:_transitionDelay/1000];
 }
 
 - (void)_rollBackTransitionWithStyles:(NSDictionary *)styles
 {
-    _layoutAnimationDuration = _layoutAnimationCount * 1000 / 60;
-    _layoutAnimationCount = 0;
+    _transitionDuration = _transitionCount * 1000 / 60;
+    _transitionCount = 0;
     _propertyArray = nil;
 }
 
 - (void)_resloveTransitionProperty:(NSString *)propertyNames withStyles:(NSDictionary *)styles
 {
-    NSArray *array = @[@"width",@"height",@"top",@"bottom",@"right",@"left",@"opacity"];
-    for (NSString *propertyName in array) {
-        if ([propertyNames containsString:propertyName]) {
-            [self _judgeProperty:propertyName];
-        }
+    if (styles.count == 0) {
+        return;
     }
-    
-    NSArray *animationModuleArray = @[@"transform",@"backgroundColor"];
-    for (NSString *propertyName in animationModuleArray) {
-        if ([propertyNames containsString:propertyName]) {
-            [self _dealTransitionWithProperty:propertyName styles:styles];
-        }
+    NSString *singleProperty = styles.allKeys[0];
+    if ([propertyNames containsString:singleProperty]) {
+        [self _dealTransitionWithProperty:singleProperty styles:styles];
     }
-}
-
-- (void)_judgeProperty:(NSString *)singleProperty
-{
-    WXTransitionInfo *info = [WXTransitionInfo new];
-    info.fromValue = @(_fromStyles[singleProperty] ? [WXConvert CGFloat:_fromStyles[singleProperty]] : 0);
-    info.toValue = @(_toStyles[singleProperty] ? [WXConvert CGFloat:_toStyles[singleProperty]] : 0 );
-    info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
-    info.propertyName = singleProperty;
-    if (!_propertyArray) {
-        _propertyArray = [NSMutableArray new];
-    }
-    [_propertyArray addObject:info];
 }
 
 - (void)_dealTransitionWithProperty:(NSString *)singleProperty styles:(NSDictionary *)styles
@@ -186,7 +162,7 @@
             info.propertyName = singleProperty;
             [_propertyArray addObject:info];
         }
-        if ([singleProperty isEqualToString:@"transform"]) {
+        else if ([singleProperty isEqualToString:@"transform"]) {
             NSString *transformOrigin = styles[@"transformOrigin"];
             WXTransform *wxTransform = [[WXTransform alloc] initWithCSSValue:_toStyles[singleProperty] origin:transformOrigin instance:_targetComponent.weexInstance];
             WXTransform *oldTransform = _targetComponent->_transform;
@@ -195,7 +171,7 @@
                 info.propertyName = @"transform.rotation";
                 info.fromValue = @(oldTransform.rotateAngle);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateX != oldTransform.rotateX)
@@ -204,7 +180,7 @@
                 info.propertyName = @"transform.rotation.x";
                 info.fromValue = @(oldTransform.rotateX);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateY != oldTransform.rotateY)
@@ -213,7 +189,7 @@
                 info.propertyName = @"transform.rotation.y";
                 info.fromValue = @(oldTransform.rotateY);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.rotateZ != oldTransform.rotateZ)
@@ -222,25 +198,23 @@
                 info.propertyName = @"transform.rotation.z";
                 info.fromValue = @(oldTransform.rotateZ);
                 info.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
-            
             if (wxTransform.scaleX != oldTransform.scaleX) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.scale.x";
                 info.fromValue = @(oldTransform.scaleX);
                 info.toValue = @(wxTransform.scaleX);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
-            
             if (wxTransform.scaleY != oldTransform.scaleY) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.scale.y";
                 info.fromValue = @(oldTransform.scaleY);
-                info.toValue = @(wxTransform.scaleX);
-                info.perValue = @([info.toValue floatValue] - [info.fromValue floatValue]);
+                info.toValue = @(wxTransform.scaleY);
+                info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
                 [_propertyArray addObject:info];
             }
             if (wxTransform.translateX && [wxTransform.translateX floatValue] !=[oldTransform.translateX floatValue]) {
@@ -261,6 +235,15 @@
             }
             _targetComponent->_transform = wxTransform;
         }
+        else
+        {
+            WXTransitionInfo *info = [WXTransitionInfo new];
+            info.fromValue = @(_fromStyles[singleProperty] ? [WXConvert CGFloat:_fromStyles[singleProperty]] : 0);
+            info.toValue = @(_toStyles[singleProperty] ? [WXConvert CGFloat:_toStyles[singleProperty]] : 0 );
+            info.perValue = @([info.toValue doubleValue] - [info.fromValue doubleValue]);
+            info.propertyName = singleProperty;
+            [_propertyArray addObject:info];
+        }
     }
 }
 
@@ -280,14 +263,14 @@
     return @[@(R),@(G),@(B),@(A)];
 }
 
-- (void)_calculateLayoutAnimationProcessingStyle
+- (void)_calculatetransitionProcessingStyle
 {
     if (_propertyArray.count == 0) {
         return;
     }
-    double per = 1000 * (_layoutAnimationCount + 1 ) / (60 * _layoutAnimationDuration);//linear
-    if (![[NSString stringWithFormat:@"%@",_layoutAnimationTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
-        per = [self solveWithx:((_layoutAnimationCount+2)*16)/_layoutAnimationDuration epsilon:SOLVE_EPS(_layoutAnimationDuration)];
+    double per = 1000 * (_transitionCount + 1 ) / (60 * _transitionDuration);//linear
+    if (![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+        per = [self solveWithx:((_transitionCount+2)*16)/_transitionDuration epsilon:SOLVE_EPS(_transitionDuration)];
     }
     NSString *transformString = [NSString string];
     for (WXTransitionInfo *info in _propertyArray) {
@@ -357,73 +340,73 @@
 }
 
 #pragma mark CADisplayLink
-- (void)_startLayoutAnimationDisplayLink
+- (void)_startTransitionDisplayLink
 {
     WXAssertComponentThread();
-    if (!_layoutAnimationDisplayLink) {
-        _layoutAnimationDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(_handleLayoutAnimationDisplayLink)];
-        [_layoutAnimationDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    if (!_transitionDisplayLink) {
+        _transitionDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(_handleTransitionDisplayLink)];
+        [_transitionDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     }
     else{
-        [self _awakeLayoutAnimationDisplayLink];
+        [self _awakeTransitionDisplayLink];
     }
 }
 
-- (void)_stopLayoutAnimationDisplayLink
+- (void)_stopTransitionDisplayLink
 {
     WXAssertComponentThread();
-    if (_layoutAnimationDisplayLink) {
-        [_layoutAnimationDisplayLink invalidate];
-        _layoutAnimationDisplayLink = nil;
+    if (_transitionDisplayLink) {
+        [_transitionDisplayLink invalidate];
+        _transitionDisplayLink = nil;
     }
 }
 
-- (BOOL)_isLayoutAnimationRunning
+- (BOOL)_isTransitionRunning
 {
     WXAssertComponentThread();
     BOOL yesOrNo = NO;
-    if (!_layoutAnimationDisplayLink.paused && _layoutAnimationCount >= 5) {
+    if (!_transitionDisplayLink.paused && _transitionCount >= 5) {
         yesOrNo = YES;
     }
     return yesOrNo;
 }
 
-- (void)_suspendLayoutAnimationDisplayLink
+- (void)_suspendTransitionDisplayLink
 {
     WXAssertComponentThread();
-    if(_layoutAnimationDisplayLink && !_layoutAnimationDisplayLink.paused){
-        _layoutAnimationDisplayLink.paused = YES;
+    if(_transitionDisplayLink && !_transitionDisplayLink.paused){
+        _transitionDisplayLink.paused = YES;
     }
 }
 
-- (void)_awakeLayoutAnimationDisplayLink
+- (void)_awakeTransitionDisplayLink
 {
     WXAssertComponentThread();
-    if (_layoutAnimationDisplayLink && _layoutAnimationDisplayLink.paused) {
-        _layoutAnimationDisplayLink.paused = NO;
+    if (_transitionDisplayLink && _transitionDisplayLink.paused) {
+        _transitionDisplayLink.paused = NO;
     }
 }
 
-- (void)_handleLayoutAnimationDisplayLink
+- (void)_handleTransitionDisplayLink
 {
     WXAssertComponentThread();
-    int count = _layoutAnimationDuration * 60 / 1000;
-    if (_layoutAnimationCount >= count) {
-        [self _suspendLayoutAnimationDisplayLink];
+    int count = _transitionDuration * 60 / 1000;
+    if (_transitionCount >= count) {
+        [self _suspendTransitionDisplayLink];
         [self _resetProcessAnimationParameter];
         return;
     }
     else
     {
-        [self _calculateLayoutAnimationProcessingStyle];
+        [self _calculatetransitionProcessingStyle];
     }
-    _layoutAnimationCount ++;
+    _transitionCount ++;
 }
 
 - (void)_resetProcessAnimationParameter
 {
-    _layoutAnimationCount = 0;
-    _layoutAnimationDuration = 0;
+    _transitionCount = 0;
+    _transitionDuration = 0;
     _propertyArray = nil;
 
     _addStyles = nil;
