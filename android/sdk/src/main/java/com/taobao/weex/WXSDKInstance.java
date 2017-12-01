@@ -1227,15 +1227,15 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
           godView.setLayoutParams(layoutParams);
         }
 
-        JSONObject style = new JSONObject();
+//        JSONObject style = new JSONObject();
         WXComponent rootComponent = mRootComp;
-
         if(rootComponent == null){
           return;
         }
-        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
-        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
-        updateRootComponentStyle(style);
+        rootComponent.applyLayoutAndEvent(rootComponent);
+//        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
+//        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
+//        updateRootComponentStyle(style);
       }
     }
   }
@@ -1267,7 +1267,7 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
     fireEvent(elementRef,type,data,null);
   }
 
-  public void fireEvent(String ref, String type){
+  public void fireEvent(String ref, String type) {
     fireEvent(ref,type,new HashMap<String, Object>());
   }
 
