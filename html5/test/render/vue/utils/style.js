@@ -40,8 +40,7 @@ describe('style', function () {
   // const rect = document.documentElement.getBoundingClientRect()
   // const info = {}
   const {
-    scale,
-    dpr
+    scale
   } = init()
   it('should support using 0.5px to paint 1px width border', () => {
     expect(supportHairlines()).to.be.false
@@ -56,7 +55,7 @@ describe('style', function () {
   it('should normalize units numbers', () => {
     expect(normalizeUnitsNum('100px')).to.equal(100 * scale + 'px')
     expect(normalizeUnitsNum('100')).to.equal(100 * scale + 'px')
-    expect(normalizeUnitsNum('100wx')).to.equal(100 * scale * dpr + 'px')
+    expect(normalizeUnitsNum('100wx')).to.equal('100px')
     expect(normalizeUnitsNum('20wm')).to.equal('')
   })
   it('should normalize number style vals', () => {
@@ -67,7 +66,7 @@ describe('style', function () {
     expect(normalizeString('width', '100%')).to.equal('100%')
     expect(normalizeString('transform', 'translate3d(10px, 10px, 10px)')).to.equal(`translate3d(${10 * scale}px, ${10 * scale}px, ${10 * scale}px)`)
     expect(normalizeString('border-bottom', '4px solid #112233')).to.equal(`${4 * scale}px solid #112233`)
-    expect(normalizeString('border-left', '4wx dotted red')).to.equal(`${4 * scale * dpr}px dotted red`)
+    expect(normalizeString('border-left', '4wx dotted red')).to.equal(`4px dotted red`)
   })
   it('should normalize style object', () => {
     const style = {
