@@ -20,6 +20,7 @@
 import Document from '../vdom/Document'
 import { isRegisteredModule, getModuleDescription } from './module'
 import { isRegisteredComponent } from './component'
+import { getTaskCenter } from '../vdom/operation'
 
 const moduleProxies = {}
 
@@ -31,13 +32,31 @@ function getId (weex) {
   return weex['[[CurrentInstanceId]]']
 }
 
-function moduleGetter (module, method, taskCenter) {
+function moduleGetter (id, module, method) {
+  const taskCenter = getTaskCenter(id)
+  if (!taskCenter || typeof taskCenter.send !== 'function') {
+    console.error(`[JS Framework] Failed to find taskCenter (${id}).`)
+    return null
+  }
   return (...args) => taskCenter.send('module', { module, method }, args)
+}
+
+function moduleSetter (id, module, method, fn) {
+  const taskCenter = getTaskCenter(id)
+  if (!taskCenter || typeof taskCenter.send !== 'function') {
+    console.error(`[JS Framework] Failed to find taskCenter (${id}).`)
+    return null
+  }
+  if (typeof fn !== 'function') {
+    console.error(`[JS Framework] ${module}.${method} must be assigned as a function.`)
+    return null
+  }
+  return fn => taskCenter.send('module', { module, method }, [fn])
 }
 
 export default class WeexInstance {
   constructor (id, config) {
-    setId(this, id)
+    setId(this, String(id))
     this.config = config || {}
     this.document = new Document(id, this.config.bundleUrl)
     this.requireModule = this.requireModule.bind(this)
@@ -48,7 +67,8 @@ export default class WeexInstance {
   requireModule (moduleName) {
     const id = getId(this)
     if (!(id && this.document && this.document.taskCenter)) {
-      console.error(`[JS Framework] invalid instance id "${id}"`)
+      console.error(`[JS Framework] Failed to requireModule("${moduleName}"), `
+        + `instance (${id}) doesn't exist anymore.`)
       return
     }
 
@@ -59,46 +79,38 @@ export default class WeexInstance {
     }
 
     // create new module proxy
-    if (!moduleProxies[moduleName]) {
-      const moduleDefine = getModuleDescription(moduleName)
-      const taskCenter = this.document.taskCenter
-
+    const proxyName = `${moduleName}#${id}`
+    if (!moduleProxies[proxyName]) {
       // create registered module apis
+      const moduleDefine = getModuleDescription(moduleName)
       const moduleApis = {}
       for (const methodName in moduleDefine) {
         Object.defineProperty(moduleApis, methodName, {
           enumerable: true,
           configurable: true,
-          get: () => moduleGetter(moduleName, methodName, taskCenter),
-          set (fn) {
-            if (typeof fn === 'function') {
-              return taskCenter.send('module', {
-                module: moduleName,
-                method: methodName
-              }, [fn])
-            }
-          }
+          get: () => moduleGetter(id, moduleName, methodName),
+          set: fn => moduleSetter(id, moduleName, methodName, fn)
         })
       }
 
       // create module Proxy
       if (typeof Proxy === 'function') {
-        moduleProxies[moduleName] = new Proxy(moduleApis, {
+        moduleProxies[proxyName] = new Proxy(moduleApis, {
           get (target, methodName) {
             if (methodName in target) {
               return target[methodName]
             }
             console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
-            return moduleGetter(moduleName, methodName, taskCenter)
+            return moduleGetter(id, moduleName, methodName)
           }
         })
       }
       else {
-        moduleProxies[moduleName] = moduleApis
+        moduleProxies[proxyName] = moduleApis
       }
     }
 
-    return moduleProxies[moduleName]
+    return moduleProxies[proxyName]
   }
 
   supports (condition) {
