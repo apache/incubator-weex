@@ -29,7 +29,7 @@ export class TaskCenter {
   constructor (id, sendTasks) {
     Object.defineProperty(this, 'instanceId', {
       enumerable: true,
-      value: id
+      value: String(id)
     })
     Object.defineProperty(this, 'callbackManager', {
       enumerable: true,
@@ -48,6 +48,10 @@ export class TaskCenter {
 
   triggerHook (...args) {
     return this.callbackManager.triggerHook(...args)
+  }
+
+  updateData (componentId, newData) {
+    this.callModule('dom', 'updateComponentData', [newData])
   }
 
   destroyCallback () {
