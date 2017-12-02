@@ -22,7 +22,7 @@ import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
-import { createTracker } from '../utils'
+import { track } from '../bridge/debug'
 import WeexInstance from './WeexInstance'
 
 let frameworks
@@ -100,7 +100,6 @@ function createInstance (id, code, config, data) {
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
 
   const weex = new WeexInstance(id, config)
-  const tracker = createTracker(weex)
   Object.freeze(weex)
 
   const runtimeEnv = {
@@ -127,7 +126,7 @@ function createInstance (id, code, config, data) {
       + `Please upgrade it to Vue.js or Rax.`)
   }
 
-  tracker('bundleType', bundleType)
+  track(id, 'bundleType', bundleType)
 
   // run create instance
   if (typeof framework.prepareInstanceContext === 'function') {
