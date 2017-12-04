@@ -6,6 +6,7 @@
 #include <WeexCore/render/action/RenderAction.h>
 #include <Layout/WXCoreLayout.h>
 #include <base/android/string/StringUtils.h>
+#include <base/WXCorePerformance.h>
 #include "RenderPage.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
@@ -36,9 +37,14 @@ namespace WeexCore {
 
   RenderPage::RenderPage(std::string pageID) {
     mPageId = pageID;
+    mWXCorePerformance = new WXCorePerformance();
+    mInstance_Impl_Android = nullptr;
+    mInstance_Impl_iOS = nullptr;
   }
 
   RenderPage::~RenderPage() {
+
+    JNIEnv *env = getJNIEnv();
 
     if (pRoot != nullptr) {
       delete pRoot;
@@ -59,8 +65,22 @@ namespace WeexCore {
     for (; begin != end; ++begin) {
       delete begin->second;
     }
-
     mRenderObjectMap.clear();
+
+    if (mWXCorePerformance != nullptr) {
+      delete mWXCorePerformance;
+      mWXCorePerformance = nullptr;
+    }
+
+    if (mInstance_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mInstance_Impl_Android);
+      mInstance_Impl_Android = nullptr;
+    }
+
+    if (mInstance_Impl_iOS != nullptr) {
+      delete mInstance_Impl_iOS;
+      mInstance_Impl_iOS = nullptr;
+    }
   }
 
   void RenderPage::createRootRender(std::string data) {
@@ -201,5 +221,35 @@ namespace WeexCore {
 
   void RenderPage::sendAddEventAction(RenderObject *render) {
 
+  }
+
+  void RenderPage::jniCallTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->jniCallTime += time;
+  }
+
+  void RenderPage::cssLayoutTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->cssLayoutTime += time;
+  }
+
+  void RenderPage::bindInstance_Impl_Android(jobject instance) {
+    if (instance != nullptr)
+      this->mInstance_Impl_Android = getJNIEnv()->NewGlobalRef(instance);
+  }
+
+  void RenderPage::bindInstance_Impl_iOS(void *instance) {
+    if (instance != nullptr)
+      this->mInstance_Impl_iOS = instance;
+  }
+
+  void RenderPage::printFirstScreenLog() {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->printPerformanceLog(onFirstScreen);
+  }
+
+  void RenderPage::printRenderSuccessLog() {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->printPerformanceLog(onRenderSuccess);
   }
 } //namespace WeexCore

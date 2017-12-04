@@ -10,7 +10,11 @@ namespace WeexCore {
   public:
 
     void ExecuteAction() {
+      RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+      long long startTime = getCurrentTime();
       BridgeAndroid::getInstance()->callUpdateStyleByWeexCore(mPageId, mRef, mKey, mValue);
+      if (page != nullptr)
+        page->jniCallTime(getCurrentTime() - startTime);
     }
 
     void

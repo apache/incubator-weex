@@ -4,12 +4,15 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <jni.h>
 
 namespace WeexCore {
 
   class RenderAction;
 
   class RenderObject;
+
+  class WXCorePerformance;
 
   class RenderPage {
 
@@ -21,6 +24,8 @@ namespace WeexCore {
     std::vector<RenderAction *> mRenderActions;
 
     std::map<std::string, RenderObject *> mRenderObjectMap;
+
+    WXCorePerformance *mWXCorePerformance;
 
     void pushRenderToMap(RenderObject *render);
 
@@ -35,6 +40,10 @@ namespace WeexCore {
     void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
 
     void sendAddEventAction(RenderObject *render);
+
+    jobject mInstance_Impl_Android;
+
+    void *mInstance_Impl_iOS;
 
   public:
     RenderPage(std::string pageID);
@@ -64,6 +73,18 @@ namespace WeexCore {
     void batch();
 
     void traverseTree(RenderObject *render);
+
+    void jniCallTime(long long time);
+
+    void cssLayoutTime(long long time);
+
+    void bindInstance_Impl_Android(jobject instance);
+
+    void bindInstance_Impl_iOS(void *instance);
+
+    void printFirstScreenLog();
+
+    void printRenderSuccessLog();
 
     inline RenderObject *getRenderObject(std::string ref) {
       return mRenderObjectMap.find(ref)->second;

@@ -43,7 +43,8 @@ public class CreateBodyUIAction extends WXUIAction {
       return;
     }
 
-    WXSDKManager.getInstance().getSDKInstance(mPageId).nativeBindComponentToWXCore(mPageId, component, mRef);
+    instance.nativeBindComponentToWXCore(mPageId, component, mRef);
+    instance.nativeBindInstanceToWXCore(mPageId, instance);
 
     try {
       component.createView();

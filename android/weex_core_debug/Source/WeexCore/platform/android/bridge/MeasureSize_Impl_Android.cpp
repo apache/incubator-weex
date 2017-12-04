@@ -6,12 +6,12 @@ namespace WeexCore {
   bool RegisterJNIMeasureSize(JNIEnv *env) {
     return RegisterNativesImpl(env);
   }
-}
 
-jfloat getMeasureHeight(JNIEnv *env, jobject size) {
-  return Java_MeasureSize_getHeight(env, size);
-}
+  jfloat getMeasureHeight(JNIEnv *env, jobject size) {
+    return Java_MeasureSize_getHeight(env, size);
+  }
 
-jfloat getMeasureWidth(JNIEnv *env, jobject size) {
-  return Java_MeasureSize_getWidth(env, size);
+  jfloat getMeasureWidth(JNIEnv *env, jobject size) {
+    return Java_MeasureSize_getWidth(env, size);
+  }
 }

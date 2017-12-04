@@ -6,6 +6,7 @@ add_compile_options(-fexceptions)
 add_definitions(-DOS_ANDROID=1)
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
+add_definitions(-DDEBUG=1)
 
 ## add_subdirectory for subdirectory has a CMakeLists.txt
 add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)

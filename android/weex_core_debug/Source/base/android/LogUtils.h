@@ -7,6 +7,7 @@
 
 #define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGA(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGD(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 //#define DEBUG
 
 #ifdef DEBUG
@@ -23,7 +24,6 @@
 #define LOGD(...) ((void) 0)
 #define LOGI(...) ((void) 0)
 #define LOGW(...) ((void) 0)
-//#define LOGE(...) ((void) 0)
 #define LOG_LINE
 
 #endif

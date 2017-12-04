@@ -876,6 +876,7 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
     WXLogUtils.renderPerformanceLog("       TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("       TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
+    nativePrintRenderSuccessLog(getInstanceId());
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1017,6 +1018,8 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
     WXLogUtils.renderPerformanceLog("       firstScreenCssLayoutTime", mWXPerformance.cssLayoutTime);
     WXLogUtils.renderPerformanceLog("       firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("       firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+
+    nativePrintFirstScreenLog(getInstanceId());
   }
 
   public void batchTime(long time) {
@@ -1514,4 +1517,10 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   }
 
   public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
+
+  public native void nativeBindInstanceToWXCore(String instanceId, WXSDKInstance instance);
+
+  public native void nativePrintFirstScreenLog(String instanceId);
+
+  public native void nativePrintRenderSuccessLog(String instanceId);
 }

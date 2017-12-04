@@ -29,6 +29,16 @@ static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
     jobject component,
     jstring ref);
 
+static void BindInstanceToWXCore(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jobject instance);
+
+static void PrintFirstScreenLog(JNIEnv* env, jobject jcaller,
+    jstring instanceId);
+
+static void PrintRenderSuccessLog(JNIEnv* env, jobject jcaller,
+    jstring instanceId);
+
 // Step 2: method stubs.
 
 static intptr_t g_WXSDKInstance_getInstanceByID = 0;
@@ -66,6 +76,22 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(BindComponentToWXCore) },
+    { "nativeBindInstanceToWXCore",
+"("
+"Ljava/lang/String;"
+"Lcom/taobao/weex/WXSDKInstance;"
+")"
+"V", reinterpret_cast<void*>(BindInstanceToWXCore) },
+    { "nativePrintFirstScreenLog",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(PrintFirstScreenLog) },
+    { "nativePrintRenderSuccessLog",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(PrintRenderSuccessLog) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

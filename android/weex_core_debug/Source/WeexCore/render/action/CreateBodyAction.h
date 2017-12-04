@@ -9,6 +9,8 @@ namespace WeexCore {
   public:
 
     void ExecuteAction() {
+      RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+      long long startTime = getCurrentTime();
       BridgeAndroid::getInstance()->callCreateBodyByWeexCore(mPageId, mComponentType, mRef,
                                                              mTop,
                                                              mBottom, mLeft,
@@ -17,6 +19,8 @@ namespace WeexCore {
                                                              mWidth, mStyles, mAttributes,
                                                              mEvents,
                                                              mPaddings, mMargins, mBorders);
+      if (page != nullptr)
+        page->jniCallTime(getCurrentTime() - startTime);
     }
 
     void GenerateAction(std::string pageId, RenderObject *render) {
