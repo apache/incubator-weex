@@ -50,7 +50,7 @@ TEST_F(FlexWrapDimension, RowNoWrap) {
     target->setFlexWrap(WXCore_Wrap_NoWrap);
     root->calculateLayout();
 
-    EXPECT_FLOAT_EQ(target->getLayoutWidth(), rootWidth);
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), childHeight);
 
     EXPECT_FLOAT_EQ(lastChildInTarget->getLayoutPositionTop(), 0);
@@ -81,7 +81,7 @@ TEST_F(FlexWrapDimension, ColumnNoWrap) {
     target->setFlexDirection(WXCore_Flex_Direction_Column);
     target->setFlexWrap(WXCore_Wrap_NoWrap);
     root->calculateLayout();
-    EXPECT_FLOAT_EQ(target->getLayoutWidth(), rootWidth);
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), childHeight * childCount);
 
     EXPECT_FLOAT_EQ(lastChildInTarget->getLayoutPositionLeft(), 0);
@@ -94,7 +94,7 @@ TEST_F(FlexWrapDimension, ColumnWrap) {
     target->setFlexDirection(WXCore_Flex_Direction_Column);
     target->setFlexWrap(WXCore_Wrap_Wrap);
     root->calculateLayout();
-    EXPECT_FLOAT_EQ(target->getLayoutWidth(), rootWidth);
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), childHeight * childCount);
 
     EXPECT_FLOAT_EQ(lastChildInTarget->getLayoutPositionLeft(), 0);
