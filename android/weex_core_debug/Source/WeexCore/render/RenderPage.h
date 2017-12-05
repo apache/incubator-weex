@@ -27,6 +27,8 @@ namespace WeexCore {
 
     WXCorePerformance *mWXCorePerformance;
 
+    uint32_t command_count;
+
     void pushRenderToMap(RenderObject *render);
 
     void sendCreateBodyAction(RenderObject *render);

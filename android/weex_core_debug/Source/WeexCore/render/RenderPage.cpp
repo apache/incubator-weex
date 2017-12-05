@@ -19,7 +19,9 @@ namespace WeexCore {
   void RenderPage::calculateLayout() {
     if (pRoot == nullptr)
       return;
+    long long startTime = getCurrentTime();
     pRoot->calculateLayout();
+    cssLayoutTime(getCurrentTime() - startTime);
     traverseTree(pRoot);
   }
 
@@ -40,6 +42,7 @@ namespace WeexCore {
     mWXCorePerformance = new WXCorePerformance();
     mInstance_Impl_Android = nullptr;
     mInstance_Impl_iOS = nullptr;
+    command_count = 0;
   }
 
   RenderPage::~RenderPage() {
@@ -95,8 +98,6 @@ namespace WeexCore {
     setRootRenderObject(render);
     pushRenderToMap(render);
     sendCreateBodyAction(render);
-    // layout by dom Tree
-    calculateLayout();
   }
 
   void RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
@@ -115,8 +116,11 @@ namespace WeexCore {
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
     sendAddElementAction(child, parent, insertPosition);
-    // layout by dom Tree
-    calculateLayout();
+    command_count++;
+    if (command_count > 3) {
+      calculateLayout();
+      command_count = 0;
+    }
   }
 
   void RenderPage::removeRenderObject(std::string ref) {
