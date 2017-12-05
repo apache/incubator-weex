@@ -202,6 +202,10 @@ vue: {
 
 * fix indicator position in one page slider.
 
+#### 0.12.26
+
+* fix unit wx, which is a straight px value not to adapt to screens.
+
 ## component -> dom map
 
 | component | dom element | children | note |
