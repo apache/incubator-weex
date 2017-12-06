@@ -12,11 +12,7 @@ namespace WeexCore {
       RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
       long long startTime = getCurrentTime();
       BridgeAndroid::getInstance()->callCreateBodyByWeexCore(mPageId, mComponentType, mRef,
-                                                             mTop,
-                                                             mBottom, mLeft,
-                                                             mRight,
-                                                             mHeight,
-                                                             mWidth, mStyles, mAttributes,
+                                                             mStyles, mAttributes,
                                                              mEvents,
                                                              mPaddings, mMargins, mBorders);
       if (page != nullptr)
@@ -33,7 +29,6 @@ namespace WeexCore {
       this->mPageId = pageId;
       this->mComponentType = render->getType();
       this->mRef = render->getRef();
-      getLayoutInfo(render);
     }
   };
 }

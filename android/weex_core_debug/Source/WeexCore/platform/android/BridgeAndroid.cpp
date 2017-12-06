@@ -403,8 +403,7 @@ namespace WeexCore {
   }
 
   int BridgeAndroid::callCreateBodyByWeexCore(std::string &pageId, std::string &componentType,
-                                              std::string &ref, int top, int bottom,
-                                              int left, int right, int height, int width,
+                                              std::string &ref,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
                                               std::set<std::string> *events,
@@ -414,7 +413,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallCreateBodyByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callCreateBodyByWeexCore",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIILjava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
@@ -447,7 +446,7 @@ namespace WeexCore {
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallCreateBodyByWeexCoreMethodId, jPageId, jComponentType,
-                              jRef, top, bottom, left, right, height, width, jStyles, jAttributes,
+                              jRef, jStyles, jAttributes,
                               jEvents,
                               jPaddings, jMargins, jBorders);
     if (flag == -1) {
@@ -467,8 +466,7 @@ namespace WeexCore {
   }
 
   int BridgeAndroid::callAddElementByWeexCore(std::string &pageId, std::string &componentType,
-                                              std::string &ref, int top, int bottom,
-                                              int left, int right, int height, int width, int index,
+                                              std::string &ref, int index,
                                               std::string parentRef,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
@@ -479,7 +477,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallAddElementByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callAddElementByWeexCore",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIIILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
@@ -513,7 +511,7 @@ namespace WeexCore {
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementByWeexCoreMethodId, jPageId, jComponentType,
-                              jRef, top, bottom, left, right, height, width, index, jParentRef,
+                              jRef, index, jParentRef,
                               jStyles, jAttributes, jEvents, jPaddings, jMargins, jBorders);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callAddElement");
@@ -560,12 +558,12 @@ namespace WeexCore {
   }
 
   int BridgeAndroid::callLayoutByWeexCore(std::string &pageId, std::string &ref, int top,
-                                            int bottom, int left, int right, int height,
-                                            int width) {
+                                          int bottom, int left, int right, int height,
+                                          int width) {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallLayoutByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
-                                                                 "callLayoutByWeexCore",
-                                                                 "(Ljava/lang/String;Ljava/lang/String;IIIIII)I");
+                                                               "callLayoutByWeexCore",
+                                                               "(Ljava/lang/String;Ljava/lang/String;IIIIII)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jRef = env->NewStringUTF(ref.c_str());

@@ -93,8 +93,6 @@ namespace WeexCore {
                         jstring &ref, jstring &event, jstring &callback);
 
     int callCreateBodyByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int top,
-                                 int bottom, int left, int right, int height, int width,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
                                  std::set<std::string> *events,
@@ -103,8 +101,7 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *borders);
 
     int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int top,
-                                 int bottom, int left, int right, int height, int width, int index,
+                                 int index,
                                  std::string parentRef,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
@@ -117,8 +114,8 @@ namespace WeexCore {
                                   std::string &value);
 
     int callLayoutByWeexCore(std::string &pageId, std::string &ref,
-                               int top, int bottom, int left, int right,
-                               int height, int width);
+                             int top, int bottom, int left, int right,
+                             int height, int width);
 
   };
 } //end WeexCore
