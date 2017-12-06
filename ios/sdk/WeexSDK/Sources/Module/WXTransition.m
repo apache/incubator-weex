@@ -68,21 +68,15 @@
 {
     if (self = [super init]) {
         NSString *property = styles[kWXTransitionProperty];
-        if (property) {
-            _transitionOptions |= [property containsString:@"width"]? WXTransitionOptionsWidth:0;
-            _transitionOptions |= [property containsString:@"height"]? WXTransitionOptionsHeight:0;
-            _transitionOptions |= [property containsString:@"right"]? WXTransitionOptionsRight:0;
-            _transitionOptions |= [property containsString:@"left"]? WXTransitionOptionsLeft:0;
-            _transitionOptions |= [property containsString:@"bottom"]? WXTransitionOptionsBottom:0;
-            _transitionOptions |= [property containsString:@"top"]? WXTransitionOptionsTop:0;
-            _transitionOptions |= [property containsString:@"backgroundColor"]? WXTransitionOptionsBackgroundColor:0;
-            _transitionOptions |= [property containsString:@"transform"]? WXTransitionOptionsTransform:0;
-            _transitionOptions |= [property containsString:@"opacity"]? WXTransitionOptionsOpacity:0;
-        }
-        else
-        {
-            return self;
-        }
+        _transitionOptions |= [property containsString:@"width"]? WXTransitionOptionsWidth:0;
+        _transitionOptions |= [property containsString:@"height"]? WXTransitionOptionsHeight:0;
+        _transitionOptions |= [property containsString:@"right"]? WXTransitionOptionsRight:0;
+        _transitionOptions |= [property containsString:@"left"]? WXTransitionOptionsLeft:0;
+        _transitionOptions |= [property containsString:@"bottom"]? WXTransitionOptionsBottom:0;
+        _transitionOptions |= [property containsString:@"top"]? WXTransitionOptionsTop:0;
+        _transitionOptions |= [property containsString:@"backgroundColor"]? WXTransitionOptionsBackgroundColor:0;
+        _transitionOptions |= [property containsString:@"transform"]? WXTransitionOptionsTransform:0;
+        _transitionOptions |= [property containsString:@"opacity"]? WXTransitionOptionsOpacity:0;
     }
     return self;
 }

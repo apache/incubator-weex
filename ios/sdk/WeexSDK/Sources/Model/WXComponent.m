@@ -97,8 +97,11 @@
         _accessibilityHintContent = nil;
         
         _async = NO;
-        _transition = [[WXTransition alloc]initWithStyles:styles];
         
+        if (styles[kWXTransitionProperty]) {
+            _transition = [[WXTransition alloc]initWithStyles:styles];
+        }
+
         //TODO set indicator style 
         if ([type isEqualToString:@"indicator"]) {
             _styles[@"position"] = @"absolute";
@@ -566,7 +569,7 @@
 #pragma mark Updating
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    BOOL isTransitionTag = [self _isTransitionTag:styles];
+    BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
     if (isTransitionTag) {
         [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];
     } else {
