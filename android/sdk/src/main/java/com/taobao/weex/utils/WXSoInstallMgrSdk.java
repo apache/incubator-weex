@@ -122,7 +122,7 @@ public class WXSoInstallMgrSdk {
     copyStartUpSo();
 
     boolean InitSuc = false;
-    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
+    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size) || checkSoIsValid(libName, BuildConfig.ARMEABI_V7A_Size)) {
 
       /**
        * Load library with {@link System#loadLibrary(String)}

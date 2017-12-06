@@ -53,4 +53,6 @@ public class WXResponse {
    * Parameter for further extension.
    */
   public Map<String, Object> extendParams;
+
+  public long connectTime = 0;
 }

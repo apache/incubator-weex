@@ -1,29 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
-        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
-    }
-}
-
-plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
-apply plugin: 'com.getkeepsafe.dexcount'
-
-ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
-if(!disableCov.toBoolean()){
-    apply plugin: 'com.vanniktech.android.junit.jacoco'
-    junitJacoco {
-        excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
-    }
-}
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
@@ -60,37 +36,26 @@ android {
     def jsfmVersion = m[0][1]
     println jsfmVersion
 
-    if(project.hasProperty('asfRelease')){
-        //download so file if not exist, when compile in source release
-        download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/armeabi/libweexjsc.so"
-            overwrite false
-        }
-        download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexjsc.so"
-            overwrite false
-        }
-    }
 
-    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
-    def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
-    println "ARMEABI_Size: "+ARMEABI_Size;
-    println "X86_Size:" + X86_Size;
-
+    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length()
+    def ARMEABI_V7A_Size = new File(projectDir,"libs/armeabi-v7a/libweexjsc.so").length()
+    def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length()
+    println "ARMEABI_Size: "+ ARMEABI_Size
+    println "ARMEABI_V7A_Size: "+ ARMEABI_V7A_Size
+    println "X86_Size:" + X86_Size
 
     defaultConfig {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
         buildConfigField "long", "X86_Size", "${X86_Size}"
+        buildConfigField "long", "ARMEABI_V7A_Size", "${ARMEABI_V7A_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-        minSdkVersion 14
+        minSdkVersion rootProject.minSdkVersion
         targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi","x86"
+            abiFilters "armeabi-v7a"
         }
     }
     buildTypes {
@@ -111,7 +76,7 @@ android {
             assets.srcDirs = ['assets']
             jniLibs.srcDir(['libs'])
             java {
-                srcDirs = ["src/main/java"];
+                srcDirs = ["src/main/java"]
             }
         }
         debug.setRoot('build-types/debug')
@@ -140,30 +105,5 @@ dependencies {
     provided "com.android.support:recyclerview-v7:${project.supportLibVersion}"
     provided "com.android.support:support-v4:${project.supportLibVersion}"
     provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
-    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
-
-    testCompile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:hamcrest-core:1.3'
-    testCompile 'org.javassist:javassist:3.20.0-GA'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.objenesis:objenesis:2.1'
-    testCompile 'org.powermock:powermock-core:1.6.4'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4-common:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4-legacy:1.6.4'
-    testCompile 'org.powermock:powermock-module-testng:1.6.4'
-    testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    testCompile 'org.robolectric:robolectric:3.3.2'
-    testCompile "org.robolectric:shadows-httpclient:3.3.2"
-    testCompile 'org.json:json:20160212'
-}
-if(file('../license/LICENSE').exists()){
-    license {
-        header = file('../license/LICENSE')
-        excludes(["com/taobao/weex/dom/flex/*.java"])
-    }
-    preBuild.dependsOn licenseFormat
+    provided 'com.alibaba:fastjson:1.1.46.android'
 }

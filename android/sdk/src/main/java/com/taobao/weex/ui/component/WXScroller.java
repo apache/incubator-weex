@@ -290,7 +290,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void addChild(WXComponent child, int index) {
-    mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
+    if (child != null) { // fix WXScroller.addChild()中child参数为空导致的NPE问题
+      mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
+    }
     if (child instanceof WXBaseRefresh) {
       if (!checkRefreshOrLoading(child)) {
         mRefreshs.add(child);
