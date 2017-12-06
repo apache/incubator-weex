@@ -119,11 +119,15 @@ namespace WeexCore {
   }
 
   void RenderObject::onLayoutBefore() {
+    if (this->getMeasureFunc_Impl_Android() == nullptr)
+      return;
     JNIEnv *env = getJNIEnv();
     layoutBefore_Impl_Android(env, this->getMeasureFunc_Impl_Android());
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
+    if (this->getMeasureFunc_Impl_Android() == nullptr)
+      return;
     JNIEnv *env = getJNIEnv();
     layoutAfter_Impl_Android(env, this->getMeasureFunc_Impl_Android(), width, height);
   }
