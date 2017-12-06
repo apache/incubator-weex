@@ -6,7 +6,7 @@
 #include "WXCoreLayout.h"
 #include "WXCoreFlexEnum.h"
 
-using namespace WXCoreFlexLayout;
+using namespace WeexCore;
 
 class Padding : public ::testing::Test {
 protected:

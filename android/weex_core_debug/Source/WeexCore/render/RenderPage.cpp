@@ -22,6 +22,8 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     pRoot->calculateLayout();
     cssLayoutTime(getCurrentTime() - startTime);
+
+    std::vector<WXCoreFlexLine *> flexLines = pRoot->getFlexLine();
     traverseTree(pRoot);
   }
 
@@ -116,11 +118,7 @@ namespace WeexCore {
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
     sendAddElementAction(child, parent, insertPosition);
-    command_count++;
-    if (command_count > 3) {
-      calculateLayout();
-      command_count = 0;
-    }
+    calculateLayout();
   }
 
   void RenderPage::removeRenderObject(std::string ref) {

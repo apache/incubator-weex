@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
 
-using namespace WXCoreFlexLayout;
+using namespace WeexCore;
 
 class Dimension : public ::testing::Test {
 protected:

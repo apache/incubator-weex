@@ -1,6 +1,6 @@
 #include "WXCoreLayout.h"
 
-using namespace WXCoreFlexLayout;
+using namespace WeexCore;
 
 const float WXCoreCSSStyle::FLEX_GROW_DEFAULT = 0;
 const WXCoreFlexDirection WXCoreCSSStyle::FLEX_DIRECTION_DEFAULT = WXCore_Flex_Direction_Column;
@@ -19,7 +19,7 @@ static T min_num(T a, T b) {
   return a < b ? a : b;
 }
 
-namespace WXCoreFlexLayout {
+namespace WeexCore {
 
   /**
    * Entry function to calculate layout
@@ -111,7 +111,7 @@ namespace WXCoreFlexLayout {
                                  bool useMeasureFunc) {
 
     bool isNeedMeasure = false;
-    if (mLastAvailableSize == nullptr || mLastAvailableSize->width != width ||
+    if (mLayoutResult->isNAN() || mLastAvailableSize == nullptr || mLastAvailableSize->width != width ||
         mLastAvailableSize->height != height || mLastWidthMode != widthMeasureMode ||
         mLastHeightMode != heightMeasureMode || isDirty())
       isNeedMeasure = true;

@@ -35,7 +35,7 @@ namespace WeexCore {
 
     virtual void ExecuteAction() {}
 
-    void getLayoutInfo(WXCoreFlexLayout::WXCoreLayoutNode *node) {
+    void getLayoutInfo(WXCoreLayoutNode *node) {
       mTop = node->getLayoutPositionTop();
       mBottom = node->getLayoutPositionBottom();
       mRight = node->getLayoutPositionRight();

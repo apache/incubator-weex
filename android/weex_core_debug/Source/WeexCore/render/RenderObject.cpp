@@ -9,8 +9,6 @@
 #include <Layout/ConstantsName.h>
 #include <Layout/CssValueGetter.h>
 
-using namespace WXCoreFlexLayout;
-
 namespace WeexCore {
 
   RenderObject::RenderObject(RenderPage *page)

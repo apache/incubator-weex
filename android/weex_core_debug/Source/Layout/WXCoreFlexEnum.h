@@ -3,7 +3,7 @@
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
-namespace WXCoreFlexLayout {
+namespace WeexCore {
 
   /**
    * MainAxis direction

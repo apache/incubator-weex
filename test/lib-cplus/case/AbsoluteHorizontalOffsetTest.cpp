@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
 
-using namespace WXCoreFlexLayout;
+using namespace WeexCore;
 
 static constexpr float validWidth = 100;
 static constexpr float boundaryWidth = 0;

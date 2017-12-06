@@ -7,7 +7,7 @@
 #include "WXCoreFlexEnum.h"
 #include <math.h>
 
-namespace WXCoreFlexLayout {
+namespace WeexCore {
 
   /**
    * Margin: margin-left、margin-right、margin-top、margin-bottom
@@ -294,6 +294,10 @@ namespace WXCoreFlexLayout {
 
     ~WXCorePosition() {
       reset();
+    }
+
+    bool isNAN() {
+      return isnan(mTop) || isnan(mBottom) || isnan(mLeft) || isnan(mRight);
     }
 
     void reset() {

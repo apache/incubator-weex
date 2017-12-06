@@ -23,7 +23,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> PADDING_MAP;
   typedef std::map<std::string, std::string> BORDER_MAP;
 
-  class RenderObject : public WXCoreFlexLayout::WXCoreLayoutNode {
+  class RenderObject : public WXCoreLayoutNode {
   public:
 
   private:
@@ -65,7 +65,7 @@ namespace WeexCore {
 
     void bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
 
-    void bindMeasureFunc_Impl_iOS(WXCoreFlexLayout::WXCoreMeasureFunc measureFunc_Impl_iOS);
+    void bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
 
     void onLayoutBefore();
 

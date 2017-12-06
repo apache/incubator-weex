@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
 
-using namespace WXCoreFlexLayout;
+using namespace WeexCore;
 
 static constexpr float rootHeight = 700;
 static constexpr float targetHeight = 300;

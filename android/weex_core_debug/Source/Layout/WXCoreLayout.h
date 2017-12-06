@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-namespace WXCoreFlexLayout {
+namespace WeexCore {
 
   class WXCoreLayoutNode;
 
@@ -33,6 +33,10 @@ namespace WXCoreFlexLayout {
       width = 0;
       height = 0;
     }
+
+    bool isNAN() {
+      return isnan(width) || isnan(height);
+    }
   } WXCoreSize;
 
   /**
@@ -41,6 +45,10 @@ namespace WXCoreFlexLayout {
   typedef struct WXCorelayoutResult {
     WXCoreSize mLayoutSize;
     WXCorePosition mLayoutPosition;
+
+    bool isNAN() {
+      return mLayoutSize.isNAN() || mLayoutPosition.isNAN();
+    }
 
     void reset() {
       mLayoutSize.reset();
@@ -301,22 +309,14 @@ namespace WXCoreFlexLayout {
     void initMeasureMode();
 
     inline void setLayoutWidth(float width) {
-      if (mLayoutResult == nullptr) {
-        mLayoutResult = new WXCorelayoutResult();
-        setHasNewLayout(true);
-      }
-      if (mLayoutResult->mLayoutSize.width != width) {
+      if (isnan(mLayoutResult->mLayoutSize.width) || mLayoutResult->mLayoutSize.width != width) {
         mLayoutResult->mLayoutSize.width = width;
         setHasNewLayout(true);
       }
     }
 
     inline void setLayoutHeight(float height) {
-      if (mLayoutResult == nullptr) {
-        mLayoutResult = new WXCorelayoutResult();
-        setHasNewLayout(true);
-      }
-      if (mLayoutResult->mLayoutSize.height != height) {
+      if (isnan(mLayoutResult->mLayoutSize.height) || mLayoutResult->mLayoutSize.height != height) {
         mLayoutResult->mLayoutSize.height = height;
         setHasNewLayout(true);
       }
@@ -421,11 +421,11 @@ namespace WXCoreFlexLayout {
                                    float bottom);
 
     inline void setFrame(float l, float t, float r, float b) {
-      if (mLayoutResult == nullptr) {
-        mLayoutResult = new WXCorelayoutResult();
-        setHasNewLayout(true);
-      }
-      if (mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Left) != l
+      if (isnan(mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Left))
+          || isnan(mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Top))
+          || isnan(mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Right))
+          || isnan(mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Bottom))
+          || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Left) != l
           || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Top) != t
           || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Right) != r
           || mLayoutResult->mLayoutPosition.getPosition(WXCore_PositionEdge_Bottom) != b) {
@@ -849,6 +849,10 @@ namespace WXCoreFlexLayout {
 
     inline bool isUndefined(float value) {
       return isnan(value);
+    }
+
+    inline std::vector<WXCoreFlexLine *> getFlexLine() {
+      return mFlexLines;
     }
 
   private:
