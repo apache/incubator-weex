@@ -8,6 +8,16 @@ namespace WeexCore {
 
   public:
 
+    STYLES_MAP *mStyles;
+    ATTRIBUTES_MAP *mAttributes;
+    EVENTS_SET *mEvents;
+    PADDING_MAP *mPaddings;
+    MARGIN_MAP *mMargins;
+    BORDER_MAP *mBorders;
+    std::string mPageId;
+    std::string mComponentType;
+    std::string mRef;
+
     void ExecuteAction() {
       RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
       long long startTime = getCurrentTime();

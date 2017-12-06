@@ -54,6 +54,8 @@ namespace WeexCore {
 
     void removeEvent(std::string pageId, std::string ref, std::string event);
 
+    void createFinish(std::string pageId);
+
     RenderPage *getPage(std::string id);
 
     void printRenderAndLayoutTree(std::string pageId);

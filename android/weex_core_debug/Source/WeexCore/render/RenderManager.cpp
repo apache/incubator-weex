@@ -74,6 +74,12 @@ namespace WeexCore {
     return page;
   }
 
+  void RenderManager::createFinish(std::string pageId) {
+    RenderPage *page = getPage(pageId);
+    if (page != nullptr)
+      page->createFinish();
+  }
+
   void RenderManager::printRenderAndLayoutTree(std::string pageId) {
     RenderPage *page = this->getPage(pageId);
     if (page == nullptr)

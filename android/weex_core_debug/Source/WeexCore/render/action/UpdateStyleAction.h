@@ -9,6 +9,12 @@ namespace WeexCore {
 
   public:
 
+    EVENTS_SET *mEvents;
+    std::string mPageId;
+    std::string mRef;
+    std::string mKey;
+    std::string mValue;
+
     void ExecuteAction() {
       RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
       long long startTime = getCurrentTime();

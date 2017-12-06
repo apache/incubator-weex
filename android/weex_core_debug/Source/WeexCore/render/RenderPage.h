@@ -72,6 +72,8 @@ namespace WeexCore {
 
     void addRenderAction(RenderAction *action);
 
+    void createFinish();
+
     void batch();
 
     void traverseTree(RenderObject *render);

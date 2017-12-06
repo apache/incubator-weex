@@ -215,6 +215,11 @@ namespace WeexCore {
     render->removeEvent(event);
   }
 
+  void RenderPage::createFinish() {
+    if (pRoot != nullptr)
+      traverseTree(pRoot);
+  }
+
   void RenderPage::addRenderAction(RenderAction *action) {
     if (action != nullptr)
       action->ExecuteAction();

@@ -93,7 +93,14 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
-  flag = BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
+
+
+  std::string task = jByteArray2Str(env, jTaskString);
+  if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
+    RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId));
+  } else {
+    flag = BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
+  }
 
   return createInt32Result(flag);
 }
