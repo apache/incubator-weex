@@ -7,6 +7,7 @@
 #include <Layout/WXCoreLayout.h>
 #include <base/android/string/StringUtils.h>
 #include <base/WXCorePerformance.h>
+#include <base/WXCoreEnvironment.h>
 #include "RenderPage.h"
 #include "RenderManager.h"
 #include "RenderObject.h"
@@ -23,8 +24,26 @@ namespace WeexCore {
     pRoot->calculateLayout();
     cssLayoutTime(getCurrentTime() - startTime);
 
-    std::vector<WXCoreFlexLine *> flexLines = pRoot->getFlexLine();
-    traverseTree(pRoot);
+    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
+    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
+    float radio = deviceWidth / (750.0f*1.2f);
+
+    switch (pRoot->getFlexDirection()) {
+      case WXCore_Flex_Direction_Column:
+      case WXCore_Flex_Direction_Column_Reverse:
+        if (pRoot->getTotalMainSize() *radio  > deviceHeight) {
+          traverseTree(pRoot);
+        }
+        break;
+      case WXCore_Flex_Direction_Row:
+      case WXCore_Flex_Direction_Row_Reverse:
+      default:
+        if (pRoot->getTotalMainSize() *radio > deviceHeight) {
+          traverseTree(pRoot);
+        }
+        break;
+    }
+//    traverseTree(pRoot);
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
@@ -44,7 +63,7 @@ namespace WeexCore {
     mWXCorePerformance = new WXCorePerformance();
     mInstance_Impl_Android = nullptr;
     mInstance_Impl_iOS = nullptr;
-    command_count = 0;
+    layout_block_count = 0;
   }
 
   RenderPage::~RenderPage() {
@@ -118,6 +137,11 @@ namespace WeexCore {
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
     sendAddElementAction(child, parent, insertPosition);
+//    if (layout_block_count > 2) {
+//      calculateLayout();
+//      layout_block_count=0;
+//    }
+//    layout_block_count++;
     calculateLayout();
   }
 

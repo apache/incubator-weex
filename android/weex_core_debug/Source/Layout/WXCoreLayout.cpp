@@ -269,11 +269,11 @@ namespace WeexCore {
     determineMainSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
-                       getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom());
+//    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
+//                       getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
-    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
+//    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
     setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
@@ -360,11 +360,11 @@ namespace WeexCore {
     determineMainSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
 
     // Determines the cross size (Calculate the length along the cross axis).
-    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
-                       getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight());
+//    determineCrossSize(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode,
+//                       getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight());
 
     // Expand the views if alignItems (or alignSelf in each child view) is set to stretch.
-    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
+//    stretchViews(mCssStyle->mFlexDirection, mCssStyle->mAlignItems);
 
     // Set measure result.
     setMeasuredDimensionForFlex(mCssStyle->mFlexDirection, width, widthMeasureMode, height, heightMeasureMode);
@@ -1246,6 +1246,22 @@ namespace WeexCore {
   bool WXCoreLayoutNode::isMainAxisDirectionHorizontal(WXCoreFlexDirection flexDirection) {
     return flexDirection == WXCore_Flex_Direction_Row
            || flexDirection == WXCore_Flex_Direction_Row_Reverse;
+  }
+
+  float WXCoreLayoutNode::getTotalMainSize() {
+    float totalMainSize = 0;
+    for (int i = 0; i < mFlexLines.size(); i++) {
+      totalMainSize += mFlexLines[i]->mMainSize;
+    }
+    return totalMainSize;
+  }
+
+  float WXCoreLayoutNode::getTotalCrossSize() {
+    float totalCrossSize = 0;
+    for (int i = 0; i < mFlexLines.size(); i++) {
+      totalCrossSize += mFlexLines[i]->mCrossSize;
+    }
+    return totalCrossSize;
   }
 }
 

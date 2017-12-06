@@ -1,6 +1,7 @@
 #include "WeexProxy.h"
 #include <base/android/LogUtils.h>
 #include <base/android/string/StringUtils.h>
+#include <base/WXCoreEnvironment.h>
 #include "WeexCore.h"
 #include "ExtendJSApi.h"
 
@@ -187,6 +188,9 @@ WeexProxy::initFromParam(JNIEnv *env, jstring script, jobject params, IPCSeriali
 
   jmethodID m_platform = env->GetMethodID(c_params, "getPlatform", "()Ljava/lang/String;");
   jobject platform = env->CallObjectMethod(params, m_platform);
+  if (!WXCoreEnvironment::getInstance()->setPlatform(jString2Str(env, (jstring) platform))) {
+
+  }
   ADDSTRING(platform);
 
   jmethodID m_osVersion = env->GetMethodID(c_params, "getOsVersion", "()Ljava/lang/String;");
@@ -221,11 +225,17 @@ WeexProxy::initFromParam(JNIEnv *env, jstring script, jobject params, IPCSeriali
 
   jmethodID m_deviceWidth = env->GetMethodID(c_params, "getDeviceWidth", "()Ljava/lang/String;");
   jobject deviceWidth = env->CallObjectMethod(params, m_deviceWidth);
+  if (!WXCoreEnvironment::getInstance()->setDeviceWidth(jString2Str(env, (jstring) deviceWidth))) {
+
+  }
   ADDSTRING(deviceWidth);
 
   jmethodID m_deviceHeight = env->GetMethodID(c_params, "getDeviceHeight",
                                               "()Ljava/lang/String;");
   jobject deviceHeight = env->CallObjectMethod(params, m_deviceHeight);
+  if (!WXCoreEnvironment::getInstance()->setDeviceHeight(jString2Str(env, (jstring) deviceHeight))) {
+
+  }
   ADDSTRING(deviceHeight);
 
   jmethodID m_options = env->GetMethodID(c_params, "getOptions", "()Ljava/lang/Object;");

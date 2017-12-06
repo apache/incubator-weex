@@ -851,9 +851,9 @@ namespace WeexCore {
       return isnan(value);
     }
 
-    inline std::vector<WXCoreFlexLine *> getFlexLine() {
-      return mFlexLines;
-    }
+    float getTotalMainSize();
+
+    float getTotalCrossSize();
 
   private:
     float getLargestMainSize();

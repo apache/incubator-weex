@@ -27,7 +27,7 @@ namespace WeexCore {
 
     WXCorePerformance *mWXCorePerformance;
 
-    uint32_t command_count;
+    uint32_t layout_block_count;
 
     void pushRenderToMap(RenderObject *render);
 

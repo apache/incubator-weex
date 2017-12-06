@@ -27,6 +27,7 @@ add_library(weexjsc SHARED
     ./base/android/string/ScopedJString.cpp
     ./base/android/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
+    ./base/WXCoreEnvironment.cpp
 
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/BridgeAndroid.cpp
