@@ -110,6 +110,17 @@ static jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int ar
   return ret;
 }
 
+static char* getArgumentAsCStr(JNIEnv *env, IPCArguments *arguments, int argument) {
+  char* ret = nullptr;
+  if (arguments->getType(argument) == IPCType::STRING) {
+    const IPCString *s = arguments->getString(argument);
+    ret = (char *) malloc(s->length);
+    char *temp = (char *) &s->content;
+    strcpy(ret, temp);
+  }
+  return ret;
+}
+
 static jbyteArray getArgumentAsJByteArray(JNIEnv *env, IPCArguments *arguments, size_t argument) {
   jbyteArray ba = nullptr;
   if (argument >= arguments->getCount())
