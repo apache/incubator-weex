@@ -27,8 +27,6 @@ namespace WeexCore {
 
     WXCorePerformance *mWXCorePerformance;
 
-    uint32_t layout_block_count;
-
     void pushRenderToMap(RenderObject *render);
 
     void sendCreateBodyAction(RenderObject *render);
@@ -42,6 +40,8 @@ namespace WeexCore {
     void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
 
     void sendAddEventAction(RenderObject *render);
+
+    void sendCreateFinishAction();
 
     jobject mInstance_Impl_Android;
 

@@ -121,13 +121,13 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
         return IWXBridge.INSTANCE_RENDERING;
     }
 
-    @Override
-    public int callCreateFinish(String instanceId,  byte [] tasks, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callCreateFinish(instanceId, callback);
-        return IWXBridge.INSTANCE_RENDERING;
-    }
+//    @Override
+//    public int callCreateFinish(String instanceId,  byte [] tasks, String callback) {
+//        if (!mInit || mJsManager == null)
+//            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+//        mJsManager.callCreateFinish(instanceId, callback);
+//        return IWXBridge.INSTANCE_RENDERING;
+//    }
 
     @Override
     public int callRefreshFinish(String instanceId,  byte [] tasks, String callback) {

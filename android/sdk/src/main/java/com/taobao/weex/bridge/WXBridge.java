@@ -137,11 +137,12 @@ public class WXBridge implements IWXBridge {
   /**
    * Bridge module Js Method
    * support Sync or Async through setting  Annotation as {@link com.taobao.weex.annotation.JSMethod }
-   * @param instanceId  Instance ID
-   * @param module  the name of module
-   * @param method  the name of method
+   *
+   * @param instanceId Instance ID
+   * @param module     the name of module
+   * @param method     the name of method
    * @param arguments  the arguments of the method
-   * @param options  option arguments for extending
+   * @param options    option arguments for extending
    * @return the result
    */
   @Override
@@ -158,11 +159,12 @@ public class WXBridge implements IWXBridge {
 
   /**
    * Bridge component Js Method
-   * @param instanceId  Instance ID
-   * @param componentRef  the ref of component
-   * @param method  the name of method
-   * @param arguments  the arguments of the method
-   * @param options  option arguments for extending
+   *
+   * @param instanceId   Instance ID
+   * @param componentRef the ref of component
+   * @param method       the name of method
+   * @param arguments    the arguments of the method
+   * @param options      option arguments for extending
    */
   @Override
   public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
@@ -196,29 +198,6 @@ public class WXBridge implements IWXBridge {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e(TAG, "callCreateBody throw exception:" + e.getMessage());
       }
-    }
-    if (instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
-  public int callCreateFinish(String instanceId, byte[] tasks, String callback) {
-
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callCreateFinish(instanceId, callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      // if(WXEnvironment.isApkDebugable()){
-      WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
-      // }
     }
     if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
@@ -456,6 +435,16 @@ public class WXBridge implements IWXBridge {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e(TAG, "callReLayoutByWeexCore throw exception:" + e.getMessage());
       }
+    }
+    return errorCode;
+  }
+
+  public int callCreateFinishByWeexCore(String instanceId) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateFinishByWeexCore(instanceId);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
     }
     return errorCode;
   }

@@ -576,39 +576,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  // callCreateFinish
-  public int callCreateFinish(String instanceId, String callback) {
-    // if (WXEnvironment.isApkDebugable()) {
-    mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId)
-            .append(", callback:").append(callback);
-    WXLogUtils.d(mLodBuilder.substring(0));
-    mLodBuilder.setLength(0);
-    // }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getCreateFinish();
-        domModule.postAction((DOMAction) action, false);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_CREATEFINISH, "[WXBridgeManager] callCreateFinish exception " + e.getCause());
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
-
-  }
-
   // callRefreshFinish
   public int callRefreshFinish(String instanceId, String callback) {
     if (WXEnvironment.isApkDebugable()) {
@@ -2142,6 +2109,30 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callReLayout exception: ", e);
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callReLayout exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callCreateFinish
+  public int callCreateFinishByWeexCore(String instanceId) {
+    mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId);
+    WXLogUtils.d(mLodBuilder.substring(0));
+    mLodBuilder.setLength(0);
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      long start = System.currentTimeMillis();
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        instance.firstScreenCreateInstanceTime(start);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_CREATEFINISH, "[WXBridgeManager] callCreateFinish exception " + e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;

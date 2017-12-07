@@ -4,6 +4,7 @@
 #include <WeexCore/render/action/UpdateStyleAction.h>
 #include <WeexCore/render/action/LayoutRenderAction.h>
 #include <WeexCore/render/action/RenderAction.h>
+#include <WeexCore/render/action/CreateFinishAction.h>
 #include <Layout/WXCoreLayout.h>
 #include <base/android/string/StringUtils.h>
 #include <base/WXCorePerformance.h>
@@ -22,7 +23,6 @@ namespace WeexCore {
     mWXCorePerformance = new WXCorePerformance();
     mInstance_Impl_Android = nullptr;
     mInstance_Impl_iOS = nullptr;
-    layout_block_count = 0;
   }
 
   RenderPage::~RenderPage() {
@@ -92,7 +92,6 @@ namespace WeexCore {
         }
         break;
     }
-//    traverseTree(pRoot);
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
@@ -144,11 +143,6 @@ namespace WeexCore {
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
     sendAddElementAction(child, parent, insertPosition);
-//    if (layout_block_count > 2) {
-//      calculateLayout();
-//      layout_block_count=0;
-//    }
-//    layout_block_count++;
     calculateLayout();
   }
 
@@ -218,6 +212,7 @@ namespace WeexCore {
   void RenderPage::createFinish() {
     if (pRoot != nullptr)
       traverseTree(pRoot);
+    sendCreateFinishAction();
   }
 
   void RenderPage::addRenderAction(RenderAction *action) {
@@ -285,6 +280,12 @@ namespace WeexCore {
 
   void RenderPage::sendAddEventAction(RenderObject *render) {
 
+  }
+
+  void RenderPage::sendCreateFinishAction() {
+    CreateFinishAction *action = new CreateFinishAction();
+    action->GenerateAction(getPageId());
+    addRenderAction(action);
   }
 
   void RenderPage::jniCallTime(long long time) {

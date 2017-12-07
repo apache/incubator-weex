@@ -144,13 +144,9 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
   //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //task args[1]
-  jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
-  //callback args[2]
-  jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
-  flag = BridgeAndroid::getInstance()->callCreateFinish(jInstanceId, jTaskString, jCallback);
+  RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId));
 
   return createInt32Result(flag);
 }

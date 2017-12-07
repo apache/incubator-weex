@@ -34,9 +34,6 @@ namespace WeexCore {
     virtual int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                                  jstring &callback) = 0;
 
-    virtual int callCreateFinish(jstring &instanceId, jbyteArray &taskString,
-                                 jstring &callback) = 0;
-
     virtual int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                                   jstring &callback) = 0;
 

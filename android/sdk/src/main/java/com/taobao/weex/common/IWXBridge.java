@@ -77,8 +77,6 @@ public interface IWXBridge extends IWXObject {
 
   int callUpdateFinish(String instanceId,  byte [] tasks, String callback);
 
-  int callCreateFinish(String instanceId,  byte [] tasks, String callback);
-
   int callRefreshFinish(String instanceId,  byte [] tasks, String callback);
 
   int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback);

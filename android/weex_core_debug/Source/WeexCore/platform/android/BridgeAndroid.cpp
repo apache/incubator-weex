@@ -239,26 +239,6 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callCreateFinish(jstring &instanceId, jbyteArray &taskString,
-                                      jstring &callback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallCreateFinishMethodId == NULL) {
-      jCallCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
-                                                   "callCreateFinish",
-                                                   "(Ljava/lang/String;[BLjava/lang/String;)I");
-    }
-
-    int flag = env->CallIntMethod(jThis, jCallCreateFinishMethodId, instanceId, taskString,
-                                  callback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callCreateFinish");
-    }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(taskString);
-    env->DeleteLocalRef(callback);
-    return flag;
-  }
-
   int BridgeAndroid::callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                                        jstring &callback) {
     JNIEnv *env = getJNIEnv();
@@ -577,6 +557,22 @@ namespace WeexCore {
 
     env->DeleteLocalRef(jPageId);
     env->DeleteLocalRef(jRef);
+    return flag;
+  }
+
+  int BridgeAndroid::callCreateFinishByWeexCore(std::string &pageId) {
+    JNIEnv *env = getJNIEnv();
+    jmethodID jCallCreateFinishByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+                                                                     "callCreateFinishByWeexCore",
+                                                                     "(Ljava/lang/String;)I");
+
+    jstring jPageId = env->NewStringUTF(pageId.c_str());
+    int flag = env->CallIntMethod(jThis, jCallCreateFinishByWeexCoreMethodId, jPageId);
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callCreateFinish");
+    }
+
+    env->DeleteLocalRef(jPageId);
     return flag;
   }
 } //end WeexCore

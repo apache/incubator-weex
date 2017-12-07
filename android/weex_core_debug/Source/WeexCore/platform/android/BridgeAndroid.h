@@ -68,9 +68,6 @@ namespace WeexCore {
     int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                          jstring &callback);
 
-    int callCreateFinish(jstring &instanceId, jbyteArray &taskString,
-                         jstring &callback);
-
     int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                           jstring &callback);
 
@@ -117,6 +114,7 @@ namespace WeexCore {
                              int top, int bottom, int left, int right,
                              int height, int width);
 
+    int callCreateFinishByWeexCore(std::string &pageId);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h
