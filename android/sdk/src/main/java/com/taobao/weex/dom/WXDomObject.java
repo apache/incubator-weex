@@ -36,12 +36,16 @@ import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -75,7 +79,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     DESTROYED.mRef = "_destroyed";
   }
   private AtomicBoolean sDestroy = new AtomicBoolean();
-  
+
   private int mViewPortWidth =750;
 
   private DomContext mDomContext;
@@ -239,14 +243,14 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     }
     Object event = map.get("event");
     if (event != null && event instanceof JSONArray) {
-        WXEvent events = new WXEvent();
-        JSONArray eventArray = (JSONArray) event;
-        int count = eventArray.size();
-        for (int i = 0; i < count; i++) {
-            Object value = eventArray.get(i);
-            events.addEvent(value);
-        }
-        this.mEvents = events;
+      WXEvent events = new WXEvent();
+      JSONArray eventArray = (JSONArray) event;
+      int count = eventArray.size();
+      for (int i = 0; i < count; i++) {
+        Object value = eventArray.get(i);
+        events.addEvent(value);
+      }
+      this.mEvents = events;
     }
 
   }
@@ -312,6 +316,29 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     }
   }
 
+  @Override
+  public void setStyleHeight(float height) {
+    if(getStyles().containsKey(Constants.Name.OVERFLOW) && TextUtils.equals(Constants.Value.HIDDEN,
+            WXUtils.getString(getStyles().get(Constants.Name.OVERFLOW), null))
+            && !getStyles().containsKey(Constants.Name.MAX_HEIGHT)){
+      super.setStyleHeight(height);
+      super.setMaxHeight(height);
+    }else{
+      super.setStyleHeight(height);
+    }
+  }
+
+  @Override
+  public void setStyleWidth(float width) {
+    if(getStyles().containsKey(Constants.Name.OVERFLOW) && TextUtils.equals(Constants.Value.HIDDEN,
+            WXUtils.getString(getStyles().get(Constants.Name.OVERFLOW), null))
+            && !getStyles().containsKey(Name.MAX_WIDTH)){
+      super.setStyleWidth(width);
+      super.setMaxWidth(width);
+    }else{
+      super.setStyleWidth(width);
+    }
+  }
 
   public boolean isFixed() {
     return mStyles == null ? false : mStyles.isFixed();
@@ -440,41 +467,53 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     mEvents.remove(e);
   }
 
-  public void updateAttr(Map<String, Object> attrs) {
-    if (attrs == null || attrs.isEmpty()) {
+  public void updateAttr(Map<String, Object> updates) {
+    if(!diffUpdates(updates, getAttrs())){
       return;
     }
     if (mAttributes == null) {
       mAttributes = new WXAttr();
     }
-    mAttributes.putAll(attrs);
+    mAttributes.putAll(updates);
     if(hasNewLayout()){
-       markUpdateSeen();
+      markUpdateSeen();
     }
-    super.dirty();
+    if(shouldDirty(updates)) {
+      super.dirty();
+    }
   }
 
   public void updateStyle(Map<String, Object> styles){
     updateStyle(styles,false);
   }
 
-  public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
-    if (styles == null || styles.isEmpty()) {
-      return;
-    }
+  public void updateStyle(Map<String, Object> updates, boolean byPesudo) {
+    /**
+     * filter transform property
+     * */
     if(transition != null){
-      if(transition.hasTransitionProperty(styles)){
-        transition.startTransition(styles);
+      transition.updateTranstionParams(updates);
+      if(transition.hasTransitionProperty(updates)){
+        transition.startTransition(updates);
       }
     }
-    if (mStyles == null) {
+    /**
+     * diff styles
+     * */
+    if(!diffUpdates(updates, getStyles())){
+      return;
+    }
+
+    if(mStyles == null) {
       mStyles = new WXStyle();
     }
-    mStyles.putAll(styles,byPesudo);
+    mStyles.putAll(updates,byPesudo);
     if(transition == null){
       this.transition = WXTransition.fromMap(mStyles, this);
     }
-    super.dirty();
+    if(shouldDirty(updates)) {
+      super.dirty();
+    }
   }
 
 
@@ -757,5 +796,112 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   public void setCloneThis(boolean cloneThis) {
     this.cloneThis = cloneThis;
+  }
+
+  /**
+   * diff updates with source, return same value with source on updates map
+   * if has update return true, else return false;
+   * */
+  private static boolean diffUpdates(Map<String,Object> updates, Map<String,Object> source){
+    if(updates == null){
+      return  false;
+    }
+    Set<Map.Entry<String,Object>> entries = updates.entrySet();
+    Iterator<Map.Entry<String,Object>> it = entries.iterator();
+    while (it.hasNext()){
+      Map.Entry<String,Object> entry =  it.next();
+      Object old = source.get(entry.getKey());
+      if(entry.getValue() == old){
+        it.remove();
+        continue;
+      }
+      if(old == null){
+        continue;
+      }
+      if(old.equals(entry.getValue())){
+        it.remove();
+        continue;
+      }
+    }
+    return updates.size() > 0;
+  }
+
+  private static boolean shouldDirty(Map<String,Object> updates){
+    Set<Map.Entry<String, Object>>   entries =  updates.entrySet();
+    for(Map.Entry<String, Object> entry : entries){
+      if(dirtyStyle.contains(entry.getKey())){
+        return  true;
+      }
+    }
+    return  false;
+  }
+
+  private static final Set<String> dirtyStyle = new HashSet<>();
+  static {
+    dirtyStyle.add(Name.DEFAULT_HEIGHT);
+    dirtyStyle.add(Name.DEFAULT_WIDTH);
+    dirtyStyle.add(Name.WIDTH);
+    dirtyStyle.add(Name.MIN_WIDTH);
+    dirtyStyle.add(Name.MAX_WIDTH);
+    dirtyStyle.add(Name.HEIGHT);
+    dirtyStyle.add(Name.MIN_HEIGHT);
+    dirtyStyle.add(Name.MAX_HEIGHT);
+    dirtyStyle.add(Name.ALIGN_ITEMS);
+    dirtyStyle.add(Name.ALIGN_SELF);
+    dirtyStyle.add(Name.FLEX);
+    dirtyStyle.add(Name.FLEX_DIRECTION);
+    dirtyStyle.add(Name.JUSTIFY_CONTENT);
+    dirtyStyle.add(Name.FLEX_WRAP);
+    dirtyStyle.add(Name.MARGIN);
+    dirtyStyle.add(Name.MARGIN_TOP);
+    dirtyStyle.add(Name.MARGIN_LEFT);
+    dirtyStyle.add(Name.MARGIN_RIGHT);
+    dirtyStyle.add(Name.MARGIN_BOTTOM);
+    dirtyStyle.add(Name.PADDING);
+    dirtyStyle.add(Name.PADDING_TOP);
+    dirtyStyle.add(Name.PADDING_LEFT);
+    dirtyStyle.add(Name.PADDING_RIGHT);
+    dirtyStyle.add(Name.PADDING_BOTTOM);
+    dirtyStyle.add(Name.LEFT);
+    dirtyStyle.add(Name.TOP);
+    dirtyStyle.add(Name.RIGHT);
+    dirtyStyle.add(Name.BOTTOM);
+    dirtyStyle.add(Name.BORDER_WIDTH);
+    dirtyStyle.add(Name.BORDER_TOP_WIDTH);
+    dirtyStyle.add(Name.BORDER_RIGHT_WIDTH);
+    dirtyStyle.add(Name.BORDER_BOTTOM_WIDTH);
+    dirtyStyle.add(Name.BORDER_LEFT_WIDTH);
+
+    dirtyStyle.add(Name.POSITION);
+    dirtyStyle.add(Name.TEXT_DECORATION);
+    dirtyStyle.add(Name.TEXT_ALIGN);
+    dirtyStyle.add(Name.FONT_WEIGHT);
+    dirtyStyle.add(Name.FONT_STYLE);
+    dirtyStyle.add(Name.FONT_SIZE);
+    dirtyStyle.add(Name.COLOR);
+    dirtyStyle.add(Name.LINES);
+    dirtyStyle.add(Name.FONT_FAMILY);
+    dirtyStyle.add(Name.TEXT_OVERFLOW);
+    dirtyStyle.add(Name.ELLIPSIS);
+    dirtyStyle.add(Name.LINE_HEIGHT);
+    dirtyStyle.add(Name.VALUE);
+    dirtyStyle.add(Name.OVERFLOW);
+    dirtyStyle.add(Name.SINGLELINE);
+    dirtyStyle.add(Name.MAX_LENGTH);
+    dirtyStyle.add(Name.MAXLENGTH);
+    dirtyStyle.add(Name.ROWS);
+    dirtyStyle.add(Name.VISIBILITY);
+    dirtyStyle.add(Name.ITEM_SIZE);
+    dirtyStyle.add(Name.DISPLAY);
+    dirtyStyle.add(Name.RESIZE);
+    dirtyStyle.add(Name.FONT_FACE);
+    dirtyStyle.add(Name.MAX);
+    dirtyStyle.add(Name.MIN);
+    dirtyStyle.add(Name.FONT_FACE);
+
+  }
+
+  public static void addDirtyKey(String key){
+    dirtyStyle.add(key);
   }
 }
