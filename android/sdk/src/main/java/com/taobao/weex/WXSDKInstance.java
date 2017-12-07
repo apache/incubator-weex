@@ -349,6 +349,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mNativeInvokeHelper;
   }
 
+  @Deprecated
   public void setBizType(String bizType) {
     if (!TextUtils.isEmpty(bizType)) {
       mWXPerformance.bizType = bizType;
@@ -442,6 +443,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    mWXPerformance.renderTimeOrigin = System.currentTimeMillis();
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
       WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
 
@@ -1200,6 +1202,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
+    mWXPerformance.fsRenderTime = System.currentTimeMillis();
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
     WXLogUtils.renderPerformanceLog("   firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
     WXLogUtils.renderPerformanceLog("   firstScreenCallNativeTime", mWXPerformance.callNativeTime);
