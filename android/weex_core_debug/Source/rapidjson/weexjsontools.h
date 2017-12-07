@@ -1,7 +1,6 @@
 #ifndef WEEX_JSON_TOOLS
 #define WEEX_JSON_TOOLS
 
-#include <vector>
 #include "pointer.h"
 
 namespace WeexCore {
@@ -119,8 +118,6 @@ namespace WeexCore {
  * @return {@link RenderObject*}
  */
   RenderObject *json2RenderObject(char *data, RenderPage *page);
-
-  bool json2Pair(char *data, std::vector<std::pair<std::string, std::string>> &pairs);
 }
 
 #endif //WEEX_JSON_TOOLS

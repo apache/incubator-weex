@@ -183,7 +183,6 @@ namespace WeexCore {
       return;
 
     render->addStyle(key, value);
-    calculateLayout();
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {

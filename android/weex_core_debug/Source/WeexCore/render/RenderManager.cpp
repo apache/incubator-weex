@@ -47,15 +47,11 @@ namespace WeexCore {
     }
   }
 
-  void RenderManager::updateStyle(std::string pageId, std::string ref, std::string data) {
+  void RenderManager::updateStyle(std::string pageId, std::string ref, std::string key,
+                                  std::string value) {
     RenderPage *page = this->getPage(pageId);
     if (page != nullptr) {
-      char *c_data = (char *) data.data();
-      std::vector<std::pair<std::string, std::string>> styles;
-      json2Pair(c_data, styles);
-      for (int i = 0; i < styles.size(); ++i) {
-        page->updateStyle(ref, styles[i].first, styles[i].second);
-      }
+      page->updateStyle(ref, key, value);
     }
   }
 
