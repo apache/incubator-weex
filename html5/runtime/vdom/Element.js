@@ -30,7 +30,6 @@ import {
 } from './operation'
 import { uniqueId } from '../utils'
 import { getWeexElement, setElement } from './WeexElement'
-import { filterDirective } from './directive'
 
 const DEFAULT_TAG_NAME = 'div'
 const BUBBLE_EVENTS = [
@@ -289,11 +288,29 @@ export default class Element extends Node {
     const taskCenter = getTaskCenter(this.docId)
     if (!silent && taskCenter) {
       const result = {}
-      result[key] = filterDirective(value)
+      result[key] = value
       taskCenter.send(
         'dom',
         { action: 'updateAttrs' },
         [this.ref, result]
+      )
+    }
+  }
+
+  /**
+   * Set batched attributes.
+   * @param {object} batchedAttrs
+   * @param {boolean} silent
+   */
+  setAttrs (batchedAttrs, silent) {
+    // TODO: validate batched attributes
+    Object.assign(this.attr, batchedAttrs)
+    const taskCenter = getTaskCenter(this.docId)
+    if (!silent && taskCenter) {
+      taskCenter.send(
+        'dom',
+        { action: 'updateAttrs' },
+        [this.ref, batchedAttrs]
       )
     }
   }
@@ -317,6 +334,24 @@ export default class Element extends Node {
         'dom',
         { action: 'updateStyle' },
         [this.ref, result]
+      )
+    }
+  }
+
+  /**
+   * Set batched style properties.
+   * @param {object} batchedStyles
+   * @param {boolean} silent
+   */
+  setStyles (batchedStyles, silent) {
+    // TODO: validate batched styles
+    Object.assign(this.style, batchedStyles)
+    const taskCenter = getTaskCenter(this.docId)
+    if (!silent && taskCenter) {
+      taskCenter.send(
+        'dom',
+        { action: 'updateStyle' },
+        [this.ref, batchedStyles]
       )
     }
   }
@@ -435,7 +470,7 @@ export default class Element extends Node {
     const result = {
       ref: this.ref.toString(),
       type: this.type,
-      attr: filterDirective(this.attr),
+      attr: this.attr,
       style: this.toStyle()
     }
     const event = []

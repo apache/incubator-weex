@@ -44,16 +44,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCellDomObject;
-import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXRecyclerDomObject;
@@ -70,6 +68,7 @@ import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.binding.Layouts;
 import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.list.RecyclerTransform;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
@@ -132,6 +131,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private boolean isScrollable = true;
     private int mOffsetAccuracy = 10;
     private Point mLastReport = new Point(-1, -1);
+    private boolean mHasAddScrollEvent = false;
 
     private JSONArray listData;
     private String listDataKey = Constants.Name.Recycler.LIST_DATA;
@@ -146,6 +146,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private Runnable listUpdateRunnable;
     private ConcurrentHashMap<String, TemplateCache> mTemplatesCache;
     private int templateCacheSize = 2;
+
+
+    /**
+     * scroll start and scroll end event
+     * */
+    private ScrollStartEndHelper mScrollStartEndHelper;
+
 
 
     /**
@@ -235,6 +242,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         bounceRecyclerView.getInnerView().setItemAnimator(null);
         if(itemViewCacheSize != 2) {
             bounceRecyclerView.getInnerView().setItemViewCacheSize(itemViewCacheSize);
+        }
+        if(bounceRecyclerView.getSwipeLayout()  != null){
+            if(WXUtils.getBoolean(getDomObject().getAttrs().get("nestedScrollingEnabled"), false)) {
+                bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
+            }
         }
         bounceRecyclerView.getInnerView().setHasFixedSize(hasFixedSize);
         bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
@@ -827,7 +839,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     @Override
     public void addEvent(String type) {
         super.addEvent(type);
-        if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
+        if (ScrollStartEndHelper.isScrollEvent(type)
+                && getHostView() != null
+                && getHostView().getInnerView() != null
+                && !mHasAddScrollEvent) {
+            mHasAddScrollEvent = true;
             WXRecyclerView innerView = getHostView().getInnerView();
             innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 private int offsetXCorrection, offsetYCorrection;
@@ -852,7 +868,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         offsetX = offsetX - offsetXCorrection;
                         offsetY = offsetY - offsetYCorrection;
                     }
-
+                    getScrollStartEndHelper().onScrolled(offsetX, offsetY);
+                    if(!getDomObject().getEvents().contains(Constants.Event.SCROLL)){
+                        return;
+                    }
                     if (mFirstEvent) {
                         //skip first event
                         mFirstEvent = false;
@@ -868,6 +887,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
     private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+        fireEvent(Constants.Event.SCROLL, getScrollEvent(recyclerView, offsetX, offsetY));
+    }
+
+    public Map<String, Object> getScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY){
         offsetY = -calcContentOffset(recyclerView);
         int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
         int contentHeight = calcContentSize();
@@ -883,9 +906,10 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
         event.put(Constants.Name.CONTENT_SIZE, contentSize);
         event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-        fireEvent(Constants.Event.SCROLL, event);
+        return event;
     }
+
+
 
     private boolean shouldReport(int offsetX, int offsetY) {
         if (mLastReport.x == -1 && mLastReport.y == -1) {
@@ -915,23 +939,23 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private boolean setRefreshOrLoading(final WXComponent child) {
         if (child instanceof WXRefresh && getHostView() != null) {
             getHostView().setOnRefreshListener((WXRefresh) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setHeaderView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
 
         if (child instanceof WXLoading && getHostView() != null) {
             getHostView().setOnLoadingListener((WXLoading) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setFooterView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
         return false;
@@ -1335,7 +1359,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     int key = childLisener.getHostView().hashCode();
                     if(appear){
                         if(!componentDisAppearList.containsKey(key)){
-                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.APPEAR, direction);
+                            childLisener.notifyAppearStateChange(Constants.Event.APPEAR, direction);
                             List<Object> eventArgs = null;
                             if(childLisener.getDomObject().getEvents() != null
                                     && childLisener.getDomObject().getEvents().getEventBindingArgsValues() != null
@@ -1346,7 +1370,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }else{
                         if(componentDisAppearList.containsKey(key)){
-                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
+                            childLisener.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
                             componentDisAppearList.remove(key);
                         }
                     }
@@ -1384,7 +1408,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 Set<Map.Entry<Integer, List<Object>>> eventWatcherEntries = eventWatchers.entrySet();
                 for(Map.Entry<Integer, List<Object>> eventWatcherEntry : eventWatcherEntries){
                     events.putEventBindingArgsValue(Constants.Event.DISAPPEAR, eventWatcherEntry.getValue());
-                    component.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
+                    component.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
                 }
                 eventWatchers.clear();
             }
@@ -1427,7 +1451,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return totalHeight;
     }
 
-    private int calcContentOffset(RecyclerView recyclerView) {
+    public int calcContentOffset(RecyclerView recyclerView) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
@@ -1638,5 +1662,12 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 WXLogUtils.d(TAG, "doInitLazyCell idle" + inPreload + template + " bindData used " + (System.currentTimeMillis() - start));
             }
         }
+    }
+
+    public ScrollStartEndHelper getScrollStartEndHelper() {
+        if(mScrollStartEndHelper == null){
+            mScrollStartEndHelper = new ScrollStartEndHelper(this);
+        }
+        return mScrollStartEndHelper;
     }
 }

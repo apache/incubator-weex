@@ -176,9 +176,35 @@ vue: {
 
 * not to prevent default behaviour of click events unless the click-binding element is inside a `<a>` link, or it is a `<a>` link and has a `prevent` attribute on it.
 
-#### 0.12.17
+#### 0.12.18
 
 * support offset appear.
+* fix lazyload failing when frequently updating images' src. Typical scenario is skeleton replacing.
+
+#### 0.12.20
+
+* fix scrollToElement on latest chrome.
+
+#### 0.12.21
+
+* fix `stream.fetch` for adding wrong suffix to the request url.
+
+#### 0.12.22
+
+* fix image lazyloading.
+
+#### 0.12.24
+
+* add try catch to accessing localStorage.
+* support image sprite.
+
+#### 0.12.25
+
+* fix indicator position in one page slider.
+
+#### 0.12.26
+
+* fix unit wx, which is a straight px value not to adapt to screens.
 
 ## component -> dom map
 

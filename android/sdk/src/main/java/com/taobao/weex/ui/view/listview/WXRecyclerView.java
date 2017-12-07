@@ -28,7 +28,6 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
@@ -42,6 +41,8 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   public static final int TYPE_STAGGERED_GRID_LAYOUT = 3;
   private WXGesture mGesture;
   private boolean scrollable = true;
+  private boolean hasTouch = false;
+
 
   public WXRecyclerView(Context context) {
     super(context);
@@ -55,10 +56,6 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     this.scrollable = scrollable;
   }
 
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
   public void initView(Context context, int type,int orientation) {
     initView(context,type, Constants.Value.COLUMN_COUNT_NORMAL,Constants.Value.COLUMN_GAP_NORMAL,orientation);
   }
@@ -91,6 +88,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     if(!scrollable) {
       return true;
     }
+    hasTouch = true;
     boolean result = super.onTouchEvent(event);
     if (mGesture != null) {
       result |= mGesture.onTouch(this, event);
@@ -110,26 +108,31 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
       }
       //Any else?
     } else {
+      smoothScrollToPosition(position);
       if (offset != 0) {
         setOnSmoothScrollEndListener(new ExtendedLinearLayoutManager.OnSmoothScrollEndListener() {
           @Override
           public void onStop() {
-            if (orientation == Constants.Orientation.VERTICAL) {
-                smoothScrollBy(0, offset);
-            } else {
-                smoothScrollBy(offset, 0);
-            }
+            post(WXThread.secure(new Runnable() {
+              @Override
+              public void run() {
+                if (orientation == Constants.Orientation.VERTICAL) {
+                  smoothScrollBy(0, offset);
+                } else {
+                  smoothScrollBy(offset, 0);
+                }
+              }
+            }));
           }
         });
       }
-      smoothScrollToPosition(position);
     }
   }
 
   public void setOnSmoothScrollEndListener(final ExtendedLinearLayoutManager.OnSmoothScrollEndListener onSmoothScrollEndListener){
-    if(getLayoutManager() instanceof ExtendedLinearLayoutManager){
+    if(getLayoutManager() instanceof ExtendedLinearLayoutManager && !hasTouch){
        ExtendedLinearLayoutManager extendedLinearLayoutManager = (ExtendedLinearLayoutManager)getLayoutManager();
-       extendedLinearLayoutManager.setOnScrollEndListener(onSmoothScrollEndListener);
+      extendedLinearLayoutManager.setOnScrollEndListener(onSmoothScrollEndListener);
     }else{
       addOnScrollListener(new RecyclerView.OnScrollListener() {
         @Override

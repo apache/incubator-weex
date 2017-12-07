@@ -31,7 +31,6 @@ import com.taobao.weex.utils.WXLogUtils;
 public class WXThread extends HandlerThread {
 
   private Handler mHandler;
-  private static final String SYSTEM_ACTION_PREFIX = "android.view.";
 
   static class SafeRunnable implements Runnable {
 
@@ -53,6 +52,7 @@ public class WXThread extends HandlerThread {
           WXLogUtils.e(TAG,"SafeRunnable run throw expection:"+e.getMessage());
           throw e;
         }
+        WXLogUtils.w(TAG, e);
       }
     }
   }
@@ -85,19 +85,12 @@ public class WXThread extends HandlerThread {
 
   /**
    * Secure Runnable to prevent throw during execution.
+   * NOTE: DO NOT use this method to wrap runnable that may be removed by {@link Handler#removeCallbacks(Runnable)}
    * @param runnable
    * @return
    */
   public static Runnable secure(Runnable runnable){
     if(runnable == null || runnable instanceof SafeRunnable){
-      return runnable;
-    }
-    String className = runnable.getClass().getCanonicalName();
-    if (className != null && className.startsWith(SYSTEM_ACTION_PREFIX)) {
-      /**
-       * Ignore the Runnable send from system such as {@link android.view.View$CheckForTap},
-       * because system need identify it on {@link android.view.View#removeCallbacks(Runnable)}}
-       */
       return runnable;
     }
     return new SafeRunnable(runnable);

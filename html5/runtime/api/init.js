@@ -18,9 +18,11 @@
  */
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
+import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
+import { track } from '../bridge/debug'
 import WeexInstance from './WeexInstance'
 
 let frameworks
@@ -116,6 +118,15 @@ function createInstance (id, code, config, data) {
   if (!framework) {
     return new Error(`invalid bundle type "${bundleType}".`)
   }
+  if (bundleType === 'Weex') {
+    console.error(`[JS Framework] COMPATIBILITY WARNING: `
+      + `Weex DSL 1.0 (.we) framework is no longer supported! `
+      + `It will be removed in the next version of WeexSDK, `
+      + `your page would be crash if you still using the ".we" framework. `
+      + `Please upgrade it to Vue.js or Rax.`)
+  }
+
+  track(id, 'bundleType', bundleType)
 
   // run create instance
   if (typeof framework.prepareInstanceContext === 'function') {
@@ -151,7 +162,14 @@ function runInContext (code, context) {
 const methods = {
   createInstance,
   registerService: register,
-  unregisterService: unregister
+  unregisterService: unregister,
+  callJS (id, tasks) {
+    const framework = frameworks[getFrameworkType(id)]
+    if (framework && typeof framework.receiveTasks === 'function') {
+      return framework.receiveTasks(id, tasks)
+    }
+    return receiveTasks(id, tasks)
+  }
 }
 
 /**
@@ -186,23 +204,6 @@ function genInstance (methodName) {
       }
 
       return result
-    }
-    return new Error(`invalid instance id "${id}"`)
-  }
-}
-
-/**
- * Adapt some legacy method(s) which will be called for each instance. These
- * methods should be deprecated and removed later.
- * @param {string} methodName
- * @param {string} nativeMethodName
- */
-function adaptInstance (methodName, nativeMethodName) {
-  methods[nativeMethodName] = function (...args) {
-    const id = args[0]
-    const type = getFrameworkType(id)
-    if (type && frameworks[type]) {
-      return frameworks[type][methodName](...args)
     }
     return new Error(`invalid instance id "${id}"`)
   }
@@ -246,9 +247,7 @@ export default function init (config) {
   adaptMethod('registerModules', registerModules)
   adaptMethod('registerMethods')
 
-  ; ['destroyInstance', 'refreshInstance', 'receiveTasks', 'getRoot'].forEach(genInstance)
-
-  adaptInstance('receiveTasks', 'callJS')
+  ; ['destroyInstance', 'refreshInstance', 'getRoot'].forEach(genInstance)
 
   return methods
 }

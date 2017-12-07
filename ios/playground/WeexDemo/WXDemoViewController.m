@@ -91,6 +91,15 @@
 - (void)viewDidLayoutSubviews
 {
     _weexHeight = self.view.frame.size.height;
+    UIEdgeInsets safeArea = UIEdgeInsetsZero;
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        safeArea = self.view.safeAreaInsets;
+    } else {
+        // Fallback on earlier versions
+    }
+#endif
+    _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.bottom);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -119,7 +128,17 @@
     }
     
     _instance.viewController = self;
-    _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
+    UIEdgeInsets safeArea = UIEdgeInsetsZero;
+    
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        safeArea = self.view.safeAreaInsets;
+    } else {
+        // Fallback on earlier versions
+    }
+#endif
+    
+    _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight-safeArea.bottom);
     
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {

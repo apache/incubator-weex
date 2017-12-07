@@ -113,10 +113,7 @@ WX_EXPORT_METHOD(@selector(onclose:))
         if(sendData){
             [loader send:sendData];
         }
-        
     }
-    
-    
 }
 
 - (void)close

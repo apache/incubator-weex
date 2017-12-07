@@ -24,23 +24,34 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewParentCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
-public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent {
+public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent, NestedScrollingChild {
 
-  private NestedScrollingParentHelper parentHelper;
+  private NestedScrollingParentHelper mNestedScrollingParentHelper;
+  private NestedScrollingChildHelper mNestedScrollingChildHelper;
+  private final int[] mParentScrollConsumed = new int[2];
+  private final int[] mParentOffsetInWindow = new int[2];
+  private boolean mNestedScrollInProgress;
   private WXOnRefreshListener onRefreshListener;
   private WXOnLoadingListener onLoadingListener;
+
+  private ViewParent mNestedScrollAcceptedParent;
 
   /**
    * On refresh Callback, call on start refresh
@@ -143,7 +154,9 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       throw new RuntimeException("WXSwipeLayout should not have more than one child");
     }
 
-    parentHelper = new NestedScrollingParentHelper(this);
+    mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
+    mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
+    setNestedScrollingEnabled(false);
 
     if (isInEditMode() && attrs == null) {
       return;
@@ -203,31 +216,125 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
     if ((!mPullRefreshEnable && !mPullLoadEnable)) {
       return false;
     }
+    if (!isEnabled() || canChildScrollUp()
+            || mRefreshing || mNestedScrollInProgress) {
+      // Fail fast if we're not in a state where a swipe is possible
+      return false;
+    }
+
     return super.onInterceptTouchEvent(ev);
+  }
+
+  // NestedScrollingChild
+
+  @Override
+  public void setNestedScrollingEnabled(boolean enabled) {
+    mNestedScrollingChildHelper.setNestedScrollingEnabled(enabled);
+  }
+
+  @Override
+  public boolean isNestedScrollingEnabled() {
+    return mNestedScrollingChildHelper.isNestedScrollingEnabled();
+  }
+
+  @Override
+  public boolean startNestedScroll(int axes) {
+    boolean result = mNestedScrollingChildHelper.startNestedScroll(axes);
+    if(result){
+       if(mNestedScrollAcceptedParent == null){
+            ViewParent parent  = this.getParent();
+            View child = this;
+            while (parent != null) {
+              if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
+                 mNestedScrollAcceptedParent = parent;
+                 break;
+              }
+              if(parent instanceof  View){
+                child = (View) parent;
+              }
+              parent = parent.getParent();
+            }
+       }
+    }
+    return result;
+  }
+
+  @Override
+  public void stopNestedScroll() {
+    mNestedScrollingChildHelper.stopNestedScroll();
+    if(mNestedScrollAcceptedParent != null){
+      mNestedScrollAcceptedParent = null;
+    }
+  }
+
+  @Override
+  public boolean hasNestedScrollingParent() {
+    return mNestedScrollingChildHelper.hasNestedScrollingParent();
+  }
+
+  @Override
+  public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed,
+                                      int dyUnconsumed, int[] offsetInWindow) {
+    return mNestedScrollingChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed,
+            dxUnconsumed, dyUnconsumed, offsetInWindow);
+  }
+
+  @Override
+  public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow) {
+    return mNestedScrollingChildHelper.dispatchNestedPreScroll(
+            dx, dy, consumed, offsetInWindow);
+  }
+
+
+
+  @Override
+  public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed) {
+    return mNestedScrollingChildHelper.dispatchNestedFling(velocityX, velocityY, consumed);
+  }
+
+  @Override
+  public boolean dispatchNestedPreFling(float velocityX, float velocityY) {
+    return mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY);
   }
 
   /*********************************** NestedScrollParent *************************************/
 
+
+  @Override
+  public boolean onNestedPreFling(View target, float velocityX,
+                                  float velocityY) {
+    if(isNestedScrollingEnabled()) {
+      return dispatchNestedPreFling(velocityX, velocityY);
+    }
+    return  false;
+  }
+
+  @Override
+  public boolean onNestedFling(View target, float velocityX, float velocityY,
+                               boolean consumed) {
+    if(isNestedScrollingEnabled()) {
+      return dispatchNestedFling(velocityX, velocityY, consumed);
+    }
+    return  false;
+  }
+
   @Override
   public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-    return true;
+    boolean result =  isEnabled()  && !mRefreshing
+            && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
+
+    return  result;
   }
 
   @Override
   public void onNestedScrollAccepted(View child, View target, int axes) {
-    parentHelper.onNestedScrollAccepted(child, target, axes);
+    mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
+    if(isNestedScrollingEnabled()){
+      startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
+      mNestedScrollInProgress = true;
+    }
   }
 
-  /**
-   * Callback on TouchEvent.ACTION_CANCLE or TouchEvent.ACTION_UP
-   * handler : refresh or loading
-   * @param child : child view of SwipeLayout,RecyclerView or Scroller
-   */
-  @Override
-  public void onStopNestedScroll(View child) {
-    parentHelper.onStopNestedScroll(child);
-    handlerAction();
-  }
 
   /**
    * With child view to processing move events
@@ -238,46 +345,103 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
    */
   @Override
   public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+    // Now let our nested parent consume the leftovers
+    final int[] parentConsumed = mParentScrollConsumed;
+    if(isNestedScrollingEnabled()){
+      if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
+        consumed[0] += parentConsumed[0];
+        consumed[1] += parentConsumed[1];
+        return;
+      }
+    }
     if ((!mPullRefreshEnable && !mPullLoadEnable)) {
       return;
     }
 
-    dy = (int) calculateDistanceY(target, dy);
+    /**
+     * when in nest-scroll, list canChildScrollUp() false,
+     * maybe parent scroll can scroll up
+     * */
+    if(!canChildScrollUp() && isNestedScrollingEnabled()){
+      if(mNestedScrollAcceptedParent != null && mNestedScrollAcceptedParent != mTargetView){
+        ViewGroup group = (ViewGroup) mNestedScrollAcceptedParent;
+        if(group.getChildCount() > 0){
+          int count = group.getChildCount();
+          for(int i=0; i<count; i++){
+            View view  = group.getChildAt(i);
+            if(view.getVisibility() != View.GONE && view.getMeasuredHeight() > 0){
+              if(view.getTop() < 0){
+                return;
+              }else{
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    int spinnerDy = (int) calculateDistanceY(target, dy);
 
     if (!isConfirm) {
-      if (dy < 0 && !canChildScrollUp()) {
+      if (spinnerDy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;
         isConfirm = true;
-      } else if (dy > 0 && !canChildScrollDown() && (!mRefreshing)) {
+      } else if (spinnerDy > 0 && !canChildScrollDown() && (!mRefreshing)) {
         mCurrentAction = LOAD_MORE;
         isConfirm = true;
       }
     }
 
-    if (moveSpinner(-dy)) {
-      consumed[1] += dy;
+    if (moveSpinner(-spinnerDy)) {
+      if (!canChildScrollUp() && mPullRefreshEnable
+              && mTargetView.getTranslationY() > 0
+              && dy > 0) {
+        consumed[1] += dy;
+      }else if (!canChildScrollDown() && mPullLoadEnable
+              && mTargetView.getTranslationY() < 0
+              && dy < 0){
+         consumed[1] += dy;
+      }else{
+        consumed[1] += spinnerDy;
+      }
     }
   }
 
   @Override
-  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-
-  }
-
-  @Override
   public int getNestedScrollAxes() {
-    return parentHelper.getNestedScrollAxes();
+    return mNestedScrollingParentHelper.getNestedScrollAxes();
   }
 
+
+  /**
+   * Callback on TouchEvent.ACTION_CANCLE or TouchEvent.ACTION_UP
+   * handler : refresh or loading
+   * @param child : child view of SwipeLayout,RecyclerView or Scroller
+   */
   @Override
-  public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-    return false;
+  public void onStopNestedScroll(View child) {
+    mNestedScrollingParentHelper.onStopNestedScroll(child);
+    handlerAction();
+    if(isNestedScrollingEnabled()) {
+      mNestedScrollInProgress = true;
+      stopNestedScroll();
+    }
   }
 
+
   @Override
-  public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed) {
-    return false;
+  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+    if(isNestedScrollingEnabled()) {
+      dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
+    }
   }
+
+
+
+
 
   private double calculateDistanceY(View target, int dy) {
     int viewHeight = target.getMeasuredHeight();

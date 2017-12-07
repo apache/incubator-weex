@@ -268,6 +268,11 @@
 		841CD1051F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841CD1061F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841CD1071F974E000081196D /* WXExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CD1021F9739890081196D /* WXExceptionUtils.m */; };
+		9B9E74791FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */; };
+		BA5F00F11FC5AFFE00F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
+		BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */; };
+		BA5F00F31FC6834900F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
+		BA5F00F41FC6834C00F76B5C /* WXLocaleModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */; };
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
@@ -857,6 +862,10 @@
 		77E65A181C155F25008B8775 /* WXScrollerComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXScrollerComponent.m; sourceTree = "<group>"; };
 		841CD1021F9739890081196D /* WXExceptionUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExceptionUtils.m; sourceTree = "<group>"; };
 		841CD1041F97399C0081196D /* WXExceptionUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXExceptionUtils.h; sourceTree = "<group>"; };
+		9B9E74771FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestBridgeMethodDummy.h; sourceTree = "<group>"; };
+		9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestBridgeMethodDummy.m; sourceTree = "<group>"; };
+		BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLocaleModule.h; sourceTree = "<group>"; };
+		BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXLocaleModule.m; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
@@ -1190,6 +1199,8 @@
 			isa = PBXGroup;
 			children = (
 				74F7BFF41DC782EC004D0871 /* testRootView.js */,
+				9B9E74771FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.h */,
+				9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1406,6 +1417,8 @@
 		77E659D71C07F585008B8775 /* Module */ = {
 			isa = PBXGroup;
 			children = (
+				BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */,
+				BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */,
 				DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */,
 				DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */,
 				333D9A251F41507A007CED39 /* WXTransition.h */,
@@ -1696,6 +1709,7 @@
 				74D205201E091B8000128F44 /* WXCallJSMethod.h in Headers */,
 				741DFE061DDD9B30009B020F /* UIBezierPath+Weex.h in Headers */,
 				2AAFC1B61C48DFF70026D2FE /* WXSDKError.h in Headers */,
+				BA5F00F11FC5AFFE00F76B5C /* WXLocaleModule.h in Headers */,
 				742AD72E1DF98C45007DC46C /* WXResourceRequest.h in Headers */,
 				D317338C1C57257000BB7539 /* WXTransform.h in Headers */,
 				77D161301C02DE4E0010B15B /* WXComponent.h in Headers */,
@@ -1771,6 +1785,7 @@
 				DCA445EC1EFA5A0E00D0CFA8 /* WXTextAreaComponent.h in Headers */,
 				DCA445D81EFA599400D0CFA8 /* WXRootView.h in Headers */,
 				DCA446131EFA5A8C00D0CFA8 /* WXCallJSMethod.h in Headers */,
+				BA5F00F31FC6834900F76B5C /* WXLocaleModule.h in Headers */,
 				74B81AED1F73C3E900D3A61D /* WXCellSlotComponent.h in Headers */,
 				DCA445E41EFA59DC00D0CFA8 /* WXVideoComponent.h in Headers */,
 				DCA4460B1EFA5A7200D0CFA8 /* WXAssert.h in Headers */,
@@ -2090,6 +2105,7 @@
 				74B8BF011DC49AFE004A6027 /* WXRootViewTests.m in Sources */,
 				597334B11D4D9E7F00988789 /* WXSDKManagerTests.m in Sources */,
 				74C896401D2AC2210043B82A /* WeexSDKTests.m in Sources */,
+				9B9E74791FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m in Sources */,
 				598805AD1D52D8C800EDED2C /* WXStorageTests.m in Sources */,
 				C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */,
 			);
@@ -2135,6 +2151,7 @@
 				744BEA5A1D0520F300452B5D /* WXComponent+Layout.m in Sources */,
 				59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */,
 				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */,
+				BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */,
 				74BB5FBA1DFEE81A004FC3DF /* WXMetaModule.m in Sources */,
 				741081201CED585A001BC6E5 /* WXComponentManager.m in Sources */,
 				1D3000F21D40B9AC004F3B4F /* WXClipboardModule.m in Sources */,
@@ -2231,6 +2248,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA5F00F41FC6834C00F76B5C /* WXLocaleModule.m in Sources */,
 				DCA4452D1EFA55B300D0CFA8 /* WXComponent+Layout.m in Sources */,
 				DCA4452F1EFA55B300D0CFA8 /* WXResourceLoader.m in Sources */,
 				DCA445301EFA55B300D0CFA8 /* WXComponent+Events.m in Sources */,

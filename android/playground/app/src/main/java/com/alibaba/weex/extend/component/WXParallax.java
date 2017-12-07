@@ -20,6 +20,8 @@ package com.alibaba.weex.extend.component;
 
 import android.graphics.Color;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
@@ -41,6 +43,9 @@ import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.list.BasicListComponent;
+import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 
@@ -62,6 +67,7 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
   ArrayList<TransformCreator> mTransformPropArrayList = new ArrayList<>();
   BackgroundColorCreator mBackgroundColor;
   String mBindingRef = "";
+  WXComponent mBindingComponent;
 
   private int mBackGroundColor = 0;
   private float mOffsetY = 0;
@@ -150,8 +156,22 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
 
   @Override
   public void onScrolled(View view, int dx, int dy) {
-
-    mOffsetY = mOffsetY + dy;
+    if(ViewCompat.isInLayout(view)){
+      if(mBindingComponent == null && mBindingRef != null){
+        mBindingComponent = findComponent(mBindingRef);
+      }
+      if(mBindingComponent instanceof BasicListComponent
+              && view instanceof RecyclerView){
+        BasicListComponent listComponent = (BasicListComponent) mBindingComponent;
+        mOffsetY = Math.abs(listComponent.calcContentOffset((RecyclerView) view));
+      }else if(mBindingComponent instanceof WXRecyclerTemplateList
+              && view instanceof RecyclerView){
+        WXRecyclerTemplateList listComponent = (WXRecyclerTemplateList) mBindingComponent;
+        mOffsetY = Math.abs(listComponent.calcContentOffset((RecyclerView) view));
+      }
+    }else{
+       mOffsetY = mOffsetY + dy;
+    }
 
     AnimationSet animationSet = new AnimationSet(true);
     boolean hasAnimation = false;

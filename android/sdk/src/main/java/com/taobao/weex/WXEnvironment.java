@@ -28,7 +28,9 @@ import android.telephony.TelephonyManager;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -68,6 +70,7 @@ public class WXEnvironment {
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
+  public static boolean sDebugNetworkEventReporterEnable = false;//debugtool network switch
   public static long sJSLibInitTime = 0;
 
   public static long sSDKInitStart = 0;// init start timestamp
@@ -79,8 +82,6 @@ public class WXEnvironment {
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
-
-  public static boolean sShow3DLayer=true;
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -167,8 +168,8 @@ public class WXEnvironment {
    */
   public static boolean isSupport() {
     boolean isInitialized = WXSDKEngine.isInitialized();
-    if(WXEnvironment.isApkDebugable()){
-      WXLogUtils.d("WXSDKEngine.isInitialized():" + isInitialized);
+    if(!isInitialized){
+      WXLogUtils.e("WXSDKEngine.isInitialized():" + isInitialized);
     }
     return isHardwareSupport() && isInitialized;
   }

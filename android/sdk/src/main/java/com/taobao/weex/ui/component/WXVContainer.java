@@ -28,8 +28,6 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
@@ -357,11 +355,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if(getHostView()==null || mChildren==null){
       return;
     }
-    for(WXComponent component:mChildren){
-      if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
-        wxEventType= Constants.Event.DISAPPEAR;
+    //appear should not notify child
+    if(getDomObject().getAttrs().containsKey("appearNotifyChild")){
+      for(WXComponent component:mChildren){
+        if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
+          wxEventType= Constants.Event.DISAPPEAR;
+        }
+        component.notifyAppearStateChange(wxEventType,direction);
       }
-      component.notifyAppearStateChange(wxEventType,direction);
     }
   }
 
@@ -487,26 +488,31 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    *  end hook Activity life cycle callback
    ********************************************************/
 
-  public @Nullable View getBoxShadowHost() {
+  public @Nullable View getBoxShadowHost(boolean isClear) {
+    if (isClear) {
+      // Return existed host if want clear shadow
+      return mBoxShadowHost;
+    }
+
     ViewGroup hostView = getHostView();
     if (hostView == null) {
       return null;
     }
 
-    if (hostView instanceof ScrollView || hostView instanceof HorizontalScrollView) {
-      return hostView;
-    }
-
     try {
-      if (mBoxShadowHost == null) {
-        mBoxShadowHost = new BoxShadowHost(getContext());
-        WXViewUtils.setBackGround(mBoxShadowHost, null);
-        mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+      String type = getDomObject().getType();
+      if (WXBasicComponentType.DIV.equals(type)) {
+        WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
+        if (mBoxShadowHost == null) {
+          mBoxShadowHost = new BoxShadowHost(getContext());
+          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+          hostView.addView(mBoxShadowHost);
+        }
+        hostView.removeView(mBoxShadowHost);
         hostView.addView(mBoxShadowHost);
+        return mBoxShadowHost;
       }
-      hostView.removeView(mBoxShadowHost);
-      hostView.addView(mBoxShadowHost);
-      return mBoxShadowHost;
     } catch (Throwable t) {
       WXLogUtils.w("BoxShadow", t);
     }

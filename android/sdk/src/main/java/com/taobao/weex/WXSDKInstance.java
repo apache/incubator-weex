@@ -18,8 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +36,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -75,18 +74,24 @@ import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -108,6 +113,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private WXRefreshData mLastRefreshData;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
+  public static String requestUrl = "requestUrl";
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
@@ -126,13 +132,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public int mExecJSTraceId = WXTracing.nextId();
 
   /**
+   *for network tracker
+   */
+  public String mwxDims[] = new String [5];
+  public long measureTimes[] = new long [5];
+
+  public WeakReference<String> templateRef;
+  public Map<String,List<String>> responseHeaders = new HashMap<>();
+
+  /**
    * Render strategy.
    */
   private WXRenderStrategy mRenderStrategy = WXRenderStrategy.APPEND_ASYNC;
+
   /**
    * Render start time
    */
-  private long mRenderStartTime;
+  public long mRenderStartTime;
   /**
    * Refresh start time
    */
@@ -152,6 +168,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
+  private boolean mIsCommitedDomAtionExp = false;
+
+  public boolean getismIsCommitedDomAtionExp() {
+	return mIsCommitedDomAtionExp;
+  }
+
+  public void setmIsCommitedDomAtionExp(boolean mIsCommitedDomAtionExp) {
+	this.mIsCommitedDomAtionExp = mIsCommitedDomAtionExp;
+  }
+
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -454,7 +480,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
+	mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
+	if (TextUtils.isEmpty(mBundleUrl)) {
+	  mBundleUrl = mWXPerformance.pageName;
+	}
+
+	WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
@@ -479,7 +510,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    mWXPerformance.pageName = pageName;
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
     mRenderStartTime = System.currentTimeMillis();
@@ -489,10 +519,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
-
-    if (TextUtils.isEmpty(mBundleUrl)) {
-      mBundleUrl = pageName;
-    }
   }
 
   private void renderByUrlInternal(String pageName,
@@ -526,6 +552,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = rewriteUri(Uri.parse(url),URIAdapter.BUNDLE).toString();
+	if(wxRequest != null && !TextUtils.isEmpty(wxRequest.url)){
+	  requestUrl = wxRequest.url;
+	}else {
+	  requestUrl = pageName;
+	}
+
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
@@ -591,7 +623,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private String wrapPageName(String pageName, String url) {
     if(TextUtils.equals(pageName, WXPerformance.DEFAULT)){
-      pageName=url;
+      pageName = url;
+	  WXExceptionUtils.degradeUrl = pageName;
       try {
         Uri uri=Uri.parse(url);
         if(uri!=null){
@@ -619,7 +652,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKEngine.reload();
 
     if (reloadThis) {
-      // 可以发送广播吗？
       if (mContext != null)  {
         Intent intent = new Intent();
         intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
@@ -834,6 +866,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
+	  mWXPerformance.wxDims = mwxDims;
+	  mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
@@ -997,9 +1031,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           if ( mContext != null) {
             onViewAppear();
             View wxView= mRenderContainer;
-            if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
-              wxView = WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
-            }
             if(mRenderListener != null) {
               mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
             }
@@ -1061,13 +1092,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             }
 
             WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-
           }
         }
       });
     }
     if(!WXEnvironment.isApkDebugable()){
-      Log.e("weex_perf",mWXPerformance.getPerfData());
+      WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
 
@@ -1203,38 +1233,38 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /**
-   * UserTrack Log
+   * UserTrack Log instead by {@code WXExceptionUtils#commitCriticalExceptionRT}
    */
-  public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (TextUtils.isEmpty(type) || errorCode == null) {
-      return;
-    }
-
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        // Record exception if a render error happened.
-        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
-          mStatisticsListener.onException(mInstanceId,
-                                          errorCode.getErrorCode(),
-                                          errorCode.getErrorMsg());
-        }
-
-        WXPerformance performance = new WXPerformance();
-        performance.errCode = errorCode.getErrorCode();
-        performance.args = errorCode.getArgs();
-        if (errorCode != WXErrorCode.WX_SUCCESS) {
-          performance.errMsg = errorCode.getErrorMsg();
-          if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(performance.toString());
-          }
-        }
-        if( mUserTrackAdapter!= null) {
-          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
-        }
-      }
-    });
-  }
+//  public void commitUTStab(final String type, final WXErrorCode errorCode) {
+//    if (TextUtils.isEmpty(type) || errorCode == null) {
+//      return;
+//    }
+//
+//    runOnUiThread(new Runnable() {
+//      @Override
+//      public void run() {
+//        // Record exception if a render error happened.
+//        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
+//          mStatisticsListener.onException(mInstanceId,
+//                                          errorCode.getErrorCode(),
+//                                          errorCode.getErrorMsg());
+//        }
+//
+//        WXPerformance performance = new WXPerformance();
+//        performance.errCode = errorCode.getErrorCode();
+//        performance.args = errorCode.getArgs();
+//        if (errorCode != WXErrorCode.WX_SUCCESS) {
+//          performance.errMsg = errorCode.getErrorMsg();
+//          if (WXEnvironment.isApkDebugable()) {
+//            WXLogUtils.d(performance.toString());
+//          }
+//        }
+//        if( mUserTrackAdapter!= null) {
+//          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
+//        }
+//      }
+//    });
+//  }
 
   private void destroyView(View rootView) {
     try {
@@ -1292,6 +1322,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mRenderListener = null;
       isDestroy = true;
       mStatisticsListener = null;
+      if(responseHeaders != null){
+          responseHeaders.clear();
+      }
+      if(templateRef != null){
+        templateRef = null;
+      }
     }
   }
 
@@ -1600,10 +1636,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     @Override
-    public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
+    public void onHeadersReceived(int statusCode, Map<String,List<String>> headers) {
       if (this.instance != null
           && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHeadersReceived();
+      }
+      if(this.instance != null
+              && this.instance.responseHeaders != null
+              && headers != null){
+        this.instance.responseHeaders.putAll(headers);
       }
     }
 
@@ -1672,13 +1713,32 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             performance.appendErrMsg(response.errorCode);
             performance.appendErrMsg("|");
             performance.appendErrMsg(response.errorMsg);
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+					"\n response.errorCode=" + response.errorCode +
+					"\n response.errorMsg=" +  response.errorMsg +
+					"\n response=" + getTemplateInfo(),
+					null);
+
           }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
             performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
             performance.appendErrMsg(response.statusCode);
             performance.appendErrMsg("|template is null!");
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED_TEMPLATE_NULL", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+							"\n response.errorCode=" + response.errorCode +
+							"\n response.errorMsg=" +  response.errorMsg +
+							"\n response=" + getTemplateInfo(),
+					null);
+
           }else {
             performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
-          }
+		  }
+
           if (mUserTrackAdapter != null) {
             mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
           }
@@ -1688,13 +1748,64 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
-      } else if (TextUtils.equals(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR, response.statusCode)) {
-        WXLogUtils.d("user intercept");
-        onRenderError(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,response.errorMsg);
-      } else {
-        onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
+
+		// check content-type
+      } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+			  response.statusCode)) {
+        WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
+				"|instance bundleUrl = \n" + instance.getBundleUrl() +
+				"|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
+		);
+
+		// check content-length
+      } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
+		WXLogUtils.e("user intercept: WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED");
+		onRenderError(
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorCode(),
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorMsg() +
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+	  }
+      else {
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode(),
+				response.errorMsg);
       }
     }
+  }
+
+  /**
+   * return md5, and bytes length
+   * */
+  public String getTemplateInfo() {
+    String template = getTemplate();
+    if(template == null){
+      return " template md5 null";
+    }
+    if(TextUtils.isEmpty(template)){
+      return " template md5  length 0";
+    }
+    try {
+      byte[] bts = template.getBytes("UTF-8");
+      return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
+               + "response header " + JSONObject.toJSONString(responseHeaders);
+    } catch (UnsupportedEncodingException e) {
+      return "template md5 getBytes error";
+    }
+
+  }
+
+  public String getTemplate() {
+    if(templateRef == null){
+      return  null;
+    }
+    return templateRef.get();
+  }
+
+  public void setTemplate(String template) {
+    this.templateRef = new WeakReference<String>(template);
   }
 
   public interface NestedInstanceInterceptor {

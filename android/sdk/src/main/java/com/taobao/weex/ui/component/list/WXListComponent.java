@@ -24,6 +24,7 @@ import android.util.Pair;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -37,6 +38,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+import com.taobao.weex.utils.WXUtils;
 
 import java.util.Map;
 
@@ -79,8 +81,13 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
-
-    return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
+    BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
+    if(bounceRecyclerView.getSwipeLayout()  != null){
+      if(WXUtils.getBoolean(getDomObject().getAttrs().get("nestedScrollingEnabled"), false)) {
+          bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
+      }
+    }
+    return  bounceRecyclerView;
   }
 
   @Override
@@ -92,22 +99,22 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
     if (child instanceof WXRefresh && getHostView() != null) {
         getHostView().setOnRefreshListener((WXRefresh) child);
-        getHostView().postDelayed(new Runnable() {
+        getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setHeaderView(child);
         }
-      }, 100);
+      }), 100);
     }
 
     if (child instanceof WXLoading && getHostView() != null) {
         getHostView().setOnLoadingListener((WXLoading) child);
-        getHostView().postDelayed(new Runnable() {
+        getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setFooterView(child);
         }
-      }, 100);
+      }), 100);
     }
 
     // Synchronize DomObject's attr to Component and Native View
@@ -195,20 +202,20 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         child.createView();
         if (child instanceof WXRefresh) {
           getHostView().setOnRefreshListener((WXRefresh) child);
-          getHostView().postDelayed(new Runnable() {
+          getHostView().postDelayed(WXThread.secure(new Runnable() {
             @Override
             public void run() {
               getHostView().setHeaderView(child);
             }
-          }, 100);
+          }), 100);
         } else if (child instanceof WXLoading) {
           getHostView().setOnLoadingListener((WXLoading) child);
-          getHostView().postDelayed(new Runnable() {
+          getHostView().postDelayed(WXThread.secure(new Runnable() {
             @Override
             public void run() {
               getHostView().setFooterView(child);
             }
-          }, 100);
+          }), 100);
         }
       } else {
         super.createChildViewAt(ret.second);

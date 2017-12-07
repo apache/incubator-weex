@@ -42,6 +42,7 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.IWXScroller;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
@@ -78,6 +79,14 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean mForceLoadmoreNextTime = false;
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
+  private boolean mHasAddScrollEvent = false;
+
+  /**
+   * scroll start and scroll end event
+   * */
+  private ScrollStartEndHelper mScrollStartEndHelper;
+
+
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -101,6 +110,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private Handler handler=new Handler();
 
   private boolean isScrollable = true;
+
 
   @Deprecated
   public WXScroller(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -148,11 +158,17 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (Constants.Event.SCROLL.equals(type) && getInnerView() != null) {
+    if (ScrollStartEndHelper.isScrollEvent(type)
+            && getInnerView() != null && !mHasAddScrollEvent) {
+      mHasAddScrollEvent = true;
       if (getInnerView() instanceof WXScrollView) {
         ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {
           @Override
           public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
+            getScrollStartEndHelper().onScrolled(x, y);
+            if(!getDomObject().getEvents().contains(Constants.Event.SCROLL)){
+              return;
+            }
             if (shouldReport(x, y)) {
               fireScrollEvent(scrollView.getContentFrame(), x, y, oldx, oldy);
             }
@@ -177,6 +193,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         ((WXHorizontalScrollView) getInnerView()).addScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
           @Override
           public void onScrollChanged(WXHorizontalScrollView scrollView, int x, int y, int oldx, int oldy) {
+            getScrollStartEndHelper().onScrolled(x, y);
+            if(!getDomObject().getEvents().contains(Constants.Event.SCROLL)){
+              return;
+            }
             if (shouldReport(x, y)) {
               fireScrollEvent(scrollView.getContentFrame(), x, y, oldx, oldy);
             }
@@ -187,6 +207,16 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   private void fireScrollEvent(Rect contentFrame, int x, int y, int oldx, int oldy) {
+    fireEvent(Constants.Event.SCROLL, getScrollEvent(x, y));
+  }
+
+  public Map<String, Object> getScrollEvent(int x, int y){
+    Rect contentFrame =  new Rect();
+    if (getInnerView() instanceof WXScrollView) {
+       contentFrame = ((WXScrollView) getInnerView()).getContentFrame();
+    }else if (getInnerView() instanceof WXHorizontalScrollView) {
+      contentFrame = ((WXHorizontalScrollView) getInnerView()).getContentFrame();
+    }
     Map<String, Object> event = new HashMap<>(2);
     Map<String, Object> contentSize = new HashMap<>(2);
     Map<String, Object> contentOffset = new HashMap<>(2);
@@ -201,8 +231,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
     event.put(Constants.Name.CONTENT_SIZE, contentSize);
     event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-    fireEvent(Constants.Event.SCROLL, event);
+    return  event;
   }
 
   private boolean shouldReport(int x, int y) {
@@ -611,7 +640,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       return;
     }
 
-    getInnerView().postDelayed(new Runnable() {
+    getInnerView().postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         if (mOrientation == Constants.Orientation.VERTICAL) {
@@ -629,7 +658,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
         getInnerView().invalidate();
       }
-    }, 16);
+    }), 16);
   }
 
   @Override
@@ -718,5 +747,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @JSMethod
   public void resetLoadmore() {
     mForceLoadmoreNextTime = true;
+  }
+
+
+  public ScrollStartEndHelper getScrollStartEndHelper() {
+    if(mScrollStartEndHelper == null){
+      mScrollStartEndHelper = new ScrollStartEndHelper(this);
+    }
+    return mScrollStartEndHelper;
   }
 }

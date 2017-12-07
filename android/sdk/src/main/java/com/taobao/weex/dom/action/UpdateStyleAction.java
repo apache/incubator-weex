@@ -32,6 +32,7 @@ import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 import java.util.Map;
 
@@ -66,27 +67,32 @@ class UpdateStyleAction extends TraceableAction implements DOMAction, RenderActi
     WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATESTYLE);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_STYLE.getErrorCode(),
+				"updateStyle",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_STYLE.getErrorMsg() + "domObject is null",null);
       }
       return;
     }
     mPadding = domObject.getPadding();
     mBorder = domObject.getBorder();
 
-    Map<String, Object> animationMap = new ArrayMap<>(2);
-    animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));
-    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.get(WXDomObject.TRANSFORM_ORIGIN));
+    if(mData.get(WXDomObject.TRANSFORM) != null || mData.get(WXDomObject.TRANSFORM_ORIGIN) != null){
+      if(domObject.getTransition() == null) {
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));
+        animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.get(WXDomObject.TRANSFORM_ORIGIN));
+        context.addAnimationForElement(mRef, animationMap);
+      }
+    }
 
-    context.addAnimationForElement(mRef, animationMap);
 
     if (!mData.isEmpty()) {
       domObject.updateStyle(mData, mIsCausedByPesudo);
-      domObject.traverseTree(context.getApplyStyleConsumer());
-      context.postRenderTask(this);
-    }
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      domObject.applyStyle(mData);
+      if(!mData.isEmpty()) {
+        context.postRenderTask(this);
+      }
     }
   }
 

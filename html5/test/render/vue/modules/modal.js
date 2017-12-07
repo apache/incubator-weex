@@ -55,16 +55,17 @@ describe('modal module', function () {
       expect(toast.push).to.be.a('function')
       expect(toast.show).to.be.a('function')
     })
-    it('should toast mount on document when push method is called', function () {
+    it('should toast mount on document when push method is called', function (done) {
       const TOAST_WIN_CLASS_NAME = '.weex-toast'
       let $Toast = null
-      const clock = sinon.useFakeTimers()
       toast.push(config.message, config.duration)
       $Toast = document.querySelector(TOAST_WIN_CLASS_NAME)
       expect($Toast.innerText, 'should contain Test message').to.be.equal(config.message)
       expect(nodeListToArray($Toast.classList), 'should include hide class').to.include('hide')
-      clock.tick(config.duration * 1000)
-      expect(nodeListToArray($Toast.classList), 'should remove hide class').to.not.include('hide')
+      setTimeout(function () {
+        expect(nodeListToArray($Toast.classList), 'should remove hide class').to.not.include('hide')
+        done()
+      }, config.duration * 1000)
     })
     it('call show method while toast queue length < 1', function () {
       const TOAST_WIN_CLASS_NAME = '.weex-toast'

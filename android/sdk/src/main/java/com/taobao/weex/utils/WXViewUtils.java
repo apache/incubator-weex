@@ -136,6 +136,11 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
+  @Deprecated
+  public static int setScreenWidth(int screenWidth) {
+     return mScreenWidth = screenWidth;
+  }
+
   public static float getScreenDensity(Context ctx){
     if(ctx != null){
       try{
@@ -427,22 +432,9 @@ public class WXViewUtils {
   private static boolean clipCanvasIfAnimationExist(View targetView) {
     if (Build.VERSION.SDK_INT != VERSION_CODES.N) {
       return true;
+    } else {
+      return false;
     }
-    if(targetView != null &&
-            targetView.getScaleX() == 1 &&
-            targetView.getScaleY() == 1 &&
-            targetView.getTranslationX() == 0 &&
-            targetView.getTranslationY() == 0 &&
-            targetView.getRotation() == 0 &&
-            targetView.getRotationX() == 0 &&
-            targetView.getRotationY() == 0) {
-      if(Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP && targetView.getTranslationZ() != 0 ) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

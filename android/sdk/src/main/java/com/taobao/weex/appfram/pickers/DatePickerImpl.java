@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.appfram.pickers;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -25,9 +26,11 @@ import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.text.ParseException;
@@ -35,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by moxun on 16/11/23.
@@ -48,7 +52,7 @@ public class DatePickerImpl {
     private static SimpleDateFormat timeFormatter;
     private static SimpleDateFormat dateFormatter;
 
-    public static void pickDate(@NonNull Context context, String value, String max, String min, @NonNull final OnPickListener listener) {
+    public static void pickDate(@NonNull Context context, String value, String max, String min, @NonNull final OnPickListener listener, @Nullable Map<String, Object> extras) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(parseDate(value));
         final DatePickerDialog dialog = new DatePickerDialog(
@@ -102,10 +106,13 @@ public class DatePickerImpl {
             }
         });
 
+        setButtonText(dialog, DialogInterface.BUTTON_NEGATIVE, String.valueOf(extras.get("cancelTitle")));
+        setButtonText(dialog, DialogInterface.BUTTON_POSITIVE, String.valueOf(extras.get("confirmTitle")));
+
         dialog.show();
     }
 
-    public static void pickTime(@NonNull Context context, String value, @NonNull final OnPickListener listener) {
+    public static void pickTime(@NonNull Context context, String value, @NonNull final OnPickListener listener, @Nullable Map<String, Object> extras) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(parseTime(value));
         TimePickerDialog dialog = new TimePickerDialog(
@@ -130,6 +137,9 @@ public class DatePickerImpl {
                 listener.onPick(false, null);
             }
         });
+
+        setButtonText(dialog, DialogInterface.BUTTON_NEGATIVE, String.valueOf(extras.get("cancelTitle")));
+        setButtonText(dialog, DialogInterface.BUTTON_POSITIVE, String.valueOf(extras.get("confirmTitle")));
 
         dialog.show();
     }
@@ -164,5 +174,25 @@ public class DatePickerImpl {
             WXLogUtils.w("[DatePickerImpl] " + e.toString());
         }
         return new Date();
+    }
+
+    private static void setButtonText(final AlertDialog dialog, final int which, final CharSequence text) {
+        if (TextUtils.isEmpty(text) || "null".equals(text)) {
+            return;
+        }
+        try {
+            dialog.getWindow().getDecorView().post(WXThread.secure(new Runnable() {
+                @Override
+                public void run() {
+                    Button button = dialog.getButton(which);
+                    if (button != null) {
+                        button.setAllCaps(false);
+                        button.setText(text);
+                    }
+                }
+            }));
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }

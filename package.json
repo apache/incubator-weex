@@ -4,7 +4,7 @@
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.22.4",
-    "vue-render": "0.12.17",
+    "vue-render": "0.12.26",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -75,7 +75,7 @@
     "flow": "flow check",
     "test:case": "mocha --require reify html5/test/case/tester.js",
     "test:vue": "webpack --config build/webpack.test.web.config.js && karma start build/karma.vue.conf.js",
-    "test:unit": "mocha --require reify html5/test/unit/",
+    "test:unit": "mocha --require reify html5/test/unit/**/*",
     "test": "npm run lint && npm run test:unit && npm run test:case && npm run test:vue",
     "test:cover-html": "babel-istanbul cover --report html node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/ && open coverage/index.html",
     "test:cover": "babel-istanbul cover --report text node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/",

@@ -85,20 +85,16 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     };
     
     loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
-        if (weakSelf) {
-            [weakSelf _loadFinishWithResponse:[response copy] data:data callbackRsp:callbackRsp];
-            if (callback) {
-                callback(callbackRsp);
-            }
+        if (weakSelf && callback) {
+             [weakSelf _loadFinishWithResponse:[response copy] data:data callbackRsp:callbackRsp];
+             callback(callbackRsp);
         }
     };
     
     loader.onFailed = ^(NSError *error) {
-        if (weakSelf) {
+        if (weakSelf && callback) {
             [weakSelf _loadFailedWithError:error callbackRsp:callbackRsp];
-            if (callback) {
-                callback(callbackRsp);
-            }
+            callback(callbackRsp);
         }
     };
     
@@ -268,7 +264,7 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     NSError * error = nil;
     id jsonObj = [WXUtility JSONObject:data error:&error];
     if (error) {
-        WXLogError(@"%@", [error description]);
+        WXLogDebug(@"%@", [error description]);
     }
     return jsonObj;
 }

@@ -39,7 +39,7 @@
     if ([keys[0] isEqualToString:@"iOS_weex_prerender_config"] && [keys[1] isEqualToString:@"max_cache_num"]){
         return @2;
     }
-    return nil;
+    return defaultValue;
 }
 
 @end

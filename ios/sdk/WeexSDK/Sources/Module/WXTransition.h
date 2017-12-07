@@ -38,7 +38,7 @@ typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
 };
 
 
-@interface WXLayoutAnimationInfo : NSObject
+@interface WXTransitionInfo : NSObject
 @property (nonatomic, strong) id fromValue;
 @property (nonatomic, strong) id toValue;
 @property (nonatomic, strong) id perValue;
@@ -51,7 +51,7 @@ typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
 @property(nonatomic,strong) NSMutableArray *propertyArray;
 @property(nonatomic,assign) WXTransitionOptions transitionOptions;
 - (instancetype) initWithStyles:(NSDictionary *)styles;
-- (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent;
+- (void)_handleTransitionWithStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles  target:(WXComponent *)targetComponent;
 @end
 
 

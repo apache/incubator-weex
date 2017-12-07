@@ -174,7 +174,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  *  the info stored by user.
  */
-@property (nonatomic, strong) NSMutableDictionary *userInfo;
+@property (atomic, strong) NSMutableDictionary *userInfo;
 
 /**
  *  scale factor from css unit to device pixel.

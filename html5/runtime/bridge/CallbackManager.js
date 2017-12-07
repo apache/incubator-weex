@@ -19,6 +19,10 @@
 
 import { decodePrimitive } from './normalize'
 
+function getHookKey (componentId, type, hookName) {
+  return `${type}@${hookName}#${componentId}`
+}
+
 /**
  * For general callback management of a certain Weex instance.
  * Because function can not passed into native, so we create callback
@@ -28,9 +32,10 @@ import { decodePrimitive } from './normalize'
  */
 export default class CallbackManager {
   constructor (instanceId) {
-    this.instanceId = instanceId
+    this.instanceId = String(instanceId)
     this.lastCallbackId = 0
     this.callbacks = {}
+    this.hooks = {}
   }
   add (callback) {
     this.lastCallbackId++
@@ -41,6 +46,31 @@ export default class CallbackManager {
     const callback = this.callbacks[callbackId]
     delete this.callbacks[callbackId]
     return callback
+  }
+  registerHook (componentId, type, hookName, hookFunction) {
+    // TODO: validate arguments
+    const key = getHookKey(componentId, type, hookName)
+    if (this.hooks[key]) {
+      console.warn(`[JS Framework] Override an existing component hook "${key}".`)
+    }
+    this.hooks[key] = hookFunction
+  }
+  triggerHook (componentId, type, hookName, options = {}) {
+    // TODO: validate arguments
+    const key = getHookKey(componentId, type, hookName)
+    const hookFunction = this.hooks[key]
+    if (typeof hookFunction !== 'function') {
+      console.error(`[JS Framework] Invalid hook function type (${typeof hookFunction}) on "${key}".`)
+      return null
+    }
+    let result = null
+    try {
+      result = hookFunction.apply(null, options.args || [])
+    }
+    catch (e) {
+      console.error(`[JS Framework] Failed to execute the hook function on "${key}".`)
+    }
+    return result
   }
   consume (callbackId, data, ifKeepAlive) {
     const callback = this.callbacks[callbackId]
@@ -54,5 +84,6 @@ export default class CallbackManager {
   }
   close () {
     this.callbacks = {}
+    this.hooks = {}
   }
 }
