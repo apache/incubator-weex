@@ -50,7 +50,7 @@ class WXBridge implements IWXBridge {
    *
    * @param framework assets/main.js
    */
-  public native int initFramework(String framework, WXParams params, String cacheDir, boolean pieSupport);
+  public native int initFrameworkMultiProcess(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
 
   /**
@@ -80,7 +80,7 @@ class WXBridge implements IWXBridge {
 
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
     if (MULTIPROCESS) {
-      return initFramework(framework, params, cacheDir, pieSupport);
+      return initFrameworkMultiProcess(framework, params, cacheDir, pieSupport);
     } else {
       return  initFramework(framework, params);
     }
