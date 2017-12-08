@@ -318,9 +318,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   @Override
   public void setStyleHeight(float height) {
-    if(getStyles().containsKey(Constants.Name.OVERFLOW) && TextUtils.equals(Constants.Value.HIDDEN,
-            WXUtils.getString(getStyles().get(Constants.Name.OVERFLOW), null))
-            && !getStyles().containsKey(Constants.Name.MAX_HEIGHT)){
+    if(getAttrs().containsKey(Name.OVERFLOW_HIDDEN_HEIGHT)){
       super.setStyleHeight(height);
       super.setMaxHeight(height);
     }else{
@@ -330,9 +328,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   @Override
   public void setStyleWidth(float width) {
-    if(getStyles().containsKey(Constants.Name.OVERFLOW) && TextUtils.equals(Constants.Value.HIDDEN,
-            WXUtils.getString(getStyles().get(Constants.Name.OVERFLOW), null))
-            && !getStyles().containsKey(Name.MAX_WIDTH)){
+    if(getAttrs().containsKey(Name.OVERFLOW_HIDDEN_WIDTH)){
       super.setStyleWidth(width);
       super.setMaxWidth(width);
     }else{

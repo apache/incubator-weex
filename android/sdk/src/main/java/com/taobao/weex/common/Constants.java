@@ -192,6 +192,10 @@ public class Constants {
     String HAS_FIXED_SIZE = "hasFixedSize";
     String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
 
+    String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
+    String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
+
+
     interface  Recycler{
       String LIST_DATA = "listData";
       String LIST_DATA_ITEM  ="alias";
