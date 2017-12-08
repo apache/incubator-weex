@@ -18,13 +18,14 @@
  */
 package com.taobao.weex.adapter;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
-
+import com.taobao.weex.utils.WXLogUtils;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -45,6 +46,58 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
   private static final IEventReporterDelegate DEFAULT_DELEGATE = new NOPEventReportDelegate();
   private ExecutorService mExecutorService;
 
+  @Override
+  public void sendRequest(final WXRequest request, final OnHttpListener listener) {
+    if (listener != null) {
+      listener.onHttpStart();
+      final WXResponse response = getResponseByPackageApp(request);
+      if (TextUtils.equals("200", response.statusCode)) {
+        response.extendParams.put(WXPerformance.CACHE_TYPE, "zcache");
+        listener.onHttpFinish(response);
+      }
+      else {
+        execute(new Runnable() {
+          @Override
+          public void run() {
+            IEventReporterDelegate reporter = getEventReporterDelegate();
+            try {
+              HttpURLConnection connection = openConnection(request, listener);
+              reporter.preConnect(connection, request.body);
+              Map<String, List<String>> headers = connection.getHeaderFields();
+              int responseCode = connection.getResponseCode();
+              if (listener != null) {
+                listener.onHeadersReceived(responseCode, headers);
+              }
+              reporter.postConnect();
+
+              response.statusCode = String.valueOf(responseCode);
+              if (responseCode >= 200 && responseCode <= 299) {
+                InputStream rawStream = connection.getInputStream();
+                rawStream = reporter.interpretResponseStream(rawStream);
+                response.originalData = readInputStreamAsBytes(rawStream, listener);
+              } else {
+                response.errorMsg = readInputStream(connection.getErrorStream(), listener);
+              }
+              response.extendParams.put(WXPerformance.CACHE_TYPE, "none");
+              listener.onHttpFinish(response);
+            } catch (IOException | IllegalArgumentException e) {
+              e.printStackTrace();
+              response.statusCode = "-1";
+              response.errorCode = "-1";
+              response.errorMsg = e.getMessage();
+              if (listener != null) {
+                listener.onHttpFinish(response);
+              }
+              if (e instanceof IOException) {
+                reporter.httpExchangeFailed((IOException) e);
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
   private void execute(Runnable runnable){
     if(mExecutorService==null){
       mExecutorService = Executors.newFixedThreadPool(3);
@@ -52,53 +105,43 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
     mExecutorService.execute(runnable);
   }
 
-  @Override
-  public void sendRequest(final WXRequest request, final OnHttpListener listener) {
-    if (listener != null) {
-      listener.onHttpStart();
-    }
-    execute(new Runnable() {
-      @Override
-      public void run() {
-        WXResponse response = new WXResponse();
-        IEventReporterDelegate reporter = getEventReporterDelegate();
-        try {
-          HttpURLConnection connection = openConnection(request, listener);
-          reporter.preConnect(connection, request.body);
-          Map<String,List<String>> headers = connection.getHeaderFields();
-          int responseCode = connection.getResponseCode();
-          if(listener != null){
-            listener.onHeadersReceived(responseCode,headers);
-          }
-          reporter.postConnect();
-
-          response.statusCode = String.valueOf(responseCode);
-          if (responseCode >= 200 && responseCode<=299) {
-            InputStream rawStream = connection.getInputStream();
-            rawStream = reporter.interpretResponseStream(rawStream);
-            response.originalData = readInputStreamAsBytes(rawStream, listener);
-          } else {
-            response.errorMsg = readInputStream(connection.getErrorStream(), listener);
-          }
-          if (listener != null) {
-            listener.onHttpFinish(response);
-          }
-        } catch (IOException|IllegalArgumentException e) {
-          e.printStackTrace();
-          response.statusCode = "-1";
-          response.errorCode="-1";
-          response.errorMsg=e.getMessage();
-          if(listener!=null){
-            listener.onHttpFinish(response);
-          }
-          if (e instanceof IOException) {
-            reporter.httpExchangeFailed((IOException) e);
-          }
-        }
+  /**
+   * 通过PackageApp获取JS Bundle的缓存
+   *
+   * @param request  请求Request
+   * @param response response
+   * @return 有缓存response.statusCode=200
+   */
+  private WXResponse getResponseByPackageApp(WXRequest request) {
+    WXResponse ret = new WXResponse();
+    ret.statusCode = "-1";
+    String template="";
+    String url = request.url.trim();
+    try {
+      Uri uri = Uri.parse(url);
+      if(uri.getBooleanQueryParameter("wh_weex", false)) {
+        String host = uri.getHost();
+        String newHost = uri.getHost() + ".local.weex";
+        String newUrl = url.replace(host, newHost);
+        //TODO Zcache剥离&初始化
+        //template = ZipAppUtils.getStreamByUrl(newUrl);
+      } else {
+        //TODO Zcache剥离&初始化
+        //template = ZipAppUtils.getStreamByUrl(url);
       }
-    });
-  }
+    }catch(Exception e){
+      WXLogUtils.e("getResponseByPackageApp error:"+e.getMessage());
+    }
 
+    if (!TextUtils.isEmpty(template)) {
+      ret.statusCode = "200";
+      ret.originalData = template.getBytes();
+      ret.extendParams.put("requestType", "packageApp");
+      ret.extendParams.put("connectionType", "packageApp");
+      return ret;
+    }
+    return ret;
+  }
 
   /**
    * Opens an {@link HttpURLConnection} with parameters.

@@ -1702,6 +1702,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         Object requestType=response.extendParams.get("requestType");
         mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
 
+        Object cacheType = response.extendParams.get(WXPerformance.CACHE_TYPE);
+        if(cacheType instanceof String){
+          mWXPerformance.cacheType = (String) cacheType;
+        }
+
         if("network".equals(requestType) && mUserTrackAdapter!=null){
           WXPerformance performance=new WXPerformance();
           if(!TextUtils.isEmpty(mBundleUrl)){

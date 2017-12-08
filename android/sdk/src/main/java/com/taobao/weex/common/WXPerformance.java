@@ -28,6 +28,9 @@ public class WXPerformance {
 
   public static final String DEFAULT = "default";
 
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  public static final String CACHE_TYPE = "cacheType";
+
   /**
    * No longer needed.
    */
