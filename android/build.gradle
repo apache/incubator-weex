@@ -22,7 +22,7 @@ repositories {
 subprojects {
     repositories {
         mavenLocal()
-        maven { url "http://mvnrepo.alibaba-inc.com/nexus/content/repositories/snapshots"}
+        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository"}
         jcenter()
     }
     buildscript {

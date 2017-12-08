@@ -24,7 +24,8 @@ import android.os.Bundle;
 
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
-import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
+import com.alibaba.weex.extend.AliHaIniter;
+import com.alibaba.weex.extend.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.adapter.WXUserTrackAdapter;
@@ -61,6 +62,7 @@ public class WXApplication extends Application {
      * Fresco.initialize(this,config);
      **/
 //    initDebugEnvironment(true, false, "DEBUG_SERVER_HOST");
+    new AliHaIniter().init(this);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
@@ -68,7 +70,7 @@ public class WXApplication extends Application {
                                //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
                                .setImgAdapter(new ImageAdapter())
                                .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
-                               .setJSExceptionAdapter(new JSExceptionAdapter())
+                               .setJSExceptionAdapter(new JSExceptionAdapter(this))
                                .setHttpAdapter(new InterceptWXHttpAdapter())
                                .setUtAdapter(new WXUserTrackAdapter())
                                .build()
