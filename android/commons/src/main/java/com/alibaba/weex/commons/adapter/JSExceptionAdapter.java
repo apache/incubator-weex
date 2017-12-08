@@ -18,19 +18,43 @@
  */
 package com.alibaba.weex.commons.adapter;
 
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.utils.WXLogUtils;
 
 /**
  */
 
 public class JSExceptionAdapter implements IWXJSExceptionAdapter {
 
-  @Override
-  public void onJSException(WXJSExceptionInfo exception) {
-    if (exception != null) {
-      WXLogUtils.d(exception.toString());
+    @Override
+    public void onJSException(WXJSExceptionInfo wxjsExceptionInfo) {
+        if (null == wxjsExceptionInfo) {
+            return;
+        }
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(wxjsExceptionInfo.getInstanceId());
+        if (null != instance) {
+            Map<String, Object> params = null;
+            try {
+                params = JSON.parseObject(JSON.toJSONString(wxjsExceptionInfo));
+            } catch (Exception e) {
+                params.put("bundleUrl", wxjsExceptionInfo.getBundleUrl());
+                params.put("errorCode", wxjsExceptionInfo.getErrCode());
+                params.put("exception", wxjsExceptionInfo.getException());
+                params.put("extParams", wxjsExceptionInfo.getExtParams());
+                params.put("function", wxjsExceptionInfo.getFunction());
+                params.put("instanceId", wxjsExceptionInfo.getInstanceId());
+                params.put("jsFrameworkVersion", wxjsExceptionInfo.getJsFrameworkVersion());
+                params.put("weexVersion", wxjsExceptionInfo.getWeexVersion());
+            }
+            instance.fireGlobalEventCallback("exception", params);
+        }
+        //WXLogUtils.d(wxjsExceptionInfo.toString());
     }
-  }
+
 }
