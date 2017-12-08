@@ -18,8 +18,9 @@
  */
 package com.taobao.weex.common;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import com.taobao.weex.WXEnvironment;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,15 +29,24 @@ public class WXPerformance {
   public static final String DEFAULT = "default";
 
   /**
-   * Business unit, mandatory. If no business unit can be provided, set the field as default
+   * No longer needed.
    */
+  @Deprecated
   public String bizType = "weex";
 
   /**
-   * URL used for rendering view, optional
+   * Use {@link #pageName} instead.
    */
+  @Deprecated
   public String templateUrl;
 
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  public String cacheType="unknown";
+
+  @RestrictTo(Scope.LIBRARY)
+  public long renderTimeOrigin;
+
+  public long fsRenderTime;
   /**
    * Time spent for reading, time unit is ms.
    */
@@ -180,8 +190,19 @@ public class WXPerformance {
    *for network tracker
    */
 
-  public String wxDims[] = new String [5];
-  public long measureTimes[] = new long [5];
+  /**
+   * TODO These dimensions will be moved to elsewhere
+   */
+  @RestrictTo(Scope.LIBRARY)
+  @Deprecated
+  public String wxDims[] = new String[5];
+
+  /**
+   * TODO These dimensions will be moved to elsewhere
+   */
+  @RestrictTo(Scope.LIBRARY)
+  @Deprecated
+  public long measureTimes[] = new long[5];
 
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
@@ -189,49 +210,72 @@ public class WXPerformance {
 
   public Map<String,Double> getMeasureMap(){
     Map<String,Double> quotas = new HashMap<>();
-    quotas.put("JSTemplateSize", JSTemplateSize);
     quotas.put("JSLibSize", JSLibSize);
-    quotas.put("communicateTime", (double)communicateTime);
-    quotas.put("screenRenderTime", (double)screenRenderTime);
-    quotas.put("totalTime", totalTime);
-    quotas.put("localReadTime", localReadTime);
     quotas.put("JSLibInitTime", (double)JSLibInitTime);
-    quotas.put("networkTime", (double)networkTime);
-    quotas.put("templateLoadTime", (double)templateLoadTime);
+    quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
     quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
     quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
+    quotas.put("JSTemplateSize", JSTemplateSize);
+    quotas.put("pureNetworkTime",(double)pureNetworkTime);
+    quotas.put("networkTime", (double)networkTime);
+
+    double fsRenderTime;
+    if (this.fsRenderTime == 0) {
+      fsRenderTime = totalTime;
+    } else {
+      fsRenderTime = this.fsRenderTime - renderTimeOrigin;
+    }
+
+    quotas.put("fsRenderTime", fsRenderTime);
+    quotas.put("screenRenderTime", (double)screenRenderTime);
+    quotas.put("communicateTime", (double)communicateTime);
+    quotas.put("communicateTotalTime", totalTime);
+    quotas.put("localReadTime", localReadTime);
+    quotas.put("templateLoadTime", (double)templateLoadTime);
     quotas.put("firstScreenJSFExecuteTime",(double) firstScreenJSFExecuteTime);
     quotas.put("componentCount",(double)componentCount);
     quotas.put("actualNetworkTime",(double)actualNetworkTime);
-    quotas.put("pureNetworkTime",(double)pureNetworkTime);
     quotas.put("syncTaskTime",(double)syncTaskTime);
     quotas.put("packageSpendTime",(double)packageSpendTime);
-    quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
     quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
     quotas.put("useScroller", (double) useScroller);
-	quotas.put("measureTime1", (double) measureTimes[0]);
-	quotas.put("measureTime2", (double) measureTimes[1]);
-	quotas.put("measureTime3", (double) measureTimes[2]);
-	quotas.put("measureTime4", (double) measureTimes[3]);
-	quotas.put("measureTime5", (double) measureTimes[4]);
-	return quotas;
+
+    /**
+     * TODO These attribute will be moved to elsewhere
+     * Extra Value for 3rd developers.
+     */
+    quotas.put("measureTime1", (double) measureTimes[0]);
+    quotas.put("measureTime2", (double) measureTimes[1]);
+    quotas.put("measureTime3", (double) measureTimes[2]);
+    quotas.put("measureTime4", (double) measureTimes[3]);
+    quotas.put("measureTime5", (double) measureTimes[4]);
+    return quotas;
   }
 
   public Map<String,String> getDimensionMap(){
     Map<String,String> quotas = new HashMap<>();
-    quotas.put("bizType", bizType);
-    quotas.put("templateUrl", templateUrl);
-    quotas.put("pageName", pageName);
     quotas.put("JSLibVersion", JSLibVersion);
     quotas.put("WXSDKVersion", WXSDKVersion);
-    quotas.put("connectionType",connectionType);
+    quotas.put("pageName", pageName);
     quotas.put("requestType",requestType);
-	quotas.put("wxdim1", wxDims[0]);
-	quotas.put("wxdim2", wxDims[1]);
-	quotas.put("wxdim3", wxDims[2]);
-	quotas.put("wxdim4", wxDims[3]);
-	quotas.put("wxdim5", wxDims[4]);
-	return quotas;
+    quotas.put("connectionType",connectionType);
+
+    /**
+     * TODO These attribute will be moved to elsewhere
+     * Extra Dimension for 3rd developers.
+     */
+	  quotas.put("wxdim1", wxDims[0]);
+	  quotas.put("wxdim2", wxDims[1]);
+	  quotas.put("wxdim3", wxDims[2]);
+	  quotas.put("wxdim4", wxDims[3]);
+	  quotas.put("wxdim5", wxDims[4]);
+
+    /**
+     * TODO the following attribute is no longer needed and will be deleted soon.
+     */
+    quotas.put("bizType", bizType);
+    quotas.put("templateUrl", templateUrl);
+	  return quotas;
   }
 
   public static String[] getDimensions(){
