@@ -67,9 +67,8 @@ public class WXStreamModule extends WXModule {
    */
   @Deprecated
   @JSMethod(uiThread = false)
-  public void sendHttp(String params, final String callback) {
+  public void sendHttp(JSONObject paramsObj, final String callback) {
 
-    JSONObject paramsObj = JSON.parseObject(params);
     String method = paramsObj.getString("method");
     String url = paramsObj.getString("url");
     JSONObject headers = paramsObj.getJSONObject("header");
@@ -125,14 +124,8 @@ public class WXStreamModule extends WXModule {
    *  headers: object 响应头
    */
   @JSMethod(uiThread = false)
-  public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback){
 
-    JSONObject optionsObj = null;
-    try {
-      optionsObj = JSON.parseObject(optionsStr);
-    }catch (JSONException e){
-      WXLogUtils.e("", e);
-    }
 
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
@@ -311,7 +304,7 @@ public class WXStreamModule extends WXModule {
       if(mProgressCallback !=null) {
         mResponse.put("readyState",1);//readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
         mResponse.put("length",0);
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -339,7 +332,7 @@ public class WXStreamModule extends WXModule {
       mResponse.put("headers", simpleHeaders);
       mRespHeaders = simpleHeaders;
       if (mProgressCallback != null) {
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -347,7 +340,7 @@ public class WXStreamModule extends WXModule {
     public void onHttpResponseProgress(int loadedLength) {
       mResponse.put("length",loadedLength);
       if(mProgressCallback!=null){
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
 
     }

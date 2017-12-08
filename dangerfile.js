@@ -279,6 +279,7 @@ filesToVerifySrcHeader.forEach(filepath => {
   var res = reg.test(content);
   if(res){
     console.error("Code file "+ filepath +" has cn source code.");
+    console.error("position " + reg.exec(content));
     fail("Code file "+ filepath +" has cn source code.");
     return ;
   }
