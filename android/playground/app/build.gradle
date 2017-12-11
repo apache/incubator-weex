@@ -106,7 +106,8 @@ dependencies {
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     compile 'com.taobao.android:weex_inspector:0.11.0'
     //插件管理
-    compile('com.alibaba.ha:alihatbadapter:1.0.0.11@aar') {
+    compile('com.alibaba.ha:alihatbadapter:1.0.0.13@aar') {
         transitive = true
     }
+    compile 'com.taobao.android:accs_sdk_taobao:3.0.3'
 }
