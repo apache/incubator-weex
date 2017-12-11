@@ -22,6 +22,15 @@ under the License.
     <item
             android:id="@+id/action_scan"
             android:title="扫码"
+        app:showAsAction="ifRoom"
             android:icon="@drawable/ic_action_scan"
-            app:showAsAction="ifRoom"/>
+           />
+    <item
+        android:title="模拟崩溃"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_crash"/>
+    <item
+        android:title="发送jserror"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_js_error"/>
 </menu>

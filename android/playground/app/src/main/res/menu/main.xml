@@ -27,6 +27,13 @@ under the License.
     <item
             android:title="refresh"
             android:icon="@drawable/ic_action_refresh"
-            app:showAsAction="ifRoom"
             android:id="@+id/action_refresh"/>
+    <item
+        android:title="模拟崩溃"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_crash"/>
+    <item
+        android:title="发送jserror"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_js_error"/>
 </menu>

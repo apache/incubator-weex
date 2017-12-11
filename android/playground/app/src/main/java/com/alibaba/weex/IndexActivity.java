@@ -44,6 +44,8 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
@@ -136,6 +138,17 @@ public class IndexActivity extends AbstractWeexActivity {
           startActivity(new Intent(this, CaptureActivity.class));
         }
         break;
+      case R.id.action_js_error:
+        WXBridgeManager.getInstance().commitJscCrashAlarmMonitor(
+                "test",WXErrorCode.WX_ERROR_DOM_CREATEFINISH,
+                "test error msg",
+                "1000",
+                "test_url"
+        );
+        Toast.makeText(this,"已发送jserror",Toast.LENGTH_SHORT).show();
+        break;
+      case R.id.action_crash:
+        throw new RuntimeException("mock test exception");
       default:
         break;
     }
