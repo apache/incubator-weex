@@ -6,17 +6,13 @@ static jmethodID jReportExceptionMethodId;
 static jmethodID jCallNativeMethodId;
 static jmethodID jCallNativeModuleMethodId;
 static jmethodID jCallNativeComponentMethodId;
-static jmethodID jCallAddElementMethodId;
 
 static jmethodID jSetTimeoutNativeMethodId;
 static jmethodID jLogMethodId;
-static jmethodID jCallCreateBodyMethodId;
 static jmethodID jCallUpdateFinishMethodId;
 
-static jmethodID jCallCreateFinishMethodId;
 static jmethodID jCallRefreshFinishMethodId;
 static jmethodID jCallUpdateAttrsMethodId;
-static jmethodID jCallUpdateStyleMethodId;
 static jmethodID jCallRemoveElementMethodId;
 static jmethodID jCallMoveElementMethodId;
 static jmethodID jCallAddEventMethodId;
@@ -26,6 +22,12 @@ static jmethodID jMapConstructorMethodId;
 static jmethodID jMapPutMethodId;
 static jmethodID jSetConstructorMethodId;
 static jmethodID jSetAddMethodId;
+
+static jmethodID jCallCreateBodyByWeexCoreMethodId;
+static jmethodID jCallAddElementByWeexCoreMethodId;
+static jmethodID jCallUpdateStyleByWeexCoreMethodId;
+static jmethodID jCallLayoutByWeexCoreMethodId;
+static jmethodID jCallCreateFinishByWeexCoreMethodId;
 
 namespace WeexCore {
 
@@ -343,7 +345,8 @@ namespace WeexCore {
                                               std::map<std::string, std::string> *margins,
                                               std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
-    jmethodID jCallCreateBodyByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+    if (jCallCreateBodyByWeexCoreMethodId == NULL)
+      jCallCreateBodyByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callCreateBodyByWeexCore",
                                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
@@ -407,7 +410,8 @@ namespace WeexCore {
                                               std::map<std::string, std::string> *margins,
                                               std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
-    jmethodID jCallAddElementByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+    if (jCallAddElementByWeexCoreMethodId == NULL)
+      jCallAddElementByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                    "callAddElementByWeexCore",
                                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
@@ -469,7 +473,8 @@ namespace WeexCore {
                                            std::vector<std::pair<std::string, std::string> *> *padding,
                                            std::vector<std::pair<std::string, std::string> *> *border) {
     JNIEnv *env = getJNIEnv();
-    jmethodID jCallUpdateStyleByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+    if (jCallUpdateStyleByWeexCoreMethodId == NULL)
+      jCallUpdateStyleByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                     "callUpdateStyleByWeexCore",
                                                                     "(Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
 
@@ -523,7 +528,8 @@ namespace WeexCore {
                                           int bottom, int left, int right, int height,
                                           int width) {
     JNIEnv *env = getJNIEnv();
-    jmethodID jCallLayoutByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+    if (jCallLayoutByWeexCoreMethodId == NULL)
+      jCallLayoutByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                "callLayoutByWeexCore",
                                                                "(Ljava/lang/String;Ljava/lang/String;IIIIII)I");
 
@@ -544,7 +550,8 @@ namespace WeexCore {
 
   int BridgeAndroid::callCreateFinishByWeexCore(std::string &pageId) {
     JNIEnv *env = getJNIEnv();
-    jmethodID jCallCreateFinishByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+    if (jCallCreateFinishByWeexCoreMethodId == NULL)
+      jCallCreateFinishByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                      "callCreateFinishByWeexCore",
                                                                      "(Ljava/lang/String;)I");
 
