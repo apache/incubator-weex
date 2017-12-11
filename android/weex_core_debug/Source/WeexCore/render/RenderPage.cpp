@@ -177,12 +177,48 @@ namespace WeexCore {
     newParent->addRenderObject(stringToNum<int>(index), child);
   }
 
-  void RenderPage::updateStyle(std::string ref, std::string key, std::string value) {
+  void RenderPage::updateStyle(std::string ref,
+                               std::vector<std::pair<std::string, std::string> *> *styles) {
     RenderObject *render = getRenderObject(ref);
-    if (render == nullptr)
+    if (render == nullptr || styles == nullptr || styles->empty())
       return;
 
-    render->addStyle(key, value);
+    std::vector<std::pair<std::string, std::string> *> *style = nullptr;
+    std::vector<std::pair<std::string, std::string> *> *margin = nullptr;
+    std::vector<std::pair<std::string, std::string> *> *padding = nullptr;
+    std::vector<std::pair<std::string, std::string> *> *border = nullptr;
+
+    for (int i = 0; i < styles->size(); ++i) {
+      if ((*styles)[i] == nullptr)
+        return;
+
+      switch (render->addStyle((*styles)[i]->first, (*styles)[i]->second)) {
+        case TypeStyle:
+          if (style == nullptr)
+            style = new std::vector<std::pair<std::string, std::string> *>();
+          style->insert(style->end(), (*styles)[i]);
+          break;
+        case TypeMargin:
+          if (margin == nullptr)
+            margin = new std::vector<std::pair<std::string, std::string> *>();
+          margin->insert(margin->end(), (*styles)[i]);
+          break;
+        case TypePadding:
+          if (padding == nullptr)
+            padding = new std::vector<std::pair<std::string, std::string> *>();
+          padding->insert(padding->end(), (*styles)[i]);
+          break;
+        case TypeBorder:
+          if (border == nullptr)
+            border = new std::vector<std::pair<std::string, std::string> *>();
+          border->insert(border->end(), (*styles)[i]);
+          break;
+      }
+    }
+
+    sendUpdateStyleAction(render, style, margin, padding, border);
+    if (styles->size() > 0)
+      calculateLayout();
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {
@@ -266,16 +302,18 @@ namespace WeexCore {
     addRenderAction(action);
   }
 
-  void RenderPage::sendUpdateStyleAction(std::string key, std::string value, std::string ref) {
+  void RenderPage::sendUpdateStyleAction(RenderObject *render,
+                                         std::vector<std::pair<std::string, std::string> *> *style,
+                                         std::vector<std::pair<std::string, std::string> *> *margin,
+                                         std::vector<std::pair<std::string, std::string> *> *padding,
+                                         std::vector<std::pair<std::string, std::string> *> *border) {
     UpdateStyleAction *action = new UpdateStyleAction();
-    action->GenerateAction(getPageId(), ref, key, value);
+    action->GenerateAction(getPageId(), render->getRef(), style, margin, padding, border);
     addRenderAction(action);
   }
 
   void RenderPage::sendUpdateAttrAction(std::string key, std::string value, std::string ref) {
-    UpdateStyleAction *action = new UpdateStyleAction();
-    action->GenerateAction(getPageId(), ref, key, value);
-    addRenderAction(action);
+
   }
 
   void RenderPage::sendAddEventAction(RenderObject *render) {

@@ -48,7 +48,7 @@ namespace WeexCore {
 
     void updateAttr(std::string pageId, std::string ref, std::string key, std::string value);
 
-    void updateStyle(std::string pageId, std::string ref, std::string key, std::string value);
+    void updateStyle(std::string pageId, std::string ref, std::string data);
 
     void addEvent(std::string pageId, std::string ref, std::string event);
 

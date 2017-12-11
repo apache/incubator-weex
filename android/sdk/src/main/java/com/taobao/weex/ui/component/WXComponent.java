@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -65,6 +66,7 @@ import com.taobao.weex.ui.action.WXUISize;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -92,69 +94,93 @@ import java.util.Set;
 /**
  * abstract component
  */
-public abstract class WXComponent<T extends View> implements IWXObject, IWXActivityStateListener, OnActivePseudoListner {
+public abstract class WXComponent<T extends View> extends WXBasicComponent implements IWXObject, IWXActivityStateListener, OnActivePseudoListner {
 
   public static final String PROP_FIXED_SIZE = "fixedSize";
   public static final String PROP_FS_MATCH_PARENT = "m";
   public static final String PROP_FS_WRAP_CONTENT = "w";
 
+  public static final int TYPE_COMMON = 0;
+  public static final int TYPE_VIRTUAL = 1;
+
   private int mFixedProp = 0;
   public static int mComponentNum = 0;
 
-  /**
-   * package
-   **/
   T mHost;
-
   private volatile WXVContainer mParent;
+  private IFComponentHolder mHolder;
   private WXSDKInstance mInstance;
   private Context mContext;
-
   private int mAbsoluteY = 0;
   private int mAbsoluteX = 0;
-  private Set<String> mGestureType;
-
-  private BorderDrawable mBackgroundDrawable;
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
+  private Set<String> mGestureType;
   private WXGesture mGesture;
-  private IFComponentHolder mHolder;
-  private boolean isUsing = false;
+  private BorderDrawable mBackgroundDrawable;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
+  private boolean isUsing = false;
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
 
-  public static final int TYPE_COMMON = 0;
-  public static final int TYPE_VIRTUAL = 1;
-
-  private Object mExtra;
-
-  private int mViewPortWidth = 750;
-
-  private String mPageId;
-  private String mComponentType;
-  private String mParentRef;
-  private String mRef;
-  private WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
-  private WXUISize mLayoutSize = new WXUISize(0, 0);
-
-  private WXStyle mStyles;
-  private WXAttr mAttributes;
-  private WXEvent mEvents;
-  private CSSShorthand mMargins;
-  private CSSShorthand mPaddings;
-  private CSSShorthand mBorders;
-
   private ContentBoxMeasurement contentBoxMeasurement;
+
+
+  @Deprecated
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+    this(instance, parent, isLazy, action);
+  }
+
+  @Deprecated
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+    this(instance, parent, action);
+  }
+
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+    this(instance, parent, TYPE_COMMON, action);
+  }
+
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WXUIAction action) {
+    setPageId(action.mPageId);
+    setComponentType(action.mComponentType);
+    setParentRef(action.mParentRef);
+    setRef(action.mRef);
+    setLayoutSize(action.mLayoutSize);
+    setLayoutPosition(action.mLayoutPosition);
+
+    mInstance = instance;
+    mContext = mInstance.getContext();
+    mParent = parent;
+    mType = type;
+    mGestureType = new HashSet<>();
+    ++mComponentNum;
+    if (instance != null)
+      setViewPortWidth(instance.getInstanceViewPortWidth());
+
+    onCreate();
+    ComponentObserver observer;
+    if ((observer = getInstance().getComponentObserver()) != null) {
+      observer.onCreate(this);
+    }
+  }
+
+  private void copyData(WXComponent component) {
+    setPageId(component.getPageId());
+    setComponentType(component.getComponentType());
+    setParentRef(component.getParentRef());
+    setRef(component.getRef());
+    mParent = component.getParent();
+    mType = component.getType();
+  }
 
   protected void setContentBoxMeasurement(ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
@@ -163,188 +189,22 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   public native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
-  public @NonNull
-  WXStyle getStyles() {
-    if (mStyles == null) {
-      mStyles = new WXStyle();
-    }
-    return mStyles;
-  }
-
-  public @NonNull
-  WXAttr getAttrs() {
-    if (mAttributes == null) {
-      mAttributes = new WXAttr();
-    }
-    return mAttributes;
-  }
-
-  public @NonNull
-  WXEvent getEvents() {
-    if (mEvents == null) {
-      mEvents = new WXEvent();
-    }
-    return mEvents;
-  }
-
-  /**
-   * Get this node's margin, as defined by cssstyle + default margin.
-   */
-  public @NonNull
-  CSSShorthand getMargin() {
-    if (mMargins == null) {
-      mMargins = new CSSShorthand();
-    }
-    return mMargins;
-  }
-
-  /**
-   * Get this node's padding, as defined by cssstyle + default padding.
-   */
-  public @NonNull
-  CSSShorthand getPadding() {
-    if (mPaddings == null) {
-      mPaddings = new CSSShorthand();
-    }
-    return mPaddings;
-  }
-
-  /**
-   * Get this node's border, as defined by cssstyle.
-   */
-  public @NonNull
-  CSSShorthand getBorder() {
-    if (mBorders == null) {
-      mBorders = new CSSShorthand();
-    }
-    return mBorders;
-  }
-
-  public void addAttr(Map<String, Object> attrs) {
-    if (attrs == null || attrs.isEmpty()) {
-      return;
-    }
-    if (mAttributes == null) {
-      mAttributes = new WXAttr();
-    }
-    mAttributes.putAll(attrs);
-  }
-
-  public void addStyle(Map<String, Object> styles) {
-    if (styles == null || styles.isEmpty()) {
-      return;
-    }
-    if (mStyles == null) {
-      mStyles = new WXStyle();
-    }
-    addStyle(styles, false);
-  }
-
-  public void addStyle(Map<String, Object> styles, boolean byPesudo) {
-    if (styles == null || styles.isEmpty()) {
-      return;
-    }
-    if (mStyles == null) {
-      mStyles = new WXStyle();
-    }
-    mStyles.putAll(styles, byPesudo);
-  }
-
-  public void addEvent(Set<String> events) {
-    if (events == null || events.isEmpty()) {
-      return;
-    }
-    if (mEvents == null) {
-      mEvents = new WXEvent();
-    }
-    mEvents.addAll(events);
-  }
-
-  public void addShorthand(Map<String, String> shorthand) {
-    if (!shorthand.isEmpty()) {
-      for (Map.Entry<String, String> item : shorthand.entrySet()) {
-        String key = item.getKey();
-        switch (key) {
-          case Constants.Name.MARGIN:
-            addMargin(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.MARGIN_LEFT:
-            addMargin(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.MARGIN_TOP:
-            addMargin(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.MARGIN_RIGHT:
-            addMargin(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.MARGIN_BOTTOM:
-            addMargin(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.BORDER_WIDTH:
-            addBorder(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.BORDER_TOP_WIDTH:
-            addBorder(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.BORDER_RIGHT_WIDTH:
-            addBorder(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.BORDER_BOTTOM_WIDTH:
-            addBorder(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.BORDER_LEFT_WIDTH:
-            addBorder(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.PADDING:
-            addPadding(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.PADDING_LEFT:
-            addPadding(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.PADDING_TOP:
-            addPadding(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.PADDING_RIGHT:
-            addPadding(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-          case Constants.Name.PADDING_BOTTOM:
-            addPadding(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
-            break;
-        }
-      }
-    }
-  }
-
-  public void addMargin(CSSShorthand.EDGE spacingType, float margin) {
-    if (mMargins == null) {
-      mMargins = new CSSShorthand();
-    }
-    mMargins.set(spacingType, margin);
-  }
-
-  public void addPadding(CSSShorthand.EDGE spacingType, float padding) {
-    if (mPaddings == null) {
-      mPaddings = new CSSShorthand();
-    }
-    mPaddings.set(spacingType, padding);
-  }
-
-  public void addBorder(CSSShorthand.EDGE spacingType, float border) {
-    if (mBorders == null) {
-      mBorders = new CSSShorthand();
-    }
-    mBorders.set(spacingType, border);
-  }
-
   private void applyStyles(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
     }
   }
 
-  public void applyStyle(String key, String value) {
+  private void applyStyle(String key, String value) {
     if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
       setProperty(key, value);
+  }
+
+  public void updateStyles(Map<String, Object> styles) {
+    if (styles != null) {
+      addStyle(styles);
+      updateProperties(styles);
+    }
   }
 
   private void applyAttrs(WXComponent component) {
@@ -353,9 +213,16 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     }
   }
 
-  public void applyAttr(String key, String value) {
+  private void applyAttr(String key, String value) {
     if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
       setProperty(key, value);
+  }
+
+  public void updateAttrs(Map<String, Object> attrs) {
+    if (attrs != null) {
+      addAttr(attrs);
+      updateProperties(attrs);
+    }
   }
 
   private void applyBorder(WXComponent component) {
@@ -375,7 +242,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     setBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, bottom);
   }
 
-  public void applyPadding(CSSShorthand padding, CSSShorthand border) {
+  private void applyPadding(CSSShorthand padding, CSSShorthand border) {
     int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
     int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
     int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
@@ -388,10 +255,14 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     mHost.setPadding(left, top, right, bottom);
   }
 
+  public void updateCSSShorthand(Map<String, String> cssShorthand) {
+    addShorthand(cssShorthand);
+  }
+
   private void applyEvents() {
-    if (mEvents == null || mEvents.isEmpty())
+    if (getEvents() == null || getEvents().isEmpty())
       return;
-    for (String type : mEvents) {
+    for (String type : getEvents()) {
       applyEvent(type);
     }
     setActiveTouchListener();
@@ -443,6 +314,38 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         scroller.bindDisappearEvent(this);
       }
     }
+  }
+
+  protected void onCreate() {
+
+  }
+
+  public void bindHolder(IFComponentHolder holder) {
+    mHolder = holder;
+  }
+
+
+  public WXSDKInstance getInstance() {
+    return mInstance;
+  }
+
+  public Context getContext() {
+    return mContext;
+  }
+
+  /**
+   * Find component by component reference.
+   *
+   * @param ref
+   * @return
+   */
+  protected final WXComponent findComponent(String ref) {
+    if (mInstance != null && ref != null) {
+      return WXSDKManager.getInstance()
+              .getWXRenderManager()
+              .getWXComponent(mInstance.getInstanceId(), ref);
+    }
+    return null;
   }
 
   public String getAttrByKey(String key) {
@@ -518,95 +421,12 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   }
 
-  public String getParentRef() {
-    return mParentRef;
-  }
-
   public interface OnClickListener {
     void onHostViewClick();
   }
 
   interface OnFocusChangeListener {
     void onFocusChange(boolean hasFocus);
-  }
-
-  @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
-    this(instance, parent, isLazy, action);
-  }
-
-  @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
-    this(instance, parent, action);
-  }
-
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
-    this(instance, parent, TYPE_COMMON, action);
-  }
-
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WXUIAction action) {
-    mPageId = action.mPageId;
-    mComponentType = action.mComponentType;
-    mParentRef = action.mParentRef;
-    mRef = action.mRef;
-    mLayoutPosition = action.mLayoutPosition;
-    mLayoutSize = action.mLayoutSize;
-
-    mInstance = instance;
-    mContext = mInstance.getContext();
-    mParent = parent;
-    mType = type;
-    mGestureType = new HashSet<>();
-    ++mComponentNum;
-    if (instance != null)
-      mViewPortWidth = instance.getInstanceViewPortWidth();
-
-    onCreate();
-    ComponentObserver observer;
-    if ((observer = getInstance().getComponentObserver()) != null) {
-      observer.onCreate(this);
-    }
-  }
-
-  private void copyData(WXComponent component) {
-    mPageId = component.getPageId();
-    mComponentType = component.getComponentType();
-    mParentRef = component.getParentRef();
-    mRef = component.getRef();
-    mParent = component.getParent();
-    mType = component.getType();
-  }
-
-  protected void onCreate() {
-
-  }
-
-  public void bindHolder(IFComponentHolder holder) {
-    mHolder = holder;
-  }
-
-
-  public WXSDKInstance getInstance() {
-    return mInstance;
-  }
-
-  public Context getContext() {
-    return mContext;
-  }
-
-  /**
-   * Find component by component reference.
-   *
-   * @param ref
-   * @return
-   */
-  protected final WXComponent findComponent(String ref) {
-    if (mInstance != null && ref != null) {
-      return WXSDKManager.getInstance()
-              .getWXRenderManager()
-              .getWXComponent(mInstance.getInstanceId(), ref);
-    }
-    return null;
   }
 
   public final void fireEvent(String type) {
@@ -619,7 +439,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
 
   protected final void fireEvent(String type, Map<String, Object> params, Map<String, Object> domChanges) {
     if (mInstance != null) {
-      mInstance.fireEvent(mRef, type, params, domChanges);
+      mInstance.fireEvent(getRef(), type, params, domChanges);
     }
   }
 
@@ -674,7 +494,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
         });
       }
       mHostClickListeners.add(l);
-
     }
   }
 
@@ -708,170 +527,13 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public void updateDemission(WXUIAction action) {
-    mLayoutPosition = action.mLayoutPosition;
-    mLayoutSize = action.mLayoutSize;
+    setLayoutPosition(action.mLayoutPosition);
+    setLayoutSize(action.mLayoutSize);
   }
 
   public void refreshData(WXComponent component) {
 
   }
-
-  protected BorderDrawable getOrCreateBorder() {
-    if (mBackgroundDrawable == null) {
-      Drawable backgroundDrawable = mHost.getBackground();
-      WXViewUtils.setBackGround(mHost, null);
-      mBackgroundDrawable = new BorderDrawable();
-      if (backgroundDrawable == null) {
-        WXViewUtils.setBackGround(mHost, mBackgroundDrawable);
-      } else {
-        //TODO Not strictly clip according to background-clip:border-box
-        WXViewUtils.setBackGround(mHost, new LayerDrawable(new Drawable[]{
-                mBackgroundDrawable, backgroundDrawable}));
-      }
-    }
-    return mBackgroundDrawable;
-  }
-
-  /**
-   * layout view
-   */
-  public final void setLayout(WXComponent component) {
-
-    if (TextUtils.isEmpty(component.getPageId()) || TextUtils.isEmpty(component.getComponentType())
-            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
-            || component.getLayoutSize() == null) {
-      return;
-    }
-
-    mLayoutPosition = component.getLayoutPosition();
-    mLayoutSize = component.getLayoutSize();
-    mViewPortWidth = component.getViewPortWidth();
-    mPaddings = component.getPadding();
-    mMargins = component.getMargin();
-    mBorders = component.getBorder();
-
-    boolean nullParent = mParent == null;//parent is nullable
-
-    //offset by sibling
-    int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
-
-    int realWidth = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getWidth(), mViewPortWidth);
-    int realHeight = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getHeight(), mViewPortWidth);
-    int realLeft = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getLeft(), mViewPortWidth) -
-            getPadding().get(CSSShorthand.EDGE.LEFT) - getBorder().get(CSSShorthand.EDGE.LEFT));
-    int realTop = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getTop(), mViewPortWidth) -
-            getPadding().get(CSSShorthand.EDGE.TOP) - getBorder().get(CSSShorthand.EDGE.TOP)) + siblingOffset;
-    int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
-    int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
-
-    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
-      return;
-    }
-
-    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getLayoutY());
-    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getLayoutX());
-
-    //calculate first screen time
-    if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      mInstance.firstScreenRenderFinished();
-    }
-
-    if (mHost == null) {
-      return;
-    }
-
-    MeasureOutput measureOutput = measure(realWidth, realHeight);
-    realWidth = measureOutput.width;
-    realHeight = measureOutput.height;
-
-    //fixed style
-    if (isFixed()) {
-      setFixedHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
-    } else {
-      setHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
-    }
-
-    mPreRealWidth = realWidth;
-    mPreRealHeight = realHeight;
-    mPreRealLeft = realLeft;
-    mPreRealTop = realTop;
-
-    onFinishLayout();
-  }
-
-
-  public int getLayoutTopOffsetForSibling() {
-    return 0;
-  }
-
-  protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
-    ViewGroup.LayoutParams lp;
-    if (mParent == null) {
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-      params.setMargins(left, top, right, bottom);
-      lp = params;
-    } else {
-      lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
-    }
-    if (lp != null) {
-      mHost.setLayoutParams(lp);
-    }
-  }
-
-  private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
-    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-    params.width = width;
-    params.height = height;
-    params.setMargins(left, top, right, bottom);
-    host.setLayoutParams(params);
-    mInstance.moveFixedView(host);
-
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
-      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + getStyles().getLeft() + " " + (int) getStyles().getTop());
-    }
-  }
-
-  /**
-   * After component's layout result is apply to view. May be invoke multiple times since
-   * DOM can be changed in js runtime.
-   */
-  protected void onFinishLayout() {
-    Object param = getStyles() != null ? getStyles().get(Constants.Name.BACKGROUND_IMAGE) : null;
-    if (param != null) {
-      setBackgroundImage(param.toString());
-    }
-  }
-
-  public float getLayoutWidth() {
-    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getWidth(), mViewPortWidth);
-  }
-
-  public float getLayoutHeight() {
-    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(), mViewPortWidth);
-  }
-
-  public void updateExtra(Object extra) {
-    this.mExtra = extra;
-  }
-
-  /**
-   * measure
-   */
-  protected MeasureOutput measure(int width, int height) {
-    MeasureOutput measureOutput = new MeasureOutput();
-
-    if (mFixedProp != 0) {
-      measureOutput.width = mFixedProp;
-      measureOutput.height = mFixedProp;
-    } else {
-      measureOutput.width = width;
-      measureOutput.height = height;
-    }
-    return measureOutput;
-  }
-
 
   @Deprecated
   public void updateProperties(Map<String, Object> props) {
@@ -1037,6 +699,150 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     }
   }
 
+  protected BorderDrawable getOrCreateBorder() {
+    if (mBackgroundDrawable == null) {
+      Drawable backgroundDrawable = mHost.getBackground();
+      WXViewUtils.setBackGround(mHost, null);
+      mBackgroundDrawable = new BorderDrawable();
+      if (backgroundDrawable == null) {
+        WXViewUtils.setBackGround(mHost, mBackgroundDrawable);
+      } else {
+        //TODO Not strictly clip according to background-clip:border-box
+        WXViewUtils.setBackGround(mHost, new LayerDrawable(new Drawable[]{
+                mBackgroundDrawable, backgroundDrawable}));
+      }
+    }
+    return mBackgroundDrawable;
+  }
+
+  /**
+   * layout view
+   */
+  public final void setLayout(WXComponent component) {
+
+    if (TextUtils.isEmpty(component.getPageId()) || TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
+      return;
+    }
+
+    setLayoutSize(component.getLayoutSize());
+    setLayoutPosition(component.getLayoutPosition());
+    setViewPortWidth(component.getViewPortWidth());
+    setPaddings(component.getPadding());
+    setMargins(component.getMargin());
+    setBorders(component.getBorder());
+
+    boolean nullParent = mParent == null;//parent is nullable
+
+    //offset by sibling
+    int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
+
+    int realWidth = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getWidth(), getViewPortWidth());
+    int realHeight = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getHeight(), getViewPortWidth());
+    int realLeft = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getLeft(), getViewPortWidth()) -
+            getPadding().get(CSSShorthand.EDGE.LEFT) - getBorder().get(CSSShorthand.EDGE.LEFT));
+    int realTop = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getTop(), getViewPortWidth()) -
+            getPadding().get(CSSShorthand.EDGE.TOP) - getBorder().get(CSSShorthand.EDGE.TOP)) + siblingOffset;
+    int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
+    int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
+
+    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
+      return;
+    }
+
+    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getLayoutY());
+    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getLayoutX());
+
+    //calculate first screen time
+    if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+      mInstance.firstScreenRenderFinished();
+    }
+
+    if (mHost == null) {
+      return;
+    }
+
+    MeasureOutput measureOutput = measure(realWidth, realHeight);
+    realWidth = measureOutput.width;
+    realHeight = measureOutput.height;
+
+    //fixed style
+    if (isFixed()) {
+      setFixedHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
+    } else {
+      setHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
+    }
+
+    mPreRealWidth = realWidth;
+    mPreRealHeight = realHeight;
+    mPreRealLeft = realLeft;
+    mPreRealTop = realTop;
+
+    onFinishLayout();
+  }
+
+
+  public int getLayoutTopOffsetForSibling() {
+    return 0;
+  }
+
+  protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
+    ViewGroup.LayoutParams lp;
+    if (mParent == null) {
+      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+      params.setMargins(left, top, right, bottom);
+      lp = params;
+    } else {
+      lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
+    }
+    if (lp != null) {
+      mHost.setLayoutParams(lp);
+    }
+  }
+
+  private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+    params.width = width;
+    params.height = height;
+    params.setMargins(left, top, right, bottom);
+    host.setLayoutParams(params);
+    mInstance.moveFixedView(host);
+
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + getStyles().getLeft() + " " + (int) getStyles().getTop());
+    }
+  }
+
+  /**
+   * After component's layout result is apply to view. May be invoke multiple times since
+   * DOM can be changed in js runtime.
+   */
+  protected void onFinishLayout() {
+    Object param = getStyles() != null ? getStyles().get(Constants.Name.BACKGROUND_IMAGE) : null;
+    if (param != null) {
+      setBackgroundImage(param.toString());
+    }
+  }
+
+  /**
+   * measure
+   */
+  protected MeasureOutput measure(int width, int height) {
+    MeasureOutput measureOutput = new MeasureOutput();
+
+    if (mFixedProp != 0) {
+      measureOutput.width = mFixedProp;
+      measureOutput.height = mFixedProp;
+    } else {
+      measureOutput.width = width;
+      measureOutput.height = height;
+    }
+    return measureOutput;
+  }
+
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
   protected void setAriaHidden(boolean isHidden) {
     View host = getHostView();
@@ -1150,10 +956,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     return mParent;
   }
 
-  public String getRef() {
-    return mRef;
-  }
-
   /**
    * create view
    */
@@ -1249,10 +1051,10 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if (TextUtils.isEmpty(type)) {
       return;
     }
-    if (mEvents == null || mAppendEvents == null || mGestureType == null) {
+    if (getEvents() == null || mAppendEvents == null || mGestureType == null) {
       return;
     }
-    mEvents.remove(type);
+    getEvents().remove(type);
     mAppendEvents.remove(type);//only clean append events, not dom's events.
     mGestureType.remove(type);
     removeEventFromView(type);
@@ -1349,7 +1151,7 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     if ("".equals(bgImage.trim())) {
       getOrCreateBorder().setImage(null);
     } else {
-      Shader shader = WXResourceUtils.getShader(bgImage, mLayoutSize.getWidth(), mLayoutSize.getHeight());
+      Shader shader = WXResourceUtils.getShader(bgImage, getLayoutSize().getWidth(), getLayoutSize().getHeight());
       getOrCreateBorder().setImage(shader);
     }
   }
@@ -1631,7 +1433,6 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
   }
 
   public static class MeasureOutput {
-
     public int width;
     public int height;
   }
@@ -1810,41 +1611,5 @@ public abstract class WXComponent<T extends View> implements IWXObject, IWXActiv
     message.obj = task;
     message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
     WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
-  }
-
-  public int getViewPortWidth() {
-    return mViewPortWidth;
-  }
-
-  public void setViewPortWidth(int mViewPortWidth) {
-    this.mViewPortWidth = mViewPortWidth;
-  }
-
-  public WXUISize getLayoutSize() {
-    return mLayoutSize;
-  }
-
-  public WXUIPosition getLayoutPosition() {
-    return mLayoutPosition;
-  }
-
-  public float getLayoutX() {
-    return mLayoutPosition.getLeft();
-  }
-
-  public float getLayoutY() {
-    return mLayoutPosition.getTop();
-  }
-
-  public Object getExtra() {
-    return mExtra;
-  }
-
-  public String getComponentType() {
-    return mComponentType;
-  }
-
-  public String getPageId() {
-    return mPageId;
   }
 }

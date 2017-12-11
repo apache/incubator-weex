@@ -25,6 +25,7 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class WXUIAction {
@@ -38,8 +39,8 @@ public abstract class WXUIAction {
   public WXUISize mLayoutSize = new WXUISize(0, 0);
   public String mKey = null;
   public String mValue = null;
-  public HashMap<String, String> mStyle;
-  public HashMap<String, String> mAttributes;
+  public Map<String, String> mStyle;
+  public Map<String, String> mAttributes;
   public Set<String> mEvents;
   public HashMap<String, String> mPaddings;
   public HashMap<String, String> mMargins;

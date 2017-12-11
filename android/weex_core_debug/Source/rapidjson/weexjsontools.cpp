@@ -268,7 +268,6 @@ namespace WeexCore {
         RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
         r.EnterObject();
         while (const char *key2 = r.NextObjectKey()) {
-          // may call
           if (r.PeekType() == kNumberType) {
             char *temp = new char;
             if (0 == strcmp(key, "attr")) {
@@ -298,7 +297,6 @@ namespace WeexCore {
           } else {
             r.SkipValue();
           }
-
         }
       } else if (0 == strcmp(key, "event")) {
         RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
@@ -338,6 +336,36 @@ namespace WeexCore {
     JsonParser r(data);
     parseJsonObject(r, page, root);
     return root;
+  }
+
+  std::vector<std::pair<std::string, std::string> *> *json2Pairs(char *data) {
+    std::vector<std::pair<std::string, std::string> *> *pairs = nullptr;
+    JsonParser r(data);
+    RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+    r.EnterObject();
+    pairs = new std::vector<std::pair<std::string, std::string> *>();
+    while (const char *key = r.NextObjectKey()) {
+      std::pair<std::string, std::string> *myPair = nullptr;
+      if (r.PeekType() == kNumberType) {
+        char *temp = new char;
+        int len = fpconv_dtoa(r.GetDouble(), temp);
+        temp[len] = '\0';
+        char value[len + 1];
+        strcpy(value, temp);
+        myPair = new std::pair<std::string, std::string>(key, value);
+        pairs->insert(pairs->end(), myPair);
+        delete temp;
+      } else if (r.PeekType() == kStringType) {
+        const char *str = r.GetString();
+        char value[strlen(str) + 1];
+        strcpy(value, str);
+        myPair = new std::pair<std::string, std::string>(key, value);
+        pairs->insert(pairs->end(), myPair);
+      } else {
+        r.SkipValue();
+      }
+    }
+    return pairs;
   }
 }
 

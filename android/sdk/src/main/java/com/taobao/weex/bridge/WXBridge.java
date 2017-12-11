@@ -412,11 +412,14 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  public int callUpdateStyleByWeexCore(String instanceId, String ref, String key, String value) {
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+  public int callUpdateStyleByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> styles,
+                                       HashMap<String, String> paddings,
+                                       HashMap<String, String> margins,
+                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, key, value);
+      errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {

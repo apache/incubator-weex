@@ -29,6 +29,13 @@ public class UpdateStyleUIAction extends WXUIAction {
     if (component == null) {
       return;
     }
-    component.applyStyle(mKey, mValue);
+    if (mStyle != null) {
+      component.updateStyles(mStyle);
+      component.updateAttrs(mAttributes);
+      component.updateCSSShorthand(mPaddings);
+      component.updateCSSShorthand(mMargins);
+      component.updateCSSShorthand(mBorders);
+      component.setLayout(component);
+    }
   }
 }

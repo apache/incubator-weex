@@ -35,7 +35,12 @@ namespace WeexCore {
 
     void sendLayoutAction(RenderObject *render);
 
-    void sendUpdateStyleAction(std::string key, std::string value, std::string ref);
+    void
+    sendUpdateStyleAction(RenderObject *render,
+                          std::vector<std::pair<std::string, std::string> *> *style,
+                          std::vector<std::pair<std::string, std::string> *> *margin,
+                          std::vector<std::pair<std::string, std::string> *> *padding,
+                          std::vector<std::pair<std::string, std::string> *> *border);
 
     void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
 
@@ -62,7 +67,7 @@ namespace WeexCore {
 
     void moveRenderObject(std::string ref, std::string parentRef, std::string index);
 
-    void updateStyle(std::string ref, std::string key, std::string value);
+    void updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
     void updateAttr(std::string ref, std::string key, std::string value);
 

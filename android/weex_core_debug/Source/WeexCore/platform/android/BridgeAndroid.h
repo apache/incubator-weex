@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
 
 namespace WeexCore {
 
@@ -56,14 +57,9 @@ namespace WeexCore {
     void callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
                              jbyteArray &jArgString, jbyteArray &jOptString);
 
-    int callAddElement(jstring &jInstanceId, jstring &jref, jbyteArray &jdomString,
-                       jstring &jindex, jstring &jCallback);
-
     void setTimeout(jstring &jCallbackID, jstring &jTime);
 
     void callNativeLog(jbyteArray &str_msg);
-
-    int callCreateBody(jstring &instanceId, jbyteArray &taskString, jstring &callback);
 
     int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                          jstring &callback);
@@ -72,9 +68,6 @@ namespace WeexCore {
                           jstring &callback);
 
     int callUpdateAttrs(jstring &instanceId, jstring &ref,
-                        jbyteArray &taskString, jstring &callback);
-
-    int callUpdateStyle(jstring &instanceId, jstring &ref,
                         jbyteArray &taskString, jstring &callback);
 
     int callRemoveElement(jstring &instanceId, jstring &ref,
@@ -107,12 +100,15 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *margins,
                                  std::map<std::string, std::string> *borders);
 
-    int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
-                                  std::string &value);
-
     int callLayoutByWeexCore(std::string &pageId, std::string &ref,
                              int top, int bottom, int left, int right,
                              int height, int width);
+
+    int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
+                                  std::vector<std::pair<std::string, std::string> *> *style,
+                                  std::vector<std::pair<std::string, std::string> *> *margin,
+                                  std::vector<std::pair<std::string, std::string> *> *padding,
+                                  std::vector<std::pair<std::string, std::string> *> *border);
 
     int callCreateFinishByWeexCore(std::string &pageId);
   };

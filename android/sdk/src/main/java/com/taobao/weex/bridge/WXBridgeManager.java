@@ -2021,19 +2021,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callUpdateStyleByWeexCore(String instanceId, String ref, String key, String value) {
-    if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore: call UpdateStyle args is null");
-      }
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE, "[WXBridgeManager] callUpdateStyleByWeexCore: call UpdateStyle args is null");
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
+  public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, String> styles,
+                                       HashMap<String, String> paddings,
+                                       HashMap<String, String> margins,
+                                       HashMap<String, String> borders) {
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyleByWeexCore >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref)
-              .append(", key:").append(key)
-              .append(", value:").append(value);
+              .append(", ref:").append(ref);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -2047,8 +2041,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         final WXUIAction action = new UpdateStyleUIAction();
         action.mPageId = instanceId;
         action.mRef = ref;
-        action.mKey = key;
-        action.mValue = value;
+        action.mStyle = styles;
+        action.mPaddings = paddings;
+        action.mMargins = margins;
+        action.mBorders = borders;
 
         WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
           @Override

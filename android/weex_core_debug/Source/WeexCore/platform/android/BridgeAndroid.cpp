@@ -52,6 +52,21 @@ namespace WeexCore {
     }
   }
 
+  void static
+  cpyCVector2JMap(std::vector<std::pair<std::string, std::string> *> *cVector, jobject jMap,
+                  JNIEnv *env) {
+    jstring jKey;
+    jstring jValue;
+
+    for (int i = 0; i < cVector->size(); ++i) {
+      jKey = env->NewStringUTF((*cVector)[i]->first.c_str());
+      jValue = env->NewStringUTF((*cVector)[i]->second.c_str());
+      env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
+      env->DeleteLocalRef(jKey);
+      env->DeleteLocalRef(jValue);
+    }
+  }
+
   void static cpyCSet2JSet(std::set<std::string> *cSet, jobject jSet, JNIEnv *env) {
     jstring jValue;
 
@@ -145,29 +160,6 @@ namespace WeexCore {
     env->DeleteLocalRef(jOptString);
   }
 
-  int BridgeAndroid::callAddElement(jstring &jInstanceId, jstring &jref, jbyteArray &jdomString,
-                                    jstring &jindex, jstring &jCallback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallAddElementMethodId == NULL) {
-      jCallAddElementMethodId = env->GetMethodID(jBridgeClazz,
-                                                 "callAddElement",
-                                                 "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;Ljava/lang/String;)I");
-    }
-
-    int flag = env->CallIntMethod(jThis, jCallAddElementMethodId, jInstanceId, jref, jdomString,
-                                  jindex,
-                                  jCallback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callNative");
-    }
-    env->DeleteLocalRef(jInstanceId);
-    env->DeleteLocalRef(jref);
-    env->DeleteLocalRef(jdomString);
-    env->DeleteLocalRef(jindex);
-    env->DeleteLocalRef(jCallback);
-    return flag;
-  }
-
   void BridgeAndroid::setTimeout(jstring &jCallbackID, jstring &jTime) {
     JNIEnv *env = getJNIEnv();
     if (jSetTimeoutNativeMethodId == NULL) {
@@ -196,28 +188,6 @@ namespace WeexCore {
     }
     env->DeleteLocalRef(str_msg);
   }
-
-
-  int
-  BridgeAndroid::callCreateBody(jstring &jInstanceId, jbyteArray &jTaskString, jstring &jCallback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallCreateBodyMethodId == NULL) {
-      jCallCreateBodyMethodId = env->GetMethodID(jBridgeClazz,
-                                                 "callCreateBody",
-                                                 "(Ljava/lang/String;[BLjava/lang/String;)I");
-    }
-    int flag = env->CallIntMethod(jThis, jCallCreateBodyMethodId, jInstanceId, jTaskString,
-                                  jCallback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callCreateBody");
-    }
-
-    env->DeleteLocalRef(jTaskString);
-    env->DeleteLocalRef(jInstanceId);
-    env->DeleteLocalRef(jCallback);
-    return flag;
-  }
-
 
   int BridgeAndroid::callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                                       jstring &callback) {
@@ -270,27 +240,6 @@ namespace WeexCore {
                                   callback);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callUpdateAttrs");
-    }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(ref);
-    env->DeleteLocalRef(taskString);
-    env->DeleteLocalRef(callback);
-    return flag;
-  }
-
-  int BridgeAndroid::callUpdateStyle(jstring &instanceId, jstring &ref,
-                                     jbyteArray &taskString, jstring &callback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallUpdateStyleMethodId == NULL) {
-      jCallUpdateStyleMethodId = env->GetMethodID(jBridgeClazz,
-                                                  "callUpdateStyle",
-                                                  "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)I");
-    }
-
-    int flag = env->CallIntMethod(jThis, jCallUpdateStyleMethodId, instanceId, ref, taskString,
-                                  callback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callUpdateStyle");
     }
     env->DeleteLocalRef(instanceId);
     env->DeleteLocalRef(ref);
@@ -381,6 +330,9 @@ namespace WeexCore {
     env->DeleteLocalRef(Callback);
     return flag;
   }
+
+
+  /****************** WeexCore *****************/
 
   int BridgeAndroid::callCreateBodyByWeexCore(std::string &pageId, std::string &componentType,
                                               std::string &ref,
@@ -511,29 +463,59 @@ namespace WeexCore {
   }
 
   int
-  BridgeAndroid::callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
-                                           std::string &value) {
+  BridgeAndroid::callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
+                                           std::vector<std::pair<std::string, std::string> *> *style,
+                                           std::vector<std::pair<std::string, std::string> *> *margin,
+                                           std::vector<std::pair<std::string, std::string> *> *padding,
+                                           std::vector<std::pair<std::string, std::string> *> *border) {
     JNIEnv *env = getJNIEnv();
     jmethodID jCallUpdateStyleByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                                     "callUpdateStyleByWeexCore",
-                                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
+                                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+
+    if (jMapConstructorMethodId == NULL)
+      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
+    if (jMapPutMethodId == NULL)
+      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
+                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jRef = env->NewStringUTF(ref.c_str());
-    jstring jKey = env->NewStringUTF(key.c_str());
-    jstring jValue = env->NewStringUTF(value.c_str());
+
+    jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
+    jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
+    jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
+    jobject jBorders = env->NewObject(jMapClazz, jMapConstructorMethodId);
+
+    if (style != nullptr) {
+      cpyCVector2JMap(style, jStyles, env);
+    }
+
+    if (margin != nullptr) {
+      cpyCVector2JMap(margin, jMargins, env);
+    }
+
+    if (padding != nullptr) {
+      cpyCVector2JMap(padding, jPaddings, env);
+    }
+
+    if (border != nullptr) {
+      cpyCVector2JMap(border, jBorders, env);
+    }
 
     int flag = 0;
-    flag = env->CallIntMethod(jThis, jCallUpdateStyleByWeexCoreMethodId, jPageId, jRef, jKey,
-                              jValue);
+    flag = env->CallIntMethod(jThis, jCallUpdateStyleByWeexCoreMethodId, jPageId, jRef, jStyles,
+                              jMargins, jPaddings, jBorders);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callUpdateStyle");
     }
 
     env->DeleteLocalRef(jPageId);
     env->DeleteLocalRef(jRef);
-    env->DeleteLocalRef(jKey);
-    env->DeleteLocalRef(jValue);
+    env->DeleteLocalRef(jStyles);
+    env->DeleteLocalRef(jMargins);
+    env->DeleteLocalRef(jPaddings);
+    env->DeleteLocalRef(jBorders);
     return flag;
   }
 

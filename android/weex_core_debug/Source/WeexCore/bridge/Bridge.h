@@ -21,11 +21,6 @@ namespace WeexCore {
     virtual void callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
                                      jbyteArray &jArgString, jbyteArray &jOptString) = 0;
 
-    virtual int callAddElement(jstring &jInstanceId, jstring &jref, jbyteArray &jdomString,
-                               jstring &jindex, jstring &jCallback) = 0;
-
-    virtual int callCreateBody(jstring &instanceId, jbyteArray &taskString, jstring &callback) = 0;
-
     virtual void setTimeout(jstring &jCallbackID, jstring &jTime) = 0;
 
     virtual void callNativeLog(jbyteArray &str_msg) = 0;
@@ -38,9 +33,6 @@ namespace WeexCore {
                                   jstring &callback) = 0;
 
     virtual int callUpdateAttrs(jstring &instanceId, jstring &ref,
-                                jbyteArray &taskString, jstring &callback) = 0;
-
-    virtual int callUpdateStyle(jstring &instanceId, jstring &ref,
                                 jbyteArray &taskString, jstring &callback) = 0;
 
     virtual int callRemoveElement(jstring &instanceId, jstring &ref,
