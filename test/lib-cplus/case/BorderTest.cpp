@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include "WXCoreLayout.h"
-#include "WXCoreFlexEnum.h"
 
 using namespace WeexCore;
 
