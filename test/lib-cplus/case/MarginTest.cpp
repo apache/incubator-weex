@@ -243,10 +243,10 @@ TEST_F(Margin, MarginWidthEdgeOverrideShorthand) {
 TEST_F(Margin, MarginDimension) {
     root->setMargin(marginAll, 200);
     root->calculateLayout();
-    EXPECT_FLOAT_EQ(root->getLayoutWidth(), 300);
-    EXPECT_FLOAT_EQ(root->getLayoutHeight(), 500);
+    EXPECT_FLOAT_EQ(root->getLayoutWidth(), 100);
+    EXPECT_FLOAT_EQ(root->getLayoutHeight(), 300);
     EXPECT_FLOAT_EQ(root->getLayoutPositionLeft(), 200);
     EXPECT_FLOAT_EQ(root->getLayoutPositionRight(), 300);
-    EXPECT_FLOAT_EQ(root->getLayoutPositionTop(), 500);
+    EXPECT_FLOAT_EQ(root->getLayoutPositionTop(), 200);
     EXPECT_FLOAT_EQ(root->getLayoutPositionBottom(), 500);
 }
