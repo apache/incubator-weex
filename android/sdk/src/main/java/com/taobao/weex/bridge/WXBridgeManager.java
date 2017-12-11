@@ -501,49 +501,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  // callCreateBody
-  public int callCreateBody(String instanceId, String tasks, String callback) {
-    if (TextUtils.isEmpty(tasks)) {
-      // if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
-      // }
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-
-    // if (WXEnvironment.isApkDebugable()) {
-    mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> instanceId:").append(instanceId)
-            .append(", tasks:").append(tasks).append(", callback:").append(callback);
-    WXLogUtils.d(mLodBuilder.substring(0));
-    mLodBuilder.setLength(0);
-    // }
-
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        JSONObject domObject = JSON.parseObject(tasks);
-        WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getCreateBody(domObject);
-        domModule.postAction((DOMAction) action, true);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callCreateBody exception " + e.getCause());
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
-
-  }
-
   // callUpdateFinish
   public int callUpdateFinish(String instanceId, String callback) {
     if (WXEnvironment.isApkDebugable()) {
@@ -650,48 +607,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     getNextTick(instanceId, callback);
     return IWXBridge.INSTANCE_RENDERING;
 
-  }
-
-  // callUpdateStyle
-  public int callUpdateStyle(String instanceId, String ref, String task, String callback) {
-    if (TextUtils.isEmpty(task)) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
-      }
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE, "[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-//    if (WXEnvironment.isApkDebugable()) {
-    mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
-            .append(", ref:").append(ref)
-            .append(", task:").append(task)
-            .append(", callback:").append(callback);
-    WXLogUtils.d(mLodBuilder.substring(0));
-    mLodBuilder.setLength(0);
-//    }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        WXDomModule domModule = getDomModule(instanceId);
-        JSONObject domObject = JSON.parseObject(task);
-        Action action = Actions.getUpdateStyle(ref, domObject, false);
-        domModule.postAction((DOMAction) action, false);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callUpdateStyle exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE, "[WXBridgeManager] callUpdateStyle exception " + e.getCause());
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
   }
 
   // callUpdateStyle
@@ -826,40 +741,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     // get next tick
     getNextTick(instanceId, callback);
     return IWXBridge.INSTANCE_RENDERING;
-  }
-
-  public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
-
-    if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callNative::callAddElement >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref).append(", dom:").append(dom).append(", callback:").append(callback);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-
-    if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-      long start = System.currentTimeMillis();
-      JSONObject domObject = JSON.parseObject(dom);
-
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
-      }
-      WXDomModule domModule = getDomModule(instanceId);
-      domModule.postAction(Actions.getAddElement(domObject, ref, Integer.parseInt(index)), false);
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
-
   }
 
   public int callReportCrashReloadPage(String instanceId, String crashFile) {

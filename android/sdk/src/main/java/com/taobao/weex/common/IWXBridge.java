@@ -18,8 +18,14 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Bridge interface, native bridge and debug bridge both need to implement this interface
@@ -65,23 +71,20 @@ public interface IWXBridge extends IWXObject {
 
   /**
    * js call native
-
    */
   int callNative(String instanceId, String tasks, String callback);
 
   void reportJSException(String instanceId, String func, String exception);
 
-  Object callNativeModule(String instanceId, String module, String method,  byte [] arguments,  byte [] options);
+  Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
 
-  void callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
+  void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options);
 
-  int callUpdateFinish(String instanceId,  byte [] tasks, String callback);
+  int callUpdateFinish(String instanceId, byte[] tasks, String callback);
 
-  int callRefreshFinish(String instanceId,  byte [] tasks, String callback);
+  int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-  int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback);
-
-  int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback);
+  int callUpdateAttrs(String instanceId, String ref, byte[] tasks, String callback);
 
   int callRemoveElement(String instanceId, String ref, String callback);
 
@@ -92,5 +95,26 @@ public interface IWXBridge extends IWXObject {
   int callRemoveEvent(String instanceId, String ref, String event, String callback);
 
   void reportServerCrash(String instanceId, String crashFile);
+
+
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders);
+
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders);
+
+  public int callUpdateStyleByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> styles,
+                                       HashMap<String, String> paddings,
+                                       HashMap<String, String> margins,
+                                       HashMap<String, String> borders);
+
+  public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
+
+  public int callCreateFinishByWeexCore(String instanceId);
 
 }

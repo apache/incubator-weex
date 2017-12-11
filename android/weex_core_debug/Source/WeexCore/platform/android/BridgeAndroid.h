@@ -3,10 +3,6 @@
 
 #include "../../bridge/Bridge.h"
 #include "WeexCore.h"
-#include <string>
-#include <map>
-#include <set>
-#include <vector>
 
 namespace WeexCore {
 

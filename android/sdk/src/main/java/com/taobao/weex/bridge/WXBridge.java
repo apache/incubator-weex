@@ -250,28 +250,6 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callUpdateStyle(String instanceId, String ref, byte[] tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callUpdateStyle(instanceId, ref, new String(tasks), callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callUpdateStyle throw exception:" + e.getMessage());
-      }
-    }
-    if (instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
   public int callRemoveElement(String instanceId, String ref, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
