@@ -94,7 +94,15 @@ class WXBridge implements IWXBridge {
    */
 
   public int callNative(String instanceId, byte [] tasks, String callback) {
+    try {
      return callNative(instanceId,new String(tasks),callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      // if(WXEnvironment.isApkDebugable()){
+      WXLogUtils.e(TAG,"callNative throw exception:"+e.getMessage());
+      // }
+      return 0;
+    }
   }
 
   public int callNative(String instanceId, String tasks, String callback) {
@@ -124,7 +132,12 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
   public int callAddElement(String instanceId, String ref,byte[] dom,String index, String callback) {
-    return callAddElement(instanceId,ref, new String(dom),index,callback);
+    try {
+      return callAddElement(instanceId,ref,new String(dom),index,callback);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG,"callAddElement throw exception:"+e.getMessage());
+      return 0;
+    }
   }
 
   /**
@@ -136,7 +149,12 @@ class WXBridge implements IWXBridge {
    */
 
   public int callCreateBody(String instanceId, byte [] tasks, String callback) {
-    return callCreateBody(instanceId,new String(tasks),callback);
+    try {
+      return callCreateBody(instanceId, new String(tasks),callback);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      return 0;
+    }
   }
 
   public int callCreateBody(String instanceId, String tasks, String callback) {
@@ -218,10 +236,10 @@ class WXBridge implements IWXBridge {
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
 
-    JSONArray argArray = JSON.parseArray(new String(arguments));
+    JSONArray argArray = JSON.parseArray(arguments == null ? new String("") : new String(arguments));
     JSONObject optionsObj = null;
     if (options != null) {
-      optionsObj = JSON.parseObject(new String(options));
+      optionsObj = JSON.parseObject(options == null ? new String("") :new String(options));
     }
     Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,optionsObj);
     return new WXJSObject(object);
@@ -237,7 +255,7 @@ class WXBridge implements IWXBridge {
    */
   @Override
   public void callNativeComponent(String instanceId, String componentRef, String method, byte [] arguments, byte [] options) {
-    JSONArray argArray = JSON.parseArray(new String(arguments));
+    JSONArray argArray = JSON.parseArray(arguments == null ? new String("") : new String(arguments));
      WXBridgeManager.getInstance().callNativeComponent(instanceId,componentRef,method,argArray,options);
   }
 
@@ -356,7 +374,7 @@ class WXBridge implements IWXBridge {
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callUpdateAttrs(instanceId, ref, new String(tasks), callback);
+      errorCode = WXBridgeManager.getInstance().callUpdateAttrs(instanceId, ref, tasks == null ? new String("") : new String(tasks), callback);
     } catch (Throwable e) {
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
