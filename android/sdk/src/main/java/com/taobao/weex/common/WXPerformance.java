@@ -50,6 +50,14 @@ public class WXPerformance {
   public long renderTimeOrigin;
 
   public long fsRenderTime;
+
+  /**
+   * Time used for
+   * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
+   */
+  @RestrictTo(Scope.LIBRARY)
+  public long callCreateInstanceTime;
+
   /**
    * Time spent for reading, time unit is ms.
    */
@@ -78,9 +86,9 @@ public class WXPerformance {
   public long templateLoadTime;
 
   /**
-   * Time used for
-   * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
+   * Use {@link #callCreateInstanceTime} instead.
    */
+  @Deprecated
   public long communicateTime;
 
   /**
@@ -223,25 +231,42 @@ public class WXPerformance {
     quotas.put("networkTime", (double)networkTime);
 
     double fsRenderTime;
-    if (this.fsRenderTime == 0) {
-      fsRenderTime = totalTime;
-    } else {
+    if (this.fsRenderTime != 0) {
       fsRenderTime = this.fsRenderTime - renderTimeOrigin;
+    } else {
+      if (totalTime != 0) {
+        fsRenderTime = totalTime;
+      } else {
+        fsRenderTime = -1;
+      }
     }
 
+    quotas.put("fsCallJsTotalNum", 0D);
+    quotas.put("fsCallNativeTotalNum", 0D);
     quotas.put("fsRenderTime", fsRenderTime);
+    quotas.put("fsRequestNum", 0D);
+    quotas.put("callCreateInstanceTime", (double) (callCreateInstanceTime- renderTimeOrigin));
+    quotas.put("communicateTotalTime", totalTime);
+    quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
+    quotas.put("maxDeepVDomLayer", 0D);
+    quotas.put("componentCount",(double)componentCount);
+    quotas.put("useScroller", (double) useScroller);
+    quotas.put("cellExceedNum", 0D);
+    quotas.put("timerInvokeCount", 0D);
+    quotas.put("avgFps", 0D);
+    quotas.put("MaxImproveMemory", 0D);
+    quotas.put("BackImproveMemory", 0D);
+    quotas.put("PushImproveMemory", 0D);
+
+
     quotas.put("screenRenderTime", (double)screenRenderTime);
     quotas.put("communicateTime", (double)communicateTime);
-    quotas.put("communicateTotalTime", totalTime);
     quotas.put("localReadTime", localReadTime);
     quotas.put("templateLoadTime", (double)templateLoadTime);
     quotas.put("firstScreenJSFExecuteTime",(double) firstScreenJSFExecuteTime);
-    quotas.put("componentCount",(double)componentCount);
     quotas.put("actualNetworkTime",(double)actualNetworkTime);
     quotas.put("syncTaskTime",(double)syncTaskTime);
     quotas.put("packageSpendTime",(double)packageSpendTime);
-    quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
-    quotas.put("useScroller", (double) useScroller);
 
     /**
      * TODO These attribute will be moved to elsewhere
