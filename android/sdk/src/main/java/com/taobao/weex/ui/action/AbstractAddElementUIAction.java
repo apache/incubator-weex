@@ -28,25 +28,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class WXUIAction {
+public abstract class AbstractAddElementUIAction extends BasicUIAction {
 
   public String mPageId = null;
+  public String mRef = null;
   public String mComponentType = null;
   public String mParentRef = null;
-  public String mRef = null;
   public int mIndex = -1;
-  public WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
-  public WXUISize mLayoutSize = new WXUISize(0, 0);
-  public String mKey = null;
-  public String mValue = null;
   public Map<String, String> mStyle;
   public Map<String, String> mAttributes;
   public Set<String> mEvents;
   public HashMap<String, String> mPaddings;
   public HashMap<String, String> mMargins;
   public HashMap<String, String> mBorders;
-
-  public abstract void executeAction();
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent) {
 

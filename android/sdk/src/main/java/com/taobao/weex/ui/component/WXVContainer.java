@@ -22,11 +22,9 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.WXUIAction;
-
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import java.util.ArrayList;
 
 /**
@@ -38,16 +36,16 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance,parent,isLazy,action);
   }
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, WXUIAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, AbstractAddElementUIAction action) {
     super(instance, parent,action);
   }
 
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
     super(instance, parent,action);
   }
 

@@ -24,7 +24,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXRecyclerDomObject;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
@@ -55,12 +55,12 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private float mPaddingRight;
 
   @Deprecated
-  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent, isLazy,action);
   }
 
 
-  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, WXUIAction action) {
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, AbstractAddElementUIAction action) {
     super(instance, parent,action);
 //    if (node != null && node instanceof WXRecyclerDomObject) {
 //      mDomObject = (WXRecyclerDomObject) node;

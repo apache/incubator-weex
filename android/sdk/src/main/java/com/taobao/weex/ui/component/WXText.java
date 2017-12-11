@@ -40,18 +40,17 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
-import android.view.ViewGroup;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextDecorationSpan;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCustomStyleSpan;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXLineHeightSpan;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.layout.MeasureMode;
 import com.taobao.weex.ui.layout.MeasureSize;
@@ -78,18 +77,18 @@ public class WXText extends WXComponent<WXTextView> {
   public static final int sDEFAULT_SIZE = 32;
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXText(instance, parent,action);
     }
   }
 
   @Deprecated
-  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent,action);
   }
 
   public WXText(WXSDKInstance instance,
-                WXVContainer parent, WXUIAction action) {
+                WXVContainer parent, AbstractAddElementUIAction action) {
     super(instance, parent,action);
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       class SetSpanOperation {

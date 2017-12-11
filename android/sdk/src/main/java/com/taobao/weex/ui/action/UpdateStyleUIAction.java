@@ -21,7 +21,20 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 
-public class UpdateStyleUIAction extends WXUIAction {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class UpdateStyleUIAction extends BasicUIAction {
+
+  public String mPageId = null;
+  public String mRef = null;
+  public Map<String, String> mStyle;
+  public Map<String, String> mAttributes;
+  public Set<String> mEvents;
+  public HashMap<String, String> mPaddings;
+  public HashMap<String, String> mMargins;
+  public HashMap<String, String> mBorders;
 
   @Override
   public void executeAction() {

@@ -42,7 +42,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;
 import com.taobao.weex.ui.view.WXEditText;
@@ -74,7 +74,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private SoftKeyboardDetector.Unregister mUnregister;
   private boolean mIgnoreNextOnInputEvent = false;
 
-  public AbstractEditComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+  public AbstractEditComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
     super(instance, parent, isLazy,action);
     mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
   }

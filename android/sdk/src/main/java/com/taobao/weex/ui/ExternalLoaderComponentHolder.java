@@ -22,7 +22,7 @@ import android.util.Pair;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
@@ -65,7 +65,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
     if(mClass == null){
       mClass = mClzGetter.getExternalComponentClass(mType,instance);
     }

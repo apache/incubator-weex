@@ -56,7 +56,6 @@ import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.LayoutUIAction;
 import com.taobao.weex.ui.action.UpdateStyleUIAction;
-import com.taobao.weex.ui.action.WXUIAction;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1822,7 +1821,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new CreateBodyUIAction();
+        final CreateBodyUIAction action = new CreateBodyUIAction();
         action.mStyle = styles;
         action.mAttributes = attributes;
         action.mEvents = events;
@@ -1874,7 +1873,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new AddElementUIAction();
+        final AddElementUIAction action = new AddElementUIAction();
         action.mStyle = styles;
         action.mAttributes = attributes;
         action.mEvents = events;
@@ -1919,7 +1918,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final WXUIAction action = new UpdateStyleUIAction();
+        final UpdateStyleUIAction action = new UpdateStyleUIAction();
         action.mPageId = instanceId;
         action.mRef = ref;
         action.mStyle = styles;
@@ -1966,7 +1965,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final WXUIAction action = new LayoutUIAction();
+        final LayoutUIAction action = new LayoutUIAction();
         action.mPageId = pageId;
         action.mRef = ref;
         action.mLayoutPosition.setTop(top);

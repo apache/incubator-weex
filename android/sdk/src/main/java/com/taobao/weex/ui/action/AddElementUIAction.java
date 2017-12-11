@@ -21,15 +21,18 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-public class AddElementUIAction extends WXUIAction {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class AddElementUIAction extends AbstractAddElementUIAction {
 
   @Override
   public void executeAction() {
-
-    //Create component in dom thread
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
       return;

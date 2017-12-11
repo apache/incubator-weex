@@ -18,11 +18,15 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 
-public class LayoutUIAction extends WXUIAction {
+public class LayoutUIAction extends BasicUIAction {
+
+  public String mPageId = null;
+  public String mRef = null;
+  public WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
+  public WXUISize mLayoutSize = new WXUISize(0, 0);
 
   @Override
   public void executeAction() {
@@ -31,7 +35,7 @@ public class LayoutUIAction extends WXUIAction {
       return;
     }
 
-    component.updateDemission(this);
+    component.updateDemission(mLayoutSize, mLayoutPosition);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
   }

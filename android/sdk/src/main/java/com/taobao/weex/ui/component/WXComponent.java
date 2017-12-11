@@ -39,7 +39,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -52,15 +51,12 @@ import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
-import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
 import com.taobao.weex.dom.flex.Spacing;
@@ -136,26 +132,24 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent, isLazy, action);
   }
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent, action);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
     this(instance, parent, TYPE_COMMON, action);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, WXUIAction action) {
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, AbstractAddElementUIAction action) {
     setPageId(action.mPageId);
     setComponentType(action.mComponentType);
     setParentRef(action.mParentRef);
     setRef(action.mRef);
-    setLayoutSize(action.mLayoutSize);
-    setLayoutPosition(action.mLayoutPosition);
 
     mInstance = instance;
     mContext = mInstance.getContext();
@@ -526,9 +520,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void updateDemission(WXUIAction action) {
-    setLayoutPosition(action.mLayoutPosition);
-    setLayoutSize(action.mLayoutSize);
+  public void updateDemission(WXUISize size, WXUIPosition position) {
+    setLayoutPosition(position);
+    setLayoutSize(size);
   }
 
   public void refreshData(WXComponent component) {

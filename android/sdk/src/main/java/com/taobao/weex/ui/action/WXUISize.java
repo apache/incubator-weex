@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.utils.WXViewUtils;
-
 public class WXUISize {
 
   private float mWidth;
@@ -27,11 +25,11 @@ public class WXUISize {
 
   public WXUISize(float mWidth, float mHeight) {
     this.mWidth = mWidth;
-    this.mHeight =  mHeight;
+    this.mHeight = mHeight;
   }
 
   public float getWidth() {
-    return  mWidth;
+    return mWidth;
   }
 
   public void setWidth(float mWidth) {

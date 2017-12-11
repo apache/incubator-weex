@@ -47,9 +47,8 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
@@ -151,7 +150,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private WXStickyHelper stickyHelper;
 
 
-  public BasicListComponent(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+  public BasicListComponent(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
     super(instance, parent,action);
     stickyHelper = new WXStickyHelper(this);
   }

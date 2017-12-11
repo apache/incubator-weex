@@ -18,49 +18,6 @@
  */
 package com.taobao.weex.ui.action;
 
-public class WXUIPosition {
-
-  private float mLeft;
-  private float mTop;
-  private float mRight;
-  private float mBottom;
-
-  public WXUIPosition(float left, float top, float right, float bottom) {
-    this.mLeft = left;
-    this.mTop = top;
-    this.mRight = right;
-    this.mBottom = bottom;
-  }
-
-  public float getLeft() {
-    return mLeft;
-  }
-
-  public void setLeft(float mLeft) {
-    this.mLeft = mLeft;
-  }
-
-  public float getTop() {
-    return mTop;
-  }
-
-  public void setTop(float mTop) {
-    this.mTop = mTop;
-  }
-
-  public float getRight() {
-    return mRight;
-  }
-
-  public void setRight(float mRight) {
-    this.mRight = mRight;
-  }
-
-  public float getBottom() {
-    return mBottom;
-  }
-
-  public void setBottom(float mBottom) {
-    this.mBottom = mBottom;
-  }
+public abstract class BasicUIAction {
+  public abstract void executeAction();
 }

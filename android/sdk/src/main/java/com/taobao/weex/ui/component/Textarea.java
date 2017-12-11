@@ -18,15 +18,13 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
 
@@ -34,7 +32,7 @@ import com.taobao.weex.utils.WXUtils;
  * Created by sospartan on 7/11/16.
  */
 public class Textarea extends AbstractEditComponent {
-  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
     super(instance, parent, isLazy,action);
   }
 
