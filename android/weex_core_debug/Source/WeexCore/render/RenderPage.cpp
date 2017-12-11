@@ -219,6 +219,54 @@ namespace WeexCore {
     sendUpdateStyleAction(render, style, margin, padding, border);
     if (styles->size() > 0)
       calculateLayout();
+
+    if (style != nullptr) {
+      for (int i = 0; i < style->size(); ++i) {
+        if ((*style)[i] != nullptr) {
+          delete (*style)[i];
+          (*style)[i] = nullptr;
+        }
+      }
+      style->clear();
+      delete style;
+      style = nullptr;
+    }
+
+    if (margin != nullptr) {
+      for (int i = 0; i < margin->size(); ++i) {
+        if ((*margin)[i] != nullptr) {
+          delete (*margin)[i];
+          (*margin)[i] = nullptr;
+        }
+      }
+      margin->clear();
+      delete margin;
+      margin = nullptr;
+    }
+
+    if (padding != nullptr) {
+      for (int i = 0; i < padding->size(); ++i) {
+        if ((*padding)[i] != nullptr) {
+          delete (*padding)[i];
+          (*padding)[i] = nullptr;
+        }
+      }
+      padding->clear();
+      delete padding;
+      padding = nullptr;
+    }
+
+    if (border != nullptr) {
+      for (int i = 0; i < border->size(); ++i) {
+        if ((*border)[i] != nullptr) {
+          delete (*border)[i];
+          (*border)[i] = nullptr;
+        }
+      }
+      border->clear();
+      delete border;
+      border = nullptr;
+    }
   }
 
   void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {
