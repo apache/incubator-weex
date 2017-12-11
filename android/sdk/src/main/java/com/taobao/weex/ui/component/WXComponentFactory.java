@@ -82,7 +82,7 @@ public class WXComponentFactory {
   }
 
   public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    if (instance == null || TextUtils.isEmpty(action.mComponentType)) {
+    if (instance == null || TextUtils.isEmpty(action.getComponentType())) {
       return null;
     }
 
@@ -90,13 +90,13 @@ public class WXComponentFactory {
       Set<String> types=new HashSet<>();
       sComponentTypes.put(instance.getInstanceId(),types);
     }
-    sComponentTypes.get(instance.getInstanceId()).add(action.mComponentType);
+    sComponentTypes.get(instance.getInstanceId()).add(action.getComponentType());
 
-    IFComponentHolder holder = WXComponentRegistry.getComponent(action.mComponentType);
+    IFComponentHolder holder = WXComponentRegistry.getComponent(action.getComponentType());
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
-                action.mComponentType + "]" + " class not found";
+                action.getComponentType() + "]" + " class not found";
         WXLogUtils.e(tag);
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
@@ -109,7 +109,7 @@ public class WXComponentFactory {
     try {
       return holder.createInstance(instance, parent,action);
     } catch (Exception e) {
-      WXLogUtils.e("WXComponentFactory Exception type:[" + action.mComponentType + "] ", e);
+      WXLogUtils.e("WXComponentFactory Exception type:[" + action.getComponentType() + "] ", e);
     }
 
     return null;

@@ -31,6 +31,28 @@ import java.util.Set;
 
 public class AddElementUIAction extends AbstractAddElementUIAction {
 
+  public AddElementUIAction(String pageId, String ref,
+                            String componentType, String parentRef,
+                            int index,
+                            Map<String, String> style,
+                            Map<String, String> attributes,
+                            Set<String> events,
+                            HashMap<String, String> paddings,
+                            HashMap<String, String> margins,
+                            HashMap<String, String> borders) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mComponentType = componentType;
+    this.mParentRef = parentRef;
+    this.mIndex = index;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
+  }
+
   @Override
   public void executeAction() {
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
@@ -54,4 +76,6 @@ public class AddElementUIAction extends AbstractAddElementUIAction {
       WXLogUtils.e("add component failed.", e);
     }
   }
+
+
 }

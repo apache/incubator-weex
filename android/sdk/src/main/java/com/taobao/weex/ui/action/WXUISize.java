@@ -23,24 +23,24 @@ public class WXUISize {
   private float mWidth;
   private float mHeight;
 
-  public WXUISize(float mWidth, float mHeight) {
-    this.mWidth = mWidth;
-    this.mHeight = mHeight;
+  public WXUISize(float width, float height) {
+    this.mWidth = width;
+    this.mHeight = height;
   }
 
   public float getWidth() {
     return mWidth;
   }
 
-  public void setWidth(float mWidth) {
-    this.mWidth = mWidth;
+  public void setWidth(float width) {
+    this.mWidth = width;
   }
 
   public float getHeight() {
     return mHeight;
   }
 
-  public void setHeight(float mHeight) {
-    this.mHeight = mHeight;
+  public void setHeight(float height) {
+    this.mHeight = height;
   }
 }

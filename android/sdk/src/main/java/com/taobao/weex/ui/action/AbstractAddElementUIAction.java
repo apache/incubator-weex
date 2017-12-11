@@ -30,17 +30,17 @@ import java.util.Set;
 
 public abstract class AbstractAddElementUIAction extends BasicUIAction {
 
-  public String mPageId = null;
-  public String mRef = null;
-  public String mComponentType = null;
-  public String mParentRef = null;
-  public int mIndex = -1;
-  public Map<String, String> mStyle;
-  public Map<String, String> mAttributes;
-  public Set<String> mEvents;
-  public HashMap<String, String> mPaddings;
-  public HashMap<String, String> mMargins;
-  public HashMap<String, String> mBorders;
+  protected String mPageId = null;
+  protected String mRef = null;
+  protected String mComponentType = null;
+  protected String mParentRef = null;
+  protected int mIndex = -1;
+  protected Map<String, String> mStyle;
+  protected Map<String, String> mAttributes;
+  protected Set<String> mEvents;
+  protected HashMap<String, String> mPaddings;
+  protected HashMap<String, String> mMargins;
+  protected HashMap<String, String> mBorders;
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent) {
 
@@ -57,5 +57,49 @@ public abstract class AbstractAddElementUIAction extends BasicUIAction {
     }
 
     return component;
+  }
+
+  public String getPageId() {
+    return mPageId;
+  }
+
+  public String getRef() {
+    return mRef;
+  }
+
+  public String getComponentType() {
+    return mComponentType;
+  }
+
+  public String getParentRef() {
+    return mParentRef;
+  }
+
+  public int getIndex() {
+    return mIndex;
+  }
+
+  public Map<String, String> getStyle() {
+    return mStyle;
+  }
+
+  public Map<String, String> getAttributes() {
+    return mAttributes;
+  }
+
+  public Set<String> getEvents() {
+    return mEvents;
+  }
+
+  public HashMap<String, String> getPaddings() {
+    return mPaddings;
+  }
+
+  public HashMap<String, String> getMargins() {
+    return mMargins;
+  }
+
+  public HashMap<String, String> getBorders() {
+    return mBorders;
   }
 }

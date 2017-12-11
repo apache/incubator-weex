@@ -36,6 +36,25 @@ import java.util.Set;
 
 public class CreateBodyUIAction extends AbstractAddElementUIAction {
 
+  public CreateBodyUIAction(String pageId, String ref,
+                            String componentType,
+                            Map<String, String> style,
+                            Map<String, String> attributes,
+                            Set<String> events,
+                            HashMap<String, String> paddings,
+                            HashMap<String, String> margins,
+                            HashMap<String, String> borders) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mComponentType = componentType;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
+  }
+
   @Override
   public void executeAction() {
     final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);

@@ -146,10 +146,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, AbstractAddElementUIAction action) {
-    setPageId(action.mPageId);
-    setComponentType(action.mComponentType);
-    setParentRef(action.mParentRef);
-    setRef(action.mRef);
+    setPageId(action.getPageId());
+    setComponentType(action.getComponentType());
+    setParentRef(action.getParentRef());
+    setRef(action.getRef());
 
     mInstance = instance;
     mContext = mInstance.getContext();

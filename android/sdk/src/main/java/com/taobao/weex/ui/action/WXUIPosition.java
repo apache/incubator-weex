@@ -36,31 +36,31 @@ public class WXUIPosition {
     return mLeft;
   }
 
-  public void setLeft(float mLeft) {
-    this.mLeft = mLeft;
+  public void setLeft(float left) {
+    this.mLeft = left;
   }
 
   public float getTop() {
     return mTop;
   }
 
-  public void setTop(float mTop) {
-    this.mTop = mTop;
+  public void setTop(float top) {
+    this.mTop = top;
   }
 
   public float getRight() {
     return mRight;
   }
 
-  public void setRight(float mRight) {
-    this.mRight = mRight;
+  public void setRight(float right) {
+    this.mRight = right;
   }
 
   public float getBottom() {
     return mBottom;
   }
 
-  public void setBottom(float mBottom) {
-    this.mBottom = mBottom;
+  public void setBottom(float bottom) {
+    this.mBottom = bottom;
   }
 }

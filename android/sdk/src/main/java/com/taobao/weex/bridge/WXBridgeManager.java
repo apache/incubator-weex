@@ -56,6 +56,8 @@ import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.LayoutUIAction;
 import com.taobao.weex.ui.action.UpdateStyleUIAction;
+import com.taobao.weex.ui.action.WXUIPosition;
+import com.taobao.weex.ui.action.WXUISize;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1821,18 +1823,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final CreateBodyUIAction action = new CreateBodyUIAction();
-        action.mStyle = styles;
-        action.mAttributes = attributes;
-        action.mEvents = events;
-        action.mPaddings = paddings;
-        action.mMargins = margins;
-        action.mBorders = borders;
-        action.mPageId = pageId;
-        action.mComponentType = componentType;
-        action.mRef = ref;
+        final CreateBodyUIAction action = new CreateBodyUIAction(pageId, ref, componentType,
+                styles, attributes, events, paddings, margins, borders);
 
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -1873,20 +1867,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final AddElementUIAction action = new AddElementUIAction();
-        action.mStyle = styles;
-        action.mAttributes = attributes;
-        action.mEvents = events;
-        action.mPaddings = paddings;
-        action.mMargins = margins;
-        action.mBorders = borders;
-        action.mPageId = pageId;
-        action.mComponentType = componentType;
-        action.mRef = ref;
-        action.mParentRef = parentRef;
-        action.mIndex = index;
+        final AddElementUIAction action = new AddElementUIAction(pageId, ref, componentType, parentRef, index,
+                styles, attributes, events, paddings, margins, borders);
 
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -1918,15 +1902,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final UpdateStyleUIAction action = new UpdateStyleUIAction();
-        action.mPageId = instanceId;
-        action.mRef = ref;
-        action.mStyle = styles;
-        action.mPaddings = paddings;
-        action.mMargins = margins;
-        action.mBorders = borders;
+        final UpdateStyleUIAction action = new UpdateStyleUIAction(instanceId, ref, styles, paddings, margins, borders);
 
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getmPageId()).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
@@ -1965,17 +1943,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final LayoutUIAction action = new LayoutUIAction();
-        action.mPageId = pageId;
-        action.mRef = ref;
-        action.mLayoutPosition.setTop(top);
-        action.mLayoutPosition.setBottom(bottom);
-        action.mLayoutPosition.setLeft(left);
-        action.mLayoutPosition.setRight(right);
-        action.mLayoutSize.setHeight(height);
-        action.mLayoutSize.setWidth(width);
+        WXUISize size = new WXUISize(width, height);
+        WXUIPosition position = new WXUIPosition(left, top, right, bottom);
+        final LayoutUIAction action = new LayoutUIAction(pageId, ref, position, size);
 
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.mPageId).runOnUiThread(new Runnable() {
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
           @Override
           public void run() {
             action.executeAction();
