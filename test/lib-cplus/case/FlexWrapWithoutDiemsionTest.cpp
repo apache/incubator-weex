@@ -66,7 +66,7 @@ TEST_F(FlexWrapDimension, RowWrap) {
 
     auto flexCap = static_cast<int>(rootWidth / childWidth);
     int linesBeforeLast = childCount / flexCap - (childCount % flexCap == 0 ? 1 : 0);
-    int itemsBeforeLast = childCount % flexCap == 0 ? flexCap - 1 : childCount % flexCap;
+    int itemsBeforeLast = childCount % flexCap == 0 ? flexCap - 1 : (childCount % flexCap - 1);
 
     EXPECT_FLOAT_EQ(target->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), (linesBeforeLast + 1) * childHeight);
