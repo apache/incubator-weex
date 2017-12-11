@@ -135,71 +135,54 @@ namespace WeexCore {
   StyleType RenderObject::applyStyle(std::string key, std::string value) {
     if (key == ALIGN_ITEMS) {
       setAlignItems(getWXCoreAlignItem(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == ALIGN_SELF) {
       setAlignSelf(getWXCoreAlignSelf(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == FLEX) {
       setFlex(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == FLEX_DIRECTION) {
       setFlexDirection(getWXCoreFlexDirection(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == JUSTIFY_CONTENT) {
       setJustifyContent(getWXCoreJustifyContent(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == FLEX_WRAP) {
       setFlexWrap(getWXCoreFlexWrap(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == MIN_WIDTH) {
       setMinWidth(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == MIN_HEIGHT) {
       setMinHeight(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == MAX_WIDTH) {
       setMaxWidth(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == MAX_HEIGHT) {
       setMaxHeight(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
       setStyleHeight(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
       setStyleWidth(stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == POSITION) {
       setStylePositionType(getWXCorePositionType(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == LEFT) {
       setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == TOP) {
       setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == RIGHT) {
       setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == BOTTOM) {
       setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
-      mStyles->insert(std::pair<std::string, std::string>(key, value));
       return TypeLayout;
     } else if (key == MARGIN) {
       setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
