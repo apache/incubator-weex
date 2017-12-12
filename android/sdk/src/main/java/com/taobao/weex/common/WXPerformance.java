@@ -325,6 +325,7 @@ public class WXPerformance {
     quotas.put("pageName", pageName);
     quotas.put("requestType",requestType);
     quotas.put("connectionType",connectionType);
+    quotas.put(CACHE_TYPE, cacheType);
 
     /**
      * TODO These attribute will be moved to elsewhere
