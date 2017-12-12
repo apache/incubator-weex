@@ -12,7 +12,7 @@ using namespace std;
 constexpr float childWidth = 150;
 constexpr float childHeight = 100;
 constexpr float rootWidth = 750;
-constexpr int childCount = 10;
+constexpr int childCount = 20;
 
 class FlexWrapDimension : public Test {
 protected:
