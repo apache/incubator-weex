@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,12 +113,12 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
    * 通过PackageApp获取JS Bundle的缓存
    *
    * @param request  请求Request
-   * @param response response
    * @return 有缓存response.statusCode=200
    */
   private WXResponse getResponseByPackageApp(WXRequest request) {
     WXResponse ret = new WXResponse();
     ret.statusCode = "-1";
+    ret.extendParams = new HashMap<>();
     String template="";
     String url = request.url.trim();
     try {
@@ -141,6 +142,8 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
       ret.originalData = template.getBytes();
       ret.extendParams.put("requestType", "packageApp");
       ret.extendParams.put("connectionType", "packageApp");
+
+      WXLogUtils.w("HttpAdapter", "ZCache命中: " + url);
       return ret;
     }
     return ret;
