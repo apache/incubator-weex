@@ -1573,7 +1573,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     invokeExecJS(instanceId, namespace, function, args, true);
   }
 
-  public void invokeExecJS(String instanceId, String namespace, String function,
+  public void invokeExecJS(final String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
 //     if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
@@ -1582,8 +1582,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-//     }
+
+    final long start = System.currentTimeMillis();
     mWXBridge.execJS(instanceId, namespace, function, args);
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (null != instance){
+      instance.callJsTime(System.currentTimeMillis()-start);
+    }
   }
 
   private void invokeInitFramework(Message msg) {

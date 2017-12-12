@@ -31,6 +31,10 @@ public class WXPerformance {
   @RestrictTo(Scope.LIBRARY_GROUP)
   public static final String CACHE_TYPE = "cacheType";
 
+  public static final int VIEW_LIMIT_HEIGHT = 720;
+  public static final int VIEW_LIMIT_WIDTH = 480;
+  public static final boolean TRACE_DATA = WXEnvironment.isApkDebugable();
+
   /**
    * No longer needed.
    */
@@ -57,6 +61,35 @@ public class WXPerformance {
    */
   @RestrictTo(Scope.LIBRARY)
   public long callCreateInstanceTime;
+
+
+  public long fsCallJsTotalTime;
+
+  public int fsCallJsTotalNum;
+
+  public long fsCallNativeTotalTime;
+
+  public int fsCallNativeTotalNum;
+
+  public int fsRequestNum;
+
+  public int cellExceedNum;
+
+  public int timerInvokeCount;
+
+  public long avgFPS;
+  public long frameSum;
+  public long frameStartTime;
+  public long frameEndTime;
+
+  public long maxImproveMemory;
+
+  public long backImproveMemory;
+
+  public long pushImproveMemory;
+
+  public long memBeforeRender;
+
 
   /**
    * Time spent for reading, time unit is ms.
@@ -154,6 +187,9 @@ public class WXPerformance {
    * view hierarchy
    */
   public int maxDeepViewLayer;
+
+  public int maxDeepVDomLayer;
+
   /**
    * 1:true
    * 0:false
@@ -241,21 +277,23 @@ public class WXPerformance {
       }
     }
 
-    quotas.put("fsCallJsTotalNum", 0D);
-    quotas.put("fsCallNativeTotalNum", 0D);
-    quotas.put("fsRenderTime", fsRenderTime);
-    quotas.put("fsRequestNum", 0D);
     quotas.put("callCreateInstanceTime", (double) (callCreateInstanceTime- renderTimeOrigin));
+    quotas.put("fsCallJsTotalTime",(double) fsCallJsTotalTime);
+    quotas.put("fsCallJsTotalNum", (double) fsCallJsTotalNum);
+    quotas.put("fsCallNativeTotalTime", (double) fsCallNativeTotalTime);
+    quotas.put("fsCallNativeTotalNum", (double) fsCallNativeTotalNum);
+    quotas.put("fsRenderTime", fsRenderTime);
+    quotas.put("fsRequestNum", (double) fsRequestNum);
     quotas.put("communicateTotalTime", totalTime);
     quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
-    quotas.put("maxDeepVDomLayer", 0D);
+    quotas.put("maxDeepVDomLayer", (double) maxDeepVDomLayer);
     quotas.put("componentCount",(double)componentCount);
     quotas.put("useScroller", (double) useScroller);
-    quotas.put("cellExceedNum", 0D);
-    quotas.put("timerInvokeCount", 0D);
-    quotas.put("avgFps", 0D);
+    quotas.put("cellExceedNum", (double) cellExceedNum);
+    quotas.put("timerInvokeCount", (double) timerInvokeCount);
+    quotas.put("avgFps", (double) avgFPS);
     quotas.put("MaxImproveMemory", 0D);
-    quotas.put("BackImproveMemory", 0D);
+    quotas.put("BackImproveMemory", (double) backImproveMemory);
     quotas.put("PushImproveMemory", 0D);
 
 

@@ -31,7 +31,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +64,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.performance.FpsCollector;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -73,6 +73,7 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
+import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
@@ -195,6 +196,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
 
   private int mMaxDeepLayer;
+  private int mMaxVDomDeepLayer;
 
   public boolean isTrackComponent() {
     return trackComponent;
@@ -444,6 +446,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     mWXPerformance.renderTimeOrigin = System.currentTimeMillis();
+    if (WXPerformance.TRACE_DATA ){
+      mWXPerformance.memBeforeRender = MemUtils.getTotalPss(mContext);
+      FpsCollector.getInstance().registerListener(mInstanceId, new FpsCollector.IFrameCallBack() {
+          @Override
+          public void doFrame(long frameTimeNanos) {
+              if (mWXPerformance.frameSum >= Long.MAX_VALUE){
+                 return;
+              }
+              mWXPerformance.frameSum++;
+              if (mWXPerformance.frameStartTime == 0){
+                  mWXPerformance.frameStartTime = System.currentTimeMillis();
+              }
+              mWXPerformance.frameEndTime = System.currentTimeMillis();
+          }
+      });
+    }
+
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
       WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
 
@@ -1174,8 +1193,18 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
-  public void callNativeTime(long time) {
-    mWXPerformance.callNativeTime += time;
+  public void callNativeTime(final long time) {
+    if (!mEnd){
+      mWXPerformance.fsCallNativeTotalTime += time;
+      mWXPerformance.fsCallNativeTotalNum++;
+    }
+  }
+
+  public void callJsTime(final long time){
+    if (!mEnd){
+      mWXPerformance.fsCallJsTotalTime+=time;
+      mWXPerformance.fsCallJsTotalNum++;
+    }
   }
 
   public void jsonParseTime(long time) {
@@ -1183,7 +1212,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void firstScreenRenderFinished() {
-    if(mEnd == true)
+    if(mEnd)
        return;
 
     mEnd = true;
@@ -1330,6 +1359,16 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       }
       if(templateRef != null){
         templateRef = null;
+      }
+      if (WXPerformance.TRACE_DATA){
+        mWXPerformance.backImproveMemory = MemUtils.getTotalPss(mContext) - mWXPerformance.memBeforeRender;
+
+        FpsCollector.getInstance().unRegister(mInstanceId);
+        long frameDiffTime = mWXPerformance.frameEndTime - mWXPerformance.frameStartTime;
+        if (0L == frameDiffTime){
+            frameDiffTime = 1L;
+        }
+        mWXPerformance.avgFPS = mWXPerformance.frameSum/frameDiffTime;
       }
     }
   }
@@ -1595,6 +1634,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mMaxDeepLayer = maxDeepLayer;
   }
 
+  public int getMaxDomDeep() {
+    return mMaxVDomDeepLayer;
+  }
+
+  public void setMaxDomDeep(int maxDomDeep){
+    mMaxVDomDeepLayer = maxDomDeep;
+    mWXPerformance.maxDeepVDomLayer = maxDomDeep;
+  }
+
+  public void onHttpStart(){
+    if (!mEnd){
+      mWXPerformance.fsRequestNum++;
+    }
+  }
+
   /**
    * load bundle js listener
    */
@@ -1625,7 +1679,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         event.submit();
       }
     }
-    
+
     public void setSDKInstance(WXSDKInstance instance) {
       this.instance = instance;
     }
@@ -1635,6 +1689,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (this.instance != null
           && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpStart();
+        this.instance.onHttpStart();
       }
     }
 

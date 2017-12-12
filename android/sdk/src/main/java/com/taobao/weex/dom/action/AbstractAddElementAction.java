@@ -108,10 +108,15 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     appendDomToTree(context, domObject);
     Stopwatch.split("appendDomToTree");
 
-    domObject.traverseTree(
+    int maxDomDep = domObject.traverseTree(
         context.getAddDOMConsumer(),
         context.getApplyStyleConsumer()
     );
+
+    if (instance.getMaxDomDeep()< maxDomDep){
+      instance.setMaxDomDeep(maxDomDep);
+    }
+
     Stopwatch.split("traverseTree");
 
 
