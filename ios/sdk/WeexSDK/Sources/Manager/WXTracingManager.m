@@ -92,7 +92,9 @@
         if(![[WXTracingManager sharedInstance].tracingTasks objectForKey:tracing.iid]){
             WXTracingTask *task = [WXTracingTask new];
             task.iid = tracing.iid;
-            [[WXTracingManager sharedInstance].tracingTasks setObject:task forKey:tracing.iid];
+            if (tracing.iid) {
+                [[WXTracingManager sharedInstance].tracingTasks setObject:task forKey:tracing.iid];
+            }
         }
         WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:tracing.iid];
         if(task.bundleUrl.length == 0){
