@@ -46,7 +46,7 @@ namespace WeexCore {
     void
     moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
 
-    void updateAttr(std::string pageId, std::string ref, std::string key, std::string value);
+    void updateAttr(std::string pageId, std::string ref, std::string data);
 
     void updateStyle(std::string pageId, std::string ref, std::string data);
 

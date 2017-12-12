@@ -84,8 +84,6 @@ public interface IWXBridge extends IWXObject {
 
   int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-  int callUpdateAttrs(String instanceId, String ref, byte[] tasks, String callback);
-
   int callRemoveElement(String instanceId, String ref, String callback);
 
   int callMoveElement(String instanceId, String ref, String parentref, String index, String callback);
@@ -112,6 +110,9 @@ public interface IWXBridge extends IWXObject {
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders);
+
+  public int callUpdateAttrsByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> attrs);
 
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
 

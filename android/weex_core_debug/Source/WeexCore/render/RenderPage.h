@@ -42,7 +42,8 @@ namespace WeexCore {
                           std::vector<std::pair<std::string, std::string> *> *padding,
                           std::vector<std::pair<std::string, std::string> *> *border);
 
-    void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
+    void sendUpdateAttrAction(RenderObject *render,
+                              std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void sendAddEventAction(RenderObject *render);
 
@@ -69,7 +70,8 @@ namespace WeexCore {
 
     void updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    void updateAttr(std::string ref, std::string key, std::string value);
+    void updateAttr(std::string ref,
+                    std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void addEvent(std::string ref, std::string event);
 

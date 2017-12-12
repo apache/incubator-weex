@@ -2,6 +2,7 @@
 #include <WeexCore/render/action/AddElementAction.h>
 #include <WeexCore/render/action/CreateBodyAction.h>
 #include <WeexCore/render/action/UpdateStyleAction.h>
+#include <WeexCore/render/action/UpdateAttrAction.h>
 #include <WeexCore/render/action/LayoutRenderAction.h>
 #include <WeexCore/render/action/RenderAction.h>
 #include <WeexCore/render/action/CreateFinishAction.h>
@@ -217,8 +218,7 @@ namespace WeexCore {
     }
 
     sendUpdateStyleAction(render, style, margin, padding, border);
-    if (styles->size() > 0)
-      calculateLayout();
+    calculateLayout();
 
     if (style != nullptr) {
       for (int i = 0; i < style->size(); ++i) {
@@ -267,14 +267,45 @@ namespace WeexCore {
       delete border;
       border = nullptr;
     }
+
+//    if (styles != nullptr) {
+//      for (int i = 0; i < styles->size(); ++i) {
+//        if ((*styles)[i] != nullptr) {
+//          delete (*styles)[i];
+//          (*styles)[i] = nullptr;
+//        }
+//      }
+//      styles->clear();
+//      delete styles;
+//      styles = nullptr;
+//    }
   }
 
-  void RenderPage::updateAttr(std::string ref, std::string key, std::string value) {
+  void RenderPage::updateAttr(std::string ref,
+                              std::vector<std::pair<std::string, std::string> *> *attrs) {
     RenderObject *render = getRenderObject(ref);
-    if (render == nullptr)
+    if (render == nullptr || attrs == nullptr || attrs->empty())
       return;
 
-    render->addAttr(key, value);
+    for (int i = 0; i < attrs->size(); ++i) {
+      if ((*attrs)[i] == nullptr)
+        return;
+      render->addAttr((*attrs)[i]->first, (*attrs)[i]->second);
+    }
+
+    sendUpdateAttrAction(render, attrs);
+
+    for (int i = 0; i < attrs->size(); ++i) {
+      if ((*attrs)[i] != nullptr) {
+        delete (*attrs)[i];
+        (*attrs)[i] = nullptr;
+      }
+    }
+
+    if (attrs != nullptr) {
+      delete attrs;
+      attrs = nullptr;
+    }
   }
 
   void RenderPage::addEvent(std::string ref, std::string event) {
@@ -360,8 +391,11 @@ namespace WeexCore {
     addRenderAction(action);
   }
 
-  void RenderPage::sendUpdateAttrAction(std::string key, std::string value, std::string ref) {
-
+  void RenderPage::sendUpdateAttrAction(RenderObject *render,
+                                        std::vector<std::pair<std::string, std::string> *> *attrs) {
+    UpdateAttrAction *action = new UpdateAttrAction();
+    action->GenerateAction(getPageId(), render->getRef(), attrs);
+    addRenderAction(action);
   }
 
   void RenderPage::sendAddEventAction(RenderObject *render) {

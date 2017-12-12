@@ -63,9 +63,6 @@ namespace WeexCore {
     int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                           jstring &callback);
 
-    int callUpdateAttrs(jstring &instanceId, jstring &ref,
-                        jbyteArray &taskString, jstring &callback);
-
     int callRemoveElement(jstring &instanceId, jstring &ref,
                           jstring &callback);
 
@@ -105,6 +102,9 @@ namespace WeexCore {
                                   std::vector<std::pair<std::string, std::string> *> *margin,
                                   std::vector<std::pair<std::string, std::string> *> *padding,
                                   std::vector<std::pair<std::string, std::string> *> *border);
+
+    int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
+                                                 std::vector<std::pair<std::string, std::string> *> *attrs);
 
     int callCreateFinishByWeexCore(std::string &pageId);
   };

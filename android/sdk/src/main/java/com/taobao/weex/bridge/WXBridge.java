@@ -228,28 +228,6 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callUpdateAttrs(String instanceId, String ref, byte[] tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callUpdateAttrs(instanceId, ref, new String(tasks), callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callUpdateAttrs throw exception:" + e.getMessage());
-      }
-    }
-    if (instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
   public int callRemoveElement(String instanceId, String ref, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -353,6 +331,7 @@ public class WXBridge implements IWXBridge {
     }
   }
 
+  @Override
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
@@ -371,6 +350,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
@@ -390,6 +370,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
   public int callUpdateStyleByWeexCore(String instanceId, String ref,
                                        HashMap<String, String> styles,
                                        HashMap<String, String> paddings,
@@ -407,6 +388,22 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
+  public int callUpdateAttrsByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> attrs) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateAttrsByWeexCore(instanceId, ref, attrs);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callUpdateStyle throw exception:" + e.getMessage());
+      }
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -420,6 +417,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
   public int callCreateFinishByWeexCore(String instanceId) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {

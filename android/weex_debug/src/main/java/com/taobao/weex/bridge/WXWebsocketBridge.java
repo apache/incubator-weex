@@ -115,17 +115,6 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        if (tasks != null) {
-            mJsManager.callUpdateAttrs(instanceId, ref, new String(tasks), callback);
-        }
-
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
     public int callRemoveElement(String instanceId, String ref, String callback) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
@@ -236,6 +225,14 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
         return IWXBridge.INSTANCE_RENDERING_ERROR ;
       mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
       return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateAttrsByWeexCore(String instanceId, String ref, HashMap<String, String> attrs) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
+        return IWXBridge.INSTANCE_RENDERING;
     }
 
     @Override

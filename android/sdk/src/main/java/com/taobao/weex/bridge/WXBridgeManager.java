@@ -55,6 +55,7 @@ import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.LayoutUIAction;
+import com.taobao.weex.ui.action.UpdateAttrUIAction;
 import com.taobao.weex.ui.action.UpdateStyleUIAction;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
@@ -1903,6 +1904,37 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         final UpdateStyleUIAction action = new UpdateStyleUIAction(instanceId, ref, styles, paddings, margins, borders);
+
+        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getmPageId()).runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            action.executeAction();
+          }
+        });
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE, "[WXBridgeManager] callUpdateStyleByWeexCore exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callUpdateAttrsByWeexCore(String instanceId, String ref, HashMap<String, String> attrs) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateAttrsByWeexCore >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        final UpdateAttrUIAction action = new UpdateAttrUIAction(instanceId, ref, attrs);
 
         WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getmPageId()).runOnUiThread(new Runnable() {
           @Override
