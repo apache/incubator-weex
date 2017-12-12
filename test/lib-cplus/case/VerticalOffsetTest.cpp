@@ -7,7 +7,7 @@
 using namespace WeexCore;
 
 static constexpr float rootHeight = 700;
-static constexpr float targetHeight = 300;
+static constexpr float targetChildHeight = 300;
 static constexpr float targetWidth = 400;
 static constexpr float fooHeight = 200;
 
@@ -31,7 +31,7 @@ protected:
         foo->setStyleWidth(100);
         foo->setStyleHeight(fooHeight);
         targetChild->setStyleWidth(50);
-        targetChild->setStyleHeight(targetHeight);
+        targetChild->setStyleHeight(targetChildHeight);
 
         target->setStyleWidth(targetWidth);
         target->setStylePositionType(positionType);
@@ -71,7 +71,7 @@ TEST_P(PositionVertical, relative) {
     if (expectedCase == actualCase) {
         float height, tvalue, bvalue, top, bottom;
         if (isnan(height = ::testing::get<0>(GetParam())))
-            height = targetHeight;
+            height = targetChildHeight;
         tvalue = ::testing::get<1>(GetParam());
         bvalue = ::testing::get<2>(GetParam());
 
@@ -121,7 +121,7 @@ TEST_P(PositionVertical, absolute) {
             if (!isnan(tvalue) && !isnan(bvalue)) {
                 height = rootHeight - tvalue - bvalue;
             } else {
-                height = targetHeight;
+                height = targetChildHeight;
             }
         }
 
@@ -130,16 +130,12 @@ TEST_P(PositionVertical, absolute) {
                 top = 0;
                 bottom = height;
             } else {
-                top = rootHeight - bvalue - targetHeight;
+                top = rootHeight - bvalue - height;
                 bottom = rootHeight - bvalue;
             }
         } else {
             top = tvalue;
-            if (isnan(bvalue)) {
-                bottom = tvalue + targetHeight;
-            } else {
-                bottom = rootHeight - bvalue;
-            }
+            bottom = top + height;
         }
 
         EXPECT_FLOAT_EQ(targetWidth, target->getLayoutWidth());
