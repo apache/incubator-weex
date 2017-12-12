@@ -22,10 +22,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.zcache.zipapp.utils.ZipAppUtils;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -124,10 +127,10 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
         String newHost = uri.getHost() + ".local.weex";
         String newUrl = url.replace(host, newHost);
         //TODO Zcache剥离&初始化
-        //template = ZipAppUtils.getStreamByUrl(newUrl);
+        template = ZipAppUtils.getStreamByUrl(newUrl);
       } else {
         //TODO Zcache剥离&初始化
-        //template = ZipAppUtils.getStreamByUrl(url);
+        template = ZipAppUtils.getStreamByUrl(url);
       }
     }catch(Exception e){
       WXLogUtils.e("getResponseByPackageApp error:"+e.getMessage());

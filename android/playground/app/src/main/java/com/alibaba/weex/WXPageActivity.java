@@ -66,6 +66,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.zcache.events.Events;
+import com.taobao.zcache.events.ZCacheEventProxy;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -333,6 +335,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if(mWxAnalyzerDelegate != null){
       mWxAnalyzerDelegate.onDestroy();
     }
+    ZCacheEventProxy.getInstance().receiveEvent(Events.PAGE_destroy);
   }
 
 
@@ -350,6 +353,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if(mWxAnalyzerDelegate != null){
       mWxAnalyzerDelegate.onResume();
     }
+    ZCacheEventProxy.getInstance().receiveEvent(Events.PAGE_onResume);
   }
 
   public static Activity getCurrentWxPageActivity() {
@@ -415,6 +419,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     mContainer.requestLayout();
     Log.d("WARenderListener", "renderSuccess");
+    ZCacheEventProxy.getInstance().receiveEvent(Events.PAGE_Finished);
   }
 
   @Override

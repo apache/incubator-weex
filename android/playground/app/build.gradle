@@ -110,4 +110,5 @@ dependencies {
         transitive = true
     }
     compile 'com.taobao.android:accs_sdk_taobao:3.0.3'
+    compile 'com.taobao.android:zcache:0.0.1.6-SNAPSHOT'
 }
