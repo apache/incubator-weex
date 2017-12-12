@@ -346,12 +346,29 @@ public class WXPerformance {
   }
 
   public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType", CACHE_TYPE,"requestType"
     ,"wxdim1","wxdim2","wxdim3","wxdim4","wxdim5"};
   }
 
   public static String[] getMeasures(){
-    return new String[]{"JSTemplateSize",
+    return new String[]{
+        "callCreateInstanceTime",
+        "fsCallJsTotalTime",
+        "fsCallJsTotalNum",
+        "fsCallNativeTotalTime",
+        "fsCallNativeTotalNum",
+        "fsRenderTime",
+        "fsRequestNum",
+        "communicateTotalTime",
+        "maxDeepVDomLayer",
+        "cellExceedNum",
+        "cellExceedNum",
+        "avgFps",
+        "MaxImproveMemory",
+        "BackImproveMemory",
+        "PushImproveMemory",
+
+        "JSTemplateSize",
         "JSLibSize",
         "communicateTime",
         "screenRenderTime",
