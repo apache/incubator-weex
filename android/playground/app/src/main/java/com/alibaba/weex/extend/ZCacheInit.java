@@ -10,7 +10,7 @@ import com.taobao.zcache.config.ZCacheConfigHandler;
 import com.taobao.zcache.config.ZCacheConfigUpdateCallback;
 import com.taobao.zcache.config.managers.CDNConfigManagerV1;
 import com.taobao.zcache.utils.ILog;
-import com.taobao.zcache.utils.TaoLog;
+import com.taobao.zcache.utils.ZLog;
 
 /**
  * Created by moxun on 12/12/2017.
@@ -19,7 +19,7 @@ import com.taobao.zcache.utils.TaoLog;
 public class ZCacheInit {
   public static void initZCache(Application application, String appKey, String appVersion) {
     ZCache.initZCache(application, appKey, appVersion);
-    TaoLog.setLogImpl(new ILog() {
+    ZLog.setLogImpl(new ILog() {
       @Override
       public void d(String tag, String msg) {
         WXLogUtils.d(tag, msg);

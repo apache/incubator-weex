@@ -11,7 +11,7 @@ import com.taobao.zcache.connect.ConnectManager;
 import com.taobao.zcache.connect.HttpConnectListener;
 import com.taobao.zcache.connect.HttpResponse;
 import com.taobao.zcache.utils.ConfigStorage;
-import com.taobao.zcache.utils.TaoLog;
+import com.taobao.zcache.utils.ZLog;
 import com.taobao.zcache.utils.WVConfigUtils;
 
 import org.json.JSONException;
@@ -80,7 +80,7 @@ public class WVCommonConfig {
           }
         } catch (UnsupportedEncodingException e) {
           callback.updateStatus(ZCacheConfigUpdateCallback.CONFIG_UPDATE_STATUS.ENCODING_ERROR, 0);
-          TaoLog.e(TAG, "config encoding error. " + e.getMessage());
+          ZLog.e(TAG, "config encoding error. " + e.getMessage());
         }
       }
 
@@ -90,7 +90,7 @@ public class WVCommonConfig {
           callback.updateError(finalCommonConfigUrl, message);
           callback.updateStatus(ZCacheConfigUpdateCallback.CONFIG_UPDATE_STATUS.UNKNOWN_ERROR, 0);
         }
-        TaoLog.d(TAG, "update common failed! : " + message);
+        ZLog.d(TAG, "update common failed! : " + message);
         super.onError(code, message);
       }
 
@@ -186,12 +186,12 @@ public class WVCommonConfig {
         if (ids != null) {
           for (String s : ids) {
             if (identifier.equalsIgnoreCase(s)) {
-              TaoLog.e(TAG, "Degrade unzip: " + identifier);
+              ZLog.e(TAG, "Degrade unzip: " + identifier);
               commonConfig.needZipDegrade = true;
               if (commonConfig.zipDegradeMode == 2) {
                 // 关闭当前设备上的预加载
                 commonConfig.packageAppStatus = 0;
-                TaoLog.w(TAG, "Disable package app");
+                ZLog.w(TAG, "Disable package app");
               }
               break;
             }

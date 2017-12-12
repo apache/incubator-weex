@@ -33,4 +33,12 @@ under the License.
         android:title="发送jserror"
         android:icon="@drawable/ic_action_refresh"
         android:id="@+id/action_js_error"/>
+    <item
+        android:title="强制更新ZCache"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_update_zcache"/>
+    <item
+        android:title="卸载所有ZCache"
+        android:icon="@drawable/ic_action_refresh"
+        android:id="@+id/action_delete_zcache"/>
 </menu>

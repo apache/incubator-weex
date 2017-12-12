@@ -141,7 +141,7 @@ dependencies {
     provided "com.android.support:support-v4:${project.supportLibVersion}"
     provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
     provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
-    provided "com.taobao.android:zcache:0.0.1.6-SNAPSHOT"
+    provided "com.taobao.android:zcache:0.0.1.8-SNAPSHOT"
 
     testCompile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     testCompile 'junit:junit:4.12'

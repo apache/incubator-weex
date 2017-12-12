@@ -48,6 +48,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.zcache.WVPackageAppTool;
 
 public class IndexActivity extends AbstractWeexActivity {
 
@@ -149,6 +150,12 @@ public class IndexActivity extends AbstractWeexActivity {
         break;
       case R.id.action_crash:
         throw new RuntimeException("mock test exception");
+      case R.id.action_update_zcache:
+        WVPackageAppTool.forceUpdateApp();
+        break;
+      case R.id.action_delete_zcache:
+        WVPackageAppTool.uninstallAll();
+        break;
       default:
         break;
     }
