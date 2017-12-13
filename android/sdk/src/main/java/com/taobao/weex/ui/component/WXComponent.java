@@ -491,7 +491,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT || realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
       mInstance.getWXPerformance().cellExceedNum++;
     }
 

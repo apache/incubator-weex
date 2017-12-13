@@ -21,6 +21,8 @@ package com.taobao.weex.common;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.utils.WXViewUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +33,8 @@ public class WXPerformance {
   @RestrictTo(Scope.LIBRARY_GROUP)
   public static final String CACHE_TYPE = "cacheType";
 
-  public static final int VIEW_LIMIT_HEIGHT = 720;
-  public static final int VIEW_LIMIT_WIDTH = 480;
+  public static final int VIEW_LIMIT_HEIGHT = WXViewUtils.getScreenHeight()/2;
+  public static final int VIEW_LIMIT_WIDTH = WXViewUtils.getScreenWidth()/2;
   public static final boolean TRACE_DATA = WXEnvironment.isApkDebugable();
 
   /**
