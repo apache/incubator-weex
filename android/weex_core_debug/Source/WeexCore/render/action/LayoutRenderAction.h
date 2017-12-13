@@ -11,7 +11,6 @@ namespace WeexCore {
 
     EVENTS_SET *mEvents;
     std::string mPageId;
-    std::string mComponentType;
     std::string mRef;
     float mWidth;
     float mHeight;
@@ -27,8 +26,10 @@ namespace WeexCore {
                                                          mTop, mBottom,
                                                          mLeft, mRight,
                                                          mHeight, mWidth);
-      if (page != nullptr)
+      if (page != nullptr) {
         page->jniCallTime(getCurrentTime() - startTime);
+        page->layoutActionJniTime(getCurrentTime() - startTime);
+      }
     }
 
     void getLayoutInfo(WXCoreLayoutNode *node) {

@@ -89,6 +89,10 @@ namespace WeexCore {
 
     void cssLayoutTime(long long time);
 
+    void addElementActionJNITime(long long time);
+
+    void layoutActionJniTime(long long time);
+
     void bindInstance_Impl_Android(jobject instance);
 
     void bindInstance_Impl_iOS(void *instance);

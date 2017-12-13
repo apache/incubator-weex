@@ -25,8 +25,10 @@ namespace WeexCore {
                                                              mStyles, mAttributes,
                                                              mEvents,
                                                              mPaddings, mMargins, mBorders);
-      if (page != nullptr)
+      if (page != nullptr) {
         page->jniCallTime(getCurrentTime() - startTime);
+        page->addElementActionJNITime(getCurrentTime() - startTime);
+      }
     }
 
     void GenerateAction(std::string pageId, RenderObject *render) {

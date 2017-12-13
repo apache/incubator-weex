@@ -331,8 +331,9 @@ namespace WeexCore {
   }
 
   void RenderPage::addRenderAction(RenderAction *action) {
-    if (action != nullptr)
+    if (action != nullptr) {
       action->ExecuteAction();
+    }
   }
 
   void RenderPage::pushRenderToMap(RenderObject *render) {
@@ -416,6 +417,16 @@ namespace WeexCore {
   void RenderPage::cssLayoutTime(long long time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->cssLayoutTime += time;
+  }
+
+  void RenderPage::addElementActionJNITime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->addElementActionJNITime += time;
+  }
+
+  void RenderPage::layoutActionJniTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->layoutActionJniTime += time;
   }
 
   void RenderPage::bindInstance_Impl_Android(jobject instance) {
