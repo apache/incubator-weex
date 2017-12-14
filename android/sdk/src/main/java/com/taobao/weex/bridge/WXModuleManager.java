@@ -30,7 +30,6 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -53,7 +52,6 @@ public class WXModuleManager {
    */
   private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
-  private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
   /**
    * monitor keys
@@ -73,11 +71,6 @@ public class WXModuleManager {
    */
   public static boolean registerModule(final String moduleName, final ModuleFactory factory, final boolean global) throws WXException {
     if (moduleName == null || factory == null) {
-      return false;
-    }
-
-    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
-      WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
 
@@ -168,7 +161,7 @@ public class WXModuleManager {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
-      if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
+      if (wxModule instanceof WXTimerModule) {
         wxModule.mWXSDKInstance = null;
       }
     }
@@ -369,7 +362,6 @@ public class WXModuleManager {
   }
 
   public static void destroyInstanceModules(String instanceId) {
-    sDomModuleMap.remove(instanceId);
     Map<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
     if (moduleMap == null || moduleMap.size() < 1) {
       return;
@@ -384,20 +376,6 @@ public class WXModuleManager {
       }
 
     }
-  }
-
-  public static void createDomModule(WXSDKInstance instance){
-    if(instance != null) {
-      sDomModuleMap.put(instance.getInstanceId(), new WXDomModule(instance));
-    }
-  }
-
-  public static void destoryDomModule(String instanceID){
-    sDomModuleMap.remove(instanceID);
-  }
-
-  public static WXDomModule getDomModule(String instanceId){
-    return sDomModuleMap.get(instanceId);
   }
 
   public static void reload(){

@@ -30,7 +30,6 @@ import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.WXSDKManagerTest;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXJSBridgeMsgType;
-import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.WXRenderManager;
 import org.junit.After;
 import org.junit.Before;
