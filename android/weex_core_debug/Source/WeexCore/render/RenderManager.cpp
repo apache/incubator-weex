@@ -44,7 +44,7 @@ namespace WeexCore {
 
     return page->removeRenderObject(ref);
   }
-int
+
   bool RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef, int index) {
     RenderPage *page = this->getPage(pageId);
     if (page == nullptr)

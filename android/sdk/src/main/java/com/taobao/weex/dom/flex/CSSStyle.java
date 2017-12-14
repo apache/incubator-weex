@@ -29,10 +29,6 @@ public class CSSStyle {
   public CSSWrap flexWrap;
   public float flex;
 
-  public Spacing margin = new Spacing();
-  public Spacing padding = new Spacing();
-  public Spacing border = new Spacing();
-
   public float[] position = new float[4];
   public float[] dimensions = new float[2];
 
@@ -57,10 +53,6 @@ public class CSSStyle {
     flexWrap = CSSWrap.NOWRAP;
     flex = 0f;
 
-    margin.reset();
-    padding.reset();
-    border.reset();
-
     Arrays.fill(position, CSSConstants.UNDEFINED);
     Arrays.fill(dimensions, CSSConstants.UNDEFINED);
 
@@ -81,9 +73,6 @@ public class CSSStyle {
     positionType = cssStyle.positionType;
     flexWrap = cssStyle.flexWrap;
     flex = cssStyle.flex;
-    margin = cssStyle.margin;
-    padding = cssStyle.padding;
-    border = cssStyle.border;
     position[POSITION_TOP] = cssStyle.position[POSITION_TOP];
     position[POSITION_BOTTOM] = cssStyle.position[POSITION_BOTTOM];
     position[POSITION_LEFT] = cssStyle.position[POSITION_LEFT];
@@ -106,9 +95,6 @@ public class CSSStyle {
             + "positionType =" + positionType + "\n"
             + "flexWrap =" + flexWrap + "\n"
             + "flex =" + flex + "\n"
-            + "margin =" + margin + "\n"
-            + "padding =" + padding + "\n"
-            + "border =" + border + "\n"
             + "position[POSITION_TOP] =" + position[POSITION_TOP] + "\n"
             + "position[POSITION_BOTTOM] =" + position[POSITION_BOTTOM] + "\n"
             + "position[POSITION_LEFT] =" + position[POSITION_LEFT] + "\n"

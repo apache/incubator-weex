@@ -25,7 +25,6 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
@@ -138,8 +137,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     mColumnCount = mDomObject.getColumnCount();
     mColumnGap = mDomObject.getColumnGap();
     mColumnWidth = mDomObject.getColumnWidth();
-    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
-    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
+//    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
+//    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
@@ -185,14 +184,14 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
             ||props.containsKey(Constants.Name.PADDING_LEFT)
             || props.containsKey(Constants.Name.PADDING_RIGHT)){
 
-      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
-              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
+//      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
+//              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
 
-        markComponentUsable();
-        updateRecyclerAttr();
-        WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-        wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
-      }
+//        markComponentUsable();
+//        updateRecyclerAttr();
+//        WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//        wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
+//      }
     }
 
   }

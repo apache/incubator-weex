@@ -21,18 +21,6 @@ package com.taobao.weex.ui.view.border;
 
 import android.support.annotation.IntDef;
 
-import com.taobao.weex.dom.flex.Spacing;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Retention(RetentionPolicy.SOURCE)
-@IntDef({
-    Spacing.ALL,
-    Spacing.TOP,
-    Spacing.RIGHT,
-    Spacing.BOTTOM,
-    Spacing.LEFT})
-public @interface BorderWidthStyleColorType {
-
-}

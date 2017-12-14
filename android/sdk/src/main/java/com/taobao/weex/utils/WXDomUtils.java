@@ -19,11 +19,8 @@
 
 package com.taobao.weex.utils;
 
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.flex.CSSConstants;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.layout.CSSShorthand;
 

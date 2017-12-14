@@ -59,7 +59,6 @@ import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
@@ -1185,19 +1184,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_RIGHT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_LEFT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
           break;
       }
     }
@@ -1207,19 +1206,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (!TextUtils.isEmpty(borderStyle)) {
       switch (key) {
         case Constants.Name.BORDER_STYLE:
-          getOrCreateBorder().setBorderStyle(Spacing.ALL, borderStyle);
+          getOrCreateBorder().setBorderStyle(CSSShorthand.EDGE.ALL, borderStyle);
           break;
         case Constants.Name.BORDER_RIGHT_STYLE:
-          getOrCreateBorder().setBorderStyle(Spacing.RIGHT, borderStyle);
+          getOrCreateBorder().setBorderStyle(CSSShorthand.EDGE.RIGHT, borderStyle);
           break;
         case Constants.Name.BORDER_BOTTOM_STYLE:
-          getOrCreateBorder().setBorderStyle(Spacing.BOTTOM, borderStyle);
+          getOrCreateBorder().setBorderStyle(CSSShorthand.EDGE.BOTTOM, borderStyle);
           break;
         case Constants.Name.BORDER_LEFT_STYLE:
-          getOrCreateBorder().setBorderStyle(Spacing.LEFT, borderStyle);
+          getOrCreateBorder().setBorderStyle(CSSShorthand.EDGE.LEFT, borderStyle);
           break;
         case Constants.Name.BORDER_TOP_STYLE:
-          getOrCreateBorder().setBorderStyle(Spacing.TOP, borderStyle);
+          getOrCreateBorder().setBorderStyle(CSSShorthand.EDGE.TOP, borderStyle);
           break;
       }
     }
@@ -1231,19 +1230,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (colorInt != Integer.MIN_VALUE) {
         switch (key) {
           case Constants.Name.BORDER_COLOR:
-            getOrCreateBorder().setBorderColor(Spacing.ALL, colorInt);
+            getOrCreateBorder().setBorderColor(CSSShorthand.EDGE.ALL, colorInt);
             break;
           case Constants.Name.BORDER_TOP_COLOR:
-            getOrCreateBorder().setBorderColor(Spacing.TOP, colorInt);
+            getOrCreateBorder().setBorderColor(CSSShorthand.EDGE.TOP, colorInt);
             break;
           case Constants.Name.BORDER_RIGHT_COLOR:
-            getOrCreateBorder().setBorderColor(Spacing.RIGHT, colorInt);
+            getOrCreateBorder().setBorderColor(CSSShorthand.EDGE.RIGHT, colorInt);
             break;
           case Constants.Name.BORDER_BOTTOM_COLOR:
-            getOrCreateBorder().setBorderColor(Spacing.BOTTOM, colorInt);
+            getOrCreateBorder().setBorderColor(CSSShorthand.EDGE.BOTTOM, colorInt);
             break;
           case Constants.Name.BORDER_LEFT_COLOR:
-            getOrCreateBorder().setBorderColor(Spacing.LEFT, colorInt);
+            getOrCreateBorder().setBorderColor(CSSShorthand.EDGE.LEFT, colorInt);
             break;
         }
       }

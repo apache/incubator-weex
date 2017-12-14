@@ -30,7 +30,6 @@ import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.Map;
@@ -43,9 +42,6 @@ class UpdateStyleAction implements DOMAction, RenderAction {
   private final String mRef;
   private final JSONObject mData;
   private final boolean mIsCausedByPesudo;
-
-  private Spacing mPadding;
-  private Spacing mBorder;
 
   UpdateStyleAction(String ref, JSONObject data) {
     this(ref, data, false);
@@ -70,8 +66,6 @@ class UpdateStyleAction implements DOMAction, RenderAction {
       }
       return;
     }
-    mPadding = domObject.getPadding();
-    mBorder = domObject.getBorder();
 
     Map<String, Object> animationMap = new ArrayMap<>(2);
     animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));

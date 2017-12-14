@@ -59,17 +59,9 @@ public class LayoutEngine {
   };
 
   private static final int[] leadingSpacing = {
-      Spacing.TOP,
-      Spacing.BOTTOM,
-      Spacing.START,
-      Spacing.START
   };
 
   private static final int[] trailingSpacing = {
-      Spacing.BOTTOM,
-      Spacing.TOP,
-      Spacing.END,
-      Spacing.END
   };
 
   private static float boundAxis(CSSNode node, int axis, float value) {
@@ -108,15 +100,6 @@ public class LayoutEngine {
         node.cssstyle.dimensions[dim[axis]] <= 0.0) {
       return;
     }
-
-    // The dimensions can never be smaller than the padding and border
-    float maxLayoutDimension = Math.max(
-        boundAxis(node, axis, node.cssstyle.dimensions[dim[axis]]),
-        node.cssstyle.padding.getWithFallback(leadingSpacing[axis], leading[axis]) +
-        node.cssstyle.padding.getWithFallback(trailingSpacing[axis], trailing[axis]) +
-        node.cssstyle.border.getWithFallback(leadingSpacing[axis], leading[axis]) +
-        node.cssstyle.border.getWithFallback(trailingSpacing[axis], trailing[axis]));
-    node.csslayout.dimensions[dim[axis]] = maxLayoutDimension;
   }
 
   private static float getRelativePosition(CSSNode node, int axis) {
@@ -238,22 +221,10 @@ public class LayoutEngine {
 
     // The position is set by the parent, but we need to complete it with a
     // delta composed of the margin and left/top/right/bottom
-    node.csslayout.position[leading[mainAxis]] += node.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) +
-                                                  getRelativePosition(node, mainAxis);
-    node.csslayout.position[trailing[mainAxis]] += node.cssstyle.margin.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) +
-                                                   getRelativePosition(node, mainAxis);
-    node.csslayout.position[leading[crossAxis]] += node.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) +
-                                                   getRelativePosition(node, crossAxis);
-    node.csslayout.position[trailing[crossAxis]] += node.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]) +
-                                                    getRelativePosition(node, crossAxis);
 
     // Inline immutable values from the target node to avoid excessive method
     // invocations during the csslayout calculation.
     int childCount = node.getChildCount();
-    float paddingAndBorderAxisResolvedRow = ((node.cssstyle.padding.getWithFallback(leadingSpacing[resolvedRowAxis], leading[resolvedRowAxis]) +
-                                              node.cssstyle.border.getWithFallback(leadingSpacing[resolvedRowAxis], leading[resolvedRowAxis])) +
-                                             (node.cssstyle.padding.getWithFallback(trailingSpacing[resolvedRowAxis], trailing[resolvedRowAxis]) +
-                                              node.cssstyle.border.getWithFallback(trailingSpacing[resolvedRowAxis], trailing[resolvedRowAxis])));
 
     if (isMeasureDefined(node)) {
       boolean isResolvedRowDimDefined = !Float.isNaN(node.csslayout.dimensions[dim[resolvedRowAxis]]);
@@ -264,10 +235,7 @@ public class LayoutEngine {
       } else if (isResolvedRowDimDefined) {
         width = node.csslayout.dimensions[dim[resolvedRowAxis]];
       } else {
-        width = parentMaxWidth -
-                (node.cssstyle.margin.getWithFallback(leadingSpacing[resolvedRowAxis], leading[resolvedRowAxis]) + node.cssstyle.margin.getWithFallback(trailingSpacing[resolvedRowAxis], trailing[resolvedRowAxis]));
       }
-      width -= paddingAndBorderAxisResolvedRow;
 
       // We only need to give a dimension for the text if we haven't got any
       // for it computed yet. It can either be from the cssstyle attribute or because
@@ -284,12 +252,8 @@ public class LayoutEngine {
             width
                                                );
         if (isRowUndefined) {
-          node.csslayout.dimensions[DIMENSION_WIDTH] = measureDim.width +
-                                                       paddingAndBorderAxisResolvedRow;
         }
         if (isColumnUndefined) {
-          node.csslayout.dimensions[DIMENSION_HEIGHT] = measureDim.height +
-                                                        ((node.cssstyle.padding.getWithFallback(leadingSpacing[CSS_FLEX_DIRECTION_COLUMN], leading[CSS_FLEX_DIRECTION_COLUMN]) + node.cssstyle.border.getWithFallback(leadingSpacing[CSS_FLEX_DIRECTION_COLUMN], leading[CSS_FLEX_DIRECTION_COLUMN])) + (node.cssstyle.padding.getWithFallback(trailingSpacing[CSS_FLEX_DIRECTION_COLUMN], trailing[CSS_FLEX_DIRECTION_COLUMN]) + node.cssstyle.border.getWithFallback(trailingSpacing[CSS_FLEX_DIRECTION_COLUMN], trailing[CSS_FLEX_DIRECTION_COLUMN])));
         }
       }
       if (childCount == 0) {
@@ -300,11 +264,6 @@ public class LayoutEngine {
     boolean isNodeFlexWrap = (node.cssstyle.flexWrap == CSSWrap.WRAP);
 
     CSSJustify justifyContent = node.cssstyle.justifyContent;
-
-    float leadingPaddingAndBorderMain = (node.cssstyle.padding.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + node.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]));
-    float leadingPaddingAndBorderCross = (node.cssstyle.padding.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + node.cssstyle.border.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]));
-    float paddingAndBorderAxisMain = ((node.cssstyle.padding.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + node.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis])) + (node.cssstyle.padding.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) + node.cssstyle.border.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis])));
-    float paddingAndBorderAxisCross = ((node.cssstyle.padding.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + node.cssstyle.border.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis])) + (node.cssstyle.padding.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]) + node.cssstyle.border.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis])));
 
     boolean isMainDimDefined = !Float.isNaN(node.csslayout.dimensions[dim[mainAxis]]);
     boolean isCrossDimDefined = !Float.isNaN(node.csslayout.dimensions[dim[crossAxis]]);
@@ -320,7 +279,6 @@ public class LayoutEngine {
 
     float definedMainDim = CSSConstants.UNDEFINED;
     if (isMainDimDefined) {
-      definedMainDim = node.csslayout.dimensions[dim[mainAxis]] - paddingAndBorderAxisMain;
     }
 
     // We want to execute the next two loops one per line with flex-wrap
@@ -366,7 +324,6 @@ public class LayoutEngine {
       CSSNode firstFlexChild = null;
       CSSNode currentFlexChild = null;
 
-      float mainDim = leadingPaddingAndBorderMain;
       float crossDim = 0;
 
       float maxWidth;
@@ -389,12 +346,6 @@ public class LayoutEngine {
             child.cssstyle.positionType == CSSPositionType.RELATIVE &&
             isCrossDimDefined &&
             !(!Float.isNaN(child.cssstyle.dimensions[dim[crossAxis]]) && child.cssstyle.dimensions[dim[crossAxis]] >= 0.0)) {
-          child.csslayout.dimensions[dim[crossAxis]] = Math.max(
-              boundAxis(child, crossAxis, node.csslayout.dimensions[dim[crossAxis]] -
-                                          paddingAndBorderAxisCross - (child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]))),
-              // You never want to go smaller than padding
-              ((child.cssstyle.padding.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.border.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis])) + (child.cssstyle.padding.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]) + child.cssstyle.border.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis])))
-                                                               );
         } else if (child.cssstyle.positionType == CSSPositionType.ABSOLUTE) {
           // Store a private linked list of absolutely positioned children
           // so that we can efficiently traverse them later.
@@ -414,15 +365,6 @@ public class LayoutEngine {
                 !(!Float.isNaN(child.cssstyle.dimensions[dim[axis]]) && child.cssstyle.dimensions[dim[axis]] >= 0.0) &&
                 !Float.isNaN(child.cssstyle.position[leading[axis]]) &&
                 !Float.isNaN(child.cssstyle.position[trailing[axis]])) {
-              child.csslayout.dimensions[dim[axis]] = Math.max(
-                  boundAxis(child, axis, node.csslayout.dimensions[dim[axis]] -
-                                         ((node.cssstyle.padding.getWithFallback(leadingSpacing[axis], leading[axis]) + node.cssstyle.border.getWithFallback(leadingSpacing[axis], leading[axis])) + (node.cssstyle.padding.getWithFallback(trailingSpacing[axis], trailing[axis]) + node.cssstyle.border.getWithFallback(trailingSpacing[axis], trailing[axis]))) -
-                                         (child.cssstyle.margin.getWithFallback(leadingSpacing[axis], leading[axis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[axis], trailing[axis])) -
-                                         (Float.isNaN(child.cssstyle.position[leading[axis]]) ? 0 : child.cssstyle.position[leading[axis]]) -
-                                         (Float.isNaN(child.cssstyle.position[trailing[axis]]) ? 0 : child.cssstyle.position[trailing[axis]])),
-                  // You never want to go smaller than padding
-                  ((child.cssstyle.padding.getWithFallback(leadingSpacing[axis], leading[axis]) + child.cssstyle.border.getWithFallback(leadingSpacing[axis], leading[axis])) + (child.cssstyle.padding.getWithFallback(trailingSpacing[axis], trailing[axis]) + child.cssstyle.border.getWithFallback(trailingSpacing[axis], trailing[axis])))
-                                                              );
             }
           }
         }
@@ -449,19 +391,11 @@ public class LayoutEngine {
           // border and margin. We'll use this partial information, which represents
           // the smallest possible size for the child, to compute the remaining
           // available space.
-          nextContentDim = ((child.cssstyle.padding.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + child.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis])) + (child.cssstyle.padding.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) + child.cssstyle.border.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]))) +
-                           (child.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]));
-
         } else {
           maxWidth = CSSConstants.UNDEFINED;
           if (!isMainRowDirection) {
             if ((!Float.isNaN(node.cssstyle.dimensions[dim[resolvedRowAxis]]) && node.cssstyle.dimensions[dim[resolvedRowAxis]] >= 0.0)) {
-              maxWidth = node.csslayout.dimensions[dim[resolvedRowAxis]] -
-                         paddingAndBorderAxisResolvedRow;
             } else {
-              maxWidth = parentMaxWidth -
-                         (node.cssstyle.margin.getWithFallback(leadingSpacing[resolvedRowAxis], leading[resolvedRowAxis]) + node.cssstyle.margin.getWithFallback(trailingSpacing[resolvedRowAxis], trailing[resolvedRowAxis])) -
-                         paddingAndBorderAxisResolvedRow;
             }
           }
 
@@ -475,7 +409,6 @@ public class LayoutEngine {
           if (child.cssstyle.positionType == CSSPositionType.RELATIVE) {
             nonFlexibleChildrenCount++;
             // At this point we know the final size and margin of the element.
-            nextContentDim = (child.csslayout.dimensions[dim[mainAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]));
           }
         }
 
@@ -512,17 +445,13 @@ public class LayoutEngine {
         }
 
         if (isSimpleStackMain) {
-          child.csslayout.position[pos[mainAxis]] += mainDim;
           if (isMainDimDefined) {
             child.csslayout.position[trailing[mainAxis]] = node.csslayout.dimensions[dim[mainAxis]] - child.csslayout.dimensions[dim[mainAxis]] - child.csslayout.position[pos[mainAxis]];
           }
 
-          mainDim += (child.csslayout.dimensions[dim[mainAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]));
-          crossDim = Math.max(crossDim, boundAxis(child, crossAxis, (child.csslayout.dimensions[dim[crossAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]))));
         }
 
         if (isSimpleStackCross) {
-          child.csslayout.position[pos[crossAxis]] += linesCrossDim + leadingPaddingAndBorderCross;
           if (isCrossDimDefined) {
             child.csslayout.position[trailing[crossAxis]] = node.csslayout.dimensions[dim[crossAxis]] - child.csslayout.dimensions[dim[crossAxis]] - child.csslayout.position[pos[crossAxis]];
           }
@@ -561,14 +490,6 @@ public class LayoutEngine {
         currentFlexChild = firstFlexChild;
         while (currentFlexChild != null) {
           if (currentFlexChild.isShow()) {
-            baseMainDim = flexibleMainDim * currentFlexChild.cssstyle.flex +
-                          ((currentFlexChild.cssstyle.padding.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + currentFlexChild.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis])) + (currentFlexChild.cssstyle.padding.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) + currentFlexChild.cssstyle.border.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis])));
-            boundMainDim = boundAxis(currentFlexChild, mainAxis, baseMainDim);
-
-            if (baseMainDim != boundMainDim) {
-              remainingMainDim -= boundMainDim;
-              totalFlexible -= currentFlexChild.cssstyle.flex;
-            }
           }
           currentFlexChild = currentFlexChild.nextFlexChild;
         }
@@ -585,20 +506,7 @@ public class LayoutEngine {
           if (currentFlexChild.isShow()) {
             // At this point we know the final size of the element in the main
             // dimension
-            currentFlexChild.csslayout.dimensions[dim[mainAxis]] = boundAxis(currentFlexChild, mainAxis,
-                                                                             flexibleMainDim * currentFlexChild.cssstyle.flex +
-                                                                             ((currentFlexChild.cssstyle.padding.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + currentFlexChild.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis])) + (currentFlexChild.cssstyle.padding.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) + currentFlexChild.cssstyle.border.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis])))
-                                                                            );
-
             maxWidth = CSSConstants.UNDEFINED;
-            if ((!Float.isNaN(node.cssstyle.dimensions[dim[resolvedRowAxis]]) && node.cssstyle.dimensions[dim[resolvedRowAxis]] >= 0.0)) {
-              maxWidth = node.csslayout.dimensions[dim[resolvedRowAxis]] -
-                         paddingAndBorderAxisResolvedRow;
-            } else if (!isMainRowDirection) {
-              maxWidth = parentMaxWidth -
-                         (node.cssstyle.margin.getWithFallback(leadingSpacing[resolvedRowAxis], leading[resolvedRowAxis]) + node.cssstyle.margin.getWithFallback(trailingSpacing[resolvedRowAxis], trailing[resolvedRowAxis])) -
-                         paddingAndBorderAxisResolvedRow;
-            }
 
             // And we recursively call the csslayout algorithm for this child
             layoutNode(layoutContext, currentFlexChild, maxWidth, direction);
@@ -637,7 +545,6 @@ public class LayoutEngine {
       // find their position. In order to do that, we accumulate data in
       // variables that are also useful to compute the total dimensions of the
       // container!
-      mainDim += leadingMainDim;
 
       for (i = firstComplexMain; i < endLine; ++i) {
         child = node.getChildAt(i);
@@ -650,13 +557,9 @@ public class LayoutEngine {
           // In case the child is position absolute and has left/top being
           // defined, we override the position to whatever the user said
           // (and margin/border).
-          child.csslayout.position[pos[mainAxis]] = (Float.isNaN(child.cssstyle.position[leading[mainAxis]]) ? 0 : child.cssstyle.position[leading[mainAxis]]) +
-                                                    node.cssstyle.border.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) +
-                                                    child.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]);
         } else {
           // If the child is position absolute (without top/left) or relative,
           // we put it at the current accumulated offset.
-          child.csslayout.position[pos[mainAxis]] += mainDim;
 
           // Define the trailing position accordingly.
           if (isMainDimDefined) {
@@ -669,23 +572,14 @@ public class LayoutEngine {
           if (child.cssstyle.positionType == CSSPositionType.RELATIVE) {
             // The main dimension is the sum of all the elements dimension plus
             // the spacing.
-            mainDim += betweenMainDim + (child.csslayout.dimensions[dim[mainAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[mainAxis], leading[mainAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]));
             // The cross dimension is the max of the elements dimension since there
             // can only be one element in that cross dimension.
-            crossDim = Math.max(crossDim, boundAxis(child, crossAxis, (child.csslayout.dimensions[dim[crossAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]))));
           }
         }
       }
 
       float containerCrossAxis = node.csslayout.dimensions[dim[crossAxis]];
       if (!isCrossDimDefined) {
-        containerCrossAxis = Math.max(
-            // For the cross dim, we add both sides at the end because the value
-            // is aggregate via a max function. Intermediate negative values
-            // can mess this computation otherwise
-            boundAxis(node, crossAxis, crossDim + paddingAndBorderAxisCross),
-            paddingAndBorderAxisCross
-                                     );
       }
 
       // <Loop D> Position elements in the cross axis
@@ -700,12 +594,8 @@ public class LayoutEngine {
           // In case the child is absolutely positionned and has a
           // top/left/bottom/right being set, we override all the previously
           // computed positions to set it correctly.
-          child.csslayout.position[pos[crossAxis]] = (Float.isNaN(child.cssstyle.position[leading[crossAxis]]) ? 0 : child.cssstyle.position[leading[crossAxis]]) +
-                                                     node.cssstyle.border.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) +
-                                                     child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]);
 
         } else {
-          float leadingCrossDim = leadingPaddingAndBorderCross;
 
           // For a relative children, we're either using alignItems (parent) or
           // alignSelf (child) in order to determine the position in the cross axis
@@ -717,30 +607,13 @@ public class LayoutEngine {
             if (alignItem == CSSAlign.STRETCH) {
               // You can only stretch if the dimension has not already been set
               // previously.
-              if (Float.isNaN(child.csslayout.dimensions[dim[crossAxis]])) {
-                child.csslayout.dimensions[dim[crossAxis]] = Math.max(
-                    boundAxis(child, crossAxis, containerCrossAxis -
-                                                paddingAndBorderAxisCross - (child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]))),
-                    // You never want to go smaller than padding
-                    ((child.cssstyle.padding.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.border.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis])) + (child.cssstyle.padding.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]) + child.cssstyle.border.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis])))
-                                                                     );
-              }
             } else if (alignItem != CSSAlign.FLEX_START) {
               // The remaining space between the parent dimensions+padding and child
               // dimensions+margin.
-              float remainingCrossDim = containerCrossAxis -
-                                        paddingAndBorderAxisCross - (child.csslayout.dimensions[dim[crossAxis]] + child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]));
-
-              if (alignItem == CSSAlign.CENTER) {
-                leadingCrossDim += remainingCrossDim / 2;
-              } else { // CSSAlign.FLEX_END
-                leadingCrossDim += remainingCrossDim;
-              }
             }
           }
 
           // And we apply the position
-          child.csslayout.position[pos[crossAxis]] += linesCrossDim + leadingCrossDim;
 
           // Define the trailing position accordingly.
           if (isCrossDimDefined) {
@@ -750,7 +623,6 @@ public class LayoutEngine {
       }
 
       linesCrossDim += crossDim;
-      linesMainDim = Math.max(linesMainDim, mainDim);
       linesCount += 1;
       startLine = endLine;
     }
@@ -769,24 +641,6 @@ public class LayoutEngine {
     // section 9.4
     //
     if (linesCount > 1 && isCrossDimDefined) {
-      float nodeCrossAxisInnerSize = node.csslayout.dimensions[dim[crossAxis]] -
-                                     paddingAndBorderAxisCross;
-      float remainingAlignContentDim = nodeCrossAxisInnerSize - linesCrossDim;
-
-      float crossDimLead = 0;
-      float currentLead = leadingPaddingAndBorderCross;
-
-      CSSAlign alignContent = node.cssstyle.alignContent;
-      if (alignContent == CSSAlign.FLEX_END) {
-        currentLead += remainingAlignContentDim;
-      } else if (alignContent == CSSAlign.CENTER) {
-        currentLead += remainingAlignContentDim / 2;
-      } else if (alignContent == CSSAlign.STRETCH) {
-        if (nodeCrossAxisInnerSize > linesCrossDim) {
-          crossDimLead = (remainingAlignContentDim / linesCount);
-        }
-      }
-
       int endIndex = 0;
       for (i = 0; i < linesCount; ++i) {
         int startIndex = endIndex;
@@ -803,14 +657,8 @@ public class LayoutEngine {
             break;
           }
           if (!Float.isNaN(child.csslayout.dimensions[dim[crossAxis]])) {
-            lineHeight = Math.max(
-                lineHeight,
-                child.csslayout.dimensions[dim[crossAxis]] + (child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]) + child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]))
-                                 );
           }
         }
-        endIndex = ii;
-        lineHeight += crossDimLead;
 
         for (ii = startIndex; ii < endIndex; ++ii) {
           child = node.getChildAt(ii);
@@ -819,22 +667,8 @@ public class LayoutEngine {
             continue;
           }
 
-          CSSAlign alignContentAlignItem = getAlignItem(node, child);
-          if (alignContentAlignItem == CSSAlign.FLEX_START) {
-            child.csslayout.position[pos[crossAxis]] = currentLead + child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]);
-          } else if (alignContentAlignItem == CSSAlign.FLEX_END) {
-            child.csslayout.position[pos[crossAxis]] = currentLead + lineHeight - child.cssstyle.margin.getWithFallback(trailingSpacing[crossAxis], trailing[crossAxis]) - child.csslayout.dimensions[dim[crossAxis]];
-          } else if (alignContentAlignItem == CSSAlign.CENTER) {
-            float childHeight = child.csslayout.dimensions[dim[crossAxis]];
-            child.csslayout.position[pos[crossAxis]] = currentLead + (lineHeight - childHeight) / 2;
-          } else if (alignContentAlignItem == CSSAlign.STRETCH) {
-            child.csslayout.position[pos[crossAxis]] = currentLead + child.cssstyle.margin.getWithFallback(leadingSpacing[crossAxis], leading[crossAxis]);
-            // TODO(prenaux): Correctly set the height of items with undefined
-            //                (auto) crossAxis dimension.
-          }
         }
 
-        currentLead += lineHeight;
       }
     }
 
@@ -844,14 +678,6 @@ public class LayoutEngine {
     // If the user didn't specify a width or height, and it has not been set
     // by the container, then we set it via the children.
     if (!isMainDimDefined) {
-      node.csslayout.dimensions[dim[mainAxis]] = Math.max(
-          // We're missing the last padding at this point to get the final
-          // dimension
-          boundAxis(node, mainAxis, linesMainDim + (node.cssstyle.padding.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]) + node.cssstyle.border.getWithFallback(trailingSpacing[mainAxis], trailing[mainAxis]))),
-          // We can never assign a width smaller than the padding and borders
-          paddingAndBorderAxisMain
-                                                         );
-
       if (mainAxis == CSS_FLEX_DIRECTION_ROW_REVERSE ||
           mainAxis == CSS_FLEX_DIRECTION_COLUMN_REVERSE) {
         needsMainTrailingPos = true;
@@ -859,14 +685,6 @@ public class LayoutEngine {
     }
 
     if (!isCrossDimDefined) {
-      node.csslayout.dimensions[dim[crossAxis]] = Math.max(
-          // For the cross dim, we add both sides at the end because the value
-          // is aggregate via a max function. Intermediate negative values
-          // can mess this computation otherwise
-          boundAxis(node, crossAxis, linesCrossDim + paddingAndBorderAxisCross),
-          paddingAndBorderAxisCross
-                                                          );
-
       if (crossAxis == CSS_FLEX_DIRECTION_ROW_REVERSE ||
           crossAxis == CSS_FLEX_DIRECTION_COLUMN_REVERSE) {
         needsCrossTrailingPos = true;
@@ -899,22 +717,6 @@ public class LayoutEngine {
         // the axis are defined (either both left and right or top and bottom).
         for (ii = 0; ii < 2; ii++) {
           axis = (ii != 0) ? CSS_FLEX_DIRECTION_ROW : CSS_FLEX_DIRECTION_COLUMN;
-
-          if (!Float.isNaN(node.csslayout.dimensions[dim[axis]]) &&
-              !(!Float.isNaN(currentAbsoluteChild.cssstyle.dimensions[dim[axis]]) && currentAbsoluteChild.cssstyle.dimensions[dim[axis]] >= 0.0) &&
-              !Float.isNaN(currentAbsoluteChild.cssstyle.position[leading[axis]]) &&
-              !Float.isNaN(currentAbsoluteChild.cssstyle.position[trailing[axis]])) {
-            currentAbsoluteChild.csslayout.dimensions[dim[axis]] = Math.max(
-                boundAxis(currentAbsoluteChild, axis, node.csslayout.dimensions[dim[axis]] -
-                                                      (node.cssstyle.border.getWithFallback(leadingSpacing[axis], leading[axis]) + node.cssstyle.border.getWithFallback(trailingSpacing[axis], trailing[axis])) -
-                                                      (currentAbsoluteChild.cssstyle.margin.getWithFallback(leadingSpacing[axis], leading[axis]) + currentAbsoluteChild.cssstyle.margin.getWithFallback(trailingSpacing[axis], trailing[axis])) -
-                                                      (Float.isNaN(currentAbsoluteChild.cssstyle.position[leading[axis]]) ? 0 : currentAbsoluteChild.cssstyle.position[leading[axis]]) -
-                                                      (Float.isNaN(currentAbsoluteChild.cssstyle.position[trailing[axis]]) ? 0 : currentAbsoluteChild.cssstyle.position[trailing[axis]])
-                         ),
-                // You never want to go smaller than padding
-                ((currentAbsoluteChild.cssstyle.padding.getWithFallback(leadingSpacing[axis], leading[axis]) + currentAbsoluteChild.cssstyle.border.getWithFallback(leadingSpacing[axis], leading[axis])) + (currentAbsoluteChild.cssstyle.padding.getWithFallback(trailingSpacing[axis], trailing[axis]) + currentAbsoluteChild.cssstyle.border.getWithFallback(trailingSpacing[axis], trailing[axis])))
-                                                                           );
-          }
 
           if (!Float.isNaN(currentAbsoluteChild.cssstyle.position[trailing[axis]]) &&
               !!Float.isNaN(currentAbsoluteChild.cssstyle.position[leading[axis]])) {

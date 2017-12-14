@@ -338,17 +338,7 @@ public class CSSNode {
     }
   }
 
-  /**
-   * Get this node's margin, as defined by cssstyle + default margin.
-   */
-  public @NonNull Spacing getMargin() {
-    return cssstyle.margin;
-  }
-
   public void setMargin(int spacingType, float margin) {
-    if (cssstyle.margin.set(spacingType, margin)) {
-      dirty();
-    }
   }
 
   public void setMinWidth(float minWidth) {
@@ -379,30 +369,11 @@ public class CSSNode {
     }
   }
 
-  /**
-   * Get this node's padding, as defined by cssstyle + default padding.
-   */
-  public @NonNull Spacing getPadding() {
-    return cssstyle.padding;
-  }
-
   public void setPadding(int spacingType, float padding) {
-    if (cssstyle.padding.set(spacingType, padding)) {
-      dirty();
-    }
   }
 
-  /**
-   * Get this node's border, as defined by cssstyle.
-   */
-  public @NonNull Spacing getBorder() {
-    return cssstyle.border;
-  }
 
   public void setBorder(int spacingType, float border) {
-    if (cssstyle.border.set(spacingType, border)) {
-      dirty();
-    }
   }
 
   /**
@@ -525,14 +496,6 @@ public class CSSNode {
     return csslayout.direction;
   }
 
-  /**
-   * Set a default padding (left/top/right/bottom) for this node.
-   */
-  public void setDefaultPadding(int spacingType, float padding) {
-    if (cssstyle.padding.setDefault(spacingType, padding)) {
-      dirty();
-    }
-  }
 
   /**
    * Resets this instance to its default state. This method is meant to be used when recycling

@@ -23,8 +23,8 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import com.taobao.weex.ui.layout.CSSShorthand;
 
-import com.taobao.weex.dom.flex.Spacing;
 
 /**
  * Edge for border. Every border has four edges, and each edge has a previous corner and a post
@@ -39,12 +39,12 @@ class BorderEdge {
   @NonNull
   final BorderCorner mPostCorner;
 
-  private final int mEdge;
+  private final CSSShorthand.EDGE mEdge;
   private final float mBorderWidth;
 
   BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner,
-             @BorderWidthStyleColorType int edge, float
-      borderWidth) {
+             CSSShorthand.EDGE edge, float
+                     borderWidth) {
     mPreCorner = preCorner;
     mPostCorner = postCorner;
     mEdge = edge;
@@ -62,16 +62,16 @@ class BorderEdge {
     paint.setStrokeWidth(mBorderWidth);
 
     drawRoundedCorner(canvas, paint, mPreCorner,
-                      mPreCorner.getAngleBisectorDegree(),
-                      mPreCorner.getSharpCornerStart(), lineStart);
+            mPreCorner.getAngleBisectorDegree(),
+            mPreCorner.getSharpCornerStart(), lineStart);
 
     paint.setStrokeWidth(mBorderWidth);
     PointF lineEnd = mPostCorner.getCornerStart();
     canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
 
     drawRoundedCorner(canvas, paint, mPostCorner,
-                      mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                      lineEnd, mPostCorner.getSharpCornerEnd());
+            mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
+            lineEnd, mPostCorner.getSharpCornerEnd());
   }
 
   /**
@@ -110,10 +110,8 @@ class BorderEdge {
   /**
    * The index of the edge
    * @return index of edge. May be one of
-   * {@link Spacing#TOP},{@link Spacing#BOTTOM},{@link Spacing#RIGHT},{@link Spacing#LEFT}.
    */
-  public @BorderWidthStyleColorType
-  int getEdge() {
+  public CSSShorthand.EDGE getEdge() {
     return mEdge;
   }
 }
