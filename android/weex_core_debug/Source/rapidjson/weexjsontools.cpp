@@ -328,7 +328,7 @@ namespace WeexCore {
 /**
  * Parse json data to RenderObject
  * @param data : json data (include ref/style/attr/event/children)
- * @param page : {@link RenderPage*}
+ * @param page : {@link RenderPage}
  * @return {@link RenderObject*}
  */
   RenderObject *json2RenderObject(char *data, RenderPage *page) {

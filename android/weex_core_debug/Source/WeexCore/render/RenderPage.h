@@ -60,7 +60,7 @@ namespace WeexCore {
 
     void calculateLayout();
 
-    bool createRootRender(std::string data);
+    bool createRootRender(RenderObject *root);
 
     bool addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 
@@ -92,6 +92,10 @@ namespace WeexCore {
     void addElementActionJNITime(long long time);
 
     void layoutActionJniTime(long long time);
+
+    void parseJsonTime(long long time);
+
+    void buildRenderObjectTime(long long time);
 
     bool bindInstance_Impl_Android(jobject instance);
 

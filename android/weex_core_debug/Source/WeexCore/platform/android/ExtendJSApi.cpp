@@ -340,7 +340,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jTaskString);
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
@@ -368,7 +368,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   env->DeleteLocalRef(jref);
   env->DeleteLocalRef(jdomString);
   env->DeleteLocalRef(jindex);
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
@@ -387,7 +387,7 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
   env->DeleteLocalRef(jTaskString);
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
@@ -403,7 +403,7 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
   env->DeleteLocalRef(jTaskString);
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
@@ -415,7 +415,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   flag = RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
@@ -439,5 +439,5 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
     flag = BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
   }
 
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }

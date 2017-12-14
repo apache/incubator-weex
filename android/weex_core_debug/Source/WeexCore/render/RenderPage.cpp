@@ -112,24 +112,19 @@ namespace WeexCore {
     }
   }
 
-  bool RenderPage::createRootRender(std::string data) {
-    int alen = data.length();
-    char *c_data = (char *) malloc(alen + 1);
-    strcpy(c_data, data.c_str());
-    c_data[alen] = 0;
-    RenderObject *render = json2RenderObject(c_data, this);
-    free(c_data);
-    c_data = nullptr;
-
-    if (render == nullptr)
+  bool RenderPage::createRootRender(RenderObject *root) {
+    if (root == nullptr)
       return false;
-    setRootRenderObject(render);
-    pushRenderToMap(render);
-    sendCreateBodyAction(render);
+    long long startTime = getCurrentTime();
+    setRootRenderObject(root);
+    pushRenderToMap(root);
+    buildRenderObjectTime(getCurrentTime() - startTime);
+    sendCreateBodyAction(root);
     return true;
   }
 
   bool RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
+    long long startTime = getCurrentTime();
     RenderObject *parent = getRenderObject(parentRef);
     if (parent == nullptr || child == nullptr) {
       return false;
@@ -140,12 +135,14 @@ namespace WeexCore {
     // add child to Render Tree
     child->setParentRender(parent);
     parent->addRenderObject(insertPosition, child);
+    buildRenderObjectTime(getCurrentTime() - startTime);
     sendAddElementAction(child, parent, insertPosition);
     calculateLayout();
     return true;
   }
 
   bool RenderPage::removeRenderObject(std::string ref) {
+    long long startTime = getCurrentTime();
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
       return false;
@@ -157,10 +154,12 @@ namespace WeexCore {
     parent->removeRenderObject(child);
     mRenderObjectMap.erase(child->getRef());
     delete child;
+    buildRenderObjectTime(getCurrentTime() - startTime);
     return true;
   }
 
   bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
+    long long startTime = getCurrentTime();
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
       return false;
@@ -175,11 +174,13 @@ namespace WeexCore {
 
     oldParent->removeRenderObject(child);
     newParent->addRenderObject(stringToNum<int>(index), child);
+    buildRenderObjectTime(getCurrentTime() - startTime);
     return true;
   }
 
   bool RenderPage::updateStyle(std::string ref,
                                std::vector<std::pair<std::string, std::string> *> *styles) {
+    long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr || styles == nullptr || styles->empty())
       return false;
@@ -221,6 +222,8 @@ namespace WeexCore {
         }
       }
     }
+
+    buildRenderObjectTime(getCurrentTime() - startTime);
 
     sendUpdateStyleAction(render, style, margin, padding, border);
     calculateLayout();
@@ -289,6 +292,7 @@ namespace WeexCore {
 
   bool RenderPage::updateAttr(std::string ref,
                               std::vector<std::pair<std::string, std::string> *> *attrs) {
+    long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr || attrs == nullptr || attrs->empty())
       return false;
@@ -298,6 +302,8 @@ namespace WeexCore {
         return false;
       render->addAttr((*attrs)[i]->first, (*attrs)[i]->second);
     }
+
+    buildRenderObjectTime(getCurrentTime() - startTime);
 
     sendUpdateAttrAction(render, attrs);
 
@@ -317,20 +323,26 @@ namespace WeexCore {
   }
 
   bool RenderPage::addEvent(std::string ref, std::string event) {
+    long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
       return false;
 
     render->addEvent(event);
+    buildRenderObjectTime(getCurrentTime() - startTime);
+
     return true;
   }
 
   bool RenderPage::removeEvent(std::string ref, std::string event) {
+    long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
       return false;
 
     render->removeEvent(event);
+    buildRenderObjectTime(getCurrentTime() - startTime);
+
     return true;
   }
 
@@ -440,6 +452,16 @@ namespace WeexCore {
   void RenderPage::layoutActionJniTime(long long time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->layoutActionJniTime += time;
+  }
+
+  void RenderPage::parseJsonTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->parseJsonTime += time;
+  }
+
+  void RenderPage::buildRenderObjectTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->buildRenderObjectTime += time;
   }
 
   bool RenderPage::bindInstance_Impl_Android(jobject instance) {

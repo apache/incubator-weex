@@ -2,16 +2,22 @@
 #include <WeexCore/render/RenderManager.h>
 #include <WeexCore/render/RenderPage.h>
 #include <WeexCore/render/RenderObject.h>
+#include <base/TimeUtils.h>
 
 namespace WeexCore {
 
-  // save all pages info with RenderPage;
   RenderManager *RenderManager::m_pInstance = nullptr;
 
   bool RenderManager::createPage(std::string pageId, std::string data) {
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
-    return page->createRootRender(data);
+
+    long long startTime = getCurrentTime();
+    char *c_data = (char *) data.data();
+    RenderObject *root = json2RenderObject(c_data, page);
+    page->parseJsonTime(getCurrentTime() - startTime);
+    page->buildRenderObjectTime(getCurrentTime() - startTime);
+    return page->createRootRender(root);
   }
 
   bool RenderManager::addRenderObject(std::string pageId, std::string parentRef, int index,
@@ -20,8 +26,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+    long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *child = json2RenderObject(c_data, page);
+    page->parseJsonTime(getCurrentTime() - startTime);
+    page->buildRenderObjectTime(getCurrentTime() - startTime);
     if (child == nullptr)
       return false;
 
@@ -50,8 +59,12 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+    long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    return page->updateAttr(ref, json2Pairs(c_data));
+    std::vector<std::pair<std::string, std::string> *> *attrs = json2Pairs(c_data);
+    page->parseJsonTime(getCurrentTime() - startTime);
+    page->buildRenderObjectTime(getCurrentTime() - startTime);
+    return page->updateAttr(ref, attrs);
   }
 
   bool RenderManager::updateStyle(std::string pageId, std::string ref, std::string data) {
@@ -59,8 +72,12 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+    long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    return page->updateStyle(ref, json2Pairs(c_data));
+    std::vector<std::pair<std::string, std::string> *> *styles = json2Pairs(c_data);
+    page->parseJsonTime(getCurrentTime() - startTime);
+    page->buildRenderObjectTime(getCurrentTime() - startTime);
+    return page->updateStyle(ref, styles);
   }
 
   bool RenderManager::addEvent(std::string pageId, std::string ref, std::string event) {

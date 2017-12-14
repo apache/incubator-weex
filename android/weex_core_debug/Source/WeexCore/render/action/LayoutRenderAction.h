@@ -26,10 +26,8 @@ namespace WeexCore {
                                                          mTop, mBottom,
                                                          mLeft, mRight,
                                                          mHeight, mWidth);
-      if (page != nullptr) {
-        page->jniCallTime(getCurrentTime() - startTime);
-        page->layoutActionJniTime(getCurrentTime() - startTime);
-      }
+      page->jniCallTime(getCurrentTime() - startTime);
+      page->layoutActionJniTime(getCurrentTime() - startTime);
     }
 
     void getLayoutInfo(WXCoreLayoutNode *node) {

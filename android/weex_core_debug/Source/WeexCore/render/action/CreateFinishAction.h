@@ -16,8 +16,7 @@ namespace WeexCore {
       long long startTime = getCurrentTime();
       BridgeAndroid::getInstance()->callCreateFinishByWeexCore(mPageId);
 
-      if (page != nullptr)
-        page->jniCallTime(getCurrentTime() - startTime);
+      page->jniCallTime(getCurrentTime() - startTime);
     }
 
     void GenerateAction(std::string pageId) {

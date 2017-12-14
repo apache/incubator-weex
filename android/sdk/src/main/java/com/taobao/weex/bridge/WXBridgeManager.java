@@ -1994,7 +1994,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  // callCreateFinish
   public int callCreateFinishByWeexCore(String instanceId) {
     mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId);
     WXLogUtils.d(mLodBuilder.substring(0));
