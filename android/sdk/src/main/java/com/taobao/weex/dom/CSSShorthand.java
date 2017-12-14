@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.layout;
+package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;

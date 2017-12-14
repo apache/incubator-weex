@@ -27,11 +27,10 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
-import com.taobao.weex.ui.layout.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

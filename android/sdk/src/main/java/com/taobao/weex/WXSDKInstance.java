@@ -134,8 +134,6 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
    * */
   private volatile boolean isPreRenderMode;
 
-  private LayoutFinishListener mLayoutFinishListener;
-
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
 
@@ -596,15 +594,6 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
   }
-
-  public void setLayoutFinishListener(@Nullable LayoutFinishListener listener) {
-    this.mLayoutFinishListener = listener;
-  }
-
-  public LayoutFinishListener getLayoutFinishListener() {
-    return this.mLayoutFinishListener;
-  }
-
 
   /**set render start time*/
   public void setRenderStartTime(long renderStartTime) {

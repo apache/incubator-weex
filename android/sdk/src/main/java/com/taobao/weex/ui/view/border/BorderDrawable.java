@@ -35,7 +35,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-import com.taobao.weex.ui.layout.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 

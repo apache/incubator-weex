@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-import com.taobao.weex.ui.layout.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand;
 
 class BorderUtil {
 

@@ -16,29 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.layout;
+package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
 
-public class MeasureSize {
-  private float width;
-  private float height;
+public abstract class ContentBoxMeasurement {
 
   @CalledByNative
-  public float getWidth() {
-    return width;
-  }
-
-  public void setWidth(float width) {
-    this.width = width;
-  }
+  public abstract MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode);
 
   @CalledByNative
-  public float getHeight() {
-    return height;
-  }
+  public abstract void layoutBefore();
 
-  public void setHeight(float height) {
-    this.height = height;
-  }
+  @CalledByNative
+  public abstract void layoutAfter(float computedWidth, float computedHeight);
 }

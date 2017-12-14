@@ -23,7 +23,7 @@ import android.graphics.LinearGradient;
 import android.graphics.PathEffect;
 import android.graphics.Shader;
 import android.support.annotation.Nullable;
-import com.taobao.weex.ui.layout.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand;
 
 enum BorderStyle {
   SOLID,

@@ -16,23 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.layout;
+package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
 
-public class MeasureMode {
-
-  public static int EXACTLY = 0;
-
-  public static int ATMOST = 1;
+public class MeasureSize {
+  private float width;
+  private float height;
 
   @CalledByNative
-  public static int getEXACTLY() {
-    return EXACTLY;
+  public float getWidth() {
+    return width;
+  }
+
+  public void setWidth(float width) {
+    this.width = width;
   }
 
   @CalledByNative
-  public static int getATMOST() {
-    return ATMOST;
+  public float getHeight() {
+    return height;
+  }
+
+  public void setHeight(float height) {
+    this.height = height;
   }
 }

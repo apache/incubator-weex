@@ -38,7 +38,7 @@ static const JNINativeMethod kMethodsWXComponent[] = {
 "("
 "Ljava/lang/String;"
 "Ljava/lang/String;"
-"Lcom/taobao/weex/ui/layout/ContentBoxMeasurement;"
+"Lcom/taobao/weex/layout/ContentBoxMeasurement;"
 ")"
 "V", reinterpret_cast<void*>(BindMeasurementToWXCore) },
 };

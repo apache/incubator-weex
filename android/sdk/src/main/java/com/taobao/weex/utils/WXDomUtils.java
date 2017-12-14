@@ -22,7 +22,7 @@ package com.taobao.weex.utils;
 import com.taobao.weex.dom.CSSConstants;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.layout.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand;
 
 public class WXDomUtils {
 
