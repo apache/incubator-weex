@@ -205,7 +205,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (mWxDebugProxy != null) {
       mWxDebugProxy.stop(false);
     }
-    if (WXEnvironment.sDebugServerConnectable && WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.sDebugServerConnectable && (WXEnvironment.isApkDebugable() || WXEnvironment.sForceEnableDevTool)) {
       if (WXEnvironment.getApplication() != null) {
         try {
           Class clazz = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
