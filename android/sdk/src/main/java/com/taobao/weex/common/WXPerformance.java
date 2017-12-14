@@ -294,9 +294,9 @@ public class WXPerformance {
     quotas.put("cellExceedNum", (double) cellExceedNum);
     quotas.put("timerInvokeCount", (double) timerInvokeCount);
     quotas.put("avgFps", (double) avgFPS);
-    quotas.put("MaxImproveMemory", 0D);
-    quotas.put("BackImproveMemory", (double) backImproveMemory);
-    quotas.put("PushImproveMemory", 0D);
+    quotas.put("maxImproveMemory", 0D);
+    quotas.put("backImproveMemory", (double) backImproveMemory);
+    quotas.put("pushImproveMemory", 0D);
 
 
     quotas.put("screenRenderTime", (double)screenRenderTime);
@@ -326,6 +326,7 @@ public class WXPerformance {
     quotas.put("WXSDKVersion", WXSDKVersion);
     quotas.put("pageName", pageName);
     quotas.put("requestType",requestType);
+    quotas.put("networkType", "unknown");
     quotas.put("connectionType",connectionType);
     quotas.put(CACHE_TYPE, cacheType);
 
@@ -348,8 +349,9 @@ public class WXPerformance {
   }
 
   public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType", CACHE_TYPE,"requestType"
-    ,"wxdim1","wxdim2","wxdim3","wxdim4","wxdim5"};
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion",
+        "connectionType", CACHE_TYPE,"requestType", "networkType",
+        "wxdim1","wxdim2","wxdim3","wxdim4","wxdim5"};
   }
 
   public static String[] getMeasures(){
@@ -365,10 +367,11 @@ public class WXPerformance {
         "maxDeepVDomLayer",
         "cellExceedNum",
         "cellExceedNum",
+        "timerInvokeCount",
         "avgFps",
-        "MaxImproveMemory",
-        "BackImproveMemory",
-        "PushImproveMemory",
+        "maxImproveMemory",
+        "backImproveMemory",
+        "pushImproveMemory",
 
         "JSTemplateSize",
         "JSLibSize",
