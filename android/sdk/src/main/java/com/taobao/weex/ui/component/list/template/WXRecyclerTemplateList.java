@@ -44,6 +44,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
@@ -177,6 +178,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private ArrayStack bindIngStackContext = new ArrayStack();
     private Map bindIngMapContext = new HashMap();
 
+
     public WXRecyclerTemplateList(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
         super(instance, node, parent);
         initRecyclerTemplateList(instance, node, parent);
@@ -204,15 +206,28 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 listData = array;
             }
         }
-        long start = System.currentTimeMillis();
-        if(mDomObject != null && mDomObject.getCellList() != null){
-            for(int i=0; i<mDomObject.getCellList().size(); i++){
-                addChild(DomTreeBuilder.buildTree(mDomObject.getCellList().get(i),  this));
+        /**
+         * we have separate cell with list, post add cell in dom thread ensure
+         * list has layout and can archive better user experience and better load time,
+         * which reduce waste cell layout when list layout changes.
+         * */
+        WXSDKManager.getInstance().getWXDomManager().post(new Runnable() {
+            @Override
+            public void run() {
+                if(isDestoryed()){
+                    return;
+                }
+                long start = System.currentTimeMillis();
+                if(mDomObject != null && mDomObject.getCellList() != null){
+                    for(int i=0; i<mDomObject.getCellList().size(); i++){
+                        addChild(DomTreeBuilder.buildTree(mDomObject.getCellList().get(i),  WXRecyclerTemplateList.this));
+                    }
+                }
+                if(WXEnvironment.isApkDebugable()){
+                    WXLogUtils.d(TAG, "TemplateList BuildDomTree Used " + (System.currentTimeMillis() - start));
+                }
             }
-        }
-        if(WXEnvironment.isApkDebugable()){
-            WXLogUtils.d(TAG, "TemplateList BuildDomTree Used " + (System.currentTimeMillis() - start));
-        }
+        });
     }
 
     @Override

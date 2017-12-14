@@ -18,10 +18,12 @@
  */
 package com.taobao.weex.dom;
 
+
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 /**
  * Created by zhengshihan on 2017/4/11.
@@ -36,17 +38,19 @@ public class WXCellDomObject extends WXDomObject {
         CSSNode parent = node.getParent();
         if (parent != null && parent instanceof WXRecyclerDomObject) {
           WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
-          parentDom.preCalculateCellWidth();
+          if(!parentDom.hasPreCalculateCellWidth()) {
+              parentDom.preCalculateCellWidth();
+          }
           WXDomObject domObject = (WXDomObject) node;
           if (WXBasicComponentType.CELL.equals(domObject.getType())
                   || WXBasicComponentType.CELL_SLOT.equals(domObject.getType())) {
             float w = ((WXRecyclerDomObject) parent).getColumnWidth();
-            if(w <= 0 && parentDom.getColumnCount() <= 1){
+            if((w <= 0 || Float.isNaN(w)) && parentDom.getColumnCount() <= 1){
                   w = parentDom.getAvailableWidth();
-                  if(w <= 0){
+                  if(w <= 0 || Float.isNaN(w)){
                       w = parentDom.getLayoutWidth();
-                      if(w <= 0){
-                          w = parentDom.getViewPortWidth();
+                      if(w <= 0 || Float.isNaN(w)){
+                          w =  WXViewUtils.getRealPxByWidth( parentDom.getViewPortWidth(),  parentDom.getViewPortWidth());
                       }
                   }
              }
@@ -76,12 +80,15 @@ public class WXCellDomObject extends WXDomObject {
                   recyclerDomObject.preCalculateCellWidth();
               }
               float w = recyclerDomObject.getColumnWidth();
-              if(w <= 0 && recyclerDomObject.getColumnCount() <= 1){
+              if((w <= 0 || Float.isNaN(w)) && recyclerDomObject.getColumnCount() <= 1){
                   w = recyclerDomObject.getAvailableWidth();
-                  if(w <= 0){
+                  if(w <= 0 || Float.isNaN(w)){
                       w = recyclerDomObject.getLayoutWidth();
-                      if(w <= 0){
-                          w = recyclerDomObject.getViewPortWidth();
+                      if(w <= 0 || Float.isNaN(w)){
+                          w = recyclerDomObject.getStyleWidth();
+                          if(w <= 0 || Float.isNaN(w)){
+                              w = WXViewUtils.getRealPxByWidth(recyclerDomObject.getViewPortWidth(), recyclerDomObject.getViewPortWidth());
+                          }
                       }
                   }
               }
