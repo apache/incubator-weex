@@ -19,16 +19,13 @@
 package com.taobao.weex.dom;
 
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.Constants;
+
 import static com.taobao.weex.common.Constants.Name.*;
 
-import com.taobao.weex.dom.flex.MeasureOutput;
-import com.taobao.weex.ui.component.WXComponent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;

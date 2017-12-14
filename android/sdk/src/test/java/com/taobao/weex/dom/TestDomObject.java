@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.dom;
 
-import com.taobao.weex.dom.flex.CSSLayout;
-
 import static com.taobao.weex.common.Constants.Event;
 
 /**

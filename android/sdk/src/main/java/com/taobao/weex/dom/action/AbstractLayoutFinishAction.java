@@ -42,8 +42,8 @@ abstract class AbstractLayoutFinishAction implements DOMAction, RenderAction {
     }
 
     WXDomObject root = context.getDomByRef(WXDomObject.ROOT);
-    mLayoutHeight = (int)root.getLayoutHeight();
-    mLayoutWidth = (int)root.getLayoutWidth();
+//    mLayoutHeight = (int)root.getLayoutHeight();
+//    mLayoutWidth = (int)root.getLayoutWidth();
     context.postRenderTask(this);
     WXSDKInstance instance = context.getInstance();
     if (instance != null) {

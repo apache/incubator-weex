@@ -20,9 +20,6 @@ package com.taobao.weex.dom;
 
 import android.text.TextPaint;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSConstants;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXViewUtils;
@@ -43,16 +40,6 @@ public class BasicEditTextDomObject extends WXDomObject {
   public BasicEditTextDomObject() {
     super();
     mPaint.setTextSize(WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,getViewPortWidth()));
-    setMeasureFunction(new MeasureFunction() {
-      @Override
-      public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
-        if (CSSConstants.isUndefined(width)) {
-          width = node.cssstyle.maxWidth;
-        }
-        measureOutput.height = getMeasureHeight();
-        measureOutput.width = width;
-      }
-    });
   }
 
   @Override
@@ -99,8 +86,6 @@ public class BasicEditTextDomObject extends WXDomObject {
       if (fontFamily != null) {
         TypefaceUtil.applyFontStyle(mPaint, fontStyle, fontWeight, fontFamily);
       }
-
-      this.dirty();
     }
   }
 

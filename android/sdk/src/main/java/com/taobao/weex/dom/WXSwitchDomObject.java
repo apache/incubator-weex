@@ -20,39 +20,38 @@ package com.taobao.weex.dom;
 
 import android.content.Context;
 import android.view.View.MeasureSpec;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
+
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXLogUtils;
 
 public class WXSwitchDomObject extends WXDomObject {
 
-  private static final MeasureFunction SWITCH_MEASURE_FUNCTION = new MeasureFunction() {
-
-    @Override
-    public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
-      try {
-        Context context=((WXDomObject) node).getDomContext().getUIContext();
-        WXSwitchView wxSwitchView = new WXSwitchView(context);
-        int widthSpec, heightSpec;
-        heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-        if (Float.isNaN(width)) {
-          widthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-        } else {
-          widthSpec = MeasureSpec.makeMeasureSpec((int) width, MeasureSpec.AT_MOST);
-        }
-        wxSwitchView.measure(widthSpec, heightSpec);
-        measureOutput.width = wxSwitchView.getMeasuredWidth();
-        measureOutput.height = wxSwitchView.getMeasuredHeight();
-      } catch (RuntimeException e) {
-        WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
-      }
-    }
-  };
-
-  public WXSwitchDomObject() {
-    super();
-    setMeasureFunction(SWITCH_MEASURE_FUNCTION);
-  }
+//  private static final MeasureFunction SWITCH_MEASURE_FUNCTION = new MeasureFunction() {
+//
+//    @Override
+//    public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
+//      try {
+//        Context context=((WXDomObject) node).getDomContext().getUIContext();
+//        WXSwitchView wxSwitchView = new WXSwitchView(context);
+//        int widthSpec, heightSpec;
+//        heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+//        if (Float.isNaN(width)) {
+//          widthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+//        } else {
+//          widthSpec = MeasureSpec.makeMeasureSpec((int) width, MeasureSpec.AT_MOST);
+//        }
+//        wxSwitchView.measure(widthSpec, heightSpec);
+//        measureOutput.width = wxSwitchView.getMeasuredWidth();
+//        measureOutput.height = wxSwitchView.getMeasuredHeight();
+//      } catch (RuntimeException e) {
+//        WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+//      }
+//    }
+//  };
+//
+//  public WXSwitchDomObject() {
+//    super();
+//    setMeasureFunction(SWITCH_MEASURE_FUNCTION);
+//  }
 
 }

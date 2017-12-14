@@ -29,12 +29,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
-import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Actually, {@link com.taobao.weex.ui.component.WXComponent} hold references to
  * {@link android.view.View} and {@link WXDomObject}.
  */
-public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject {
+public class WXDomObject implements Cloneable,ImmutableDomObject {
   public static final String CHILDREN = "children";
   public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();
@@ -170,13 +166,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   }
 
   protected final void copyFields(WXDomObject dest) {
-    dest.cssstyle.copy(this.cssstyle);
-    dest.mRef = mRef;
-    dest.mType = mType;
-    dest.mStyles = mStyles == null ? null : mStyles.clone();//mStyles == null ? null : mStyles.clone();
-    dest.mAttributes = mAttributes == null ? null : mAttributes.clone();//mAttrs == null ? null : mAttrs.clone();
-    dest.mEvents = mEvents == null ? null : mEvents.clone();
-    dest.csslayout.copy(this.csslayout);
+//    dest.cssstyle.copy(this.cssstyle);
+//    dest.mRef = mRef;
+//    dest.mType = mType;
+//    dest.mStyles = mStyles == null ? null : mStyles.clone();//mStyles == null ? null : mStyles.clone();
+//    dest.mAttributes = mAttributes == null ? null : mAttributes.clone();//mAttrs == null ? null : mAttrs.clone();
+//    dest.mEvents = mEvents == null ? null : mEvents.clone();
+//    dest.csslayout.copy(this.csslayout);
   }
 
   /**
@@ -231,15 +227,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   }
 
-  /**
-   * Tell whether this object need to be updated. This is usually called when
-   * {@link CSSNode#calculateLayout(CSSLayoutContext)} finishes and new layout has been
-   * calculated. This method is a simple wrapper method for {@link #hasNewLayout()} and
-   * {@link #isDirty()}.
-   * @return true for need update since last update.
-   */
   public final boolean hasUpdate() {
-    return hasNewLayout() || isDirty();
+//    return hasNewLayout() || isDirty();
+    return true;
   }
 
   /**
@@ -269,9 +259,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
    * #hasUpdate()} will return false. This method is also a wrapper for {@link #markUpdateSeen()}
    */
   public final void markUpdateSeen() {
-    if (hasNewLayout()) {
-      markLayoutSeen();
-    }
+//    if (hasNewLayout()) {
+//      markLayoutSeen();
+//    }
   }
 
   public boolean isFixed() {
@@ -294,7 +284,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     int index = mDomChildren.indexOf(child);
     removeFromDom(child);
     if (index != -1) {
-      super.removeChildAt(index);
+//      super.removeChildAt(index);
     }
   }
 
@@ -338,10 +328,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     index = index >= count ? -1 : index;
     if (index == -1) {
       mDomChildren.add(child);
-      super.addChildAt(child, super.getChildCount());
+//      super.addChildAt(child, super.getChildCount());
     } else {
       mDomChildren.add(index, child);
-      super.addChildAt(child, index);
+//      super.addChildAt(child, index);
     }
     child.parent = this;
   }
@@ -352,13 +342,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       return;
     }
 
-    int count = super.getChildCount();
-    index = index >= count ? -1 : index;
-    if (index == -1) {
-      super.addChildAt(child, super.getChildCount());
-    } else {
-      super.addChildAt(child, index);
-    }
     child.parent = this;
   }
 
@@ -411,7 +394,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       mAttributes = new WXAttr();
     }
     mAttributes.putAll(attrs);
-    super.dirty();
   }
 
   public void updateStyle(Map<String, Object> styles){
@@ -426,7 +408,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       mStyles = new WXStyle();
     }
     mStyles.putAll(styles,byPesudo);
-    super.dirty();
   }
 
   /** package **/ void applyStyleToNode() {
@@ -435,59 +416,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if (!stylesMap.isEmpty()) {
       for(Map.Entry<String,Object> item:stylesMap.entrySet()) {
         switch (item.getKey()) {
-          case Constants.Name.ALIGN_ITEMS:
-            setAlignItems(stylesMap.getAlignItems());
-            break;
-          case Constants.Name.ALIGN_SELF:
-            setAlignSelf(stylesMap.getAlignSelf());
-            break;
-          case Constants.Name.FLEX:
-            setFlex(stylesMap.getFlex());
-            break;
-          case Constants.Name.FLEX_DIRECTION:
-            setFlexDirection(stylesMap.getFlexDirection());
-            break;
-          case Constants.Name.JUSTIFY_CONTENT:
-            setJustifyContent(stylesMap.getJustifyContent());
-            break;
-          case Constants.Name.FLEX_WRAP:
-            setWrap(stylesMap.getCSSWrap());
-            break;
-          case Constants.Name.MIN_WIDTH:
-            setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth(vp),vp));
-            break;
-          case Constants.Name.MIN_HEIGHT:
-            setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight(vp),vp));
-            break;
-          case Constants.Name.MAX_WIDTH:
-            setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth(vp),vp));
-            break;
-          case Constants.Name.MAX_HEIGHT:
-            setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight(vp),vp));
-            break;
-          case Constants.Name.DEFAULT_HEIGHT:
-          case Constants.Name.HEIGHT:
-            setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.HEIGHT)?stylesMap.getHeight(vp):stylesMap.getDefaultHeight(),vp));
-            break;
-          case Constants.Name.WIDTH:
-          case Constants.Name.DEFAULT_WIDTH:
-            setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.WIDTH)?stylesMap.getWidth(vp):stylesMap.getDefaultWidth(),vp));
-            break;
-          case Constants.Name.POSITION:
-            setPositionType(stylesMap.getPosition());
-            break;
-          case Constants.Name.LEFT:
-            setPositionLeft(WXViewUtils.getRealPxByWidth(stylesMap.getLeft(vp),vp));
-            break;
-          case Constants.Name.TOP:
-            setPositionTop(WXViewUtils.getRealPxByWidth(stylesMap.getTop(vp),vp));
-            break;
-          case Constants.Name.RIGHT:
-            setPositionRight(WXViewUtils.getRealPxByWidth(stylesMap.getRight(vp),vp));
-            break;
-          case Constants.Name.BOTTOM:
-            setPositionBottom(WXViewUtils.getRealPxByWidth(stylesMap.getBottom(vp),vp));
-            break;
         }
       }
     }
@@ -498,15 +426,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   }
 
   public void hide() {
-    setVisible(false);
   }
 
   public void show() {
-    setVisible(true);
   }
 
   public boolean isVisible() {
-    return super.isShow();
+    return true;
   }
 
   /**

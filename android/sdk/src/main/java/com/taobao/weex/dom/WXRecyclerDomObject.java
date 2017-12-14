@@ -112,13 +112,6 @@ public class WXRecyclerDomObject extends WXDomObject{
             WXLogUtils.w("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
             return;
         }
-        int count = getChildCount();
-        for(int i=0;i<count; i++){
-            WXDomObject domObject = getChild(i);
-            if(WXBasicComponentType.CELL.equals(domObject.getComponentType())) {
-                getChild(i).getStyles().put(Constants.Name.WIDTH, mColumnWidth);
-            }
-        }
     }
 
     @Override

@@ -108,11 +108,11 @@ class AnimationAction implements DOMAction, RenderAction {
           (domObject = context.getDomByRef(ref)) != null) {
         WXAnimationBean animationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
         if (animationBean != null && animationBean.styles != null) {
-          int width = (int) domObject.getLayoutWidth();
-          int height = (int) domObject.getLayoutHeight();
-          animationBean.styles.init(animationBean.styles.transformOrigin,
-                                    animationBean.styles.transform, width, height,
-                                    context.getInstance().getInstanceViewPortWidth());
+//          int width = (int) domObject.getLayoutWidth();
+//          int height = (int) domObject.getLayoutHeight();
+//          animationBean.styles.init(animationBean.styles.transformOrigin,
+//                                    animationBean.styles.transform, width, height,
+//                                    context.getInstance().getInstanceViewPortWidth());
           mAnimationBean = animationBean;
           context.postRenderTask(this);
         }

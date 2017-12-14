@@ -54,13 +54,13 @@ final class MoveElementAction implements DOMAction, RenderAction {
     WXSDKInstance instance = context.getInstance();
     WXDomObject domObject = context.getDomByRef(mRef);
     WXDomObject parentObject = context.getDomByRef(mParentRef);
-    if (domObject == null || domObject.parent == null
-        || parentObject == null || parentObject.hasNewLayout()) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
-      }
-      return;
-    }
+//    if (domObject == null || domObject.parent == null
+//        || parentObject == null || parentObject.hasNewLayout()) {
+//      if (instance != null) {
+//        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
+//      }
+//      return;
+//    }
     int index = mIndex;
     if (domObject.parent.equals(parentObject)) {
       if(parentObject.index(domObject) == index) {

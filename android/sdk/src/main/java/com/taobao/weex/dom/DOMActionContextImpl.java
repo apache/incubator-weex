@@ -25,7 +25,6 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
@@ -67,7 +66,6 @@ class DOMActionContextImpl implements DOMActionContext {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set <Pair<String, Map<String, Object>>> animations;
-  private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
   private Map<String, AddDomInfo> mAddDom = new HashMap<>();
@@ -84,7 +82,6 @@ class DOMActionContextImpl implements DOMActionContext {
   public DOMActionContextImpl(String instanceId, WXRenderManager renderManager) {
     mDestroy = false;
     mInstanceId = instanceId;
-    mLayoutContext = new CSSLayoutContext();
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     animations = new LinkedHashSet<>();
@@ -129,7 +126,6 @@ class DOMActionContextImpl implements DOMActionContext {
     mAddDOMConsumer = null;
     mNormalTasks.clear();
     mAddDom.clear();
-    mLayoutContext = null;
     mWXRenderManager = null;
     animations.clear();
   }
@@ -195,8 +191,6 @@ class DOMActionContextImpl implements DOMActionContext {
     });
     long start = System.currentTimeMillis();
 
-
-    rootDom.calculateLayout(mLayoutContext);
 
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
@@ -385,10 +379,10 @@ class DOMActionContextImpl implements DOMActionContext {
           String transformOrigin = (String) style.get(WXDomObject.TRANSFORM_ORIGIN);
           WXAnimationBean animationBean = new WXAnimationBean();
           WXDomObject domObject = mRegistry.get(ref);
-          int width = (int) domObject.getLayoutWidth();
-          int height = (int) domObject.getLayoutHeight();
-          animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(mInstanceId));
+//          int width = (int) domObject.getLayoutWidth();
+//          int height = (int) domObject.getLayoutHeight();
+//          animationBean.styles = new WXAnimationBean.Style();
+//          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(mInstanceId));
           return animationBean;
         }
       }catch (RuntimeException e){
