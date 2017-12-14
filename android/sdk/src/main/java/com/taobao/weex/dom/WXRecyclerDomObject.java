@@ -109,17 +109,22 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     @Override
     public float getStyleWidth() {
-        float width =  getLayoutWidth();
+        float width =  super.getStyleWidth();
         if (Float.isNaN(width) || width <= 0){
-            if(getParent() != null){
-                width = getParent().getLayoutWidth();
-            }
+            width = super.getLayoutWidth();
             if (Float.isNaN(width) || width <= 0){
-                width = super.getStyleWidth();
+                if(getStyles().containsKey(Constants.Name.WIDTH)) {
+                    width = WXViewUtils.getRealPxByWidth(getStyles().containsKey(Constants.Name.WIDTH) ? getStyles().getWidth(getViewPortWidth()) : getStyles().getDefaultWidth(), getViewPortWidth());
+                }
+                if (Float.isNaN(width) || width <= 0){
+                    if(getParent() != null){
+                        width = getParent().getLayoutWidth();
+                    }
+                }
             }
         }
         if (Float.isNaN(width) || width <= 0){
-            width = getViewPortWidth();
+            width = WXViewUtils.getRealPxByWidth(getViewPortWidth(), getViewPortWidth());
         }
         return width;
     }
