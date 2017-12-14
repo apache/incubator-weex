@@ -26,8 +26,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.action.Action;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXLogUtils;
 
 
@@ -78,64 +76,4 @@ public final class WXDomModule extends WXModule {
     mWXSDKInstance = instance;
   }
 
-  public void callDomMethod(JSONObject task) {
-    if (task == null) {
-      return;
-    }
-    String method = (String) task.get(WXBridgeManager.METHOD);
-    JSONArray args = (JSONArray) task.get(WXBridgeManager.ARGS);
-    callDomMethod(method,args);
-  }
-  
-  public Object callDomMethod(String method, JSONArray args) {
-
-    if (method == null) {
-      return null;
-    }
-    //TODO：add pooling
-    try {
-      Action action = Actions.get(method,args);
-      if(action == null){
-        WXLogUtils.e("Unknown dom action.");
-      }
-      if(action instanceof DOMAction){
-        postAction((DOMAction)action, CREATE_BODY.equals(method) || ADD_RULE.equals(method));
-      }else {
-        postAction((RenderAction)action);
-      }
-    } catch (IndexOutOfBoundsException e) {
-      // no enougn args
-      e.printStackTrace();
-      WXLogUtils.e("Dom module call miss arguments.");
-    } catch (ClassCastException cce) {
-      WXLogUtils.e("Dom module call arguments format error!!");
-    }
-    return null;
-  }
-
-  /**
-   * invoke dom method
-   * @param ref
-   * @param method
-   * @param args
-   */
-  public void invokeMethod(String ref, String method, JSONArray args){
-    if(ref == null || method == null){
-      return;
-    }
-
-    postAction(Actions.getInvokeMethod(ref,method,args),false);
-  }
-
-  public void postAction(RenderAction action){
-    WXSDKManager.getInstance().getWXRenderManager().runOnThread(mWXSDKInstance.getInstanceId(),action);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(DOMAction action, boolean createContext){
-    WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(),action,createContext);
-  }
 }

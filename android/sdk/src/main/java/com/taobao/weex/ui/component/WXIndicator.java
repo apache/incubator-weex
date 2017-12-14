@@ -29,7 +29,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -149,23 +148,6 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
       getHostView().setVisibility(View.VISIBLE);
     } else {
       getHostView().setVisibility(View.GONE);
-    }
-  }
-
-  public static class IndicatorDomNode extends WXDomObject{
-    public IndicatorDomNode(){
-      super();
-    }
-
-    @Override
-    protected Map<String, String> getDefaultStyle() {
-      WXStyle pendingStyles = getStyles();
-      Map<String,String> map = new HashMap<>();
-      if(!pendingStyles.containsKey(Constants.Name.RIGHT))
-        map.put(Constants.Name.LEFT,"0");
-      if(!pendingStyles.containsKey(Constants.Name.BOTTOM))
-        map.put(Constants.Name.TOP,"0");
-      return map;
     }
   }
 }

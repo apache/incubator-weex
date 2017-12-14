@@ -48,10 +48,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.action.Action;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.LayoutUIAction;
@@ -371,7 +368,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXDomModule.WXDOM.equals(module)) {
         WXDomModule dom = getDomModule(instanceId);
-        return dom.callDomMethod(method, arguments);
+//        return dom.callDomMethod(method, arguments);
       } else {
         return callModuleMethod(instanceId, module,
                 method, arguments);
@@ -396,7 +393,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXDomModule.WXDOM.equals(module)) {
         WXDomModule dom = getDomModule(instanceId);
-        return dom.callDomMethod(method, arguments);
+//        return dom.callDomMethod(method, arguments);
       } else {
         return callModuleMethod(instanceId, module,
                 method, arguments, options);
@@ -419,7 +416,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
 
       WXDomModule dom = getDomModule(instanceId);
-      dom.invokeMethod(componentRef, method, arguments);
+//      dom.invokeMethod(componentRef, method, arguments);
 
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
@@ -474,7 +471,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             if (target != null) {
               if (WXDomModule.WXDOM.equals(target)) {
                 WXDomModule dom = getDomModule(instanceId);
-                dom.callDomMethod(task);
+//                dom.callDomMethod(task);
               } else {
                 JSONObject optionObj = task.getJSONObject(OPTIONS);
                 callModuleMethod(instanceId, (String) target,
@@ -483,7 +480,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             } else if (task.get(COMPONENT) != null) {
               //call component
               WXDomModule dom = getDomModule(instanceId);
-              dom.invokeMethod((String) task.get(REF), (String) task.get(METHOD), (JSONArray) task.get(ARGS));
+//              dom.invokeMethod((String) task.get(REF), (String) task.get(METHOD), (JSONArray) task.get(ARGS));
             } else {
               throw new IllegalArgumentException("unknown callNative");
             }
@@ -519,8 +516,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getUpdateFinish();
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getUpdateFinish();
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateFinish exception: ", e);
@@ -551,8 +548,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getRefreshFinish();
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getRefreshFinish();
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRefreshFinish exception: ", e);
@@ -594,8 +591,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
         JSONObject domObject = JSON.parseObject(task);
-        Action action = Actions.getUpdateAttrs(ref, domObject);
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getUpdateAttrs(ref, domObject);
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateAttrs exception: ", e);
@@ -628,8 +625,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getRemoveElement(ref);
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getRemoveElement(ref);
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
@@ -663,8 +660,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getMoveElement(ref, parentref, Integer.parseInt(index));
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getMoveElement(ref, parentref, Integer.parseInt(index));
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callMoveElement exception: ", e);
@@ -696,8 +693,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getAddEvent(ref, event);
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getAddEvent(ref, event);
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
@@ -729,8 +726,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getRemoveEvent(ref, event);
-        domModule.postAction((DOMAction) action, false);
+//        Action action = Actions.getRemoveEvent(ref, event);
+//        domModule.postAction((DOMAction) action, false);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
@@ -781,8 +778,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         boolean reloadThisInstance = shouReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
         WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
-        domModule.postAction((DOMAction) action, true);
+//        Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
+//        domModule.postAction((DOMAction) action, true);
       }
 
     } catch (Exception e) {
@@ -1673,8 +1670,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           if (reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
             WXDomModule domModule = getDomModule(instanceId);
-            Action action = Actions.getReloadPage(instanceId, true);
-            domModule.postAction((DOMAction) action, true);
+//            Action action = Actions.getReloadPage(instanceId, true);
+//            domModule.postAction((DOMAction) action, true);
             instance.setNeedLoad(true);
             return;
           }

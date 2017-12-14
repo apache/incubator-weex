@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
@@ -44,41 +43,6 @@ public class WXComponentFactory {
   }
   public static void removeComponentTypesByInstanceId(String instanceId){
     sComponentTypes.remove(instanceId);
-  }
-
-  public static WXComponent newInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    if (instance == null || node == null || TextUtils.isEmpty(node.getComponentType()) ) {
-      return null;
-    }
-
-
-    if(sComponentTypes.get(instance.getInstanceId())==null){
-      Set<String> types=new HashSet<>();
-      sComponentTypes.put(instance.getInstanceId(),types);
-    }
-    sComponentTypes.get(instance.getInstanceId()).add(node.getComponentType());
-
-    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getComponentType());
-    if (holder == null) {
-      if (WXEnvironment.isApkDebugable()) {
-        String tag = "WXComponentFactory error type:[" +
-                node.getComponentType() + "]" + " class not found";
-        WXLogUtils.e(tag);
-      }
-      //For compatible reason of JS framework, unregistered type will be treated as container.
-      holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
-      if(holder == null){
-        throw new WXRuntimeException("Container component not found.");
-      }
-    }
-
-    try {
-//      return holder.createInstance(instance, node, parent);
-    } catch (Exception e) {
-      WXLogUtils.e("WXComponentFactory Exception type:[" + node.getComponentType() + "] ", e);
-    }
-
-    return null;
   }
 
   public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {

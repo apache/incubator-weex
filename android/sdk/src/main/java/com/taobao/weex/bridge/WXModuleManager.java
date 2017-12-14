@@ -21,7 +21,6 @@ package com.taobao.weex.bridge;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
@@ -31,9 +30,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -184,8 +181,8 @@ public class WXModuleManager {
     }
     // we are in preRender mode
     if(invoker.isRunOnUIThread()) {/*ASYNC CALL*/
-      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
-      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
+//      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
+//      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
       return null;
     } else {/*SYNC CALL*/
       return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);

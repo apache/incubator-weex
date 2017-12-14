@@ -51,11 +51,8 @@ import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
@@ -94,6 +91,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final String PROP_FIXED_SIZE = "fixedSize";
   public static final String PROP_FS_MATCH_PARENT = "m";
   public static final String PROP_FS_WRAP_CONTENT = "w";
+  public static final String TYPE = "type";
+  public static final String ROOT = "_root";
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
@@ -881,7 +880,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @param type
    */
   protected void appendEventToDOM(String type) {
-    WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(), type), false);
+//    WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(), type), false);
   }
 
   public View getRealView() {
@@ -927,7 +926,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         scroller = (Scrollable) container;
         return scroller;
       }
-      if (container.getRef().equals(WXDomObject.ROOT)) {
+      if (container.getRef().equals(ROOT)) {
         return null;
       }
       component = container;
@@ -1530,18 +1529,18 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
-    Message message = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = getInstanceId();
-    task.args = new ArrayList<>();
-
-    JSONObject styleJson = new JSONObject(styles);
-    task.args.add(getRef());
-    task.args.add(styleJson);
-    task.args.add(true);//flag pesudo
-    message.obj = task;
-    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+//    Message message = Message.obtain();
+//    WXDomTask task = new WXDomTask();
+//    task.instanceId = getInstanceId();
+//    task.args = new ArrayList<>();
+//
+//    JSONObject styleJson = new JSONObject(styles);
+//    task.args.add(getRef());
+//    task.args.add(styleJson);
+//    task.args.add(true);//flag pesudo
+//    message.obj = task;
+//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 
   public int getStickyOffset() {
@@ -1581,28 +1580,28 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * Trigger a applyStyles invoke to relayout current page
    */
   public void notifyNativeSizeChanged(int w, int h) {
-    if (!mNeedLayoutOnAnimation) {
-      return;
-    }
-
-    Message message = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = getInstanceId();
-    if (task.args == null) {
-      task.args = new ArrayList<>();
-    }
-
-    JSONObject style = new JSONObject(2);
-    float webW = WXViewUtils.getWebPxByWidth(w);
-    float webH = WXViewUtils.getWebPxByWidth(h);
-
-    style.put("width", webW);
-    style.put("height", webH);
-
-    task.args.add(getRef());
-    task.args.add(style);
-    message.obj = task;
-    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+//    if (!mNeedLayoutOnAnimation) {
+//      return;
+//    }
+//
+//    Message message = Message.obtain();
+//    WXDomTask task = new WXDomTask();
+//    task.instanceId = getInstanceId();
+//    if (task.args == null) {
+//      task.args = new ArrayList<>();
+//    }
+//
+//    JSONObject style = new JSONObject(2);
+//    float webW = WXViewUtils.getWebPxByWidth(w);
+//    float webH = WXViewUtils.getWebPxByWidth(h);
+//
+//    style.put("width", webW);
+//    style.put("height", webH);
+//
+//    task.args.add(getRef());
+//    task.args.add(style);
+//    message.obj = task;
+//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 }

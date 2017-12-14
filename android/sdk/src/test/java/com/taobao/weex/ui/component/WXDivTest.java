@@ -22,7 +22,6 @@ import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 
 import org.junit.Before;

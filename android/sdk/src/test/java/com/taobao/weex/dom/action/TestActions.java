@@ -19,7 +19,6 @@
 package com.taobao.weex.dom.action;
 
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.dom.DOMAction;
 
 /**
  * Created by sospartan on 01/03/2017.

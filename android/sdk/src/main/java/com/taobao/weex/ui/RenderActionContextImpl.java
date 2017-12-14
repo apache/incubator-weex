@@ -19,7 +19,6 @@
 package com.taobao.weex.ui;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.ui.component.WXComponent;
 
@@ -60,8 +59,7 @@ class RenderActionContextImpl implements RenderActionContext {
   /**
    * set layout information of View
    */
-  void setLayout(String ref, WXDomObject domObject) {
-    WXComponent component = mRegistry.get(ref);
+  void setLayout(String ref, WXComponent component) {
     if (component == null) {
       return;
     }
