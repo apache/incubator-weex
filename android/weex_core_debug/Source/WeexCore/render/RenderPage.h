@@ -66,7 +66,7 @@ namespace WeexCore {
 
     bool removeRenderObject(std::string ref);
 
-    bool moveRenderObject(std::string ref, std::string parentRef, std::string index);
+    bool moveRenderObject(std::string ref, std::string parentRef, int index);
 
     bool updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 

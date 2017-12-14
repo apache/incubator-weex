@@ -158,7 +158,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
+  bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, int index) {
     long long startTime = getCurrentTime();
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
@@ -173,7 +173,7 @@ namespace WeexCore {
       return false;
 
     oldParent->removeRenderObject(child);
-    newParent->addRenderObject(stringToNum<int>(index), child);
+    newParent->addRenderObject(index, child);
     buildRenderObjectTime(getCurrentTime() - startTime);
     return true;
   }

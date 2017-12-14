@@ -94,8 +94,18 @@ namespace WeexCore {
     }
 
     inline void addRenderObject(int index, RenderObject *child) {
-      // insert RenderObject child
-      addChildAt(child, getChildCount());
+
+      if (child == nullptr || index < -1) {
+        return;
+      }
+
+      int count = getChildCount();
+      index = index >= count ? -1 : index;
+      if (index == -1) {
+        addChildAt(child, getChildCount());
+      } else {
+        addChildAt(child, index);
+      }
     }
 
     inline void removeRenderObject(RenderObject *child) {

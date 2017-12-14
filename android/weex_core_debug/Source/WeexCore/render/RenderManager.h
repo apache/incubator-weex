@@ -44,7 +44,7 @@ namespace WeexCore {
     bool removeRenderObject(std::string pageId, std::string ref);
 
     bool
-    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
+    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, int index);
 
     bool updateAttr(std::string pageId, std::string ref, std::string data);
 

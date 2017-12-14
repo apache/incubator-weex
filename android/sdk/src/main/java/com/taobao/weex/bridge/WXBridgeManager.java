@@ -1180,7 +1180,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    WXModuleManager.createDomModule(instance);
+//    WXModuleManager.createDomModule(instance);
     post(new Runnable() {
       @Override
       public void run() {
