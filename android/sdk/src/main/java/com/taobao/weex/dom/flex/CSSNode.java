@@ -7,7 +7,7 @@ package com.taobao.weex.dom.flex;
 
 //import javax.annotation.Nullable;
 
-import android.support.annotation.NonNull;
+import com.taobao.weex.base.FloatUtil;
 
 import java.util.ArrayList;
 

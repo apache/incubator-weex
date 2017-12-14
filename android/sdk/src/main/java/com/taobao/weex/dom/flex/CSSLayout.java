@@ -5,6 +5,8 @@
  */
 package com.taobao.weex.dom.flex;
 
+import com.taobao.weex.base.FloatUtil;
+
 import java.util.Arrays;
 
 /**

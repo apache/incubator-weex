@@ -22,7 +22,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.dom.flex.FloatUtil;
+import com.taobao.weex.base.FloatUtil;
 
 abstract class BorderCorner {
 

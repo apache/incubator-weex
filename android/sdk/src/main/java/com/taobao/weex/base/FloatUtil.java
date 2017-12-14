@@ -3,7 +3,7 @@
  * the BSD-style license found in the LICENSE file in the root directory of this source tree. An
  * additional grant of patent rights can be found in the PATENTS file in the same directory.
  */
-package com.taobao.weex.dom.flex;
+package com.taobao.weex.base;
 
 public class FloatUtil {
 

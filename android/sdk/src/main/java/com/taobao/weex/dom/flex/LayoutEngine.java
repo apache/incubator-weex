@@ -5,6 +5,8 @@
  */
 package com.taobao.weex.dom.flex;
 
+import com.taobao.weex.base.FloatUtil;
+
 import static com.taobao.weex.dom.flex.CSSLayout.DIMENSION_HEIGHT;
 import static com.taobao.weex.dom.flex.CSSLayout.DIMENSION_WIDTH;
 import static com.taobao.weex.dom.flex.CSSLayout.POSITION_BOTTOM;
