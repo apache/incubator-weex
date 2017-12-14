@@ -23,7 +23,6 @@ import android.content.Context;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
@@ -49,7 +48,7 @@ import java.util.Map;
 
 public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private String TAG = "WXListComponent";
-  private WXRecyclerDomObject mDomObject;
+//  private WXRecyclerDomObject mDomObject;
   private float mPaddingLeft;
   private float mPaddingRight;
 
@@ -90,12 +89,12 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     setRefreshOrLoading(child);
 
     // Synchronize DomObject's attr to Component and Native View
-    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
-            mColumnCount != mDomObject.getColumnCount() ||
-            mColumnGap != mDomObject.getColumnGap())) {
-      updateRecyclerAttr();
-      getHostView().getInnerView().initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-    }
+//    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
+//            mColumnCount != mDomObject.getColumnCount() ||
+//            mColumnGap != mDomObject.getColumnGap())) {
+//      updateRecyclerAttr();
+//      getHostView().getInnerView().initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+//    }
   }
 
   /**
@@ -134,41 +133,41 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   private void updateRecyclerAttr(){
-    mColumnCount = mDomObject.getColumnCount();
-    mColumnGap = mDomObject.getColumnGap();
-    mColumnWidth = mDomObject.getColumnWidth();
+//    mColumnCount = mDomObject.getColumnCount();
+//    mColumnGap = mDomObject.getColumnGap();
+//    mColumnWidth = mDomObject.getColumnWidth();
 //    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
 //    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnCount)  {
-    if(mDomObject.getColumnWidth() != mColumnWidth){
-      markComponentUsable();
-      updateRecyclerAttr();
-      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-    }
+//    if(mDomObject.getColumnWidth() != mColumnWidth){
+//      markComponentUsable();
+//      updateRecyclerAttr();
+//      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+//    }
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
-    if(mDomObject.getColumnCount() != mColumnCount){
-      markComponentUsable();
-      updateRecyclerAttr();
-      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-    }
+//    if(mDomObject.getColumnCount() != mColumnCount){
+//      markComponentUsable();
+//      updateRecyclerAttr();
+//      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+//    }
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
-    if(mDomObject.getColumnGap() != mColumnGap) {
-      markComponentUsable();
-      updateRecyclerAttr();
-      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-      wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
-    }
+//    if(mDomObject.getColumnGap() != mColumnGap) {
+//      markComponentUsable();
+//      updateRecyclerAttr();
+//      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//      wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
+//    }
   }
 
   @WXComponentProp(name = Constants.Name.SCROLLABLE)

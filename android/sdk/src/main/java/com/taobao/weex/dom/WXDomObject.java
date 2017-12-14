@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Actually, {@link com.taobao.weex.ui.component.WXComponent} hold references to
  * {@link android.view.View} and {@link WXDomObject}.
  */
-public class WXDomObject implements Cloneable,ImmutableDomObject {
+public class WXDomObject implements Cloneable {
   public static final String CHILDREN = "children";
   public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();

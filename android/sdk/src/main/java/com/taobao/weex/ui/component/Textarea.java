@@ -23,7 +23,6 @@ import android.view.Gravity;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
@@ -32,6 +31,9 @@ import com.taobao.weex.utils.WXUtils;
  * Created by sospartan on 7/11/16.
  */
 public class Textarea extends AbstractEditComponent {
+
+  public static final int DEFAULT_ROWS = 2;
+
   public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
     super(instance, parent, isLazy,action);
   }
@@ -47,7 +49,7 @@ public class Textarea extends AbstractEditComponent {
     super.appleStyleAfterCreated(editText);
     String rowsStr = (String) getStyles().get(Constants.Name.ROWS);
 
-    int rows = TextAreaEditTextDomObject.DEFAULT_ROWS;
+    int rows = DEFAULT_ROWS;
     try{
       if(!TextUtils.isEmpty(rowsStr)) {
         rows = Integer.parseInt(rowsStr);
