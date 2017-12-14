@@ -64,16 +64,18 @@ namespace WeexCore {
     }
   }
 
-  void RenderObject::bindComponent_Impl_Android(jobject component_Impl_Android) {
+  bool RenderObject::bindComponent_Impl_Android(jobject component_Impl_Android) {
     if (component_Impl_Android == nullptr)
-      return;
+      return false;
     this->mComponent_Impl_Android = getJNIEnv()->NewGlobalRef(component_Impl_Android);
+    return true;
   }
 
-  void RenderObject::bindComponent_Impl_iOS(void *component_Impl_iOS) {
+  bool RenderObject::bindComponent_Impl_iOS(void *component_Impl_iOS) {
     if (component_Impl_iOS == nullptr)
-      return;
+      return false;
     this->mComponent_Impl_iOS = component_Impl_iOS;
+    return true;
   }
 
   WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
@@ -105,17 +107,19 @@ namespace WeexCore {
     return size;
   }
 
-  void RenderObject::bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android) {
+  bool RenderObject::bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android) {
     if (measureFunc_Impl_Android == nullptr)
-      return;
+      return false;
     this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_Impl_Android);
     setMeasureFunc(measureFunc_Impl);
+    return true;
   }
 
-  void RenderObject::bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS) {
+  bool RenderObject::bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS) {
     if (measureFunc_Impl_iOS == nullptr)
-      return;
+      return false;
     setMeasureFunc(measureFunc_Impl_iOS);
+    return true;
   }
 
   void RenderObject::onLayoutBefore() {

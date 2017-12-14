@@ -112,7 +112,7 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::createRootRender(std::string data) {
+  bool RenderPage::createRootRender(std::string data) {
     int alen = data.length();
     char *c_data = (char *) malloc(alen + 1);
     strcpy(c_data, data.c_str());
@@ -122,20 +122,17 @@ namespace WeexCore {
     c_data = nullptr;
 
     if (render == nullptr)
-      return;
+      return false;
     setRootRenderObject(render);
     pushRenderToMap(render);
     sendCreateBodyAction(render);
+    return true;
   }
 
-  void RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
+  bool RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
     RenderObject *parent = getRenderObject(parentRef);
-    if (parent == nullptr) {
-      return;
-    }
-
-    if (child == nullptr) {
-      return;
+    if (parent == nullptr || child == nullptr) {
+      return false;
     }
 
     pushRenderToMap(child);
@@ -145,75 +142,83 @@ namespace WeexCore {
     parent->addRenderObject(insertPosition, child);
     sendAddElementAction(child, parent, insertPosition);
     calculateLayout();
+    return true;
   }
 
-  void RenderPage::removeRenderObject(std::string ref) {
+  bool RenderPage::removeRenderObject(std::string ref) {
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
-      return;
+      return false;
 
     RenderObject *parent = child->getParentRender();
     if (parent == nullptr)
-      return;
+      return false;
 
     parent->removeRenderObject(child);
     mRenderObjectMap.erase(child->getRef());
     delete child;
+    return true;
   }
 
-  void RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
+  bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, std::string index) {
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
-      return;
+      return false;
 
     RenderObject *oldParent = child->getParentRender();
     if (oldParent == nullptr)
-      return;
+      return false;
 
     RenderObject *newParent = getRenderObject(parentRef);
     if (newParent == nullptr)
-      return;
+      return false;
 
     oldParent->removeRenderObject(child);
     newParent->addRenderObject(stringToNum<int>(index), child);
+    return true;
   }
 
-  void RenderPage::updateStyle(std::string ref,
+  bool RenderPage::updateStyle(std::string ref,
                                std::vector<std::pair<std::string, std::string> *> *styles) {
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr || styles == nullptr || styles->empty())
-      return;
+      return false;
 
     std::vector<std::pair<std::string, std::string> *> *style = nullptr;
     std::vector<std::pair<std::string, std::string> *> *margin = nullptr;
     std::vector<std::pair<std::string, std::string> *> *padding = nullptr;
     std::vector<std::pair<std::string, std::string> *> *border = nullptr;
 
-    for (int i = 0; i < styles->size(); ++i) {
-      if ((*styles)[i] == nullptr)
-        return;
+    bool flag = false;
 
-      switch (render->addStyle((*styles)[i]->first, (*styles)[i]->second)) {
-        case TypeStyle:
-          if (style == nullptr)
-            style = new std::vector<std::pair<std::string, std::string> *>();
-          style->insert(style->end(), (*styles)[i]);
-          break;
-        case TypeMargin:
-          if (margin == nullptr)
-            margin = new std::vector<std::pair<std::string, std::string> *>();
-          margin->insert(margin->end(), (*styles)[i]);
-          break;
-        case TypePadding:
-          if (padding == nullptr)
-            padding = new std::vector<std::pair<std::string, std::string> *>();
-          padding->insert(padding->end(), (*styles)[i]);
-          break;
-        case TypeBorder:
-          if (border == nullptr)
-            border = new std::vector<std::pair<std::string, std::string> *>();
-          border->insert(border->end(), (*styles)[i]);
-          break;
+    for (int i = 0; i < styles->size(); ++i) {
+      if ((*styles)[i] != nullptr) {
+        switch (render->addStyle((*styles)[i]->first, (*styles)[i]->second)) {
+          case TypeStyle:
+            if (style == nullptr)
+              style = new std::vector<std::pair<std::string, std::string> *>();
+            style->insert(style->end(), (*styles)[i]);
+            flag = true;
+            break;
+          case TypeMargin:
+            if (margin == nullptr)
+              margin = new std::vector<std::pair<std::string, std::string> *>();
+            margin->insert(margin->end(), (*styles)[i]);
+            flag = true;
+            break;
+          case TypePadding:
+            if (padding == nullptr)
+              padding = new std::vector<std::pair<std::string, std::string> *>();
+            padding->insert(padding->end(), (*styles)[i]);
+            flag = true;
+            break;
+          case TypeBorder:
+            if (border == nullptr)
+              border = new std::vector<std::pair<std::string, std::string> *>();
+            border->insert(border->end(), (*styles)[i]);
+            flag = true;
+            break;
+        }
       }
     }
 
@@ -279,17 +284,18 @@ namespace WeexCore {
 //      delete styles;
 //      styles = nullptr;
 //    }
+    return flag;
   }
 
-  void RenderPage::updateAttr(std::string ref,
+  bool RenderPage::updateAttr(std::string ref,
                               std::vector<std::pair<std::string, std::string> *> *attrs) {
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr || attrs == nullptr || attrs->empty())
-      return;
+      return false;
 
     for (int i = 0; i < attrs->size(); ++i) {
       if ((*attrs)[i] == nullptr)
-        return;
+        return false;
       render->addAttr((*attrs)[i]->first, (*attrs)[i]->second);
     }
 
@@ -306,28 +312,35 @@ namespace WeexCore {
       delete attrs;
       attrs = nullptr;
     }
+
+    return true;
   }
 
-  void RenderPage::addEvent(std::string ref, std::string event) {
+  bool RenderPage::addEvent(std::string ref, std::string event) {
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
-      return;
+      return false;
 
     render->addEvent(event);
+    return true;
   }
 
-  void RenderPage::removeEvent(std::string ref, std::string event) {
+  bool RenderPage::removeEvent(std::string ref, std::string event) {
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
-      return;
+      return false;
 
     render->removeEvent(event);
+    return true;
   }
 
-  void RenderPage::createFinish() {
-    if (pRoot != nullptr)
-      traverseTree(pRoot);
+  bool RenderPage::createFinish() {
+    if (pRoot == nullptr) {
+      return false;
+    }
+    traverseTree(pRoot);
     sendCreateFinishAction();
+    return true;
   }
 
   void RenderPage::addRenderAction(RenderAction *action) {
@@ -429,14 +442,18 @@ namespace WeexCore {
       mWXCorePerformance->layoutActionJniTime += time;
   }
 
-  void RenderPage::bindInstance_Impl_Android(jobject instance) {
-    if (instance != nullptr)
-      this->mInstance_Impl_Android = getJNIEnv()->NewGlobalRef(instance);
+  bool RenderPage::bindInstance_Impl_Android(jobject instance) {
+    if (instance == nullptr)
+      return false;
+    this->mInstance_Impl_Android = getJNIEnv()->NewGlobalRef(instance);
+    return true;
   }
 
-  void RenderPage::bindInstance_Impl_iOS(void *instance) {
-    if (instance != nullptr)
-      this->mInstance_Impl_iOS = instance;
+  bool RenderPage::bindInstance_Impl_iOS(void *instance) {
+    if (instance == nullptr)
+      return false;
+    this->mInstance_Impl_iOS = instance;
+    return true;
   }
 
   void RenderPage::printFirstScreenLog() {

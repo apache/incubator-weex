@@ -364,7 +364,7 @@ public class WXBridge implements IWXBridge {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
         e.printStackTrace();
-        WXLogUtils.e(TAG, "callNative throw error:" + e.getMessage());
+        WXLogUtils.e(TAG, "callAddElement throw error:" + e.getMessage());
       }
     }
     return errorCode;
@@ -397,7 +397,7 @@ public class WXBridge implements IWXBridge {
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callUpdateStyle throw exception:" + e.getMessage());
+        WXLogUtils.e(TAG, "callUpdateAttr throw exception:" + e.getMessage());
       }
     }
     return errorCode;
@@ -411,7 +411,7 @@ public class WXBridge implements IWXBridge {
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callReLayoutByWeexCore throw exception:" + e.getMessage());
+        WXLogUtils.e(TAG, "callLayout throw exception:" + e.getMessage());
       }
     }
     return errorCode;

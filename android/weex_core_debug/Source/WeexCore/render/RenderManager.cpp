@@ -8,76 +8,88 @@ namespace WeexCore {
   // save all pages info with RenderPage;
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-  void RenderManager::createPage(std::string pageId, std::string data) {
+  bool RenderManager::createPage(std::string pageId, std::string data) {
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
-    page->createRootRender(data);
+    return page->createRootRender(data);
   }
 
-  void RenderManager::addRenderObject(std::string pageId, std::string parentRef, int index,
+  bool RenderManager::addRenderObject(std::string pageId, std::string parentRef, int index,
                                       std::string data) {
     RenderPage *page = getPage(pageId);
-    if (page != nullptr) {
-      char *c_data = (char *) data.data();
-      RenderObject *child = json2RenderObject(c_data, page);
-      page->addRenderObject(parentRef, index, child);
-    }
+    if (page == nullptr)
+      return false;
+
+    char *c_data = (char *) data.data();
+    RenderObject *child = json2RenderObject(c_data, page);
+    if (child == nullptr)
+      return false;
+
+    return page->addRenderObject(parentRef, index, child);
   }
 
-  void RenderManager::removeRenderObject(std::string pageId, std::string ref) {
+  bool RenderManager::removeRenderObject(std::string pageId, std::string ref) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      page->removeRenderObject(ref);
-    }
+    if (page == nullptr)
+      return false;
+
+    return page->removeRenderObject(ref);
   }
 
-  void RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef,
+  bool RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef,
                                        std::string index) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      page->moveRenderObject(ref, parentRef, index);
-    }
+    if (page == nullptr)
+      return false;
+
+    return page->moveRenderObject(ref, parentRef, index);
   }
 
-  void RenderManager::updateAttr(std::string pageId, std::string ref, std::string data) {
+  bool RenderManager::updateAttr(std::string pageId, std::string ref, std::string data) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      char *c_data = (char *) data.data();
-      page->updateAttr(ref, json2Pairs(c_data));
-    }
+    if (page == nullptr)
+      return false;
+
+    char *c_data = (char *) data.data();
+    return page->updateAttr(ref, json2Pairs(c_data));
   }
 
-  void RenderManager::updateStyle(std::string pageId, std::string ref, std::string data) {
+  bool RenderManager::updateStyle(std::string pageId, std::string ref, std::string data) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      char *c_data = (char *) data.data();
-      page->updateStyle(ref, json2Pairs(c_data));
-    }
+    if (page == nullptr)
+      return false;
+
+    char *c_data = (char *) data.data();
+    return page->updateStyle(ref, json2Pairs(c_data));
   }
 
-  void RenderManager::addEvent(std::string pageId, std::string ref, std::string event) {
+  bool RenderManager::addEvent(std::string pageId, std::string ref, std::string event) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      page->addEvent(ref, event);
-    }
+    if (page == nullptr)
+      return false;
+
+    return page->addEvent(ref, event);
   }
 
-  void RenderManager::removeEvent(std::string pageId, std::string ref, std::string event) {
+  bool RenderManager::removeEvent(std::string pageId, std::string ref, std::string event) {
     RenderPage *page = this->getPage(pageId);
-    if (page != nullptr) {
-      page->removeEvent(ref, event);
-    }
+    if (page == nullptr)
+      return false;
+
+    return page->removeEvent(ref, event);
+  }
+
+  bool RenderManager::createFinish(std::string pageId) {
+    RenderPage *page = getPage(pageId);
+    if (page == nullptr)
+      return false;
+
+    return page->createFinish();
   }
 
   RenderPage *RenderManager::getPage(std::string id) {
     RenderPage *page = mPages.find(id)->second;
     return page;
-  }
-
-  void RenderManager::createFinish(std::string pageId) {
-    RenderPage *page = getPage(pageId);
-    if (page != nullptr)
-      page->createFinish();
   }
 
   void RenderManager::printRenderAndLayoutTree(std::string pageId) {

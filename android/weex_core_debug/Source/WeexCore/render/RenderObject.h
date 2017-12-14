@@ -63,13 +63,13 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void bindComponent_Impl_Android(jobject component_Impl_Android);
+    bool bindComponent_Impl_Android(jobject component_Impl_Android);
 
-    void bindComponent_Impl_iOS(void *component_Impl_iOS);
+    bool bindComponent_Impl_iOS(void *component_Impl_iOS);
 
-    void bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
+    bool bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
 
-    void bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
+    bool bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
 
     void onLayoutBefore();
 

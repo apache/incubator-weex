@@ -336,8 +336,8 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   //task args[1]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
 
-  RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
-                                           jByteArray2Str(env, jTaskString));
+  flag = RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
+                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jTaskString);
   return createInt32Result(flag);
@@ -362,7 +362,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   int index = stringToNum<int>(str_index);
   std::string data = jByteArray2Str(env, jdomString);
 
-  RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data);
+  flag = RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jref);
@@ -381,8 +381,8 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
   int flag = 0;
-  RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId), jString2Str(env, jRef),
-                                            jByteArray2Str(env, jTaskString));
+  flag = RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId), jString2Str(env, jRef),
+                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
@@ -397,8 +397,8 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
   int flag = 0;
-  RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId), jString2Str(env, jRef),
-                                           jByteArray2Str(env, jTaskString));
+  flag = RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId), jString2Str(env, jRef),
+                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
@@ -412,7 +412,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
 
   int flag = 0;
-  RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId));
+  flag = RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   return createInt32Result(flag);
@@ -429,10 +429,9 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 
   int flag = 0;
 
-
   std::string task = jByteArray2Str(env, jTaskString);
   if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
-    RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId));
+    flag = RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
     env->DeleteLocalRef(jInstanceId);
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);

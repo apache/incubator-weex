@@ -1812,9 +1812,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
-              .append(", componentType:").append(componentType).append(", ref:").append(ref);
-      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
+//              .append(", componentType:").append(componentType).append(", ref:").append(ref);
+//      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 
@@ -1855,10 +1855,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
-              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-              .append(", parentRef:").append(parentRef);
-      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+//              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
+//              .append(", parentRef:").append(parentRef);
+//      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 
@@ -1961,11 +1961,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callReLayout >>>> pageId:").append(pageId)
-              .append(", ref:").append(ref).append(", top:").append(top)
-              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
-              .append(", height:").append(height).append(" width:").append(width);
-      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.append("[WXBridgeManager] callReLayout >>>> pageId:").append(pageId)
+//              .append(", ref:").append(ref).append(", top:").append(top)
+//              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
+//              .append(", height:").append(height).append(" width:").append(width);
+//      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 

@@ -60,26 +60,26 @@ namespace WeexCore {
 
     void calculateLayout();
 
-    void createRootRender(std::string data);
+    bool createRootRender(std::string data);
 
-    void addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
+    bool addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 
-    void removeRenderObject(std::string ref);
+    bool removeRenderObject(std::string ref);
 
-    void moveRenderObject(std::string ref, std::string parentRef, std::string index);
+    bool moveRenderObject(std::string ref, std::string parentRef, std::string index);
 
-    void updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    bool updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    void updateAttr(std::string ref,
+    bool updateAttr(std::string ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    void addEvent(std::string ref, std::string event);
+    bool addEvent(std::string ref, std::string event);
 
-    void removeEvent(std::string ref, std::string event);
+    bool removeEvent(std::string ref, std::string event);
 
     void addRenderAction(RenderAction *action);
 
-    void createFinish();
+    bool createFinish();
 
     void batch();
 
@@ -93,9 +93,9 @@ namespace WeexCore {
 
     void layoutActionJniTime(long long time);
 
-    void bindInstance_Impl_Android(jobject instance);
+    bool bindInstance_Impl_Android(jobject instance);
 
-    void bindInstance_Impl_iOS(void *instance);
+    bool bindInstance_Impl_iOS(void *instance);
 
     void printFirstScreenLog();
 
