@@ -30,15 +30,15 @@ add_library(weexjsc SHARED
     ./base/WXCoreEnvironment.cpp
 
     ./WeexCore/platform/android/WeexJSConnection.cpp
-    ./WeexCore/platform/android/BridgeAndroid.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
     ./WeexCore/platform/android/WeexProxy.cpp
     ./WeexCore/platform/android/WeexCore.cpp
-    ./WeexCore/platform/android/bridge/MeasureMode_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/ContentBoxMeasurement_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/WXSDKInstance_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/WXComponent_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/MeasureSize_Impl_Android.cpp
+    ./WeexCore/platform/android/BridgeAndroid.cpp
+    ./WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/WXSDKInstance_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/WXComponent_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.cpp
 
     ./WeexCore/render/RenderManager.cpp
     ./WeexCore/render/RenderObject.cpp

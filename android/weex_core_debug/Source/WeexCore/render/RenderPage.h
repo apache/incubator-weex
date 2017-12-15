@@ -17,6 +17,10 @@ namespace WeexCore {
   class RenderPage {
 
   private:
+    const float LAYOUT_FIRSTSCREEN_OVERFLOW_RADIO = 1.2;
+
+    float mViewPortWidth;
+
     RenderObject *pRoot;
 
     std::string mPageId;
@@ -121,6 +125,14 @@ namespace WeexCore {
 
     inline std::string getPageId() {
       return mPageId;
+    }
+
+    inline float getViewPortWidth() {
+      return mViewPortWidth;
+    }
+
+    inline void setViewPortWidth(float viewPortWidth) {
+      this->mViewPortWidth = viewPortWidth;
     }
   };
 }
