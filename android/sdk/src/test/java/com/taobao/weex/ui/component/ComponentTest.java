@@ -21,7 +21,6 @@ package com.taobao.weex.ui.component;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

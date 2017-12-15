@@ -134,8 +134,8 @@ public class WXStreamModule extends WXModule {
       WXLogUtils.e("", e);
     }
 
-    boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
-    if(invaildOption){
+    boolean invalidOption = optionsObj==null || optionsObj.getString("url")==null;
+    if(invalidOption){
       if(callback != null) {
         Map<String, Object> resp = new HashMap<>();
         resp.put("ok", false);

@@ -22,7 +22,6 @@ import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 
 import org.junit.Before;

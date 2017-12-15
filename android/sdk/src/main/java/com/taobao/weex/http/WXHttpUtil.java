@@ -31,12 +31,12 @@ import java.util.Map;
  */
 public class WXHttpUtil {
 
-  private static String sDefautUA = null;
+  private static String sDefaultUA = null;
 
   public static final String KEY_USER_AGENT = "user-agent";
 
   public static String assembleUserAgent(Context ctx,Map<String, String> config) {
-    if (TextUtils.isEmpty(sDefautUA)) {
+    if (TextUtils.isEmpty(sDefaultUA)) {
       StringBuilder builder = new StringBuilder();
       builder.append(config.get(WXConfig.sysModel))
           .append("(Android/")
@@ -60,8 +60,8 @@ public class WXHttpUtil {
           .append(TextUtils.isEmpty(config.get(WXConfig.externalUserAgent)) ? "" : " ")
 
           .append(WXViewUtils.getScreenWidth(ctx) + "x" + WXViewUtils.getScreenHeight(ctx));
-      sDefautUA = builder.toString();
+      sDefaultUA = builder.toString();
     }
-    return sDefautUA;
+    return sDefaultUA;
   }
 }
