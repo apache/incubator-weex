@@ -48,7 +48,8 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
-import com.taobao.zcache.WVPackageAppTool;
+import com.taobao.zcache.utils.WVPackageAppTool;
+
 
 public class IndexActivity extends AbstractWeexActivity {
 

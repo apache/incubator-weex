@@ -2,13 +2,8 @@ package com.alibaba.weex.extend;
 
 import android.app.Application;
 
-import com.alibaba.weex.extend.misc.WVCommonConfig;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.zcache.ZCache;
-import com.taobao.zcache.config.BaseConfigManager;
-import com.taobao.zcache.config.ZCacheConfigHandler;
-import com.taobao.zcache.config.ZCacheConfigUpdateCallback;
-import com.taobao.zcache.config.managers.CDNConfigManagerV1;
 import com.taobao.zcache.utils.ILog;
 import com.taobao.zcache.utils.ZLog;
 
@@ -18,7 +13,6 @@ import com.taobao.zcache.utils.ZLog;
 
 public class ZCacheInit {
   public static void initZCache(Application application, String appKey, String appVersion) {
-    ZCache.initZCache(application, appKey, appVersion);
     ZLog.setLogImpl(new ILog() {
       @Override
       public void d(String tag, String msg) {
@@ -75,12 +69,6 @@ public class ZCacheInit {
         return true;
       }
     });
-
-    CDNConfigManagerV1.getInstance().registerHandler(BaseConfigManager.CONFIGNAME_COMMON, new ZCacheConfigHandler() {
-      @Override
-      public void update(String s, ZCacheConfigUpdateCallback zCacheConfigUpdateCallback) {
-        WVCommonConfig.getInstance().updateCommonRule(zCacheConfigUpdateCallback, s, getSnapshotN());
-      }
-    });
+    ZCache.initZCache(application, appKey, appVersion);
   }
 }

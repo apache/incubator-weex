@@ -26,9 +26,9 @@ import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.AliHaIniter;
 import com.alibaba.weex.extend.ZCacheInit;
-import com.alibaba.weex.extend.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
+import com.alibaba.weex.extend.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.adapter.WXUserTrackAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
@@ -64,7 +64,7 @@ public class WXApplication extends Application {
      **/
 //    initDebugEnvironment(true, false, "DEBUG_SERVER_HOST");
     new AliHaIniter().init(this);
-    ZCacheInit.initZCache(this, "21646297", "7.2.4"); //Same as TaoBao Android
+    ZCacheInit.initZCache(this, "1111111", "7.2.4");
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,

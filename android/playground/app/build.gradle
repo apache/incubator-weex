@@ -113,5 +113,5 @@ dependencies {
         exclude group: 'com.taobao.android',module: 'tbrest'
     }
     compile 'com.taobao.android:accs_sdk_taobao:3.0.3'
-    compile 'com.taobao.android:zcache:0.0.1.8-SNAPSHOT'
+    compile 'com.taobao.android:zcache:0.0.1.9-SNAPSHOT'
 }
