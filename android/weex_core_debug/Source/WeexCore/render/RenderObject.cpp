@@ -1,8 +1,8 @@
 #include "RenderObject.h"
 #include "RenderPage.h"
-#include <WeexCore/platform/android/bridge/ContentBoxMeasurement_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/MeasureSize_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/MeasureMode_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
 #include <base/android/jni/scoped_java_ref.h>
 #include <WeexCore/platform/android/WeexCore.h>
 #include <base/android/string/StringUtils.h>

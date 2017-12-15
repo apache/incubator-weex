@@ -24,6 +24,7 @@ namespace WeexCore {
     mWXCorePerformance = new WXCorePerformance();
     mInstance_Impl_Android = nullptr;
     mInstance_Impl_iOS = nullptr;
+    mViewPortWidth = 750.0f;
   }
 
   RenderPage::~RenderPage() {
@@ -76,7 +77,7 @@ namespace WeexCore {
 
     float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
     float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
-    float radio = deviceWidth / (750.0f * 1.2f);
+    float radio = deviceWidth / (mViewPortWidth * LAYOUT_FIRSTSCREEN_OVERFLOW_RADIO);
 
     switch (pRoot->getFlexDirection()) {
       case WXCore_Flex_Direction_Column:
@@ -137,6 +138,7 @@ namespace WeexCore {
     parent->addRenderObject(insertPosition, child);
     buildRenderObjectTime(getCurrentTime() - startTime);
     sendAddElementAction(child, parent, insertPosition);
+
     calculateLayout();
     return true;
   }

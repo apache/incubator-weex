@@ -2,11 +2,11 @@
 #include <WeexCore/platform/android/WeexCore.h>
 #include <base/android/jni/android_jni.h>
 #include <android/log.h>
-#include <WeexCore/platform/android/bridge/MeasureMode_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/ContentBoxMeasurement_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/WXSDKInstance_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/WXComponent_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/MeasureSize_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXSDKInstance_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXComponent_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.h>
 
 jint JNI_OnLoad (JavaVM *vm, void *reserved)
 {
