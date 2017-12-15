@@ -44,7 +44,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.constants.Constants;
@@ -64,9 +63,10 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.zcache.events.Events;
 import com.taobao.zcache.events.ZCacheEventProxy;
-
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -182,7 +182,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
         mConfigMap.put("bundleUrl", mUri.toString());
         String path = "file".equals(mUri.getScheme()) ? assembleFilePath(mUri) : mUri.toString();
-        mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
+        String pageName="";
+        try {
+          URI uri= new URI(path);
+          if(!TextUtils.isEmpty(uri.getHost())){
+            pageName = uri.getHost();
+          }
+          if(!TextUtils.isEmpty(uri.getPath())){
+            pageName += uri.getPath();
+          }
+        } catch (URISyntaxException e) {
+          pageName = TAG;
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
+        }
+        mInstance.render(pageName, WXFileUtils.loadAsset(path, WXPageActivity.this),
             mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
       }
@@ -213,6 +226,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   }
 
   private void loadWXfromService(final String url) {
+    String pageName="";
+    try {
+      URI uri= new URI(url);
+      if(!TextUtils.isEmpty(uri.getHost())){
+        pageName = uri.getHost();
+      }
+      if(!TextUtils.isEmpty(uri.getPath())){
+        pageName += uri.getPath();
+      }
+    } catch (URISyntaxException e) {
+      pageName = TAG;
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
+    }
+
     mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
@@ -228,7 +255,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mInstance.setNestedInstanceInterceptor(this);
     mInstance.setBundleUrl(url);
     mInstance.setTrackComponent(true);
-    mInstance.renderByUrl(TAG, url, mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+
+    mInstance.renderByUrl(pageName, url, mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
 
     /*WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
