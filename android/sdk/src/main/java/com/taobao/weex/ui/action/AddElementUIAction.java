@@ -21,15 +21,40 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-public class AddElementUIAction extends WXUIAction {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class AddElementUIAction extends AbstractAddElementUIAction {
+
+  public AddElementUIAction(String pageId, String ref,
+                            String componentType, String parentRef,
+                            int index,
+                            Map<String, String> style,
+                            Map<String, String> attributes,
+                            Set<String> events,
+                            HashMap<String, String> paddings,
+                            HashMap<String, String> margins,
+                            HashMap<String, String> borders) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mComponentType = componentType;
+    this.mParentRef = parentRef;
+    this.mIndex = index;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
+  }
 
   @Override
   public void executeAction() {
-
-    //Create component in dom thread
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
       return;
@@ -51,4 +76,6 @@ public class AddElementUIAction extends WXUIAction {
       WXLogUtils.e("add component failed.", e);
     }
   }
+
+
 }

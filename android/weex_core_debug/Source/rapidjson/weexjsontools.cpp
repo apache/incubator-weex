@@ -268,23 +268,25 @@ namespace WeexCore {
         RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
         r.EnterObject();
         while (const char *key2 = r.NextObjectKey()) {
-          // may call
           if (r.PeekType() == kNumberType) {
-            char value[100];
+            char *temp = new char;
             if (0 == strcmp(key, "attr")) {
-              int len = fpconv_dtoa(r.GetDouble(), value);
-              value[len] = '\0';
+              int len = fpconv_dtoa(r.GetDouble(), temp);
+              temp[len] = '\0';
+              char value[len + 1];
+              strcpy(value, temp);
               root->addAttr(key2, value);
             } else if (0 == strcmp(key, "style")) {
-              int len = fpconv_dtoa(r.GetDouble(), value);
-              value[len] = '\0';
+              int len = fpconv_dtoa(r.GetDouble(), temp);
+              temp[len] = '\0';
+              char value[len + 1];
+              strcpy(value, temp);
               root->addStyle(key2, value);
             }
-            memset(value, 0, sizeof(value));
+            delete temp;
           } else if (r.PeekType() == kStringType) {
-            const char* str = r.GetString();
-            const int size = strlen(str) + 1;
-            char value[size];
+            const char *str = r.GetString();
+            char value[strlen(str) + 1];
             if (0 == strcmp(key, "attr")) {
               strcpy(value, str);
               root->addAttr(key2, value);
@@ -292,11 +294,9 @@ namespace WeexCore {
               strcpy(value, str);
               root->addStyle(key2, value);
             }
-            memset(value, 0, sizeof(value));
           } else {
             r.SkipValue();
           }
-
         }
       } else if (0 == strcmp(key, "event")) {
         RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
@@ -328,7 +328,7 @@ namespace WeexCore {
 /**
  * Parse json data to RenderObject
  * @param data : json data (include ref/style/attr/event/children)
- * @param page : {@link RenderPage*}
+ * @param page : {@link RenderPage}
  * @return {@link RenderObject*}
  */
   RenderObject *json2RenderObject(char *data, RenderPage *page) {
@@ -336,6 +336,36 @@ namespace WeexCore {
     JsonParser r(data);
     parseJsonObject(r, page, root);
     return root;
+  }
+
+  std::vector<std::pair<std::string, std::string> *> *json2Pairs(char *data) {
+    std::vector<std::pair<std::string, std::string> *> *pairs = nullptr;
+    JsonParser r(data);
+    RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+    r.EnterObject();
+    pairs = new std::vector<std::pair<std::string, std::string> *>();
+    while (const char *key = r.NextObjectKey()) {
+      std::pair<std::string, std::string> *myPair = nullptr;
+      if (r.PeekType() == kNumberType) {
+        char *temp = new char;
+        int len = fpconv_dtoa(r.GetDouble(), temp);
+        temp[len] = '\0';
+        char value[len + 1];
+        strcpy(value, temp);
+        myPair = new std::pair<std::string, std::string>(key, value);
+        pairs->insert(pairs->end(), myPair);
+        delete temp;
+      } else if (r.PeekType() == kStringType) {
+        const char *str = r.GetString();
+        char value[strlen(str) + 1];
+        strcpy(value, str);
+        myPair = new std::pair<std::string, std::string>(key, value);
+        pairs->insert(pairs->end(), myPair);
+      } else {
+        r.SkipValue();
+      }
+    }
+    return pairs;
   }
 }
 

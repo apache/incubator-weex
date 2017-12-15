@@ -25,14 +25,38 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
+import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-public class CreateBodyUIAction extends WXUIAction {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class CreateBodyUIAction extends AbstractAddElementUIAction {
+
+  public CreateBodyUIAction(String pageId, String ref,
+                            String componentType,
+                            Map<String, String> style,
+                            Map<String, String> attributes,
+                            Set<String> events,
+                            HashMap<String, String> paddings,
+                            HashMap<String, String> margins,
+                            HashMap<String, String> borders) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mComponentType = componentType;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
+  }
 
   @Override
   public void executeAction() {
-    //Create component in dom thread
     final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
     if (instance == null || instance.getContext() == null) {
       return;

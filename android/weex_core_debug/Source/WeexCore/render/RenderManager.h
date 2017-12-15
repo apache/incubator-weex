@@ -37,22 +37,24 @@ namespace WeexCore {
     void batch();
 
     // create root node
-    void createPage(std::string pageId, std::string data);
+    bool createPage(std::string pageId, std::string data);
 
-    void addRenderObject(std::string pageId, std::string parentRef, int index, std::string data);
+    bool addRenderObject(std::string pageId, std::string parentRef, int index, std::string data);
 
-    void removeRenderObject(std::string pageId, std::string ref);
+    bool removeRenderObject(std::string pageId, std::string ref);
 
-    void
-    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, std::string index);
+    bool
+    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, int index);
 
-    void updateAttr(std::string pageId, std::string ref, std::string key, std::string value);
+    bool updateAttr(std::string pageId, std::string ref, std::string data);
 
-    void updateStyle(std::string pageId, std::string ref, std::string key, std::string value);
+    bool updateStyle(std::string pageId, std::string ref, std::string data);
 
-    void addEvent(std::string pageId, std::string ref, std::string event);
+    bool addEvent(std::string pageId, std::string ref, std::string event);
 
-    void removeEvent(std::string pageId, std::string ref, std::string event);
+    bool removeEvent(std::string pageId, std::string ref, std::string event);
+
+    bool createFinish(std::string pageId);
 
     RenderPage *getPage(std::string id);
 

@@ -21,7 +21,6 @@ package com.taobao.weex.bridge;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
@@ -31,9 +30,6 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -56,7 +52,6 @@ public class WXModuleManager {
    */
   private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
-  private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
   /**
    * monitor keys
@@ -76,11 +71,6 @@ public class WXModuleManager {
    */
   public static boolean registerModule(final String moduleName, final ModuleFactory factory, final boolean global) throws WXException {
     if (moduleName == null || factory == null) {
-      return false;
-    }
-
-    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
-      WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
 
@@ -171,7 +161,7 @@ public class WXModuleManager {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
-      if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
+      if (wxModule instanceof WXTimerModule) {
         wxModule.mWXSDKInstance = null;
       }
     }
@@ -184,8 +174,8 @@ public class WXModuleManager {
     }
     // we are in preRender mode
     if(invoker.isRunOnUIThread()) {/*ASYNC CALL*/
-      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
-      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
+//      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
+//      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
       return null;
     } else {/*SYNC CALL*/
       return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
@@ -372,7 +362,6 @@ public class WXModuleManager {
   }
 
   public static void destroyInstanceModules(String instanceId) {
-    sDomModuleMap.remove(instanceId);
     Map<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
     if (moduleMap == null || moduleMap.size() < 1) {
       return;
@@ -387,20 +376,6 @@ public class WXModuleManager {
       }
 
     }
-  }
-
-  public static void createDomModule(WXSDKInstance instance){
-    if(instance != null) {
-      sDomModuleMap.put(instance.getInstanceId(), new WXDomModule(instance));
-    }
-  }
-
-  public static void destoryDomModule(String instanceID){
-    sDomModuleMap.remove(instanceID);
-  }
-
-  public static WXDomModule getDomModule(String instanceId){
-    return sDomModuleMap.get(instanceId);
   }
 
   public static void reload(){

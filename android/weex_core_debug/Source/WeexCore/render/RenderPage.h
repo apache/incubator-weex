@@ -27,8 +27,6 @@ namespace WeexCore {
 
     WXCorePerformance *mWXCorePerformance;
 
-    uint32_t layout_block_count;
-
     void pushRenderToMap(RenderObject *render);
 
     void sendCreateBodyAction(RenderObject *render);
@@ -37,11 +35,19 @@ namespace WeexCore {
 
     void sendLayoutAction(RenderObject *render);
 
-    void sendUpdateStyleAction(std::string key, std::string value, std::string ref);
+    void
+    sendUpdateStyleAction(RenderObject *render,
+                          std::vector<std::pair<std::string, std::string> *> *style,
+                          std::vector<std::pair<std::string, std::string> *> *margin,
+                          std::vector<std::pair<std::string, std::string> *> *padding,
+                          std::vector<std::pair<std::string, std::string> *> *border);
 
-    void sendUpdateAttrAction(std::string key, std::string value, std::string ref);
+    void sendUpdateAttrAction(RenderObject *render,
+                              std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void sendAddEventAction(RenderObject *render);
+
+    void sendCreateFinishAction();
 
     jobject mInstance_Impl_Android;
 
@@ -54,23 +60,26 @@ namespace WeexCore {
 
     void calculateLayout();
 
-    void createRootRender(std::string data);
+    bool createRootRender(RenderObject *root);
 
-    void addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
+    bool addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 
-    void removeRenderObject(std::string ref);
+    bool removeRenderObject(std::string ref);
 
-    void moveRenderObject(std::string ref, std::string parentRef, std::string index);
+    bool moveRenderObject(std::string ref, std::string parentRef, int index);
 
-    void updateStyle(std::string ref, std::string key, std::string value);
+    bool updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    void updateAttr(std::string ref, std::string key, std::string value);
+    bool updateAttr(std::string ref,
+                    std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    void addEvent(std::string ref, std::string event);
+    bool addEvent(std::string ref, std::string event);
 
-    void removeEvent(std::string ref, std::string event);
+    bool removeEvent(std::string ref, std::string event);
 
     void addRenderAction(RenderAction *action);
+
+    bool createFinish();
 
     void batch();
 
@@ -80,9 +89,17 @@ namespace WeexCore {
 
     void cssLayoutTime(long long time);
 
-    void bindInstance_Impl_Android(jobject instance);
+    void addElementActionJNITime(long long time);
 
-    void bindInstance_Impl_iOS(void *instance);
+    void layoutActionJniTime(long long time);
+
+    void parseJsonTime(long long time);
+
+    void buildRenderObjectTime(long long time);
+
+    bool bindInstance_Impl_Android(jobject instance);
+
+    bool bindInstance_Impl_iOS(void *instance);
 
     void printFirstScreenLog();
 

@@ -35,6 +35,7 @@ import com.taobao.weex.websocket.WXWebSocketManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import okio.BufferedSource;
@@ -97,22 +98,6 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
         return IWXBridge.INSTANCE_RENDERING;
     }
 
-//    @Override
-//    public int callCreateBody(String instanceId, String tasks, String callback) {
-//        if (!mInit || mJsManager == null)
-//            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-//        mJsManager.callCreateBody(instanceId, tasks, callback);
-//        return IWXBridge.INSTANCE_RENDERING;
-//    }
-
-//    @Override
-//    public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
-//        if (!mInit || mJsManager == null)
-//            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-//        mJsManager.callAddElement(instanceId, ref,dom, index,callback);
-//        return IWXBridge.INSTANCE_RENDERING;
-//    }
-
     @Override
     public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
         if (!mInit || mJsManager == null)
@@ -122,40 +107,10 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int callCreateFinish(String instanceId,  byte [] tasks, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callCreateFinish(instanceId, callback);
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
     public int callRefreshFinish(String instanceId,  byte [] tasks, String callback) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
         mJsManager.callRefreshFinish(instanceId, callback);
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
-    public int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        if (tasks != null) {
-            mJsManager.callUpdateAttrs(instanceId, ref, new String(tasks), callback);
-        }
-
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
-    public int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        if (tasks != null) {
-            mJsManager.callUpdateStyle(instanceId, ref, new String(tasks), callback);
-        }
-
         return IWXBridge.INSTANCE_RENDERING;
     }
 
@@ -248,6 +203,53 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
 
     }
 
+    @Override
+    public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events, paddings, margins, borders);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+      if (!mInit || mJsManager == null)
+        return IWXBridge.INSTANCE_RENDERING_ERROR ;
+      mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef, styles, attributes, events, paddings, margins, borders);
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, String> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+      if (!mInit || mJsManager == null)
+        return IWXBridge.INSTANCE_RENDERING_ERROR ;
+      mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateAttrsByWeexCore(String instanceId, String ref, HashMap<String, String> attrs) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+      if (!mInit || mJsManager == null)
+        return IWXBridge.INSTANCE_RENDERING_ERROR ;
+      mJsManager.callLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callCreateFinishByWeexCore(String instanceId) {
+      if (!mInit || mJsManager == null)
+        return IWXBridge.INSTANCE_RENDERING_ERROR ;
+      mJsManager.callCreateFinishByWeexCore(instanceId);
+      return IWXBridge.INSTANCE_RENDERING;
+    }
 
     @Override
     public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {

@@ -25,7 +25,7 @@ import android.widget.CompoundButton;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXUtils;
 
@@ -39,11 +39,11 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
   private CompoundButton.OnCheckedChangeListener mListener;
 
   @Deprecated
-  public WXSwitch(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXSwitch(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent, isLazy,action);
   }
 
-  public WXSwitch(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+  public WXSwitch(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
     super(instance, parent, isLazy,action);
   }
 

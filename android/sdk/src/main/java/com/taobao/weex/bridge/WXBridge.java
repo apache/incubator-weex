@@ -37,10 +37,15 @@ import java.util.HashSet;
 public class WXBridge implements IWXBridge {
 
   private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
+
   private native int nativeInitFramework(String framework, WXParams params);
+
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
+
   private native void nativeOnVsync(String instanceId);
+
   private native int nativeExecJSService(String javascript);
+
   private native void nativeTakeHeapSnapshot(String filename);
 
   public static final boolean MULTIPROCESS = true;
@@ -92,33 +97,33 @@ public class WXBridge implements IWXBridge {
    * @param callback
    */
 
-  public int callNative(String instanceId, byte [] tasks, String callback) {
-     return callNative(instanceId,new String(tasks),callback);
+  public int callNative(String instanceId, byte[] tasks, String callback) {
+    return callNative(instanceId, new String(tasks), callback);
   }
 
   @Override
   public int callNative(String instanceId, String tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
-    }catch (Throwable e){
+    } catch (Throwable e) {
       //catch everything during call native.
       // if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callNative throw exception:"+e.getMessage());
+      WXLogUtils.e(TAG, "callNative throw exception:" + e.getMessage());
       // }
     }
 
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
-    if(WXEnvironment.isApkDebugable()){
-      if(errorCode == IWXBridge.DESTROY_INSTANCE){
-        WXLogUtils.w("destroyInstance :"+instanceId+" JSF must stop callNative");
+    if (WXEnvironment.isApkDebugable()) {
+      if (errorCode == IWXBridge.DESTROY_INSTANCE) {
+        WXLogUtils.w("destroyInstance :" + instanceId + " JSF must stop callNative");
       }
     }
     return errorCode;
@@ -132,37 +137,39 @@ public class WXBridge implements IWXBridge {
   /**
    * Bridge module Js Method
    * support Sync or Async through setting  Annotation as {@link com.taobao.weex.annotation.JSMethod }
-   * @param instanceId  Instance ID
-   * @param module  the name of module
-   * @param method  the name of method
+   *
+   * @param instanceId Instance ID
+   * @param module     the name of module
+   * @param method     the name of method
    * @param arguments  the arguments of the method
-   * @param options  option arguments for extending
-   * @return  the result
+   * @param options    option arguments for extending
+   * @return the result
    */
   @Override
-  public Object callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
+  public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
 
     JSONArray argArray = JSON.parseArray(new String(arguments));
     JSONObject optionsObj = null;
     if (options != null) {
       optionsObj = JSON.parseObject(new String(options));
     }
-    Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,optionsObj);
+    Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
     return new WXJSObject(object);
   }
 
   /**
    * Bridge component Js Method
-   * @param instanceId  Instance ID
-   * @param componentRef  the ref of component
-   * @param method  the name of method
-   * @param arguments  the arguments of the method
-   * @param options  option arguments for extending
+   *
+   * @param instanceId   Instance ID
+   * @param componentRef the ref of component
+   * @param method       the name of method
+   * @param arguments    the arguments of the method
+   * @param options      option arguments for extending
    */
   @Override
-  public void callNativeComponent(String instanceId, String componentRef, String method, byte [] arguments, byte [] options) {
+  public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
     JSONArray argArray = JSON.parseArray(new String(arguments));
-     WXBridgeManager.getInstance().callNativeComponent(instanceId,componentRef,method,argArray,options);
+    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
   public void setTimeoutNative(String callbackId, String time) {
@@ -170,17 +177,17 @@ public class WXBridge implements IWXBridge {
   }
 
   public void setJSFrmVersion(String version) {
-    if(version != null) {
+    if (version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
   }
 
   @Override
-  public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
+  public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
 
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -188,44 +195,21 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callUpdateFinish(instanceId, callback);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callCreateBody throw exception:" + e.getMessage());
       }
     }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
   }
 
   @Override
-  public int callCreateFinish(String instanceId, byte [] tasks, String callback) {
-
+  public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callCreateFinish(instanceId, callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      // if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callCreateFinish throw exception:" + e.getMessage());
-      // }
-    }
-    if(instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
-  public int callRefreshFinish(String instanceId, byte [] tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -233,55 +217,11 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callRefreshFinish(instanceId, callback);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callCreateFinish throw exception:" + e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
       }
     }
-    if(instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
-  public int callUpdateAttrs(String instanceId, String ref, byte [] tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callUpdateAttrs(instanceId, ref, new String(tasks), callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callUpdateAttrs throw exception:" + e.getMessage());
-      }
-    }
-    if(instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
-  public int callUpdateStyle(String instanceId, String ref, byte [] tasks, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callUpdateStyle(instanceId, ref, new String(tasks), callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callUpdateStyle throw exception:" + e.getMessage());
-      }
-    }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
@@ -291,7 +231,7 @@ public class WXBridge implements IWXBridge {
   public int callRemoveElement(String instanceId, String ref, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -299,11 +239,11 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callRemoveElement(instanceId, ref, callback);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callRemoveElement throw exception:" + e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callRemoveElement throw exception:" + e.getMessage());
       }
     }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
@@ -313,7 +253,7 @@ public class WXBridge implements IWXBridge {
   public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -322,11 +262,11 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callMoveElement(instanceId, ref, parentref, index, callback);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callMoveElement throw exception:" + e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callMoveElement throw exception:" + e.getMessage());
       }
     }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
@@ -336,7 +276,7 @@ public class WXBridge implements IWXBridge {
   public int callAddEvent(String instanceId, String ref, String event, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -345,10 +285,10 @@ public class WXBridge implements IWXBridge {
     } catch (Throwable e) {
       //catch everything during call native.
       // if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callAddEvent throw exception:" + e.getMessage());
+      WXLogUtils.e(TAG, "callAddEvent throw exception:" + e.getMessage());
       // }
     }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
@@ -358,7 +298,7 @@ public class WXBridge implements IWXBridge {
   public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.firstScreenCreateInstanceTime(start);
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -366,39 +306,40 @@ public class WXBridge implements IWXBridge {
       errorCode = WXBridgeManager.getInstance().callRemoveEvent(instanceId, ref, event, callback);
     } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"callRemoveEvent throw exception:" + e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callRemoveEvent throw exception:" + e.getMessage());
       }
     }
-    if(instance != null) {
+    if (instance != null) {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
   }
 
   public void reportServerCrash(String instanceId, String crashFile) {
-    WXLogUtils.e(TAG,"reportServerCrash instanceId:" + instanceId);
+    WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile);
 
       // upload crash log
-    }catch (Throwable e){
+    } catch (Throwable e) {
       //catch everything during call native.
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.e(TAG,"reloadPageNative throw exception:"+e.getMessage());
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "reloadPageNative throw exception:" + e.getMessage());
       }
     }
   }
 
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width,
+  @Override
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
-      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width,
+      errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref,
               styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
@@ -409,30 +350,35 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int top, int bottom, int left, int right, int height, int width, int index, String parentRef,
+  @Override
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
-      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, top, bottom, left, right, height, width, index, parentRef,
+      errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
               styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
         e.printStackTrace();
-        WXLogUtils.e(TAG, "callNative throw error:" + e.getMessage());
+        WXLogUtils.e(TAG, "callAddElement throw error:" + e.getMessage());
       }
     }
     return errorCode;
   }
 
-  public int callUpdateStyleByWeexCore(String instanceId, String ref, String key, String value) {
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+  @Override
+  public int callUpdateStyleByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> styles,
+                                       HashMap<String, String> paddings,
+                                       HashMap<String, String> margins,
+                                       HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, key, value);
+      errorCode = WXBridgeManager.getInstance().callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -442,6 +388,22 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
+  public int callUpdateAttrsByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> attrs) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateAttrsByWeexCore(instanceId, ref, attrs);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callUpdateAttr throw exception:" + e.getMessage());
+      }
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -449,8 +411,19 @@ public class WXBridge implements IWXBridge {
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callReLayoutByWeexCore throw exception:" + e.getMessage());
+        WXLogUtils.e(TAG, "callLayout throw exception:" + e.getMessage());
       }
+    }
+    return errorCode;
+  }
+
+  @Override
+  public int callCreateFinishByWeexCore(String instanceId) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateFinishByWeexCore(instanceId);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
     }
     return errorCode;
   }

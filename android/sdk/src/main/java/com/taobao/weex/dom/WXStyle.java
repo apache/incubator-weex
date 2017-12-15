@@ -26,11 +26,6 @@ import android.text.Layout;
 import android.text.TextUtils;
 
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSAlign;
-import com.taobao.weex.dom.flex.CSSFlexDirection;
-import com.taobao.weex.dom.flex.CSSJustify;
-import com.taobao.weex.dom.flex.CSSPositionType;
-import com.taobao.weex.dom.flex.CSSWrap;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
@@ -200,52 +195,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
       return lineHeight;
     }
     return (int) WXViewUtils.getRealPxByWidth(lineHeight,viewPortW);
-  }
-  /*
-   * flexbox
-   **/
-  public CSSAlign getAlignItems() {
-    Object alignItems = get(Constants.Name.ALIGN_ITEMS);
-    if (alignItems == null) {
-      return CSSAlign.STRETCH;
-    }
-    return CSSAlignConvert.convert2AlignItems(alignItems.toString().trim());
-  }
-
-  public CSSAlign getAlignSelf() {
-    Object alignSelf = get(Constants.Name.ALIGN_SELF);
-    if (alignSelf == null) {
-      return CSSAlign.AUTO;
-    }
-    return CSSAlignConvert.convert2AlignSelf(alignSelf.toString().trim());
-  }
-
-  public float getFlex() {
-    return WXUtils.getFloat(get(Constants.Name.FLEX));
-  }
-
-  public CSSFlexDirection getFlexDirection() {
-    Object flexDirection = get(Constants.Name.FLEX_DIRECTION);
-    if (flexDirection == null) {
-      return CSSFlexDirection.COLUMN;
-    }
-    return CSSFlexDirectionConvert.convert(flexDirection.toString().trim());
-  }
-
-  public CSSJustify getJustifyContent() {
-    Object justifyContent = get(Constants.Name.JUSTIFY_CONTENT);
-    if (justifyContent == null) {
-      return CSSJustify.FLEX_START;
-    }
-    return CSSJustifyConvert.convert(justifyContent.toString().trim());
-  }
-
-  public CSSWrap getCSSWrap() {
-    Object cssWrap = get(Constants.Name.FLEX_WRAP);
-    if (cssWrap == null) {
-      return CSSWrap.NOWRAP;
-    }
-    return CSSWrapConvert.convert(cssWrap.toString().trim());
   }
 
   /*
@@ -546,17 +495,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
       temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
     }
     return temp;
-  }
-
-  /*
-   * position
-   **/
-  public CSSPositionType getPosition() {
-    Object position = get(Constants.Name.POSITION);
-    if (position == null) {
-      return CSSPositionType.RELATIVE;
-    }
-    return CSSPositionTypeConvert.convert(position.toString().trim());
   }
 
   public boolean isSticky() {

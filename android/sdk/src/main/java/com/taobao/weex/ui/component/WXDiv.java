@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
@@ -36,17 +36,17 @@ import java.lang.reflect.InvocationTargetException;
 public class WXDiv extends WXVContainer<WXFrameLayout> {
 
   public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, WXUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXDiv(instance,parent,action);
     }
   }
 
   @Deprecated
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance,parent,action);
   }
 
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
     super(instance, parent, action);
   }
 

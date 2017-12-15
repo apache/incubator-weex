@@ -6,10 +6,10 @@
 //     /Users/miomin/Desktop/workspace/alibaba/WeexCore-dev/WeexCore-
 //    dev/android/weex_core_debug/Source/prebuild/jni_generator.py
 // For
-//     com/taobao/weex/ui/layout/ContentBoxMeasurement
+//     com/taobao/weex/layout/ContentBoxMeasurement
 
-#ifndef com_taobao_weex_ui_layout_ContentBoxMeasurement_JNI
-#define com_taobao_weex_ui_layout_ContentBoxMeasurement_JNI
+#ifndef com_taobao_weex_layout_ContentBoxMeasurement_JNI
+#define com_taobao_weex_layout_ContentBoxMeasurement_JNI
 
 #include <jni.h>
 
@@ -18,7 +18,7 @@
 // Step 1: forward declarations.
 namespace {
 const char kContentBoxMeasurementClassPath[] =
-    "com/taobao/weex/ui/layout/ContentBoxMeasurement";
+    "com/taobao/weex/layout/ContentBoxMeasurement";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
 jclass g_ContentBoxMeasurement_clazz = NULL;
 #define ContentBoxMeasurement_clazz(env) g_ContentBoxMeasurement_clazz
@@ -48,7 +48,7 @@ static base::android::ScopedLocalJavaRef<jobject>
 "I"
 "I"
 ")"
-"Lcom/taobao/weex/ui/layout/MeasureSize;",
+"Lcom/taobao/weex/layout/MeasureSize;",
       &g_ContentBoxMeasurement_measure);
 
   jobject ret =
@@ -117,4 +117,4 @@ static bool RegisterNativesImpl(JNIEnv* env) {
   return true;
 }
 
-#endif  // com_taobao_weex_ui_layout_ContentBoxMeasurement_JNI
+#endif  // com_taobao_weex_layout_ContentBoxMeasurement_JNI

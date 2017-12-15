@@ -35,9 +35,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-
-import com.taobao.weex.dom.flex.FloatUtil;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -94,7 +92,7 @@ public class BorderDrawable extends Drawable {
   /**
    * set background-image linear-gradient
    */
-  private Shader mShader=null;
+  private Shader mShader = null;
   private int mAlpha = 255;
 
   public BorderDrawable() {
@@ -156,8 +154,8 @@ public class BorderDrawable extends Drawable {
 
   @Override
   public int getOpacity() {
-    return mShader!=null?PixelFormat.OPAQUE:
-          WXViewUtils.getOpacityFromColor(WXViewUtils.multiplyColorAlpha(mColor, mAlpha));
+    return mShader != null ? PixelFormat.OPAQUE :
+            WXViewUtils.getOpacityFromColor(WXViewUtils.multiplyColorAlpha(mColor, mAlpha));
   }
 
   /* Android's elevation implementation requires this to be implemented to know where to draw the
@@ -173,29 +171,29 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  public void setBorderWidth(@BorderWidthStyleColorType int position, float width) {
+  public void setBorderWidth(CSSShorthand.EDGE edge, float width) {
     if (mBorderWidth == null) {
       mBorderWidth = new SparseArray<>(5);
-      mBorderWidth.put(Spacing.ALL, DEFAULT_BORDER_WIDTH);
+      mBorderWidth.put(CSSShorthand.EDGE.ALL.ordinal(), DEFAULT_BORDER_WIDTH);
     }
-    if (!FloatUtil.floatsEqual(getBorderWidth(position), width)) {
-      BorderUtil.updateSparseArray(mBorderWidth, position, width);
-      mBorderWidth.put(position, width);
+    if (getBorderWidth(edge) != width) {
+      BorderUtil.updateSparseArray(mBorderWidth, edge.ordinal(), width);
+      mBorderWidth.put(edge.ordinal(), width);
       mNeedUpdatePath = true;
       invalidateSelf();
     }
   }
 
-  float getBorderWidth(@BorderWidthStyleColorType int position) {
-    return BorderUtil.fetchFromSparseArray(mBorderWidth, position, DEFAULT_BORDER_WIDTH);
+  float getBorderWidth(CSSShorthand.EDGE edge) {
+    return BorderUtil.fetchFromSparseArray(mBorderWidth, edge.ordinal(), DEFAULT_BORDER_WIDTH);
   }
 
   public void setBorderRadius(@BorderRadiusType int position, float radius) {
     if (mBorderRadius == null) {
       mBorderRadius = new SparseArray<>(5);
-      mBorderRadius.put(Spacing.ALL, DEFAULT_BORDER_RADIUS);
+      mBorderRadius.put(CSSShorthand.EDGE.ALL.ordinal(), DEFAULT_BORDER_RADIUS);
     }
-    if (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, position), radius)) {
+    if (getBorderRadius(mBorderRadius, position) != radius) {
       BorderUtil.updateSparseArray(mBorderRadius, position, radius, true);
       mNeedUpdatePath = true;
       invalidateSelf();
@@ -215,36 +213,36 @@ public class BorderDrawable extends Drawable {
     float topRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS);
     float bottomRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS);
     float bottomLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_LEFT_RADIUS);
-    return new float[]{topLeftRadius,topLeftRadius,
-        topRightRadius,topRightRadius,
-        bottomRightRadius, bottomRightRadius,
-        bottomLeftRadius,bottomLeftRadius};
+    return new float[]{topLeftRadius, topLeftRadius,
+            topRightRadius, topRightRadius,
+            bottomRightRadius, bottomRightRadius,
+            bottomLeftRadius, bottomLeftRadius};
   }
 
-  public void setBorderColor(@BorderWidthStyleColorType int position, int color) {
+  public void setBorderColor(CSSShorthand.EDGE edge, int color) {
     if (mBorderColor == null) {
       mBorderColor = new SparseIntArray(5);
-      mBorderColor.put(Spacing.ALL, DEFAULT_BORDER_COLOR);
+      mBorderColor.put(CSSShorthand.EDGE.ALL.ordinal(), DEFAULT_BORDER_COLOR);
     }
-    if (getBorderColor(position) != color) {
-      BorderUtil.updateSparseArray(mBorderColor, position, color);
+    if (getBorderColor(edge) != color) {
+      BorderUtil.updateSparseArray(mBorderColor, edge.ordinal(), color);
       invalidateSelf();
     }
   }
 
-  int getBorderColor(@BorderWidthStyleColorType int position) {
-    return BorderUtil.fetchFromSparseArray(mBorderColor, position, DEFAULT_BORDER_COLOR);
+  int getBorderColor(CSSShorthand.EDGE edge) {
+    return BorderUtil.fetchFromSparseArray(mBorderColor, edge.ordinal(), DEFAULT_BORDER_COLOR);
   }
 
-  public void setBorderStyle(@BorderWidthStyleColorType int position, @NonNull String style) {
+  public void setBorderStyle(CSSShorthand.EDGE edge, @NonNull String style) {
     if (mBorderStyle == null) {
       mBorderStyle = new SparseIntArray(5);
-      mBorderStyle.put(Spacing.ALL, DEFAULT_BORDER_STYLE.ordinal());
+      mBorderStyle.put(CSSShorthand.EDGE.ALL.ordinal(), DEFAULT_BORDER_STYLE.ordinal());
     }
     try {
       int borderStyle = BorderStyle.valueOf(style.toUpperCase(Locale.US)).ordinal();
-      if (getBorderStyle(position) != borderStyle) {
-        BorderUtil.updateSparseArray(mBorderStyle, position, borderStyle);
+      if (getBorderStyle(edge) != borderStyle) {
+        BorderUtil.updateSparseArray(mBorderStyle, edge.ordinal(), borderStyle);
         invalidateSelf();
       }
     } catch (IllegalArgumentException e) {
@@ -252,8 +250,8 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  int getBorderStyle(@BorderWidthStyleColorType int position) {
-    return BorderUtil.fetchFromSparseArray(mBorderStyle, position, BorderStyle.SOLID.ordinal());
+  int getBorderStyle(CSSShorthand.EDGE edge) {
+    return BorderUtil.fetchFromSparseArray(mBorderStyle, edge.ordinal(), BorderStyle.SOLID.ordinal());
   }
 
   public int getColor() {
@@ -270,16 +268,16 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
-  public boolean hasImage(){
-    return mShader!=null;
+  public boolean hasImage() {
+    return mShader != null;
   }
 
   public boolean isRounded() {
     return mBorderRadius != null &&
-           (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS), 0));
+            (getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS) != 0 ||
+                    getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS) != 0 ||
+                    getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS) != 0 ||
+                    getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS) != 0);
   }
 
   public
@@ -316,22 +314,22 @@ public class BorderDrawable extends Drawable {
       float topLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS);
       float topRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS);
       float bottomRightRadius = getBorderRadius(mOverlappingBorderRadius,
-                                                BORDER_BOTTOM_RIGHT_RADIUS);
+              BORDER_BOTTOM_RIGHT_RADIUS);
       float bottomLeftRadius = getBorderRadius(mOverlappingBorderRadius,
-                                               BORDER_BOTTOM_LEFT_RADIUS);
+              BORDER_BOTTOM_LEFT_RADIUS);
       path.addRoundRect(
-          rectF,
-          new float[]{
-              topLeftRadius - leftPadding,
-              topLeftRadius - topPadding,
-              topRightRadius - rightPadding,
-              topRightRadius - topPadding,
-              bottomRightRadius - rightPadding,
-              bottomRightRadius - bottomPadding,
-              bottomLeftRadius - leftPadding,
-              bottomLeftRadius - bottomPadding
-          },
-          Path.Direction.CW);
+              rectF,
+              new float[]{
+                      topLeftRadius - leftPadding,
+                      topLeftRadius - topPadding,
+                      topRightRadius - rightPadding,
+                      topRightRadius - topPadding,
+                      bottomRightRadius - rightPadding,
+                      bottomRightRadius - bottomPadding,
+                      bottomLeftRadius - leftPadding,
+                      bottomLeftRadius - bottomPadding
+              },
+              Path.Direction.CW);
     } else {
       path.addRect(rectF, Path.Direction.CW);
     }
@@ -345,43 +343,43 @@ public class BorderDrawable extends Drawable {
       float factor = getScaleFactor(borderBox);
       if (mOverlappingBorderRadius == null) {
         mOverlappingBorderRadius = new SparseArray<>(5);
-        mOverlappingBorderRadius.put(Spacing.ALL, 0f);
+        mOverlappingBorderRadius.put(CSSShorthand.EDGE.ALL.ordinal(), 0f);
       }
       if (!Float.isNaN(factor) && factor < 1) {
         mOverlappingBorderRadius.put(BORDER_TOP_LEFT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS) *
-                                     factor);
+                getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS) *
+                        factor);
         mOverlappingBorderRadius.put(BORDER_TOP_RIGHT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS) *
-                                     factor);
+                getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS) *
+                        factor);
         mOverlappingBorderRadius.put(BORDER_BOTTOM_RIGHT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS) *
-                                     factor);
+                getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS) *
+                        factor);
         mOverlappingBorderRadius.put(BORDER_BOTTOM_LEFT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS) *
-                                     factor);
+                getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS) *
+                        factor);
       } else {
         mOverlappingBorderRadius.put(BORDER_TOP_LEFT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS));
+                getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS));
         mOverlappingBorderRadius.put(BORDER_TOP_RIGHT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS));
+                getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS));
         mOverlappingBorderRadius.put(BORDER_BOTTOM_RIGHT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS));
+                getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS));
         mOverlappingBorderRadius.put(BORDER_BOTTOM_LEFT_RADIUS,
-                                     getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS));
+                getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS));
       }
     }
   }
 
   private float getScaleFactor(@NonNull RectF borderBox) {
     final float topRadius = getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS)
-                            + getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS);
+            + getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS);
     final float rightRadius = getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS)
-                              + getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS);
+            + getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS);
     final float bottomRadius = getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS)
-                               + getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS);
+            + getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS);
     final float leftRadius = getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS)
-                             + getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS);
+            + getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS);
     List<Float> factors = new ArrayList<>(4);
     updateFactor(factors, borderBox.width(), topRadius);
     updateFactor(factors, borderBox.height(), rightRadius);
@@ -397,7 +395,7 @@ public class BorderDrawable extends Drawable {
   }
 
   private void updateFactor(@NonNull List<Float> list, float numerator, float denominator) {
-    if (!FloatUtil.floatsEqual(denominator, 0)) {
+    if (denominator != 0) {
       list.add(numerator / denominator);
     }
   }
@@ -405,47 +403,47 @@ public class BorderDrawable extends Drawable {
   private void drawBorders(Canvas canvas) {
     RectF rectBounds = new RectF(getBounds());
     BorderCorner topLeft = new TopLeftCorner(
-        getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS),
-        getBorderWidth(Spacing.LEFT),
-        getBorderWidth(Spacing.TOP),
-        rectBounds);
+            getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS),
+            getBorderWidth(CSSShorthand.EDGE.LEFT),
+            getBorderWidth(CSSShorthand.EDGE.TOP),
+            rectBounds);
     BorderCorner topRight = new TopRightCorner(
-        getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS),
-        getBorderWidth(Spacing.TOP),
-        getBorderWidth(Spacing.RIGHT),
-        rectBounds);
+            getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS),
+            getBorderWidth(CSSShorthand.EDGE.TOP),
+            getBorderWidth(CSSShorthand.EDGE.RIGHT),
+            rectBounds);
     BorderCorner bottomRight = new BottomRightCorner(
-        getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS),
-        getBorderWidth(Spacing.RIGHT),
-        getBorderWidth(Spacing.BOTTOM),
-        rectBounds);
+            getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS),
+            getBorderWidth(CSSShorthand.EDGE.RIGHT),
+            getBorderWidth(CSSShorthand.EDGE.BOTTOM),
+            rectBounds);
     BorderCorner bottomLeft = new BottomLeftCorner(
-        getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_LEFT_RADIUS),
-        getBorderWidth(Spacing.BOTTOM),
-        getBorderWidth(Spacing.LEFT),
-        rectBounds);
-    drawOneSide(canvas, new BorderEdge(topLeft, topRight, Spacing.TOP,
-                                       getBorderWidth(Spacing.TOP)));
-    drawOneSide(canvas, new BorderEdge(topRight, bottomRight, Spacing.RIGHT,
-                                       getBorderWidth(Spacing.RIGHT)));
-    drawOneSide(canvas, new BorderEdge(bottomRight, bottomLeft, Spacing.BOTTOM,
-                                       getBorderWidth(Spacing.BOTTOM)));
-    drawOneSide(canvas, new BorderEdge(bottomLeft, topLeft, Spacing.LEFT,
-                                       getBorderWidth(Spacing.LEFT)));
+            getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_LEFT_RADIUS),
+            getBorderWidth(CSSShorthand.EDGE.BOTTOM),
+            getBorderWidth(CSSShorthand.EDGE.LEFT),
+            rectBounds);
+    drawOneSide(canvas, new BorderEdge(topLeft, topRight, CSSShorthand.EDGE.TOP,
+            getBorderWidth(CSSShorthand.EDGE.TOP)));
+    drawOneSide(canvas, new BorderEdge(topRight, bottomRight, CSSShorthand.EDGE.RIGHT,
+            getBorderWidth(CSSShorthand.EDGE.RIGHT)));
+    drawOneSide(canvas, new BorderEdge(bottomRight, bottomLeft, CSSShorthand.EDGE.BOTTOM,
+            getBorderWidth(CSSShorthand.EDGE.BOTTOM)));
+    drawOneSide(canvas, new BorderEdge(bottomLeft, topLeft, CSSShorthand.EDGE.LEFT,
+            getBorderWidth(CSSShorthand.EDGE.LEFT)));
   }
 
   private void drawOneSide(Canvas canvas, @NonNull BorderEdge borderEdge) {
-    if (!FloatUtil.floatsEqual(0, getBorderWidth(borderEdge.getEdge()))) {
+    if (0 != getBorderWidth(borderEdge.getEdge())) {
       preparePaint(borderEdge.getEdge());
       borderEdge.drawEdge(canvas, mPaint);
     }
   }
 
-  private void preparePaint(@BorderWidthStyleColorType int side) {
-    float borderWidth = getBorderWidth(side);
-    int color = WXViewUtils.multiplyColorAlpha(getBorderColor(side), mAlpha);
-    BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(side)];
-    Shader shader = borderStyle.getLineShader(borderWidth, color, side);
+  private void preparePaint(CSSShorthand.EDGE edge) {
+    float borderWidth = getBorderWidth(edge);
+    int color = WXViewUtils.multiplyColorAlpha(getBorderColor(edge), mAlpha);
+    BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(edge)];
+    Shader shader = borderStyle.getLineShader(borderWidth, color, edge);
     mPaint.setShader(shader);
     mPaint.setColor(color);
     mPaint.setStrokeCap(Paint.Cap.ROUND);

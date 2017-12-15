@@ -21,22 +21,20 @@ package com.taobao.weex.ui.component;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.ATagUtil;
-import com.taobao.weex.utils.WXLogUtils;
 
 @Component(lazyload = false)
 public class WXA extends WXDiv {
 
   @Deprecated
-  public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+  public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
     this(instance, parent,action);
   }
 
-  public WXA(WXSDKInstance instance, WXVContainer parent, WXUIAction action) {
+  public WXA(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
     super(instance, parent,action);
   }
 

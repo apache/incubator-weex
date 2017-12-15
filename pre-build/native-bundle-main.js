@@ -1,5 +1,5 @@
-(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.23.4-beta.0, Build 2017-11-27 15:52.');
-(this.getJSFMVersion = function(){return "0.23.4-beta.0"});var global = this, process = { env: {} };var setTimeout = global.setTimeout;
+(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.23.4, Build 2017-12-07 11:33.');
+(this.getJSFMVersion = function(){return "0.23.4"});var global = this, process = { env: {} };var setTimeout = global.setTimeout;
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
@@ -859,9 +859,9 @@ var VNode = function VNode (
   this.elm = elm;
   this.ns = undefined;
   this.context = context;
-  this.functionalContext = undefined;
-  this.functionalOptions = undefined;
-  this.functionalScopeId = undefined;
+  this.fnContext = undefined;
+  this.fnOptions = undefined;
+  this.fnScopeId = undefined;
   this.key = data && data.key;
   this.componentOptions = componentOptions;
   this.componentInstance = undefined;
@@ -920,6 +920,9 @@ function cloneVNode (vnode, deep) {
   cloned.isStatic = vnode.isStatic;
   cloned.key = vnode.key;
   cloned.isComment = vnode.isComment;
+  cloned.fnContext = vnode.fnContext;
+  cloned.fnOptions = vnode.fnOptions;
+  cloned.fnScopeId = vnode.fnScopeId;
   cloned.isCloned = true;
   if (deep) {
     if (vnode.children) {
@@ -2030,6 +2033,43 @@ var initProxy;
   };
 }
 
+/*  */
+
+var seenObjects = new _Set();
+
+/**
+ * Recursively traverse an object to evoke all converted
+ * getters, so that every nested property inside the object
+ * is collected as a "deep" dependency.
+ */
+function traverse (val) {
+  _traverse(val, seenObjects);
+  seenObjects.clear();
+}
+
+function _traverse (val, seen) {
+  var i, keys;
+  var isA = Array.isArray(val);
+  if ((!isA && !isObject(val)) || Object.isFrozen(val)) {
+    return
+  }
+  if (val.__ob__) {
+    var depId = val.__ob__.dep.id;
+    if (seen.has(depId)) {
+      return
+    }
+    seen.add(depId);
+  }
+  if (isA) {
+    i = val.length;
+    while (i--) { _traverse(val[i], seen); }
+  } else {
+    keys = Object.keys(val);
+    i = keys.length;
+    while (i--) { _traverse(val[keys[i]], seen); }
+  }
+}
+
 var mark;
 var measure;
 
@@ -2622,7 +2662,7 @@ function resolveSlots (
     }
     // named slots should only be respected if the vnode was rendered in the
     // same context.
-    if ((child.context === context || child.functionalContext === context) &&
+    if ((child.context === context || child.fnContext === context) &&
       data && data.slot != null
     ) {
       var name = child.data.slot;
@@ -2842,7 +2882,10 @@ function mountComponent (
     };
   }
 
-  vm._watcher = new Watcher(vm, updateComponent, noop);
+  // we set this to vm._watcher inside the watcher's constructor
+  // since the watcher's initial patch may call $forceUpdate (e.g. inside child
+  // component's mounted hook), which relies on vm._watcher being already defined
+  new Watcher(vm, updateComponent, noop, null, true /* isRenderWatcher */);
   hydrating = false;
 
   // manually mounted instance, call mounted on self
@@ -3129,9 +3172,13 @@ var Watcher = function Watcher (
   vm,
   expOrFn,
   cb,
-  options
+  options,
+  isRenderWatcher
 ) {
   this.vm = vm;
+  if (isRenderWatcher) {
+    vm._watcher = this;
+  }
   vm._watchers.push(this);
   // options
   if (options) {
@@ -3322,40 +3369,6 @@ Watcher.prototype.teardown = function teardown () {
     this.active = false;
   }
 };
-
-/**
- * Recursively traverse an object to evoke all converted
- * getters, so that every nested property inside the object
- * is collected as a "deep" dependency.
- */
-var seenObjects = new _Set();
-function traverse (val) {
-  seenObjects.clear();
-  _traverse(val, seenObjects);
-}
-
-function _traverse (val, seen) {
-  var i, keys;
-  var isA = Array.isArray(val);
-  if ((!isA && !isObject(val)) || !Object.isExtensible(val)) {
-    return
-  }
-  if (val.__ob__) {
-    var depId = val.__ob__.dep.id;
-    if (seen.has(depId)) {
-      return
-    }
-    seen.add(depId);
-  }
-  if (isA) {
-    i = val.length;
-    while (i--) { _traverse(val[i], seen); }
-  } else {
-    keys = Object.keys(val);
-    i = keys.length;
-    while (i--) { _traverse(val[keys[i]], seen); }
-  }
-}
 
 /*  */
 
@@ -4070,8 +4083,8 @@ function FunctionalRenderContext (
     this._c = function (a, b, c, d) {
       var vnode = createElement(contextVm, a, b, c, d, needNormalization);
       if (vnode) {
-        vnode.functionalScopeId = options._scopeId;
-        vnode.functionalContext = parent;
+        vnode.fnScopeId = options._scopeId;
+        vnode.fnContext = parent;
       }
       return vnode
     };
@@ -4112,8 +4125,8 @@ function createFunctionalComponent (
   var vnode = options.render.call(null, renderContext._c, renderContext);
 
   if (vnode instanceof VNode) {
-    vnode.functionalContext = contextVm;
-    vnode.functionalOptions = options;
+    vnode.fnContext = contextVm;
+    vnode.fnOptions = options;
     if (data.slot) {
       (vnode.data || (vnode.data = {})).slot = data.slot;
     }
@@ -4304,15 +4317,10 @@ function createComponentInstanceForVnode (
   parentElm,
   refElm
 ) {
-  var vnodeComponentOptions = vnode.componentOptions;
   var options = {
     _isComponent: true,
     parent: parent,
-    propsData: vnodeComponentOptions.propsData,
-    _componentTag: vnodeComponentOptions.tag,
     _parentVnode: vnode,
-    _parentListeners: vnodeComponentOptions.listeners,
-    _renderChildren: vnodeComponentOptions.children,
     _parentElm: parentElm || null,
     _refElm: refElm || null
   };
@@ -4322,7 +4330,7 @@ function createComponentInstanceForVnode (
     options.render = inlineTemplate.render;
     options.staticRenderFns = inlineTemplate.staticRenderFns;
   }
-  return new vnodeComponentOptions.Ctor(options)
+  return new vnode.componentOptions.Ctor(options)
 }
 
 function mergeHooks (data) {
@@ -4484,6 +4492,7 @@ function applyNS (vnode, ns, force) {
 
 function initRender (vm) {
   vm._vnode = null; // the root of the child tree
+  vm._staticTrees = null; // v-once cached trees
   var options = vm.$options;
   var parentVnode = vm.$vnode = options._parentVnode; // the placeholder node in parent tree
   var renderContext = parentVnode && parentVnode.context;
@@ -4648,14 +4657,18 @@ function initMixin (Vue) {
 function initInternalComponent (vm, options) {
   var opts = vm.$options = Object.create(vm.constructor.options);
   // doing this because it's faster than dynamic enumeration.
+  var parentVnode = options._parentVnode;
   opts.parent = options.parent;
-  opts.propsData = options.propsData;
-  opts._parentVnode = options._parentVnode;
-  opts._parentListeners = options._parentListeners;
-  opts._renderChildren = options._renderChildren;
-  opts._componentTag = options._componentTag;
+  opts._parentVnode = parentVnode;
   opts._parentElm = options._parentElm;
   opts._refElm = options._refElm;
+
+  var vnodeComponentOptions = parentVnode.componentOptions;
+  opts.propsData = vnodeComponentOptions.propsData;
+  opts._parentListeners = vnodeComponentOptions.listeners;
+  opts._renderChildren = vnodeComponentOptions.children;
+  opts._componentTag = vnodeComponentOptions.tag;
+
   if (options.render) {
     opts.render = options.render;
     opts.staticRenderFns = options.staticRenderFns;
@@ -4940,7 +4953,7 @@ function pruneCacheEntry (
   current
 ) {
   var cached$$1 = cache[key];
-  if (cached$$1 && cached$$1 !== current) {
+  if (cached$$1 && (!current || cached$$1.tag !== current.tag)) {
     cached$$1.componentInstance.$destroy();
   }
   cache[key] = null;
@@ -4982,21 +4995,27 @@ var KeepAlive = {
   },
 
   render: function render () {
-    var vnode = getFirstComponentChild(this.$slots.default);
+    var slot = this.$slots.default;
+    var vnode = getFirstComponentChild(slot);
     var componentOptions = vnode && vnode.componentOptions;
     if (componentOptions) {
       // check pattern
       var name = getComponentName(componentOptions);
-      if (name && (
-        (this.exclude && matches(this.exclude, name)) ||
-        (this.include && !matches(this.include, name))
-      )) {
+      var ref = this;
+      var include = ref.include;
+      var exclude = ref.exclude;
+      if (
+        // not included
+        (include && (!name || !matches(include, name))) ||
+        // excluded
+        (exclude && name && matches(exclude, name))
+      ) {
         return vnode
       }
 
-      var ref = this;
-      var cache = ref.cache;
-      var keys = ref.keys;
+      var ref$1 = this;
+      var cache = ref$1.cache;
+      var keys = ref$1.keys;
       var key = vnode.key == null
         // same constructor may get registered as different local components
         // so cid alone is not enough (#3269)
@@ -5018,7 +5037,7 @@ var KeepAlive = {
 
       vnode.data.keepAlive = true;
     }
-    return vnode
+    return vnode || (slot && slot[0])
   }
 };
 
@@ -5085,7 +5104,7 @@ Object.defineProperty(Vue$2.prototype, '$ssrContext', {
   }
 });
 
-Vue$2.version = '2.5.3';
+Vue$2.version = '2.5.9';
 
 var latestNodeId = 1;
 
@@ -5548,7 +5567,7 @@ function createPatchFunction (backend) {
   // of going through the normal attribute patching process.
   function setScope (vnode) {
     var i;
-    if (isDef(i = vnode.functionalScopeId)) {
+    if (isDef(i = vnode.fnScopeId)) {
       nodeOps.setAttribute(vnode.elm, i, '');
     } else {
       var ancestor = vnode;
@@ -5562,7 +5581,7 @@ function createPatchFunction (backend) {
     // for slot content they should also get the scopeId from the host instance.
     if (isDef(i = activeInstance) &&
       i !== vnode.context &&
-      i !== vnode.functionalContext &&
+      i !== vnode.fnContext &&
       isDef(i = i.$options._scopeId)
     ) {
       nodeOps.setAttribute(vnode.elm, i, '');
@@ -5789,7 +5808,9 @@ function createPatchFunction (backend) {
   var hydrationBailed = false;
   // list of modules that can skip create hook during hydration because they
   // are already rendered on the client or has no need for initialization
-  var isRenderedModule = makeMap('attrs,style,class,staticClass,staticStyle,key');
+  // Note: style is excluded because it relies on initial clone for future
+  // deep updates (#7063).
+  var isRenderedModule = makeMap('attrs,class,staticClass,staticStyle,key');
 
   // Note: this is a browser-only function so we can assume elms are DOM nodes.
   function hydrate (elm, vnode, insertedVnodeQueue, inVPre) {
@@ -5868,11 +5889,17 @@ function createPatchFunction (backend) {
         }
       }
       if (isDef(data)) {
+        var fullInvoke = false;
         for (var key in data) {
           if (!isRenderedModule(key)) {
+            fullInvoke = true;
             invokeCreateHooks(vnode, insertedVnodeQueue);
             break
           }
+        }
+        if (!fullInvoke && data['class']) {
+          // ensure collecting deps for deep class bindings for future updates
+          traverse(data['class']);
         }
       }
     } else if (elm.data !== vnode.text) {
@@ -6948,7 +6975,9 @@ var Transition$1 = {
       oldChild &&
       oldChild.data &&
       !isSameChild(child, oldChild) &&
-      !isAsyncPlaceholder(oldChild)
+      !isAsyncPlaceholder(oldChild) &&
+      // #6687 component root is a comment node
+      !(oldChild.componentInstance && oldChild.componentInstance._vnode.isComment)
     ) {
       // replace old child transition data with fresh one
       // important for dynamic transitions!
@@ -7175,6 +7204,8 @@ function query (el, document) {
 
 /*  */
 
+/* globals document */
+
 // install platform specific utils
 Vue$2.config.mustUseProp = mustUseProp;
 Vue$2.config.isReservedTag = isReservedTag$1;
@@ -7195,7 +7226,7 @@ Vue$2.prototype.$mount = function (
 ) {
   return mountComponent(
     this,
-    el && query(el, this.$document),
+    el && query(el, document),
     hydrating
   )
 };
@@ -7213,136 +7244,100 @@ var index = createCommonjsModule(function (module, exports) {
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+/*  */
+
+// TODO: these declarations should be moved to a separate file.
+
+
+
+
+
 // this will be preserved during build
+// $flow-disable-line
 var VueFactory = factory;
 
-var instances = {};
+var instanceOptions = {};
 
 /**
- * Prepare framework config.
- * Nothing need to do actually, just an interface provided to weex runtime.
+ * Create instance context.
  */
-function init () {}
-
-/**
- * Reset framework config and clear all registrations.
- */
-function reset () {
-  clear(instances);
-}
-
-/**
- * Delete all keys of an object.
- * @param {object} obj
- */
-function clear (obj) {
-  for (var key in obj) {
-    delete obj[key];
-  }
-}
-
-function createInstanceContext (instanceId, runtimeContext) {
-  if ( runtimeContext === void 0 ) { runtimeContext = {}; }
+function createInstanceContext (
+  instanceId,
+  runtimeContext,
+  data
+) {
+  if ( data === void 0 ) { data = {}; }
 
   var weex = runtimeContext.weex;
-  var instance = instances[instanceId] = {
+  var instance = instanceOptions[instanceId] = {
     instanceId: instanceId,
-    document: weex.document
+    config: weex.config,
+    document: weex.document,
+    data: data
   };
 
   // Each instance has a independent `Vue` module instance
   var Vue = instance.Vue = createVueModuleInstance(instanceId, weex);
 
+  // DEPRECATED
   var timerAPIs = getInstanceTimer(instanceId, weex.requireModule);
+
   var instanceContext = Object.assign({ Vue: Vue }, timerAPIs);
   Object.freeze(instanceContext);
-
   return instanceContext
-}
-
-/**
- * Create an instance with id, code, config and external data.
- * @param {string} instanceId
- * @param {string} appCode
- * @param {object} config
- * @param {object} data
- * @param {object} runtimeContext { weex, ...services }
- */
-function createInstance (
-  instanceId,
-  appCode,
-  config,
-  data,
-  instanceContext
-) {
-  if ( appCode === void 0 ) { appCode = ''; }
-  if ( config === void 0 ) { config = {}; }
-  if ( instanceContext === void 0 ) { instanceContext = {}; }
-
-  var instance = Object.assign(instances[instanceId], { config: config, data: data });
-
-  appCode = "(function(global){ \n" + appCode + "\n })(Object.create(this))";
-  callFunction(instanceContext, appCode);
-
-  return instance
 }
 
 /**
  * Destroy an instance with id. It will make sure all memory of
  * this instance released and no more leaks.
- * @param {string} instanceId
  */
 function destroyInstance (instanceId) {
-  var instance = instances[instanceId];
+  var instance = instanceOptions[instanceId];
   if (instance && instance.app instanceof instance.Vue) {
-    instance.document.destroy();
-    instance.app.$destroy();
+    try {
+      instance.app.$destroy();
+      instance.document.destroy();
+    } catch (e) {}
     delete instance.document;
     delete instance.app;
   }
-  delete instances[instanceId];
+  delete instanceOptions[instanceId];
 }
 
 /**
  * Refresh an instance with id and new top-level component data.
  * It will use `Vue.set` on all keys of the new data. So it's better
  * define all possible meaningful keys when instance created.
- * @param {string} instanceId
- * @param {object} data
  */
-function refreshInstance (instanceId, data) {
-  var instance = instances[instanceId];
+function refreshInstance (
+  instanceId,
+  data
+) {
+  var instance = instanceOptions[instanceId];
   if (!instance || !(instance.app instanceof instance.Vue)) {
     return new Error(("refreshInstance: instance " + instanceId + " not found!"))
   }
-  for (var key in data) {
-    instance.Vue.set(instance.app, key, data[key]);
+  if (instance.Vue && instance.Vue.set) {
+    for (var key in data) {
+      instance.Vue.set(instance.app, key, data[key]);
+    }
   }
   // Finally `refreshFinish` signal needed.
   instance.document.taskCenter.send('dom', { action: 'refreshFinish' }, []);
 }
 
 /**
- * Get the JSON object of the root element.
- * @param {string} instanceId
- */
-function getRoot (instanceId) {
-  var instance = instances[instanceId];
-  if (!instance || !(instance.app instanceof instance.Vue)) {
-    return new Error(("getRoot: instance " + instanceId + " not found!"))
-  }
-  return instance.app.$el.toJSON()
-}
-
-/**
  * Create a fresh instance of Vue for each Weex instance.
  */
-function createVueModuleInstance (instanceId, weex) {
+function createVueModuleInstance (
+  instanceId,
+  weex
+) {
   var exports = {};
   VueFactory(exports, weex.document);
   var Vue = exports.Vue;
 
-  var instance = instances[instanceId];
+  var instance = instanceOptions[instanceId];
 
   // patch reserved tag detection to account for dynamically registered
   // components
@@ -7382,9 +7377,9 @@ function createVueModuleInstance (instanceId, weex) {
     mounted: function mounted () {
       var options = this.$options;
       // root component (vm)
-      if (options.el && instance.app === this) {
+      if (options.el && weex.document && instance.app === this) {
         try {
-          // Send `createFinish` signal to native.
+          // Send "createFinish" signal to native.
           weex.document.taskCenter.send('dom', { action: 'createFinish' }, []);
         } catch (e) {}
       }
@@ -7406,16 +7401,17 @@ function createVueModuleInstance (instanceId, weex) {
 }
 
 /**
+ * DEPRECATED
  * Generate HTML5 Timer APIs. An important point is that the callback
  * will be converted into callback id when sent to native. So the
  * framework can make sure no side effect of the callback happened after
  * an instance destroyed.
- * @param  {[type]} instanceId   [description]
- * @param  {[type]} moduleGetter [description]
- * @return {[type]}              [description]
  */
-function getInstanceTimer (instanceId, moduleGetter) {
-  var instance = instances[instanceId];
+function getInstanceTimer (
+  instanceId,
+  moduleGetter
+) {
+  var instance = instanceOptions[instanceId];
   var timer = moduleGetter('timer');
   var timerAPIs = {
     setTimeout: function () {
@@ -7454,53 +7450,22 @@ function getInstanceTimer (instanceId, moduleGetter) {
   return timerAPIs
 }
 
-/**
- * Call a new function body with some global objects.
- * @param  {object} globalObjects
- * @param  {string} code
- * @return {any}
- */
-function callFunction (globalObjects, body) {
-  var globalKeys = [];
-  var globalValues = [];
-  for (var key in globalObjects) {
-    globalKeys.push(key);
-    globalValues.push(globalObjects[key]);
-  }
-  globalKeys.push(body);
-
-  var result = new (Function.prototype.bind.apply( Function, [ null ].concat( globalKeys) ));
-  return result.apply(void 0, globalValues)
-}
-
-exports.init = init;
-exports.reset = reset;
 exports.createInstanceContext = createInstanceContext;
-exports.createInstance = createInstance;
 exports.destroyInstance = destroyInstance;
 exports.refreshInstance = refreshInstance;
-exports.getRoot = getRoot;
 });
 
 var index$1 = unwrapExports(index);
-var getRoot$1 = index.getRoot;
 var refreshInstance = index.refreshInstance;
 var destroyInstance$1 = index.destroyInstance;
-var createInstance$1 = index.createInstance;
 var createInstanceContext = index.createInstanceContext;
-var reset = index.reset;
-var init$2 = index.init;
 
 var Vue = Object.freeze({
 	default: index$1,
 	__moduleExports: index,
-	getRoot: getRoot$1,
 	refreshInstance: refreshInstance,
 	destroyInstance: destroyInstance$1,
-	createInstance: createInstance$1,
-	createInstanceContext: createInstanceContext,
-	reset: reset,
-	init: init$2
+	createInstanceContext: createInstanceContext
 });
 
 /*
@@ -12505,7 +12470,7 @@ function callTasks (app, tasks) {
  * @param  {string} code
  * @param  {object} data
  */
-function init$3 (app, code, data, services) {
+function init$2 (app, code, data, services) {
   console.debug('[JS Framework] Intialize an instance with:\n', data);
   var result;
 
@@ -12961,7 +12926,7 @@ var instanceMap$1 = {};
  * @param  {object} data
  * @param  {object} info { created, ... services }
  */
-function createInstance$2 (id, code, options, data, info) {
+function createInstance$1 (id, code, options, data, info) {
   var ref = info || {};
   var services = ref.services;
   resetTarget();
@@ -12973,7 +12938,7 @@ function createInstance$2 (id, code, options, data, info) {
   if (!instance) {
     instance = new App$1(id, options);
     instanceMap$1[id] = instance;
-    result = init$3(instance, code, data, services);
+    result = init$2(instance, code, data, services);
   }
   else {
     result = new Error(("invalid instance id \"" + id + "\""));
@@ -13003,7 +12968,7 @@ function createInstance$2 (id, code, options, data, info) {
  * Init config informations for Weex framework
  * @param  {object} cfg
  */
-function init$4 (cfg) {
+function init$3 (cfg) {
   config$1.Document = cfg.Document;
   config$1.Element = cfg.Element;
   config$1.Comment = cfg.Comment;
@@ -13212,7 +13177,7 @@ function receiveTasks$1 (id, tasks) {
  * @param  {string} id
  * @return {object} a virtual dom tree
  */
-function getRoot$2 (id) {
+function getRoot$1 (id) {
   var instance = instanceMap$1[id];
   var result;
   /* istanbul ignore else */
@@ -13262,12 +13227,12 @@ var Weex = Object.freeze({
 	registerComponents: registerComponents,
 	registerModules: registerModules,
 	registerMethods: registerMethods,
-	createInstance: createInstance$2,
-	init: init$4,
+	createInstance: createInstance$1,
+	init: init$3,
 	refreshInstance: refreshInstance$1,
 	destroyInstance: destroyInstance$2,
 	receiveTasks: receiveTasks$1,
-	getRoot: getRoot$2
+	getRoot: getRoot$1
 });
 
 var framework_weex = createCommonjsModule(function (module) {
@@ -22032,7 +21997,7 @@ var frameworks = {
   Weex: Weex
 };
 
-var subversion = {"browser":"0.5.0","framework":"0.23.4-beta.0","vue-render":"0.12.24","transformer":">=0.1.5 <0.5"};
+var subversion = {"browser":"0.5.0","framework":"0.23.4","vue-render":"0.12.26","transformer":">=0.1.5 <0.5"};
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24152,7 +24117,7 @@ function getHookKey (componentId, type, hookName) {
  * callback through the callback id we have passed before.
  */
 var CallbackManager = function CallbackManager (instanceId) {
-  this.instanceId = instanceId;
+  this.instanceId = String(instanceId);
   this.lastCallbackId = 0;
   this.callbacks = {};
   this.hooks = {};
@@ -24181,7 +24146,7 @@ CallbackManager.prototype.triggerHook = function triggerHook (componentId, type,
   // TODO: validate arguments
   var key = getHookKey(componentId, type, hookName);
   var hookFunction = this.hooks[key];
-  if (typeof hookFunction === 'function') {
+  if (typeof hookFunction !== 'function') {
     console.error(("[JS Framework] Invalid hook function type (" + (typeof hookFunction) + ") on \"" + key + "\"."));
     return null
   }
@@ -24631,74 +24596,6 @@ function getWeexElement (type) {
  * under the License.
  */
 
-// match the binding delimiter
-var delimiterRE = /\[\[((?:.|\n)+?)\]\]/g;
-
-function generateBinding (text) {
-  if (typof$1(text) === 'String') {
-    return { '@binding': text }
-  }
-  return text
-}
-
-function parseString (string) {
-  var tokens = [];
-  var lastIndex = delimiterRE.lastIndex = 0;
-  var match, index;
-  while ((match = delimiterRE.exec(string))) {
-    index = match.index;
-    if (index > lastIndex) {
-      tokens.push(string.slice(lastIndex, index));
-    }
-    var binding = generateBinding(match[1].trim());
-    tokens.push(binding);
-    lastIndex = index + match[0].length;
-  }
-  if (lastIndex < string.length) {
-    tokens.push(string.slice(lastIndex));
-  }
-  if (tokens.length === 1) {
-    return tokens[0]
-  }
-  return tokens
-}
-
-function filterDirective (value) {
-  if (typof$1(value) === 'String' && delimiterRE.test(value)) {
-    return parseString(value)
-  }
-  if (typof$1(value) === 'Object') {
-    var realData = {};
-    for (var key in value) {
-      realData[key] = filterDirective(value[key]);
-    }
-    return realData
-  }
-  if (typof$1(value) === 'Array') {
-    return value.map(filterDirective)
-  }
-  return value
-}
-
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 var DEFAULT_TAG_NAME = 'div';
 var BUBBLE_EVENTS = [
   'click', 'longpress', 'touchstart', 'touchmove', 'touchend',
@@ -24962,7 +24859,7 @@ var Element = (function (Node$$1) {
     var taskCenter = getTaskCenter(this.docId);
     if (!silent && taskCenter) {
       var result = {};
-      result[key] = filterDirective(value);
+      result[key] = value;
       taskCenter.send(
         'dom',
         { action: 'updateAttrs' },
@@ -25148,7 +25045,7 @@ var Element = (function (Node$$1) {
     var result = {
       ref: this.ref.toString(),
       type: this.type,
-      attr: filterDirective(this.attr),
+      attr: this.attr,
       style: this.toStyle()
     };
     var event = [];
@@ -25213,7 +25110,7 @@ var fallback = function () {};
 var TaskCenter = function TaskCenter (id, sendTasks) {
   Object.defineProperty(this, 'instanceId', {
     enumerable: true,
-    value: id
+    value: String(id)
   });
   Object.defineProperty(this, 'callbackManager', {
     enumerable: true,
@@ -25240,6 +25137,10 @@ TaskCenter.prototype.triggerHook = function triggerHook () {
 
   return (ref = this.callbackManager).triggerHook.apply(ref, args)
     var ref;
+};
+
+TaskCenter.prototype.updateData = function updateData (componentId, newData) {
+  this.callModule('dom', 'updateComponentData', [newData]);
 };
 
 TaskCenter.prototype.destroyCallback = function destroyCallback () {
@@ -25299,7 +25200,7 @@ TaskCenter.prototype.callModule = function callModule (module, method, args, opt
   return this.moduleHandler(this.instanceId, module, method, args, options)
 };
 
-function init$6 () {
+function init$5 () {
   var DOM_METHODS = {
     createFinish: global.callCreateFinish,
     updateFinish: global.callUpdateFinish,
@@ -25389,12 +25290,14 @@ function componentHook (document, componentId, type, hook, options) {
 function receiveTasks$2 (id, tasks) {
   var document = getDoc(id);
   if (!document) {
-    return new Error(("Invalid instance id \"" + id + "\", failed the receive tasks."))
+    return new Error("[JS Framework] Failed to receiveTasks, "
+      + "instance (" + id + ") is not available.")
   }
   if (Array.isArray(tasks)) {
     return tasks.map(function (task) {
       switch (task.method) {
         case 'callback': return callback$2.apply(void 0, [ document ].concat( task.args ))
+        case 'fireEventSync':
         case 'fireEvent': return fireEvent$2.apply(void 0, [ document ].concat( task.args ))
         case 'componentHook': return componentHook.apply(void 0, [ document ].concat( task.args ))
       }
@@ -25608,31 +25511,29 @@ function indexOf (name) {
  * under the License.
  */
 
-function createTracker (id, options) {
-  if ( options === void 0 ) options = {};
-
+function track (id, type, value) {
   var taskCenter = getTaskCenter(id);
   if (!taskCenter || typeof taskCenter.send !== 'function') {
     console.error("[JS Framework] Failed to create tracker!");
-    return function () {}
+    return
   }
-  return function WeexJSFrameworkTracker (type, value) {
-    if (type && value) {
-      var label = "jsfm." + type + "." + value;
-      try {
-        if (isRegisteredModule('userTrack', 'addPerfPoint')) {
-          var message = Object.create(null);
-          message[label] = '4';
-          taskCenter.send('module', {
-            module: 'userTrack',
-            method: 'addPerfPoint'
-          }, [message], options);
-        }
-      }
-      catch (err) {
-        console.error(("[JS Framework] Failed to trace \"" + label + "\"!"));
-      }
+  if (!type || !value) {
+    console.warn(("[JS Framework] Invalid track type (" + type + ") or value (" + value + ")"));
+    return
+  }
+  var label = "jsfm." + type + "." + value;
+  try {
+    if (isRegisteredModule('userTrack', 'addPerfPoint')) {
+      var message = Object.create(null);
+      message[label] = '4';
+      taskCenter.send('module', {
+        module: 'userTrack',
+        method: 'addPerfPoint'
+      }, [message]);
     }
+  }
+  catch (err) {
+    console.error(("[JS Framework] Failed to trace \"" + label + "\"!"));
   }
 }
 
@@ -26161,7 +26062,7 @@ Document.prototype.fireEvent = function fireEvent (el, type, event, domChanges, 
     return
   }
   event = event || {};
-  event.type = type;
+  event.type = event.type || type;
   event.target = el;
   event.currentTarget = el;
   event.timestamp = Date.now();
@@ -26215,7 +26116,12 @@ function getId (weex) {
   return weex['[[CurrentInstanceId]]']
 }
 
-function moduleGetter$1 (module, method, taskCenter) {
+function moduleGetter$1 (id, module, method) {
+  var taskCenter = getTaskCenter(id);
+  if (!taskCenter || typeof taskCenter.send !== 'function') {
+    console.error(("[JS Framework] Failed to find taskCenter (" + id + ")."));
+    return null
+  }
   return function () {
     var args = [], len = arguments.length;
     while ( len-- ) args[ len ] = arguments[ len ];
@@ -26224,8 +26130,21 @@ function moduleGetter$1 (module, method, taskCenter) {
   }
 }
 
+function moduleSetter$1 (id, module, method, fn) {
+  var taskCenter = getTaskCenter(id);
+  if (!taskCenter || typeof taskCenter.send !== 'function') {
+    console.error(("[JS Framework] Failed to find taskCenter (" + id + ")."));
+    return null
+  }
+  if (typeof fn !== 'function') {
+    console.error(("[JS Framework] " + module + "." + method + " must be assigned as a function."));
+    return null
+  }
+  return function (fn) { return taskCenter.send('module', { module: module, method: method }, [fn]); }
+}
+
 var WeexInstance = function WeexInstance (id, config) {
-  setId$1(this, id);
+  setId$1(this, String(id));
   this.config = config || {};
   this.document = new Document(id, this.config.bundleUrl);
   this.requireModule = this.requireModule.bind(this);
@@ -26236,7 +26155,8 @@ var WeexInstance = function WeexInstance (id, config) {
 WeexInstance.prototype.requireModule = function requireModule (moduleName) {
   var id = getId(this);
   if (!(id && this.document && this.document.taskCenter)) {
-    console.error(("[JS Framework] invalid instance id \"" + id + "\""));
+    console.error("[JS Framework] Failed to requireModule(\"" + moduleName + "\"), "
+      + "instance (" + id + ") doesn't exist anymore.");
     return
   }
 
@@ -26247,25 +26167,17 @@ WeexInstance.prototype.requireModule = function requireModule (moduleName) {
   }
 
   // create new module proxy
-  if (!moduleProxies[moduleName]) {
-    var moduleDefine = getModuleDescription(moduleName);
-    var taskCenter = this.document.taskCenter;
-
+  var proxyName = moduleName + "#" + id;
+  if (!moduleProxies[proxyName]) {
     // create registered module apis
+    var moduleDefine = getModuleDescription(moduleName);
     var moduleApis = {};
     var loop = function ( methodName ) {
       Object.defineProperty(moduleApis, methodName, {
         enumerable: true,
         configurable: true,
-        get: function () { return moduleGetter$1(moduleName, methodName, taskCenter); },
-        set: function set (fn) {
-          if (typeof fn === 'function') {
-            return taskCenter.send('module', {
-              module: moduleName,
-              method: methodName
-            }, [fn])
-          }
-        }
+        get: function () { return moduleGetter$1(id, moduleName, methodName); },
+        set: function (fn) { return moduleSetter$1(id, moduleName, methodName, fn); }
       });
     };
 
@@ -26273,22 +26185,22 @@ WeexInstance.prototype.requireModule = function requireModule (moduleName) {
 
     // create module Proxy
     if (typeof Proxy === 'function') {
-      moduleProxies[moduleName] = new Proxy(moduleApis, {
+      moduleProxies[proxyName] = new Proxy(moduleApis, {
         get: function get (target, methodName) {
           if (methodName in target) {
             return target[methodName]
           }
           console.warn(("[JS Framework] using unregistered method \"" + moduleName + "." + methodName + "\""));
-          return moduleGetter$1(moduleName, methodName, taskCenter)
+          return moduleGetter$1(id, moduleName, methodName)
         }
       });
     }
     else {
-      moduleProxies[moduleName] = moduleApis;
+      moduleProxies[proxyName] = moduleApis;
     }
   }
 
-  return moduleProxies[moduleName]
+  return moduleProxies[proxyName]
 };
 
 WeexInstance.prototype.supports = function supports (condition) {
@@ -26307,8 +26219,6 @@ WeexInstance.prototype.supports = function supports (condition) {
 
   return null
 };
-
-Object.freeze(WeexInstance);
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -26383,31 +26293,32 @@ function getFrameworkType (id) {
   return instanceTypeMap[id]
 }
 
-function createInstanceContext$1 (id, config) {
-  if ( config === void 0 ) config = {};
+function createInstanceContext$1 (id, options, data) {
+  if ( options === void 0 ) options = {};
 
-  var weex = new WeexInstance(id, config);
-  var tracker = createTracker(id);
+  var weex = new WeexInstance(id, options);
   Object.freeze(weex);
 
-  var bundleType = config.bundleType;
-  var services$$1 = createServices(id, { weex: weex, bundleType: bundleType }, runtimeConfig);
-  Object.freeze(services$$1);
-
-  var runtimeContext = Object.create(null);
-  Object.assign(runtimeContext, services$$1, { weex: weex });
-  Object.freeze(runtimeContext);
-
+  var bundleType = options.bundleType || 'Vue';
   var framework = runtimeConfig.frameworks[bundleType];
   if (!framework) {
     return new Error(("invalid bundle type \"" + bundleType + "\"."))
   }
-  tracker('bundleType', bundleType);
+  track(id, 'bundleType', bundleType);
 
+  // prepare js service
+  var services$$1 = createServices(id, { weex: weex, bundleType: bundleType }, runtimeConfig);
+  Object.freeze(services$$1);
+
+  // prepare runtime context
+  var runtimeContext = Object.create(null);
+  Object.assign(runtimeContext, services$$1, { weex: weex });
+  Object.freeze(runtimeContext);
+
+  // prepare instance context
   var instanceContext = Object.create(runtimeContext);
-  // run create instance
   if (typeof framework.createInstanceContext === 'function') {
-    Object.assign(instanceContext, framework.createInstanceContext(id, runtimeContext));
+    Object.assign(instanceContext, framework.createInstanceContext(id, runtimeContext, data));
   }
   Object.freeze(instanceContext);
   return instanceContext
@@ -26421,7 +26332,7 @@ function createInstanceContext$1 (id, config) {
  * @param {object} config
  * @param {object} data
  */
-function createInstance$3 (id, code, config, data) {
+function createInstance$2 (id, code, config, data) {
   if (instanceTypeMap[id]) {
     return new Error(("Thi instance id \"" + id + "\" has already been used!"))
   }
@@ -26447,11 +26358,11 @@ function createInstance$3 (id, code, config, data) {
       + "Please upgrade it to Vue.js or Rax.");
   }
 
-  var instanceContext = createInstanceContext$1(id, config);
+  var instanceContext = createInstanceContext$1(id, config, data);
   if (typeof framework.createInstance === 'function') {
     return framework.createInstance(id, code, config, data, instanceContext)
   }
-  console.error(("[JS Framework] Can't find available \"createInstance\" method in " + bundleType + "!"));
+  // console.error(`[JS Framework] Can't find available "createInstance" method in ${bundleType}!`)
   runInContext(code, instanceContext);
 }
 
@@ -26468,13 +26379,33 @@ function runInContext (code, context) {
     args.push(context[key]);
   }
 
-  var bundle = "\n    (function (global) {\n      \"use strict\";\n      " + code + "\n    })(Object.create(this))\n  ";
+  var bundle = "\n    (function (global) {\n      " + code + "\n    })(Object.create(this))\n  ";
 
   return (new (Function.prototype.bind.apply( Function, [ null ].concat( keys, [bundle]) ))).apply(void 0, args)
 }
 
+/**
+ * Get the JSON object of the root element.
+ * @param {string} instanceId
+ */
+function getRoot$2 (instanceId) {
+  var document = getDoc(instanceId);
+  try {
+    if (document && document.body) {
+      return document.body.toJSON()
+    }
+  }
+  catch (e) {
+    console.error("[JS Framework] Failed to get the virtual dom tree.");
+    return
+  }
+}
+
 var methods$1 = {
-  createInstance: createInstance$3,
+  createInstance: createInstance$2,
+  createInstanceContext: createInstanceContext$1,
+  getRoot: getRoot$2,
+  getDocument: getDoc,
   registerService: register$2,
   unregisterService: unregister,
   callJS: function callJS (id, tasks) {
@@ -26551,24 +26482,29 @@ function adaptMethod (methodName, sharedMethod) {
   };
 }
 
-function init$5 (config) {
+function init$4 (config) {
   runtimeConfig = config || {};
   frameworks$1 = runtimeConfig.frameworks || {};
-  init$6();
+  init$5();
 
   // Init each framework by `init` method and `config` which contains three
   // virtual-DOM Class: `Document`, `Element` & `Comment`, and a JS bridge method:
   // `sendTasks(...args)`.
   for (var name in frameworks$1) {
     var framework = frameworks$1[name];
-    framework.init(config);
+    if (typeof framework.init === 'function') {
+      try {
+        framework.init(config);
+      }
+      catch (e) {}
+    }
   }
 
   adaptMethod('registerComponents', registerComponents$1);
   adaptMethod('registerModules', registerModules$1);
   adaptMethod('registerMethods')
 
-  ; ['destroyInstance', 'refreshInstance', 'getRoot'].forEach(genInstance);
+  ; ['destroyInstance', 'refreshInstance'].forEach(genInstance);
 
   return methods$1
 }
@@ -26673,7 +26609,7 @@ var runtime = {
   resetNativeTimer: resetNativeTimer,
   service: { register: register$2, unregister: unregister, has: has$5 },
   freezePrototype: freezePrototype$$1,
-  init: init$5,
+  init: init$4,
   config: config$2
 };
 
@@ -26905,8 +26841,8 @@ var setup = function (frameworks) {
     runtime.service.register(serviceName, services$1[serviceName]);
   }
 
-  // runtime.freezePrototype()
-  // runtime.setNativeConsole()
+  runtime.freezePrototype();
+  runtime.setNativeConsole();
 
   // register framework meta info
   global.frameworkVersion = native;

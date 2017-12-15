@@ -27,7 +27,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.WXLoadingLayout;
 import com.taobao.weex.ui.view.WXRefreshLayout;

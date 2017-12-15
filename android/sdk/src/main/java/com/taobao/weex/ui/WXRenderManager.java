@@ -24,9 +24,7 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -101,29 +99,29 @@ public class WXRenderManager {
     }));
   }
 
-  public void runOnThread(final String instanceId, final RenderAction action) {
-    mWXRenderHandler.post(WXThread.secure(new Runnable() {
-
-      @Override
-      public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
-        }
-        action.executeRender(getRenderContext(instanceId));
-      }
-    }));
-  }
+//  public void runOnThread(final String instanceId, final RenderAction action) {
+//    mWXRenderHandler.post(WXThread.secure(new Runnable() {
+//
+//      @Override
+//      public void run() {
+//        if (mRegistries.get(instanceId) == null) {
+//          return;
+//        }
+//        action.executeRender(getRenderContext(instanceId));
+//      }
+//    }));
+//  }
 
   public void registerInstance(WXSDKInstance instance) {
     mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
   }
 
-  public void setLayout(String instanceId, String ref, WXDomObject domObject) {
+  public void setLayout(String instanceId, String ref, WXComponent component) {
     RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
-    statement.setLayout(ref, domObject);
+    statement.setLayout(ref, component);
   }
 
   /**

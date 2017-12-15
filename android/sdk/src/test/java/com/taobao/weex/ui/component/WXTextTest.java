@@ -23,9 +23,6 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.SimpleComponentHolder;
 
 import org.junit.Before;

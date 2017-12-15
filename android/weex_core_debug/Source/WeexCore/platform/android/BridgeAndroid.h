@@ -3,9 +3,6 @@
 
 #include "../../bridge/Bridge.h"
 #include "WeexCore.h"
-#include <string>
-#include <map>
-#include <set>
 
 namespace WeexCore {
 
@@ -56,29 +53,15 @@ namespace WeexCore {
     void callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
                              jbyteArray &jArgString, jbyteArray &jOptString);
 
-    int callAddElement(jstring &jInstanceId, jstring &jref, jbyteArray &jdomString,
-                       jstring &jindex, jstring &jCallback);
-
     void setTimeout(jstring &jCallbackID, jstring &jTime);
 
     void callNativeLog(jbyteArray &str_msg);
 
-    int callCreateBody(jstring &instanceId, jbyteArray &taskString, jstring &callback);
-
     int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
-                         jstring &callback);
-
-    int callCreateFinish(jstring &instanceId, jbyteArray &taskString,
                          jstring &callback);
 
     int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                           jstring &callback);
-
-    int callUpdateAttrs(jstring &instanceId, jstring &ref,
-                        jbyteArray &taskString, jstring &callback);
-
-    int callUpdateStyle(jstring &instanceId, jstring &ref,
-                        jbyteArray &taskString, jstring &callback);
 
     int callRemoveElement(jstring &instanceId, jstring &ref,
                           jstring &callback);
@@ -93,8 +76,6 @@ namespace WeexCore {
                         jstring &ref, jstring &event, jstring &callback);
 
     int callCreateBodyByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int top,
-                                 int bottom, int left, int right, int height, int width,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
                                  std::set<std::string> *events,
@@ -103,8 +84,7 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *borders);
 
     int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int top,
-                                 int bottom, int left, int right, int height, int width, int index,
+                                 int index,
                                  std::string parentRef,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
@@ -113,13 +93,20 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *margins,
                                  std::map<std::string, std::string> *borders);
 
-    int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref, std::string &key,
-                                  std::string &value);
-
     int callLayoutByWeexCore(std::string &pageId, std::string &ref,
-                               int top, int bottom, int left, int right,
-                               int height, int width);
+                             int top, int bottom, int left, int right,
+                             int height, int width);
 
+    int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
+                                  std::vector<std::pair<std::string, std::string> *> *style,
+                                  std::vector<std::pair<std::string, std::string> *> *margin,
+                                  std::vector<std::pair<std::string, std::string> *> *padding,
+                                  std::vector<std::pair<std::string, std::string> *> *border);
+
+    int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
+                                                 std::vector<std::pair<std::string, std::string> *> *attrs);
+
+    int callCreateFinishByWeexCore(std::string &pageId);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

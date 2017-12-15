@@ -26,7 +26,7 @@ import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.ui.action.WXUIAction;
+import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
@@ -48,11 +48,11 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
 
 
     @Deprecated
-    public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, WXUIAction action) {
+    public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
         this(instance,parent,isLazy,action);
     }
 
-    public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, WXUIAction action) {
+    public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
         super(instance, parent,true ,action);
     }
 

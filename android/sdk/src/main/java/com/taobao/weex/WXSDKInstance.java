@@ -24,7 +24,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -57,17 +56,12 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
-import com.taobao.weex.dom.DomContext;
-import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -91,7 +85,7 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
+public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
 
   //Performance
   public boolean mEnd = false;
@@ -139,8 +133,6 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
    * whether we are in preRender mode
    * */
   private volatile boolean isPreRenderMode;
-
-  private LayoutFinishListener mLayoutFinishListener;
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
@@ -517,11 +509,6 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
     return mRenderStrategy;
   }
 
-  @Override
-  public Context getUIContext() {
-    return mContext;
-  }
-
   public String getInstanceId() {
     return mInstanceId;
   }
@@ -607,15 +594,6 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
   }
-
-  public void setLayoutFinishListener(@Nullable LayoutFinishListener listener) {
-    this.mLayoutFinishListener = listener;
-  }
-
-  public LayoutFinishListener getLayoutFinishListener() {
-    return this.mLayoutFinishListener;
-  }
-
 
   /**set render start time*/
   public void setRenderStartTime(long renderStartTime) {
@@ -1192,17 +1170,17 @@ public class WXSDKInstance implements DomContext, View.OnLayoutChangeListener, W
   }
 
   private void updateRootComponentStyle(JSONObject style) {
-    Message message = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = getInstanceId();
-    if (task.args == null) {
-      task.args = new ArrayList<>();
-    }
-    task.args.add(WXDomObject.ROOT);
-    task.args.add(style);
-    message.obj = task;
-    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+//    Message message = Message.obtain();
+//    WXDomTask task = new WXDomTask();
+//    task.instanceId = getInstanceId();
+//    if (task.args == null) {
+//      task.args = new ArrayList<>();
+//    }
+//    task.args.add(WXComponent.ROOT);
+//    task.args.add(style);
+//    message.obj = task;
+//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 
   public void setSize(int width, int height) {

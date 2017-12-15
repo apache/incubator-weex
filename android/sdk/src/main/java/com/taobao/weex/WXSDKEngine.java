@@ -46,16 +46,6 @@ import com.taobao.weex.common.TypeModuleFactory;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.BasicEditTextDomObject;
-import com.taobao.weex.dom.TextAreaEditTextDomObject;
-import com.taobao.weex.dom.WXCellDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXListDomObject;
-import com.taobao.weex.dom.WXRecyclerDomObject;
-import com.taobao.weex.dom.WXScrollerDomObject;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -260,22 +250,6 @@ public class WXSDKEngine {
       registerModule("picker", WXPickersModule.class);
       registerModule("meta", WXMetaModule.class,true);
       registerModule("webSocket", WebSocketModule.class);
-
-
-      registerDomObject(simpleList, WXListDomObject.class);
-      registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
-      registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.HEADER, WXCellDomObject.class);
-      registerDomObject(WXBasicComponentType.CELL, WXCellDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, BasicEditTextDomObject.class);
-      registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
-      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
-      registerDomObject(WXBasicComponentType.LIST, WXListDomObject.class);
-      registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
-      registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
-      registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
-      registerDomObject(WXBasicComponentType.RECYCLER, WXRecyclerDomObject.class);
-      registerDomObject(WXBasicComponentType.WATERFALL, WXRecyclerDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
@@ -385,10 +359,6 @@ public class WXSDKEngine {
     public DestroyableModuleFactory(Class<T> clz) {
       super(clz);
     }
-  }
-
-  public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
-    return WXDomRegistry.registerDomObject(type, clazz);
   }
 
   public static void callback(String instanceId, String funcId, Map<String, Object> data) {

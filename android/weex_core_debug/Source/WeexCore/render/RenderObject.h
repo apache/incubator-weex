@@ -13,6 +13,10 @@ namespace WeexCore {
 
   class RenderPage;
 
+  typedef enum StyleType {
+    TypeStyle, TypeLayout, TypeMargin, TypePadding, TypeBorder
+  } Style_Type;
+
   typedef std::map<std::string, std::string>::const_iterator STYLE_IT;
   typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
   typedef std::set<std::string>::const_iterator EVENT_IT;
@@ -59,19 +63,19 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void bindComponent_Impl_Android(jobject component_Impl_Android);
+    bool bindComponent_Impl_Android(jobject component_Impl_Android);
 
-    void bindComponent_Impl_iOS(void *component_Impl_iOS);
+    bool bindComponent_Impl_iOS(void *component_Impl_iOS);
 
-    void bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
+    bool bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
 
-    void bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
+    bool bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
 
     void onLayoutBefore();
 
     void onLayoutAfter(float width, float height);
 
-    void applyStyle(std::string key, std::string value);
+    StyleType applyStyle(std::string key, std::string value);
 
     void printRenderMsg();
 
@@ -90,8 +94,18 @@ namespace WeexCore {
     }
 
     inline void addRenderObject(int index, RenderObject *child) {
-      // insert RenderObject child
-      addChildAt(child, getChildCount());
+
+      if (child == nullptr || index < -1) {
+        return;
+      }
+
+      int count = getChildCount();
+      index = index >= count ? -1 : index;
+      if (index == -1) {
+        addChildAt(child, getChildCount());
+      } else {
+        addChildAt(child, index);
+      }
     }
 
     inline void removeRenderObject(RenderObject *child) {
@@ -102,20 +116,8 @@ namespace WeexCore {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    inline void addAttr(std::map<std::string, std::string> attr) {
-//      mAttributes->insert(attr);
-    }
-
-    inline void addStyle(std::string key, std::string value) {
-      applyStyle(key, value);
-    }
-
-    inline void addStyle(std::map<std::string, std::string> style) {
-      STYLE_IT style_begin = style.begin();
-      STYLE_IT style_end = style.end();
-      for (; style_begin != style_end; ++style_begin) {
-        applyStyle(style_begin->first, style_begin->second);
-      }
+    inline StyleType addStyle(std::string key, std::string value) {
+      return applyStyle(key, value);
     }
 
     inline void addEvent(std::string event) {

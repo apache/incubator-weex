@@ -38,7 +38,6 @@ import com.taobao.weex.bridge.WXHashMap;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import java.lang.annotation.Retention;
@@ -155,12 +154,12 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void postOrHoldMessage(@MessageType final int what,final int funcId,final int interval,final int instanceId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
-        @Override
-        public void run() {
-          postMessage(what,funcId,interval,instanceId);
-        }
-      }),false);
+//      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
+//        @Override
+//        public void run() {
+//          postMessage(what,funcId,interval,instanceId);
+//        }
+//      }),false);
     } else {
       postMessage(what,funcId,interval,instanceId);
     }
@@ -168,12 +167,12 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void removeOrHoldMessage(@MessageType final int what,final int funcId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
-        @Override
-        public void run() {
-          handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
-        }
-      }),false);
+//      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
+//        @Override
+//        public void run() {
+//          handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
+//        }
+//      }),false);
     } else {
       handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
     }

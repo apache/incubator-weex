@@ -18,11 +18,22 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 
-public class LayoutUIAction extends WXUIAction {
+public class LayoutUIAction extends BasicUIAction {
+
+  private String mPageId = null;
+  private String mRef = null;
+  private WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
+  private WXUISize mLayoutSize = new WXUISize(0, 0);
+
+  public LayoutUIAction(String pageId, String ref, WXUIPosition layoutPosition, WXUISize layoutSize) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mLayoutPosition = layoutPosition;
+    this.mLayoutSize = layoutSize;
+  }
 
   @Override
   public void executeAction() {
@@ -31,8 +42,24 @@ public class LayoutUIAction extends WXUIAction {
       return;
     }
 
-    component.updateDemission(this);
+    component.updateDemission(mLayoutSize, mLayoutPosition);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
+  }
+
+  public String getPageId() {
+    return mPageId;
+  }
+
+  public String getRef() {
+    return mRef;
+  }
+
+  public WXUIPosition getLayoutPosition() {
+    return mLayoutPosition;
+  }
+
+  public WXUISize getLayoutSize() {
+    return mLayoutSize;
   }
 }

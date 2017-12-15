@@ -6,10 +6,10 @@
 //     /Users/miomin/Desktop/workspace/alibaba/WeexCore-dev/WeexCore-
 //    dev/android/weex_core_debug/Source/prebuild/jni_generator.py
 // For
-//     com/taobao/weex/ui/layout/MeasureSize
+//     com/taobao/weex/layout/MeasureSize
 
-#ifndef com_taobao_weex_ui_layout_MeasureSize_JNI
-#define com_taobao_weex_ui_layout_MeasureSize_JNI
+#ifndef com_taobao_weex_layout_MeasureSize_JNI
+#define com_taobao_weex_layout_MeasureSize_JNI
 
 #include <jni.h>
 
@@ -17,7 +17,7 @@
 
 // Step 1: forward declarations.
 namespace {
-const char kMeasureSizeClassPath[] = "com/taobao/weex/ui/layout/MeasureSize";
+const char kMeasureSizeClassPath[] = "com/taobao/weex/layout/MeasureSize";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
 jclass g_MeasureSize_clazz = NULL;
 #define MeasureSize_clazz(env) g_MeasureSize_clazz
@@ -82,4 +82,4 @@ static bool RegisterNativesImpl(JNIEnv* env) {
   return true;
 }
 
-#endif  // com_taobao_weex_ui_layout_MeasureSize_JNI
+#endif  // com_taobao_weex_layout_MeasureSize_JNI
