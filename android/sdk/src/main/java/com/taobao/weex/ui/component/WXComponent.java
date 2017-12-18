@@ -1526,6 +1526,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
+    // TODO
 //    Message message = Message.obtain();
 //    WXDomTask task = new WXDomTask();
 //    task.instanceId = getInstanceId();
@@ -1577,6 +1578,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * Trigger a applyStyles invoke to relayout current page
    */
   public void notifyNativeSizeChanged(int w, int h) {
+    // TODO
 //    if (!mNeedLayoutOnAnimation) {
 //      return;
 //    }

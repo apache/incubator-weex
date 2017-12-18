@@ -60,6 +60,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, AbstractAddElementUIAction action) {
     super(instance, parent,action);
+    // TODO
 //    if (node != null && node instanceof WXRecyclerDomObject) {
 //      mDomObject = (WXRecyclerDomObject) node;
 //      mDomObject.preCalculateCellWidth();
@@ -87,6 +88,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       return;
     }
     setRefreshOrLoading(child);
+    // TODO
 
     // Synchronize DomObject's attr to Component and Native View
 //    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
@@ -133,6 +135,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   private void updateRecyclerAttr(){
+    // TODO
+
 //    mColumnCount = mDomObject.getColumnCount();
 //    mColumnGap = mDomObject.getColumnGap();
 //    mColumnWidth = mDomObject.getColumnWidth();
@@ -142,6 +146,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnCount)  {
+    // TODO
 //    if(mDomObject.getColumnWidth() != mColumnWidth){
 //      markComponentUsable();
 //      updateRecyclerAttr();
@@ -152,6 +157,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
+    // TODO
 //    if(mDomObject.getColumnCount() != mColumnCount){
 //      markComponentUsable();
 //      updateRecyclerAttr();
@@ -162,6 +168,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
+    // TODO
 //    if(mDomObject.getColumnGap() != mColumnGap) {
 //      markComponentUsable();
 //      updateRecyclerAttr();
@@ -182,7 +189,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     if(props.containsKey(Constants.Name.PADDING)
             ||props.containsKey(Constants.Name.PADDING_LEFT)
             || props.containsKey(Constants.Name.PADDING_RIGHT)){
-
+      // TODO
 //      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
 //              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
 

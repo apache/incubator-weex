@@ -76,6 +76,4 @@ public class AddElementUIAction extends AbstractAddElementUIAction {
       WXLogUtils.e("add component failed.", e);
     }
   }
-
-
 }

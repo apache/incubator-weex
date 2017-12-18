@@ -31,6 +31,7 @@ public class WXAnimationModule extends WXModule {
   @JSMethod
   public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
     if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
+      // TODO
 //      DOMAction animationActions = getAnimationAction(ref, animation, callBack);
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
@@ -47,6 +48,7 @@ public class WXAnimationModule extends WXModule {
     private String callback;
 
     public void execute(WXSDKInstance mInstance, WXComponent component) {
+      // TODO
 //      RenderAction action = Actions.getAnimationAction(component.getRef(), wxAnimationBean, callback);
 //      WXSDKManager.getInstance().getWXRenderManager().runOnThread(mInstance.getInstanceId(), action);
     }

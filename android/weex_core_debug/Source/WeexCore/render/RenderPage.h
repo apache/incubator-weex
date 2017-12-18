@@ -53,6 +53,7 @@ namespace WeexCore {
 
     void sendCreateFinishAction();
 
+    // TODO 和 SDKInstance 生命周期绑定
     jobject mInstance_Impl_Android;
 
     void *mInstance_Impl_iOS;

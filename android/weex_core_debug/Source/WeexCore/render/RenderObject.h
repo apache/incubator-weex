@@ -51,6 +51,7 @@ namespace WeexCore {
 
     EVENTS_SET *mEvents;
 
+    // TODO 和 WXComponent 绑定
     jobject mComponent_Impl_Android;
 
     jobject mMeasureFunc_Impl_Android;

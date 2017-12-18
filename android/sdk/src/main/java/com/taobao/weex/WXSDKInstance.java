@@ -1170,6 +1170,7 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
   }
 
   private void updateRootComponentStyle(JSONObject style) {
+    // TODO
 //    Message message = Message.obtain();
 //    WXDomTask task = new WXDomTask();
 //    task.instanceId = getInstanceId();
@@ -1206,6 +1207,7 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
           return;
         }
         rootComponent.applyLayoutAndEvent(rootComponent);
+        // TODO
 //        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
 //        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
 //        updateRootComponentStyle(style);
