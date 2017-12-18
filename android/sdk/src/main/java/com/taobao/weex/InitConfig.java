@@ -22,6 +22,7 @@ import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXNativeExceptionAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -41,6 +42,7 @@ public class InitConfig {
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
+  private IWXNativeExceptionAdapter mNativeExceptionAdapter;
   private String framework;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -83,6 +85,10 @@ public class InitConfig {
     return mJSExceptionAdapter;
   }
 
+  public IWXNativeExceptionAdapter getNativeExceptionAdapter(){
+    return mNativeExceptionAdapter;
+  }
+
   private InitConfig() {
   }
 
@@ -95,6 +101,7 @@ public class InitConfig {
     IWXSoLoaderAdapter soLoader;
     URIAdapter mURIAdapter;
     IWXJSExceptionAdapter mJSExceptionAdapter;
+    IWXNativeExceptionAdapter mWxNativeExceptionAdapter;
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
     public Builder(){
@@ -136,6 +143,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setNativeExceptionAdapter(IWXNativeExceptionAdapter nativeExceptionAdapter){
+      mWxNativeExceptionAdapter = nativeExceptionAdapter;
+      return this;
+    }
+
     public Builder setSoLoader(IWXSoLoaderAdapter loader) {
       this.soLoader = loader;
       return this;
@@ -163,6 +175,7 @@ public class InitConfig {
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       config.mJSExceptionAdapter=this.mJSExceptionAdapter;
+      config.mNativeExceptionAdapter = this.mWxNativeExceptionAdapter;
       return config;
     }
   }

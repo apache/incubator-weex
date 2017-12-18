@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXNativeExceptionAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -82,6 +83,7 @@ public class WXSDKManager {
   private ICrashInfoReporter mCrashInfo;
 
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
+  private IWXNativeExceptionAdapter mIWXNativeExceptionAdapter;
 
   private IWXStorageAdapter mIWXStorageAdapter;
   private IWXStatisticsListener mStatisticsListener;
@@ -331,6 +333,14 @@ public class WXSDKManager {
     mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
   }
 
+  public IWXNativeExceptionAdapter getIWXNativeExceptionAdapter(){
+    return mIWXNativeExceptionAdapter;
+  }
+
+  public void setIWXNativeExceptionAdapte(IWXNativeExceptionAdapter adapter){
+    this.mIWXNativeExceptionAdapter = adapter;
+  }
+
   public @NonNull IWXHttpAdapter getIWXHttpAdapter() {
     if (mIWXHttpAdapter == null) {
       mIWXHttpAdapter = new DefaultWXHttpAdapter();
@@ -359,6 +369,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
+    this.mIWXNativeExceptionAdapter = config.getNativeExceptionAdapter();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){
