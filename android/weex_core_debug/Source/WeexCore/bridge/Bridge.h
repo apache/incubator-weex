@@ -7,7 +7,6 @@
 #include <set>
 #include <vector>
 
-//TODO: remove platform related code
 namespace WeexCore {
 
   class Bridge {

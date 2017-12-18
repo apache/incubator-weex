@@ -518,7 +518,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
 
-  // TODO Need constrain, each container can only have one sticky child
   @Override
   public void bindStickStyle(WXComponent component) {
     stickyHelper.bindStickStyle(component,mStickyMap);

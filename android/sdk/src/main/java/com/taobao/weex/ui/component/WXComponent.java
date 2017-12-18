@@ -993,7 +993,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   protected T initComponentHostView(@NonNull Context context) {
     /**
      * compatible old initView
-     * TODO: change to abstract method in next V1.0 .
      */
     return null;
   }

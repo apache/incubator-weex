@@ -1082,7 +1082,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (instance == null || errCode == null) {
       return;
     }
-    // TODO: We should move WXPerformance and IWXUserTrackAdapter
     // into a adapter level.
     // comment out the line below to prevent commiting twice.
     //instance.commitUTStab(WXConst.JS_BRIDGE, errCode, errMsg);

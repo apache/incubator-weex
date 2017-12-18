@@ -1105,7 +1105,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private int generateViewType(WXComponent component) {
     long id;
     try {
-      // TODO default scope
       id = Integer.parseInt(component.getRef());
       String type = component.getAttrByKey("scope");
 

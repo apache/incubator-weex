@@ -33,7 +33,6 @@ namespace WeexCore {
 
   public:
 
-    //TODO: how to triggle a Frame event
     void batch();
 
     // create root node
