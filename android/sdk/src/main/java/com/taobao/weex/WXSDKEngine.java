@@ -434,7 +434,7 @@ public class WXSDKEngine {
     return registerModule(moduleName, moduleClass,false);
   }
 
-  public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
+  public static boolean registerService(String name, String serviceScript, Map<String, Object> options) {
     return WXServiceManager.registerService(name, serviceScript, options);
   }
 
