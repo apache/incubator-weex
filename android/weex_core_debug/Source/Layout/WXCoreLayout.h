@@ -15,10 +15,10 @@ namespace WeexCore {
 
   class WXCoreFlexLine;
 
-  typedef enum FormatingContext {
+  typedef enum FormattingContext {
     BFC,
     NON_BFC,
-  } FormatingContext;
+  } FormattingContext;
 
   typedef enum MeasureMode {
     AT_MOST,
@@ -450,8 +450,8 @@ namespace WeexCore {
 
     /** ================================ tree =================================== **/
 
-    inline uint32_t getChildCount(FormatingContext formatingContext) {
-      switch (formatingContext) {
+    inline uint32_t getChildCount(FormattingContext formattingContext) {
+      switch (formattingContext) {
         case NON_BFC:
           return NonBFCs.size();
         case BFC:
@@ -492,8 +492,8 @@ namespace WeexCore {
       dirty();
     }
 
-    inline WXCoreLayoutNode *getChildAt(FormatingContext formatingContext, uint32_t index) {
-      switch (formatingContext) {
+    inline WXCoreLayoutNode *getChildAt(FormattingContext formattingContext, uint32_t index) {
+      switch (formattingContext) {
         case NON_BFC:
           return NonBFCs[index];
         case BFC:
