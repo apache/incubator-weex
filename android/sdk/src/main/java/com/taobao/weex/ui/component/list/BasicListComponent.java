@@ -95,6 +95,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
+  private Runnable mAppearComponentsRunnable = null;
+  private long mAppearDelay = 50;
 
   private boolean isScrollable = true;
   private ArrayMap<String, Long> mRefToViewType;
@@ -217,6 +219,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void destroy() {
+    if(mAppearComponentsRunnable != null) {
+      getHostView().removeCallbacks(mAppearComponentsRunnable);
+      mAppearComponentsRunnable = null;
+    }
     super.destroy();
     if (mStickyMap != null)
       mStickyMap.clear();
@@ -224,6 +230,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       mViewTypes.clear();
     if (mRefToViewType != null)
       mRefToViewType.clear();
+
   }
 
   @Override
@@ -254,6 +261,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
     if(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY) != null){
       keepPositionLayoutDelay = WXUtils.getNumberInt(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY), (int)keepPositionLayoutDelay);
+    }
+    if(getDomObject().getAttrs().get("appearActionDelay") != null){
+      mAppearDelay =  WXUtils.getNumberInt(getDomObject().getAttrs().get("appearActionDelay"), (int)mAppearDelay);
     }
 
     mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
@@ -425,6 +435,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void bindAppearEvent(WXComponent component) {
     setAppearanceWatch(component, AppearanceHelper.APPEAR, true);
+    if(mAppearComponentsRunnable == null){
+      mAppearComponentsRunnable =  new Runnable() {
+        @Override
+        public void run() {
+          if(mAppearComponentsRunnable != null) {
+             notifyAppearStateChange(0, 0, 0, 0);
+          }
+        }
+      };
+    }
+    getHostView().removeCallbacks(mAppearComponentsRunnable);
+    getHostView().postDelayed(mAppearComponentsRunnable, mAppearDelay);
   }
 
   @Override
@@ -1151,6 +1173,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
+    if(mAppearComponentsRunnable != null) {
+       getHostView().removeCallbacks(mAppearComponentsRunnable);
+       mAppearComponentsRunnable = null;
+    }
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
     String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
