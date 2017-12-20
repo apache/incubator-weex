@@ -88,6 +88,8 @@ public class WXEnvironment {
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
 
+  private static boolean openDebugLog = false;
+
   private static String sGlobalFontFamily;
 
   private static Map<String, String> options = new HashMap<>();
@@ -305,9 +307,20 @@ public class WXEnvironment {
       }
     }
   }
-    
+
+  public static boolean isOpenDebugLog() {
+    return openDebugLog;
+  }
+
+  public static void setOpenDebugLog(boolean openDebugLog) {
+    WXEnvironment.openDebugLog = openDebugLog;
+  }
+
   public static void  setApkDebugable(boolean debugable){
-      isApkDebug  = debugable;
+    isApkDebug  = debugable;
+    if(!isApkDebug){
+       openDebugLog = false;
+    }
   }
 
 }

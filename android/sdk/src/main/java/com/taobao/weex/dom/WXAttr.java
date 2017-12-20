@@ -455,7 +455,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic state ment
    * */
-  private Map<String, Object> filterBindingStatement(Map attrs) {
+  public Map<String, Object> filterBindingStatement(Map attrs) {
     if(attrs == null || attrs.size() == 0){
       return attrs;
     }
@@ -511,6 +511,13 @@ public class WXAttr implements Map<String, Object>,Cloneable {
               return  true;
            }
         }
+
+        if(WXStatement.WX_ONCE.equals(key)){
+          if(mStatement == null){
+             mStatement = new WXStatement();
+          }
+          mStatement.put(key, true);
+        }
         return  false;
   }
 
@@ -519,11 +526,15 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   }
 
   @Override
-  protected WXAttr clone(){
+  protected WXAttr clone() {
     WXAttr wxAttr = new WXAttr();
     wxAttr.skipFilterPutAll(attr);
-    wxAttr.mBindingAttrs = mBindingAttrs;
-    wxAttr.mStatement = mStatement;
+    if (mBindingAttrs != null) {
+      wxAttr.mBindingAttrs = new ArrayMap<>(mBindingAttrs);
+    }
+    if (mStatement != null){
+       wxAttr.mStatement = new WXStatement(mStatement);
+     }
     return wxAttr;
   }
 }
