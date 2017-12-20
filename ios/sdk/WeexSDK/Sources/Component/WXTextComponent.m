@@ -127,7 +127,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
     
-    BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
     NSString *_wordWrap;
     
@@ -155,7 +154,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // just for coretext and textkit render replacement
-        _needsRemoveObserver = NO;
         pthread_mutexattr_init(&(_propertMutexAttr));
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
@@ -190,7 +188,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_needsRemoveObserver) {
+    if (_fontFamily) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -412,16 +410,8 @@ do {\
     }
     
     if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
@@ -511,16 +501,8 @@ do {\
     }
     
     if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
