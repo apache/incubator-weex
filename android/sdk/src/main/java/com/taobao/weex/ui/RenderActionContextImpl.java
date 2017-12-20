@@ -28,25 +28,17 @@ import java.util.Map;
 /**
  * Class for rendering view. Method in this class should be run in main thread.
  * This class is also <strong>not</storng> thread safe.
- * This class is very similar to {@link com.taobao.weex.dom.WXDomStatement}
- * @see com.taobao.weex.dom.WXDomStatement
  */
 class RenderActionContextImpl implements RenderActionContext {
 
   private Map<String, WXComponent> mRegistry;
   private WXSDKInstance mWXSDKInstance;
-  /**
-   * The container for weex root view.
-   */
 
   public RenderActionContextImpl(WXSDKInstance instance) {
     mWXSDKInstance = instance;
     mRegistry = new HashMap<>();
   }
 
-  /**
-   * @see com.taobao.weex.dom.WXDomStatement#destroy()
-   */
   public void destroy() {
     mWXSDKInstance = null;
     mRegistry.clear();
@@ -54,27 +46,6 @@ class RenderActionContextImpl implements RenderActionContext {
 
   public WXSDKInstance getWXSDKInstance() {
     return mWXSDKInstance;
-  }
-
-  /**
-   * set layout information of View
-   */
-  void setLayout(String ref, WXComponent component) {
-    if (component == null) {
-      return;
-    }
-    component.setLayout(component);
-  }
-
-  /**
-   * set extra information of View
-   */
-  void setExtra(String ref, Object extra) {
-    WXComponent component = mRegistry.get(ref);
-    if (component == null) {
-      return;
-    }
-    component.updateExtra(extra);
   }
 
   @Override

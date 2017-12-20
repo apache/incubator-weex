@@ -44,8 +44,7 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
                             HashMap<String, String> paddings,
                             HashMap<String, String> margins,
                             HashMap<String, String> borders) {
-    this.mPageId = pageId;
-    this.mRef = ref;
+    super(pageId, ref);
     this.mComponentType = componentType;
     this.mStyle = style;
     this.mAttributes = attributes;
@@ -57,7 +56,7 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
 
   @Override
   public void executeAction() {
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
+    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
     if (instance == null || instance.getContext() == null) {
       return;
     }
@@ -67,8 +66,8 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
       return;
     }
 
-    instance.nativeBindComponentToWXCore(mPageId, component, mRef);
-    instance.nativeBindInstanceToWXCore(mPageId, instance);
+    instance.nativeBindComponentToWXCore(getPageId(), component, getRef());
+    instance.nativeBindInstanceToWXCore(getPageId(), instance);
 
     try {
       component.createView();

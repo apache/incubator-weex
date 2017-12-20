@@ -25,6 +25,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.ui.action.BasicUIAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -85,8 +86,7 @@ public class WXRenderManager {
     }
   }
 
-  //TODO Use runnable temporarily
-  public void runOnThread(final String instanceId, final IWXRenderTask task) {
+  public void postRenderAction(final String instanceId, final BasicUIAction action) {
     mWXRenderHandler.post(WXThread.secure(new Runnable() {
 
       @Override
@@ -94,45 +94,13 @@ public class WXRenderManager {
         if (mRegistries.get(instanceId) == null) {
           return;
         }
-        task.execute();
+        action.executeAction();
       }
     }));
   }
 
-//  public void runOnThread(final String instanceId, final RenderAction action) {
-//    mWXRenderHandler.post(WXThread.secure(new Runnable() {
-//
-//      @Override
-//      public void run() {
-//        if (mRegistries.get(instanceId) == null) {
-//          return;
-//        }
-//        action.executeRender(getRenderContext(instanceId));
-//      }
-//    }));
-//  }
-
   public void registerInstance(WXSDKInstance instance) {
     mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
-  }
-
-  public void setLayout(String instanceId, String ref, WXComponent component) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.setLayout(ref, component);
-  }
-
-  /**
-   * Set extra info, other than attribute and style
-   */
-  public void setExtra(String instanceId, String ref, Object extra) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.setExtra(ref, extra);
   }
 
   public List<WXSDKInstance> getAllInstances() {

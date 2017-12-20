@@ -19,5 +19,22 @@
 package com.taobao.weex.ui.action;
 
 public abstract class BasicUIAction {
+
+  private String mPageId = null;
+  private String mRef = null;
+
+  public BasicUIAction(String pageId, String ref) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+  }
+
   public abstract void executeAction();
+
+  public String getPageId() {
+    return mPageId;
+  }
+
+  public String getRef() {
+    return mRef;
+  }
 }

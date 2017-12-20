@@ -40,8 +40,7 @@ public class AddElementUIAction extends AbstractAddElementUIAction {
                             HashMap<String, String> paddings,
                             HashMap<String, String> margins,
                             HashMap<String, String> borders) {
-    this.mPageId = pageId;
-    this.mRef = ref;
+    super(pageId, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;
     this.mIndex = index;
@@ -55,19 +54,19 @@ public class AddElementUIAction extends AbstractAddElementUIAction {
 
   @Override
   public void executeAction() {
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
     if (instance == null || instance.getContext() == null) {
       return;
     }
 
-    final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mParentRef);
+    final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
     WXComponent child = createComponent(instance, parent);
 
     if (child == null || parent == null) {
       return;
     }
 
-    WXSDKManager.getInstance().getSDKInstance(mPageId).nativeBindComponentToWXCore(mPageId, child, mRef);
+    WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
 
     try {
       parent.addChild(child, mIndex);

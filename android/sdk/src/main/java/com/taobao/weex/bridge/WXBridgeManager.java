@@ -49,6 +49,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.action.AddElementUIAction;
+import com.taobao.weex.ui.action.BasicUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
 import com.taobao.weex.ui.action.LayoutUIAction;
 import com.taobao.weex.ui.action.UpdateAttrUIAction;
@@ -367,8 +368,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //        WXDomModule dom = getDomModule(instanceId);
 //        return dom.callDomMethod(method, arguments);
 //      } else {
-        return callModuleMethod(instanceId, module,
-                method, arguments);
+      return callModuleMethod(instanceId, module,
+              method, arguments);
 //      }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
@@ -392,8 +393,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //        WXDomModule dom = getDomModule(instanceId);
 //        return dom.callDomMethod(method, arguments);
 //      } else {
-        return callModuleMethod(instanceId, module,
-                method, arguments, options);
+      return callModuleMethod(instanceId, module,
+              method, arguments, options);
 //      }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
@@ -469,9 +470,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //                WXDomModule dom = getDomModule(instanceId);
 //                dom.callDomMethod(task);
 //              } else {
-                JSONObject optionObj = task.getJSONObject(OPTIONS);
-                callModuleMethod(instanceId, (String) target,
-                        (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
+              JSONObject optionObj = task.getJSONObject(OPTIONS);
+              callModuleMethod(instanceId, (String) target,
+                      (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
 //              }
             } else if (task.get(COMPONENT) != null) {
               //call component
@@ -1816,15 +1817,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final CreateBodyUIAction action = new CreateBodyUIAction(pageId, ref, componentType,
+        final BasicUIAction action = new CreateBodyUIAction(pageId, ref, componentType,
                 styles, attributes, events, paddings, margins, borders);
-
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
+        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
@@ -1860,15 +1855,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final AddElementUIAction action = new AddElementUIAction(pageId, ref, componentType, parentRef, index,
+        final BasicUIAction action = new AddElementUIAction(pageId, ref, componentType, parentRef, index,
                 styles, attributes, events, paddings, margins, borders);
-
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
+        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
@@ -1895,14 +1884,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final UpdateStyleUIAction action = new UpdateStyleUIAction(instanceId, ref, styles, paddings, margins, borders);
-
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getmPageId()).runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
+        final BasicUIAction action = new UpdateStyleUIAction(instanceId, ref, styles, paddings, margins, borders);
+        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
@@ -1926,14 +1909,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final UpdateAttrUIAction action = new UpdateAttrUIAction(instanceId, ref, attrs);
-
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getmPageId()).runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
+        final BasicUIAction action = new UpdateAttrUIAction(instanceId, ref, attrs);
+        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
@@ -1969,14 +1946,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         WXUISize size = new WXUISize(width, height);
         WXUIPosition position = new WXUIPosition(left, top, right, bottom);
-        final LayoutUIAction action = new LayoutUIAction(pageId, ref, position, size);
-
-        WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(action.getPageId()).runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            action.executeAction();
-          }
-        });
+        final BasicUIAction action = new LayoutUIAction(pageId, ref, position, size);
+        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callReLayout exception: ", e);

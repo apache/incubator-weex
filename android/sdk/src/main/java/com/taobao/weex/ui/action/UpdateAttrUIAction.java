@@ -26,42 +26,23 @@ import java.util.Map;
 
 public class UpdateAttrUIAction extends BasicUIAction {
 
-  private String mPageId = null;
-  private String mRef = null;
   private Map<String, String> mAttrs;
 
   public UpdateAttrUIAction(String pageId, String ref,
                             Map<String, String> attrs) {
-    this.mPageId = pageId;
-    this.mRef = ref;
+    super(pageId, ref);
     this.mAttrs = attrs;
   }
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
       return;
     }
     if (mAttrs != null) {
       component.updateAttrs(mAttrs);
     }
-  }
-
-  public String getmPageId() {
-    return mPageId;
-  }
-
-  public void setmPageId(String mPageId) {
-    this.mPageId = mPageId;
-  }
-
-  public String getmRef() {
-    return mRef;
-  }
-
-  public void setmRef(String mRef) {
-    this.mRef = mRef;
   }
 
   public Map<String, String> getAttrs() {

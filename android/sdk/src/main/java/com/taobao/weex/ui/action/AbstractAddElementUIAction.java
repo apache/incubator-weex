@@ -30,8 +30,6 @@ import java.util.Set;
 
 public abstract class AbstractAddElementUIAction extends BasicUIAction {
 
-  protected String mPageId = null;
-  protected String mRef = null;
   protected String mComponentType = null;
   protected String mParentRef = null;
   protected int mIndex = -1;
@@ -42,10 +40,14 @@ public abstract class AbstractAddElementUIAction extends BasicUIAction {
   protected HashMap<String, String> mMargins;
   protected HashMap<String, String> mBorders;
 
+  public AbstractAddElementUIAction(String pageId, String ref) {
+    super(pageId, ref);
+  }
+
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent) {
 
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, this);
-    WXSDKManager.getInstance().getWXRenderManager().registerComponent(mPageId, mRef, component);
+    WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
 
     if (component != null) {
       component.addStyle(mStyle);
@@ -57,14 +59,6 @@ public abstract class AbstractAddElementUIAction extends BasicUIAction {
     }
 
     return component;
-  }
-
-  public String getPageId() {
-    return mPageId;
-  }
-
-  public String getRef() {
-    return mRef;
   }
 
   public String getComponentType() {

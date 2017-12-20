@@ -27,8 +27,6 @@ import java.util.Set;
 
 public class UpdateStyleUIAction extends BasicUIAction {
 
-  private String mPageId = null;
-  private String mRef = null;
   private Map<String, String> mStyle;
   private HashMap<String, String> mPaddings;
   private HashMap<String, String> mMargins;
@@ -39,8 +37,7 @@ public class UpdateStyleUIAction extends BasicUIAction {
                              HashMap<String, String> paddings,
                              HashMap<String, String> margins,
                              HashMap<String, String> borders) {
-    this.mPageId = pageId;
-    this.mRef = ref;
+    super(pageId, ref);
     this.mStyle = style;
     this.mPaddings = paddings;
     this.mMargins = margins;
@@ -49,7 +46,7 @@ public class UpdateStyleUIAction extends BasicUIAction {
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
       return;
     }
@@ -60,53 +57,5 @@ public class UpdateStyleUIAction extends BasicUIAction {
       component.updateCSSShorthand(mBorders);
       component.setLayout(component);
     }
-  }
-
-  public String getmPageId() {
-    return mPageId;
-  }
-
-  public void setmPageId(String mPageId) {
-    this.mPageId = mPageId;
-  }
-
-  public String getmRef() {
-    return mRef;
-  }
-
-  public void setmRef(String mRef) {
-    this.mRef = mRef;
-  }
-
-  public Map<String, String> getmStyle() {
-    return mStyle;
-  }
-
-  public void setmStyle(Map<String, String> mStyle) {
-    this.mStyle = mStyle;
-  }
-
-  public HashMap<String, String> getmPaddings() {
-    return mPaddings;
-  }
-
-  public void setmPaddings(HashMap<String, String> mPaddings) {
-    this.mPaddings = mPaddings;
-  }
-
-  public HashMap<String, String> getmMargins() {
-    return mMargins;
-  }
-
-  public void setmMargins(HashMap<String, String> mMargins) {
-    this.mMargins = mMargins;
-  }
-
-  public HashMap<String, String> getmBorders() {
-    return mBorders;
-  }
-
-  public void setmBorders(HashMap<String, String> mBorders) {
-    this.mBorders = mBorders;
   }
 }
