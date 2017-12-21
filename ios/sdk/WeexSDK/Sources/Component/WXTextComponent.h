@@ -20,6 +20,7 @@
 #import "WXComponent.h"
 
 @interface WXTextComponent : WXComponent
+@property (atomic, strong) NSString *text;
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText;
 - (BOOL)useCoreText;
