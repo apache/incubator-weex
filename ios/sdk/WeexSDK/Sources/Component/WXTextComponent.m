@@ -67,7 +67,7 @@
     NSRange semicolonRange = [superDescription rangeOfString:@";"];
     NSString * content = _textStorage.string;
     if ([(WXTextComponent*)self.wx_component useCoreText]) {
-        content = [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+        content = ((WXTextComponent*)self.wx_component).text;
     }
     NSString *replacement = [NSString stringWithFormat:@"; text: %@; frame:%f,%f,%f,%f", content, self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height];
     return [superDescription stringByReplacingCharactersInRange:semicolonRange withString:replacement];
@@ -81,7 +81,7 @@
     if (![(WXTextComponent*)self.wx_component useCoreText]) {
         return _textStorage.string;
     }
-    return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+    return ((WXTextComponent*)self.wx_component).text;
 }
 
 - (NSString *)accessibilityLabel
@@ -112,7 +112,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     NSTextStorage *_textStorage;
     CGFloat _textStorageWidth;
     
-    NSString *_text;
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
@@ -250,9 +249,9 @@ do {\
 
 - (void)fillAttributes:(NSDictionary *)attributes
 {
-    id text = attributes[@"value"];
-    if (text && ![[self text] isEqualToString:text]) {
-        [self setText:[WXConvert NSString:text]];
+    id text = [WXConvert NSString:attributes[@"value"]];
+    if (text && ![self.text isEqualToString:text]) {
+        self.text = text;
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
@@ -359,17 +358,6 @@ do {\
 
 #pragma mark Text Building
 
-- (NSString *)text
-{
-    return _text;
-}
-- (void)setText:(NSString*)text
-{
-    pthread_mutex_lock(&(_ctAttributedStringMutex));
-    _text = text;
-    pthread_mutex_unlock(&(_ctAttributedStringMutex));
-}
-
 - (NSAttributedString *)ctAttributedString
 {
     NSAttributedString * attributedString = nil;
@@ -399,9 +387,9 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString * string = [self text];
+    NSString * string = self.text;
     if (![string isKindOfClass:[NSString class]]) {
-        WXLogError(@"text %@ is invalid", [self text]);
+        WXLogError(@"text %@ is invalid", self.text);
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
@@ -491,7 +479,7 @@ do {\
 
 - (NSAttributedString *)buildAttributeString
 {
-    NSString *string = [self text] ?: @"";
+    NSString *string = self.text ?: @"";
     
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
