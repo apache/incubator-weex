@@ -1,11 +1,10 @@
 #include <rapidjson/weexjsontools.h>
-#include <WeexCore/render/action/AddElementAction.h>
-#include <WeexCore/render/action/CreateBodyAction.h>
-#include <WeexCore/render/action/UpdateStyleAction.h>
-#include <WeexCore/render/action/UpdateAttrAction.h>
-#include <WeexCore/render/action/LayoutRenderAction.h>
-#include <WeexCore/render/action/RenderAction.h>
-#include <WeexCore/render/action/CreateFinishAction.h>
+#include <WeexCore/render/action/RenderActionAddElement.h>
+#include <WeexCore/render/action/RenderActionCreateBody.h>
+#include <WeexCore/render/action/RenderActionUpdateStyle.h>
+#include <WeexCore/render/action/RenderActionUpdateAttr.h>
+#include <WeexCore/render/action/RenderActionLayout.h>
+#include <WeexCore/render/action/RenderActionCreateFinish.h>
 #include <Layout/WXCoreLayout.h>
 #include <base/android/string/StringUtils.h>
 #include <base/WXCorePerformance.h>
