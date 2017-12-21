@@ -28,14 +28,15 @@ import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class RichText extends WXComponent<TextView> {
 
-  public RichText(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    super(instance, parent,action);
+  public RichText(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+    super(instance, parent, commonCompData);
   }
 
   @Override

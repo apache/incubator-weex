@@ -44,14 +44,7 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
                             HashMap<String, String> paddings,
                             HashMap<String, String> margins,
                             HashMap<String, String> borders) {
-    super(pageId, ref);
-    this.mComponentType = componentType;
-    this.mStyle = style;
-    this.mAttributes = attributes;
-    this.mEvents = events;
-    this.mPaddings = paddings;
-    this.mMargins = margins;
-    this.mBorders = borders;
+    super(pageId, ref, componentType, null, -2, style, attributes, events, paddings, margins, borders);
   }
 
   @Override

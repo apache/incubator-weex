@@ -28,15 +28,15 @@ import java.util.Set;
 public class UpdateStyleUIAction extends BasicUIAction {
 
   private Map<String, String> mStyle;
-  private HashMap<String, String> mPaddings;
-  private HashMap<String, String> mMargins;
-  private HashMap<String, String> mBorders;
+  private Map<String, String> mPaddings;
+  private Map<String, String> mMargins;
+  private Map<String, String> mBorders;
 
   public UpdateStyleUIAction(String pageId, String ref,
                              Map<String, String> style,
-                             HashMap<String, String> paddings,
-                             HashMap<String, String> margins,
-                             HashMap<String, String> borders) {
+                             Map<String, String> paddings,
+                             Map<String, String> margins,
+                             Map<String, String> borders) {
     super(pageId, ref);
     this.mStyle = style;
     this.mPaddings = paddings;

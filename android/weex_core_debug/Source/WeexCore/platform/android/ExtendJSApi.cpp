@@ -337,7 +337,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
 
   flag = RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
-                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
+                                                  jByteArray2Str(env, jTaskString)) ? 0 : -1;
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jTaskString);
   return createInt32Result(0);
@@ -348,7 +348,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   //instacneID args[1]
-  jstring jref = getArgumentAsJString(env, arguments, 1);
+  jstring jParentRef = getArgumentAsJString(env, arguments, 1);
   //dom node args[2]
   jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
   //index  args[3]
@@ -357,15 +357,16 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   int flag = 0;
 
   std::string pageId = jString2Str(env, jInstanceId);
-  std::string parentRef = jString2Str(env, jref);
+  std::string parentRef = jString2Str(env, jParentRef);
   std::string str_index = jString2Str(env, jindex);
   int index = stringToNum<int>(str_index);
   std::string data = jByteArray2Str(env, jdomString);
 
+//  flag = BridgeAndroid::getInstance()->callAddElement(jInstanceId, jParentRef, jdomString, jindex);
   flag = RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
-  env->DeleteLocalRef(jref);
+  env->DeleteLocalRef(jParentRef);
   env->DeleteLocalRef(jdomString);
   env->DeleteLocalRef(jindex);
   return createInt32Result(0);
@@ -381,8 +382,9 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
   int flag = 0;
-  flag = RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId), jString2Str(env, jRef),
-                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
+  flag = RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId),
+                                                   jString2Str(env, jRef),
+                                                   jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
@@ -397,8 +399,9 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
   int flag = 0;
-  flag = RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId), jString2Str(env, jRef),
-                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
+  flag = RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId),
+                                                  jString2Str(env, jRef),
+                                                  jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);

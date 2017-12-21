@@ -25,6 +25,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,23 +37,23 @@ import java.lang.reflect.InvocationTargetException;
 public class WXDiv extends WXVContainer<WXFrameLayout> {
 
   public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXDiv(instance,parent,action);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXDiv(instance, parent, commonCompData);
     }
   }
 
   @Deprecated
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
-    this(instance,parent,action);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
+    this(instance, parent, commonCompData);
   }
 
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    super(instance, parent, action);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+    super(instance, parent, commonCompData);
   }
 
   @Override
   protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-    WXFrameLayout frameLayout =new WXFrameLayout(context);
+    WXFrameLayout frameLayout = new WXFrameLayout(context);
     frameLayout.holdComponent(this);
     return frameLayout;
   }

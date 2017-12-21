@@ -51,6 +51,7 @@ import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.action.WXUIPosition;
 import com.taobao.weex.ui.action.WXUISize;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -127,25 +128,24 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
-    this(instance, parent, isLazy, action);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
+    this(instance, parent, isLazy, commonCompData);
   }
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
-    this(instance, parent, action);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
+    this(instance, parent, commonCompData);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    this(instance, parent, TYPE_COMMON, action);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+    this(instance, parent, TYPE_COMMON, commonCompData);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, AbstractAddElementUIAction action) {
-    setPageId(action.getPageId());
-    setComponentType(action.getComponentType());
-    setParentRef(action.getParentRef());
-    setRef(action.getRef());
-
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, CommonCompData commonCompData) {
+    setPageId(commonCompData.mPageId);
+    setRef(commonCompData.mRef);
+    setParentRef(commonCompData.mParentRef);
+    setComponentType(commonCompData.mComponentType);
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;

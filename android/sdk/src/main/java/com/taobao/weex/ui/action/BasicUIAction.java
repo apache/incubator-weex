@@ -20,8 +20,8 @@ package com.taobao.weex.ui.action;
 
 public abstract class BasicUIAction {
 
-  private String mPageId = null;
-  private String mRef = null;
+  private String mPageId;
+  private String mRef;
 
   public BasicUIAction(String pageId, String ref) {
     this.mPageId = pageId;
@@ -36,5 +36,13 @@ public abstract class BasicUIAction {
 
   public String getRef() {
     return mRef;
+  }
+
+  public void setRef(String ref) {
+    this.mRef = ref;
+  }
+
+  public void setPageId(String pageId) {
+    this.mPageId = pageId;
   }
 }

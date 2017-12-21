@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
 /**
@@ -34,8 +35,8 @@ public class WXBaseRefresh extends WXVContainer<WXFrameLayout> {
 
   private WXLoadingIndicator mLoadingIndicator;
 
-  public WXBaseRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, AbstractAddElementUIAction action) {
-    super(instance, parent, lazy,action);
+  public WXBaseRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, CommonCompData commonCompData) {
+    super(instance, parent, lazy, commonCompData);
   }
 
   @Override

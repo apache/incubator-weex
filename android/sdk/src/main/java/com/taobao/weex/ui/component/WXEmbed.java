@@ -36,6 +36,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -165,17 +166,17 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
-    this(instance,parent,action);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
+    this(instance, parent, commonCompData);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    super(instance, parent,action);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+    super(instance, parent, commonCompData);
     mListener = new EmbedRenderListener(this);
 
-    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
-    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
-    if(instance instanceof EmbedManager) {
+    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270, instance.getInstanceViewPortWidth());
+    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260, instance.getInstanceViewPortWidth());
+    if (instance instanceof EmbedManager) {
       Object itemId = getAttrs().get(ITEM_ID);
       if (itemId != null) {
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);

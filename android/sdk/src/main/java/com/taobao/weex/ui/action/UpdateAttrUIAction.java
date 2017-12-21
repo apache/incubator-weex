@@ -20,8 +20,6 @@ package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
-
-import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateAttrUIAction extends BasicUIAction {

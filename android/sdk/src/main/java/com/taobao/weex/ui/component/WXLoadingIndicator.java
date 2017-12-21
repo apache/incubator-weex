@@ -26,6 +26,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.refresh.circlebar.CircleProgressBar;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -35,8 +36,8 @@ import com.taobao.weex.utils.WXUtils;
 public class WXLoadingIndicator extends WXComponent<CircleProgressBar> {
 
 
-    public WXLoadingIndicator(WXSDKInstance instance, WXVContainer parent, boolean isLazy, AbstractAddElementUIAction action) {
-        super(instance, parent, isLazy,action);
+    public WXLoadingIndicator(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
+        super(instance, parent, isLazy, commonCompData);
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
@@ -82,19 +83,18 @@ public class WXImage extends WXComponent<ImageView> {
   };
 
   public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXImage(instance,parent,action);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXImage(instance, parent, commonCompData);
     }
   }
 
-
   @Deprecated
-  public WXImage(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, AbstractAddElementUIAction action) {
-    this(instance,parent,action);
+  public WXImage(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
+    this(instance, parent, commonCompData);
   }
 
-  public WXImage(WXSDKInstance instance, WXVContainer parent, AbstractAddElementUIAction action) {
-    super(instance, parent,action);
+  public WXImage(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+    super(instance, parent, commonCompData);
   }
 
   @Override

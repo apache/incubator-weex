@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
-import com.taobao.weex.ui.action.CommonCompData;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXVContainer;
+public class CommonCompData {
 
-import java.lang.reflect.InvocationTargetException;
+  public String mPageId;
+  public String mRef;
+  public String mComponentType;
+  public String mParentRef;
 
-/**
- * Created by sospartan on 7/27/16.
- */
-public interface ComponentCreator {
-  WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException;
+  public CommonCompData(String pageId, String ref, String componentType, String parentRef) {
+    this.mPageId = pageId;
+    this.mRef = ref;
+    this.mComponentType = componentType;
+    this.mParentRef = parentRef;
+  }
 }
