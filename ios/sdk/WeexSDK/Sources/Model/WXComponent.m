@@ -97,8 +97,11 @@
         _accessibilityHintContent = nil;
         
         _async = NO;
-        _transition = [[WXTransition alloc]initWithStyles:styles];
         
+        if (styles[kWXTransitionProperty]) {
+            _transition = [[WXTransition alloc]initWithStyles:styles];
+        }
+
         //TODO set indicator style 
         if ([type isEqualToString:@"indicator"]) {
             _styles[@"position"] = @"absolute";
@@ -125,6 +128,9 @@
         }
         if(attributes[@"accessibilityHint"]) {
             _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
+        }
+        if (attributes[@"groupAccessibilityChildren"]) {
+            _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
         }
         
         if (attributes[@"testId"]) {
@@ -366,6 +372,9 @@
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
         }
+        if (_groupAccessibilityChildren) {
+            [_view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
+        }
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -560,39 +569,29 @@
 #pragma mark Updating
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    if ([self _isPropertyTransitionStyles:styles]) {
-        [_transition _handleTransitionWithStyles:styles withTarget:self];
+    BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
+    if (isTransitionTag) {
+        [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
+        [self _resetCSSNodeStyles:resetStyles];
     }
-    
     if (isUpdateStyles) {
         [self _modifyStyles:styles];
     }
-    [self _resetCSSNodeStyles:resetStyles];
 }
 
-- (BOOL)_isPropertyTransitionStyles:(NSDictionary *)styles
+- (BOOL)_isTransitionTag:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
     if (_transition.transitionOptions != WXTransitionOptionsNone) {
-        if ((_transition.transitionOptions & WXTransitionOptionsWidth &&styles[@"width"])
-            ||(_transition.transitionOptions & WXTransitionOptionsHeight &&styles[@"height"])
-            ||(_transition.transitionOptions & WXTransitionOptionsRight &&styles[@"right"])
-            ||(_transition.transitionOptions & WXTransitionOptionsLeft &&styles[@"left"])
-            ||(_transition.transitionOptions & WXTransitionOptionsBottom &&styles[@"bottom"])
-            ||(_transition.transitionOptions & WXTransitionOptionsTop &&styles[@"top"])
-            ||(_transition.transitionOptions & WXTransitionOptionsBackgroundColor &&styles[@"backgroundColor"])
-            ||(_transition.transitionOptions & WXTransitionOptionsTransform &&styles[@"transform"])
-            ||(_transition.transitionOptions & WXTransitionOptionsOpacity &&styles[@"opacity"])) {
-            yesOrNo = true;
-        }
+        yesOrNo = true;
     }
     return yesOrNo;
 }
 
-- (BOOL)_isPropertyAnimationStyles:(NSDictionary *)styles
+- (BOOL)_isTransitionOnMainThreadStyles:(NSDictionary *)styles
 {
     BOOL yesOrNo = false;
     if (_transition.transitionOptions != WXTransitionOptionsNone) {
@@ -636,12 +635,11 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    if (![self _isPropertyAnimationStyles:styles]) {
+    if (![self _isTransitionOnMainThreadStyles:styles]) {
         [self _updateViewStyles:styles];
     } else {
         [self _transitionUpdateViewProperty:styles];
     }
-    
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     [self updateStyles:styles];
@@ -735,6 +733,12 @@
         _accessibilityHintContent = [WXConvert NSString:attributes[@"accessibilityHint"]];
         [self.view setAccessibilityHint:_accessibilityHintContent];
     }
+    
+    if (attributes[@"groupAccessibilityChildren"]) {
+        _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
+        [self.view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
+    }
+
     
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];

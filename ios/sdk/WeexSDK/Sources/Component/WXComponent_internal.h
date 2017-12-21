@@ -70,6 +70,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString * _ariaHidden; // accessibilityElementsHidden
     NSString * _accessible; // accessible
     NSString * _accessibilityHintContent; // hint for the action
+    NSString * _groupAccessibilityChildren; // voice-over navigation order
     NSString * _testId;// just for auto-test
     
     BOOL _accessibilityMagicTapEvent;
@@ -200,8 +201,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 ///--------------------------------------
 /// @name Private Methods
 ///--------------------------------------
-
-- (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles;
 
 - (void)_modifyStyles:(NSDictionary *)styles;
 

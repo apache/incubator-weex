@@ -26,6 +26,7 @@ import android.os.Bundle;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
+import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
@@ -71,6 +72,8 @@ public class WXApplication extends Application {
                                .setHttpAdapter(new InterceptWXHttpAdapter())
                                .build()
                           );
+
+    WXSDKManager.getInstance().setAccessibilityRoleAdapter(new DefaultAccessibilityRoleAdapter());
 
     try {
       Fresco.initialize(this);

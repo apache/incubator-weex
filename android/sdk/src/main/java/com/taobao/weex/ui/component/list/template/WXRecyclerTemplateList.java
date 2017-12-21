@@ -49,6 +49,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
@@ -938,23 +939,23 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private boolean setRefreshOrLoading(final WXComponent child) {
         if (child instanceof WXRefresh && getHostView() != null) {
             getHostView().setOnRefreshListener((WXRefresh) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setHeaderView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
 
         if (child instanceof WXLoading && getHostView() != null) {
             getHostView().setOnLoadingListener((WXLoading) child);
-            getHostView().postDelayed(new Runnable() {
+            getHostView().postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     getHostView().setFooterView(child);
                 }
-            }, 100);
+            }), 100);
             return true;
         }
         return false;
@@ -1358,7 +1359,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                     int key = childLisener.getHostView().hashCode();
                     if(appear){
                         if(!componentDisAppearList.containsKey(key)){
-                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.APPEAR, direction);
+                            childLisener.notifyAppearStateChange(Constants.Event.APPEAR, direction);
                             List<Object> eventArgs = null;
                             if(childLisener.getDomObject().getEvents() != null
                                     && childLisener.getDomObject().getEvents().getEventBindingArgsValues() != null
@@ -1369,7 +1370,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                         }
                     }else{
                         if(componentDisAppearList.containsKey(key)){
-                            childLisener.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
+                            childLisener.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
                             componentDisAppearList.remove(key);
                         }
                     }
@@ -1407,7 +1408,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 Set<Map.Entry<Integer, List<Object>>> eventWatcherEntries = eventWatchers.entrySet();
                 for(Map.Entry<Integer, List<Object>> eventWatcherEntry : eventWatcherEntries){
                     events.putEventBindingArgsValue(Constants.Event.DISAPPEAR, eventWatcherEntry.getValue());
-                    component.notifyWatchAppearDisappearEvent(Constants.Event.DISAPPEAR, direction);
+                    component.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
                 }
                 eventWatchers.clear();
             }
@@ -1450,7 +1451,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         return totalHeight;
     }
 
-    private int calcContentOffset(RecyclerView recyclerView) {
+    public int calcContentOffset(RecyclerView recyclerView) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();

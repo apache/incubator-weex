@@ -344,7 +344,7 @@ transform 属性向元素应用 2D 转换。该属性允许我们对元素进行
 
 
 
-## transition <span class="api-version">v0.16.0+</span>
+## transition <span class="api-version">v0.17.0+</span>
 
 现在您可以在CSS中使用transition属性来提升您应用的交互性与视觉感受，transition中包括布局动画，即LayoutAnimation，现在布局产生变化的同时也能使用transition带来的流畅动画。transition允许CSS的属性值在一定的时间区间内平滑地过渡。
 

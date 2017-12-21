@@ -312,7 +312,6 @@
             }
         }
     }
-    
     _originX = [WXLength lengthWithFloat:originX type:typeX];
     _originY = [WXLength lengthWithFloat:originY type:typeY];
 }
@@ -348,6 +347,12 @@
 
 - (void)parseTranslate:(NSArray *)value
 {
+    [self parseTranslatex:@[value[0]]];
+    [self parseTranslatey:@[value[1]]];
+}
+
+- (void)parseTranslatex:(NSArray *)value
+{
     WXLength *translateX;
     double x = [value[0] doubleValue];
     if ([value[0] hasSuffix:@"%"]) {
@@ -356,30 +361,20 @@
         x = WXPixelScale(x, self.weexInstance.pixelScaleFactor);
         translateX = [WXLength lengthWithFloat:x type:WXLengthTypeFixed];
     }
-
-    WXLength *translateY;
-    if (value.count > 1) {
-        double y = [value[1] doubleValue];
-        if ([value[1] hasSuffix:@"%"]) {
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
-        } else {
-            y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
-        }
-    }
-    
     _translateX = translateX;
-    _translateY = translateY;
-}
-
-- (void)parseTranslatex:(NSArray *)value
-{
-    [self parseTranslate:@[value[0], @"0"]];
 }
 
 - (void)parseTranslatey:(NSArray *)value
 {
-    [self parseTranslate:@[@"0", value[0]]];
+    WXLength *translateY;
+    double y = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
+    } else {
+        y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
+    }
+    _translateY = translateY;
 }
 
 - (void)parseScale:(NSArray *)value

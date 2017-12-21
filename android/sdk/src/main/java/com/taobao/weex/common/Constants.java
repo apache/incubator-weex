@@ -183,6 +183,7 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+    String ROLE = "role";
 
     String DIRECTION = "direction";
     String RTL = "rtl";
@@ -190,6 +191,10 @@ public class Constants {
     String STICKY_OFFSET = "stickyOffset";
     String HAS_FIXED_SIZE = "hasFixedSize";
     String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
+
+    String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
+    String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
+
 
     interface  Recycler{
       String LIST_DATA = "listData";

@@ -93,16 +93,43 @@ function getWaterfall (weex) {
       _createChildren (h, rootStyle) {
         const slots = this.$slots.default || []
         this._headers = []
+        this._footers = []
         this._others = []
+        const len = slots.length
+
+        for (let i = 0; i < len; i++) {
+          const vnode = slots[i]
+          const tag = vnode.componentOptions && vnode.componentOptions.tag
+          if (tag === 'refresh' || tag === 'loading') {
+            continue
+          }
+          if (tag === 'cell') {
+            break
+          }
+          if (tag === 'header') {
+            this._headers.push(vnode)
+          }
+        }
+
+        for (let i = len - 1; i >= 0; i--) {
+          const vnode = slots[i]
+          const tag = vnode.componentOptions && vnode.componentOptions.tag
+          if (tag === 'refresh' || tag === 'loading') {
+            continue
+          }
+          if (tag === 'cell') {
+            break
+          }
+          if (tag === 'header') {
+            this._footers.push(vnode)
+          }
+        }
+
         this._cells = slots.filter(vnode => {
           if (!vnode.tag || !vnode.componentOptions) return false
           const tag = vnode.componentOptions.tag
           if (tag === 'refresh' || tag === 'loading') {
             this[`_${tag}`] = vnode
-            return false
-          }
-          if (tag === 'header') {
-            this._headers.push(vnode)
             return false
           }
           if (tag !== 'cell') {
@@ -111,17 +138,21 @@ function getWaterfall (weex) {
           }
           return true
         })
+
         this._reCalc(rootStyle)
         this._genColumns(h)
         let children = []
         this._refresh && children.push(this._refresh)
-        children = children
-          .concat(this._headers)
-          .concat(this._others)
+        children = children.concat(this._headers)
+          // .concat(this._others)
         children.push(h('html:div', {
           ref: 'columns',
           staticClass: 'weex-waterfall-inner-columns weex-ct'
         }, this._columns))
+        children.push(h('html:div', {
+          ref: 'footers',
+          staticClass: 'weex-waterfall-footers weex-ct'
+        }, this._footers))
         this._loading && children.push(this._loading)
         return [
           h('article', {

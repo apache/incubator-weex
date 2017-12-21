@@ -269,10 +269,10 @@ public class WXDomStatementTest {
 
   @Test
   public void testCreateFinish() throws Exception {
-    createBody();
-    createFinish();
-
-    stmt.batch();
+//    createBody();
+//    createFinish();
+//
+//    stmt.batch();
   }
 
   @Test

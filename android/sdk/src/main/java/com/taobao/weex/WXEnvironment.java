@@ -31,8 +31,10 @@ import android.text.TextUtils;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -68,6 +70,7 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
+  public static final boolean sForceEnableDevTool = false;
   public static String sDebugWsUrl = "";
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
@@ -172,8 +175,8 @@ public class WXEnvironment {
    */
   public static boolean isSupport() {
     boolean isInitialized = WXSDKEngine.isInitialized();
-    if(WXEnvironment.isApkDebugable()){
-      WXLogUtils.d("WXSDKEngine.isInitialized():" + isInitialized);
+    if(!isInitialized){
+      WXLogUtils.e("WXSDKEngine.isInitialized():" + isInitialized);
     }
     return isHardwareSupport() && isInitialized;
   }

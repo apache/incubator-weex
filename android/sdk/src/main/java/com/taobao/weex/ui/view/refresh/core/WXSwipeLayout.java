@@ -396,7 +396,17 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     if (moveSpinner(-spinnerDy)) {
-       consumed[1] += spinnerDy;
+      if (!canChildScrollUp() && mPullRefreshEnable
+              && mTargetView.getTranslationY() > 0
+              && dy > 0) {
+        consumed[1] += dy;
+      }else if (!canChildScrollDown() && mPullLoadEnable
+              && mTargetView.getTranslationY() < 0
+              && dy < 0){
+         consumed[1] += dy;
+      }else{
+        consumed[1] += spinnerDy;
+      }
     }
   }
 

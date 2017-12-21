@@ -48,11 +48,7 @@ final class ScrollToElementAction implements DOMAction, RenderAction {
     if (context.isDestory()) {
       return;
     }
-    WXSDKInstance instance = context.getInstance();
     context.postRenderTask(this);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override

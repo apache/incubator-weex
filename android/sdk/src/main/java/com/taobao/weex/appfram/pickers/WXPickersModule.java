@@ -38,6 +38,7 @@ import android.widget.TextView;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -260,16 +261,16 @@ public class WXPickersModule extends WXModule {
             }
         });
 
-        listView.post(new Runnable() {
+        listView.post(WXThread.secure(new Runnable() {
             @Override
             public void run() {
                 if (selectedView != null) {
                     listView.performItemClick(selectedView, selected, selectedView.getId());
                 }
             }
-        });
+        }));
 
-        dialog.getWindow().getDecorView().post(new Runnable() {
+        dialog.getWindow().getDecorView().post(WXThread.secure(new Runnable() {
             @Override
             public void run() {
                 Button confirm = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -303,7 +304,7 @@ public class WXPickersModule extends WXModule {
                     }
                 }
             }
-        });
+        }));
 
         dialog.show();
     }

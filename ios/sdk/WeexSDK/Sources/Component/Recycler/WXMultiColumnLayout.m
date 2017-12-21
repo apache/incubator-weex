@@ -281,6 +281,11 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 {
     if ([elementKind isEqualToString:kCollectionSupplementaryViewKindHeader]) {
         UICollectionViewLayoutAttributes *attributes = self.layoutAttributes[kMultiColumnLayoutHeader][@(indexPath.section)];
+        if (!attributes) {
+            attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:elementKind withIndexPath:indexPath];
+            attributes.frame = CGRectZero;
+            attributes.hidden = YES;
+        }
         WXLogDebug(@"return header attributes:%@ for index path:%@", attributes, indexPath);
         
         return attributes;
