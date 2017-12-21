@@ -27,6 +27,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -48,6 +49,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.action.AddElementAction;
 import com.taobao.weex.ui.action.AddElementUIAction;
 import com.taobao.weex.ui.action.BasicUIAction;
 import com.taobao.weex.ui.action.CreateBodyUIAction;
@@ -1930,11 +1932,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-//      mLodBuilder.append("[WXBridgeManager] callReLayout >>>> pageId:").append(pageId)
-//              .append(", ref:").append(ref).append(", top:").append(top)
-//              .append(", bottom:").append(bottom).append(", left:").append(left).append(", right").append(right)
-//              .append(", height:").append(height).append(" width:").append(width);
-//      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 
@@ -1975,6 +1972,28 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_CREATEFINISH, "[WXBridgeManager] callCreateFinish exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddElement(String instanceId, String parentRef, String dom, String index) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(parentRef).append(", dom:").append(dom);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+//      JSONObject domObject = JSON.parseObject(dom);
+//      final BasicUIAction action = new AddElementAction(instanceId, parentRef, domObject, Integer.parseInt(index));
+//      WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
     }
 
     return IWXBridge.INSTANCE_RENDERING;

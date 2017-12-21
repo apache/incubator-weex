@@ -107,6 +107,8 @@ namespace WeexCore {
                                                  std::vector<std::pair<std::string, std::string> *> *attrs);
 
     int callCreateFinishByWeexCore(std::string &pageId);
+
+    int callAddElement(jstring jInstanceId, jstring jParentRef, jbyteArray jdomString, jstring jindex);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

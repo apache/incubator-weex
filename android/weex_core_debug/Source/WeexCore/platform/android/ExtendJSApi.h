@@ -8,7 +8,7 @@
 #include "IPC/IPCSender.h"
 #include "IPC/IPCString.h"
 #include "IPC/Serializing/IPCSerializer.h"
-#include <WeexCore/render/RenderManager.h>
+#include <WeexCore/render/manager/RenderManager.h>
 #include "BridgeAndroid.h"
 
 static std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments);

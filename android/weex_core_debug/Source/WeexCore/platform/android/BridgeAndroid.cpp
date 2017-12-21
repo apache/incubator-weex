@@ -1,4 +1,4 @@
-#include <WeexCore/render/RenderObject.h>
+#include <WeexCore/render/node/RenderObject.h>
 #include "BridgeAndroid.h"
 
 static jmethodID jSetJSFrmVersionMethodId;
@@ -28,6 +28,7 @@ static jmethodID jCallUpdateStyleByWeexCoreMethodId;
 static jmethodID jCallUpdateAttrsByWeexCoreMethodId;
 static jmethodID jCallLayoutByWeexCoreMethodId;
 static jmethodID jCallCreateFinishByWeexCoreMethodId;
+static jmethodID jCallAddElementMethodId;
 
 namespace WeexCore {
 
@@ -505,7 +506,7 @@ namespace WeexCore {
   }
 
   int BridgeAndroid::callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                               std::vector<std::pair<std::string, std::string> *> *attrs) {
+                                              std::vector<std::pair<std::string, std::string> *> *attrs) {
     JNIEnv *env = getJNIEnv();
     if (jCallUpdateAttrsByWeexCoreMethodId == NULL) {
       jCallUpdateAttrsByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
@@ -578,6 +579,23 @@ namespace WeexCore {
     }
 
     env->DeleteLocalRef(jPageId);
+    return flag;
+  }
+
+  int BridgeAndroid::callAddElement(jstring jInstanceId, jstring jParentRef, jbyteArray jdomString,
+                                    jstring jindex) {
+    JNIEnv *env = getJNIEnv();
+    if (jCallAddElementMethodId == NULL) {
+      jCallAddElementMethodId = env->GetMethodID(jBridgeClazz,
+                                                 "callAddElement",
+                                                 "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)I");
+    }
+
+    int flag = env->CallIntMethod(jThis, jCallAddElementMethodId, jInstanceId, jParentRef,
+                                  jdomString, jindex);
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callAddElement");
+    }
     return flag;
   }
 } //end WeexCore

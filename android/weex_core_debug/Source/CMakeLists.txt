@@ -40,9 +40,13 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/bridge/impl/WXComponent_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.cpp
 
-    ./WeexCore/render/RenderManager.cpp
-    ./WeexCore/render/RenderObject.cpp
-    ./WeexCore/render/RenderPage.cpp
+    ./WeexCore/render/manager/RenderManager.cpp
+    ./WeexCore/render/page/RenderPage.cpp
+    ./WeexCore/render/node/RenderObject.cpp
+
+    ./WeexCore/render/node/RenderText.cpp
+    ./WeexCore/render/node/RenderCell.cpp
+
     ./rapidjson/weexjsontools.cpp
 
     ./Layout/WXCoreLayout.cpp

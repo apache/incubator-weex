@@ -1,7 +1,7 @@
 #include <rapidjson/weexjsontools.h>
-#include <WeexCore/render/RenderManager.h>
-#include <WeexCore/render/RenderPage.h>
-#include <WeexCore/render/RenderObject.h>
+#include <WeexCore/render/manager/RenderManager.h>
+#include <WeexCore/render/page/RenderPage.h>
+#include <WeexCore/render/node/RenderObject.h>
 #include <base/TimeUtils.h>
 
 namespace WeexCore {

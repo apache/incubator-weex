@@ -11,8 +11,8 @@
 #include <base/WXCorePerformance.h>
 #include <base/WXCoreEnvironment.h>
 #include "RenderPage.h"
-#include "RenderManager.h"
-#include "RenderObject.h"
+#include "WeexCore/render/manager/RenderManager.h"
+#include "WeexCore/render/node/RenderObject.h"
 
 namespace WeexCore {
 

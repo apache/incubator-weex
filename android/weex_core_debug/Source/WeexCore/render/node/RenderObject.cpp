@@ -1,5 +1,5 @@
 #include "RenderObject.h"
-#include "RenderPage.h"
+#include "WeexCore/render/page/RenderPage.h"
 #include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>

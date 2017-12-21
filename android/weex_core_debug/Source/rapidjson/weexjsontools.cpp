@@ -1,8 +1,8 @@
 
 #include "weexjsontools.h"
 #include <base/fpconv.h>
-#include <WeexCore/render/RenderObject.h>
-#include <WeexCore/render/RenderPage.h>
+#include <WeexCore/render/node/RenderObject.h>
+#include <WeexCore/render/page/RenderPage.h>
 
 using namespace std;
 using namespace rapidjson;
