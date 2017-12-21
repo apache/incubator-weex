@@ -320,6 +320,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
       }
     });
+
+
     bounceRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
       @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
       @Override
@@ -380,6 +382,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         boolean draggable = WXUtils.getBoolean(param,false);
         setDraggable(draggable);
         return true;
+      case Constants.Name.SHOW_SCROLLBAR:
+        Boolean result = WXUtils.getBoolean(param,null);
+        if (result != null)
+          setShowScrollbar(result);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -408,6 +415,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       WXLogUtils.d("set draggable : " + isDraggable);
     }
   }
+
+  @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
+  public void setShowScrollbar(boolean show) {
+    if(getHostView() == null || getHostView().getInnerView() == null){
+      return;
+    }
+    if (getOrientation() == Constants.Orientation.VERTICAL) {
+      getHostView().getInnerView().setVerticalScrollBarEnabled(show);
+    } else {
+      getHostView().getInnerView().setHorizontalScrollBarEnabled(show);
+    }
+  }
+
 
   @Override
   public boolean isScrollable() {
