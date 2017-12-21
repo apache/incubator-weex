@@ -18,49 +18,29 @@
  */
 package com.taobao.weex.ui.action;
 
-public class WXUIPosition {
+public class GraphicSize {
 
-  private float mLeft;
-  private float mTop;
-  private float mRight;
-  private float mBottom;
+  private float mWidth;
+  private float mHeight;
 
-  public WXUIPosition(float left, float top, float right, float bottom) {
-    this.mLeft = left;
-    this.mTop = top;
-    this.mRight = right;
-    this.mBottom = bottom;
+  public GraphicSize(float width, float height) {
+    this.mWidth = width;
+    this.mHeight = height;
   }
 
-  public float getLeft() {
-    return mLeft;
+  public float getWidth() {
+    return mWidth;
   }
 
-  public void setLeft(float left) {
-    this.mLeft = left;
+  public void setWidth(float width) {
+    this.mWidth = width;
   }
 
-  public float getTop() {
-    return mTop;
+  public float getHeight() {
+    return mHeight;
   }
 
-  public void setTop(float top) {
-    this.mTop = top;
-  }
-
-  public float getRight() {
-    return mRight;
-  }
-
-  public void setRight(float right) {
-    this.mRight = right;
-  }
-
-  public float getBottom() {
-    return mBottom;
-  }
-
-  public void setBottom(float bottom) {
-    this.mBottom = bottom;
+  public void setHeight(float height) {
+    this.mHeight = height;
   }
 }

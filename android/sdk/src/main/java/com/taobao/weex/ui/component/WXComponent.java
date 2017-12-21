@@ -50,10 +50,9 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
-import com.taobao.weex.ui.action.WXUIPosition;
-import com.taobao.weex.ui.action.WXUISize;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
@@ -515,7 +514,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void updateDemission(WXUISize size, WXUIPosition position) {
+  public void updateDemission(GraphicSize size, GraphicPosition position) {
     setLayoutPosition(position);
     setLayoutSize(size);
   }

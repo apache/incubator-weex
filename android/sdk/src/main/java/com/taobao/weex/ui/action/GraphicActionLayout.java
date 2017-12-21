@@ -18,29 +18,29 @@
  */
 package com.taobao.weex.ui.action;
 
-public class WXUISize {
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.component.WXComponent;
 
-  private float mWidth;
-  private float mHeight;
+public class GraphicActionLayout extends BasicGraphicAction {
 
-  public WXUISize(float width, float height) {
-    this.mWidth = width;
-    this.mHeight = height;
+  private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
+  private GraphicSize mLayoutSize = new GraphicSize(0, 0);
+
+  public GraphicActionLayout(String pageId, String ref, GraphicPosition layoutPosition, GraphicSize layoutSize) {
+    super(pageId, ref);
+    this.mLayoutPosition = layoutPosition;
+    this.mLayoutSize = layoutSize;
   }
 
-  public float getWidth() {
-    return mWidth;
-  }
+  @Override
+  public void executeAction() {
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
+      return;
+    }
 
-  public void setWidth(float width) {
-    this.mWidth = width;
-  }
-
-  public float getHeight() {
-    return mHeight;
-  }
-
-  public void setHeight(float height) {
-    this.mHeight = height;
+    component.updateDemission(mLayoutSize, mLayoutPosition);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
   }
 }

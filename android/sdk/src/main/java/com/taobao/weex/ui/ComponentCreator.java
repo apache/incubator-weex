@@ -19,7 +19,6 @@
 package com.taobao.weex.ui;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;

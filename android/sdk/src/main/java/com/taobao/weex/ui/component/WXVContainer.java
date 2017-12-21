@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 
 import java.util.ArrayList;

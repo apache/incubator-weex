@@ -40,7 +40,6 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;

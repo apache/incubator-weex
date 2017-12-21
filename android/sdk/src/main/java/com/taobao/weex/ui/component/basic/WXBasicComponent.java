@@ -25,8 +25,8 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.WXUIPosition;
-import com.taobao.weex.ui.action.WXUISize;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -48,8 +48,8 @@ public abstract class WXBasicComponent<T extends View> {
   private String mComponentType;
   private String mParentRef;
   private String mRef;
-  private WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
-  private WXUISize mLayoutSize = new WXUISize(0, 0);
+  private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
+  private GraphicSize mLayoutSize = new GraphicSize(0, 0);
 
   private int mViewPortWidth = 750;
 
@@ -298,19 +298,19 @@ public abstract class WXBasicComponent<T extends View> {
     this.mRef = mRef;
   }
 
-  public WXUIPosition getLayoutPosition() {
+  public GraphicPosition getLayoutPosition() {
     return mLayoutPosition;
   }
 
-  public void setLayoutPosition(WXUIPosition mLayoutPosition) {
+  public void setLayoutPosition(GraphicPosition mLayoutPosition) {
     this.mLayoutPosition = mLayoutPosition;
   }
 
-  public WXUISize getLayoutSize() {
+  public GraphicSize getLayoutSize() {
     return mLayoutSize;
   }
 
-  public void setLayoutSize(WXUISize mLayoutSize) {
+  public void setLayoutSize(GraphicSize mLayoutSize) {
     this.mLayoutSize = mLayoutSize;
   }
 

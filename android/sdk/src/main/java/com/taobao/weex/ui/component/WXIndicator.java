@@ -29,16 +29,11 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *

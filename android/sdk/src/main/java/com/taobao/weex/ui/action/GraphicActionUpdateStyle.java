@@ -20,16 +20,26 @@ package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+
 import java.util.Map;
 
-public class UpdateAttrUIAction extends BasicUIAction {
+public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
-  private Map<String, String> mAttrs;
+  private Map<String, String> mStyle;
+  private Map<String, String> mPaddings;
+  private Map<String, String> mMargins;
+  private Map<String, String> mBorders;
 
-  public UpdateAttrUIAction(String pageId, String ref,
-                            Map<String, String> attrs) {
+  public GraphicActionUpdateStyle(String pageId, String ref,
+                                  Map<String, String> style,
+                                  Map<String, String> paddings,
+                                  Map<String, String> margins,
+                                  Map<String, String> borders) {
     super(pageId, ref);
-    this.mAttrs = attrs;
+    this.mStyle = style;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
   }
 
   @Override
@@ -38,16 +48,12 @@ public class UpdateAttrUIAction extends BasicUIAction {
     if (component == null) {
       return;
     }
-    if (mAttrs != null) {
-      component.updateAttrs(mAttrs);
+    if (mStyle != null) {
+      component.updateStyles(mStyle);
+      component.updateCSSShorthand(mPaddings);
+      component.updateCSSShorthand(mMargins);
+      component.updateCSSShorthand(mBorders);
+      component.setLayout(component);
     }
-  }
-
-  public Map<String, String> getAttrs() {
-    return mAttrs;
-  }
-
-  public void setAttrs(Map<String, String> attrs) {
-    this.mAttrs = attrs;
   }
 }

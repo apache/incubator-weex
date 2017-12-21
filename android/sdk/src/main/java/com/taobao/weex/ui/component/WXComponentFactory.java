@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.CommonCompData;

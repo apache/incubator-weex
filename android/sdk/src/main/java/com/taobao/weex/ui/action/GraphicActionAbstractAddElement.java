@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AbstractAddElementUIAction extends BasicUIAction {
+public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction {
 
   protected String mComponentType;
   protected String mParentRef;
@@ -40,7 +40,7 @@ public abstract class AbstractAddElementUIAction extends BasicUIAction {
   protected HashMap<String, String> mMargins;
   protected HashMap<String, String> mBorders;
 
-  public AbstractAddElementUIAction(String pageId, String ref) {
+  public GraphicActionAbstractAddElement(String pageId, String ref) {
     super(pageId, ref);
   }
 

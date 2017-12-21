@@ -18,31 +18,36 @@
  */
 package com.taobao.weex.ui.action;
 
-public abstract class BasicUIAction {
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.component.WXComponent;
+import java.util.Map;
 
-  private String mPageId;
-  private String mRef;
+public class GraphicActionUpdateAttr extends BasicGraphicAction {
 
-  public BasicUIAction(String pageId, String ref) {
-    this.mPageId = pageId;
-    this.mRef = ref;
+  private Map<String, String> mAttrs;
+
+  public GraphicActionUpdateAttr(String pageId, String ref,
+                                 Map<String, String> attrs) {
+    super(pageId, ref);
+    this.mAttrs = attrs;
   }
 
-  public abstract void executeAction();
-
-  public String getPageId() {
-    return mPageId;
+  @Override
+  public void executeAction() {
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
+      return;
+    }
+    if (mAttrs != null) {
+      component.updateAttrs(mAttrs);
+    }
   }
 
-  public String getRef() {
-    return mRef;
+  public Map<String, String> getAttrs() {
+    return mAttrs;
   }
 
-  public void setRef(String ref) {
-    this.mRef = ref;
-  }
-
-  public void setPageId(String pageId) {
-    this.mPageId = pageId;
+  public void setAttrs(Map<String, String> attrs) {
+    this.mAttrs = attrs;
   }
 }

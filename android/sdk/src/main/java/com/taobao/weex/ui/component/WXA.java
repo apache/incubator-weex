@@ -22,7 +22,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.ATagUtil;

@@ -27,7 +27,6 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -49,15 +48,14 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.action.AddElementAction;
-import com.taobao.weex.ui.action.AddElementUIAction;
-import com.taobao.weex.ui.action.BasicUIAction;
-import com.taobao.weex.ui.action.CreateBodyUIAction;
-import com.taobao.weex.ui.action.LayoutUIAction;
-import com.taobao.weex.ui.action.UpdateAttrUIAction;
-import com.taobao.weex.ui.action.UpdateStyleUIAction;
-import com.taobao.weex.ui.action.WXUIPosition;
-import com.taobao.weex.ui.action.WXUISize;
+import com.taobao.weex.ui.action.GraphicActionAddElementOld;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionLayout;
+import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1819,7 +1817,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final BasicUIAction action = new CreateBodyUIAction(pageId, ref, componentType,
+        final BasicGraphicAction action = new GraphicActionCreateBody(pageId, ref, componentType,
                 styles, attributes, events, paddings, margins, borders);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
@@ -1857,7 +1855,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final BasicUIAction action = new AddElementUIAction(pageId, ref, componentType, parentRef, index,
+        final BasicGraphicAction action = new GraphicActionAddElementOld(pageId, ref, componentType, parentRef, index,
                 styles, attributes, events, paddings, margins, borders);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
@@ -1886,7 +1884,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final BasicUIAction action = new UpdateStyleUIAction(instanceId, ref, styles, paddings, margins, borders);
+        final BasicGraphicAction action = new GraphicActionUpdateStyle(instanceId, ref, styles, paddings, margins, borders);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -1911,7 +1909,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        final BasicUIAction action = new UpdateAttrUIAction(instanceId, ref, attrs);
+        final BasicGraphicAction action = new GraphicActionUpdateAttr(instanceId, ref, attrs);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -1941,9 +1939,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        WXUISize size = new WXUISize(width, height);
-        WXUIPosition position = new WXUIPosition(left, top, right, bottom);
-        final BasicUIAction action = new LayoutUIAction(pageId, ref, position, size);
+        GraphicSize size = new GraphicSize(width, height);
+        GraphicPosition position = new GraphicPosition(left, top, right, bottom);
+        final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -1992,7 +1990,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
 //      JSONObject domObject = JSON.parseObject(dom);
-//      final BasicUIAction action = new AddElementAction(instanceId, parentRef, domObject, Integer.parseInt(index));
+//      final BasicGraphicAction action = new GraphicActionAddElement(instanceId, parentRef, domObject, Integer.parseInt(index));
 //      WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
     }
 

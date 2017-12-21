@@ -36,7 +36,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXCircleIndicator;

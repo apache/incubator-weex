@@ -42,7 +42,6 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;

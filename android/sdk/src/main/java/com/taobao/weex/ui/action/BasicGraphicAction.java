@@ -18,29 +18,31 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
+public abstract class BasicGraphicAction {
 
-public class LayoutUIAction extends BasicUIAction {
+  private String mPageId;
+  private String mRef;
 
-  private WXUIPosition mLayoutPosition = new WXUIPosition(0, 0, 0, 0);
-  private WXUISize mLayoutSize = new WXUISize(0, 0);
-
-  public LayoutUIAction(String pageId, String ref, WXUIPosition layoutPosition, WXUISize layoutSize) {
-    super(pageId, ref);
-    this.mLayoutPosition = layoutPosition;
-    this.mLayoutSize = layoutSize;
+  public BasicGraphicAction(String pageId, String ref) {
+    this.mPageId = pageId;
+    this.mRef = ref;
   }
 
-  @Override
-  public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if (component == null) {
-      return;
-    }
+  public abstract void executeAction();
 
-    component.updateDemission(mLayoutSize, mLayoutPosition);
-    component.applyLayoutAndEvent(component);
-    component.bindData(component);
+  public String getPageId() {
+    return mPageId;
+  }
+
+  public String getRef() {
+    return mRef;
+  }
+
+  public void setRef(String ref) {
+    this.mRef = ref;
+  }
+
+  public void setPageId(String pageId) {
+    this.mPageId = pageId;
   }
 }

@@ -21,7 +21,6 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -29,17 +28,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class AddElementUIAction extends AbstractAddElementUIAction {
+public class GraphicActionAddElementOld extends GraphicActionAbstractAddElement {
 
-  public AddElementUIAction(String pageId, String ref,
-                            String componentType, String parentRef,
-                            int index,
-                            Map<String, String> style,
-                            Map<String, String> attributes,
-                            Set<String> events,
-                            HashMap<String, String> paddings,
-                            HashMap<String, String> margins,
-                            HashMap<String, String> borders) {
+  public GraphicActionAddElementOld(String pageId, String ref,
+                                    String componentType, String parentRef,
+                                    int index,
+                                    Map<String, String> style,
+                                    Map<String, String> attributes,
+                                    Set<String> events,
+                                    HashMap<String, String> paddings,
+                                    HashMap<String, String> margins,
+                                    HashMap<String, String> borders) {
     super(pageId, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;

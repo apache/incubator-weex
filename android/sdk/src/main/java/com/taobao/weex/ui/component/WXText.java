@@ -50,7 +50,6 @@ import com.taobao.weex.dom.WXCustomStyleSpan;
 import com.taobao.weex.dom.WXLineHeightSpan;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.layout.MeasureMode;
 import com.taobao.weex.layout.MeasureSize;

@@ -29,12 +29,12 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-public class AddElementAction extends AbstractAddElementUIAction {
+public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   private JSONObject mData;
 
-  public AddElementAction(String pageId, String parentRef,
-                          JSONObject data, int index) {
+  public GraphicActionAddElement(String pageId, String parentRef,
+                                 JSONObject data, int index) {
     super(pageId, null);
     this.mParentRef = parentRef;
     this.mData = data;

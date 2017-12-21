@@ -20,7 +20,6 @@ package com.alibaba.weex.extend.component;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXVContainer;

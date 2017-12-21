@@ -43,7 +43,6 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.ui.action.AbstractAddElementUIAction;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXImageView;

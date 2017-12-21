@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,30 +16,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.alibaba.weex.commons.adapter;
+package com.taobao.weex.ui.action;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.widget.ImageView;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.CommonCompData;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXVContainer;
+public class GraphicPosition {
 
-/**
- * Created by sospartan on 8/19/16.
- */
-public class FrescoImageComponent extends WXImage {
+  private float mLeft;
+  private float mTop;
+  private float mRight;
+  private float mBottom;
 
-  public FrescoImageComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public GraphicPosition(float left, float top, float right, float bottom) {
+    this.mLeft = left;
+    this.mTop = top;
+    this.mRight = right;
+    this.mBottom = bottom;
   }
 
-  @Override
-  protected ImageView initComponentHostView(@NonNull Context context) {
-    FrescoImageView view = new FrescoImageView(context);
-    view.setScaleType(ImageView.ScaleType.FIT_XY);
+  public float getLeft() {
+    return mLeft;
+  }
 
-    return view;
+  public void setLeft(float left) {
+    this.mLeft = left;
+  }
+
+  public float getTop() {
+    return mTop;
+  }
+
+  public void setTop(float top) {
+    this.mTop = top;
+  }
+
+  public float getRight() {
+    return mRight;
+  }
+
+  public void setRight(float right) {
+    this.mRight = right;
+  }
+
+  public float getBottom() {
+    return mBottom;
+  }
+
+  public void setBottom(float bottom) {
+    this.mBottom = bottom;
   }
 }

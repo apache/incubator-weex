@@ -20,31 +20,28 @@ package com.taobao.weex.ui.action;
 
 import android.widget.ScrollView;
 
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class CreateBodyUIAction extends AbstractAddElementUIAction {
+public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
 
-  public CreateBodyUIAction(String pageId, String ref,
-                            String componentType,
-                            Map<String, String> style,
-                            Map<String, String> attributes,
-                            Set<String> events,
-                            HashMap<String, String> paddings,
-                            HashMap<String, String> margins,
-                            HashMap<String, String> borders) {
+  public GraphicActionCreateBody(String pageId, String ref,
+                                 String componentType,
+                                 Map<String, String> style,
+                                 Map<String, String> attributes,
+                                 Set<String> events,
+                                 HashMap<String, String> paddings,
+                                 HashMap<String, String> margins,
+                                 HashMap<String, String> borders) {
     super(pageId, ref);
     this.mComponentType = componentType;
     this.mStyle = style;
