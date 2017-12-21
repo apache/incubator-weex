@@ -39,33 +39,14 @@ public abstract class AbstractAddElementUIAction extends BasicUIAction {
   protected HashMap<String, String> mPaddings;
   protected HashMap<String, String> mMargins;
   protected HashMap<String, String> mBorders;
-  protected CommonCompData mCommonCompData;
 
-  public AbstractAddElementUIAction(String pageId, String ref,
-                                    String componentType, String parentRef,
-                                    int index,
-                                    Map<String, String> style,
-                                    Map<String, String> attributes,
-                                    Set<String> events,
-                                    HashMap<String, String> paddings,
-                                    HashMap<String, String> margins,
-                                    HashMap<String, String> borders) {
+  public AbstractAddElementUIAction(String pageId, String ref) {
     super(pageId, ref);
-    this.mComponentType = componentType;
-    this.mParentRef = parentRef;
-    this.mIndex = index;
-    this.mStyle = style;
-    this.mAttributes = attributes;
-    this.mEvents = events;
-    this.mPaddings = paddings;
-    this.mMargins = margins;
-    this.mBorders = borders;
-    this.mCommonCompData = new CommonCompData(pageId, ref, componentType, parentRef);
   }
 
-  protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent) {
+  protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
 
-    WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, mCommonCompData);
+    WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, commonCompData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
 
     if (component != null) {

@@ -36,6 +36,7 @@ import java.util.Set;
 
 public class CreateBodyUIAction extends AbstractAddElementUIAction {
 
+
   public CreateBodyUIAction(String pageId, String ref,
                             String componentType,
                             Map<String, String> style,
@@ -44,7 +45,14 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
                             HashMap<String, String> paddings,
                             HashMap<String, String> margins,
                             HashMap<String, String> borders) {
-    super(pageId, ref, componentType, null, -2, style, attributes, events, paddings, margins, borders);
+    super(pageId, ref);
+    this.mComponentType = componentType;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
   }
 
   @Override
@@ -54,7 +62,8 @@ public class CreateBodyUIAction extends AbstractAddElementUIAction {
       return;
     }
 
-    final WXComponent component = createComponent(instance, null);
+    CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), null);
+    final WXComponent component = createComponent(instance, null, commonCompData);
     if (component == null) {
       return;
     }
