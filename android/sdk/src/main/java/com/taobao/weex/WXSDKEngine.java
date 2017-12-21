@@ -21,6 +21,7 @@ package com.taobao.weex;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -46,6 +47,7 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.dom.BasicEditTextDomObject;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.dom.WXCellDomObject;
@@ -57,6 +59,7 @@ import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
+import com.taobao.weex.performance.FpsCollector;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
 import com.taobao.weex.ui.IExternalModuleGetter;
@@ -102,6 +105,7 @@ import com.taobao.weex.utils.batch.BatchOperationHelper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Handler;
 
 public class WXSDKEngine {
 
@@ -172,6 +176,15 @@ public class WXSDKEngine {
       doInitInternal(application,config);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
+      if (WXPerformance.TRACE_DATA){
+        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            FpsCollector.getInstance().init();
+          }
+        },0);
+      }
+
       mIsInit = true;
     }
   }

@@ -323,7 +323,8 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Override
-  public void onAppear() {
+  public void
+  onAppear() {
     //appear event from root instance will not trigger visibility change
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootComponent();
