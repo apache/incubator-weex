@@ -1,0 +1,22 @@
+#include "RenderPerformance.h"
+#include <base/android/LogUtils.h>
+
+namespace WeexCore {
+  void RenderPerformance::printPerformanceLog_Impl_Android(PerformanceStage performanceStage) {
+    if (performanceStage == onFirstScreen) {
+      LOGD("[WeexCore render time] onFirstScreen");
+    } else {
+      LOGD("[WeexCore render time] onRenderSuccess");
+    }
+    LOGD("[WeexCore render time]      jniCallTime: %lld", jniCallTime);
+    LOGD("[WeexCore render time]      addElementActionJNITime: %lld", addElementActionJNITime);
+    LOGD("[WeexCore render time]      layoutActionJniTime: %lld", layoutActionJniTime);
+    LOGD("[WeexCore render time]      cssLayoutTime: %lld", cssLayoutTime);
+    LOGD("[WeexCore render time]      parseJsonTime: %lld", parseJsonTime);
+    LOGD("[WeexCore render time]      buildRenderObjectTime: %lld", buildRenderObjectTime);
+  }
+
+  void RenderPerformance::printPerformanceLog_Impl_iOS(PerformanceStage performanceStage) {
+
+  }
+}

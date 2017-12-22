@@ -57,8 +57,12 @@ add_library(weexjsc SHARED
     ./WeexCore/parser/DomParser.cpp
 
     ./WeexCore/layout/WXCoreLayout.cpp
+    ./WeexCore/layout/WXCoreStyle.cpp
+
+    ./WeexCore/css/CssValueGetter.cpp
 
     ./WeexCore/env/CoreEnvironment.cpp
+    ./WeexCore/env/RenderPerformance.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)
