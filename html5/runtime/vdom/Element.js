@@ -28,7 +28,7 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
-import { uniqueId } from '../utils'
+import { uniqueId, isEmpty } from '../utils'
 import { getWeexElement, setElement } from './WeexElement'
 
 const DEFAULT_TAG_NAME = 'div'
@@ -303,15 +303,23 @@ export default class Element extends Node {
    * @param {boolean} silent
    */
   setAttrs (batchedAttrs, silent) {
-    // TODO: validate batched attributes
-    Object.assign(this.attr, batchedAttrs)
-    const taskCenter = getTaskCenter(this.docId)
-    if (!silent && taskCenter) {
-      taskCenter.send(
-        'dom',
-        { action: 'updateAttrs' },
-        [this.ref, batchedAttrs]
-      )
+    if (isEmpty(batchedAttrs)) return
+    const mutations = {}
+    for (const key in batchedAttrs) {
+      if (this.attr[key] !== batchedAttrs[key]) {
+        this.attr[key] = batchedAttrs[key]
+        mutations[key] = batchedAttrs[key]
+      }
+    }
+    if (!isEmpty(mutations)) {
+      const taskCenter = getTaskCenter(this.docId)
+      if (!silent && taskCenter) {
+        taskCenter.send(
+          'dom',
+          { action: 'updateAttrs' },
+          [this.ref, mutations]
+        )
+      }
     }
   }
 
@@ -344,15 +352,23 @@ export default class Element extends Node {
    * @param {boolean} silent
    */
   setStyles (batchedStyles, silent) {
-    // TODO: validate batched styles
-    Object.assign(this.style, batchedStyles)
-    const taskCenter = getTaskCenter(this.docId)
-    if (!silent && taskCenter) {
-      taskCenter.send(
-        'dom',
-        { action: 'updateStyle' },
-        [this.ref, batchedStyles]
-      )
+    if (isEmpty(batchedStyles)) return
+    const mutations = {}
+    for (const key in batchedStyles) {
+      if (this.style[key] !== batchedStyles[key]) {
+        this.style[key] = batchedStyles[key]
+        mutations[key] = batchedStyles[key]
+      }
+    }
+    if (!isEmpty(mutations)) {
+      const taskCenter = getTaskCenter(this.docId)
+      if (!silent && taskCenter) {
+        taskCenter.send(
+          'dom',
+          { action: 'updateStyle' },
+          [this.ref, mutations]
+        )
+      }
     }
   }
 
