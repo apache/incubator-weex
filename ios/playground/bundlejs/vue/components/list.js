@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(427)
+	__vue_styles__.push(__webpack_require__(31)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(428)
+	__vue_exports__ = __webpack_require__(32)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(429)
+	var __vue_template__ = __webpack_require__(33)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/list.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/list.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-b4a37b42"
+	__vue_options__._scopeId = "data-v-2953851f"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,10 +89,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 427:
-/***/ function(module, exports) {
+/***/ 31:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "list": {
@@ -100,7 +100,10 @@
 	  },
 	  "count": {
 	    "fontSize": 48,
-	    "margin": 10
+	    "marginTop": 10,
+	    "marginRight": 10,
+	    "marginBottom": 10,
+	    "marginLeft": 10
 	  },
 	  "indicator": {
 	    "height": 40,
@@ -115,15 +118,18 @@
 	    "borderBottomWidth": 2,
 	    "borderBottomColor": "#c0c0c0",
 	    "height": 100,
-	    "padding": 20,
+	    "paddingTop": 20,
+	    "paddingRight": 20,
+	    "paddingBottom": 20,
+	    "paddingLeft": 20,
 	    "backgroundColor:active": "#00BDFF"
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 428:
-/***/ function(module, exports) {
+/***/ 32:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -176,19 +182,20 @@
 	//
 	//
 	//
+	//
 
 	module.exports = {
 	  methods: {
-	    onappear: function onappear(e) {
-	      var appearId = this.rows[e.target.attr.index].id;
-	      nativeLog('+++++', appearId);
+	    onappear: function onappear(idx, e) {
+	      var appearId = this.rows[idx].id;
+	      console.log('+++++', appearId);
 	      var appearIds = this.appearIds;
 	      appearIds.push(appearId);
 	      this.getMinAndMaxIds(appearIds);
 	    },
-	    ondisappear: function ondisappear(e) {
-	      var disAppearId = this.rows[e.target.attr.index].id;
-	      nativeLog('+++++', disAppearId);
+	    ondisappear: function ondisappear(idx, e) {
+	      var disAppearId = this.rows[idx].id;
+	      console.log('+++++', disAppearId);
 	      var appearIds = this.appearIds;
 	      var index = appearIds.indexOf(disAppearId);
 	      if (index > -1) {
@@ -215,16 +222,17 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 429:
-/***/ function(module, exports) {
+/***/ 33:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', [_c('list', {
 	    staticClass: ["list"]
 	  }, _vm._l((_vm.rows), function(v, i) {
 	    return _c('cell', {
+	      key: i,
 	      staticClass: ["row"],
 	      appendAsTree: true,
 	      attrs: {
@@ -232,8 +240,12 @@
 	        "index": i
 	      },
 	      on: {
-	        "appear": _vm.onappear,
-	        "disappear": _vm.ondisappear
+	        "appear": function($event) {
+	          _vm.onappear(i, $event)
+	        },
+	        "disappear": function($event) {
+	          _vm.ondisappear(i, $event)
+	        }
 	      }
 	    }, [_c('div', {
 	      staticClass: ["item"]
@@ -249,6 +261,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

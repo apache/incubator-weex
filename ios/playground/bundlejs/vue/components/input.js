@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(424)
+	__vue_styles__.push(__webpack_require__(28)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(425)
+	__vue_exports__ = __webpack_require__(29)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(426)
+	var __vue_template__ = __webpack_require__(30)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/input.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/input.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-7d23074e"
+	__vue_options__._scopeId = "data-v-9b1cdcce"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,10 +89,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 424:
-/***/ function(module, exports) {
+/***/ 28:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "input": {
@@ -115,13 +115,23 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 425:
-/***/ function(module, exports) {
+/***/ 29:
+/***/ (function(module, exports) {
 
 	'use strict';
 
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 	//
 	//
 	//
@@ -311,14 +321,21 @@
 	    setRange: function setRange() {
 	      console.log(this.$refs["inputselection"]);
 	      this.$refs["inputselection"].setSelectionRange(2, 6);
+	    },
+	    getSelectionRange: function getSelectionRange() {
+	      console.log(this.$refs["inputselection"]);
+	      var self = this;
+	      this.$refs["inputselection"].getSelectionRange(function (e) {
+	        self.txtSelection = e.selectionStart + '-' + e.selectionEnd;
+	      });
 	    }
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 426:
-/***/ function(module, exports) {
+/***/ 30:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', [_c('div', [_c('text', {
@@ -333,12 +350,16 @@
 	    staticStyle: {
 	      fontSize: "40px"
 	    }
-	  }, [_vm._v("onreturntype: " + _vm._s(_vm.txtReturnType))])]), _c('scroller', [_c('div', [_vm._m(0), _c('input', {
+	  }, [_vm._v("onreturntype: " + _vm._s(_vm.txtReturnType))]), _c('text', {
+	    staticStyle: {
+	      fontSize: "40px"
+	    }
+	  }, [_vm._v("selection: " + _vm._s(_vm.txtSelection))])]), _c('scroller', [_c('div', [_vm._m(0), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
 	      "placeholder": "Input Text",
-	      "autofocus": _vm.autofocus,
+	      "autofocus": true,
 	      "value": ""
 	    },
 	    on: {
@@ -398,6 +419,16 @@
 	  })]), _c('div', [_vm._m(6), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
+	      "type": "number",
+	      "placeholder": "Input number"
+	    },
+	    on: {
+	      "change": _vm.onchange,
+	      "input": _vm.oninput
+	    }
+	  })]), _c('div', [_vm._m(7), _c('input', {
+	    staticClass: ["input"],
+	    attrs: {
 	      "type": "date",
 	      "placeholder": "Input Date",
 	      "max": "2017-12-12",
@@ -407,7 +438,7 @@
 	      "change": _vm.onchange,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(7), _c('input', {
+	  })]), _c('div', [_vm._m(8), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -419,7 +450,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(8), _c('input', {
+	  })]), _c('div', [_vm._m(9), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -431,7 +462,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(9), _c('input', {
+	  })]), _c('div', [_vm._m(10), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -443,7 +474,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(10), _c('input', {
+	  })]), _c('div', [_vm._m(11), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -455,7 +486,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(11), _c('input', {
+	  })]), _c('div', [_vm._m(12), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -467,7 +498,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(12), _c('input', {
+	  })]), _c('div', [_vm._m(13), _c('input', {
 	    staticClass: ["input"],
 	    attrs: {
 	      "type": "text",
@@ -479,7 +510,7 @@
 	      "return": _vm.onreturn,
 	      "input": _vm.oninput
 	    }
-	  })]), _c('div', [_vm._m(13), _c('div', {
+	  })]), _c('div', [_vm._m(14), _c('div', {
 	    staticStyle: {
 	      flexDirection: "row",
 	      marginBottom: "16px",
@@ -511,7 +542,7 @@
 	      "placeholder": "Input1",
 	      "value": ""
 	    }
-	  })]), _c('div', [_vm._m(14), _c('div', {
+	  })]), _c('div', [_vm._m(15), _c('div', {
 	    staticStyle: {
 	      flexDirection: "row",
 	      marginBottom: "16px",
@@ -525,6 +556,15 @@
 	    },
 	    on: {
 	      "click": _vm.setRange
+	    }
+	  }), _c('text', {
+	    staticClass: ["button"],
+	    attrs: {
+	      "value": "getSelectionRange",
+	      "type": "primary"
+	    },
+	    on: {
+	      "click": _vm.getSelectionRange
 	    }
 	  })]), _c('input', {
 	    ref: "inputselection",
@@ -630,6 +670,19 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
+	  }, [_vm._v("input type = number")])])
+	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', {
+	    staticStyle: {
+	      backgroundColor: "#286090"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      height: "80",
+	      padding: "20",
+	      color: "#FFFFFF"
+	    }
 	  }, [_vm._v("input type = date")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -643,7 +696,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = default")])])
+	  }, [_vm._v("input return-key-type = default")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -656,7 +709,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = go")])])
+	  }, [_vm._v("input return-key-type = go")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -669,7 +722,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = next")])])
+	  }, [_vm._v("input return-key-type = next")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -682,7 +735,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = search")])])
+	  }, [_vm._v("input return-key-type = search")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -695,7 +748,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = send")])])
+	  }, [_vm._v("input return-key-type = send")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -708,7 +761,7 @@
 	      padding: "20",
 	      color: "#FFFFFF"
 	    }
-	  }, [_vm._v("input keyboard = done")])])
+	  }, [_vm._v("input return-key-type = done")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
@@ -738,6 +791,6 @@
 	}]}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });
