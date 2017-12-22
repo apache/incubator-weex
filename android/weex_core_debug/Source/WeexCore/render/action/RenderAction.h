@@ -1,7 +1,7 @@
 #ifndef WEEXV8_RENDERACTION_H
 #define WEEXV8_RENDERACTION_H
 
-#include <Layout/WXCoreLayout.h>
+#include <WeexCore/layout/WXCoreLayout.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>

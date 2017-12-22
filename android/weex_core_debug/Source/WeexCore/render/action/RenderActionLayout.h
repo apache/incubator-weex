@@ -5,7 +5,7 @@
 
 namespace WeexCore {
 
-  class LayoutRenderAction : public RenderAction {
+  class RenderActionLayout : public RenderAction {
 
   public:
 
@@ -19,31 +19,11 @@ namespace WeexCore {
     float mBottom;
     float mRight;
 
-    void ExecuteAction() {
-      RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
-      long long startTime = getCurrentTime();
-      BridgeAndroid::getInstance()->callLayoutByWeexCore(mPageId, mRef,
-                                                         mTop, mBottom,
-                                                         mLeft, mRight,
-                                                         mHeight, mWidth);
-      page->jniCallTime(getCurrentTime() - startTime);
-      page->layoutActionJniTime(getCurrentTime() - startTime);
-    }
+    RenderActionLayout(std::string pageId, RenderObject *render);
 
-    void getLayoutInfo(WXCoreLayoutNode *node) {
-      mTop = node->getLayoutPositionTop();
-      mBottom = node->getLayoutPositionBottom();
-      mRight = node->getLayoutPositionRight();
-      mLeft = node->getLayoutPositionLeft();
-      mHeight = node->getLayoutHeight();
-      mWidth = node->getLayoutWidth();
-    }
+    void ExecuteAction();
 
-    void GenerateAction(std::string pageId, RenderObject *render) {
-      this->mPageId = pageId;
-      this->mRef = render->getRef();
-      getLayoutInfo(render);
-    }
+    void getLayoutInfo(WXCoreLayoutNode *node);
   };
 }
 

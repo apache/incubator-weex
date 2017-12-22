@@ -36,7 +36,7 @@ protected:
     ~FlexWrapDimension() override {
         root->freeWXCoreNode();
         target->freeWXCoreNode();
-        FormatingContext bfc = NON_BFC;
+        FormattingContext bfc = NON_BFC;
         for (auto i = 0; i < root->getChildCount(bfc); i++) {
             root->getChildAt(bfc, i)->freeWXCoreNode();
         }

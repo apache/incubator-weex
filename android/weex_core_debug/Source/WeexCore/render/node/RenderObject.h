@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include <jni.h>
-#include <Layout/WXCoreLayout.h>
+#include <WeexCore/layout/WXCoreLayout.h>
 
 namespace WeexCore {
 

@@ -12,7 +12,7 @@ namespace WeexCore {
 
   class RenderObject;
 
-  class WXCorePerformance;
+  class RenderPerformance;
 
   class RenderPage {
 
@@ -29,7 +29,7 @@ namespace WeexCore {
 
     std::map<std::string, RenderObject *> mRenderObjectMap;
 
-    WXCorePerformance *mWXCorePerformance;
+    RenderPerformance *mWXCorePerformance;
 
     void pushRenderToMap(RenderObject *render);
 

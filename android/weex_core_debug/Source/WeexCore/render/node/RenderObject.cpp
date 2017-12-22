@@ -6,8 +6,8 @@
 #include <base/android/jni/scoped_java_ref.h>
 #include <WeexCore/platform/android/WeexCore.h>
 #include <base/android/string/StringUtils.h>
-#include <Layout/ConstantsName.h>
-#include <Layout/CssValueGetter.h>
+#include <WeexCore/css/ConstantsName.h>
+#include <WeexCore/css/CssValueGetter.h>
 
 namespace WeexCore {
 

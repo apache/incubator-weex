@@ -5,23 +5,15 @@
 
 namespace WeexCore {
 
-  class CreateFinishAction : public RenderAction {
+  class RenderActionCreateFinish : public RenderAction {
 
   public:
 
     std::string mPageId;
 
-    void ExecuteAction() {
-      RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
-      long long startTime = getCurrentTime();
-      BridgeAndroid::getInstance()->callCreateFinishByWeexCore(mPageId);
+    RenderActionCreateFinish(std::string pageId);
 
-      page->jniCallTime(getCurrentTime() - startTime);
-    }
-
-    void GenerateAction(std::string pageId) {
-      this->mPageId = pageId;
-    }
+    void ExecuteAction();
   };
 }
 

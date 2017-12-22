@@ -17,7 +17,7 @@ IF (COVERAGE)
 ENDIF ()
 
 # Add Layout as a static library.
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../android/weex_core_debug/Source/Layout)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../android/weex_core_debug/Source/WeexCore/layout)
 file(GLOB_RECURSE HEAD_FILES ${SOURCE_DIR}/*.h)
 file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 add_library(WXCoreLayout_lib ${HEAD_FILES} ${SOURCE_FILES})

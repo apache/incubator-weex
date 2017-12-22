@@ -9,7 +9,7 @@ namespace WeexCore {
     onFirstScreen, onRenderSuccess,
   } PerformanceStage;
 
-  class WXCorePerformance {
+  class RenderPerformance {
 
   public:
 
@@ -25,7 +25,7 @@ namespace WeexCore {
 
     long long buildRenderObjectTime;
 
-    WXCorePerformance() : jniCallTime(0), cssLayoutTime(0), addElementActionJNITime(0),
+    RenderPerformance() : jniCallTime(0), cssLayoutTime(0), addElementActionJNITime(0),
                           layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0) {}
 
     inline void printPerformanceLog(PerformanceStage performanceStage) {

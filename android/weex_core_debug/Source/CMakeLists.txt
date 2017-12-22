@@ -18,6 +18,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 add_library(weexjsc SHARED
 
     ./prebuild/jni_load.cc
+
     ./base/android/jni/android_jni.cpp
     ./base/android/jni/scoped_java_ref.cpp
 
@@ -27,7 +28,6 @@ add_library(weexjsc SHARED
     ./base/android/string/ScopedJString.cpp
     ./base/android/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
-    ./base/WXCoreEnvironment.cpp
 
     ./WeexCore/platform/android/WeexJSConnection.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
@@ -47,9 +47,18 @@ add_library(weexjsc SHARED
     ./WeexCore/render/node/RenderText.cpp
     ./WeexCore/render/node/RenderCell.cpp
 
-    ./rapidjson/weexjsontools.cpp
+    ./WeexCore/render/action/RenderActionAddElement.cpp
+    ./WeexCore/render/action/RenderActionCreateBody.cpp
+    ./WeexCore/render/action/RenderActionCreateFinish.cpp
+    ./WeexCore/render/action/RenderActionLayout.cpp
+    ./WeexCore/render/action/RenderActionUpdateAttr.cpp
+    ./WeexCore/render/action/RenderActionUpdateStyle.cpp
 
-    ./Layout/WXCoreLayout.cpp
+    ./WeexCore/parser/DomParser.cpp
+
+    ./WeexCore/layout/WXCoreLayout.cpp
+
+    ./WeexCore/env/CoreEnvironment.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)

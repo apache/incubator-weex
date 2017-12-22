@@ -1,7 +1,7 @@
 #ifndef WEEX_JSON_TOOLS
 #define WEEX_JSON_TOOLS
 
-#include "pointer.h"
+#include "rapidjson/pointer.h"
 #include <vector>
 
 namespace WeexCore {

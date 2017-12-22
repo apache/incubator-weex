@@ -1,5 +1,5 @@
 
-#include "weexjsontools.h"
+#include "DomParser.h"
 #include <base/fpconv.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/render/page/RenderPage.h>

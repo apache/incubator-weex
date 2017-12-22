@@ -1,5 +1,5 @@
-#include "WXCoreEnvironment.h"
-#include "CoreConstants.h"
+#include "CoreEnvironment.h"
+#include "base/CoreConstants.h"
 #include <stdlib.h>
 
 namespace WeexCore {

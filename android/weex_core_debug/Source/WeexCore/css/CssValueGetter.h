@@ -3,8 +3,8 @@
 
 #include "ConstantsValue.h"
 #include "ConstantsName.h"
-#include "WXCoreStyle.h"
-#include "WXCoreFlexEnum.h"
+#include "WeexCore/layout/WXCoreStyle.h"
+#include "WeexCore/layout/WXCoreFlexEnum.h"
 #include <string>
 
 inline WeexCore::WXCoreFlexDirection getWXCoreFlexDirection(std::string value) {

@@ -3,7 +3,7 @@
 
 #include <base/android/LogUtils.h>
 #include <base/android/string/StringUtils.h>
-#include <base/WXCoreEnvironment.h>
+#include <WeexCore/env/CoreEnvironment.h>
 #include "WeexCore.h"
 #include "ExtendJSApi.h"
 

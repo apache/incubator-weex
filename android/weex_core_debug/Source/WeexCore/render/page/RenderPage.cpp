@@ -1,14 +1,14 @@
-#include <rapidjson/weexjsontools.h>
+#include <WeexCore/parser/DomParser.h>
 #include <WeexCore/render/action/RenderActionAddElement.h>
 #include <WeexCore/render/action/RenderActionCreateBody.h>
 #include <WeexCore/render/action/RenderActionUpdateStyle.h>
 #include <WeexCore/render/action/RenderActionUpdateAttr.h>
 #include <WeexCore/render/action/RenderActionLayout.h>
 #include <WeexCore/render/action/RenderActionCreateFinish.h>
-#include <Layout/WXCoreLayout.h>
+#include <WeexCore/layout/WXCoreLayout.h>
 #include <base/android/string/StringUtils.h>
-#include <base/WXCorePerformance.h>
-#include <base/WXCoreEnvironment.h>
+#include <WeexCore/env/RenderPerformance.h>
+#include <WeexCore/env/CoreEnvironment.h>
 #include "RenderPage.h"
 #include "WeexCore/render/manager/RenderManager.h"
 #include "WeexCore/render/node/RenderObject.h"
@@ -20,7 +20,7 @@ namespace WeexCore {
 
   RenderPage::RenderPage(std::string pageID) {
     mPageId = pageID;
-    mWXCorePerformance = new WXCorePerformance();
+    mWXCorePerformance = new RenderPerformance();
     mInstance_Impl_Android = nullptr;
     mInstance_Impl_iOS = nullptr;
     mViewPortWidth = 750.0f;
@@ -377,8 +377,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    CreateBodyAction *action = new CreateBodyAction();
-    action->GenerateAction(getPageId(), render);
+    RenderActionCreateBody *action = new RenderActionCreateBody(getPageId(), render);
     addRenderAction(action);
 
     for (int i = 0; i < render->getChildCount(); ++i) {
@@ -390,8 +389,7 @@ namespace WeexCore {
     if (child == nullptr || parent == nullptr)
       return;
 
-    AddElementAction *action = new AddElementAction();
-    action->GenerateAction(getPageId(), child, parent, index);
+    RenderActionAddElement *action = new RenderActionAddElement(getPageId(), child, parent, index);
     addRenderAction(action);
 
     for (int i = 0; i < child->getChildCount(); ++i) {
@@ -403,8 +401,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    LayoutRenderAction *action = new LayoutRenderAction();
-    action->GenerateAction(getPageId(), render);
+    RenderActionLayout *action = new RenderActionLayout(getPageId(), render);
     addRenderAction(action);
   }
 
@@ -413,15 +410,13 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string> *> *margin,
                                          std::vector<std::pair<std::string, std::string> *> *padding,
                                          std::vector<std::pair<std::string, std::string> *> *border) {
-    UpdateStyleAction *action = new UpdateStyleAction();
-    action->GenerateAction(getPageId(), render->getRef(), style, margin, padding, border);
+    RenderActionUpdateStyle *action = new RenderActionUpdateStyle(getPageId(), render->getRef(), style, margin, padding, border);
     addRenderAction(action);
   }
 
   void RenderPage::sendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string> *> *attrs) {
-    UpdateAttrAction *action = new UpdateAttrAction();
-    action->GenerateAction(getPageId(), render->getRef(), attrs);
+    RenderActionUpdateAttr *action = new RenderActionUpdateAttr(getPageId(), render->getRef(), attrs);
     addRenderAction(action);
   }
 
@@ -430,8 +425,7 @@ namespace WeexCore {
   }
 
   void RenderPage::sendCreateFinishAction() {
-    CreateFinishAction *action = new CreateFinishAction();
-    action->GenerateAction(getPageId());
+    RenderActionCreateFinish *action = new RenderActionCreateFinish(getPageId());
     addRenderAction(action);
   }
 
