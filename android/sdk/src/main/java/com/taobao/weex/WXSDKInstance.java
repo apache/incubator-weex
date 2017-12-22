@@ -18,6 +18,8 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +37,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -54,6 +55,7 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.WXPerformance.Dimension;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
@@ -65,6 +67,7 @@ import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.performance.FpsCollector;
+import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -73,7 +76,6 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
-import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
@@ -81,7 +83,6 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -91,8 +92,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -881,18 +880,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   @Override
   public void onActivityPause() {
     onViewDisappear();
-    if(!isCommit){
-      Set<String> componentTypes= WXComponentFactory.getComponentTypesByInstanceId(getInstanceId());
-      if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
-        mWXPerformance.useScroller=1;
+    if (!isCommit) {
+      Set<String> componentTypes = WXComponentFactory
+          .getComponentTypesByInstanceId(getInstanceId());
+      if (componentTypes != null && componentTypes.contains(WXBasicComponentType.SCROLLER)) {
+        mWXPerformance.useScroller = 1;
       }
-      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
-	  mWXPerformance.wxDims = mwxDims;
-	  mWXPerformance.measureTimes = measureTimes;
+      mWXPerformance.maxDeepViewLayer = getMaxDeepLayer();
+      mWXPerformance.wxDims = mwxDims;
+      mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
-        mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
+        Uri pageNameUri = Uri.parse(mWXPerformance.pageName);
+        String scheme = pageNameUri.getScheme();
+        String spm = pageNameUri.getQueryParameter("spm");
+        mUserTrackAdapter
+            .commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
-      isCommit=true;
+      isCommit = true;
     }
     // module listen Activity onActivityPause
     WXModuleManager.onActivityPause(getInstanceId());
@@ -1757,7 +1761,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         Object requestType=response.extendParams.get("requestType");
         mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
 
-        Object cacheType = response.extendParams.get(WXPerformance.CACHE_TYPE);
+        Object cacheType = response.extendParams.get(Dimension.cacheType.toString());
         if(cacheType instanceof String){
           mWXPerformance.cacheType = (String) cacheType;
         }
