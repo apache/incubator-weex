@@ -29,6 +29,9 @@
 #import "WXRecycleListDataManager.h"
 #import "WXRecycleListTemplateManager.h"
 #import "WXRecycleListUpdateManager.h"
+#import "WXBridgeManager.h"
+#import "WXSDKManager.h"
+#import "WXComponent+DataBinding.h"
 
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
@@ -36,11 +39,7 @@
 
 @implementation WXRecycleListComponent
 {
-    WXRecycleListDataManager *_dataManager;
-    WXRecycleListTemplateManager *_templateManager;
-    WXRecycleListUpdateManager *_updateManager;
-    
-    NSString *_templateKey;
+    NSString *_templateSwitchKey;
     NSString *_aliasKey;
     NSString *_indexKey;
     __weak UICollectionView *_collectionView;
@@ -52,11 +51,14 @@
 }
 
 WX_EXPORT_METHOD(@selector(appendData:))
-WX_EXPORT_METHOD(@selector(insertData:atIndex:))
-WX_EXPORT_METHOD(@selector(updateData:atIndex:))
-WX_EXPORT_METHOD(@selector(removeData:))
+WX_EXPORT_METHOD(@selector(appendRange:))
+WX_EXPORT_METHOD(@selector(insertData:data:))
+WX_EXPORT_METHOD(@selector(updateData:data:))
+WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
 WX_EXPORT_METHOD(@selector(scrollTo:options:))
+WX_EXPORT_METHOD(@selector(insertRange:range:))
+WX_EXPORT_METHOD(@selector(setListData:))
 
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
@@ -66,11 +68,11 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
                weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
-        _dataManager = [[WXRecycleListDataManager alloc] initWithData:attributes[@"listData"]];
+        _dataManager = attributes[@"listData"]? [[WXRecycleListDataManager alloc] initWithData:attributes[@"listData"]] : [WXRecycleListDataManager new];
         _templateManager = [WXRecycleListTemplateManager new];
         _updateManager = [WXRecycleListUpdateManager new];
         _updateManager.delegate = self;
-        _templateKey = [WXConvert NSString:attributes[@"templateKey"]] ? : @"templateType";
+        _templateSwitchKey = [WXConvert NSString:attributes[@"switch"]];
         _aliasKey = [WXConvert NSString:attributes[@"alias"]];
         _indexKey = [WXConvert NSString:attributes[@"index"]];
         _sizeCache = [NSMutableDictionary dictionary];
@@ -119,6 +121,15 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     if (attributes[@"listData"]) {
         NSArray *listData = attributes[@"listData"];
         [self _updateListData:listData withCompletion:nil animation:NO];
+    }
+    if (attributes[@"switch"]) {
+        _templateSwitchKey = [WXConvert NSString:attributes[@"switch"]];
+    }
+    if (attributes[@"alias"]) {
+        _aliasKey = [WXConvert NSString:attributes[@"alias"]];
+    }
+    if (attributes[@"index"]) {
+        _indexKey = [WXConvert NSString:attributes[@"index"]];
     }
 }
 
@@ -179,18 +190,33 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 
 #pragma mark - Exported Component Methods
 
-- (void)appendData:(NSArray *)appendingData
+- (void)appendData:(id)appendingData
 {
-    if (![appendingData isKindOfClass:[NSArray class]]) {
-        WXLogError(@"wrong format of appending data:%@", appendingData);
+    if (!appendingData){
+        return;
+    }
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    [newListData addObject:appendingData];
+}
+
+- (void)appendRange:(NSArray*)data
+{
+    if (![data isKindOfClass:[NSArray class]]) {
+        WXLogError(@"wrong format of appending data:%@", data);
         return;
     }
     
     NSArray *oldData = [_dataManager data];
-    [_updateManager updateWithAppendingData:appendingData oldData:oldData completion:nil animation:NO];
+    [_updateManager updateWithAppendingData:data oldData:oldData completion:nil animation:NO];
 }
 
-- (void)insertData:(id)data atIndex:(NSUInteger)index
+- (void)setListData:(NSArray*)data
+{
+    if ([data count]) {
+        [_dataManager updateData:data];
+    }
+}
+- (void)insertData:(NSUInteger)index data:(id)data
 {
     // TODO: bring the update logic to UpdateManager
     // TODO: update cell because index has changed
@@ -202,47 +228,110 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         
         [UIView performWithoutAnimation:^{
-            [_collectionView insertItemsAtIndexPaths:@[indexPath]];
+            [self->_collectionView insertItemsAtIndexPaths:@[indexPath]];
         }];
     }
 }
 
-- (void)updateData:(id)data atIndex:(NSUInteger)index
+- (void)updateComponentData:(NSString*)componentDataId componentData:(NSDictionary*)componentData callback:(NSString*)callbackId
 {
-    // TODO: bring the update logic to UpdateManager
-    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
-    if (index < newListData.count) {
-        newListData[index] = data;
-        [_dataManager updateData:newListData];
-        
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        UICollectionViewCell *cellView = [_collectionView cellForItemAtIndexPath:indexPath];
-        WXCellSlotComponent *cellComponent = (WXCellSlotComponent *)cellView.wx_component;
-        if (cellComponent) {
-            [self _updateBindingData:data forCell:cellComponent atIndexPath:indexPath];
-        }
+    NSMutableDictionary * virtualComponentData = [[_dataManager virtualComponentDataWithId:componentDataId] mutableCopy];
+    NSIndexPath * indexPath = virtualComponentData[@"indexPath"];
+    if (!indexPath) {
+        return;
     }
+    virtualComponentData = virtualComponentData?:[NSMutableDictionary new];
+    [virtualComponentData addEntriesFromDictionary:componentData];
+    [_dataManager updateVirtualComponentData:componentDataId data:[virtualComponentData copy]];
+    virtualComponentData[@"@phase"] = @"update";
+    virtualComponentData[@"callbackId"] = callbackId;
+    [self _updateDataForCellSlotAtIndexPath:indexPath data:virtualComponentData];
 }
 
-- (void)removeData:(NSArray *)indexes
+- (void)_updateDataForCellSlotAtIndexPath:(NSIndexPath*)indexPath data:(NSDictionary*)data
 {
-    // TODO: bring the update logic to UpdateManager
-    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
-    NSMutableIndexSet *indexSet = [NSMutableIndexSet new];
-    NSMutableArray *indexPaths = [NSMutableArray array];
-    for (NSNumber *index in indexes) {
-        if ([index unsignedIntegerValue] >= newListData.count) {
-            WXLogError(@"invalid remove index:%@", index);
-            continue;
+    if(!indexPath || !data) {
+        return;
+    }
+    WXPerformBlockOnMainThread(^{
+        UICollectionViewCell * cellView = [self->_collectionView cellForItemAtIndexPath:indexPath];
+        WXCellSlotComponent * cellSlotComponent = (WXCellSlotComponent*)cellView.wx_component;
+        if (cellSlotComponent) {
+            [self _updateBindingData:data forCell:cellSlotComponent atIndexPath:indexPath];
         }
-        [indexSet addIndex:[index unsignedIntegerValue]];
-        [indexPaths addObject:[NSIndexPath indexPathForItem:[index unsignedIntegerValue] inSection:0]];
+        // callback when update virtual component data success.
+        NSString * callbackId = data[@"callbackId"];
+        if (callbackId) {
+            [[WXSDKManager bridgeMgr] callBack:self.weexInstance.instanceId funcId:callbackId params:@{@"result":@"success"}];
+        }
+    });
+}
+
+- (void)updateData:(NSUInteger)index data:(id)data
+{
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    if (!data && index > [newListData count]) {
+        return;
+    }
+    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    NSDictionary * virtualComponentData = [_dataManager virtualComponentDataWithIndexPath:indexPath];
+    if ([virtualComponentData[WXBindingOnceIdentify] boolValue]) {
+        return;
     }
     
-    [newListData removeObjectsAtIndexes:indexSet];
+    // TODO: bring the update logic to UpdateManager
+    newListData[index] = data;
     [_dataManager updateData:newListData];
+    NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
+    [_dataManager updateVirtualComponentData:virtualComponentId data:data];
+    NSMutableDictionary * newData = nil;
+    if (![data isKindOfClass:[NSDictionary class]]) {
+         newData = [NSMutableDictionary new];
+        [newData setObject:@"data" forKey:data];
+        data = newData;
+    }
+    newData = [data mutableCopy];
+    newData[@"@phase"] = @"update";
+    [self _updateDataForCellSlotAtIndexPath:indexPath data:[newData copy]];
+}
+
+- (void)insertRange:(NSInteger)index range:(NSArray*)data
+{
+    if (![data count]) {
+        WXLogDebug(@"ignore invalid insertRange");
+        return;
+    }
+    
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    NSRange range = NSMakeRange(index,[data count]);
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
+    [newListData insertObjects:data atIndexes:indexSet];
+    [_dataManager updateData:newListData];
+    [_collectionView reloadData];
+}
+
+- (void)removeData:(NSInteger)index count:(NSInteger)count
+{
+    // TODO: bring the update logic to UpdateManager
+    
+    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
+    if (index > [newListData count] || index + count - 1 > [newListData count]) {
+        
+        return;
+    }
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)];
+    [newListData removeObjectsAtIndexes:indexSet];
+    __block NSMutableArray<NSIndexPath*>* indexPaths = [NSMutableArray new];
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:idx inSection:0];
+        [indexPaths addObject:indexPath];
+    }];
+    
+    [_dataManager updateData:newListData];
+    [_dataManager deleteVirtualComponentAtIndexPaths:indexPaths];
     [UIView performWithoutAnimation:^{
-        [_collectionView deleteItemsAtIndexPaths:indexPaths];
+        [self->_collectionView deleteItemsAtIndexPaths:indexPaths];
+        [self->_collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
     }];
 }
 
@@ -258,7 +347,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     NSIndexPath *fromIndexPath = [NSIndexPath indexPathForItem:fromIndex inSection:0];
     NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:toIndex inSection:0];
     [UIView performWithoutAnimation:^{
-        [_collectionView moveItemAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+        [self->_collectionView moveItemAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
     }];
 }
 
@@ -287,11 +376,30 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 
 #pragma mark - Private
 
-- (void)_updateBindingData:(NSDictionary *)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
+- (void)_updateBindingData:(id)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
 {
-    if (_aliasKey) {
-        data = @{_aliasKey:data};
+    id originalData = data;
+    if (![originalData isKindOfClass:[NSDictionary class]]) {
+        if (_aliasKey) {
+            NSMutableDictionary * dictionary = [NSMutableDictionary dictionary];
+            [dictionary setObject:data forKey:_aliasKey];
+            data = dictionary;
+        } else {
+            return;
+        }
     }
+    
+    if (!data[@"indexPath"] || !data[@"recycleListComponentRef"]) {
+        NSMutableDictionary * dataNew = [data mutableCopy];
+        dataNew[@"recycleListComponentRef"] = self.ref;
+        dataNew[@"indexPath"] = indexPath;
+        data = dataNew;
+    }
+    
+    if ([originalData isKindOfClass:[NSDictionary class]] && _aliasKey &&!data[@"phase"]) {
+        data = @{_aliasKey:data,@"aliasKey":_aliasKey};
+    }
+    
     if (_indexKey) {
         NSMutableDictionary *dataNew = [data mutableCopy];
         dataNew[_indexKey] = @(indexPath.item);
@@ -301,8 +409,9 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 #ifdef DEBUG
     NSDate *startTime = [NSDate date];
 #endif
+    
     WXPerformBlockSyncOnComponentThread(^{
-        [cellComponent updateCellData:data];
+        [cellComponent updateCellData:[data copy]];
     });
 #ifdef DEBUG
     double duration = -[startTime timeIntervalSinceNow] * 1000;
@@ -350,16 +459,13 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     // 1. get the data relating to the cell
-    NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
-    if (!data || ![data isKindOfClass:[NSDictionary class]]) {
-        WXLogError(@"No data or wrong data format for index:%zd, data:%@", indexPath.item, data);
-        return nil;
-    }
+    id data = [_dataManager dataAtIndex:indexPath.row];
     
     // 2. get the template type specified by data
-    NSString *templateType = data[_templateKey];
+    NSString * templateType = [self templateType:indexPath];
+    _templateManager.collectionView = collectionView;
     if (!templateType) {
-        WXLogError(@"Each data should have a value for %@ to indicate template type", _templateKey);
+        WXLogError(@"Each data should have a value for %@ to indicate template type", _templateSwitchKey);
         return nil;
     }
     
@@ -392,9 +498,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     
     WXLogDebug(@"Return cell view:%@, indexPath:%@", cellView, indexPath);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self handleAppear];
-    });
+    [self handleAppear];
     
     return cellView;
 }
@@ -424,8 +528,8 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     if (size) {
         return [size CGSizeValue];
     } else {
-        NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
-        WXCellSlotComponent *cell = [_templateManager templateWithType:data[_templateKey]];
+
+        WXCellSlotComponent *cell = [_templateManager templateWithType:[self templateType:indexPath]];
         CGSize size = cell.calculatedFrame.size;
         _sizeCache[indexPath] = [NSValue valueWithCGSize:size];
         return CGSizeMake(_collectionView.frame.size.width, size.height);
@@ -454,6 +558,24 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 - (void)updateManager:(WXRecycleListUpdateManager *)manager didUpdateData:(id)newData withSuccess:(BOOL)finished
 {
     
+}
+
+- (NSString*)templateType:(NSIndexPath*)indexPath
+{
+    NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
+    // default is first template.
+    NSString *templateType = [_templateManager topTemplate].templateCaseType;
+    if (!data || ![data isKindOfClass:[NSDictionary class]]) {
+        return templateType;
+    }
+    
+    if (_templateSwitchKey &&data[_templateSwitchKey]){
+        templateType = data[_templateSwitchKey];
+    } else if (data[WXDefaultRecycleTemplateType]){
+        // read the default type.
+        templateType = data[WXDefaultRecycleTemplateType];
+    }
+    return templateType;
 }
 
 @end

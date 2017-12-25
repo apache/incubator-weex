@@ -429,7 +429,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     Class clazz = NSClassFromString(config.clazz);;
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
-    
     if (isTemplate) {
         component->_isTemplate = YES;
         [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
@@ -460,7 +459,8 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [attributesOrStyles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull attributeOrStyleName, id  _Nonnull attributeOrStyle, BOOL * _Nonnull stop) {
         if ([WXBindingMatchIdentify isEqualToString:attributeOrStyleName] // match
             ||  [WXBindingRepeatIdentify isEqualToString:attributeOrStyleName] // repeat
-            || ([attributeOrStyle isKindOfClass:[NSDictionary class]] && attributeOrStyle[WXBindingIdentify])) {  // {"attributeOrStyleName": {"@binding":"bindingExpression"}
+            ||  [WXBindingOnceIdentify isEqualToString:attributeOrStyleName] // once
+            ||([attributeOrStyle isKindOfClass:[NSDictionary class]] && attributeOrStyle[WXBindingIdentify])) {  // {"attributeOrStyleName": {"@binding":"bindingExpression"}
             bindingAttributesOrStyles[attributeOrStyleName] = attributeOrStyle;
             [newAttributesOrStyles removeObjectForKey:attributeOrStyleName];
         } else if ([attributeOrStyle isKindOfClass:[NSArray class]]) {
