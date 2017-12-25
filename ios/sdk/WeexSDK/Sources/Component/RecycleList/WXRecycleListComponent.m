@@ -357,7 +357,8 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     }
     
     // 2. get the template type specified by data
-    NSString *templateType = data[_templateKey];
+    NSString *templateType = data[_templateKey]?:[_templateManager topTemplate].templateType;
+    _templateManager.collectionView = collectionView;
     if (!templateType) {
         WXLogError(@"Each data should have a value for %@ to indicate template type", _templateKey);
         return nil;

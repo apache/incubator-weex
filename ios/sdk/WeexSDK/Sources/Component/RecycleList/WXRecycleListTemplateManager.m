@@ -91,4 +91,16 @@
     [_collectionView registerClass:[WXReusableCollectionViewCell class] forCellWithReuseIdentifier:templateID];
 }
 
+- (WXCellSlotComponent *)topTemplate
+{
+    WXCellSlotComponent * cellTemplate = nil;
+    for (NSString *templateType in [_templateTypeMap.keyEnumerator.allObjects copy]) {
+        cellTemplate = [self templateWithType:templateType];
+        if (!cellTemplate) {
+            break;
+        }
+    }
+    return cellTemplate;
+}
+
 @end
