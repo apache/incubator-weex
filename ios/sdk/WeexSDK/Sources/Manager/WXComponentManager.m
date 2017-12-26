@@ -432,7 +432,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     if (isTemplate) {
         component->_isTemplate = YES;
+        static NSUInteger __componentId = 0;
+        component->_componentId = [NSString stringWithFormat:@"%ld", __componentId % (2048*1024)];
+        __componentId++;
         [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+        [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:component->_componentId type:@"lifecycle" hook:@"create" option:nil];
     }
 
     WXAssert(component, @"Component build failed for data:%@", data);
