@@ -326,6 +326,18 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     [self callJsMethod:method];
 }
 
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase option:(NSDictionary*)option
+{
+    if (!type || !instanceId || !hookPhase) {
+        WXLogError(@"type and instance id and hookPhase should not be nil");
+        return;
+    }
+    NSArray *args = @[componentId, type, hookPhase, option?:@{}];
+    
+    WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:args instance:[WXSDKManager instanceForID:instanceId]];
+    [self callJsMethod:method];
+}
+
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive
 {
     NSArray *args = nil;
