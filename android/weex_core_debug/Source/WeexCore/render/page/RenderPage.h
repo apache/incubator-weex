@@ -102,6 +102,10 @@ namespace WeexCore {
 
     void buildRenderObjectTime(long long time);
 
+    void createJMapJNITime(long long time);
+
+    void jniCallBridgeTime(long long time);
+
     bool bindInstance_Impl_Android(jobject instance);
 
     bool bindInstance_Impl_iOS(void *instance);

@@ -48,7 +48,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.action.GraphicActionAddElementOld;
+import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionLayout;
@@ -1855,7 +1855,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final BasicGraphicAction action = new GraphicActionAddElementOld(pageId, ref, componentType, parentRef, index,
+        final BasicGraphicAction action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
                 styles, attributes, events, paddings, margins, borders);
         WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
       }

@@ -362,7 +362,6 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   int index = stringToNum<int>(str_index);
   std::string data = jByteArray2Str(env, jdomString);
 
-//  flag = BridgeAndroid::getInstance()->callAddElement(jInstanceId, jParentRef, jdomString, jindex);
   flag = RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);

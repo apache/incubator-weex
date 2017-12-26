@@ -13,6 +13,8 @@ namespace WeexCore {
 
     long long jniCallTime;
 
+    long long jniCallBridgeTime;
+
     long long cssLayoutTime;
 
     long long addElementActionJNITime;
@@ -23,8 +25,12 @@ namespace WeexCore {
 
     long long buildRenderObjectTime;
 
-    RenderPerformance() : jniCallTime(0), cssLayoutTime(0), addElementActionJNITime(0),
-                          layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0) {}
+    long long createJMapJNITime;
+
+    RenderPerformance() : jniCallTime(0), jniCallBridgeTime(0), cssLayoutTime(0),
+                          addElementActionJNITime(0),
+                          layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0),
+                          createJMapJNITime(0) {}
 
     inline void printPerformanceLog(PerformanceStage performanceStage) {
       printPerformanceLog_Impl_Android(performanceStage);
@@ -34,7 +40,7 @@ namespace WeexCore {
 
     void printPerformanceLog_Impl_Android(PerformanceStage performanceStage);
 
-    inline void printPerformanceLog_Impl_iOS(PerformanceStage performanceStage);
+    void printPerformanceLog_Impl_iOS(PerformanceStage performanceStage);
   };
 }
 

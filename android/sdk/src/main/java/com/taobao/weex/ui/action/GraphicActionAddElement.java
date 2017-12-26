@@ -18,27 +18,37 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
-  private JSONObject mData;
-
-  public GraphicActionAddElement(String pageId, String parentRef,
-                                 JSONObject data, int index) {
-    super(pageId, null);
+  public GraphicActionAddElement(String pageId, String ref,
+                                 String componentType, String parentRef,
+                                 int index,
+                                 Map<String, String> style,
+                                 Map<String, String> attributes,
+                                 Set<String> events,
+                                 HashMap<String, String> paddings,
+                                 HashMap<String, String> margins,
+                                 HashMap<String, String> borders) {
+    super(pageId, ref);
+    this.mComponentType = componentType;
     this.mParentRef = parentRef;
-    this.mData = data;
     this.mIndex = index;
+    this.mStyle = style;
+    this.mAttributes = attributes;
+    this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
   }
 
   @Override
@@ -49,41 +59,11 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     }
 
     final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
-
-    if (this.mData == null || this.mData.size() <= 0) {
-      return;
-    }
-
-    this.mComponentType = (String) this.mData.get("type");
-    setRef((String) mData.get("ref"));
-    CommonCompData commonCompData = new CommonCompData(getPageId(), null, null, getParentRef());
+    CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), getParentRef());
     WXComponent child = createComponent(instance, parent, commonCompData);
 
     if (child == null || parent == null) {
       return;
-    }
-
-    Object style = mData.get("style");
-    if (style != null && style instanceof JSONObject) {
-      WXStyle styles = new WXStyle();
-      styles.putAll((JSONObject) style, false);
-      child.addStyle(styles);
-    }
-    Object attr = mData.get("attr");
-    if (attr != null && attr instanceof JSONObject) {
-      WXAttr attrs = new WXAttr((JSONObject) attr);
-      child.addAttr(attrs);
-    }
-    Object event = mData.get("event");
-    if (event != null && event instanceof JSONArray) {
-      WXEvent events = new WXEvent();
-      JSONArray eventArray = (JSONArray) event;
-      int count = eventArray.size();
-      for (int i = 0; i < count; i++) {
-        Object value = eventArray.get(i);
-        events.add(value.toString());
-      }
-      child.addEvent(events);
     }
 
     WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());

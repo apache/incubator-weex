@@ -410,13 +410,15 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string> *> *margin,
                                          std::vector<std::pair<std::string, std::string> *> *padding,
                                          std::vector<std::pair<std::string, std::string> *> *border) {
-    RenderActionUpdateStyle *action = new RenderActionUpdateStyle(getPageId(), render->getRef(), style, margin, padding, border);
+    RenderActionUpdateStyle *action = new RenderActionUpdateStyle(getPageId(), render->getRef(),
+                                                                  style, margin, padding, border);
     addRenderAction(action);
   }
 
   void RenderPage::sendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string> *> *attrs) {
-    RenderActionUpdateAttr *action = new RenderActionUpdateAttr(getPageId(), render->getRef(), attrs);
+    RenderActionUpdateAttr *action = new RenderActionUpdateAttr(getPageId(), render->getRef(),
+                                                                attrs);
     addRenderAction(action);
   }
 
@@ -457,6 +459,16 @@ namespace WeexCore {
   void RenderPage::buildRenderObjectTime(long long time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->buildRenderObjectTime += time;
+  }
+
+  void RenderPage::createJMapJNITime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->createJMapJNITime += time;
+  }
+
+  void RenderPage::jniCallBridgeTime(long long time) {
+    if (mWXCorePerformance != nullptr)
+      mWXCorePerformance->jniCallBridgeTime += time;
   }
 
   bool RenderPage::bindInstance_Impl_Android(jobject instance) {
