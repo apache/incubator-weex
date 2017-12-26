@@ -2,7 +2,7 @@
 #define WEEX_PROJECT_CONTENTBOXMEASUREMENT_IMPL_ANDROID_H
 
 #include <jni.h>
-#include <base/android/jni/android_jni.h>
+#include <WeexCore/platform/android/base/jni/android_jni.h>
 
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env);

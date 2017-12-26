@@ -14,7 +14,7 @@
 #include <IPC/IPCFutexPageQueue.h>
 #include <IPC/IPCException.h>
 #include <IPC/IPCSender.h>
-#include <base/android/LogUtils.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 #include <IPC/ashmem.h>
 
 #include <unistd.h>

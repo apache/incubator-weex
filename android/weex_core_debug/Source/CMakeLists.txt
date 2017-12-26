@@ -17,23 +17,23 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 
 add_library(weexjsc SHARED
 
-    ./prebuild/jni_load.cc
-
-    ./base/android/jni/android_jni.cpp
-    ./base/android/jni/scoped_java_ref.cpp
-
     ./base/Compatible.cpp
-    ./base/android/base64/base64.cpp
-    ./base/android/base64/modp_base64/modp_b64.cc
-    ./base/android/string/ScopedJString.cpp
-    ./base/android/string/ScopedJStringUTF8.cpp
     ./base/fpconv.cpp
+    ./WeexCore/platform/android/prebuild/jni_load.cc
+    ./WeexCore/platform/android/base/jni/android_jni.cpp
+    ./WeexCore/platform/android/base/jni/scoped_java_ref.cpp
+    ./WeexCore/platform/android/base/base64/base64.cpp
+    ./WeexCore/platform/android/base/base64/modp_base64/modp_b64.cc
+    ./WeexCore/platform/android/base/string/ScopedJString.cpp
+    ./WeexCore/platform/android/base/string/ScopedJStringUTF8.cpp
 
-    ./WeexCore/platform/android/WeexJSConnection.cpp
+    ./WeexCore/platform/android/jsengine/WeexJSConnection.cpp
+    ./WeexCore/platform/android/jsengine/WeexProxy.cpp
     ./WeexCore/platform/android/ExtendJSApi.cpp
-    ./WeexCore/platform/android/WeexProxy.cpp
-    ./WeexCore/platform/android/WeexCore.cpp
-    ./WeexCore/platform/android/BridgeAndroid.cpp
+
+
+    ./WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/WXSDKInstance_Impl_Android.cpp

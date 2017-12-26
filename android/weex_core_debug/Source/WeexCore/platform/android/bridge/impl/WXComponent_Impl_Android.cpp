@@ -1,11 +1,11 @@
-#include <base/android/jni/android_jni.h>
+#include <WeexCore/platform/android/base/jni/android_jni.h>
 #include "WXComponent_Impl_Android.h"
 #include "WeexCore/platform/android/bridge/WXComponent_jni.h"
-#include <WeexCore/platform/android/WeexCore.h>
+#include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
-#include <base/android/string/StringUtils.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 
 using namespace WeexCore;
 

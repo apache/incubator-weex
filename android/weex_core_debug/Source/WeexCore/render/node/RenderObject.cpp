@@ -3,9 +3,9 @@
 #include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
-#include <base/android/jni/scoped_java_ref.h>
-#include <WeexCore/platform/android/WeexCore.h>
-#include <base/android/string/StringUtils.h>
+#include <WeexCore/platform/android/base/jni/scoped_java_ref.h>
+#include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/css/ConstantsName.h>
 #include <WeexCore/css/CssValueGetter.h>
 

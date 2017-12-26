@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <IPC/Serializing/IPCSerializer.h>
 #include <IPC/IPCHandler.h>
-#include "BridgeAndroid.h"
+#include <WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.h>
 
 namespace WeexCore {
 

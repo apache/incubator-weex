@@ -1,5 +1,5 @@
 #include "RenderPerformance.h"
-#include <base/android/LogUtils.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
   void RenderPerformance::printPerformanceLog_Impl_Android(PerformanceStage performanceStage) {

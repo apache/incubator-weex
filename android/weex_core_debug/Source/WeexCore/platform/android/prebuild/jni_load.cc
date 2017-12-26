@@ -1,6 +1,6 @@
 #include <jni.h>
-#include <WeexCore/platform/android/WeexCore.h>
-#include <base/android/jni/android_jni.h>
+#include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
+#include <WeexCore/platform/android/base/jni/android_jni.h>
 #include <android/log.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
@@ -23,7 +23,6 @@ jint JNI_OnLoad (JavaVM *vm, void *reserved)
     WeexCore::RegisterJNISDKInstance(env);
     WeexCore::RegisterJNIWXComponent(env);
     WeexCore::RegisterJNIMeasureSize(env);
-    __android_log_print(ANDROID_LOG_ERROR, "shiwentao", "jni_onload on jni_load.cc");
     return WeexCore::OnLoad(vm, reserved);
 }
 

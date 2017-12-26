@@ -2,7 +2,7 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <base/TimeUtils.h>
-#include "BridgeAndroid.h"
+#include "Bridge_Impl_Android.h"
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -34,12 +34,12 @@ static jmethodID jCallCreateFinishByWeexCoreMethodId;
 
 namespace WeexCore {
 
-  BridgeAndroid *BridgeAndroid::m_instance = nullptr;
+  Bridge_Impl_Android *Bridge_Impl_Android::m_instance = nullptr;
 
-  BridgeAndroid::BridgeAndroid() {
+  Bridge_Impl_Android::Bridge_Impl_Android() {
   }
 
-  BridgeAndroid::~BridgeAndroid() {
+  Bridge_Impl_Android::~Bridge_Impl_Android() {
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject jMap, JNIEnv *env) {
@@ -85,7 +85,7 @@ namespace WeexCore {
     }
   }
 
-  void BridgeAndroid::setJSVersion(jstring &jversion) {
+  void Bridge_Impl_Android::setJSVersion(jstring &jversion) {
     JNIEnv *env = getJNIEnv();
     if (jSetJSFrmVersionMethodId == NULL) {
       jSetJSFrmVersionMethodId = env->GetMethodID(jBridgeClazz,
@@ -97,7 +97,7 @@ namespace WeexCore {
   }
 
   void
-  BridgeAndroid::reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString) {
+  Bridge_Impl_Android::reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString) {
     JNIEnv *env = getJNIEnv();
     if (jReportExceptionMethodId == NULL) {
       jReportExceptionMethodId = env->GetMethodID(jBridgeClazz,
@@ -110,7 +110,7 @@ namespace WeexCore {
     env->DeleteLocalRef(jFunc);
   }
 
-  int BridgeAndroid::callNative(jstring &instanceId, jbyteArray &taskString, jstring &callback) {
+  int Bridge_Impl_Android::callNative(jstring &instanceId, jbyteArray &taskString, jstring &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallNativeMethodId == NULL) {
       jCallNativeMethodId = env->GetMethodID(jBridgeClazz,
@@ -128,7 +128,7 @@ namespace WeexCore {
     return flag;
   }
 
-  jobject BridgeAndroid::callNativeModule(jstring &jInstanceId, jstring &jmodule, jstring &jmethod,
+  jobject Bridge_Impl_Android::callNativeModule(jstring &jInstanceId, jstring &jmodule, jstring &jmethod,
                                           jbyteArray &jArgString, jbyteArray &jOptString) {
     JNIEnv *env = getJNIEnv();
     if (jCallNativeModuleMethodId == NULL) {
@@ -148,7 +148,7 @@ namespace WeexCore {
   }
 
   void
-  BridgeAndroid::callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
+  Bridge_Impl_Android::callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
                                      jbyteArray &jArgString, jbyteArray &jOptString) {
     JNIEnv *env = getJNIEnv();
     if (jCallNativeComponentMethodId == NULL) {
@@ -165,7 +165,7 @@ namespace WeexCore {
     env->DeleteLocalRef(jOptString);
   }
 
-  void BridgeAndroid::setTimeout(jstring &jCallbackID, jstring &jTime) {
+  void Bridge_Impl_Android::setTimeout(jstring &jCallbackID, jstring &jTime) {
     JNIEnv *env = getJNIEnv();
     if (jSetTimeoutNativeMethodId == NULL) {
       jSetTimeoutNativeMethodId = env->GetMethodID(jBridgeClazz,
@@ -177,7 +177,7 @@ namespace WeexCore {
     env->DeleteLocalRef(jTime);
   }
 
-  void BridgeAndroid::callNativeLog(jbyteArray &str_msg) {
+  void Bridge_Impl_Android::callNativeLog(jbyteArray &str_msg) {
     JNIEnv *env = getJNIEnv();
     if (jWXLogUtils != NULL) {
       if (jLogMethodId == NULL) {
@@ -194,7 +194,7 @@ namespace WeexCore {
     env->DeleteLocalRef(str_msg);
   }
 
-  int BridgeAndroid::callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
+  int Bridge_Impl_Android::callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                                       jstring &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallUpdateFinishMethodId == NULL) {
@@ -214,7 +214,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
+  int Bridge_Impl_Android::callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                                        jstring &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallRefreshFinishMethodId == NULL) {
@@ -233,7 +233,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callRemoveElement(jstring &instanceId, jstring &ref,
+  int Bridge_Impl_Android::callRemoveElement(jstring &instanceId, jstring &ref,
                                        jstring &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallRemoveElementMethodId == NULL) {
@@ -252,7 +252,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callMoveElement(jstring &instanceId, jstring &ref, jstring &parentref,
+  int Bridge_Impl_Android::callMoveElement(jstring &instanceId, jstring &ref, jstring &parentref,
                                      jstring &index, jstring &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallMoveElementMethodId == NULL) {
@@ -275,7 +275,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callAddEvent(jstring &instanceId,
+  int Bridge_Impl_Android::callAddEvent(jstring &instanceId,
                                   jstring &ref, jstring &event, jstring &Callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallAddEventMethodId == NULL) {
@@ -295,7 +295,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callRemoveEvent(jstring &instanceId,
+  int Bridge_Impl_Android::callRemoveEvent(jstring &instanceId,
                                      jstring &ref, jstring &event, jstring &Callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallRemoveEventMethodId == NULL) {
@@ -319,7 +319,7 @@ namespace WeexCore {
 
   /****************** WeexCore *****************/
 
-  int BridgeAndroid::callCreateBodyByWeexCore(std::string &pageId, std::string &componentType,
+  int Bridge_Impl_Android::callCreateBodyByWeexCore(std::string &pageId, std::string &componentType,
                                               std::string &ref,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
@@ -394,7 +394,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callAddElementByWeexCore(std::string &pageId, std::string &componentType,
+  int Bridge_Impl_Android::callAddElementByWeexCore(std::string &pageId, std::string &componentType,
                                               std::string &ref, int index,
                                               std::string parentRef,
                                               std::map<std::string, std::string> *styles,
@@ -472,7 +472,7 @@ namespace WeexCore {
   }
 
   int
-  BridgeAndroid::callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
+  Bridge_Impl_Android::callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
                                            std::vector<std::pair<std::string, std::string> *> *style,
                                            std::vector<std::pair<std::string, std::string> *> *margin,
                                            std::vector<std::pair<std::string, std::string> *> *padding,
@@ -540,7 +540,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
+  int Bridge_Impl_Android::callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
                                               std::vector<std::pair<std::string, std::string> *> *attrs) {
     JNIEnv *env = getJNIEnv();
 
@@ -587,7 +587,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callLayoutByWeexCore(std::string &pageId, std::string &ref, int top,
+  int Bridge_Impl_Android::callLayoutByWeexCore(std::string &pageId, std::string &ref, int top,
                                           int bottom, int left, int right, int height,
                                           int width) {
     JNIEnv *env = getJNIEnv();
@@ -618,7 +618,7 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callCreateFinishByWeexCore(std::string &pageId) {
+  int Bridge_Impl_Android::callCreateFinishByWeexCore(std::string &pageId) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::getInstance()->getPage(pageId);

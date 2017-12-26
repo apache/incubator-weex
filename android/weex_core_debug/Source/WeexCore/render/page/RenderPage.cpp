@@ -6,7 +6,7 @@
 #include <WeexCore/render/action/RenderActionLayout.h>
 #include <WeexCore/render/action/RenderActionCreateFinish.h>
 #include <WeexCore/layout/WXCoreLayout.h>
-#include <base/android/string/StringUtils.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/env/RenderPerformance.h>
 #include <WeexCore/env/CoreEnvironment.h>
 #include "RenderPage.h"
