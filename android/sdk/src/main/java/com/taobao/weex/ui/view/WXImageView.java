@@ -223,7 +223,7 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   }
 
 
-  protected void setEnableBitmapAutoManage(boolean enableBitmapAutoManage) {
+  public void setEnableBitmapAutoManage(boolean enableBitmapAutoManage) {
      this.enableBitmapAutoManage = enableBitmapAutoManage;
   }
 
