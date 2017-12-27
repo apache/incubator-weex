@@ -1354,7 +1354,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mNestedInstanceInterceptor = null;
       mUserTrackAdapter = null;
       mScrollView = null;
-      mContext = null;
       mRenderListener = null;
       isDestroy = true;
       mStatisticsListener = null;
@@ -1374,6 +1373,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         }
         mWXPerformance.avgFPS = mWXPerformance.frameSum/frameDiffTime;
       }
+      mContext = null;
     }
   }
 
