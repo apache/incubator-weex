@@ -115,24 +115,6 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int callRemoveElement(String instanceId, String ref, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callRemoveElement(instanceId, ref, callback);
-
-
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
-    public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
-        if (!mInit || mJsManager == null)
-            return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callMoveElement(instanceId, ref, parentref, index, callback);
-        return IWXBridge.INSTANCE_RENDERING;
-    }
-
-    @Override
     public int callAddEvent(String instanceId, String ref, String event, String callback) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
@@ -219,7 +201,25 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
       return IWXBridge.INSTANCE_RENDERING;
     }
 
-    @Override
+  @Override
+  public int callRemoveElement(String instanceId, String ref) {
+    if (!mInit || mJsManager == null)
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    mJsManager.callRemoveElement(instanceId, ref);
+
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  @Override
+  public int callMoveElement(String instanceId, String ref, String parentref, int index) {
+    if (!mInit || mJsManager == null)
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    mJsManager.callMoveElement(instanceId, ref, parentref, index);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  @Override
     public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, String> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
       if (!mInit || mJsManager == null)
         return IWXBridge.INSTANCE_RENDERING_ERROR ;

@@ -63,12 +63,6 @@ namespace WeexCore {
     int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                           jstring &callback);
 
-    int callRemoveElement(jstring &instanceId, jstring &ref,
-                          jstring &callback);
-
-    int callMoveElement(jstring &instanceId, jstring &ref, jstring &parentref,
-                        jstring &index, jstring &callback);
-
     int callAddEvent(jstring &instanceId,
                      jstring &ref, jstring &event, jstring &Callback);
 
@@ -93,6 +87,11 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *margins,
                                  std::map<std::string, std::string> *borders);
 
+    int callRemoveElement(std::string &pageId, std::string &ref);
+
+    int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
+                        int index);
+
     int callLayoutByWeexCore(std::string &pageId, std::string &ref,
                              int top, int bottom, int left, int right,
                              int height, int width);
@@ -104,11 +103,9 @@ namespace WeexCore {
                                   std::vector<std::pair<std::string, std::string> *> *border);
 
     int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string> *> *attrs);
+                                 std::vector<std::pair<std::string, std::string> *> *attrs);
 
     int callCreateFinishByWeexCore(std::string &pageId);
-
-    int callAddElement(jstring jInstanceId, jstring jParentRef, jbyteArray jdomString, jstring jindex);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

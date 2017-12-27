@@ -83,7 +83,7 @@ public class WXPerformance {
   /**
    * Create Instance Time spent when rendering first screen
    */
-  public long firstScreenJSFExecuteTime;
+  public long firstScreenJSFAndWeexCoreExecuteTime;
 
   /**
    * Call native Time spent when rendering first screen
@@ -194,7 +194,7 @@ public class WXPerformance {
     quotas.put("templateLoadTime", (double)templateLoadTime);
     quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
     quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
-    quotas.put("firstScreenJSFExecuteTime",(double) firstScreenJSFExecuteTime);
+    quotas.put("firstScreenJSFAndWeexCoreExecuteTime",(double) firstScreenJSFAndWeexCoreExecuteTime);
     quotas.put("componentCount",(double)componentCount);
     quotas.put("actualNetworkTime",(double)actualNetworkTime);
     quotas.put("pureNetworkTime",(double)pureNetworkTime);
@@ -241,7 +241,7 @@ public class WXPerformance {
         "syncTaskTime",
         "pureNetworkTime",
         "actualNetworkTime",
-        "firstScreenJSFExecuteTime",
+        "firstScreenJSFAndWeexCoreExecuteTime",
         "maxDeepViewLayer",
         "useScroller"};
   }
@@ -254,7 +254,7 @@ public class WXPerformance {
              + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
              + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
              + ",screenRenderTime:" + screenRenderTime
-             + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+             + ",firstScreenJSFAndWeexCoreExecuteTime:" + firstScreenJSFAndWeexCoreExecuteTime
              + ",componentCount:" + componentCount
              + ",syncTaskTime:" + syncTaskTime
              + ",pureNetworkTime:" + pureNetworkTime
@@ -278,7 +278,7 @@ public class WXPerformance {
               + " connectionType:" + connectionType
               + " requestType:" + requestType
               + " firstScreenRenderTime:" + screenRenderTime
-              + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + " firstScreenJSFAndWeexCoreExecuteTime:" + firstScreenJSFAndWeexCoreExecuteTime
               + " componentCount:" + componentCount
               + " JSTemplateSize:" + JSTemplateSize
               + " SDKInitTime:" + WXEnvironment.sSDKInitTime

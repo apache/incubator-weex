@@ -233,48 +233,6 @@ namespace WeexCore {
     return flag;
   }
 
-  int BridgeAndroid::callRemoveElement(jstring &instanceId, jstring &ref,
-                                       jstring &callback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallRemoveElementMethodId == NULL) {
-      jCallRemoveElementMethodId = env->GetMethodID(jBridgeClazz,
-                                                    "callRemoveElement",
-                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
-    }
-
-    int flag = env->CallIntMethod(jThis, jCallRemoveElementMethodId, instanceId, ref, callback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callRemoveElement");
-    }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(ref);
-    env->DeleteLocalRef(callback);
-    return flag;
-  }
-
-  int BridgeAndroid::callMoveElement(jstring &instanceId, jstring &ref, jstring &parentref,
-                                     jstring &index, jstring &callback) {
-    JNIEnv *env = getJNIEnv();
-    if (jCallMoveElementMethodId == NULL) {
-      jCallMoveElementMethodId = env->GetMethodID(jBridgeClazz,
-                                                  "callMoveElement",
-                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
-    }
-
-    int flag = env->CallIntMethod(jThis, jCallMoveElementMethodId, instanceId, ref, parentref,
-                                  index, callback);
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callRemoveElement");
-    }
-
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(ref);
-    env->DeleteLocalRef(parentref);
-    env->DeleteLocalRef(index);
-    env->DeleteLocalRef(callback);
-    return flag;
-  }
-
   int BridgeAndroid::callAddEvent(jstring &instanceId,
                                   jstring &ref, jstring &event, jstring &Callback) {
     JNIEnv *env = getJNIEnv();
@@ -469,6 +427,54 @@ namespace WeexCore {
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jBorders);
     return flag;
+  }
+
+  int BridgeAndroid::callRemoveElement(std::string &pageId, std::string &ref) {
+    JNIEnv *env = getJNIEnv();
+
+    if (jCallRemoveElementMethodId == NULL) {
+      jCallRemoveElementMethodId = env->GetMethodID(jBridgeClazz,
+                                                    "callRemoveElement",
+                                                    "(Ljava/lang/String;Ljava/lang/String;)I");
+    }
+
+    jstring jPageId = env->NewStringUTF(pageId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+
+    int flag = env->CallIntMethod(jThis, jCallRemoveElementMethodId, jPageId, jRef);
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callRemoveElement");
+    }
+
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    return 0;
+  }
+
+  int BridgeAndroid::callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
+                                     int index) {
+    JNIEnv *env = getJNIEnv();
+
+    if (jCallMoveElementMethodId == NULL) {
+      jCallMoveElementMethodId = env->GetMethodID(jBridgeClazz,
+                                                  "callMoveElement",
+                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)I");
+    }
+
+    jstring jPageId = env->NewStringUTF(pageId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+    jstring jParentRef = env->NewStringUTF(parentRef.c_str());
+
+    int flag = env->CallIntMethod(jThis, jCallMoveElementMethodId, jPageId, jRef, jParentRef,
+                                  index);
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callRemoveElement");
+    }
+
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    env->DeleteLocalRef(jParentRef);
+    return 0;
   }
 
   int

@@ -118,7 +118,7 @@ namespace WeexCore {
  * @param page : {@link RenderPage*}
  * @return {@link RenderObject*}
  */
-  RenderObject *json2RenderObject(char *data, RenderPage *page);
+  RenderObject *json2RenderObject(char *data);
 
   std::vector<std::pair<std::string, std::string> *> *
   json2Pairs(char *data);

@@ -1,5 +1,7 @@
 #include <WeexCore/parser/DomParser.h>
 #include <WeexCore/render/action/RenderActionAddElement.h>
+#include <WeexCore/render/action/RenderActionRemoveElement.h>
+#include <WeexCore/render/action/RenderActionMoveElement.h>
 #include <WeexCore/render/action/RenderActionCreateBody.h>
 #include <WeexCore/render/action/RenderActionUpdateStyle.h>
 #include <WeexCore/render/action/RenderActionUpdateAttr.h>
@@ -44,12 +46,12 @@ namespace WeexCore {
     }
     mRenderActions.clear();
 
-    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectMap.begin();
-    RENDEROBJECT_COLLECTION_IT end = mRenderObjectMap.end();
+    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectRegisterMap.begin();
+    RENDEROBJECT_COLLECTION_IT end = mRenderObjectRegisterMap.end();
     for (; begin != end; ++begin) {
       delete begin->second;
     }
-    mRenderObjectMap.clear();
+    mRenderObjectRegisterMap.clear();
 
     if (mWXCorePerformance != nullptr) {
       delete mWXCorePerformance;
@@ -117,7 +119,9 @@ namespace WeexCore {
       return false;
     long long startTime = getCurrentTime();
     setRootRenderObject(root);
-    pushRenderToMap(root);
+
+    pushRenderToRegisterMap(root);
+
     buildRenderObjectTime(getCurrentTime() - startTime);
     sendCreateBodyAction(root);
     return true;
@@ -130,7 +134,7 @@ namespace WeexCore {
       return false;
     }
 
-    pushRenderToMap(child);
+    pushRenderToRegisterMap(child);
 
     // add child to Render Tree
     child->setParentRender(parent);
@@ -152,30 +156,45 @@ namespace WeexCore {
     if (parent == nullptr)
       return false;
 
+    removeRenderFromRegisterMap(child);
     parent->removeRenderObject(child);
-    mRenderObjectMap.erase(child->getRef());
+
     delete child;
+
     buildRenderObjectTime(getCurrentTime() - startTime);
+
+    sendRemoveElementAction(ref);
     return true;
   }
 
   bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, int index) {
     long long startTime = getCurrentTime();
+
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
       return false;
 
     RenderObject *oldParent = child->getParentRender();
-    if (oldParent == nullptr)
-      return false;
-
     RenderObject *newParent = getRenderObject(parentRef);
-    if (newParent == nullptr)
+    if (oldParent == nullptr || newParent == nullptr)
       return false;
 
-    oldParent->removeRenderObject(child);
-    newParent->addRenderObject(index, child);
+    if (oldParent->getRef() == newParent->getRef()) {
+      if (oldParent->indexOf(child) < 0) {
+        return false;
+      } else if (oldParent->indexOf(child) == index) {
+        return false;
+      } else if (oldParent->indexOf(child) < index) {
+        index = index - 1;
+      }
+    }
+
+    child->getParent()->removeChild(child);
+    newParent->addChildAt(child, index);
+
     buildRenderObjectTime(getCurrentTime() - startTime);
+
+    sendMoveElementAction(ref, parentRef, index);
     return true;
   }
 
@@ -356,20 +375,32 @@ namespace WeexCore {
     return true;
   }
 
-  void RenderPage::addRenderAction(RenderAction *action) {
+  void RenderPage::postRenderAction(RenderAction *action) {
     if (action != nullptr) {
       action->ExecuteAction();
     }
   }
 
-  void RenderPage::pushRenderToMap(RenderObject *render) {
+  void RenderPage::pushRenderToRegisterMap(RenderObject *render) {
     if (render == nullptr)
       return;
 
-    mRenderObjectMap.insert(std::pair<std::string, RenderObject *>(render->getRef(), render));
+    mRenderObjectRegisterMap.insert(
+        std::pair<std::string, RenderObject *>(render->getRef(), render));
 
     for (int i = 0; i < render->getChildCount(); ++i) {
-      pushRenderToMap(render->getChild(i));
+      pushRenderToRegisterMap(render->getChild(i));
+    }
+  }
+
+  void RenderPage::removeRenderFromRegisterMap(RenderObject *render) {
+    if (render == nullptr)
+      return;
+
+    mRenderObjectRegisterMap.erase(render->getRef());
+
+    for (int i = 0; i < render->getChildCount(); ++i) {
+      removeRenderFromRegisterMap(render->getChild(i));
     }
   }
 
@@ -377,32 +408,38 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    RenderActionCreateBody *action = new RenderActionCreateBody(getPageId(), render);
-    addRenderAction(action);
-
-    for (int i = 0; i < render->getChildCount(); ++i) {
-      sendAddElementAction(render->getChild(i), render, i);
-    }
+    RenderAction *action = new RenderActionCreateBody(getPageId(), render);
+    postRenderAction(action);
   }
 
   void RenderPage::sendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
     if (child == nullptr || parent == nullptr)
       return;
 
-    RenderActionAddElement *action = new RenderActionAddElement(getPageId(), child, parent, index);
-    addRenderAction(action);
+    RenderAction *action = new RenderActionAddElement(getPageId(), child, parent, index);
+    postRenderAction(action);
 
     for (int i = 0; i < child->getChildCount(); ++i) {
       sendAddElementAction(child->getChild(i), child, i);
     }
   }
 
+  void RenderPage::sendRemoveElementAction(std::string ref) {
+    RenderAction *action = new RenderActionRemoveElement(getPageId(), ref);
+    postRenderAction(action);
+  }
+
+  void RenderPage::sendMoveElementAction(std::string ref, std::string parentRef, int index) {
+    RenderAction *action = new RenderActionMoveElement(getPageId(), ref, parentRef, index);
+    postRenderAction(action);
+  }
+
   void RenderPage::sendLayoutAction(RenderObject *render) {
     if (render == nullptr)
       return;
 
-    RenderActionLayout *action = new RenderActionLayout(getPageId(), render);
-    addRenderAction(action);
+    RenderAction *action = new RenderActionLayout(getPageId(), render);
+    postRenderAction(action);
   }
 
   void RenderPage::sendUpdateStyleAction(RenderObject *render,
@@ -410,16 +447,16 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string> *> *margin,
                                          std::vector<std::pair<std::string, std::string> *> *padding,
                                          std::vector<std::pair<std::string, std::string> *> *border) {
-    RenderActionUpdateStyle *action = new RenderActionUpdateStyle(getPageId(), render->getRef(),
-                                                                  style, margin, padding, border);
-    addRenderAction(action);
+    RenderAction *action = new RenderActionUpdateStyle(getPageId(), render->getRef(),
+                                                       style, margin, padding, border);
+    postRenderAction(action);
   }
 
   void RenderPage::sendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string> *> *attrs) {
-    RenderActionUpdateAttr *action = new RenderActionUpdateAttr(getPageId(), render->getRef(),
-                                                                attrs);
-    addRenderAction(action);
+    RenderAction *action = new RenderActionUpdateAttr(getPageId(), render->getRef(),
+                                                      attrs);
+    postRenderAction(action);
   }
 
   void RenderPage::sendAddEventAction(RenderObject *render) {
@@ -427,8 +464,8 @@ namespace WeexCore {
   }
 
   void RenderPage::sendCreateFinishAction() {
-    RenderActionCreateFinish *action = new RenderActionCreateFinish(getPageId());
-    addRenderAction(action);
+    RenderAction *action = new RenderActionCreateFinish(getPageId());
+    postRenderAction(action);
   }
 
   void RenderPage::jniCallTime(long long time) {

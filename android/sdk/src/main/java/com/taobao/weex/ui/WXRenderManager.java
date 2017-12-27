@@ -52,12 +52,13 @@ public class WXRenderManager {
     return mRegistries.get(instanceId);
   }
 
-  public @Nullable WXComponent getWXComponent(String instanceId, String ref) {
-    if(instanceId == null || TextUtils.isEmpty(ref)){
+  public @Nullable
+  WXComponent getWXComponent(String instanceId, String ref) {
+    if (instanceId == null || TextUtils.isEmpty(ref)) {
       return null;
     }
     RenderActionContext stmt = getRenderContext(instanceId);
-    return stmt == null?null:stmt.getComponent(ref);
+    return stmt == null ? null : stmt.getComponent(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
@@ -74,6 +75,7 @@ public class WXRenderManager {
 
   /**
    * Remove renderStatement, can only be invoked in UI thread.
+   *
    * @param instanceId {@link WXSDKInstance#mInstanceId}
    */
   public void removeRenderStatement(String instanceId) {
@@ -86,7 +88,7 @@ public class WXRenderManager {
     }
   }
 
-  public void postRenderAction(final String instanceId, final BasicGraphicAction action) {
+  public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
     mWXRenderHandler.post(WXThread.secure(new Runnable() {
 
       @Override
@@ -120,8 +122,16 @@ public class WXRenderManager {
   public void registerComponent(String instanceId, String ref, WXComponent comp) {
     RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement != null) {
-      statement.registerComponent(ref,comp);
+      statement.registerComponent(ref, comp);
     }
   }
 
+  public WXComponent unregisterComponent(String instanceId, String ref) {
+    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    if (statement != null) {
+      return statement.unregisterComponent(ref);
+    } else {
+      return null;
+    }
+  }
 }

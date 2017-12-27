@@ -228,51 +228,6 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callRemoveElement(String instanceId, String ref, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      errorCode = WXBridgeManager.getInstance().callRemoveElement(instanceId, ref, callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callRemoveElement throw exception:" + e.getMessage());
-      }
-    }
-    if (instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
-  public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
-    long start = System.currentTimeMillis();
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      instance.firstScreenCreateInstanceTime(start);
-    }
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-    try {
-      // Integer.parseInt(index)
-      errorCode = WXBridgeManager.getInstance().callMoveElement(instanceId, ref, parentref, index, callback);
-    } catch (Throwable e) {
-      //catch everything during call native.
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "callMoveElement throw exception:" + e.getMessage());
-      }
-    }
-    if (instance != null) {
-      instance.callNativeTime(System.currentTimeMillis() - start);
-    }
-    return errorCode;
-  }
-
-  @Override
   public int callAddEvent(String instanceId, String ref, String event, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -331,6 +286,8 @@ public class WXBridge implements IWXBridge {
     }
   }
 
+  /****************** WeexCore *****************/
+
   @Override
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
@@ -366,6 +323,48 @@ public class WXBridge implements IWXBridge {
         e.printStackTrace();
         WXLogUtils.e(TAG, "callAddElement throw error:" + e.getMessage());
       }
+    }
+    return errorCode;
+  }
+
+  @Override
+  public int callRemoveElement(String instanceId, String ref) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRemoveElement(instanceId, ref);
+    } catch (Throwable e) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callRemoveElement throw exception:" + e.getMessage());
+      }
+    }
+    if (instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  @Override
+  public int callMoveElement(String instanceId, String ref, String parentref, int index) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callMoveElement(instanceId, ref, parentref, index);
+    } catch (Throwable e) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callMoveElement throw exception:" + e.getMessage());
+      }
+    }
+    if (instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
   }

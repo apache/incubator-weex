@@ -52,6 +52,8 @@ import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionLayout;
+import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRemoveElement;
 import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
@@ -603,74 +605,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     getNextTick(instanceId, callback);
     return IWXBridge.INSTANCE_RENDERING;
 
-  }
-
-  // callUpdateStyle
-  public int callRemoveElement(String instanceId, String ref, String callback) {
-
-    if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getRemoveElement(ref);
-//        domModule.postAction((DOMAction) action, false);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT, "[WXBridgeManager] callRemoveElement exception " + e.getCause());
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
-  }
-
-  // callMoveElement
-  public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
-
-    if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
-              .append(", parentref:").append(parentref)
-              .append(", index:").append(index)
-              .append(", ref:").append(ref);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getMoveElement(ref, parentref, Integer.parseInt(index));
-//        domModule.postAction((DOMAction) action, false);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callMoveElement exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_MOVEELEMENT, "[WXBridgeManager] callMoveElement exception " + e.getCause());
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
   }
 
   public int callAddEvent(String instanceId, String ref, String event, String callback) {
@@ -1819,7 +1753,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final BasicGraphicAction action = new GraphicActionCreateBody(pageId, ref, componentType,
                 styles, attributes, events, paddings, margins, borders);
-        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
@@ -1857,11 +1791,65 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final BasicGraphicAction action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
                 styles, attributes, events, paddings, margins, borders);
-        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT, "[WXBridgeManager] callAddElement exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callRemoveElement(String instanceId, String ref) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        final BasicGraphicAction action = new GraphicActionRemoveElement(instanceId, ref);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT, "[WXBridgeManager] callRemoveElement exception " + e.getCause());
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callMoveElement(String instanceId, String ref, String parentref, int index) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
+              .append(", parentref:").append(parentref)
+              .append(", index:").append(index)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        final BasicGraphicAction action = new GraphicActionMoveElement(instanceId, ref, parentref, index);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callMoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_MOVEELEMENT, "[WXBridgeManager] callMoveElement exception " + e.getCause());
     }
 
     return IWXBridge.INSTANCE_RENDERING;
@@ -1885,7 +1873,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         final BasicGraphicAction action = new GraphicActionUpdateStyle(instanceId, ref, styles, paddings, margins, borders);
-        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
@@ -1910,7 +1898,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         final BasicGraphicAction action = new GraphicActionUpdateAttr(instanceId, ref, attrs);
-        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callUpdateStyleByWeexCore exception: ", e);
@@ -1942,7 +1930,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
         final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);
-        WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callReLayout exception: ", e);
@@ -1991,7 +1979,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
 //      JSONObject domObject = JSON.parseObject(dom);
 //      final BasicGraphicAction action = new GraphicActionAddElement(instanceId, parentRef, domObject, Integer.parseInt(index));
-//      WXSDKManager.getInstance().getWXRenderManager().postRenderAction(action.getPageId(), action);
+//      WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
 
     return IWXBridge.INSTANCE_RENDERING;

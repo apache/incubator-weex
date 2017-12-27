@@ -35,8 +35,6 @@ namespace WeexCore {
 
     std::string mType = "";
 
-    RenderPage *mPage;
-
     RenderObject *mParentRender;
 
     STYLES_MAP *mStyles;
@@ -60,7 +58,7 @@ namespace WeexCore {
 
   public:
 
-    RenderObject(RenderPage *page);
+    RenderObject();
 
     ~RenderObject();
 
@@ -92,6 +90,19 @@ namespace WeexCore {
 
     inline RenderObject *getChild(uint32_t index) {
       return (RenderObject *) getChildAt(index);
+    }
+
+    inline uint32_t indexOf(RenderObject *render) {
+      if (render == nullptr) {
+        for (int i = 0; i < getChildCount(); i++)
+          if (getChild(i) == nullptr)
+            return i;
+      } else {
+        for (int i = 0; i < getChildCount(); i++)
+          if (render->getRef() == getChild(i)->getRef())
+            return i;
+      }
+      return -1;
     }
 
     inline void addRenderObject(int index, RenderObject *child) {

@@ -6,7 +6,7 @@
 namespace WeexCore {
   class RenderCell : public RenderObject {
   public:
-    RenderCell(RenderPage *page);
+    RenderCell();
 
   private:
     void

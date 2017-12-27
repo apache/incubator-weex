@@ -27,15 +27,21 @@ namespace WeexCore {
 
     std::vector<RenderAction *> mRenderActions;
 
-    std::map<std::string, RenderObject *> mRenderObjectMap;
+    std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
 
     RenderPerformance *mWXCorePerformance;
 
-    void pushRenderToMap(RenderObject *render);
+    void pushRenderToRegisterMap(RenderObject *render);
+
+    void removeRenderFromRegisterMap(RenderObject *render);
 
     void sendCreateBodyAction(RenderObject *render);
 
     void sendAddElementAction(RenderObject *child, RenderObject *parent, int index);
+
+    void sendRemoveElementAction(std::string ref);
+
+    void sendMoveElementAction(std::string ref, std::string parentRef, int index);
 
     void sendLayoutAction(RenderObject *render);
 
@@ -82,7 +88,7 @@ namespace WeexCore {
 
     bool removeEvent(std::string ref, std::string event);
 
-    void addRenderAction(RenderAction *action);
+    void postRenderAction(RenderAction *action);
 
     bool createFinish();
 
@@ -115,7 +121,7 @@ namespace WeexCore {
     void printRenderSuccessLog();
 
     inline RenderObject *getRenderObject(std::string ref) {
-      return mRenderObjectMap.find(ref)->second;
+      return mRenderObjectRegisterMap.find(ref)->second;
     }
 
     inline void setRootRenderObject(RenderObject *root) {

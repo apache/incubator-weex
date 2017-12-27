@@ -84,10 +84,6 @@ public interface IWXBridge extends IWXObject {
 
   int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-  int callRemoveElement(String instanceId, String ref, String callback);
-
-  int callMoveElement(String instanceId, String ref, String parentref, String index, String callback);
-
   int callAddEvent(String instanceId, String ref, String event, String callback);
 
   int callRemoveEvent(String instanceId, String ref, String event, String callback);
@@ -104,6 +100,10 @@ public interface IWXBridge extends IWXObject {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders);
+
+  int callRemoveElement(String instanceId, String ref);
+
+  int callMoveElement(String instanceId, String ref, String parentref, int index);
 
   public int callUpdateStyleByWeexCore(String instanceId, String ref,
                                        HashMap<String, String> styles,

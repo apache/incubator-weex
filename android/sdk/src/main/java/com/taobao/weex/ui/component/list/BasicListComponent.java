@@ -739,7 +739,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * com.taobao.weex.ui.view.listview.WXRecyclerView}
    */
   @Override
-  protected void addSubView(View child, int index) {
+  public void addSubView(View child, int index) {
 
   }
 

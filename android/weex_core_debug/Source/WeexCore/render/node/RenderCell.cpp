@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderCell::RenderCell(RenderPage *page) : RenderObject(page) {
+  RenderCell::RenderCell() {
 
   }
 

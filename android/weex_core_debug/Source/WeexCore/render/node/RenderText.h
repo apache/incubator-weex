@@ -6,7 +6,7 @@
 namespace WeexCore {
   class RenderText : public RenderObject {
   public:
-    RenderText(RenderPage *page);
+    RenderText();
 
   private:
     void

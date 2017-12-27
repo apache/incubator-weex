@@ -59,7 +59,7 @@ class RenderActionContextImpl implements RenderActionContext {
   }
 
   public void registerComponent(String ref, WXComponent comp) {
-    mRegistry.put(ref,comp);
+    mRegistry.put(ref, comp);
   }
 
   public WXComponent unregisterComponent(String ref) {

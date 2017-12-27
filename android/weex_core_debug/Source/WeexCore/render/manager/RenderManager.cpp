@@ -14,7 +14,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderObject *root = json2RenderObject(c_data, page);
+    RenderObject *root = json2RenderObject(c_data);
     page->parseJsonTime(getCurrentTime() - startTime);
     page->buildRenderObjectTime(getCurrentTime() - startTime);
     return page->createRootRender(root);
@@ -28,7 +28,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderObject *child = json2RenderObject(c_data, page);
+    RenderObject *child = json2RenderObject(c_data);
     page->parseJsonTime(getCurrentTime() - startTime);
     page->buildRenderObjectTime(getCurrentTime() - startTime);
     if (child == nullptr)
@@ -45,7 +45,8 @@ namespace WeexCore {
     return page->removeRenderObject(ref);
   }
 
-  bool RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef, int index) {
+  bool RenderManager::moveRenderObject(std::string pageId, std::string ref, std::string parentRef,
+                                       int index) {
     RenderPage *page = this->getPage(pageId);
     if (page == nullptr)
       return false;

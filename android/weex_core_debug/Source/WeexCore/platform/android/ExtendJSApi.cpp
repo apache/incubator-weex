@@ -85,11 +85,8 @@ std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //task args[1]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
-  //callback args[2]
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
@@ -100,11 +97,8 @@ std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //task args[1]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
-  //callback args[2]
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
@@ -113,81 +107,23 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   return createInt32Result(flag);
 }
 
-std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
-  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //instacneID args[1]
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-
-  //callback args[2]
-  jstring jCallback = getArgumentAsJString(env, arguments, 2);
-
-  int flag = 0;
-  flag = BridgeAndroid::getInstance()->callRemoveElement(jInstanceId, jRef, jCallback);
-
-  return createInt32Result(flag);
-}
-
-std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
-  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //instacneID args[1]
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-
-  //callback args[2]
-  jstring jParentRef = getArgumentAsJString(env, arguments, 2);
-
-  //callback args[3]
-  jstring jIndex = getArgumentAsJString(env, arguments, 3);
-
-  //callback args[4]
-  jstring jCallback = getArgumentAsJString(env, arguments, 4);
-
-  int flag = 0;
-  flag = BridgeAndroid::getInstance()->callMoveElement(jInstanceId, jRef, jParentRef, jIndex,
-                                                       jCallback);
-
-  return createInt32Result(flag);
-}
-
 std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
-  LOGE("functionCallAddEvent");
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //instacneID args[1]
   jstring jRef = getArgumentAsJString(env, arguments, 1);
-
-  //callback args[2]
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
-
-  //callback args[3]
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
-  int flag = 0;
-  flag = BridgeAndroid::getInstance()->callAddEvent(jInstanceId, jRef, jEvent, jCallback);
+  BridgeAndroid::getInstance()->callAddEvent(jInstanceId, jRef, jEvent, jCallback);
 
-  return createInt32Result(flag);
+  return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
-  LOGE("functionCallRemoveEvent");
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //instacneID args[1]
   jstring jRef = getArgumentAsJString(env, arguments, 1);
-
-  //callback args[2]
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
-
-  //callback args[3]
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
   int flag = 0;
@@ -197,20 +133,11 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
-
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //module args[1]
   jstring jmodule = getArgumentAsJString(env, arguments, 1);
-
-  //method args[2]
   jstring jmethod = getArgumentAsJString(env, arguments, 2);
-
-  // arguments args[3]
   jbyteArray jArgString = getArgumentAsJByteArray(env, arguments, 3);
-  //arguments args[4]
   jbyteArray jOptString = getArgumentAsJByteArray(env, arguments, 4);
 
   // add for android support
@@ -246,20 +173,10 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-
-  //module args[1]
   jstring jcomponentRef = getArgumentAsJString(env, arguments, 1);
-
-  //method args[2]
   jstring jmethod = getArgumentAsJString(env, arguments, 2);
-
-  // arguments args[3]
   jbyteArray jArgString = getArgumentAsJByteArray(env, arguments, 3);
-
-  //arguments args[4]
   jbyteArray jOptString = getArgumentAsJByteArray(env, arguments, 4);
 
   BridgeAndroid::getInstance()->callNativeComponent(jInstanceId, jcomponentRef, jmethod, jArgString,
@@ -270,10 +187,7 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //callbackId
   jstring jCallbackID = getArgumentAsJString(env, arguments, 0);
-
-  //time
   jstring jTime = getArgumentAsJString(env, arguments, 1);
 
   BridgeAndroid::getInstance()->setTimeout(jCallbackID, jTime);
@@ -291,7 +205,6 @@ std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   const char *instanceID = env->GetStringUTFChars(jInstanceId, NULL);
   jstring jCallbackId = getArgumentAsJString(env, arguments, 1);
@@ -310,7 +223,6 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   const char *instanceID = env->GetStringUTFChars(jInstanceId, NULL);
   jstring jCallbackId = getArgumentAsJString(env, arguments, 1);
@@ -329,15 +241,11 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
 std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
 
   JNIEnv *env = getJNIEnv();
-  int flag = 0;
-
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //task args[1]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
 
-  flag = RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
-                                                  jByteArray2Str(env, jTaskString)) ? 0 : -1;
+  RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
+                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jTaskString);
   return createInt32Result(0);
@@ -345,24 +253,15 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //instacneID args[1]
   jstring jParentRef = getArgumentAsJString(env, arguments, 1);
-  //dom node args[2]
   jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
-  //index  args[3]
   jstring jindex = getArgumentAsJString(env, arguments, 3);
 
-  int flag = 0;
-
-  std::string pageId = jString2Str(env, jInstanceId);
-  std::string parentRef = jString2Str(env, jParentRef);
-  std::string str_index = jString2Str(env, jindex);
-  int index = stringToNum<int>(str_index);
-  std::string data = jByteArray2Str(env, jdomString);
-
-  flag = RenderManager::getInstance()->addRenderObject(pageId, parentRef, index, data) ? 0 : -1;
+  RenderManager::getInstance()->addRenderObject(jString2Str(env, jInstanceId),
+                                                jString2Str(env, jParentRef),
+                                                stringToNum<int>(jString2Str(env, jindex)),
+                                                jByteArray2Str(env, jdomString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jParentRef);
@@ -371,19 +270,41 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   return createInt32Result(0);
 }
 
+std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
+  JNIEnv *env = getJNIEnv();
+  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
+  jstring jRef = getArgumentAsJString(env, arguments, 1);
+
+  RenderManager::getInstance()->removeRenderObject(jString2Str(env, jInstanceId),
+                                                   jString2Str(env, jRef));
+
+  return createInt32Result(0);
+}
+
+std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
+  JNIEnv *env = getJNIEnv();
+  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
+  jstring jRef = getArgumentAsJString(env, arguments, 1);
+  jstring jParentRef = getArgumentAsJString(env, arguments, 2);
+  jstring jIndex = getArgumentAsJString(env, arguments, 3);
+
+  RenderManager::getInstance()->moveRenderObject(jString2Str(env, jInstanceId),
+                                                 jString2Str(env, jRef),
+                                                 jString2Str(env, jParentRef),
+                                                 stringToNum<int>(jString2Str(env, jIndex)));
+
+  return createInt32Result(0);
+}
+
 std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //instacneID args[1]
   jstring jRef = getArgumentAsJString(env, arguments, 1);
-  //task args[2]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
-  int flag = 0;
-  flag = RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId),
-                                                   jString2Str(env, jRef),
-                                                   jByteArray2Str(env, jTaskString)) ? 0 : -1;
+  RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId),
+                                            jString2Str(env, jRef),
+                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
@@ -397,10 +318,9 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   jstring jRef = getArgumentAsJString(env, arguments, 1);
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
-  int flag = 0;
-  flag = RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId),
-                                                  jString2Str(env, jRef),
-                                                  jByteArray2Str(env, jTaskString)) ? 0 : -1;
+  RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId),
+                                           jString2Str(env, jRef),
+                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
@@ -410,11 +330,9 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
 
-  int flag = 0;
-  flag = RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
+  RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   return createInt32Result(0);
@@ -422,23 +340,18 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  //task args[1]
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
-  //callback args[2]
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
-
-  int flag = 0;
 
   std::string task = jByteArray2Str(env, jTaskString);
   if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
-    flag = RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
+    RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
     env->DeleteLocalRef(jInstanceId);
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);
   } else {
-    flag = BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
+    BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
   }
 
   return createInt32Result(0);

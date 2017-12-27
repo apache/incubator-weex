@@ -48,6 +48,8 @@ add_library(weexjsc SHARED
     ./WeexCore/render/node/RenderCell.cpp
 
     ./WeexCore/render/action/RenderActionAddElement.cpp
+    ./WeexCore/render/action/RenderActionRemoveElement.cpp
+    ./WeexCore/render/action/RenderActionMoveElement.cpp
     ./WeexCore/render/action/RenderActionCreateBody.cpp
     ./WeexCore/render/action/RenderActionCreateFinish.cpp
     ./WeexCore/render/action/RenderActionLayout.cpp

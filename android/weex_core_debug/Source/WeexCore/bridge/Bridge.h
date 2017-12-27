@@ -35,12 +35,6 @@ namespace WeexCore {
     virtual int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                                   jstring &callback) = 0;
 
-    virtual int callRemoveElement(jstring &instanceId, jstring &ref,
-                                  jstring &callback) = 0;
-
-    virtual int callMoveElement(jstring &instanceId, jstring &ref, jstring &parentref,
-                                jstring &index, jstring &callback) = 0;
-
     virtual int callAddEvent(jstring &instanceId,
                              jstring &ref, jstring &event, jstring &Callback) = 0;
 
@@ -78,9 +72,14 @@ namespace WeexCore {
                                           std::vector<std::pair<std::string, std::string> *> *border) = 0;
 
     virtual int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                          std::vector<std::pair<std::string, std::string> *> *attrs) = 0;
+                                         std::vector<std::pair<std::string, std::string> *> *attrs) = 0;
 
     virtual int callCreateFinishByWeexCore(std::string &pageId) = 0;
+
+    virtual int callRemoveElement(std::string &pageId, std::string &ref) = 0;
+
+    virtual int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
+                                int index) = 0;
   };
 } //end WeexCore
 #endif //Bridge_h

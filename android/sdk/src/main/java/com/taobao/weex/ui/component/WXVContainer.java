@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.CommonCompData;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
  */
 public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
-  private static final String TAG="WXVContainer";
+  private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
 
   @Deprecated
@@ -78,7 +79,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   /**
    * Offset top for children layout.
    */
-  protected int getChildrenLayoutTopOffset(){
+  protected int getChildrenLayoutTopOffset() {
     return 0;
   }
 
@@ -86,13 +87,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    * use {@link #getHostView()} instead
    */
   @Deprecated
-  public ViewGroup getView(){
+  public ViewGroup getView() {
     return getHostView();
   }
 
   @Override
   public void applyLayoutAndEvent(WXComponent component) {
-    if(!isLazy()) {
+    if (!isLazy()) {
       if (component == null) {
         component = this;
       }
@@ -100,67 +101,67 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       int count = childCount();
       for (int i = 0; i < count; i++) {
         WXComponent child = getChild(i);
-        child.applyLayoutAndEvent(((WXVContainer)component).getChild(i));
+        child.applyLayoutAndEvent(((WXVContainer) component).getChild(i));
       }
     }
   }
 
   /**
    * Get or generate new layout parameter for child view
-   *
    */
-  public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom){
+  public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child, View childView, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.LayoutParams lp = childView.getLayoutParams();
-    if(lp == null) {
-      lp = new ViewGroup.LayoutParams(width,height);
-    }else{
+    if (lp == null) {
+      lp = new ViewGroup.LayoutParams(width, height);
+    } else {
       lp.width = width;
       lp.height = height;
-      if(lp instanceof ViewGroup.MarginLayoutParams){
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
+      if (lp instanceof ViewGroup.MarginLayoutParams) {
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
       }
     }
     return lp;
   }
 
 
-  public Scrollable getFirstScroller(){
-    if(this instanceof Scrollable){
-      return (Scrollable)this;
-    }else{
-      for (int i=0;i<getChildCount();i++){
+  public Scrollable getFirstScroller() {
+    if (this instanceof Scrollable) {
+      return (Scrollable) this;
+    } else {
+      for (int i = 0; i < getChildCount(); i++) {
         Scrollable scrollable = getChild(i).getFirstScroller();
-        if(scrollable!=null){
+        if (scrollable != null) {
           return scrollable;
         }
       }
     }
     return null;
   }
+
   @Override
   public void bindData(WXComponent component) {
-    if(!isLazy()) {
+    if (!isLazy()) {
       if (component == null) {
         component = this;
       }
       super.bindData(component);
       int count = childCount();
       for (int i = 0; i < count; i++) {
-        getChild(i).bindData(((WXVContainer)component).getChild(i));
+        getChild(i).bindData(((WXVContainer) component).getChild(i));
       }
     }
   }
 
   @Override
   public void refreshData(WXComponent component) {
-      if (component == null) {
-        component = this;
-      }
-      super.refreshData(component);
-      int count = childCount();
-      for (int i = 0; i < count; i++) {
-        getChild(i).refreshData(((WXVContainer)component).getChild(i));
-      }
+    if (component == null) {
+      component = this;
+    }
+    super.refreshData(component);
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).refreshData(((WXVContainer) component).getChild(i));
+    }
   }
 
   /**
@@ -178,8 +179,8 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     for (int i = 0; i < count; ++i) {
       createChildViewAt(i);
     }
-    if(getHostView()!=null){
-       getHostView().setClipToPadding(false);
+    if (getHostView() != null) {
+      getHostView().setClipToPadding(false);
     }
   }
 
@@ -210,7 +211,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   @Override
-  public View detachViewAndClearPreInfo(){
+  public View detachViewAndClearPreInfo() {
     View original = super.detachViewAndClearPreInfo();
     if (mChildren != null) {
       int count = childCount();
@@ -250,26 +251,26 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
-  public final int indexOf(WXComponent comp){
+  public final int indexOf(WXComponent comp) {
     return mChildren.indexOf(comp);
   }
 
-  public void createChildViewAt(int index){
+  public void createChildViewAt(int index) {
     int indexToCreate = index;
-    if(indexToCreate < 0){
-      indexToCreate = childCount()-1;
-      if(indexToCreate < 0 ){
+    if (indexToCreate < 0) {
+      indexToCreate = childCount() - 1;
+      if (indexToCreate < 0) {
         return;
       }
     }
     WXComponent child = getChild(indexToCreate);
     child.createView();
-    if(!child.isVirtualComponent()){
-      addSubView(child.getHostView(),indexToCreate);
+    if (!child.isVirtualComponent()) {
+      addSubView(child.getHostView(), indexToCreate);
     }
   }
 
-  protected void addSubView(View child, int index) {
+  public void addSubView(View child, int index) {
     if (child == null || getRealView() == null) {
       return;
     }
@@ -283,24 +284,24 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
-  public void remove(WXComponent child, boolean destroy){
+  public void remove(WXComponent child, boolean destroy) {
     if (child == null || mChildren == null || mChildren.size() == 0) {
       return;
     }
 
     mChildren.remove(child);
-    if(getInstance()!=null
-            &&getInstance().getRootView()!=null
-            && child.isFixed()){
+    if (getInstance() != null
+            && getInstance().getRootView() != null
+            && child.isFixed()) {
       getInstance().removeFixedView(child.getHostView());
-    }else if(getRealView() != null) {
-      if(!child.isVirtualComponent()){
+    } else if (getRealView() != null) {
+      if (!child.isVirtualComponent()) {
         getRealView().removeView(child.getHostView());
-      }else{
+      } else {
         child.removeVirtualComponent();
       }
     }
-    if(destroy) {
+    if (destroy) {
       child.destroy();
     }
   }
@@ -308,19 +309,19 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   @Override
   public void notifyAppearStateChange(String wxEventType, String direction) {
     super.notifyAppearStateChange(wxEventType, direction);
-    if(getHostView()==null || mChildren==null){
+    if (getHostView() == null || mChildren == null) {
       return;
     }
-    for(WXComponent component:mChildren){
-      if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
-        wxEventType= Constants.Event.DISAPPEAR;
+    for (WXComponent component : mChildren) {
+      if (component.getHostView() != null && !(component.getHostView().getVisibility() == View.VISIBLE)) {
+        wxEventType = Constants.Event.DISAPPEAR;
       }
-      component.notifyAppearStateChange(wxEventType,direction);
+      component.notifyAppearStateChange(wxEventType, direction);
     }
   }
 
-  /********************************
-   *  begin hook Activity life cycle callback
+  /********************************************************
+   *  begin hook Activity life cycle callback             *
    ********************************************************/
   @Override
   public void onActivityCreate() {
@@ -396,17 +397,17 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data){
-    super.onActivityResult(requestCode,resultCode,data);
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
 
     int count = childCount();
     for (int i = 0; i < count; i++) {
-      getChild(i).onActivityResult(requestCode,resultCode,data);
+      getChild(i).onActivityResult(requestCode, resultCode, data);
     }
 
   }
 
-  public boolean onCreateOptionsMenu(Menu menu){
+  public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
 
     int count = childCount();
@@ -418,12 +419,12 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   @Override
-  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-    super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
     int count = childCount();
     for (int i = 0; i < count; i++) {
-      getChild(i).onRequestPermissionsResult(requestCode,permissions,grantResults);
+      getChild(i).onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
 

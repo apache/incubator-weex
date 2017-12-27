@@ -951,7 +951,7 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
   private boolean mCreateInstance =true;
   public void firstScreenCreateInstanceTime(long time) {
     if(mCreateInstance) {
-      mWXPerformance.firstScreenJSFExecuteTime = time -mRenderStartTime;
+      mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime = time -mRenderStartTime;
       mCreateInstance =false;
     }
   }
@@ -985,7 +985,7 @@ public class WXSDKInstance implements View.OnLayoutChangeListener, WeexFrameRate
 
     mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
-    WXLogUtils.renderPerformanceLog("   firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenJSFAndWeexCoreExecuteTime", mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime);
     WXLogUtils.renderPerformanceLog("   firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 

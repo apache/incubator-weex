@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderText::RenderText(RenderPage *page) : RenderObject(page) {
+  RenderText::RenderText() {
 
   }
 

@@ -11,8 +11,7 @@
 
 namespace WeexCore {
 
-  RenderObject::RenderObject(RenderPage *page)
-      : mPage(page) {
+  RenderObject::RenderObject() {
     mStyles = new STYLES_MAP();
     mAttributes = new ATTRIBUTES_MAP();
     mPaddings = new PADDING_MAP();
@@ -27,7 +26,6 @@ namespace WeexCore {
 
     JNIEnv *env = getJNIEnv();
 
-    mPage = nullptr;
     mParentRender = nullptr;
 
     if (mStyles != nullptr) {
