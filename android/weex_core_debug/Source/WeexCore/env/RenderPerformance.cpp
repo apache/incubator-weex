@@ -1,5 +1,5 @@
 #include "RenderPerformance.h"
-#include <base/android/LogUtils.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
   void RenderPerformance::printPerformanceLog_Impl_Android(PerformanceStage performanceStage) {
@@ -15,7 +15,7 @@ namespace WeexCore {
     LOGD("[WeexCore render time]          createJMapJNITime: %lld", createJMapJNITime);
     LOGD("[WeexCore render time]      cssLayoutTime: %lld", cssLayoutTime);
     LOGD("[WeexCore render time]      parseJsonTime: %lld", parseJsonTime);
-    LOGD("[WeexCore render time]      buildRenderObjectTime: %lld", buildRenderObjectTime);
+    LOGD("[WeexCore render time]        buildRenderObjectTime: %lld", buildRenderObjectTime);
   }
 
   void RenderPerformance::printPerformanceLog_Impl_iOS(PerformanceStage performanceStage) {

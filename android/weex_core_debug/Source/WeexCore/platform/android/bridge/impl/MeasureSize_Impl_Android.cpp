@@ -1,4 +1,4 @@
-#include <base/android/jni/android_jni.h>
+#include <WeexCore/platform/android/base/jni/android_jni.h>
 #include "MeasureSize_Impl_Android.h"
 #include "WeexCore/platform/android/bridge/MeasureSize_jni.h"
 

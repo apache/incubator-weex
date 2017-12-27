@@ -1,4 +1,4 @@
-#include <base/android/jni/android_jni.h>
+#include <WeexCore/platform/android/base/jni/android_jni.h>
 #include "WeexCore/platform/android/bridge/ContentBoxMeasurement_jni.h"
 #include "ContentBoxMeasurement_Impl_Android.h"
 #include "MeasureMode_Impl_Android.h"

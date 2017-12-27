@@ -1,11 +1,11 @@
 // Copyright [2017-12-07] <WeexCore>
 #include "WeexProxy.h"
 
-#include <base/android/LogUtils.h>
-#include <base/android/string/StringUtils.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/env/CoreEnvironment.h>
-#include "WeexCore.h"
-#include "ExtendJSApi.h"
+#include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
+#include <WeexCore/platform/android/ExtendJSApi.h>
 
 
 const char *s_cacheDir;
@@ -47,7 +47,7 @@ jint WeexProxy::doInitFramework(JNIEnv *env,
     // initHandler(sHandler.get());
 
     ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
-    BridgeAndroid::getInstance()->setGlobalRef(jThis);
+    Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
     pExtensionJSApi->initFunction(sHandler.get());
 
     // using base::debug::TraceEvent;
@@ -74,7 +74,6 @@ jint WeexProxy::doInitFramework(JNIEnv *env,
       return false;
     }
   }
-  return true;
 }
 
 bool WeexProxy::execJSService(JNIEnv *env, jobject object, jstring script) {

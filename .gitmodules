@@ -1,3 +1,0 @@
-[submodule "test/lib-cplus/lcov"]
-	path = test/lib-cplus/lcov
-	url = git@github.com:linux-test-project/lcov.git

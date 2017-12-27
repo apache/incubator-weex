@@ -20,7 +20,7 @@ namespace WeexCore {
   void RenderActionAddElement::ExecuteAction() {
     RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
     long long startTime = getCurrentTime();
-    BridgeAndroid::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
+    Bridge_Impl_Android::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
                                                            mIndex,
                                                            mParentRef, mStyles, mAttributes,
                                                            mEvents,

@@ -1,7 +1,8 @@
 #ifndef _EXTEND_JSAPI_H_
 #define _EXTEND_JSAPI_H_
 
-#include <base/android/LogUtils.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
+#include <WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.h>
 #include "IPC/IPCHandler.h"
 #include "IPC/IPCMessageJS.h"
 #include "IPC/IPCResult.h"
@@ -9,7 +10,7 @@
 #include "IPC/IPCString.h"
 #include "IPC/Serializing/IPCSerializer.h"
 #include <WeexCore/render/manager/RenderManager.h>
-#include "BridgeAndroid.h"
+
 
 static std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments);
 

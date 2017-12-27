@@ -1,4 +1,4 @@
-#include <base/android/string/StringUtils.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;
@@ -50,7 +50,7 @@ std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
   const IPCByteArray *ba = arguments->getByteArray(0);
   LOGA("init JSFrm version %s", ba->content);
   jstring jversion = env->NewStringUTF(ba->content);
-  BridgeAndroid::getInstance()->setJSVersion(jversion);
+  Bridge_Impl_Android::getInstance()->setJSVersion(jversion);
   return createVoidResult();
 }
 
@@ -59,7 +59,7 @@ void reportException(const char *instanceID, const char *func, const char *excep
   jstring jExceptionString = env->NewStringUTF(exception_string);
   jstring jInstanceId = env->NewStringUTF(instanceID);
   jstring jFunc = env->NewStringUTF(func);
-  BridgeAndroid::getInstance()->reportException(jInstanceId, jFunc, jExceptionString);
+  Bridge_Impl_Android::getInstance()->reportException(jInstanceId, jFunc, jExceptionString);
 }
 
 std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
@@ -90,7 +90,7 @@ std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
-  flag = BridgeAndroid::getInstance()->callUpdateFinish(jInstanceId, jTaskString, jCallback);
+  flag = Bridge_Impl_Android::getInstance()->callUpdateFinish(jInstanceId, jTaskString, jCallback);
 
   return createInt32Result(flag);
 }
@@ -102,7 +102,7 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
   int flag = 0;
-  flag = BridgeAndroid::getInstance()->callRefreshFinish(jInstanceId, jTaskString, jCallback);
+  flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(jInstanceId, jTaskString, jCallback);
 
   return createInt32Result(flag);
 }
@@ -114,7 +114,7 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
-  BridgeAndroid::getInstance()->callAddEvent(jInstanceId, jRef, jEvent, jCallback);
+  Bridge_Impl_Android::getInstance()->callAddEvent(jInstanceId, jRef, jEvent, jCallback);
 
   return createInt32Result(0);
 }
@@ -127,7 +127,7 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
   int flag = 0;
-  flag = BridgeAndroid::getInstance()->callRemoveEvent(jInstanceId, jRef, jEvent, jCallback);
+  flag = Bridge_Impl_Android::getInstance()->callRemoveEvent(jInstanceId, jRef, jEvent, jCallback);
 
   return createInt32Result(flag);
 }
@@ -142,8 +142,9 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
 
   // add for android support
   jobject result;
-  result = BridgeAndroid::getInstance()->callNativeModule(jInstanceId, jmodule, jmethod, jArgString,
-                                                          jOptString);
+  result = Bridge_Impl_Android::getInstance()->callNativeModule(jInstanceId, jmodule, jmethod,
+                                                                jArgString,
+                                                                jOptString);
 
   std::unique_ptr<IPCResult> ret;
   jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
@@ -179,8 +180,9 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   jbyteArray jArgString = getArgumentAsJByteArray(env, arguments, 3);
   jbyteArray jOptString = getArgumentAsJByteArray(env, arguments, 4);
 
-  BridgeAndroid::getInstance()->callNativeComponent(jInstanceId, jcomponentRef, jmethod, jArgString,
-                                                    jOptString);
+  Bridge_Impl_Android::getInstance()->callNativeComponent(jInstanceId, jcomponentRef, jmethod,
+                                                          jArgString,
+                                                          jOptString);
 
   return createInt32Result(static_cast<int32_t>(true));
 }
@@ -190,7 +192,7 @@ std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments *arguments) {
   jstring jCallbackID = getArgumentAsJString(env, arguments, 0);
   jstring jTime = getArgumentAsJString(env, arguments, 1);
 
-  BridgeAndroid::getInstance()->setTimeout(jCallbackID, jTime);
+  Bridge_Impl_Android::getInstance()->setTimeout(jCallbackID, jTime);
 
   return createInt32Result(static_cast<int32_t>(true));
 }
@@ -198,7 +200,7 @@ std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments *arguments) {
 std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
   jbyteArray str_array = getArgumentAsJByteArray(env, arguments, 0);
-  BridgeAndroid::getInstance()->callNativeLog(str_array);
+  Bridge_Impl_Android::getInstance()->callNativeLog(str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -351,7 +353,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);
   } else {
-    BridgeAndroid::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
+    Bridge_Impl_Android::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
   }
 
   return createInt32Result(0);

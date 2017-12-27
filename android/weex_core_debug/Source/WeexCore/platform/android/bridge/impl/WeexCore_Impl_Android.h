@@ -1,9 +1,10 @@
 #ifndef _WEEX_CORE_H_
 #define _WEEX_CORE_H_
 
-#include <base/android/LogUtils.h>
-#include <base/android/string/ScopedJString.h>
-#include <base/android/string/ScopedJStringUTF8.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
+#include <WeexCore/platform/android/base/string/ScopedJString.h>
+#include <WeexCore/platform/android/base/string/ScopedJStringUTF8.h>
+#include <WeexCore/platform/android/jsengine/WeexJSConnection.h>
 
 #include <IPC/Buffering/IPCBuffer.h>
 #include <IPC/IPCArguments.h>
@@ -15,8 +16,6 @@
 #include <IPC/IPCSender.h>
 #include <IPC/IPCString.h>
 #include <IPC/Serializing/IPCSerializer.h>
-
-#include "WeexJSConnection.h"
 
 #include <jni.h>
 #include <string>

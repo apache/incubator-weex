@@ -1,38 +1,38 @@
 #ifndef BridgeAndroid_h
 #define BridgeAndroid_h
 
-#include "../../bridge/Bridge.h"
-#include "WeexCore.h"
+#include <WeexCore/bridge/Bridge.h>
+#include "WeexCore_Impl_Android.h"
 
 namespace WeexCore {
 
-  class BridgeAndroid : public Bridge {
+  class Bridge_Impl_Android : public Bridge {
 
   private:
     jobject jThis;
 
   public:
-    static BridgeAndroid *m_instance;
+    static Bridge_Impl_Android *m_instance;
 
     //just to release singleton object
     class Garbo {
     public:
       ~Garbo() {
-        if (BridgeAndroid::m_instance) {
-          delete BridgeAndroid::m_instance;
+        if (Bridge_Impl_Android::m_instance) {
+          delete Bridge_Impl_Android::m_instance;
         }
       }
     };
 
     static Garbo garbo;
 
-    BridgeAndroid();
+    Bridge_Impl_Android();
 
-    ~BridgeAndroid();
+    ~Bridge_Impl_Android();
 
-    static BridgeAndroid *getInstance() {
+    static Bridge_Impl_Android *getInstance() {
       if (m_instance == nullptr) {
-        m_instance = new BridgeAndroid();
+        m_instance = new Bridge_Impl_Android();
       }
       return m_instance;
     }
