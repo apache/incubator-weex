@@ -1369,7 +1369,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           return;
         }
       }
-      if (!(colorInt == Color.TRANSPARENT && mBackgroundDrawable == null)) {
+      if (mBackgroundDrawable != null) {
         getOrCreateBorder().setColor(colorInt);
       }
     }
