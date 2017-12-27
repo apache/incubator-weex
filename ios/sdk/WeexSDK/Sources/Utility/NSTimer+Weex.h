@@ -22,7 +22,7 @@
 @interface NSTimer (Weex)
 
 + (NSTimer *)wx_scheduledTimerWithTimeInterval:(NSTimeInterval)interval
-                                         block:(void(^)())block
+                                         block:(void(^)(void))block
                                        repeats:(BOOL)repeats;
 
 @end
