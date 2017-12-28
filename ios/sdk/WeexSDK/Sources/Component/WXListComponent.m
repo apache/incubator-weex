@@ -121,7 +121,7 @@
     NSUInteger _previousLoadMoreRowNumber;
     
     BOOL _isUpdating;
-    NSMutableArray<void(^)()> *_updates;
+    NSMutableArray<void(^)(void)> *_updates;
     NSTimeInterval _reloadInterval;
 }
 
@@ -578,7 +578,7 @@
         _isUpdating = YES;
         NSArray *updates = [_updates copy];
         [_updates removeAllObjects];
-        for (void(^update)() in updates) {
+        for (void(^update)(void) in updates) {
             update();
         }
         [_tableView reloadData];
@@ -849,7 +849,7 @@
     return [NSIndexPath indexPathForRow:row inSection:section];
 }
 
-- (void)_performUpdates:(void(^)())updates withKeepScrollPosition:(BOOL)keepScrollPosition adjustmentBlock:(CGFloat(^)(NSIndexPath *topVisibleCell))adjustmentBlock
+- (void)_performUpdates:(void(^)(void))updates withKeepScrollPosition:(BOOL)keepScrollPosition adjustmentBlock:(CGFloat(^)(NSIndexPath *topVisibleCell))adjustmentBlock
 {
     CGFloat adjustment = 0;
     

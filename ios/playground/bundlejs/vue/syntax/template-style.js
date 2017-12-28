@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(637)
+	__vue_exports__ = __webpack_require__(275)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(638)
+	var __vue_template__ = __webpack_require__(276)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,7 +66,7 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/template-style.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/syntax/template-style.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
@@ -84,10 +84,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 637:
-/***/ function(module, exports) {
+/***/ 275:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -118,10 +118,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 638:
-/***/ function(module, exports) {
+/***/ 276:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -142,6 +142,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

@@ -52,3 +52,20 @@ export function base64ToBuffer (base64) {
   })
   return array.buffer
 }
+
+/**
+ * Detect if the param is falsy or empty
+ * @param {any} any
+ */
+export function isEmpty (any) {
+  if (!any || typeof any !== 'object') {
+    return true
+  }
+
+  for (const key in any) {
+    if (Object.prototype.hasOwnProperty.call(any, key)) {
+      return false
+    }
+  }
+  return true
+}

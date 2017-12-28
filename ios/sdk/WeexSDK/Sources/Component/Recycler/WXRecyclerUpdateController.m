@@ -142,7 +142,7 @@
         return;
     }
     
-    void (^updates)() = [^{
+    void (^updates)(void) = [^{
         [self.delegate updateController:self willPerformUpdateWithNewData:newData];
         [UIView setAnimationsEnabled:NO];
         WXLogDebug(@"UICollectionView update:%@", diffResult);

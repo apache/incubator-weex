@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(516)
+	__vue_styles__.push(__webpack_require__(151)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(517)
+	__vue_exports__ = __webpack_require__(152)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(518)
+	var __vue_template__ = __webpack_require__(153)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/showcase/itemlist.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/itemlist.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-b34e9a8a"
+	__vue_options__._scopeId = "data-v-548f750a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,10 +89,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 516:
-/***/ function(module, exports) {
+/***/ 151:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "flexRow": {
@@ -126,22 +126,36 @@
 	    "flexDirection": "column",
 	    "width": 750
 	  },
+	  "test": {
+	    "width": 60,
+	    "height": 60
+	  },
 	  "shopDiv": {
 	    "flexDirection": "column",
 	    "backgroundColor": "#ffffff",
-	    "margin": 5,
-	    "padding": 10,
+	    "marginTop": 5,
+	    "marginRight": 5,
+	    "marginBottom": 5,
+	    "marginLeft": 5,
+	    "paddingTop": 10,
+	    "paddingRight": 10,
+	    "paddingBottom": 10,
+	    "paddingLeft": 10,
 	    "borderWidth": 1,
-	    "borderColor": "#cccccc",
-	    "overflow": "visible"
+	    "borderColor": "#cccccc"
 	  },
 	  "shopRowList": {
 	    "flexDirection": "column",
 	    "borderWidth": 1,
 	    "borderColor": "#cccccc",
-	    "overflow": "visible",
-	    "margin": 5,
-	    "padding": 10,
+	    "marginTop": 5,
+	    "marginRight": 5,
+	    "marginBottom": 5,
+	    "marginLeft": 5,
+	    "paddingTop": 10,
+	    "paddingRight": 10,
+	    "paddingBottom": 10,
+	    "paddingLeft": 10,
 	    "backgroundColor": "#ffffff"
 	  },
 	  "shopHeader": {
@@ -158,13 +172,18 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 517:
-/***/ function(module, exports) {
+/***/ 152:
+/***/ (function(module, exports) {
 
 	'use strict';
 
+	//
+	//
+	//
+	//
+	//
 	//
 	//
 	//
@@ -396,16 +415,16 @@
 	        PersonVisitTime: 'today',
 	        shopDesc: 'Genius only means hard-working all one\'s life',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/bao/uploaded/i2/TB1rtOnHpXXXXXLaXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/bao/uploaded/i4/TB15KrfFVXXXXXJXXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/bao/uploaded/i2/TB1t5YBGVXXXXXcaXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -425,16 +444,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'The man who has made up his mind to win will never say "impossible "',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/imgextra/i1/2655929383/TB2.qITjpXXXXcIXXXXXXXXXXXX_!!2655929383.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd3.alicdn.com/imgextra/i3/2655929383/TB2eWwZjpXXXXbHXXXXXXXXXXXX_!!2655929383.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/2655929383/TB2tgQWjpXXXXbZXXXXXXXXXXXX_!!2655929383.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -454,16 +473,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'There is no such thing as a great talent without great will - power',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/imgextra/i1/TB1AFz9LXXXXXbrXVXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/2557954751/TB2is2njXXXXXatXpXXXXXXXXXX_!!2557954751.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/2557954751/TB2PNYGjXXXXXbXXXXXXXXXXXXX_!!2557954751.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -483,16 +502,16 @@
 	        PersonVisitTime: '3 day ago',
 	        shopDesc: 'Cease to struggle and you cease to live',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/69426324/TB2zbwdfXXXXXa4XpXXXXXXXXXX_!!69426324.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/69426324/TB2L7ZAfXXXXXXOXXXXXXXXXXXX_!!69426324.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/69426324/TB2p9wufXXXXXbiXXXXXXXXXXXX_!!69426324.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -512,16 +531,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'A strong man will struggle with the storms of fate',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd3.alicdn.com/bao/uploaded/i3/TB1MQ8_KVXXXXaLXVXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/53218032/TB2bGSqiXXXXXXyXpXXXXXXXXXX_!!53218032.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/bao/uploaded/i2/TB1kP2zKFXXXXbIXXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -541,16 +560,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'Living without an aim is like sailing without a compass',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/bao/uploaded/i4/TB11yFnHXXXXXakaXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/32720628/TB2CRJUcXXXXXXwXpXXXXXXXXXX_!!32720628.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/bao/uploaded/i2/TB17LUzHXXXXXcEaXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -570,16 +589,16 @@
 	        PersonVisitTime: 'today',
 	        shopDesc: 'Live a noble and honest life. Reviving past times in your old age will help you to enjoy your life again',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/bao/uploaded/i4/TB1hvNoJXXXXXaMaXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/2058567235/TB2V8iygFXXXXaRXpXXXXXXXXXX_!!2058567235.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/2058567235/TB2im1QgFXXXXX8XXXXXXXXXXXX_!!2058567235.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -599,16 +618,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'Behind every successful man there\'s a lot u unsuccessful years',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/bao/uploaded/i1/TB18BZ2KFXXXXb8XFXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/imgextra/i1/2775383848/TB2r012jVXXXXXHXpXXXXXXXXXX_!!2775383848.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd3.alicdn.com/imgextra/i3/2775383848/TB2iI9VjVXXXXaoXpXXXXXXXXXX_!!2775383848.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -628,16 +647,16 @@
 	        PersonVisitTime: 'today',
 	        shopDesc: 'Enrich your life today,. yesterday is history.tomorrow is mystery',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/bao/uploaded/i1/TB1JB.rLpXXXXXLXXXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd4.alicdn.com/imgextra/i4/2702739128/TB2JdvmjVXXXXXjXXXXXXXXXXXX_!!2702739128.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd2.alicdn.com/imgextra/i2/2702739128/TB2A.e6jVXXXXXGXpXXXXXXXXXX_!!2702739128.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -657,16 +676,16 @@
 	        PersonVisitTime: 'yesterday',
 	        shopDesc: 'The secret of success is constancy to purpose',
 	        shopImgList: [{
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd3.alicdn.com/bao/uploaded/i3/TB17zXOGXXXXXbEXVXXXXXXXXXX_!!0-item_pic.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd1.alicdn.com/imgextra/i1/2265445951/TB22ACTbFXXXXXBXXXXXXXXXXXX_!!2265445951.jpg_220x220.jpg'
 	        }, {
-	          shopImgWidth: 220,
-	          shopImgHeight: 220,
+	          shopImgWidth: '220px',
+	          shopImgHeight: '220px',
 	          shopImg: 'https://gd3.alicdn.com/imgextra/i3/2265445951/TB2oXqUbFXXXXXIXXXXXXXXXXXX_!!2265445951.jpg_220x220.jpg'
 	        }],
 	        shopLikeImg: 'https://img.alicdn.com/tps/i1/TB1jTxXIVXXXXb8XXXX07tlTXXX-200-200.png_88x88xz.jpg',
@@ -697,10 +716,10 @@
 
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 518:
-/***/ function(module, exports) {
+/***/ 153:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('list', {
@@ -737,29 +756,26 @@
 	        flexDirection: "row"
 	      }
 	    }, [_c('div', [_c('image', {
-	      staticStyle: {
-	        width: "60",
-	        height: "60"
-	      },
+	      staticClass: ["test"],
 	      attrs: {
 	        "src": item.PersonPhoto
 	      }
 	    })]), _c('div', {
 	      staticStyle: {
 	        flexDirection: "column",
-	        marginLeft: "5"
+	        marginLeft: "5px"
 	      }
 	    }, [_c('div', {
 	      staticStyle: {
-	        marginTop: "5"
+	        marginTop: "5px"
 	      }
 	    }, [_c('text', {
 	      staticStyle: {
-	        fontSize: "20"
+	        fontSize: "20px"
 	      }
 	    }, [_vm._v(_vm._s(item.PersonName))])]), _c('div', {
 	      staticStyle: {
-	        marginTop: "5"
+	        marginTop: "5px"
 	      }
 	    }, [_c('text', {
 	      staticStyle: {
@@ -774,13 +790,13 @@
 	    }, [_c('div', {
 	      staticClass: ["descDiv"],
 	      staticStyle: {
-	        marginTop: "10",
-	        marginLeft: "10"
+	        marginTop: "10px",
+	        marginLeft: "10px"
 	      }
 	    }, [_c('text', {
 	      staticClass: ["shopDesc"],
 	      staticStyle: {
-	        fontSize: "25"
+	        fontSize: "25px"
 	      }
 	    }, [_vm._v(_vm._s(item.shopDesc))])]), _c('div', {
 	      staticStyle: {
@@ -791,8 +807,9 @@
 	        staticClass: ["imgDiv"],
 	        staticStyle: {
 	          flex: "1",
+	          height: "300px",
 	          flexDirection: "column",
-	          margin: "10"
+	          margin: "10px"
 	        }
 	      }, [_c('div', [_c('image', {
 	        staticClass: ["shopImg"],
@@ -808,13 +825,13 @@
 	      staticClass: ["shopFooter"],
 	      staticStyle: {
 	        flexDirection: "row",
-	        marginTop: "10",
-	        marginLeft: "10",
+	        marginTop: "10px",
+	        marginLeft: "10px",
 	        justifyContent: "flex-end"
 	      }
 	    }, [_c('div', {
 	      staticStyle: {
-	        marginRight: "5"
+	        marginRight: "5px"
 	      }
 	    }, [_c('image', {
 	      staticClass: ["shopLikeImg", "smallImg"],
@@ -823,16 +840,16 @@
 	      }
 	    })]), _c('div', {
 	      staticStyle: {
-	        marginRight: "15"
+	        marginRight: "15px"
 	      }
 	    }, [_c('text', {
 	      staticClass: ["shopLikeText"],
 	      staticStyle: {
-	        fontSize: "20"
+	        fontSize: "20px"
 	      }
 	    }, [_vm._v(_vm._s(item.shopLikeText))])]), _c('div', {
 	      staticStyle: {
-	        marginRight: "5"
+	        marginRight: "5px"
 	      }
 	    }, [_c('image', {
 	      staticClass: ["shopCommentImg", "smallImg"],
@@ -841,16 +858,16 @@
 	      }
 	    })]), _c('div', {
 	      staticStyle: {
-	        marginRight: "15"
+	        marginRight: "15px"
 	      }
 	    }, [_c('text', {
 	      staticClass: ["shopCommentText"],
 	      staticStyle: {
-	        fontSize: "20"
+	        fontSize: "20px"
 	      }
 	    }, [_vm._v(_vm._s(item.shopCommentText))])]), _c('div', {
 	      staticStyle: {
-	        marginRight: "5"
+	        marginRight: "5px"
 	      }
 	    }, [_c('image', {
 	      staticClass: ["shopLookImg", "smallImg"],
@@ -859,16 +876,16 @@
 	      }
 	    })]), _c('div', {
 	      staticStyle: {
-	        marginRight: "15"
+	        marginRight: "15px"
 	      }
 	    }, [_c('text', {
 	      staticClass: ["shopLookText"],
 	      staticStyle: {
-	        fontSize: "20"
+	        fontSize: "20px"
 	      }
 	    }, [_vm._v(_vm._s(item.shopLookText))])]), _c('div', {
 	      staticStyle: {
-	        marginRight: "5"
+	        marginRight: "5px"
 	      }
 	    }, [_c('image', {
 	      staticClass: ["shareImg", "smallImg"],
@@ -877,12 +894,12 @@
 	      }
 	    })]), _c('div', {
 	      staticStyle: {
-	        marginRight: "20"
+	        marginRight: "20px"
 	      }
 	    }, [_c('text', {
 	      staticClass: ["shareText"],
 	      staticStyle: {
-	        fontSize: "20"
+	        fontSize: "20px"
 	      }
 	    }, [_vm._v(_vm._s(item.shareText))])])])])])
 	  }))
@@ -895,122 +912,122 @@
 	  }, [_c('div', {
 	    staticStyle: {
 	      flexDirection: "row",
-	      marginLeft: "10",
-	      marginTop: "10"
+	      marginLeft: "10px",
+	      marginTop: "10px"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i4/TB1zkDeIFXXXXXrXVXX07tlTXXX-200-200.png_88x88xz.jpg"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("Hope")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
-	      left: "90",
-	      top: "10",
+	      left: "90px",
+	      top: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1hRb1IXXXXXX3XVXXXQaP.pXX-87-87.jpeg"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("Mem")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
-	      left: "170",
-	      top: "10",
+	      left: "170px",
+	      top: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i3/TB1DGkJJFXXXXaZXFXX07tlTXXX-200-200.png"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("auth")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
-	      left: "250",
-	      top: "10",
+	      left: "250px",
+	      top: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i1/TB1nFvPIXXXXXbUXXXXUAkPJpXX-87-87.png"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("Friend")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
-	      left: "330",
-	      top: "10",
+	      left: "330px",
+	      top: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1CpD7IXXXXXbSXXXXUAkPJpXX-87-87.png"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("issue")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
-	      left: "410",
-	      top: "10",
+	      left: "410px",
+	      top: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://gtms02.alicdn.com/tps/i2/TB11ZZfIVXXXXbMXFXXEDhGGXXX-32-32.png"
 	    }
 	  })]), _c('div', [_c('text', {
 	    staticStyle: {
-	      fontSize: "20"
+	      fontSize: "20px"
 	    }
 	  }, [_vm._v("super")])])])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticStyle: {
 	      flex: "1",
-	      marginTop: "10",
+	      marginTop: "10px",
 	      flexDirection: "row"
 	    }
 	  }, [_c('div', {
@@ -1021,19 +1038,19 @@
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i1/TB1nFvPIXXXXXbUXXXXUAkPJpXX-87-87.png"
 	    }
 	  })]), _c('div', {
 	    staticStyle: {
-	      marginLeft: "5"
+	      marginLeft: "5px"
 	    }
 	  }, [_c('text', {
 	    staticStyle: {
-	      fontSize: "20",
+	      fontSize: "20px",
 	      textAlign: "center"
 	    }
 	  }, [_vm._v("Up")])])]), _c('div', {
@@ -1044,25 +1061,25 @@
 	    }
 	  }, [_c('div', [_c('image', {
 	    staticStyle: {
-	      width: "20",
-	      height: "20"
+	      width: "20px",
+	      height: "20px"
 	    },
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1CpD7IXXXXXbSXXXXUAkPJpXX-87-87.png"
 	    }
 	  })]), _c('div', {
 	    staticStyle: {
-	      marginLeft: "5"
+	      marginLeft: "5px"
 	    }
 	  }, [_c('text', {
 	    staticStyle: {
-	      fontSize: "20",
+	      fontSize: "20px",
 	      textAlign: "center"
 	    }
 	  }, [_vm._v("down")])])])])
 	}]}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

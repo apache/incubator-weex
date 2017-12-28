@@ -177,7 +177,7 @@
         return;
     }
     
-    void (^updates)() = [^{
+    void (^updates)(void) = [^{
         [self.delegate updateManager:self willUpdateData:newData];
         [UIView setAnimationsEnabled:NO];
         NSLog(@"UICollectionView update:%@", recycleListDiffResult);

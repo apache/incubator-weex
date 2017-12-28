@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(615)
+	__vue_exports__ = __webpack_require__(275)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(616)
+	var __vue_template__ = __webpack_require__(276)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,25 +66,28 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/syntax/template-style.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/syntax/template-style.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 615:
-/***/ function(module, exports) {
+/***/ 275:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -115,30 +118,30 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 616:
-/***/ function(module, exports) {
+/***/ 276:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    on: {
 	      "click": _vm.update
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      fontSize: "48px",
 	      color: "#0000ff"
 	    }
-	  }, ["Hello"]), _h('text', {
+	  }, [_vm._v("Hello")]), _c('text', {
 	    style: {
 	      fontSize: _vm.size,
 	      color: _vm.color
 	    }
-	  }, ["Hello"])])
+	  }, [_vm._v("Hello")])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

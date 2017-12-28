@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(554)
+	__vue_styles__.push(__webpack_require__(214)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(555)
+	__vue_exports__ = __webpack_require__(215)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(556)
+	var __vue_template__ = __webpack_require__(216)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,38 +70,42 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/style/style-flex.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/style/style-flex.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-50f1e28a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 383:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 3:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(384)
+	__vue_styles__.push(__webpack_require__(4)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(385)
+	__vue_exports__ = __webpack_require__(5)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(386)
+	var __vue_template__ = __webpack_require__(6)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,23 +117,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-58511ff6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 384:
-/***/ function(module, exports) {
+/***/ 4:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "panel": {
@@ -177,13 +185,19 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
+	  },
+	  "panel-body": {
+	    "paddingLeft": 12,
+	    "paddingRight": 12,
+	    "paddingTop": 20,
+	    "paddingBottom": 20
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 385:
-/***/ function(module, exports) {
+/***/ 5:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -225,18 +239,18 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 386:
-/***/ function(module, exports) {
+/***/ 6:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -244,7 +258,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -252,27 +266,27 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 548:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 208:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(549)
+	__vue_styles__.push(__webpack_require__(209)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(550)
+	__vue_exports__ = __webpack_require__(210)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(551)
+	var __vue_template__ = __webpack_require__(211)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -284,23 +298,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/style/style-item.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/style/style-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-947d2656"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 549:
-/***/ function(module, exports) {
+/***/ 209:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "item": {
@@ -317,10 +335,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 550:
-/***/ function(module, exports) {
+/***/ 210:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -335,8 +353,8 @@
 	module.exports = {
 	  props: {
 	    value: { default: '' },
-	    type: { default: '0' } // 0, 1
-	  },
+	    type: { default: '0' // 0, 1
+	    } },
 	  computed: {
 	    bgColor: function bgColor() {
 	      return this.type == '1' ? '#7BA3A8' : '#BEAD92';
@@ -344,13 +362,13 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 551:
-/***/ function(module, exports) {
+/***/ 211:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('text', {
+	  return _c('text', {
 	    staticClass: ["item", "txt"],
 	    style: {
 	      backgroundColor: _vm.bgColor
@@ -362,10 +380,10 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 554:
-/***/ function(module, exports) {
+/***/ 214:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "row": {
@@ -380,10 +398,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 555:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 215:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -507,239 +525,239 @@
 
 	module.exports = {
 	  components: {
-	    panel: __webpack_require__(383),
-	    styleItem: __webpack_require__(548)
+	    panel: __webpack_require__(3),
+	    styleItem: __webpack_require__(208)
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 556:
-/***/ function(module, exports) {
+/***/ 216:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('panel', {
+	  return _c('div', [_c('panel', {
 	    attrs: {
 	      "title": "flex-direction",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexDirection: "row"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "row"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "type": "1"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexDirection: "column"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "column"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "type": "1"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "justify-content",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "flex-end"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "center"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "space-between"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "align-items",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "flex-end"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "center"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "stretch"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "flex",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
@@ -747,26 +765,26 @@
 	      "value": "no flex",
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -775,7 +793,7 @@
 	      "type": "1",
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "2"
@@ -783,12 +801,12 @@
 	    attrs: {
 	      "value": "flex:2"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -796,7 +814,7 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -805,7 +823,7 @@
 	      "type": "1",
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -813,12 +831,12 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -826,7 +844,7 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "2"
@@ -835,7 +853,7 @@
 	      "type": "1",
 	      "value": "flex:2"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "3"
@@ -843,77 +861,77 @@
 	    attrs: {
 	      "value": "flex:3"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "flex-wrap",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexWrap: "wrap",
 	      backgroundColor: "grey",
 	      padding: "10"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "1:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "2:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "3:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "4:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "5:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "6:wrap"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexWrap: "nowrap",
 	      backgroundColor: "grey",
 	      padding: "10"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "1:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "2:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "3:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "4:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "5:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "6:nowrap"
 	    }
-	  })])])])
+	  })], 1)])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });
