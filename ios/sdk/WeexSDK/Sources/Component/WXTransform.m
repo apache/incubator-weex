@@ -174,7 +174,8 @@
 {
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
-    if (_perspective && !isinf(_perspective)) {
+    // CGFLOAT_MAX is not INF on 32-bit device
+    if(_perspective && _perspective != CGFLOAT_MAX && !isinf(_perspective)) {
         nativeTansform3D.m34 = -1.0/_perspective;
     }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {

@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(414)
+	__vue_exports__ = __webpack_require__(34)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(419)
+	var __vue_template__ = __webpack_require__(39)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,38 +66,41 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/components/marquee.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/marquee.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 383:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 3:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(384)
+	__vue_styles__.push(__webpack_require__(4)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(385)
+	__vue_exports__ = __webpack_require__(5)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(386)
+	var __vue_template__ = __webpack_require__(6)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -109,23 +112,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-58511ff6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 384:
-/***/ function(module, exports) {
+/***/ 4:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "panel": {
@@ -173,13 +180,19 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
+	  },
+	  "panel-body": {
+	    "paddingLeft": 12,
+	    "paddingRight": 12,
+	    "paddingTop": 20,
+	    "paddingBottom": 20
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 385:
-/***/ function(module, exports) {
+/***/ 5:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -221,18 +234,18 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 386:
-/***/ function(module, exports) {
+/***/ 6:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -240,7 +253,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -248,17 +261,18 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 414:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 34:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	//
 	//
 	//
 	//
@@ -309,8 +323,8 @@
 	    };
 	  },
 	  components: {
-	    panel: __webpack_require__(383),
-	    marquee: __webpack_require__(415)
+	    panel: __webpack_require__(3),
+	    marquee: __webpack_require__(35)
 	  },
 	  methods: {
 	    marqueeChange: function marqueeChange(e) {
@@ -319,23 +333,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 415:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 35:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(416)
+	__vue_styles__.push(__webpack_require__(36)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(417)
+	__vue_exports__ = __webpack_require__(37)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(418)
+	var __vue_template__ = __webpack_require__(38)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -347,23 +361,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/marquee.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/marquee.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-34df4e3a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 416:
-/***/ function(module, exports) {
+/***/ 36:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "wrap": {
@@ -377,10 +395,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 417:
-/***/ function(module, exports) {
+/***/ 37:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -410,7 +428,7 @@
 	//
 	//
 
-	var _animation = __weex_require_module__('animation');
+	var _animation = weex.requireModule('animation');
 
 	module.exports = {
 	  props: {
@@ -438,7 +456,7 @@
 	    },
 	    animation: function animation(cb) {
 	      var offset = -this.step * this.index;
-	      _animation.transition(this.$refs.anim.ref, {
+	      _animation.transition(this.$refs.anim, {
 	        styles: {
 	          transform: 'translateY(' + offset + 'px) translateZ(0)'
 	        },
@@ -462,37 +480,37 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 418:
-/***/ function(module, exports) {
+/***/ 38:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["wrap"],
 	    on: {
 	      "appear": _vm.appeared,
 	      "disappear": _vm.disappeared
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    ref: "anim",
 	    staticClass: ["anim"]
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 419:
-/***/ function(module, exports) {
+/***/ 39:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', [_h('panel', {
+	  return _c('scroller', [_c('panel', {
 	    attrs: {
 	      "title": "Marquee",
 	      "type": "primary"
 	    }
-	  }, [_h('marquee', {
+	  }, [_c('marquee', {
 	    style: {
 	      width: 700,
 	      height: _vm.marquee.height * 2,
@@ -510,25 +528,26 @@
 	    on: {
 	      "change": _vm.marqueeChange
 	    }
-	  }, [_vm._l((_vm.marquee.list), function(item) {
-	    return _h('div', {
+	  }, _vm._l((_vm.marquee.list), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      style: {
 	        height: _vm.marquee.height * _vm.marquee.length,
 	        paddingTop: _vm.marquee.height * 0.5,
 	        paddingBottom: _vm.marquee.height * 0.5,
 	        overflow: 'hidden'
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      style: {
 	        height: _vm.marquee.height,
 	        color: 'rgb(60, 118, 61)',
 	        fontSize: 28
 	      }
-	    }, [_vm._s(item.text)])])
-	  })])])])
+	    }, [_vm._v(_vm._s(item.text))])])
+	  }))])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

@@ -67,7 +67,7 @@
     NSRange semicolonRange = [superDescription rangeOfString:@";"];
     NSString * content = _textStorage.string;
     if ([(WXTextComponent*)self.wx_component useCoreText]) {
-        content = [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+        content = ((WXTextComponent*)self.wx_component).text;
     }
     NSString *replacement = [NSString stringWithFormat:@"; text: %@; frame:%f,%f,%f,%f", content, self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height];
     return [superDescription stringByReplacingCharactersInRange:semicolonRange withString:replacement];
@@ -81,7 +81,7 @@
     if (![(WXTextComponent*)self.wx_component useCoreText]) {
         return _textStorage.string;
     }
-    return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+    return ((WXTextComponent*)self.wx_component).text;
 }
 
 - (NSString *)accessibilityLabel
@@ -112,7 +112,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     NSTextStorage *_textStorage;
     CGFloat _textStorageWidth;
     
-    NSString *_text;
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
@@ -127,7 +126,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
     
-    BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
     NSString *_wordWrap;
     
@@ -155,7 +153,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // just for coretext and textkit render replacement
-        _needsRemoveObserver = NO;
         pthread_mutexattr_init(&(_propertMutexAttr));
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
@@ -190,7 +187,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_needsRemoveObserver) {
+    if (_fontFamily) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -252,9 +249,9 @@ do {\
 
 - (void)fillAttributes:(NSDictionary *)attributes
 {
-    id text = attributes[@"value"];
-    if (text && ![[self text] isEqualToString:text]) {
-        [self setText:[WXConvert NSString:text]];
+    id text = [WXConvert NSString:attributes[@"value"]];
+    if (text && ![self.text isEqualToString:text]) {
+        self.text = text;
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
@@ -361,17 +358,6 @@ do {\
 
 #pragma mark Text Building
 
-- (NSString *)text
-{
-    return _text;
-}
-- (void)setText:(NSString*)text
-{
-    pthread_mutex_lock(&(_ctAttributedStringMutex));
-    _text = text;
-    pthread_mutex_unlock(&(_ctAttributedStringMutex));
-}
-
 - (NSAttributedString *)ctAttributedString
 {
     NSAttributedString * attributedString = nil;
@@ -401,9 +387,9 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString * string = [self text];
+    NSString * string = self.text;
     if (![string isKindOfClass:[NSString class]]) {
-        WXLogError(@"text %@ is invalid", [self text]);
+        WXLogError(@"text %@ is invalid", self.text);
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
@@ -412,16 +398,8 @@ do {\
     }
     
     if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
@@ -501,7 +479,7 @@ do {\
 
 - (NSAttributedString *)buildAttributeString
 {
-    NSString *string = [self text] ?: @"";
+    NSString *string = self.text ?: @"";
     
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
@@ -511,16 +489,8 @@ do {\
     }
     
     if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font

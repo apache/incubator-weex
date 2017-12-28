@@ -341,14 +341,17 @@ public class Statements {
             while (iterator.hasNext()){
                 Map.Entry<String, Object> entry = iterator.next();
                 String key = entry.getKey();
-                if(entry.getValue() == null){
-                    if(attr.get(key) == null){
+                Object value = entry.getValue();
+                Object oldValue = attr.get(key);
+                if(value == null){
+                    if(oldValue == null){
                         iterator.remove();
                         continue;
                     }
-                }
-                if(entry.getValue().equals(attr.get(key))){
-                    iterator.remove();
+                }else{
+                    if(value.equals(oldValue)){
+                        iterator.remove();
+                    }
                 }
             }
 

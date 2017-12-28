@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(465)
+	__vue_styles__.push(__webpack_require__(94)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(466)
+	__vue_exports__ = __webpack_require__(95)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(467)
+	var __vue_template__ = __webpack_require__(96)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,25 +70,29 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/iconfont.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/iconfont.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-f9298a60"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 465:
-/***/ function(module, exports) {
+/***/ 94:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title1": {
@@ -97,12 +101,12 @@
 	    "fontFamily": "iconfont1"
 	  },
 	  "title2": {
-	    "color": "#FF0000",
+	    "color": "#808080",
 	    "fontSize": 36,
 	    "fontFamily": "iconfont2"
 	  },
 	  "title3": {
-	    "color": "#FF0000",
+	    "color": "#FFC0CB",
 	    "fontSize": 36,
 	    "fontFamily": "iconfont3"
 	  },
@@ -113,10 +117,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 466:
-/***/ function(module, exports) {
+/***/ 95:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -155,50 +159,184 @@
 	//
 	//
 	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 
-	var domModule = __weex_require_module__('dom');
 	module.exports = {
 	  created: function created() {
-	    //目前支持ttf、woff文件，不支持svg、eot类型
-	    domModule.addRule('font-face', {
-	      'font-family': "iconfont1",
-	      'src': "url('iconfont.ttf')"
-	    });
-	    domModule.addRule('font-face', {
-	      'font-family': "iconfont2",
+
+	    var domModule = weex.requireModule('dom');
+	    //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
+
+	    domModule.addRule('fontFace', {
+	      'fontFamily': "iconfont2",
 	      'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
 	    });
-	    domModule.addRule('font-face', {
-	      'font-family': "iconfont3",
+	    domModule.addRule('fontFace', {
+	      'fontFamily': "iconfont3",
 	      'src': "url('http://at.alicdn.com/t/font_1469606522_9417143.woff')"
 	    });
-	    domModule.addRule('font-face', {
-	      'font-family': "iconfont4",
-	      'src': "url('file:///storage/emulated/0/Android/data/com.alibaba.weex/cache/http:__at.alicdn.com_t_font_1469606063_76593.ttf')"
+
+	    domModule.addRule('fontFace', {
+	      'fontFamily': "iconfont4",
+	      'src': "url('http://at.alicdn.com/t/font_zn5b3jswpofuhaor.ttf')"
 	    });
+
+	    // you can use the absolute path or the local:// scheme path
+	    //  domModule.addRule('fontFace', {
+	    //   'fontFamily': "iconfont4",
+	    //   'src': "url('file:///storage/emulated/0/Android/data/com.alibaba.weex/cache/http:__at.alicdn.com_t_font_1469606063_76593.ttf')"
+	    // });
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 467:
-/***/ function(module, exports) {
+/***/ 96:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _vm._m(0)
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('text', {
-	    staticClass: ["title1"]
-	  }, ["Assets: "]), _h('text', {
-	    staticClass: ["title2"]
-	  }, ["http ttf: "]), _h('text', {
-	    staticClass: ["title3"]
-	  }, ["http woff: "]), _h('text', {
-	    staticClass: ["title4"]
-	  }, ["file: "])])
+	  return _c('scroller', {
+	    staticStyle: {
+	      alignItems: "center"
+	    }
+	  }, [_c('div', {
+	    staticStyle: {
+	      marginTop: "20px"
+	    }
+	  }, [_c('text', {
+	    staticStyle: {
+	      color: "red",
+	      fontSize: "50px"
+	    }
+	  }, [_vm._v("only support font for ttf and woff")])]), _c('text', {
+	    staticClass: ["title2"],
+	    staticStyle: {
+	      marginTop: "50px",
+	      width: "500px"
+	    }
+	  }, [_vm._v("http ttf: ")]), _c('text', {
+	    staticClass: ["title3"],
+	    staticStyle: {
+	      marginTop: "50px",
+	      width: "500px"
+	    }
+	  }, [_vm._v("http woff: ")]), _c('div', {
+	    staticStyle: {
+	      flexDirection: "row",
+	      marginTop: "50px"
+	    }
+	  }, [_c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "50",
+	      color: "green"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "50"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "60",
+	      color: "blue"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "60",
+	      color: "green"
+	    }
+	  }, [_vm._v("")])]), _c('div', {
+	    staticStyle: {
+	      flexDirection: "row",
+	      marginTop: "50px"
+	    }
+	  }, [_c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "50",
+	      color: "green"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "50"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "60",
+	      color: "blue"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "60",
+	      color: "green"
+	    }
+	  }, [_vm._v("")])]), _c('div', [_c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "100",
+	      marginTop: "50px"
+	    }
+	  }, [_vm._v("")])]), _c('div', [_c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "100",
+	      color: "green",
+	      marginTop: "50px"
+	    }
+	  }, [_vm._v("")]), _c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "100",
+	      marginTop: "50px"
+	    }
+	  })]), _c('div', {
+	    staticStyle: {
+	      flexDirection: "row"
+	    }
+	  }, [_c('text', {
+	    staticStyle: {
+	      fontFamily: "iconfont4",
+	      fontSize: "70",
+	      width: "750px"
+	    }
+	  }, [_vm._v("")])])])
 	}]}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

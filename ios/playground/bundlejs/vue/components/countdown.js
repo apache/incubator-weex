@@ -42,23 +42,22 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ({
-
-/***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(414)
+	__vue_styles__.push(__webpack_require__(18)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(415)
+	__vue_exports__ = __webpack_require__(19)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(420)
+	var __vue_template__ = __webpack_require__(24)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +69,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/countdown.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/countdown.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-58fe9bc0"
+	__vue_options__._scopeId = "data-v-3bf51100"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,23 +88,24 @@
 	new Vue(module.exports)
 
 
-/***/ },
-
-/***/ 399:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 1 */,
+/* 2 */,
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(400)
+	__vue_styles__.push(__webpack_require__(4)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(401)
+	__vue_exports__ = __webpack_require__(5)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(402)
+	var __vue_template__ = __webpack_require__(6)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -117,10 +117,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-46407d45"
+	__vue_options__._scopeId = "data-v-58511ff6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -134,10 +134,9 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 400:
-/***/ function(module, exports) {
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "panel": {
@@ -185,13 +184,18 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
+	  },
+	  "panel-body": {
+	    "paddingLeft": 12,
+	    "paddingRight": 12,
+	    "paddingTop": 20,
+	    "paddingBottom": 20
 	  }
 	}
 
-/***/ },
-
-/***/ 401:
-/***/ function(module, exports) {
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -233,10 +237,9 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 402:
-/***/ function(module, exports) {
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -264,10 +267,20 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 414:
-/***/ function(module, exports) {
+/***/ }),
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "ctno1": {
@@ -294,10 +307,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 415:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -379,8 +391,8 @@
 	    };
 	  },
 	  components: {
-	    panel: __webpack_require__(399),
-	    countdown: __webpack_require__(416)
+	    panel: __webpack_require__(3),
+	    countdown: __webpack_require__(20)
 	  },
 	  methods: {
 	    tick: function tick(e, k) {
@@ -389,23 +401,22 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 416:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(417)
+	__vue_styles__.push(__webpack_require__(21)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(418)
+	__vue_exports__ = __webpack_require__(22)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(419)
+	var __vue_template__ = __webpack_require__(23)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -417,10 +428,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/countdown.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/countdown.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-20c26e72"
+	__vue_options__._scopeId = "data-v-50220132"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -434,10 +445,9 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 417:
-/***/ function(module, exports) {
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "wrap": {
@@ -445,10 +455,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 418:
-/***/ function(module, exports) {
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -545,10 +554,9 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 419:
-/***/ function(module, exports) {
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -564,10 +572,9 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 420:
-/***/ function(module, exports) {
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('scroller', [_c('panel', {
@@ -643,10 +650,9 @@
 	    }
 	  }, [_vm._v(":")]), _c('text', {
 	    staticClass: ["ctno2"]
-	  }, [_vm._v(_vm._s(_vm.countdown2.time.ss))])])], 1)], 1)
+	  }, [_vm._v(_vm._s(_vm.countdown2.time.ss))])])])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
-
-/******/ });
+/***/ })
+/******/ ]);

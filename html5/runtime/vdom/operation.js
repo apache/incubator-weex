@@ -122,15 +122,9 @@ export function appendBody (doc, node, before) {
 
 function sendBody (doc, node) {
   const body = node.toJSON()
-  const children = body.children
-  delete body.children
-  let result = doc.taskCenter.send('dom', { action: 'createBody' }, [body])
-  if (children) {
-    children.forEach(child => {
-      result = doc.taskCenter.send('dom', { action: 'addElement' }, [body.ref, child, -1])
-    })
+  if (doc && doc.taskCenter && typeof doc.taskCenter.send === 'function') {
+    doc.taskCenter.send('dom', { action: 'createBody' }, [body])
   }
-  return result
 }
 
 /**

@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(513)
+	__vue_styles__.push(__webpack_require__(142)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(514)
+	__vue_exports__ = __webpack_require__(143)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(515)
+	var __vue_template__ = __webpack_require__(144)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/showcase/calculator.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/calculator.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-4d170e8c"
+	__vue_options__._scopeId = "data-v-22dcf14c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,10 +89,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 513:
-/***/ function(module, exports) {
+/***/ 142:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "row": {
@@ -104,8 +104,14 @@
 	    "fontSize": 40,
 	    "color": "#FFFFFF",
 	    "height": 100,
-	    "padding": 30,
-	    "margin": 5
+	    "paddingTop": 30,
+	    "paddingRight": 30,
+	    "paddingBottom": 30,
+	    "paddingLeft": 30,
+	    "marginTop": 5,
+	    "marginRight": 5,
+	    "marginBottom": 5,
+	    "marginLeft": 5
 	  },
 	  "btn": {
 	    "flex": 1,
@@ -113,8 +119,14 @@
 	    "backgroundColor": "#eeeeee",
 	    "fontSize": 36,
 	    "height": 100,
-	    "padding": 30,
-	    "margin": 5
+	    "paddingTop": 30,
+	    "paddingRight": 30,
+	    "paddingBottom": 30,
+	    "paddingLeft": 30,
+	    "marginTop": 5,
+	    "marginRight": 5,
+	    "marginBottom": 5,
+	    "marginLeft": 5
 	  },
 	  "btn-operator": {
 	    "backgroundColor": "#666699",
@@ -123,10 +135,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 514:
-/***/ function(module, exports) {
+/***/ 143:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -235,10 +247,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 515:
-/***/ function(module, exports) {
+/***/ 144:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -339,6 +351,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });
