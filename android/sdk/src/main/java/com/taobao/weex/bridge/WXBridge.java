@@ -64,6 +64,19 @@ class WXBridge implements IWXBridge {
   public native int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
 
+
+  /**
+   * Execute JavaScript function
+   *
+   * @param instanceId
+   * @param namespace  default global
+   * @param function   function string name
+   * @param args       WXJSObject array
+   */
+  public native byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args);
+
+
+
   /**
    * register Weex Service
    *

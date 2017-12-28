@@ -66,8 +66,8 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   }
 
   @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    boolean result = super.onTouchEvent(event);
+  public boolean dispatchTouchEvent(MotionEvent event) {
+    boolean result = super.dispatchTouchEvent(event);
     if (mGesture != null) {
       result |= mGesture.onTouch(this, event);
     }

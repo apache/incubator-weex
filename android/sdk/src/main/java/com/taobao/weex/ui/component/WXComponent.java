@@ -62,6 +62,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
+import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
@@ -109,6 +110,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * abstract component
@@ -140,7 +143,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
-  private WXGesture mGesture;
+  protected WXGesture mGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
@@ -310,16 +313,42 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public final void fireEvent(String type, Map<String, Object> params){
-    fireEvent(type,params,null);
+    fireEvent(type, params,null, null);
+  }
+
+  public final EventResult fireEventWait(String type, Map<String, Object> params){
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+    EventResult callback = new EventResult(){
+      @Override
+      public void onCallback(Object result) {
+        super.onCallback(result);
+        waitLatch.countDown();
+      }
+    };
+    try{
+      fireEvent(type, params, null, callback);
+      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      return  callback;
+    }catch (Exception e){
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e("fireEventWait", e);
+      }
+      return  callback;
+    }
   }
 
   protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
+      fireEvent(type, params, domChanges, null);
+  }
+
+
+    private final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges, EventResult callback){
     if(mInstance != null && mDomObj != null) {
         List<Object> eventArgsValues = null;
         if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
              eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
         }
-        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues);
+        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues, callback);
     }
   }
 
@@ -1116,6 +1145,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         }
       }
     }
+    if(Constants.Event.SHOULD_STOP_PROPAGATION.equals(type)){
+      return  true;
+    }
     return false;
   }
 
@@ -1684,7 +1716,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  protected boolean containsEvent(String event){
+  public boolean containsEvent(String event){
     return mDomObj.getEvents().contains(event) || mAppendEvents.contains(event);
   }
 
