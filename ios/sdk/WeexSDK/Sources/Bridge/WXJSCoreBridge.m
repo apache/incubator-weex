@@ -459,7 +459,7 @@
     }
 }
 
-- (void)triggerTimeout:(void(^)())block
+- (void)triggerTimeout:(void(^)(void))block
 {
     block();
 }
@@ -477,7 +477,7 @@
 {
     if(dic[@"function"] && [dic objectForKey:@"appId"] && [_intervaltimers objectForKey:[dic objectForKey:@"appId"]]){
         NSMutableArray *timers = [_intervaltimers objectForKey:[dic objectForKey:@"appId"]];
-        void(^block)() = ((void(^)())dic[@"function"]);
+        void(^block)(void) = ((void(^)(void))dic[@"function"]);
         if(block && [timers containsObject:[dic objectForKey:@"timerId"]]){
             block();
             [self executeInterval:[dic objectForKey:@"appId"] function:block arg:[dic objectForKey:@"arg"] timerId:[[dic objectForKey:@"timerId"] longLongValue]];
@@ -503,7 +503,7 @@
     [self performSelector:@selector(callBack:) withObject:timeoutInfo afterDelay:interval inModes:@[NSRunLoopCommonModes]];
 }
 
-- (long long)triggerInterval:(NSString *)appId function:(void(^)())block arg:(NSString *)arg
+- (long long)triggerInterval:(NSString *)appId function:(void(^)(void))block arg:(NSString *)arg
 {
     double interval = [arg doubleValue]/1000.0f;
     _intervalTimerId = _intervalTimerId + 1; // timerId must auto-increment.
@@ -524,7 +524,7 @@
     return timerId;
 }
 
--(void)executeInterval:(NSString *)appId function:(void(^)())block arg:(NSString *)arg timerId:(long long)timerId
+-(void)executeInterval:(NSString *)appId function:(void(^)(void))block arg:(NSString *)arg timerId:(long long)timerId
 {
     double interval = [arg doubleValue]/1000.0f;
     NSMutableDictionary *intervalInfo = [NSMutableDictionary new];

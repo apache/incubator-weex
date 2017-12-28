@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(487)
+	__vue_exports__ = __webpack_require__(97)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(499)
+	var __vue_template__ = __webpack_require__(109)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,7 +66,7 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/index.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/index.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
@@ -84,13 +84,31 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 437:
-/***/ function(module, exports) {
+/***/ 41:
+/***/ (function(module, exports) {
 
+	/*
+	 * Licensed to the Apache Software Foundation (ASF) under one
+	 * or more contributor license agreements.  See the NOTICE file
+	 * distributed with this work for additional information
+	 * regarding copyright ownership.  The ASF licenses this file
+	 * to you under the Apache License, Version 2.0 (the
+	 * "License"); you may not use this file except in compliance
+	 * with the License.  You may obtain a copy of the License at
+	 *
+	 *   http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing,
+	 * software distributed under the License is distributed on an
+	 * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	 * KIND, either express or implied.  See the License for the
+	 * specific language governing permissions and limitations
+	 * under the License.
+	 */
 	exports.getBaseURL = function (vm) {
-	  var bundleUrl = vm.$getConfig().bundleUrl;
+	  var bundleUrl = weex.config.bundleUrl;
 	  var nativeBase;
 	  var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0 || bundleUrl.indexOf('file://assets/')>=0;
 	  var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
@@ -104,7 +122,7 @@
 	  }
 	  else {
 	    var host = 'localhost:12580';
-	    var matches = /\/\/([^\/]+?)\//.exec(vm.$getConfig().bundleUrl);
+	    var matches = /\/\/([^\/]+?)\//.exec(weex.config.bundleUrl);
 	    if (matches && matches.length >= 2) {
 	      host = matches[1];
 	    }
@@ -121,10 +139,10 @@
 	}
 
 
-/***/ },
+/***/ }),
 
-/***/ 487:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 97:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -138,40 +156,54 @@
 	module.exports = {
 	  data: function data() {
 	    var root = (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object' ? 'vue-web/vue' : 'vue';
+
 	    return {
 	      items: [
 	      // common
-	      { name: root + '/syntax/hello-world', title: 'Hello World' }, { name: root + '/style/index', title: 'Common Style' }, { name: root + '/animation', title: 'Animation' },
+	      { name: root + '/hello', title: 'Hello World' }, { name: root + '/style/index', title: 'Common Style' }, { name: root + '/animation', title: 'Animation' }, { name: root + '/transition', title: 'Transition' },
 
 	      // component
-	      { name: root + '/components/text', title: 'Text' }, { name: root + '/components/image', title: 'Image' }, { name: root + '/components/input', title: 'Input' }, { name: root + '/components/scroller', title: 'Scroller' }, { name: root + '/components/list', title: 'List' }, { name: root + '/components/waterfall', title: 'Waterfall' }, { name: root + '/components/slider', title: 'Slider' }, { name: root + '/components/a', title: 'A' }, { name: root + '/components/video', title: 'Video' }, { name: root + '/components/countdown', title: 'Countdown' }, { name: root + '/components/marquee', title: 'Marquee' }, { name: root + '/components/web', title: 'Web' }, { name: root + '/components/navigator', title: 'Navigator' }, { name: root + '/components/tabbar', title: 'Tabbar' },
+	      { name: root + '/components/text', title: 'Text' }, { name: root + '/iconfont', title: 'iconfont' }, { name: root + '/components/image', title: 'Image' }, { name: root + '/components/input', title: 'Input' }, { name: root + '/components/scroller', title: 'Scroller' }, { name: root + '/components/list', title: 'List' }, { name: root + '/components/waterfall', title: 'Waterfall' }, { name: root + '/components/slider', title: 'Slider' }, { name: root + '/components/a', title: 'A' }, { name: root + '/components/video', title: 'Video' }, { name: root + '/components/countdown', title: 'Countdown' }, { name: root + '/components/marquee', title: 'Marquee' }, { name: root + '/components/web', title: 'Web' }, { name: root + '/components/navigator', title: 'Navigator' }, { name: root + '/components/tabbar', title: 'Tabbar' },
 
 	      // module
-	      { name: root + '/modules/instance-api', title: 'Instance API' }, { name: root + '/modules/modal', title: 'Modal' }, { name: root + '/modules/stream', title: 'Stream' }, { name: root + '/modules/storage', title: 'Storage' },
+	      { name: root + '/modules/instance-api', title: 'Instance API' }, { name: root + '/modules/modal', title: 'Modal' }, { name: root + '/modules/webSocket', title: 'WebSocket' }, { name: root + '/modules/stream', title: 'Stream' }, { name: root + '/modules/storage', title: 'Storage' }, { name: root + '/modules/picker', title: 'picker' },
 	      // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
 
 	      // showcase
-	      { name: root + '/showcase/boxshadow', title: 'boxshadow' }, { name: root + '/showcase/progress', title: 'Progress Bar' }, { name: root + '/showcase/itemlist', title: 'List (Advanced)' }, { name: root + '/showcase/calculator', title: 'Calculator' }]
+	      { name: root + '/showcase/boxshadow', title: 'boxshadow' }, { name: root + '/showcase/progress', title: 'Progress Bar' }, { name: root + '/showcase/itemlist', title: 'List (Advanced)' }, { name: root + '/showcase/calculator', title: 'Calculator' }, { name: root + '/showcase/tap-penetrate', title: 'TapPenetrate' }, { name: root + '/showcase/a-node-click', title: 'ANodeClick' },
+	      // {name: root + '/showcase/minesweeper', title: 'Minesweeper'},
+	      // {name: root + '/showcase/ui', title: 'UI Gallery'},
+	      // {name: root + '/showcase/dropdown/dropdown-demo', title: 'Dropdown'}
+
+	      // market
+	      { name: root + '/market/gcanvas', title: 'Gcanvas' }]
 	    };
 	  },
 	  components: {
-	    exampleList: __webpack_require__(488)
+	    exampleList: __webpack_require__(98)
+	  },
+	  created: function created() {
+	    var root = (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object' ? 'vue-web/vue' : 'vue';
+	    var platform = this.$getConfig().env.platform.toLowerCase();
+	    if (platform === 'ios') {
+	      this.items.push({ name: root + '/showcase/compositing', title: 'Compositing' });
+	    }
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 488:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 98:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(489)
+	__vue_exports__ = __webpack_require__(99)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(498)
+	var __vue_template__ = __webpack_require__(108)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -183,7 +215,7 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/example-list.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/example-list.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
@@ -199,10 +231,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 489:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 99:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -215,7 +247,7 @@
 	//
 	//
 
-	var getBaseURL = __webpack_require__(437).getBaseURL;
+	var getBaseURL = __webpack_require__(41).getBaseURL;
 	module.exports = {
 	  props: {
 	    dir: {
@@ -226,7 +258,7 @@
 	    }
 	  },
 	  components: {
-	    exampleListItem: __webpack_require__(490)
+	    exampleListItem: __webpack_require__(100)
 	  },
 	  created: function created() {
 	    var base = getBaseURL(this);
@@ -239,23 +271,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 490:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 100:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(491)
+	__vue_styles__.push(__webpack_require__(101)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(492)
+	__vue_exports__ = __webpack_require__(102)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(497)
+	var __vue_template__ = __webpack_require__(107)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -267,10 +299,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/example-list-item.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/example-list-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-1f417e80"
+	__vue_options__._scopeId = "data-v-8b7b5d80"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -284,10 +316,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 491:
-/***/ function(module, exports) {
+/***/ 101:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "item-txt": {
@@ -296,10 +328,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 492:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 102:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -324,7 +356,7 @@
 	    url: { default: '' }
 	  },
 	  components: {
-	    listItem: __webpack_require__(493)
+	    listItem: __webpack_require__(103)
 	  },
 	  methods: {
 	    redirect: function redirect() {
@@ -333,23 +365,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 493:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 103:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(494)
+	__vue_styles__.push(__webpack_require__(104)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(495)
+	__vue_exports__ = __webpack_require__(105)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(496)
+	var __vue_template__ = __webpack_require__(106)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -361,10 +393,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/list-item.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/list-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-917012ba"
+	__vue_options__._scopeId = "data-v-32b0ed3a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -378,10 +410,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 494:
-/***/ function(module, exports) {
+/***/ 104:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "item": {
@@ -396,10 +428,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 495:
-/***/ function(module, exports) {
+/***/ 105:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -435,10 +467,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 496:
-/***/ function(module, exports) {
+/***/ 106:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -455,10 +487,10 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 497:
-/***/ function(module, exports) {
+/***/ 107:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('list-item', {
@@ -471,14 +503,15 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 498:
-/***/ function(module, exports) {
+/***/ 108:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('list', _vm._l((_vm.items), function(item) {
+	  return _c('list', _vm._l((_vm.items), function(item, i) {
 	    return _c('cell', {
+	      key: i,
 	      appendAsTree: true,
 	      attrs: {
 	        "append": "tree"
@@ -493,10 +526,10 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 499:
-/***/ function(module, exports) {
+/***/ 109:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('example-list', {
@@ -508,6 +541,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

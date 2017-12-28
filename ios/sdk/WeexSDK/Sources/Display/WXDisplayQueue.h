@@ -22,6 +22,6 @@
 // Global queue for displaying content
 @interface WXDisplayQueue : NSObject
 
-+ (void)addBlock:(void(^)())block;
++ (void)addBlock:(void(^)(void))block;
 
 @end

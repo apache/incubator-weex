@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(593)
+	__vue_exports__ = __webpack_require__(231)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(598)
+	var __vue_template__ = __webpack_require__(236)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,7 +66,7 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/script-component.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/syntax/script-component.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
@@ -84,10 +84,10 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 593:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 231:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -114,27 +114,27 @@
 	    };
 	  },
 	  components: {
-	    item: __webpack_require__(594)
+	    item: __webpack_require__(232)
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 594:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 232:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(595)
+	__vue_styles__.push(__webpack_require__(233)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(596)
+	__vue_exports__ = __webpack_require__(234)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(597)
+	var __vue_template__ = __webpack_require__(235)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -146,10 +146,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/include/sub.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/syntax/include/sub.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-7967da16"
+	__vue_options__._scopeId = "data-v-7fded835"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -163,10 +163,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 595:
-/***/ function(module, exports) {
+/***/ 233:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "item-txt": {
@@ -175,10 +175,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 596:
-/***/ function(module, exports) {
+/***/ 234:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -198,10 +198,10 @@
 	  props: ['url', 'title']
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 597:
-/***/ function(module, exports) {
+/***/ 235:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('text', {
@@ -210,14 +210,15 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 598:
-/***/ function(module, exports) {
+/***/ 236:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('list', _vm._l((_vm.items), function(item) {
+	  return _c('list', _vm._l((_vm.items), function(item, i) {
 	    return _c('cell', {
+	      key: i,
 	      appendAsTree: true,
 	      attrs: {
 	        "append": "tree"
@@ -231,6 +232,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

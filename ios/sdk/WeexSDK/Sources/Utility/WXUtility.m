@@ -43,7 +43,7 @@
 
 static BOOL utilityShouldRoundPixel = NO;
 
-void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -56,7 +56,7 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -69,7 +69,7 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *thread)
 {
     [WXUtility performBlock:block onThread:thread];
 }
@@ -146,7 +146,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 @implementation WXUtility
 
-+ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
++ (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {
     if (!thread || !block) return;
     
@@ -160,7 +160,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
 }
 
-+ (void)_performBlock:(void (^)())block
++ (void)_performBlock:(void (^)(void))block
 {
     block();
 }

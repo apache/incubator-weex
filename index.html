@@ -1,65 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Weex HTML5</title>
-<meta name="weex-viewport" content="750">
-<meta name="viewport" content="width=750, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<meta name="apple-touch-fullscreen" content="yes" />
-<meta name="format-detection" content="telephone=no, email=no" />
-<style>
-  html, body, #weex {
-    width: 100%;
-    height: 100%;
-  }
-</style>
-<script src="./dist/browser.js"></script>
+  <meta charset="utf-8">
+  <title>Weex Vue Demo</title>
+
+  <!-- You should set 'weex-viewport' to your design pixel width, and the
+    viewport meta should be set like below, OTHERWISE it won't work.-->
+  <meta name="weex-viewport" content="750">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="format-detection" content="telephone=no, email=no" />
+
+  <!-- About style below: html's height should set to 100%, and this
+    style should be added before the weex-vue-render script loaded.
+    OTHERWISE the 'weex.config.env.deviceHeight' will not work. -->
+  <style>
+    html, body {
+      -ms-overflow-style: scrollbar;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background-color: green;
+      overflow-x: hidden;
+    }
+    #info {
+      position: fixed;
+      z-index: 999999;
+      top: 100px;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      font-size: 24px;
+      color: green;
+      padding: 10px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      background-color: #eee;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body>
-<div id="weex"></div>
-<!-- entry -->
-<script>
-/**
- * init weex instance depending on the url params.
- * There are three ways to load weex bundles, depends on the
- * parameter 'loader' in the url:
- *
- *   + xhr:   use XMLHttpRequest. Parameter 'page' should be
- *   the bundle's url.
- *   + jsonp: use jsonp. Parameter 'page' should be the request
- *   url and jsonpCallback should be specified during calling
- *   weex.init.
- *   + source: use the transformed code itself. 'page' should
- *   be the transformed weex bundle.
- *
- * @param {String}  bundle  It has different meaning depends on
- *   the type of loader.
- */
-(function () {
-  function getUrlParam (key) {
-    var reg = new RegExp('[?|&]' + key + '=([^&]+)')
-    var match = location.search.match(reg)
-    return match && match[1]
-  }
+  <div id="root"></div>
+  <!-- <script>
+    window.onerror = function (err) {
+      alert('error!' + JSON.stringify(err))
+    }
+  </script> -->
+  <!--<script src="./node_modules/vue/dist/vue.runtime.min.js"></script>-->
+  <script src="./node_modules/vue/dist/vue.runtime.js"></script>
+  <!--<script src="dist/vue.runtime.js"></script> -->
+  <!-- <script src="./node_modules/weex-vue-render/index.min.js"></script> -->
+  <script src="./packages/weex-vue-render/dist/index.js"></script>
+  <!--<script src="./dist/render.vue.js"></script>-->
+  <!--<script src="./dist/render.vue.min.js"></script>-->
+  <!--<script src="./packages/weex-vue-render/dist/index.min.js"></script>-->
+  <!--This line is only used to run weex-picker example,you can remove this line when you do not need weex-picker module-->
+  <script src="./node_modules/@weex-project/weex-picker/js/build/index.js"></script>
+  <script>
+    /**
+     * these iife is just for the convenience for the showcase of demos.
+     * you can import a jsbundle by wrapping it in a <script> tag.
+     * e.g. <script src="examples/build/vue-web/vue/index.js"></*script>
+     */
+    ; (function () {
+      function getUrlParam (key) {
+        var reg = new RegExp('[?|&]' + key + '=([^&]+)')
+        var match = location.search.match(reg)
+        return match && match[1]
+      }
 
-  var loader = getUrlParam('loader') || 'xhr'
-  var page = getUrlParam('page') || 'examples/build/index.js'
+      var page = getUrlParam('page')
+      var defaultPage = 'examples/build/vue-web/vue/index.js'
+      if (!page) {
+        var url = location.href.replace(/\?|$/, function(f) {
+          var query = '?page=' + defaultPage
+          return f ? query + '&' : query
+        })
+        return location.href = url
+      }
 
-  // jsonp callback name should be specified or be the default
-  // value 'weexJsonpCallback' if the 'jsonp' loader is used.
-  var JSONP_CALLBACK_NAME = 'weexJsonpCallback'
-
-  window.weex.init({
-    jsonpCallback: JSONP_CALLBACK_NAME,
-    appId: location.href,
-    loader: loader,
-    source: page,
-    rootId: 'weex',
-    // downgrade: ['root']  // 'root', 'list', 'scroller'
-  })
-})();
-</script>
+      var bundle = document.createElement('script')
+      bundle.src = page
+      document.body.appendChild(bundle)
+    })()
+  </script>
 </body>
 </html>

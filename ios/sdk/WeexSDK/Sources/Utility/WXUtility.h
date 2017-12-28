@@ -89,19 +89,19 @@ extern "C" {
  * @abstract execute asynchronous action block on the main thread.
  *
  */
-void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute synchronous action block on the main thread.
  *
  */
-void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute action block on the specific thread.
  *
  */
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *_Nonnull thread);
 
 /**
  * @abstract swizzling methods.
@@ -119,7 +119,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 @interface WXUtility : NSObject
 
-+ (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
++ (void)performBlock:(void (^_Nonnull)(void))block onThread:(NSThread *_Nonnull)thread;
 
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
@@ -257,7 +257,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  * @abstract Returns the scale of the main screen.
  *
  */
-CGFloat WXScreenScale();
+CGFloat WXScreenScale(void);
 
 /**
  * @abstract Returns a Round float coordinates to the main screen pixel.
