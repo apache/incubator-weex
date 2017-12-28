@@ -20,7 +20,7 @@ namespace WeexCore {
   typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
   typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
 
-  RenderPage::RenderPage(std::string pageID) {
+  RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
     mWXCorePerformance = new RenderPerformance();
     mInstance_Impl_Android = nullptr;
@@ -83,14 +83,14 @@ namespace WeexCore {
     switch (pRoot->getFlexDirection()) {
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
-        if (pRoot->getTotalMainSize() * radio > deviceHeight) {
+        if (pRoot->getTotalMainSize() * radio > deviceHeight / 2) {
           traverseTree(pRoot);
         }
         break;
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
       default:
-        if (pRoot->getTotalMainSize() * radio > deviceWidth) {
+        if (pRoot->getTotalMainSize() * radio > deviceWidth / 2) {
           traverseTree(pRoot);
         }
         break;
@@ -107,7 +107,7 @@ namespace WeexCore {
       render->setHasNewLayout(false);
     }
 
-    for (int i = 0; i < render->getChildCount(); i++) {
+    for (uint32_t i = 0; i < render->getChildCount(); i++) {
       RenderObject *child = render->getChild(i);
       if (child != nullptr)
         traverseTree(child);
@@ -127,7 +127,8 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::addRenderObject(std::string parentRef, int insertPosition, RenderObject *child) {
+  bool RenderPage::addRenderObject(const std::string &parentRef, const int &insertPosition,
+                                   RenderObject *child) {
     long long startTime = getCurrentTime();
     RenderObject *parent = getRenderObject(parentRef);
     if (parent == nullptr || child == nullptr) {
@@ -146,7 +147,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::removeRenderObject(std::string ref) {
+  bool RenderPage::removeRenderObject(const std::string &ref) {
     long long startTime = getCurrentTime();
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
@@ -167,7 +168,8 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::moveRenderObject(std::string ref, std::string parentRef, int index) {
+  bool
+  RenderPage::moveRenderObject(const std::string &ref, const std::string &parentRef, int &index) {
     long long startTime = getCurrentTime();
 
     RenderObject *child = getRenderObject(ref);
@@ -198,7 +200,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::updateStyle(std::string ref,
+  bool RenderPage::updateStyle(const std::string &ref,
                                std::vector<std::pair<std::string, std::string> *> *styles) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
@@ -310,7 +312,7 @@ namespace WeexCore {
     return flag;
   }
 
-  bool RenderPage::updateAttr(std::string ref,
+  bool RenderPage::updateAttr(const std::string &ref,
                               std::vector<std::pair<std::string, std::string> *> *attrs) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
@@ -342,7 +344,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::addEvent(std::string ref, std::string event) {
+  bool RenderPage::addEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
@@ -354,7 +356,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::removeEvent(std::string ref, std::string event) {
+  bool RenderPage::removeEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
     if (render == nullptr)
@@ -388,7 +390,7 @@ namespace WeexCore {
     mRenderObjectRegisterMap.insert(
         std::pair<std::string, RenderObject *>(render->getRef(), render));
 
-    for (int i = 0; i < render->getChildCount(); ++i) {
+    for (uint32_t i = 0; i < render->getChildCount(); ++i) {
       pushRenderToRegisterMap(render->getChild(i));
     }
   }
@@ -399,7 +401,7 @@ namespace WeexCore {
 
     mRenderObjectRegisterMap.erase(render->getRef());
 
-    for (int i = 0; i < render->getChildCount(); ++i) {
+    for (uint32_t i = 0; i < render->getChildCount(); ++i) {
       removeRenderFromRegisterMap(render->getChild(i));
     }
   }
@@ -412,24 +414,26 @@ namespace WeexCore {
     postRenderAction(action);
   }
 
-  void RenderPage::sendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
+  void
+  RenderPage::sendAddElementAction(RenderObject *child, RenderObject *parent, const int &index) {
     if (child == nullptr || parent == nullptr)
       return;
 
     RenderAction *action = new RenderActionAddElement(getPageId(), child, parent, index);
     postRenderAction(action);
 
-    for (int i = 0; i < child->getChildCount(); ++i) {
+    for (uint32_t i = 0; i < child->getChildCount(); ++i) {
       sendAddElementAction(child->getChild(i), child, i);
     }
   }
 
-  void RenderPage::sendRemoveElementAction(std::string ref) {
+  void RenderPage::sendRemoveElementAction(const std::string &ref) {
     RenderAction *action = new RenderActionRemoveElement(getPageId(), ref);
     postRenderAction(action);
   }
 
-  void RenderPage::sendMoveElementAction(std::string ref, std::string parentRef, int index) {
+  void RenderPage::sendMoveElementAction(const std::string &ref, const std::string &parentRef,
+                                         int index) {
     RenderAction *action = new RenderActionMoveElement(getPageId(), ref, parentRef, index);
     postRenderAction(action);
   }
@@ -468,42 +472,42 @@ namespace WeexCore {
     postRenderAction(action);
   }
 
-  void RenderPage::jniCallTime(long long time) {
+  void RenderPage::jniCallTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->jniCallTime += time;
   }
 
-  void RenderPage::cssLayoutTime(long long time) {
+  void RenderPage::cssLayoutTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->cssLayoutTime += time;
   }
 
-  void RenderPage::addElementActionJNITime(long long time) {
+  void RenderPage::addElementActionJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->addElementActionJNITime += time;
   }
 
-  void RenderPage::layoutActionJniTime(long long time) {
+  void RenderPage::layoutActionJniTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->layoutActionJniTime += time;
   }
 
-  void RenderPage::parseJsonTime(long long time) {
+  void RenderPage::parseJsonTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->parseJsonTime += time;
   }
 
-  void RenderPage::buildRenderObjectTime(long long time) {
+  void RenderPage::buildRenderObjectTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->buildRenderObjectTime += time;
   }
 
-  void RenderPage::createJMapJNITime(long long time) {
+  void RenderPage::createJMapJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->createJMapJNITime += time;
   }
 
-  void RenderPage::jniCallBridgeTime(long long time) {
+  void RenderPage::jniCallBridgeTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->jniCallBridgeTime += time;
   }

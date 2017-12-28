@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  bool WXCoreMargin::setMargin(WXCoreMarginEdge edge, float margin) {
+  bool WXCoreMargin::setMargin(const WXCoreMarginEdge &edge, const float &margin) {
     bool dirty = false;
     switch (edge) {
       case WXCore_Margin_ALL:
@@ -45,7 +45,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCoreMargin::getMargin(WXCoreMarginEdge edge) {
+  float WXCoreMargin::getMargin(const WXCoreMarginEdge &edge) {
     float margin = 0;
     switch (edge) {
       case WXCore_Margin_Left:
@@ -66,7 +66,7 @@ namespace WeexCore {
     return margin;
   }
 
-  bool WXCorePadding::setPadding(WXCorePaddingEdge edge, float padding) {
+  bool WXCorePadding::setPadding(const WXCorePaddingEdge &edge, const float &padding) {
     bool dirty = false;
     switch (edge) {
       case WXCore_Padding_ALL:
@@ -109,7 +109,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCorePadding::getPadding(WXCorePaddingEdge edge) {
+  float WXCorePadding::getPadding(const WXCorePaddingEdge &edge) {
     float padding = 0;
     switch (edge) {
       case WXCore_Padding_Left:
@@ -130,7 +130,7 @@ namespace WeexCore {
     return padding;
   }
 
-  bool WXCoreBorderWidth::setBorderWidth(WXCoreBorderWidthEdge edge, float borderWidth) {
+  bool WXCoreBorderWidth::setBorderWidth(const WXCoreBorderWidthEdge &edge, const float &borderWidth) {
     bool dirty = false;
     switch (edge) {
       case WXCore_Border_Width_ALL:
@@ -173,7 +173,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCoreBorderWidth::getBorderWidth(WXCoreBorderWidthEdge edge) {
+  float WXCoreBorderWidth::getBorderWidth(const WXCoreBorderWidthEdge &edge) {
     float borderWidth = 0;
     switch (edge) {
       case WXCore_Border_Width_Left:
@@ -194,7 +194,7 @@ namespace WeexCore {
     return borderWidth;
   }
 
-  bool WXCorePosition::setPosition(WXCorePositionEdge edge, float position) {
+  bool WXCorePosition::setPosition(const WXCorePositionEdge &edge, const float &position) {
     bool dirty = false;
     switch (edge) {
       case WXCore_PositionEdge_Left:
@@ -225,7 +225,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCorePosition::getPosition(WXCorePositionEdge edge) {
+  float WXCorePosition::getPosition(const WXCorePositionEdge &edge) {
     float position = 0;
     switch (edge) {
       case WXCore_PositionEdge_Left:

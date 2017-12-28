@@ -19,7 +19,7 @@ namespace WeexCore {
     float mBottom;
     float mRight;
 
-    RenderActionLayout(std::string pageId, RenderObject *render);
+    RenderActionLayout(const std::string &pageId, RenderObject *render);
 
     void ExecuteAction();
 

@@ -6,17 +6,17 @@
 
 namespace WeexCore {
 
-  WXCoreFlexDirection getWXCoreFlexDirection(std::string value);
+  WXCoreFlexDirection getWXCoreFlexDirection(const std::string &value);
 
-  WXCoreJustifyContent getWXCoreJustifyContent(std::string value);
+  WXCoreJustifyContent getWXCoreJustifyContent(const std::string &value);
 
-  WXCoreAlignItems getWXCoreAlignItem(std::string value);
+  WXCoreAlignItems getWXCoreAlignItem(const std::string &value);
 
-  WXCoreFlexWrap getWXCoreFlexWrap(std::string value);
+  WXCoreFlexWrap getWXCoreFlexWrap(const std::string &value);
 
-  WXCoreAlignSelf getWXCoreAlignSelf(std::string value);
+  WXCoreAlignSelf getWXCoreAlignSelf(const std::string &value);
 
-  WXCorePositionType getWXCorePositionType(std::string value);
+  WXCorePositionType getWXCorePositionType(const std::string &value);
 }
 
 

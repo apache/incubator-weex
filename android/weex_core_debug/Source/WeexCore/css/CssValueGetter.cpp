@@ -5,7 +5,7 @@
 
 namespace WeexCore {
 
-  WXCoreFlexDirection getWXCoreFlexDirection(std::string value) {
+  WXCoreFlexDirection getWXCoreFlexDirection(const std::string &value) {
     if (value == COLUMN) {
       return WeexCore::WXCore_Flex_Direction_Column;
     } else if (value == ROW) {
@@ -18,7 +18,7 @@ namespace WeexCore {
     return WeexCore::WXCore_Flex_Direction_Column;
   }
 
-  WXCoreJustifyContent getWXCoreJustifyContent(std::string value) {
+  WXCoreJustifyContent getWXCoreJustifyContent(const std::string &value) {
     if (value == FLEX_START) {
       return WeexCore::WXCore_Justify_Flex_Start;
     } else if (value == FLEX_END) {
@@ -33,7 +33,7 @@ namespace WeexCore {
     return WeexCore::WXCore_Justify_Flex_Start;
   }
 
-  WXCoreAlignItems getWXCoreAlignItem(std::string value) {
+  WXCoreAlignItems getWXCoreAlignItem(const std::string &value) {
     if (value == STRETCH) {
       return WeexCore::WXCore_AlignItems_Stretch;
     } else if (value == FLEX_START) {
@@ -46,7 +46,7 @@ namespace WeexCore {
     return WeexCore::WXCore_AlignItems_Stretch;
   }
 
-  WXCoreFlexWrap getWXCoreFlexWrap(std::string value) {
+  WXCoreFlexWrap getWXCoreFlexWrap(const std::string &value) {
     if (value == NOWRAP) {
       return WeexCore::WXCore_Wrap_NoWrap;
     } else if (value == WRAP) {
@@ -57,7 +57,7 @@ namespace WeexCore {
     return WeexCore::WXCore_Wrap_NoWrap;
   }
 
-  WXCoreAlignSelf getWXCoreAlignSelf(std::string value) {
+  WXCoreAlignSelf getWXCoreAlignSelf(const std::string &value) {
     if (value == AUTO) {
       return WeexCore::WXCore_AlignSelf_Auto;
     } else if (value == STRETCH) {
@@ -72,7 +72,7 @@ namespace WeexCore {
     return WeexCore::WXCore_AlignSelf_Auto;
   }
 
-  WXCorePositionType getWXCorePositionType(std::string value) {
+  WXCorePositionType getWXCorePositionType(const std::string &value) {
     if (value == RELATIVE) {
       return WeexCore::WXCore_PositionType_Relative;
     } else if (value == ABSOLUTE) {

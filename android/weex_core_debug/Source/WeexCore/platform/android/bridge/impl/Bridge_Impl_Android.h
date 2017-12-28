@@ -78,8 +78,8 @@ namespace WeexCore {
                                  std::map<std::string, std::string> *borders);
 
     int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int index,
-                                 std::string parentRef,
+                                 int &index,
+                                 std::string &parentRef,
                                  std::map<std::string, std::string> *styles,
                                  std::map<std::string, std::string> *attributes,
                                  std::set<std::string> *events,

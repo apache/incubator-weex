@@ -35,15 +35,15 @@ namespace WeexCore {
 
   public:
 
-    bool setPlatform(std::string platformName);
+    bool setPlatform(const std::string &platformName);
 
     bool isAndroid();
 
     bool isIOS();
 
-    bool setDeviceWidth(std::string width);
+    bool setDeviceWidth(const std::string &width);
 
-    bool setDeviceHeight(std::string height);
+    bool setDeviceHeight(const std::string &height);
 
     float getDeviceWidth();
 

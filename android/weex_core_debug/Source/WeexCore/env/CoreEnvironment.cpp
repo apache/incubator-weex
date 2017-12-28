@@ -5,7 +5,7 @@
 namespace WeexCore {
   WXCoreEnvironment *WXCoreEnvironment::m_pInstance = nullptr;
 
-  bool WXCoreEnvironment::setPlatform(std::string platformName) {
+  bool WXCoreEnvironment::setPlatform(const std::string &platformName) {
     if (platformName.empty())
       return false;
     this->mPlatformName = platformName;
@@ -24,14 +24,14 @@ namespace WeexCore {
     return mPlatformName == OS_iOS;
   }
 
-  bool WXCoreEnvironment::setDeviceWidth(std::string width) {
+  bool WXCoreEnvironment::setDeviceWidth(const std::string &width) {
     if (width.empty())
       return false;
     mDeviceWidth = atof(width.c_str());
     return true;
   }
 
-  bool WXCoreEnvironment::setDeviceHeight(std::string height) {
+  bool WXCoreEnvironment::setDeviceHeight(const std::string &height) {
     if (height.empty())
       return false;
     mDeviceHeight = atof(height.c_str());

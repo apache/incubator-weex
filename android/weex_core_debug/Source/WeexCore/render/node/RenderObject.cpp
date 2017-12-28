@@ -53,7 +53,7 @@ namespace WeexCore {
 
     freeWXCoreNode();
 
-    for (int i = 0; i < getChildCount(); i++) {
+    for (uint32_t i = 0; i < getChildCount(); i++) {
       RenderObject *render = getChild(i);
       if (nullptr != render) {
         delete render;
@@ -134,7 +134,7 @@ namespace WeexCore {
     layoutAfter_Impl_Android(env, this->getMeasureFunc_Impl_Android(), width, height);
   }
 
-  StyleType RenderObject::applyStyle(std::string key, std::string value) {
+  StyleType RenderObject::applyStyle(const std::string &key, const std::string &value) {
     if (key == ALIGN_ITEMS) {
       setAlignItems(getWXCoreAlignItem(value));
       return TypeLayout;

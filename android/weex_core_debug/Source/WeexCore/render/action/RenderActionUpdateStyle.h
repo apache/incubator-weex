@@ -16,7 +16,7 @@ namespace WeexCore {
     std::vector<std::pair<std::string, std::string> *> *mPadding;
     std::vector<std::pair<std::string, std::string> *> *mBorder;
 
-    RenderActionUpdateStyle(std::string pageId, std::string ref,
+    RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
                             std::vector<std::pair<std::string, std::string> *> *style,
                             std::vector<std::pair<std::string, std::string> *> *margin,
                             std::vector<std::pair<std::string, std::string> *> *padding,

@@ -42,7 +42,7 @@ namespace WeexCore {
   Bridge_Impl_Android::~Bridge_Impl_Android() {
   }
 
-  void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject jMap, JNIEnv *env) {
+  void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
     std::map<std::string, std::string>::const_iterator it = cMap->begin();
     std::map<std::string, std::string>::const_iterator end = cMap->end();
     jstring jKey;
@@ -58,7 +58,7 @@ namespace WeexCore {
   }
 
   void static
-  cpyCVector2JMap(std::vector<std::pair<std::string, std::string> *> *cVector, jobject jMap,
+  cpyCVector2JMap(std::vector<std::pair<std::string, std::string> *> *cVector, jobject &jMap,
                   JNIEnv *env) {
     jstring jKey;
     jstring jValue;
@@ -72,7 +72,7 @@ namespace WeexCore {
     }
   }
 
-  void static cpyCSet2JSet(std::set<std::string> *cSet, jobject jSet, JNIEnv *env) {
+  void static cpyCSet2JSet(std::set<std::string> *cSet, jobject &jSet, JNIEnv *env) {
     jstring jValue;
 
     std::set<std::string>::const_iterator it = cSet->begin();
@@ -353,8 +353,8 @@ namespace WeexCore {
   }
 
   int Bridge_Impl_Android::callAddElementByWeexCore(std::string &pageId, std::string &componentType,
-                                              std::string &ref, int index,
-                                              std::string parentRef,
+                                              std::string &ref, int &index,
+                                              std::string &parentRef,
                                               std::map<std::string, std::string> *styles,
                                               std::map<std::string, std::string> *attributes,
                                               std::set<std::string> *events,

@@ -18,7 +18,7 @@ namespace WeexCore {
     std::string mComponentType;
     std::string mRef;
 
-    RenderActionCreateBody(std::string pageId, RenderObject *render);
+    RenderActionCreateBody(const std::string &pageId, RenderObject *render);
 
     void ExecuteAction();
   };

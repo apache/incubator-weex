@@ -11,7 +11,7 @@ namespace WeexCore {
     std::string mPageId;
     std::string mRef;
 
-    RenderActionRemoveElement(std::string pageId, std::string ref);
+    RenderActionRemoveElement(const std::string &pageId, const std::string &ref);
 
     void ExecuteAction();
   };

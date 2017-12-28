@@ -38,9 +38,9 @@ namespace WeexCore {
 
   private:
 
-    void printPerformanceLog_Impl_Android(PerformanceStage performanceStage);
+    void printPerformanceLog_Impl_Android(const PerformanceStage &performanceStage);
 
-    void printPerformanceLog_Impl_iOS(PerformanceStage performanceStage);
+    void printPerformanceLog_Impl_iOS(const PerformanceStage &performanceStage);
   };
 }
 

@@ -36,28 +36,30 @@ namespace WeexCore {
     void batch();
 
     // create root node
-    bool createPage(std::string pageId, std::string data);
+    bool createPage(const std::string &pageId, const std::string &data);
 
-    bool addRenderObject(std::string pageId, std::string parentRef, int index, std::string data);
+    bool addRenderObject(const std::string &pageId, const std::string &parentRef, const int &index,
+                         const std::string &data);
 
-    bool removeRenderObject(std::string pageId, std::string ref);
+    bool removeRenderObject(const std::string &pageId, const std::string &ref);
 
     bool
-    moveRenderObject(std::string pageId, std::string ref, std::string parentRef, int index);
+    moveRenderObject(const std::string &pageId, const std::string &ref,
+                     const std::string &parentRef, int index);
 
-    bool updateAttr(std::string pageId, std::string ref, std::string data);
+    bool updateAttr(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool updateStyle(std::string pageId, std::string ref, std::string data);
+    bool updateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool addEvent(std::string pageId, std::string ref, std::string event);
+    bool addEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
-    bool removeEvent(std::string pageId, std::string ref, std::string event);
+    bool removeEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
-    bool createFinish(std::string pageId);
+    bool createFinish(const std::string &pageId);
 
-    RenderPage *getPage(std::string id);
+    RenderPage *getPage(const std::string &id);
 
-    void printRenderAndLayoutTree(std::string pageId);
+    void printRenderAndLayoutTree(const std::string &pageId);
 
     static RenderManager *getInstance() {
       if (!m_pInstance) {

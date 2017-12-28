@@ -37,11 +37,11 @@ namespace WeexCore {
 
     void sendCreateBodyAction(RenderObject *render);
 
-    void sendAddElementAction(RenderObject *child, RenderObject *parent, int index);
+    void sendAddElementAction(RenderObject *child, RenderObject *parent, const int &index);
 
-    void sendRemoveElementAction(std::string ref);
+    void sendRemoveElementAction(const std::string &ref);
 
-    void sendMoveElementAction(std::string ref, std::string parentRef, int index);
+    void sendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
 
     void sendLayoutAction(RenderObject *render);
 
@@ -65,7 +65,7 @@ namespace WeexCore {
     void *mInstance_Impl_iOS;
 
   public:
-    RenderPage(std::string pageID);
+    RenderPage(const std::string &pageID);
 
     ~RenderPage();
 
@@ -73,20 +73,20 @@ namespace WeexCore {
 
     bool createRootRender(RenderObject *root);
 
-    bool addRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
+    bool addRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
 
-    bool removeRenderObject(std::string ref);
+    bool removeRenderObject(const std::string &ref);
 
-    bool moveRenderObject(std::string ref, std::string parentRef, int index);
+    bool moveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
 
-    bool updateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    bool updateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    bool updateAttr(std::string ref,
+    bool updateAttr(const std::string &ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    bool addEvent(std::string ref, std::string event);
+    bool addEvent(const std::string &ref, const std::string &event);
 
-    bool removeEvent(std::string ref, std::string event);
+    bool removeEvent(const std::string &ref, const std::string &event);
 
     void postRenderAction(RenderAction *action);
 
@@ -96,21 +96,21 @@ namespace WeexCore {
 
     void traverseTree(RenderObject *render);
 
-    void jniCallTime(long long time);
+    void jniCallTime(const long long &time);
 
-    void cssLayoutTime(long long time);
+    void cssLayoutTime(const long long &time);
 
-    void addElementActionJNITime(long long time);
+    void addElementActionJNITime(const long long &time);
 
-    void layoutActionJniTime(long long time);
+    void layoutActionJniTime(const long long &time);
 
-    void parseJsonTime(long long time);
+    void parseJsonTime(const long long &time);
 
-    void buildRenderObjectTime(long long time);
+    void buildRenderObjectTime(const long long &time);
 
-    void createJMapJNITime(long long time);
+    void createJMapJNITime(const long long &time);
 
-    void jniCallBridgeTime(long long time);
+    void jniCallBridgeTime(const long long &time);
 
     bool bindInstance_Impl_Android(jobject instance);
 
@@ -120,7 +120,7 @@ namespace WeexCore {
 
     void printRenderSuccessLog();
 
-    inline RenderObject *getRenderObject(std::string ref) {
+    inline RenderObject *getRenderObject(const std::string &ref) {
       return mRenderObjectRegisterMap.find(ref)->second;
     }
 
@@ -142,7 +142,7 @@ namespace WeexCore {
       return mViewPortWidth;
     }
 
-    inline void setViewPortWidth(float viewPortWidth) {
+    inline void setViewPortWidth(float &viewPortWidth) {
       this->mViewPortWidth = viewPortWidth;
     }
   };

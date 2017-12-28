@@ -74,7 +74,7 @@ namespace WeexCore {
 
     void onLayoutAfter(float width, float height);
 
-    StyleType applyStyle(std::string key, std::string value);
+    StyleType applyStyle(const std::string &key, const std::string &value);
 
     void printRenderMsg();
 
@@ -88,17 +88,17 @@ namespace WeexCore {
       return mMeasureFunc_Impl_Android;
     }
 
-    inline RenderObject *getChild(uint32_t index) {
+    inline RenderObject *getChild(uint32_t &index) {
       return (RenderObject *) getChildAt(index);
     }
 
     inline uint32_t indexOf(RenderObject *render) {
       if (render == nullptr) {
-        for (int i = 0; i < getChildCount(); i++)
+        for (uint32_t i = 0; i < getChildCount(); i++)
           if (getChild(i) == nullptr)
             return i;
       } else {
-        for (int i = 0; i < getChildCount(); i++)
+        for (uint32_t i = 0; i < getChildCount(); i++)
           if (render->getRef() == getChild(i)->getRef())
             return i;
       }
@@ -124,31 +124,31 @@ namespace WeexCore {
       removeChild(child);
     }
 
-    inline void addAttr(std::string key, std::string value) {
+    inline void addAttr(const std::string &key, const std::string &value) {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    inline StyleType addStyle(std::string key, std::string value) {
+    inline StyleType addStyle(const std::string &key, const std::string &value) {
       return applyStyle(key, value);
     }
 
-    inline void addEvent(std::string event) {
+    inline void addEvent(const std::string &event) {
       mEvents->insert(event);
     }
 
-    inline void removeEvent(std::string event) {
+    inline void removeEvent(const std::string &event) {
       mEvents->erase(event);
     }
 
-    inline void setRef(std::string ref) {
+    inline void setRef(const std::string &ref) {
       mRef = ref;
     }
 
-    inline std::string getRef() {
+    inline const std::string &getRef() {
       return mRef;
     }
 
-    inline void setType(std::string type) {
+    inline void setType(const std::string &type) {
       mType = type;
     }
 

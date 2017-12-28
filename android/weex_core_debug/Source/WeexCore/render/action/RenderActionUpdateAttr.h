@@ -14,7 +14,7 @@ namespace WeexCore {
     std::vector<std::pair<std::string, std::string> *> *mAttrs;
 
 
-    RenderActionUpdateAttr(std::string pageId, std::string ref,
+    RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
                            std::vector<std::pair<std::string, std::string> *> *mAttrs);
 
     void ExecuteAction();

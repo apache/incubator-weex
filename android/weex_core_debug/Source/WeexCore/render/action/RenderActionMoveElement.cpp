@@ -2,8 +2,8 @@
 
 namespace WeexCore {
 
-  RenderActionMoveElement::RenderActionMoveElement(std::string pageId, std::string ref,
-                                                   std::string parentRef, int index) {
+  RenderActionMoveElement::RenderActionMoveElement(const std::string &pageId, const std::string &ref,
+                                                   const std::string &parentRef, const int &index) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mParentRef = parentRef;
@@ -14,7 +14,7 @@ namespace WeexCore {
     RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callMoveElement(mPageId, mRef,
-                                                  mParentRef, mIndex);
+                                                        mParentRef, mIndex);
     page->jniCallTime(getCurrentTime() - startTime);
   }
 }

@@ -11,7 +11,7 @@ namespace WeexCore {
 
     std::string mPageId;
 
-    RenderActionCreateFinish(std::string pageId);
+    RenderActionCreateFinish(const std::string &pageId);
 
     void ExecuteAction();
   };
