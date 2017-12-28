@@ -1,7 +1,7 @@
 #include "WeexCore_Impl_Android.h"
-#include <WeexCore/platform/android/jsengine/WeexProxy.h>
+#include <WeexCore/platform/android/jsengine/multiprocess/WeexProxy.h>
 #include <WeexCore/platform/android/base/jni/android_jni.h>
-#include <WeexCore/platform/android/bridge/WXBridge_jni.h>
+#include <WeexCore/platform/android/jniprebuild/jniheader/WXBridge_jni.h>
 
 using namespace WeexCore;
 

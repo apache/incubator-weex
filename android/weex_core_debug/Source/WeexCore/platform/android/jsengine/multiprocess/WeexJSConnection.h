@@ -4,7 +4,6 @@
 #include <memory>
 
 class IPCSender;
-
 class IPCHandler;
 
 class WeexJSConnection {

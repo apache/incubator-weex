@@ -2,7 +2,7 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <base/TimeUtils.h>
-#include "Bridge_Impl_Android.h"
+#include "WXBridge_Impl_Android.h"
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;

@@ -4,7 +4,7 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/platform/android/base/string/StringUtils.h>
-#include "WeexCore/platform/android/bridge/WXSDKInstance_jni.h"
+#include "WeexCore/platform/android/jniprebuild/jniheader/WXSDKInstance_jni.h"
 
 using namespace WeexCore;
 

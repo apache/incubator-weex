@@ -1,6 +1,6 @@
 #include <WeexCore/platform/android/base/jni/android_jni.h>
 #include "WXComponent_Impl_Android.h"
-#include "WeexCore/platform/android/bridge/WXComponent_jni.h"
+#include "WeexCore/platform/android/jniprebuild/jniheader/WXComponent_jni.h"
 #include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>

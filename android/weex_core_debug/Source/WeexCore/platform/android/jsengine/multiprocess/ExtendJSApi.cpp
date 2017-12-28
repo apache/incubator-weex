@@ -214,8 +214,8 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
   jstring jTime = getArgumentAsJString(env, arguments, 2);
   const char *_time = env->GetStringUTFChars(jTime, NULL);
   long time_ = atoi(_time);
-  LOGE("functionSetIntervalWeex instanceId:%s time_:%ld callbackID:%s", instanceID, time_,
-       callbackID);
+//  LOGE("functionSetIntervalWeex instanceId:%s time_:%ld callbackID:%s", instanceID, time_,
+//       callbackID);
   int _timerId = (atoi(instanceID) << 16) | (atoi(callbackID));
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jCallbackId);
@@ -229,7 +229,7 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
   const char *instanceID = env->GetStringUTFChars(jInstanceId, NULL);
   jstring jCallbackId = getArgumentAsJString(env, arguments, 1);
   const char *callbackID = env->GetStringUTFChars(jCallbackId, NULL);
-  LOGE("functionClearIntervalWeex instanceID:%s, callbackID:%s", instanceID, callbackID);
+//  LOGE("functionClearIntervalWeex instanceID:%s, callbackID:%s", instanceID, callbackID);
   long id = atoi(callbackID);
 
   env->DeleteLocalRef(jInstanceId);

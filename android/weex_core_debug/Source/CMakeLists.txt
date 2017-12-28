@@ -19,7 +19,7 @@ add_library(weexjsc SHARED
 
     ./base/Compatible.cpp
     ./base/fpconv.cpp
-    ./WeexCore/platform/android/prebuild/jni_load.cc
+    ./WeexCore/platform/android/jniprebuild/jni_load.cc
     ./WeexCore/platform/android/base/jni/android_jni.cpp
     ./WeexCore/platform/android/base/jni/scoped_java_ref.cpp
     ./WeexCore/platform/android/base/base64/base64.cpp
@@ -27,12 +27,12 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/base/string/ScopedJString.cpp
     ./WeexCore/platform/android/base/string/ScopedJStringUTF8.cpp
 
-    ./WeexCore/platform/android/jsengine/WeexJSConnection.cpp
-    ./WeexCore/platform/android/jsengine/WeexProxy.cpp
-    ./WeexCore/platform/android/ExtendJSApi.cpp
+    ./WeexCore/platform/android/jsengine/multiprocess/WeexJSConnection.cpp
+    ./WeexCore/platform/android/jsengine/multiprocess/WeexProxy.cpp
+    ./WeexCore/platform/android/jsengine/multiprocess/ExtendJSApi.cpp
 
 
-    ./WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.cpp
+    ./WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp

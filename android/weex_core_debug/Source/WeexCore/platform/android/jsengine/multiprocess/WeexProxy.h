@@ -6,7 +6,17 @@
 #include <unistd.h>
 #include <IPC/Serializing/IPCSerializer.h>
 #include <IPC/IPCHandler.h>
-#include <WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
+#include <IPC/Buffering/IPCBuffer.h>
+#include <IPC/IPCArguments.h>
+#include <IPC/IPCByteArray.h>
+#include <IPC/IPCException.h>
+#include <IPC/IPCHandler.h>
+#include <IPC/IPCMessageJS.h>
+#include <IPC/IPCResult.h>
+#include <IPC/IPCSender.h>
+#include <IPC/IPCString.h>
+#include <IPC/Serializing/IPCSerializer.h>
 
 namespace WeexCore {
 
@@ -22,8 +32,6 @@ public:
 
     static void
     initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
-
-    static void initHandler(IPCHandler *handler);
 
     static const char *getCacheDir(JNIEnv *env);
 

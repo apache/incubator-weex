@@ -5,7 +5,7 @@
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
-#include <WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
 #include <string>
 #include <base/TimeUtils.h>
 

@@ -4,8 +4,7 @@
 #include <WeexCore/platform/android/base/LogUtils.h>
 #include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/env/CoreEnvironment.h>
-#include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
-#include <WeexCore/platform/android/ExtendJSApi.h>
+#include <WeexCore/platform/android/jsengine/multiprocess/ExtendJSApi.h>
 
 
 const char *s_cacheDir;

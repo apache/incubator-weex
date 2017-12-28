@@ -2,27 +2,20 @@
 
 #include "ashmem.h"
 #include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <string>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <IPC/IPCFutexPageQueue.h>
-#include <IPC/IPCException.h>
-#include <IPC/IPCSender.h>
-#include <WeexCore/platform/android/base/LogUtils.h>
-#include <IPC/ashmem.h>
-
-#include <unistd.h>
-
 #include <sys/mman.h>
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <IPC/IPCFutexPageQueue.h>
+#include <IPC/IPCException.h>
+#include <IPC/IPCSender.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
+
+extern const char *s_cacheDir;
+extern bool s_start_pie;
 
 static void doExec(int fd, bool traceEnable, bool startupPie = true);
 
@@ -30,13 +23,11 @@ static int copyFile(const char *SourceFile, const char *NewFile);
 
 static void closeAllButThis(int fd);
 
-extern const char *s_cacheDir;
-extern bool s_start_pie;
+static void printLogOnFile(const char *log);
+
 #if PRINT_LOG_CACHEFILE
 static std::string logFilePath = "/data/data/com.taobao.taobao/cache";
 #endif
-
-static void printLogOnFile(const char *log);
 
 struct WeexJSConnection::WeexJSConnectionImpl {
     std::unique_ptr<IPCSender> serverSender;
@@ -57,8 +48,8 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   if (-1 == fd) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
-  void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
-                    0);
+  void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                    fd, 0);
   if (base == MAP_FAILED) {
     int _errno = errno;
     close(fd);
@@ -86,6 +77,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
 
   static bool startupPie = s_start_pie;
   LOGE("startupPie :%d", startupPie);
+
   pid_t child;
   if (reinit) {
 #if PRINT_LOG_CACHEFILE
@@ -110,9 +102,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     closeAllButThis(fd);
     // implements close all but handles[1]
     // do exec
-    printLogOnFile("fork success on subprocess and start doExec");;
     doExec(fd, true, startupPie);
-    printLogOnFile("exec Failed completely.");
     LOGE("exec Failed completely.");
     // failed to exec
     _exit(1);
@@ -278,7 +268,6 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
          << std::endl;
 #endif
   if (!s_cacheDir) {
-    LOGE("crash log file path s_cacheDir is empty");
     crashFilePathEnv.append("/data/data/com.taobao.taobao/cache");
   } else {
     crashFilePathEnv.append(s_cacheDir);
@@ -297,7 +286,6 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
     const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
     if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                      const_cast<char *const *>(envp.get()))) {
-      // LOGE("execve failed: %s", strerror(errno));
     }
   }
 

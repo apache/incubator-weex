@@ -1,6 +1,6 @@
 #include <WeexCore/platform/android/base/jni/android_jni.h>
 #include "MeasureMode_Impl_Android.h"
-#include "WeexCore/platform/android/bridge/MeasureMode_jni.h"
+#include "WeexCore/platform/android/jniprebuild/jniheader/MeasureMode_jni.h"
 
 namespace WeexCore {
   bool RegisterJNIMeasureMode(JNIEnv *env) {

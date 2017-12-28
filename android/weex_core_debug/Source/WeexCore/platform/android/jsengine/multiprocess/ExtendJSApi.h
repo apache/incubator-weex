@@ -2,7 +2,7 @@
 #define _EXTEND_JSAPI_H_
 
 #include <WeexCore/platform/android/base/LogUtils.h>
-#include <WeexCore/platform/android/bridge/impl/Bridge_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
 #include "IPC/IPCHandler.h"
 #include "IPC/IPCMessageJS.h"
 #include "IPC/IPCResult.h"
