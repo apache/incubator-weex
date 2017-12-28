@@ -40,7 +40,7 @@
     WXRecycleListTemplateManager *_templateManager;
     WXRecycleListUpdateManager *_updateManager;
     
-    NSString *_templateKey;
+    NSString *_templateSwitchKey;
     NSString *_aliasKey;
     NSString *_indexKey;
     __weak UICollectionView *_collectionView;
@@ -70,7 +70,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         _templateManager = [WXRecycleListTemplateManager new];
         _updateManager = [WXRecycleListUpdateManager new];
         _updateManager.delegate = self;
-        _templateKey = [WXConvert NSString:attributes[@"templateKey"]] ? : @"templateType";
+        _templateSwitchKey = [WXConvert NSString:attributes[@"switch"]];
         _aliasKey = [WXConvert NSString:attributes[@"alias"]];
         _indexKey = [WXConvert NSString:attributes[@"index"]];
         _sizeCache = [NSMutableDictionary dictionary];
@@ -357,10 +357,16 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     }
     
     // 2. get the template type specified by data
-    NSString *templateType = data[_templateKey]?:[_templateManager topTemplate].templateType;
+    NSString *templateType = nil;
+    if (!_templateSwitchKey) {
+        // if switch key is not specified, so use the first template.
+        templateType = [_templateManager topTemplate].templateCaseType;
+    } else {
+        templateType = data[_templateSwitchKey];
+    }
     _templateManager.collectionView = collectionView;
     if (!templateType) {
-        WXLogError(@"Each data should have a value for %@ to indicate template type", _templateKey);
+        WXLogError(@"Each data should have a value for %@ to indicate template type", _templateSwitchKey);
         return nil;
     }
     
@@ -426,7 +432,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         return [size CGSizeValue];
     } else {
         NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
-        WXCellSlotComponent *cell = [_templateManager templateWithType:data[_templateKey]];
+        WXCellSlotComponent *cell = [_templateManager templateWithType:data[_templateSwitchKey]];
         CGSize size = cell.calculatedFrame.size;
         _sizeCache[indexPath] = [NSValue valueWithCGSize:size];
         return CGSizeMake(_collectionView.frame.size.width, size.height);

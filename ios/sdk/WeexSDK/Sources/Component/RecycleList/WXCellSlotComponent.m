@@ -25,7 +25,7 @@
 #import "WXAssert.h"
 #import "WXScrollerComponent.h"
 
-static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplateType";
+static const NSString *WXDefaultRecycleTemplateType = @"default";
 
 @implementation WXCellSlotComponent
 
@@ -39,7 +39,7 @@ static const NSString *WXDefaultRecycleTemplateType = @"WXDefaultRecycleTemplate
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // TODO: isRecycle / insertAnimation / deleteAnimation / keepScrollPosition
-        _templateType = attributes[@"templateType"] ? [WXConvert NSString:attributes[@"templateType"]] : WXDefaultRecycleTemplateType;
+        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] : WXDefaultRecycleTemplateType;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }

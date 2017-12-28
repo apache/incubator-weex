@@ -22,7 +22,7 @@
 
 @interface WXCellSlotComponent : WXComponent
 
-@property (nonatomic, strong) NSString *templateType;
+@property (nonatomic, strong) NSString *templateCaseType;
 
 - (void)updateCellData:(NSDictionary *)data;
 

@@ -62,7 +62,7 @@
 {
     WXAssertMainThread();
     
-    NSString *templateType = component.templateType;
+    NSString *templateType = component.templateCaseType;
     WXAssert(templateType != nil, @"cell-slot:%@ must have a template id!", component);
     
     [_templateTypeMap setObject:component forKey:templateType];
