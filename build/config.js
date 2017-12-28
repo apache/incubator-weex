@@ -21,11 +21,9 @@ const path = require('path')
 const json = require('rollup-plugin-json')
 const eslint = require('rollup-plugin-eslint')
 const replace = require('rollup-plugin-replace')
-const postcss = require('rollup-plugin-postcss')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('rollup-plugin-uglify')
 const commonjs = require('rollup-plugin-commonjs')
-const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const subversion = require('../package.json').subversion
 
@@ -87,85 +85,11 @@ const configs = {
         main: true
       }),
     ]
-  },
-  'weex-web-render': {
-    moduleName: 'Weex',
-    entry: absolute('html5/render/browser/index.js'),
-    dest: absolute('packages/weex-html5/index.js'),
-    banner: `(this.nativeLog || function(s) {console.log(s)})`
-      + `('START WEEX HTML5: ${subversion.browser}, Build ${now()}.');\n`
-      + frameworkBanner,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      })
-    ]
-  },
-  'weex-vue-render': {
-    moduleName: 'WeexVueRender',
-    entry: absolute('packages/weex-vue-render/src/index.js'),
-    dest: absolute('packages/weex-vue-render/dist/index.js'),
-    banner:`
-console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      }),
-      replace({
-        'process.env.WEEX_VERSION': subversion['vue-render']
-      })
-    ]
-  },
-  'weex-vue-render-core': {
-    moduleName: 'WeexVueRenderCore',
-    entry: absolute('packages/weex-vue-render/src/index.core.js'),
-    dest: absolute('packages/weex-vue-render/dist/index.core.js'),
-    banner:`
-console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      }),
-      replace({
-        'process.env.WEEX_VERSION': subversion['vue-render']
-      })
-    ]
-  },
-  'weex-vue-render-plugins': {
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      })
-    ]
   }
 }
 
-function getConfig (name, minify, params) {
+function getConfig (name, minify) {
   const opt = configs[name]
-  let isProd
-  if (params) {
-    isProd = params._isProd
-    delete params._isProd
-    for (const k in params) {
-      opt[k] = params[k]
-    }
-  }
   const config = {
     moduleName: opt.moduleName,
     entry: opt.entry,
@@ -176,12 +100,11 @@ function getConfig (name, minify, params) {
       json(),
       replace({
         'process.env.VIEWPORT_WIDTH': 750,
-        'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : minify ? 'production' : 'development'),
+        'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
         'process.env.NODE_DEBUG': false
       }),
       commonjs(),
-      flow(/*{ pretty: true }*/),
       buble()
     ])
   }
@@ -190,10 +113,6 @@ function getConfig (name, minify, params) {
     config.plugins.push(uglify())
   }
   else {
-    /**
-     * rollup-plugin-flow will cause soucemap problem.
-     * use rollup-plugin-flow-no-whitespace can fixe this.
-     */
     config.sourceMap = 'inline'
     config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }
