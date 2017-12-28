@@ -61,9 +61,9 @@ namespace WeexCore {
     width = isnan(mCssStyle->mStyleWidth) ? MAXFLOAT / 2.0f : mCssStyle->mStyleWidth;
     height = isnan(mCssStyle->mStyleHeight) ? MAXFLOAT / 2.0f : mCssStyle->mStyleHeight;
     bfcWidthMeasureMode =
-            isnan(mCssStyle->mStyleWidth) ? AT_MOST : EXACTLY;
+            isnan(mCssStyle->mStyleWidth) ? UNSPECIFIED : EXACTLY;
     bfcHeightMeasureMode =
-            isnan(mCssStyle->mStyleHeight) ? AT_MOST : EXACTLY;
+            isnan(mCssStyle->mStyleHeight) ? UNSPECIFIED : EXACTLY;
 
     if (mCssStyle->mPositionType == WXCore_PositionType_Absolute) {
       if (isnan(mCssStyle->mStyleWidth) &&
@@ -97,9 +97,9 @@ namespace WeexCore {
 
   void WXCoreLayoutNode::initMeasureMode() {
     widthMeasureMode =
-            isnan(mCssStyle->mStyleWidth) ? AT_MOST : EXACTLY;
+            isnan(mCssStyle->mStyleWidth) ? UNSPECIFIED : EXACTLY;
     heightMeasureMode =
-            isnan(mCssStyle->mStyleHeight) ? AT_MOST : EXACTLY;
+            isnan(mCssStyle->mStyleHeight) ? UNSPECIFIED : EXACTLY;
     for (int i = 0; i < getChildCount(NON_BFC); i++) {
       WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
       child->initMeasureMode();
@@ -143,17 +143,17 @@ namespace WeexCore {
           }
           onLayoutAfter(width, height);
         } else {
-          if (widthMeasureMode == AT_MOST) {
+          if (widthMeasureMode == UNSPECIFIED) {
             width = 0;
           }
-          if (heightMeasureMode == AT_MOST) {
+          if (heightMeasureMode == UNSPECIFIED) {
             height = 0;
           }
         }
         setMeasuredDimension(width, height);
       }
 
-      resetDirty();
+      clearDirty();
       if (mLastAvailableSize == nullptr)
         mLastAvailableSize = new WXCoreSize();
       mLastAvailableSize->width = width;
@@ -166,9 +166,8 @@ namespace WeexCore {
   void
   WXCoreLayoutNode::onMeasure(float width, MeasureMode widthMeasureMode, float height,
                               MeasureMode heightMeasureMode) {
-    if (mChildrenFrozen == nullptr || mChildrenFrozen_oldlength < getChildCount(NON_BFC)) {
+    if (mChildrenFrozen == nullptr) {
       mChildrenFrozen = new bool[getChildCount(NON_BFC)];
-      mChildrenFrozen_oldlength = getChildCount(NON_BFC);
     }
 
     // Only calculate the children views which are affected from the last measure.
@@ -198,7 +197,7 @@ namespace WeexCore {
 
     mFlexLines.clear();
 
-    uint32_t childCount = getChildCount(NON_BFC);
+    auto childCount = getChildCount(NON_BFC);
 
     float largestHeightInRow = 0.0f;
     float totalCrossSize = 0.0f;
@@ -207,7 +206,7 @@ namespace WeexCore {
     flexLine->mMainSize = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
 
     // Determine how many flex lines are needed in this layout by measuring each child.
-    for (uint32_t i = 0; i < childCount; i++) {
+    for (Index i = 0; i < childCount; i++) {
       WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
 
       // Record stretch child's index
@@ -291,7 +290,7 @@ namespace WeexCore {
 
     mFlexLines.clear();
 
-    uint32_t childCount = getChildCount(NON_BFC);
+    auto childCount = getChildCount(NON_BFC);
     float largestWidthInColumn = 0.0f;
     float totalCrossSize = 0.0f;
 
@@ -299,7 +298,7 @@ namespace WeexCore {
     flexLine->mMainSize = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
 
     // Determine how many flex lines are needed in this layout by measuring each child.
-    for (uint32_t i = 0; i < childCount; i++) {
+    for (Index i = 0; i < childCount; i++) {
       WXCoreLayoutNode *child = getChildAt(NON_BFC, i);
 
       // Record stretch child's index
@@ -413,18 +412,18 @@ namespace WeexCore {
     switch (flexDirection) {
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
-        maxMainSize = widthMeasureMode == AT_MOST ? getLargestMainSize() : width;
+        maxMainSize = widthMeasureMode == UNSPECIFIED ? getLargestMainSize() : width;
         paddingAlongMainAxis = getPaddingLeft() + getPaddingRight() + getBorderWidthLeft() + getBorderWidthRight();
         break;
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
       default:
-        maxMainSize = heightMeasureMode == AT_MOST ? getLargestMainSize() : height;
+        maxMainSize = heightMeasureMode == UNSPECIFIED ? getLargestMainSize() : height;
         paddingAlongMainAxis = getPaddingTop() + getPaddingBottom() + getBorderWidthTop() + getBorderWidthBottom();
         break;
     }
 
-    uint32_t childIndex = 0;
+    Index childIndex = 0;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
       if (flexLine->mMainSize < maxMainSize) {
         childIndex = expandFlexItems(flexLine,
@@ -446,11 +445,11 @@ namespace WeexCore {
    * @param calledRecursively    true if this method is called recursively, false otherwise
    * @return the next startIndex, the next flex line's first flex item starts from the returned index
    */
-  uint32_t WXCoreLayoutNode::expandFlexItems(WXCoreFlexLine *flexLine,
+  Index WXCoreLayoutNode::expandFlexItems(WXCoreFlexLine *flexLine,
                                              WXCoreFlexDirection flexDirection, float maxMainSize,
                                              float paddingAlongMainAxis,
-                                             uint32_t startIndex, bool calledRecursively) {
-    uint32_t childIndex = startIndex;
+                                             Index startIndex, bool calledRecursively) {
+    Index childIndex = startIndex;
     if (flexLine->mTotalFlexGrow <= 0) {
       childIndex += flexLine->mItemCount;
       return childIndex;
@@ -468,7 +467,7 @@ namespace WeexCore {
 
     float largestCrossSize = 0.0f;
 
-    for (uint32_t i = 0; i < flexLine->mItemCount; i++) {
+    for (Index i = 0; i < flexLine->mItemCount; i++) {
       WXCoreLayoutNode *child = getChildAt(NON_BFC, childIndex);
 
       if (isMainAxisDirectionHorizontal(flexDirection)) {
@@ -579,9 +578,9 @@ namespace WeexCore {
   void WXCoreLayoutNode::stretchViews(WXCoreFlexDirection flexDirection, WXCoreAlignItems alignItems) {
     if (alignItems == WXCore_AlignItems_Stretch) {
       // WXCoreAlignItems is STRETCH
-      uint32_t viewIndex = 0;
+      Index viewIndex = 0;
       for (WXCoreFlexLine *flexLine : mFlexLines) {
-        for (uint32_t i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
+        for (Index i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
           WXCoreLayoutNode *child = getChildAt(NON_BFC, viewIndex);
 
           if (child->mCssStyle->mAlignSelf != WXCore_AlignSelf_Auto &&
@@ -605,7 +604,7 @@ namespace WeexCore {
     } else {
       // WXCoreAlignItems is STRETCH
       for (WXCoreFlexLine *flexLine : mFlexLines) {
-        for (uint32_t index : flexLine->mIndicesAlignSelfStretch) {
+        for (Index index : flexLine->mIndicesAlignSelfStretch) {
           WXCoreLayoutNode *child = getChildAt(NON_BFC, index);
           switch (flexDirection) {
             case WXCore_Flex_Direction_Row:
@@ -798,7 +797,7 @@ namespace WeexCore {
   void WXCoreLayoutNode::layoutHorizontal(bool isRtl, float left, float top, float right, float bottom) {
 
     float childLeft;
-    uint32_t currentViewIndex = 0;
+    Index currentViewIndex = 0;
 
     float height = bottom - top;
     float width = right - left;
@@ -813,7 +812,7 @@ namespace WeexCore {
     // SPACE_BETWEEN or SPACE_AROUND
     float childRight;
 
-    for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
+    for (Index i = 0; i < mFlexLines.size(); i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
 
       float spaceBetweenItem = 0.0f;
@@ -832,7 +831,7 @@ namespace WeexCore {
           childRight = width - getPaddingRight() - getBorderWidthRight() - (width - flexLine->mMainSize) / 2.0f;
           break;
         case WXCore_Justify_Space_Around:
-          uint32_t visibleCount;
+          Index visibleCount;
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
             spaceBetweenItem = (width - flexLine->mMainSize)
@@ -843,7 +842,7 @@ namespace WeexCore {
           break;
         case WXCore_Justify_Space_Between:
           childLeft = getPaddingLeft() + getBorderWidthLeft();
-          uint32_t visibleItem;
+          Index visibleItem;
           visibleItem = flexLine->mItemCount;
           float denominator;
           denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
@@ -858,7 +857,7 @@ namespace WeexCore {
 
       spaceBetweenItem = max_num<float>(spaceBetweenItem, 0);
 
-      for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
+      for (Index j = 0; j < flexLine->mItemCount; j++) {
 
         WXCoreLayoutNode *child = getChildAt(NON_BFC, currentViewIndex);
 
@@ -988,7 +987,7 @@ namespace WeexCore {
   void
   WXCoreLayoutNode::layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top, float right, float bottom) {
     float childLeft = getPaddingLeft();
-    uint32_t currentViewIndex = 0;
+    Index currentViewIndex = 0;
 
     float width = right - left;
     float height = bottom - top;
@@ -1004,7 +1003,7 @@ namespace WeexCore {
     // Used only for if the direction is from mStyleBottom to mStyleTop
     float childBottom;
 
-    for (uint32_t i = 0, size = (uint32_t) mFlexLines.size(); i < size; i++) {
+    for (Index i = 0; i < mFlexLines.size(); i++) {
       WXCoreFlexLine *flexLine = mFlexLines[i];
       float spaceBetweenItem = 0.0f;
 
@@ -1022,7 +1021,7 @@ namespace WeexCore {
           childBottom = height - getPaddingBottom() - getBorderWidthBottom() - (height - flexLine->mMainSize) / 2;
           break;
         case WXCore_Justify_Space_Around:
-          uint32_t visibleCount;
+          Index visibleCount;
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
             spaceBetweenItem = (height - flexLine->mMainSize)
@@ -1033,7 +1032,7 @@ namespace WeexCore {
           break;
         case WXCore_Justify_Space_Between:
           childTop = getPaddingTop() + getBorderWidthTop();
-          uint32_t visibleItem;
+          Index visibleItem;
           visibleItem = flexLine->mItemCount;
           float denominator;
           denominator = visibleItem != 1 ? visibleItem - 1 : 1.0f;
@@ -1048,7 +1047,7 @@ namespace WeexCore {
 
       spaceBetweenItem = max_num<float>(spaceBetweenItem, 0);
 
-      for (uint32_t j = 0; j < flexLine->mItemCount; j++) {
+      for (Index j = 0; j < flexLine->mItemCount; j++) {
         WXCoreLayoutNode *child = getChildAt(NON_BFC, currentViewIndex);
 
         if (child == nullptr) {
@@ -1164,7 +1163,7 @@ namespace WeexCore {
                                                  float totalCrossSize) {
     float availableWidth, availableHeight;
     switch (child->widthMeasureMode) {
-      case AT_MOST:
+      case UNSPECIFIED:
         availableWidth =
             width - (mCssStyle->mPadding.getPadding(WXCore_Padding_Left) +
                      mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Left) +
@@ -1185,7 +1184,7 @@ namespace WeexCore {
     }
 
     switch (child->heightMeasureMode) {
-      case AT_MOST:
+      case UNSPECIFIED:
         availableHeight =
             height - (mCssStyle->mPadding.getPadding(WXCore_Padding_Top) +
                       mCssStyle->mBorderWidth.getBorderWidth(WXCore_Border_Width_Top) +
@@ -1218,7 +1217,7 @@ namespace WeexCore {
     return largestSize;
   }
 
-  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(uint32_t childIndex, uint32_t childCount, WXCoreFlexLine *flexLine,
+  void WXCoreLayoutNode::addFlexLineIfLastFlexItem(Index childIndex, Index childCount, WXCoreFlexLine *flexLine,
                                                    float usedCrossSizeSoFar) {
     if (childIndex == childCount - 1 && flexLine->mItemCount != 0) {
       // Add the flex line if this item is the last item
@@ -1227,7 +1226,6 @@ namespace WeexCore {
   }
 
   void WXCoreLayoutNode::addFlexLine(WXCoreFlexLine *flexLine, float usedCrossSizeSoFar) {
-    flexLine->mSumCrossSizeBefore = usedCrossSizeSoFar;
     mFlexLines.push_back(flexLine);
   }
 
