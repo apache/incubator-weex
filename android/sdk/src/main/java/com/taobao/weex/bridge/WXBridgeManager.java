@@ -1961,6 +1961,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 							+ ", exception function:" + function + ", exception:"
 							+ exception
 			);
+            doReportJSException(instanceId,function,exception);
             return;
           }
         } catch (Exception e) {
@@ -1969,10 +1970,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 	}
+	doReportJSException(instanceId,function,exception);
+  }
 
+  private void doReportJSException(String instanceId, String function, String exception){
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
-      String bundleUrl;
       String exceptionId = instanceId;
 
       if (instanceId == "" || instanceId == null) {
@@ -1981,7 +1985,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       if (instance == null) {
         if (("initFramework").equals(function)) {
-          bundleUrl = "jsExceptionBeforeRenderInstanceNull";
           String exceptionExt = null;
           try {
             if (WXEnvironment.getApplication() != null) {
@@ -2007,7 +2010,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                   file.delete();
                 }
               } catch (Throwable throwable) {
-
+                throwable.printStackTrace();
               }
             }
           } catch (Throwable e) {
@@ -2016,22 +2019,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           exception += "\n" + exceptionExt;
           WXLogUtils.e("reportJSException:" + exception);
 
-        } else if (function == null) {
-          bundleUrl = "jsExceptionInstanceAndFunctionNull";
-        } else {
-          bundleUrl = "jsExceptionInstanceNull" + function;
         }
-      } else {
-        bundleUrl = instance.getBundleUrl();
       }
 
-//      WXJSExceptionInfo jsException = new WXJSExceptionInfo(exceptionId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
-//      adapter.onJSException(jsException);
-
-	  WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorCode(),
-			  function,
-			  WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
-			  null);
+      WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorCode(),
+              function,
+              WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
+              null);
     }
   }
 
