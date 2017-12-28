@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(481)
+	__vue_exports__ = __webpack_require__(120)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(482)
+	var __vue_template__ = __webpack_require__(121)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,38 +66,41 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/modules/clipboard.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/modules/clipboard.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 383:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 3:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(384)
+	__vue_styles__.push(__webpack_require__(4)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(385)
+	__vue_exports__ = __webpack_require__(5)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(386)
+	var __vue_template__ = __webpack_require__(6)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -109,23 +112,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-58511ff6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 384:
-/***/ function(module, exports) {
+/***/ 4:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "panel": {
@@ -173,13 +180,19 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
+	  },
+	  "panel-body": {
+	    "paddingLeft": 12,
+	    "paddingRight": 12,
+	    "paddingTop": 20,
+	    "paddingBottom": 20
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 385:
-/***/ function(module, exports) {
+/***/ 5:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -221,18 +234,18 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 386:
-/***/ function(module, exports) {
+/***/ 6:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -240,7 +253,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -248,27 +261,27 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 387:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 7:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(388)
+	__vue_styles__.push(__webpack_require__(8)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(389)
+	__vue_exports__ = __webpack_require__(9)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(390)
+	var __vue_template__ = __webpack_require__(10)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -280,23 +293,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/button.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/button.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-71b34881"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 388:
-/***/ function(module, exports) {
+/***/ 8:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "btn": {
@@ -393,10 +410,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 389:
-/***/ function(module, exports) {
+/***/ 9:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -416,37 +433,37 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 390:
-/***/ function(module, exports) {
+/***/ 10:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['btn', 'btn-' + _vm.type, 'btn-sz-' + _vm.size]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['btn-txt', 'btn-txt-' + _vm.type, 'btn-txt-sz-' + _vm.size]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 393:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 13:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(394)
+	__vue_styles__.push(__webpack_require__(14)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(395)
+	__vue_exports__ = __webpack_require__(15)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(396)
+	var __vue_template__ = __webpack_require__(16)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -458,23 +475,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/tip.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/tip.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-36fe495c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 394:
-/***/ function(module, exports) {
+/***/ 14:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "tip": {
@@ -517,10 +538,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 395:
-/***/ function(module, exports) {
+/***/ 15:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -539,24 +560,24 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 396:
-/***/ function(module, exports) {
+/***/ 16:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['tip', 'tip-' + _vm.type]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['tip-txt', 'tip-txt-' + _vm.type]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 481:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 120:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -582,8 +603,8 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
-	var clipboard = __weex_require_module__('clipboard');
+	var modal = weex.requireModule('modal');
+	var clipboard = weex.requireModule('clipboard');
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -593,9 +614,9 @@
 	    };
 	  },
 	  components: {
-	    panel: __webpack_require__(383),
-	    tip: __webpack_require__(393),
-	    button: __webpack_require__(387)
+	    panel: __webpack_require__(3),
+	    tip: __webpack_require__(13),
+	    button: __webpack_require__(7)
 	  },
 	  mounted: function mounted() {
 	    this.tips = "1. Just click COPY button. It will auto generate a string with random text, and copy to system clipboard. \n 2. do copy in another app, then come back and click PASTE button.";
@@ -620,27 +641,27 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 482:
-/***/ function(module, exports) {
+/***/ 121:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', [_h('panel', {
+	  return _c('scroller', [_c('panel', {
 	    attrs: {
 	      "title": "Clipboard",
 	      "type": "primary"
 	    }
-	  }, [_h('panel', {
+	  }, [_c('panel', {
 	    attrs: {
 	      "title": "Copy to clipboard5"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      lineHeight: "40px",
 	      fontSize: "28px"
 	    }
-	  }, [_vm._s(_vm.textToCopy)]), _h('button', {
+	  }, [_vm._v(_vm._s(_vm.textToCopy))]), _c('button', {
 	    attrs: {
 	      "type": "info",
 	      "size": "middle",
@@ -651,16 +672,16 @@
 	        _vm.doCopy($event)
 	      }
 	    }
-	  })]), _h('panel', {
+	  })], 1), _c('panel', {
 	    attrs: {
 	      "title": "Paste from clipboard"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      lineHeight: "40px",
 	      fontSize: "28px"
 	    }
-	  }, [_vm._s(_vm.textFromPaste)]), _h('button', {
+	  }, [_vm._v(_vm._s(_vm.textFromPaste))]), _c('button', {
 	    attrs: {
 	      "type": "info",
 	      "size": "middle",
@@ -671,21 +692,21 @@
 	        _vm.doPaste($event)
 	      }
 	    }
-	  })]), _h('panel', {
+	  })], 1), _c('panel', {
 	    attrs: {
 	      "title": "Result"
 	    }
-	  }, [_h('tip', {
+	  }, [_c('tip', {
 	    staticStyle: {
 	      marginBottom: "20px"
 	    },
 	    attrs: {
 	      "value": _vm.tips
 	    }
-	  })])])])
+	  })], 1)], 1)], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

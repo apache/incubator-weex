@@ -42,23 +42,22 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ({
-
-/***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(497)
+	__vue_styles__.push(__webpack_require__(154)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(498)
+	__vue_exports__ = __webpack_require__(155)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(540)
+	var __vue_template__ = __webpack_require__(197)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,25 +69,181 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/new-fashion.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/new-fashion.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-5362f131"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
-
-/***/ 497:
-/***/ function(module, exports) {
+/***/ }),
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */,
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */,
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */,
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */,
+/* 71 */,
+/* 72 */,
+/* 73 */,
+/* 74 */,
+/* 75 */,
+/* 76 */,
+/* 77 */,
+/* 78 */,
+/* 79 */,
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */,
+/* 84 */,
+/* 85 */,
+/* 86 */,
+/* 87 */,
+/* 88 */,
+/* 89 */,
+/* 90 */,
+/* 91 */,
+/* 92 */,
+/* 93 */,
+/* 94 */,
+/* 95 */,
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "content": {
@@ -110,10 +265,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 498:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 155 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -159,19 +313,19 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
-	var timer = __weex_require_module__('timer');
+	var modal = weex.requireModule('modal');
+	var timer = weex.requireModule('timer');
 
 	module.exports = {
 	  components: {
-	    headlines: __webpack_require__(499),
-	    category: __webpack_require__(512),
-	    coupon: __webpack_require__(516),
-	    goods: __webpack_require__(520),
-	    resource: __webpack_require__(524),
-	    scene: __webpack_require__(528),
-	    match: __webpack_require__(532),
-	    brand: __webpack_require__(536)
+	    headlines: __webpack_require__(156),
+	    category: __webpack_require__(169),
+	    coupon: __webpack_require__(173),
+	    goods: __webpack_require__(177),
+	    resource: __webpack_require__(181),
+	    scene: __webpack_require__(185),
+	    match: __webpack_require__(189),
+	    brand: __webpack_require__(193)
 	  },
 	  data: {
 	    navBarHeight: 88,
@@ -681,23 +835,22 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 499:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 156 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(500)
+	__vue_styles__.push(__webpack_require__(157)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(501)
+	__vue_exports__ = __webpack_require__(158)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(511)
+	var __vue_template__ = __webpack_require__(168)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -709,23 +862,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/headlines.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/headlines.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-bf444bc4"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 500:
-/***/ function(module, exports) {
+/***/ }),
+/* 157 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "banner": {
@@ -778,10 +934,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 501:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 158 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -860,8 +1015,8 @@
 
 	module.exports = {
 	  components: {
-	    link: __webpack_require__(502),
-	    banners: __webpack_require__(505)
+	    link: __webpack_require__(159),
+	    banners: __webpack_require__(162)
 	  },
 	  props: {
 	    ds: {
@@ -879,19 +1034,18 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 502:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 159 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(503)
+	__vue_exports__ = __webpack_require__(160)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(504)
+	var __vue_template__ = __webpack_require__(161)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -903,23 +1057,25 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/link.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/link.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 503:
-/***/ function(module, exports) {
+/***/ }),
+/* 160 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -927,7 +1083,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  props: ['text', 'href'],
 	  methods: {
@@ -940,33 +1096,31 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 504:
-/***/ function(module, exports) {
+/***/ }),
+/* 161 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('text', {
+	  return _c('text', {
 	    on: {
 	      "click": _vm.clickHandler
 	    }
-	  }, [_vm._s(_vm.text)])
+	  }, [_vm._v(_vm._s(_vm.text))])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 505:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(506)
+	__vue_exports__ = __webpack_require__(163)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(510)
+	var __vue_template__ = __webpack_require__(167)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -978,23 +1132,25 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/banners.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/banners.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 506:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 163 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1015,24 +1171,23 @@
 
 	module.exports = {
 	  components: {
-	    banner: __webpack_require__(507)
+	    banner: __webpack_require__(164)
 	  },
 	  props: ['ds', 'width', 'height', 'space', 'direction']
 	};
 
-/***/ },
-
-/***/ 507:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 164 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(508)
+	__vue_exports__ = __webpack_require__(165)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(509)
+	var __vue_template__ = __webpack_require__(166)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -1044,23 +1199,25 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/banner.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/banner.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 508:
-/***/ function(module, exports) {
+/***/ }),
+/* 165 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1069,7 +1226,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  props: ['width', 'height', 'src', 'href'],
 	  data: function data() {
@@ -1087,20 +1244,19 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 509:
-/***/ function(module, exports) {
+/***/ }),
+/* 166 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('image', {
+	  return _c('image', {
 	    style: {
 	      width: _vm.width,
 	      height: _vm.height
 	    },
 	    attrs: {
 	      "src": _vm.src,
-	      "image-quality": _vm.quality
+	      "imageQuality": _vm.quality
 	    },
 	    on: {
 	      "click": _vm.clickHandler
@@ -1109,66 +1265,66 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 510:
-/***/ function(module, exports) {
+/***/ }),
+/* 167 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [(_vm.direction === 'row') ? _h('div', {
+	  return _c('div', [(_vm.direction === 'row') ? _c('div', {
 	    staticStyle: {
 	      flexDirection: "row"
 	    }
-	  }, [_vm._l((_vm.ds), function(i, item) {
-	    return _h('div', {
+	  }, _vm._l((_vm.ds), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      style: {
 	        width: _vm.width,
 	        height: _vm.height,
 	        marginLeft: (i % _vm.ds.length ? _vm.space : 0)
 	      }
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.width,
 	        "height": _vm.height,
 	        "src": item.img,
 	        "href": item.url
 	      }
-	    })])
-	  })]) : _vm._e(), (_vm.direction === 'column') ? _h('div', [_vm._l((_vm.ds), function(i, item) {
-	    return _h('div', {
+	    })], 1)
+	  })) : _vm._e(), (_vm.direction === 'column') ? _c('div', _vm._l((_vm.ds), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      style: {
 	        width: _vm.width,
 	        height: _vm.height,
 	        marginTop: (i % _vm.ds.length ? _vm.space : 0)
 	      }
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.width,
 	        "height": _vm.height,
 	        "src": item.img,
 	        "href": item.url
 	      }
-	    })])
-	  })]) : _vm._e()])
+	    })], 1)
+	  })) : _vm._e()])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 511:
-/***/ function(module, exports) {
+/***/ }),
+/* 168 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["container"]
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["banner"],
 	    attrs: {
 	      "src": _vm.ds.topBanner
 	    }
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticClass: ["rule-container"]
-	  }, [_h('link', {
+	  }, [_c('link', {
 	    staticStyle: {
 	      fontSize: "22px",
 	      color: "#ffffff",
@@ -1178,14 +1334,14 @@
 	      "text": "帮助",
 	      "href": _vm.ds.ruleLink
 	    }
-	  })]), _h('div', {
+	  })]), _c('div', {
 	    staticClass: ["announce"]
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["announce-hd"],
 	    attrs: {
 	      "src": _vm.ds.announceHdBanner
 	    }
-	  }), _h('banners', {
+	  }), _c('banners', {
 	    staticStyle: {
 	      marginLeft: "6",
 	      marginRight: "6"
@@ -1197,27 +1353,26 @@
 	      "height": _vm.NUMBER_172,
 	      "space": _vm.NUMBER_3
 	    }
-	  })])])
+	  })], 1)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 512:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 169 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(513)
+	__vue_styles__.push(__webpack_require__(170)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(514)
+	__vue_exports__ = __webpack_require__(171)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(515)
+	var __vue_template__ = __webpack_require__(172)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -1229,23 +1384,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/category.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/category.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-1b8ec5cf"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 513:
-/***/ function(module, exports) {
+/***/ }),
+/* 170 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -1290,10 +1448,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 514:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 171 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1770,7 +1927,7 @@
 
 	module.exports = {
 	  components: {
-	    banner: __webpack_require__(507)
+	    banner: __webpack_require__(164)
 	  },
 	  props: {
 	    ds: {
@@ -1810,107 +1967,108 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 515:
-/***/ function(module, exports) {
+/***/ }),
+/* 172 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [(_vm.ds.floorTitle) ? _h('image', {
+	  return _c('div', [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), _h('div', {
+	  }) : _vm._e(), _c('div', {
 	    staticClass: ["item-container"]
-	  }, [_vm._l((_vm.items), function(i, item) {
-	    return _h('div', {
+	  }, _vm._l((_vm.items), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      style: {
 	        width: 750,
 	        paddingBottom: 14,
 	        backgroundColor: item.colour
 	      }
-	    }, [_h('div', [_h('banner', {
+	    }, [_c('div', [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_750,
 	        "height": _vm.NUMBER_237,
 	        "src": i % 2 === 0 ? item.leftBannerImg : item.rightBannerImg,
 	        "href": item.bannerUrl
 	      }
-	    })]), _h('div', {
+	    })], 1), _c('div', {
 	      staticClass: ["shop-list"]
-	    }, [_vm._l((item.shopList), function(shop) {
-	      return _h('div', {
+	    }, _vm._l((item.shopList), function(i, shop) {
+	      return _c('div', {
+	        key: i,
 	        staticClass: ["shop-img-container"]
-	      }, [_h('banner', {
+	      }, [_c('banner', {
 	        attrs: {
 	          "width": _vm.NUMBER_186,
 	          "height": _vm.NUMBER_208,
 	          "src": shop.picUrl,
 	          "href": shop.shopUrl
 	        }
-	      })])
-	    })])])
-	  })]), _h('div', {
+	      })], 1)
+	    }))])
+	  })), _c('div', {
 	    staticClass: ["sub-item-container"],
 	    style: {
 	      height: Math.round(_vm.subItems.length / 3) * (241 + 3)
 	    }
-	  }, [_vm._l((_vm.subItems), function(i, item) {
-	    return _h('div', {
+	  }, _vm._l((_vm.subItems), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      staticClass: ["sub-item"],
 	      style: {
 	        top: _vm.getSubItemTop(i),
 	        left: _vm.getSubItemLeft(i)
 	      }
-	    }, [_h('image', {
+	    }, [_c('image', {
 	      staticClass: ["sub-item-bg"],
 	      attrs: {
 	        "src": _vm.subItemBg
 	      }
-	    }), _h('div', {
+	    }), _c('div', {
 	      staticClass: ["sub-item-img"]
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_248,
 	        "height": _vm.NUMBER_155,
 	        "src": item.industryImg,
 	        "href": item.industryUrl
 	      }
-	    })]), _h('div', {
+	    })], 1), _c('div', {
 	      staticClass: ["sub-item-title"]
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["industry-title"],
 	      attrs: {
 	        "href": item.industryUrl
 	      }
-	    }, [_vm._s(item.industryTitle)]), _h('text', {
+	    }, [_vm._v(_vm._s(item.industryTitle))]), _c('text', {
 	      staticClass: ["industry-benefit"],
 	      attrs: {
 	        "href": item.industryUrl
 	      }
-	    }, [_vm._s(item.industryBenefit)])])])
-	  })])])
+	    }, [_vm._v(_vm._s(item.industryBenefit))])])])
+	  }))])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 516:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 173 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(517)
+	__vue_styles__.push(__webpack_require__(174)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(518)
+	__vue_exports__ = __webpack_require__(175)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(519)
+	var __vue_template__ = __webpack_require__(176)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -1922,23 +2080,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/coupon.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/coupon.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-6cff0737"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 517:
-/***/ function(module, exports) {
+/***/ }),
+/* 174 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -1983,10 +2144,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 518:
-/***/ function(module, exports) {
+/***/ }),
+/* 175 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -2051,7 +2211,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  props: {
 	    ds: {
@@ -2075,35 +2235,34 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 519:
-/***/ function(module, exports) {
+/***/ }),
+/* 176 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [(_vm.ds.floorTitle) ? _h('image', {
+	  return _c('div', [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), _h('div', {
+	  }) : _vm._e(), _c('div', {
 	    staticClass: ["wrapper"]
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["img"],
 	    attrs: {
 	      "src": _vm.currentStatus
 	    }
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticClass: ["my-coupon"],
 	    on: {
 	      "click": _vm.handleClick
 	    }
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticClass: ["guides"],
 	    on: {
 	      "click": _vm.handleClick
 	    }
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticClass: ["lottery"],
 	    on: {
 	      "click": _vm.handleClick
@@ -2112,23 +2271,22 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 520:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 177 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(521)
+	__vue_styles__.push(__webpack_require__(178)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(522)
+	__vue_exports__ = __webpack_require__(179)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(523)
+	var __vue_template__ = __webpack_require__(180)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2140,23 +2298,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/goods.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/goods.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-3c6b4756"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 521:
-/***/ function(module, exports) {
+/***/ }),
+/* 178 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -2179,10 +2340,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 522:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 179 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2236,7 +2396,7 @@
 
 	module.exports = {
 	  components: {
-	    banner: __webpack_require__(507)
+	    banner: __webpack_require__(164)
 	  },
 	  props: {
 	    ds: {
@@ -2255,28 +2415,28 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 523:
-/***/ function(module, exports) {
+/***/ }),
+/* 180 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return (!_vm.ds.isHide) ? _h('div', [(_vm.ds.floorTitle) ? _h('image', {
+	  return (!_vm.ds.isHide) ? _c('div', [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), _h('slider', {
+	  }) : _vm._e(), _c('slider', {
 	    staticClass: ["slider"],
 	    attrs: {
-	      "show-indicators": "true",
-	      "auto-play": "true",
+	      "showIndicators": "true",
+	      "autoPlay": "true",
 	      "interval": "3000"
 	    }
-	  }, [_vm._l((_vm.ds.bannerItems), function(item) {
-	    return _h('div', {
+	  }, [_vm._l((_vm.ds.bannerItems), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      staticClass: ["pannel"]
-	    }, [_h('div', [_h('banner', {
+	    }, [_c('div', [_c('banner', {
 	      staticStyle: {
 	        marginBottom: "4"
 	      },
@@ -2286,23 +2446,23 @@
 	        "src": item.img1,
 	        "href": item.url1
 	      }
-	    }), _h('banner', {
+	    }), _c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_251,
 	        "height": _vm.NUMBER_292,
 	        "src": item.img2,
 	        "href": item.url2
 	      }
-	    })]), _h('div', {
+	    })], 1), _c('div', {
 	      staticClass: ["middle-col"]
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_240,
 	        "height": _vm.NUMBER_588,
 	        "src": item.img3,
 	        "href": item.url3
 	      }
-	    })]), _h('div', [_h('banner', {
+	    })], 1), _c('div', [_c('banner', {
 	      staticStyle: {
 	        marginBottom: "4"
 	      },
@@ -2312,15 +2472,15 @@
 	        "src": item.img4,
 	        "href": item.url4
 	      }
-	    }), _h('banner', {
+	    }), _c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_251,
 	        "height": _vm.NUMBER_292,
 	        "src": item.img5,
 	        "href": item.url5
 	      }
-	    })])])
-	  }), _h('indicator', {
+	    })], 1)])
+	  }), _c('indicator', {
 	    staticStyle: {
 	      position: "absolute",
 	      width: "714",
@@ -2331,27 +2491,26 @@
 	      itemColor: "#999999",
 	      itemSelectedColor: "#000000"
 	    }
-	  })])]) : _vm._e()
+	  })], 2)]) : _vm._e()
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 524:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 181 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(525)
+	__vue_styles__.push(__webpack_require__(182)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(526)
+	__vue_exports__ = __webpack_require__(183)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(527)
+	var __vue_template__ = __webpack_require__(184)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2363,23 +2522,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/resource.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/resource.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-29847642"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 525:
-/***/ function(module, exports) {
+/***/ }),
+/* 182 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -2391,10 +2553,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 526:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 183 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2420,8 +2581,8 @@
 
 	module.exports = {
 	  components: {
-	    banners: __webpack_require__(505),
-	    banner: __webpack_require__(507)
+	    banners: __webpack_require__(162),
+	    banner: __webpack_require__(164)
 	  },
 	  props: {
 	    ds: {
@@ -2441,22 +2602,21 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 527:
-/***/ function(module, exports) {
+/***/ }),
+/* 184 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return (!_vm.ds.isHide) ? _h('div', [_h('div', {
+	  return (!_vm.ds.isHide) ? _c('div', [_c('div', {
 	    staticClass: ["big-banner-container"]
-	  }, [_h('banner', {
+	  }, [_c('banner', {
 	    attrs: {
 	      "width": _vm.NUMBER_750,
 	      "height": _vm.NUMBER_200,
 	      "src": _vm.ds.bigBannerImg,
 	      "href": _vm.ds.bigBannerUrl
 	    }
-	  })]), _h('banners', {
+	  })], 1), _c('banners', {
 	    attrs: {
 	      "direction": "row",
 	      "ds": _vm.ds.smallBannerItems,
@@ -2464,27 +2624,26 @@
 	      "height": _vm.NUMBER_224,
 	      "space": _vm.NUMBER_4
 	    }
-	  })]) : _vm._e()
+	  })], 1) : _vm._e()
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 528:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 185 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(529)
+	__vue_styles__.push(__webpack_require__(186)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(530)
+	__vue_exports__ = __webpack_require__(187)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(531)
+	var __vue_template__ = __webpack_require__(188)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2496,23 +2655,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/scene.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/scene.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-14835aea"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 529:
-/***/ function(module, exports) {
+/***/ }),
+/* 186 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -2569,10 +2731,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 530:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 187 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2815,7 +2976,7 @@
 
 	module.exports = {
 	  components: {
-	    banner: __webpack_require__(507)
+	    banner: __webpack_require__(164)
 	  },
 	  props: {
 	    ds: {
@@ -2855,74 +3016,73 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 531:
-/***/ function(module, exports) {
+/***/ }),
+/* 188 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [(_vm.ds.floorTitle) ? _h('image', {
+	  return _c('div', [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), _h('div', {
+	  }) : _vm._e(), _c('div', {
 	    staticClass: ["small-item-container"],
 	    style: {
 	      height: Math.round(_vm.smallItems.length / 2) * 234
 	    }
-	  }, [_vm._l((_vm.smallItems), function(i, item) {
-	    return _h('div', {
+	  }, _vm._l((_vm.smallItems), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      staticClass: ["small-item"],
 	      style: {
 	        top: _vm.getItemTop(i),
 	        left: _vm.getItemLeft(i)
 	      }
-	    }, [_h('div', [_h('image', {
+	    }, [_c('div', [_c('image', {
 	      staticClass: ["small-item-bg"],
 	      attrs: {
 	        "src": _vm.smallItemBg
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticClass: ["small-item-img"]
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_186,
 	        "height": _vm.NUMBER_206,
 	        "src": item.itemImg,
 	        "href": item.sceneUrl
 	      }
-	    })]), _h('div', {
+	    })], 1), _c('div', {
 	      staticClass: ["small-benifit-img"]
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_170,
 	        "height": _vm.NUMBER_100,
 	        "src": item.benefitImg,
 	        "href": item.sceneUrl
 	      }
-	    })])])
-	  })])])
+	    })], 1)])
+	  }))])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 532:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 189 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(533)
+	__vue_styles__.push(__webpack_require__(190)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(534)
+	__vue_exports__ = __webpack_require__(191)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(535)
+	var __vue_template__ = __webpack_require__(192)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2934,23 +3094,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/match.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/match.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-99786178"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 533:
-/***/ function(module, exports) {
+/***/ }),
+/* 190 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -2962,10 +3125,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 534:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 191 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2999,7 +3161,7 @@
 
 	module.exports = {
 	  components: {
-	    banner: __webpack_require__(507)
+	    banner: __webpack_require__(164)
 	  },
 	  props: {
 	    ds: {
@@ -3019,72 +3181,71 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 535:
-/***/ function(module, exports) {
+/***/ }),
+/* 192 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [(_vm.ds.floorTitle) ? _h('image', {
+	  return _c('div', [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), (_vm.ds.isShowTmSpecBanner && _vm.ds.tmSpecBanner) ? _h('div', {
+	  }) : _vm._e(), (_vm.ds.isShowTmSpecBanner && _vm.ds.tmSpecBanner) ? _c('div', {
 	    staticClass: ["tm-banner"]
-	  }, [_h('banner', {
+	  }, [_c('banner', {
 	    attrs: {
 	      "width": _vm.NUMBER_750,
 	      "height": _vm.NUMBER_200,
 	      "src": _vm.ds.tmSpecBanner.img,
 	      "href": _vm.ds.tmSpecBanner.url
 	    }
-	  })]) : _vm._e(), _vm._l((_vm.ds.bannerItems), function(item) {
-	    return _h('div', {
+	  })], 1) : _vm._e(), _vm._l((_vm.ds.bannerItems), function(item, i) {
+	    return _c('div', {
+	      key: i,
 	      style: {
 	        flexDirection: 'row',
 	        marginBottom: _vm.NUMBER_4
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      style: {
 	        marginRight: _vm.NUMBER_4
 	      }
-	    }, [_h('banner', {
+	    }, [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_373,
 	        "height": _vm.NUMBER_240,
 	        "src": item.leftImg,
 	        "href": item.leftUrl
 	      }
-	    })]), _h('div', [_h('banner', {
+	    })], 1), _c('div', [_c('banner', {
 	      attrs: {
 	        "width": _vm.NUMBER_373,
 	        "height": _vm.NUMBER_240,
 	        "src": item.rightImg,
 	        "href": item.rightUrl
 	      }
-	    })])])
-	  })])
+	    })], 1)])
+	  })], 2)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 536:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 193 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(537)
+	__vue_styles__.push(__webpack_require__(194)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(538)
+	__vue_exports__ = __webpack_require__(195)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(539)
+	var __vue_template__ = __webpack_require__(196)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -3096,23 +3257,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/showcase/include/brand.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/showcase/include/brand.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-5fbd9006"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
-
-/***/ 537:
-/***/ function(module, exports) {
+/***/ }),
+/* 194 */
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -3125,10 +3289,9 @@
 	  }
 	}
 
-/***/ },
-
-/***/ 538:
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 195 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3154,7 +3317,7 @@
 
 	module.exports = {
 	  components: {
-	    banners: __webpack_require__(505)
+	    banners: __webpack_require__(162)
 	  },
 	  props: {
 	    ds: {
@@ -3195,25 +3358,24 @@
 	  }
 	};
 
-/***/ },
-
-/***/ 539:
-/***/ function(module, exports) {
+/***/ }),
+/* 196 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["container"]
-	  }, [(_vm.ds.floorTitle) ? _h('image', {
+	  }, [(_vm.ds.floorTitle) ? _c('image', {
 	    staticClass: ["title"],
 	    attrs: {
 	      "src": _vm.ds.floorTitle
 	    }
-	  }) : _vm._e(), _h('div', {
+	  }) : _vm._e(), _c('div', {
 	    staticStyle: {
 	      marginLeft: "4",
 	      marginRight: "4"
 	    }
-	  }, [_h('banners', {
+	  }, [_c('banners', {
 	    attrs: {
 	      "direction": "column",
 	      "ds": _vm.bannerItems,
@@ -3221,19 +3383,18 @@
 	      "height": _vm.NUMBER_230,
 	      "space": _vm.NUMBER_4
 	    }
-	  })])])
+	  })], 1)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
-
-/***/ 540:
-/***/ function(module, exports) {
+/***/ }),
+/* 197 */
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', {
+	  return _c('scroller', {
 	    staticClass: ["content"]
-	  }, [_h('refresh', {
+	  }, [_c('refresh', {
 	    staticClass: ["refresh"],
 	    staticStyle: {
 	      flexDirection: "row"
@@ -3244,44 +3405,44 @@
 	    on: {
 	      "refresh": _vm.handleRefresh
 	    }
-	  }, [_h('loading-indicator'), _h('text', {
+	  }, [_c('loading-indicator'), _c('text', {
 	    staticStyle: {
 	      marginLeft: "36px",
 	      color: "#eee"
 	    }
-	  }, ["下拉刷新..."])]), (_vm.show0) ? _h('headlines', {
+	  }, [_vm._v("下拉刷新...")])]), (_vm.show0) ? _c('headlines', {
 	    attrs: {
 	      "ds": _vm.showData.header
 	    }
-	  }) : _vm._e(), (_vm.show0) ? _h('category', {
+	  }) : _vm._e(), (_vm.show0) ? _c('category', {
 	    attrs: {
 	      "ds": _vm.showData.category
 	    }
-	  }) : _vm._e(), (_vm.show1) ? _h('coupon', {
+	  }) : _vm._e(), (_vm.show1) ? _c('coupon', {
 	    attrs: {
 	      "ds": _vm.showData.coupon
 	    }
-	  }) : _vm._e(), (_vm.show1) ? _h('goods', {
+	  }) : _vm._e(), (_vm.show1) ? _c('goods', {
 	    attrs: {
 	      "ds": _vm.showData.goods
 	    }
-	  }) : _vm._e(), (_vm.show1) ? _h('resource', {
+	  }) : _vm._e(), (_vm.show1) ? _c('resource', {
 	    attrs: {
 	      "ds": _vm.showData.resource
 	    }
-	  }) : _vm._e(), (_vm.show1) ? _h('scene', {
+	  }) : _vm._e(), (_vm.show1) ? _c('scene', {
 	    attrs: {
 	      "ds": _vm.showData.scene
 	    }
-	  }) : _vm._e(), (_vm.show2) ? _h('match', {
+	  }) : _vm._e(), (_vm.show2) ? _c('match', {
 	    attrs: {
 	      "ds": _vm.showData.match
 	    }
-	  }) : _vm._e(), (_vm.show2) ? _h('brand', {
+	  }) : _vm._e(), (_vm.show2) ? _c('brand', {
 	    attrs: {
 	      "ds": _vm.showData.brand
 	    }
-	  }) : _vm._e(), _h('loading', {
+	  }) : _vm._e(), _c('loading', {
 	    staticClass: ["loading"],
 	    attrs: {
 	      "display": _vm.displayLoading
@@ -3289,14 +3450,13 @@
 	    on: {
 	      "loading": _vm.handleLoading
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      color: "#eee"
 	    }
-	  }, ["加载更多..."])])])
+	  }, [_vm._v("加载更多...")])])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
-
-/******/ });
+/***/ })
+/******/ ]);

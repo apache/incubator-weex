@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(474)
+	__vue_styles__.push(__webpack_require__(84)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(475)
+	__vue_exports__ = __webpack_require__(85)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(476)
+	var __vue_template__ = __webpack_require__(86)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/video.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/video.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-a9b90eec"
+	__vue_options__._scopeId = "data-v-c7b2e46c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -89,23 +89,23 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 403:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 7:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(404)
+	__vue_styles__.push(__webpack_require__(8)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(405)
+	__vue_exports__ = __webpack_require__(9)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(406)
+	var __vue_template__ = __webpack_require__(10)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -117,10 +117,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/button.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/button.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-4c6be341"
+	__vue_options__._scopeId = "data-v-71b34881"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -134,10 +134,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 404:
-/***/ function(module, exports) {
+/***/ 8:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "btn": {
@@ -234,10 +234,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 405:
-/***/ function(module, exports) {
+/***/ 9:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -257,10 +257,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 406:
-/***/ function(module, exports) {
+/***/ 10:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -271,10 +271,10 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 474:
-/***/ function(module, exports) {
+/***/ 84:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "video": {
@@ -284,10 +284,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 475:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 85:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -321,7 +321,7 @@
 	    };
 	  },
 	  components: {
-	    button: __webpack_require__(403)
+	    button: __webpack_require__(7)
 	  },
 	  methods: {
 	    pause: function pause() {
@@ -351,10 +351,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 476:
-/***/ function(module, exports) {
+/***/ 86:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('scroller', [_c('video', {
@@ -395,10 +395,10 @@
 	        _vm.play($event)
 	      }
 	    }
-	  })], 1)], 1)
+	  })], 1)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

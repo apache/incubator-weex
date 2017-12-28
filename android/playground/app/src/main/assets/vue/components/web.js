@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(461)
+	__vue_styles__.push(__webpack_require__(90)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(462)
+	__vue_exports__ = __webpack_require__(91)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(463)
+	var __vue_template__ = __webpack_require__(92)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,38 +70,42 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/components/web.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/web.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-cba25c3a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 387:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 7:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(388)
+	__vue_styles__.push(__webpack_require__(8)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(389)
+	__vue_exports__ = __webpack_require__(9)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(390)
+	var __vue_template__ = __webpack_require__(10)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,23 +117,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/button.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/button.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-71b34881"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 388:
-/***/ function(module, exports) {
+/***/ 8:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "btn": {
@@ -226,10 +234,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 389:
-/***/ function(module, exports) {
+/***/ 9:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -249,24 +257,24 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 390:
-/***/ function(module, exports) {
+/***/ 10:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['btn', 'btn-' + _vm.type, 'btn-sz-' + _vm.size]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['btn-txt', 'btn-txt-' + _vm.type, 'btn-txt-sz-' + _vm.size]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 461:
-/***/ function(module, exports) {
+/***/ 90:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "wrapper": {
@@ -296,10 +304,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 462:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 91:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -350,10 +358,10 @@
 	//
 	//
 
-	var webview = __weex_require_module__('webview');
+	var webview = weex.requireModule('webview');
 	module.exports = {
 	  components: {
-	    button: __webpack_require__(387)
+	    button: __webpack_require__(7)
 	  },
 	  methods: {
 	    goback: function goback() {
@@ -374,21 +382,21 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 463:
-/***/ function(module, exports) {
+/***/ 92:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["wrapper"]
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["toolbar"],
 	    appendAsTree: true,
 	    attrs: {
 	      "append": "tree"
 	    }
-	  }, [_h('button', {
+	  }, [_c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -405,7 +413,7 @@
 	        _vm.goback($event)
 	      }
 	    }
-	  }), _h('button', {
+	  }), _c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -422,7 +430,7 @@
 	        _vm.goforward($event)
 	      }
 	    }
-	  }), _h('button', {
+	  }), _c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -439,7 +447,7 @@
 	        _vm.refresh($event)
 	      }
 	    }
-	  })]), _h('web', {
+	  })], 1), _c('web', {
 	    ref: "webview",
 	    staticClass: ["content"],
 	    attrs: {
@@ -454,6 +462,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });
