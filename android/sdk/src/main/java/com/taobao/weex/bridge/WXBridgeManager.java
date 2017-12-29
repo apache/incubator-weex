@@ -1085,6 +1085,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public void createInstance(final String instanceId, final String template,
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    instance.clearCallTime();
     if (instance == null) {
       WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
       return;
@@ -1262,7 +1263,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                            WXJSObject[] args, boolean logTaskDetail) {
     // if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
-            .append("function:").append(function);
+            .append(" function:").append(function);
     if (logTaskDetail)
       mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
     WXLogUtils.d(mLodBuilder.substring(0));
@@ -1730,6 +1731,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callCreateBodyByWeexCore: call CreateBody args is null");
@@ -1760,6 +1762,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callCreateBody exception " + e.getCause());
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callCreateBodyTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -1767,6 +1770,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callAddElement: call callAddElement args is null");
@@ -1798,6 +1802,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_ADDELEMENT, "[WXBridgeManager] callAddElement exception " + e.getCause());
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callAddElementByWeexCoreTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -1909,6 +1914,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callReLayout: call ReLayout args is null");
@@ -1937,6 +1943,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       commitJSBridgeAlarmMonitor(pageId, WXErrorCode.WX_ERR_DOM_CREATEBODY, "[WXBridgeManager] callReLayout exception " + e.getCause());
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callLayoutByWeexCoreTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 

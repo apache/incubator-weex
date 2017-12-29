@@ -22,11 +22,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -96,7 +98,27 @@ public class WXRenderManager {
         if (mRegistries.get(instanceId) == null) {
           return;
         }
+        long start = System.currentTimeMillis();
         action.executeAction();
+        long time = System.currentTimeMillis() - start;
+
+        // WXLogUtils.e("" + Thread.currentThread() + "," + Thread.currentThread().getPriority());
+        if ("com.taobao.weex.ui.action.GraphicActionAddElement".equals(action.getClass().getName())) {
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementCount();
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementTime(time);
+
+        } else if ("com.taobao.weex.ui.action.GraphicActionLayout".equals(action.getClass().getName())) {
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutCount();
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutTime(time);
+
+        } else if("com.taobao.weex.ui.action.GraphicActionCreateBody".equals(action.getClass().getName())) {
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyCount();
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyTime(time);
+
+        } else {
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherCount();
+          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherTime(time);
+        }
       }
     }));
   }

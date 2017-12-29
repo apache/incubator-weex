@@ -742,14 +742,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getLayoutY());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getLayoutX());
 
-    //calculate first screen time
-    if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      mInstance.firstScreenRenderFinished();
-    }
-
     if (mHost == null) {
       return;
     }
+
+    final int finalHeight = realHeight;
+    mHost.post(new Runnable() {
+      @Override
+      public void run() {
+        if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + finalHeight > mInstance.getWeexHeight() + 1) {
+          mInstance.firstScreenRenderFinished();
+        }
+      }
+    });
 
     MeasureOutput measureOutput = measure(realWidth, realHeight);
     realWidth = measureOutput.width;

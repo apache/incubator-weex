@@ -177,6 +177,28 @@ public class WXPerformance {
   public String requestType;
 
 
+  public int mCallCreateBodySumTime = 0;
+  public int mCallAddElementByWeexCoreSumTime = 0;
+
+  public int mCallLayoutByWeexCoreSumTime = 0;
+  public int mCallLayoutUpdateDemissionSumTime = 0;
+  public int mCallLayoutApplyLayoutAndEventSumTime = 0;
+  public int mCallLayoutBindDataSumTime = 0;
+
+  public int mActionTotalSumTime = 0;
+  public int mActionLayoutCount = 0;
+  public int mActionLayoutSumTime = 0;
+
+  public int mActionAddElementCount = 0;
+  public int mActionAddElementSumTime = 0;
+
+  public int mActionCreateBodyCount = 0;
+  public int mActionCreateBodySumTime = 0;
+
+  public int mActionOtherCount = 0;
+  public int mActionOtherSumTime = 0;
+
+
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
   }
@@ -296,5 +318,13 @@ public class WXPerformance {
 
   public void appendErrMsg(CharSequence msg) {
     mErrMsgBuilder.append(msg);
+  }
+
+  public int renderSumTime() {
+    return mActionAddElementSumTime + mActionCreateBodySumTime + mActionLayoutSumTime + mActionOtherSumTime;
+  }
+
+  public int renderSumCount() {
+    return mActionAddElementCount + mActionCreateBodyCount + mActionLayoutCount + mActionOtherCount;
   }
 }
