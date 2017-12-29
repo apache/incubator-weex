@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,5 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export * from './style'
-export * from './node'
+package com.taobao.weex.bridge;
+
+/**
+ * Created by furture on 2017/10/17.
+ */
+
+public class EventResult {
+
+    private Object result;
+    private boolean success = false;
+    /**
+     * onCallback javascript event callback method
+     * @param result
+     */
+    public void onCallback(Object result){
+        this.success = true;
+        this.result = result;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public Object getResult(){
+        return  result;
+    }
+
+}
