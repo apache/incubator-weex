@@ -133,8 +133,8 @@ export default class Element extends Node {
           node,
           this.pureChildren,
           pureBefore
-          ? this.pureChildren.indexOf(pureBefore)
-          : this.pureChildren.length
+            ? this.pureChildren.indexOf(pureBefore)
+            : this.pureChildren.length
         )
         const taskCenter = getTaskCenter(this.docId)
         if (taskCenter) {
@@ -155,8 +155,8 @@ export default class Element extends Node {
           node,
           this.pureChildren,
           pureBefore
-          ? this.pureChildren.indexOf(pureBefore)
-          : this.pureChildren.length
+            ? this.pureChildren.indexOf(pureBefore)
+            : this.pureChildren.length
         )
         const taskCenter = getTaskCenter(this.docId)
         if (taskCenter && index >= 0) {
