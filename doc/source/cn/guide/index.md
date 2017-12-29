@@ -56,4 +56,4 @@ Weex 是一套简单易用的跨平台开发方案，能以 web 的开发体验�
 ```
 它太容易了，对吧?看一下语法，这就是vue。
 
-你可以试着修改Hello World示例如果你有以前的知识构建VueJS的例子，然后生成一个新的二维码扫描。如果你没有以前的VueJS知识,别担心,这个指南教你。此外，你可以学习(VueJS指南)(https://vuejs.org/v2/guide)。
+你可以试着修改Hello World示例如果你有以前的知识构建VueJS的例子，然后生成一个新的二维码扫描。如果你没有以前的VueJS知识,别担心,这个指南教你。此外，你可以学习[VueJS指南](https://vuejs.org/v2/guide)。
