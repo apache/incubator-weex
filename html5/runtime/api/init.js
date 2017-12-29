@@ -24,6 +24,7 @@ import { registerComponents } from './component'
 import { services, register, unregister } from './service'
 import { track } from '../bridge/debug'
 import WeexInstance from './WeexInstance'
+import { getDoc } from '../vdom/operation'
 
 let frameworks
 let runtimeConfig
@@ -71,12 +72,42 @@ function createServices (id, env, config) {
   return serviceMap
 }
 
-const instanceMap = {}
-
+const instanceTypeMap = {}
 function getFrameworkType (id) {
-  if (instanceMap[id]) {
-    return instanceMap[id].framework
+  return instanceTypeMap[id]
+}
+
+function createInstanceContext (id, options = {}, data) {
+  const weex = new WeexInstance(id, options)
+  Object.freeze(weex)
+
+  const bundleType = options.bundleType || 'Vue'
+  instanceTypeMap[id] = bundleType
+  const framework = runtimeConfig.frameworks[bundleType]
+  if (!framework) {
+    return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
+  track(id, 'bundleType', bundleType)
+
+  // prepare js service
+  const services = createServices(id, { weex, bundleType }, runtimeConfig)
+  Object.freeze(services)
+
+  // prepare runtime context
+  const runtimeContext = Object.create(null)
+  Object.assign(runtimeContext, services, {
+    weex,
+    services // Temporary compatible with some legacy APIs in Rax
+  })
+  Object.freeze(runtimeContext)
+
+  // prepare instance context
+  const instanceContext = Object.create(runtimeContext)
+  if (typeof framework.createInstanceContext === 'function') {
+    Object.assign(instanceContext, framework.createInstanceContext(id, runtimeContext, data))
+  }
+  Object.freeze(instanceContext)
+  return instanceContext
 }
 
 /**
@@ -88,35 +119,22 @@ function getFrameworkType (id) {
  * @param {object} data
  */
 function createInstance (id, code, config, data) {
-  if (instanceMap[id]) {
-    return new Error(`invalid instance id "${id}"`)
+  if (instanceTypeMap[id]) {
+    return new Error(`The instance id "${id}" has already been used!`)
   }
 
   // Init instance info.
   const bundleType = getBundleType(code)
+  instanceTypeMap[id] = bundleType
 
   // Init instance config.
   config = JSON.parse(JSON.stringify(config || {}))
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
-
-  const weex = new WeexInstance(id, config)
-  Object.freeze(weex)
-
-  const runtimeEnv = {
-    weex,
-    config, // TODO: deprecated
-    created: Date.now(),
-    framework: bundleType
-  }
-  runtimeEnv.services = createServices(id, runtimeEnv, runtimeConfig)
-  instanceMap[id] = runtimeEnv
-
-  const runtimeContext = Object.create(null)
-  Object.assign(runtimeContext, runtimeEnv.services, { weex })
+  config.bundleType = bundleType
 
   const framework = runtimeConfig.frameworks[bundleType]
   if (!framework) {
-    return new Error(`invalid bundle type "${bundleType}".`)
+    return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
   if (bundleType === 'Weex') {
     console.error(`[JS Framework] COMPATIBILITY WARNING: `
@@ -126,14 +144,22 @@ function createInstance (id, code, config, data) {
       + `Please upgrade it to Vue.js or Rax.`)
   }
 
-  track(id, 'bundleType', bundleType)
-
-  // run create instance
-  if (typeof framework.prepareInstanceContext === 'function') {
-    const instanceContext = framework.prepareInstanceContext(runtimeContext)
-    return runInContext(code, instanceContext)
+  const instanceContext = createInstanceContext(id, config, data)
+  if (typeof framework.createInstance === 'function') {
+    // Temporary compatible with some legacy APIs in Rax,
+    // some Rax page is using the legacy ".we" framework.
+    if (bundleType === 'Rax' || bundleType === 'Weex') {
+      const raxInstanceContext = Object.assign({
+        config,
+        created: Date.now(),
+        framework: bundleType
+      }, instanceContext)
+      return framework.createInstance(id, code, config, data, raxInstanceContext)
+    }
+    return framework.createInstance(id, code, config, data, instanceContext)
   }
-  return framework.createInstance(id, code, config, data, runtimeEnv)
+  // console.error(`[JS Framework] Can't find available "createInstance" method in ${bundleType}!`)
+  runInContext(code, instanceContext)
 }
 
 /**
@@ -151,7 +177,6 @@ function runInContext (code, context) {
 
   const bundle = `
     (function (global) {
-      "use strict";
       ${code}
     })(Object.create(this))
   `
@@ -159,8 +184,28 @@ function runInContext (code, context) {
   return (new Function(...keys, bundle))(...args)
 }
 
+/**
+ * Get the JSON object of the root element.
+ * @param {string} instanceId
+ */
+function getRoot (instanceId) {
+  const document = getDoc(instanceId)
+  try {
+    if (document && document.body) {
+      return document.body.toJSON()
+    }
+  }
+  catch (e) {
+    console.error(`[JS Framework] Failed to get the virtual dom tree.`)
+    return
+  }
+}
+
 const methods = {
   createInstance,
+  createInstanceContext,
+  getRoot,
+  getDocument: getDoc,
   registerService: register,
   unregisterService: unregister,
   callJS (id, tasks) {
@@ -200,12 +245,13 @@ function genInstance (methodName) {
             destroy(id, { info, runtime: runtimeConfig })
           }
         })
-        delete instanceMap[id]
+        delete instanceTypeMap[id]
       }
 
       return result
     }
-    return new Error(`invalid instance id "${id}"`)
+    return new Error(`[JS Framework] Using invalid instance id `
+      + `"${id}" when calling ${methodName}.`)
   }
 }
 
@@ -240,14 +286,19 @@ export default function init (config) {
   // `sendTasks(...args)`.
   for (const name in frameworks) {
     const framework = frameworks[name]
-    framework.init(config)
+    if (typeof framework.init === 'function') {
+      try {
+        framework.init(config)
+      }
+      catch (e) {}
+    }
   }
 
   adaptMethod('registerComponents', registerComponents)
   adaptMethod('registerModules', registerModules)
   adaptMethod('registerMethods')
 
-  ; ['destroyInstance', 'refreshInstance', 'getRoot'].forEach(genInstance)
+  ; ['destroyInstance', 'refreshInstance'].forEach(genInstance)
 
   return methods
 }

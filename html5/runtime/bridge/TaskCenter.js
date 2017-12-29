@@ -50,8 +50,11 @@ export class TaskCenter {
     return this.callbackManager.triggerHook(...args)
   }
 
-  updateData (componentId, newData) {
-    this.callModule('dom', 'updateComponentData', [newData])
+  updateData (componentId, newData, callback) {
+    this.send('module', {
+      module: 'dom',
+      method: 'updateComponentData'
+    }, [componentId, newData, callback])
   }
 
   destroyCallback () {

@@ -2,7 +2,7 @@
   "name": "weex",
   "version": "0.12.2",
   "subversion": {
-    "framework": "0.22.4",
+    "framework": "0.23.6",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -81,8 +81,8 @@
     "query-string": "^4.2.3",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.4.14",
-    "weex-vue-framework": "2.4.2-weex.6"
+    "weex-rax-framework": "0.4.20",
+    "weex-vue-framework": "2.5.11-weex.1"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",
