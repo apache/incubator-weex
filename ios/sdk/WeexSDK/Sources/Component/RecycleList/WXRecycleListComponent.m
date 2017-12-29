@@ -361,8 +361,11 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     if (!_templateSwitchKey) {
         // if switch key is not specified, so use the first template.
         templateType = [_templateManager topTemplate].templateCaseType;
-    } else {
+    } else if (data[_templateSwitchKey]){
         templateType = data[_templateSwitchKey];
+    } else if (data[WXDefaultRecycleTemplateType]){
+        // read the default type.
+        templateType = data[WXDefaultRecycleTemplateType];
     }
     _templateManager.collectionView = collectionView;
     if (!templateType) {

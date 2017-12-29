@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import "WXComponent.h"
 
+static const NSString *WXDefaultRecycleTemplateType = @"default";
 @interface WXCellSlotComponent : WXComponent
 
 @property (nonatomic, strong) NSString *templateCaseType;
