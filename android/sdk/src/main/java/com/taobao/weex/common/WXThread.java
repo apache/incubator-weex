@@ -93,6 +93,7 @@ public class WXThread extends HandlerThread {
       return runnable;
     }
     String className = runnable.getClass().getName();
+
     if (className != null && className.startsWith(SYSTEM_ACTION_PREFIX)) {
       /**
        * Ignore the Runnable send from system such as {@link android.view.View$CheckForTap},
