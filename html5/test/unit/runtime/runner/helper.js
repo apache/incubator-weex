@@ -62,12 +62,12 @@ export function execute (type, code) {
   const context = createContext()
   return new Promise(resolve => {
     const id = String(Date.now() + Math.random())
-    const instance = context.createInstance(id, `
+    context.createInstance(id, `
       // { "framework": "${type}" }
       ${code}
     `)
     setTimeout(() => {
-      resolve(instance.document.body.toJSON())
+      resolve(context.getRoot(id))
     }, 10)
   })
 }
