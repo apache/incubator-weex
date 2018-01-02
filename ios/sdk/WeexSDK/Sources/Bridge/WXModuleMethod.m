@@ -59,6 +59,10 @@
                 WXLogError(@"%@", errorMessage);
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
                 if ([result.error respondsToSelector:@selector(userInfo)]) {
+                    // update the arguments when validate failed, so update the arguments for invoking -[NSError userInfo].
+                    if ([self respondsToSelector:NSSelectorFromString(@"arguments")]) {
+                        [self setValue:nil forKey:@"arguments"];
+                    }
                     NSInvocation *invocation = [self invocationWithTarget:result.error selector:@selector(userInfo)];
                     [invocation invoke];
                     return invocation;
