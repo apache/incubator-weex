@@ -18,6 +18,11 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.common.WXErrorCode;
+
+/**
+ * TODO merge to @WXErrorCode
+ */
 public class WXRenderErrorCode {
 
 //  public static final String WX_CREATE_INSTANCE_ERROR = "wx_create_instance_error";
@@ -68,6 +73,7 @@ public class WXRenderErrorCode {
 	private String degradMsg;
 	private String appendMsg = "";
 	private String args;
+	private WXErrorCode.ErrorType mErrorType = WXErrorCode.ErrorType.DELAGE_ERROR;
 
 	DegradPassivityCode(String degradCode, String degradMsg){
 	  this.degradCode = degradCode;
@@ -82,6 +88,10 @@ public class WXRenderErrorCode {
 	  StringBuilder builder=new StringBuilder(degradMsg);
 	  builder.append(appendMsg);
 	  return builder.toString();
+	}
+
+	public WXErrorCode.ErrorType getErrorType(){
+		return mErrorType;
 	}
   }
 }
