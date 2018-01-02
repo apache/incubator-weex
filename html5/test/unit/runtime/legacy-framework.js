@@ -188,11 +188,6 @@ describe('framework entry', () => {
       }
       expect(json).to.be.deep.equal(expectJSON)
     })
-
-    it('with a non-exist instanceId', () => {
-      const result = framework.getRoot('123')
-      expect(result).to.be.an.instanceof(Error)
-    })
   })
 
   describe('callJS', () => {
