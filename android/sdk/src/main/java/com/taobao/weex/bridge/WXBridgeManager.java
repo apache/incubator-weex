@@ -1961,9 +1961,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 							+ ", exception function:" + function + ", exception:"
 							+ exception
 			);
-            //doReportJSException(instanceId,function,exception);
-            WXErrorCode code = instance.mEnd?WXErrorCode.WX_RENDER_ERR_JS_RUNTIME:WXErrorCode.WX_RENDER_ERR_NATIVE_RUNTIME;
-            WXExceptionUtils.commitCriticalExceptionRT(instanceId,code.getErrorCode(),function,exception,null);
+            doReportJSException(instanceId,function,exception);
             return;
           }
         } catch (Exception e) {
