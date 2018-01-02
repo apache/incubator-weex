@@ -18,6 +18,9 @@
  */
 package com.taobao.weex;
 
+/**
+ * TODO merge to @WXErrorCode
+ */
 public class WXRenderErrorCode {
 
 //  public static final String WX_CREATE_INSTANCE_ERROR = "wx_create_instance_error";

@@ -199,7 +199,16 @@ public enum WXErrorCode {
    * WX Key Exception Commit RT JsBridge eg. js excute runtime error
    */
   WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack \n"),
-  WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack \n");
+  WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack \n"),
+
+  /**
+   * renderErrorCode
+   */
+  WX_RENDER_ERR_JS_INIT("-9600", "WX_RENDER_ERR_JS_INIT"),
+  WX_RENDER_ERR_JS_RUNTIME("-9601","WX_RENDER_ERR_JS_RUNTIME"),
+  WX_RENDER_ERR_NATIVE_INIT("-9602","WX_RENDER_ERR_NATIVE_INIT"),
+  WX_RENDER_ERR_NATIVE_RUNTIME("-9603","WX_RENDER_ERR_NATIVE_RUNTIME");
+
 
   private String errorCode;
   private String errorMsg;
