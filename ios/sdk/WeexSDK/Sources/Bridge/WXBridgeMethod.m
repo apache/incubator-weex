@@ -103,7 +103,8 @@
     }
     
     NSArray *arguments = _arguments;
-    if (signature.numberOfArguments - 2 < arguments.count) {
+    // when target is an instance of NSError's subclass, checking is meaningless.
+    if ((signature.numberOfArguments - 2 < arguments.count) && ![target isKindOfClass:[NSError class]]) {
         NSString *errorMessage = [NSString stringWithFormat:@"%@, the parameters in calling method [%@] and registered method [%@] are not consistent！", target, _methodName, NSStringFromSelector(selector)];
         WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
         return nil;
