@@ -18,6 +18,10 @@
  */
 package com.taobao.weex.common;
 
+import android.text.TextUtils;
+
+import com.taobao.weex.WXRenderErrorCode;
+
 public enum WXErrorCode {
     /*
      * environment
@@ -240,6 +244,35 @@ public enum WXErrorCode {
 
   public void setArgs(String args) {
     this.args = args;
+  }
+
+  public enum ErrorType{
+    JS_ERROR,
+    NATIVE_ERROR,
+    RENDER_ERROR,
+    DEGRAD_ERROR
+  }
+
+  /**
+   * stupid code
+   */
+  public static ErrorType getErrorType(String errorCode){
+    if (TextUtils.isEmpty(errorCode)){
+      return ErrorType.NATIVE_ERROR;
+    }
+    if (errorCode.equals(WX_KEY_EXCEPTION_WXBRIDGE.getErrorCode()) || errorCode.equals(WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION.getErrorCode())){
+      return ErrorType.JS_ERROR;
+    }
+    if (errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR.getDegradErrorCode())
+            || errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode())
+            || errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode())
+            || errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorCode())
+            || errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode())
+            || errorCode.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_OTHER_CAUSE_DEGRADTOH5.getDegradErrorCode())){
+     return ErrorType.DEGRAD_ERROR;
+    }else {
+        return ErrorType.NATIVE_ERROR;
+    }
   }
 
 }
