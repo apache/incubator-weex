@@ -62,9 +62,14 @@ function createServices (id, env, config) {
     }
     const create = options.create
     if (create) {
-      const result = create(id, env, config)
-      Object.assign(serviceMap.service, result)
-      Object.assign(serviceMap, result.instance)
+      try {
+        const result = create(id, env, config)
+        Object.assign(serviceMap.service, result)
+        Object.assign(serviceMap, result.instance)
+      }
+      catch (e) {
+        console.error(`[JS Runtime] Failed to create service ${name}.`)
+      }
     }
   })
   delete serviceMap.service.instance
@@ -90,7 +95,13 @@ function createInstanceContext (id, options = {}, data) {
   track(id, 'bundleType', bundleType)
 
   // prepare js service
-  const services = createServices(id, { weex, bundleType }, runtimeConfig)
+  const services = createServices(id, {
+    weex,
+    config: options,
+    created: Date.now(),
+    framework: bundleType,
+    bundleType
+  }, runtimeConfig)
   Object.freeze(services)
 
   // prepare runtime context
@@ -102,7 +113,7 @@ function createInstanceContext (id, options = {}, data) {
   Object.freeze(runtimeContext)
 
   // prepare instance context
-  const instanceContext = Object.create(runtimeContext)
+  const instanceContext = Object.assign({}, runtimeContext)
   if (typeof framework.createInstanceContext === 'function') {
     Object.assign(instanceContext, framework.createInstanceContext(id, runtimeContext, data))
   }
