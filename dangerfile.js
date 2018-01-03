@@ -72,12 +72,12 @@ if (unFlowedFiles.length > 0) {
 // Error or Warn when delete public interface
 var isNotDanger = false;
 console.log('pr.title:'+danger.github.pr.title)
-if(!isNotDanger && danger.github.pr.title 
+if(!isNotDanger && danger.github.pr.title
   && danger.github.pr.title.match(/@notdanger/i)){
   isNotDanger = true;
 }
 console.log('pr.body:'+danger.github.pr.body)
-if(!isNotDanger && danger.github.pr.body 
+if(!isNotDanger && danger.github.pr.body
   && danger.github.pr.body.match(/@notdanger/i)){
   isNotDanger = true;
 }
@@ -146,10 +146,10 @@ const getFileType = file => {
   } else if (file.match(/android\/sdk\/src\/main\/java\/.+\.java/)) {
     return type_android_sdk;
   } else if (
-    file.match(/html5\/(shared|frameworks|render|runtime|services)\/.+\.js/)
+    file.match(/runtime\/.+\.js/)
   ) {
     return type_jsfm;
-  } else if (file.match(/html5\/test\/.+\.js/)) {
+  } else if (file.match(/test\/js-framework\/.+\.js/)) {
     return type_jsfm_test;
   } else if (file.match(/doc\/\.+\.md/)) {
     return type_doc;
@@ -250,7 +250,8 @@ const ignoreCopyrightVerifyPath = [
   'test',
   'packages',
   'pre-build',
-  'html5/test/case',
+  'runtime/frameworks/legacy/core',
+  'test/js\-framework/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',
@@ -275,7 +276,7 @@ filesToVerifySrcHeader.forEach(filepath => {
   }
 
   // check cn for source code
-  var reg = /[\u4e00-\u9FA5]+/; 
+  var reg = /[\u4e00-\u9FA5]+/;
   var res = reg.test(content);
   if(res){
     console.error("Code file "+ filepath +" has cn source code.");
@@ -356,7 +357,7 @@ function getContent(url) {
         console.log('response:', response.statusCode)
         if (response.statusCode < 200 || response.statusCode > 299) {
           if (response.statusCode === 404  || response.statusCode === 502) {
-            // ignore this, probably a renamed file,or .so that can't blame 
+            // ignore this, probably a renamed file,or .so that can't blame
             return resolve('')
           }
           reject(new Error('Failed to load page, status code: ' + response.statusCode + ', '
