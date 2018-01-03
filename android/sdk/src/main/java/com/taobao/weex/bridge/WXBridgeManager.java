@@ -1049,6 +1049,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public void createInstance(final String instanceId, final String template,
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    instance.clearCallTime();
     if (instance == null) {
       WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
       return;
@@ -1237,7 +1238,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                            WXJSObject[] args, boolean logTaskDetail) {
     // if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
-            .append("function:").append(function);
+            .append(" function:").append(function);
     if (logTaskDetail)
       mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
     WXLogUtils.d(mLodBuilder.substring(0));
@@ -1746,6 +1747,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
@@ -1779,6 +1781,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callCreateBodyTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -1786,6 +1789,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callAddElement: call CreateBody tasks is null");
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
@@ -1820,6 +1824,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callAddElementByWeexCoreTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -1939,6 +1944,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+    long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callLayout: call callLayout arguments is null");
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
@@ -1970,6 +1976,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
+    WXSDKManager.getInstance().getSDKInstance(pageId).callLayoutByWeexCoreTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 

@@ -470,6 +470,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
+//    Debug.startMethodTracing("renderTrace");
+//    WXLogUtils.e(WXLogUtils.WEEX_TAG, "startTrace");
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
 
@@ -1104,6 +1106,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void firstScreenCreateInstanceTime(long time) {
     if(mCreateInstance) {
       mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime = time -mRenderStartTime;
+//      Debug.stopMethodTracing();
+//      WXLogUtils.e(WXLogUtils.WEEX_TAG, "stopMethodTracing");
       mCreateInstance =false;
     }
   }
@@ -1112,36 +1116,109 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance.callNativeTime += time;
   }
 
+  public void callCreateBodyTime(long time) {
+        mWXPerformance.mCallCreateBodySumTime += time;
+    }
+
+  public void callAddElementByWeexCoreTime(long time) {
+      mWXPerformance.mCallAddElementByWeexCoreSumTime += time;
+  }
+
+  public void callLayoutByWeexCoreTime(long time) {
+      mWXPerformance.mCallLayoutByWeexCoreSumTime += time;
+  }
+
+  public void callLayoutUpdateDemissionTime(long time) {
+      mWXPerformance.mCallLayoutUpdateDemissionSumTime += time;
+  }
+
+  public void callLayoutaAplyLayoutAndEventTime(long time) {
+      mWXPerformance.mCallLayoutApplyLayoutAndEventSumTime += time;
+  }
+
+  public void callLayoutBindDataCoreTime(long time) {
+      mWXPerformance.mCallLayoutBindDataSumTime += time;
+  }
+
+  public void callActionLayoutTime(long time) {
+        mWXPerformance.mActionLayoutSumTime += time;
+    }
+
+  public void callActionAddElementTime(long time) {
+      mWXPerformance.mActionAddElementSumTime += time;
+  }
+
+  public void callActionCreateBodyTime(long time) {
+      mWXPerformance.mActionCreateBodySumTime += time;
+  }
+
+  public void callActionOtherTime(long time) {
+        mWXPerformance.mActionOtherSumTime += time;
+    }
+
+  public void callActionAddElementCount() {
+        mWXPerformance.mActionAddElementCount++;
+    }
+
+  public void callActionCreateBodyCount() {
+        mWXPerformance.mActionCreateBodyCount++;
+    }
+
+  public void callActionLayoutCount() {
+        mWXPerformance.mActionLayoutCount++;
+    }
+
+  public void callActionOtherCount() {
+        mWXPerformance.mActionOtherCount++;
+    }
+
+  public void clearCallTime() {
+        mWXPerformance.mCallCreateBodySumTime = 0;
+        mWXPerformance.mCallAddElementByWeexCoreSumTime = 0;
+        mWXPerformance.mCallLayoutByWeexCoreSumTime = 0;
+  }
+
   public void jsonParseTime(long time) {
     mWXPerformance.parseJsonTime += time;
   }
 
   public void firstScreenRenderFinished() {
-    if(mEnd == true)
-       return;
+      if (mEnd == true)
+          return;
 
-    mEnd = true;
+      mEnd = true;
 
-    if (mStatisticsListener != null && mContext != null) {
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if (mStatisticsListener != null && mContext != null) {
-            Trace.beginSection("onFirstScreen");
-            mStatisticsListener.onFirstScreen();
-            Trace.endSection();
-          }
-        }
-      });
-    }
+      if (mStatisticsListener != null && mContext != null) {
+          runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                  if (mStatisticsListener != null && mContext != null) {
+                      Trace.beginSection("onFirstScreen");
+                      mStatisticsListener.onFirstScreen();
+                      Trace.endSection();
+                  }
+              }
+          });
+      }
 
-    mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
-    WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
-    WXLogUtils.renderPerformanceLog("   firstScreenJSFAndWeexCoreExecuteTime", mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime);
-    WXLogUtils.renderPerformanceLog("   firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
-    WXLogUtils.renderPerformanceLog("   firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+      mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
+      WXLogUtils.renderPerformanceLog("firstScreenJSFAndWeexCoreExecuteTime", mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime);
+      WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
+      WXLogUtils.renderPerformanceLog("   firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
+      WXLogUtils.renderPerformanceLog("   firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+      WXLogUtils.renderPerformanceLog("   firstCallCreateBodySumTime（"+mWXPerformance.mActionCreateBodyCount+"）", mWXPerformance.mCallCreateBodySumTime);
+      WXLogUtils.renderPerformanceLog("   firstCallAddElementByWeexCoreSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementByWeexCoreSumTime);
+      WXLogUtils.renderPerformanceLog("   firstCallLayoutByWeexCoreSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutByWeexCoreSumTime);
+      WXLogUtils.renderPerformanceLog("   firstScreenRenderSumTime", mWXPerformance.renderSumTime());
+      WXLogUtils.renderPerformanceLog("       firstActionCreateBodySumTime", mWXPerformance.mActionCreateBodySumTime);
+      WXLogUtils.renderPerformanceLog("       firstActionAddElementSumTime", mWXPerformance.mActionAddElementSumTime);
+      WXLogUtils.renderPerformanceLog("       firstActionLayoutSumTime", mWXPerformance.mActionLayoutSumTime);
+      WXLogUtils.renderPerformanceLog("           firstCallLayoutUpdateDemissionSumTime", mWXPerformance.mCallLayoutUpdateDemissionSumTime);
+      WXLogUtils.renderPerformanceLog("           firstCallLayoutApplyLayoutAndEventSumTime", mWXPerformance.mCallLayoutApplyLayoutAndEventSumTime);
+      WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
+      WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-    nativePrintFirstScreenLog(getInstanceId());
+      nativePrintFirstScreenLog(getInstanceId());
   }
 
   public void createInstanceFinished(long time) {
