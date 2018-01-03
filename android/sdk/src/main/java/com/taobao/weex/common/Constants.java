@@ -195,6 +195,10 @@ public class Constants {
     String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
     String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
 
+    String PRIORITY  = "priority";
+
+    String STRATEGY  = "strategy";
+
 
 
 
