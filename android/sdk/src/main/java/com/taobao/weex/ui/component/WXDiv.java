@@ -25,6 +25,9 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.flat.FlatComponent;
+import com.taobao.weex.ui.flat.WidgetContainer;
+import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +36,9 @@ import java.lang.reflect.InvocationTargetException;
  * div component
  */
 @Component(lazyload = false)
-public class WXDiv extends WXVContainer<WXFrameLayout> {
+public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatComponent<WidgetGroup> {
+
+  private WidgetGroup mWidgetGroup;
 
   public static class Ceator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -57,4 +62,54 @@ public class WXDiv extends WXVContainer<WXFrameLayout> {
     return frameLayout;
   }
 
+  @Override
+  public boolean promoteToView(boolean checkAncestor) {
+    return !intendToBeFlatContainer() ||
+            getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXDiv.class);
+  }
+
+  /**
+   * Create View tree there. Either this method or {@link #createViewImpl()} get called.
+   * If this object will be promoted to view, then getOrCreateFlatWidget() should never be called.
+   */
+  @Override
+  @NonNull
+  public WidgetGroup getOrCreateFlatWidget() {
+    if (mWidgetGroup == null) {
+      mWidgetGroup = new WidgetGroup(getInstance().getFlatUIContext());
+      for (int i = 0; i < getChildCount(); i++) {
+        createChildViewAt(i);
+      }
+      mountFlatGUI();
+    }
+    return mWidgetGroup;
+  }
+
+  @Override
+  protected void mountFlatGUI() {
+    if (promoteToView(true)) {
+      if(getHostView()!=null) {
+        getHostView().mountFlatGUI(widgets);
+      }
+    } else {
+      mWidgetGroup.replaceAll(widgets);
+    }
+  }
+
+  @Override
+  public void unmountFlatGUI() {
+    if (getHostView() != null) {
+      getHostView().unmountFlatGUI();
+    }
+  }
+
+  @Override
+  public boolean intendToBeFlatContainer() {
+    return getInstance().getFlatUIContext().isFlatUIEnabled(this) && WXDiv.class.equals(getClass());
+  }
+
+  @Override
+  public boolean isVirtualComponent() {
+    return !promoteToView(true);
+  }
 }

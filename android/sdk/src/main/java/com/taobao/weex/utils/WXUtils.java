@@ -24,9 +24,8 @@ import android.content.res.Configuration;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
@@ -50,8 +49,14 @@ public class WXUtils {
     if (value == null) {
       return Float.NaN;
     }
-
     String temp = value.toString().trim();
+    if (Constants.Name.AUTO.equals(temp)
+            || Constants.Name.UNDEFINED.equals(temp)
+            || TextUtils.isEmpty(temp)) {
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:" + Float.NaN);
+      return Float.NaN;
+    }
+
     if (temp.endsWith("wx")) {
       try {
         return transferWx(temp, viewport);
@@ -60,7 +65,7 @@ public class WXUtils {
       } catch (Exception e) {
         WXLogUtils.e("Argument error! value is " + value, e);
       }
-    }else if (temp.endsWith("px")) {
+    } else if (temp.endsWith("px")) {
       try {
         temp = temp.substring(0, temp.indexOf("px"));
         return Float.parseFloat(temp);
@@ -69,7 +74,7 @@ public class WXUtils {
       } catch (Exception e) {
         WXLogUtils.e("Argument error! value is " + value, e);
       }
-    }else {
+    } else {
       try {
         return Float.parseFloat(temp);
       } catch (NumberFormatException nfe) {
@@ -91,7 +96,10 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
-    if(TextUtils.isEmpty(temp)){
+    if(Constants.Name.AUTO.equals(temp)
+            || Constants.Name.UNDEFINED.equals(temp)
+            || TextUtils.isEmpty(temp)){
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:"+Float.NaN);
       return df;
     }
     if (temp.endsWith("wx")) {
@@ -412,12 +420,12 @@ public class WXUtils {
 
     int offsetCountBegin = content.indexOf(commentBegin);
     if (offsetCountBegin == -1) {
-        return null;
+      return null;
     }
     offsetCountBegin += commentBegin.length();
     int offsetCountEnd = indexLineBreak(content, offsetCountBegin);
     if (offsetCountEnd == -1) {
-        return null;
+      return null;
     }
     String countStr = content.substring(offsetCountBegin, offsetCountEnd);
     int count = Integer.parseInt(countStr);
@@ -425,7 +433,7 @@ public class WXUtils {
     String commentBody = content.substring(offsetCountEnd + 1, offsetCountEnd + 1 + count);
     int offsetBodyEnd = commentBody.lastIndexOf(commentEnd);
     if (offsetBodyEnd == -1) {
-        return null;
+      return null;
     }
     commentBody = commentBody.substring(0, offsetBodyEnd);
 
@@ -433,42 +441,63 @@ public class WXUtils {
     String[] items = splitLineBreak(commentBody);
 
     for (String item : items) {
-        commentBodyBuilder.append(item.replaceFirst(asteriskRegex, replacement));
+      commentBodyBuilder.append(item.replaceFirst(asteriskRegex, replacement));
     }
 
     return commentBodyBuilder.toString();
-}
+  }
 
-private static int indexLineBreak(String str, int fromIndex) {
+  private static int indexLineBreak(String str, int fromIndex) {
     final String lineBreakIos = "\r";
     final String lineBreakUnix = "\n";
     final String linebreakWin = "\r\n";
 
     int index = str.indexOf(lineBreakIos, fromIndex);
     if (index == -1) {
-        index = str.indexOf(lineBreakUnix, fromIndex);
+      index = str.indexOf(lineBreakUnix, fromIndex);
     }
     if (index == -1) {
-        index = str.indexOf(linebreakWin, fromIndex);
+      index = str.indexOf(linebreakWin, fromIndex);
     }
 
     return index;
-}
+  }
 
-private static String[] splitLineBreak(String str) {
+  private static String[] splitLineBreak(String str) {
     final String lineBreakIos = "\r";
     final String lineBreakUnix = "\n";
     final String linebreakWin = "\r\n";
     String[] items = str.split(lineBreakIos);
 
     if (items.length == 1) {
-        items = str.split(lineBreakUnix);
+      items = str.split(lineBreakUnix);
     }
     if (items.length == 1) {
-        items = str.split(linebreakWin);
+      items = str.split(linebreakWin);
     }
 
     return items;
-}
+  }
+
+
+  /**
+   * get number
+   * */
+  public static int getNumberInt(Object value, int defaultValue){
+    if(value == null){
+      return  defaultValue;
+    }
+    if(value instanceof  Number){
+      return  ((Number) value).intValue();
+    }
+    try{
+      String number = value.toString();
+      if(number.indexOf('.') >= 0) {
+        return (int) Float.parseFloat(value.toString());
+      }else{
+        return  Integer.parseInt(number);
+      }
+    }catch (Exception e){return  defaultValue;}
+  }
 
 }

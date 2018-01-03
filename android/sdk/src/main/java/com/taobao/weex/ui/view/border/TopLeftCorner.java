@@ -25,30 +25,25 @@ import android.support.annotation.NonNull;
 class TopLeftCorner extends BorderCorner {
 
   TopLeftCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
-    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox);
-  }
-
-  @Override
-  protected float getAngleBisectorDegree() {
-    return 225;
+    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 225);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerExist() {
     return new RectF(getPreBorderWidth() / 2,
-                     getPostBorderWidth() / 2,
-                     2 * getOuterCornerRadius() - getPreBorderWidth() / 2,
-                     2 * getOuterCornerRadius() - getPostBorderWidth() / 2);
+            getPostBorderWidth() / 2,
+            2 * getOuterCornerRadius() - getPreBorderWidth() / 2,
+            2 * getOuterCornerRadius() - getPostBorderWidth() / 2);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerNotExist() {
     return new RectF(getOuterCornerRadius()/2,
-                     getOuterCornerRadius()/2,
-                     getOuterCornerRadius() * 1.5f,
-                     getOuterCornerRadius() * 1.5f);
+            getOuterCornerRadius()/2,
+            getOuterCornerRadius() * 1.5f,
+            getOuterCornerRadius() * 1.5f);
   }
 
   @NonNull

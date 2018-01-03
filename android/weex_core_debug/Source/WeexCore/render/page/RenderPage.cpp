@@ -535,4 +535,8 @@ namespace WeexCore {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->printPerformanceLog(onRenderSuccess);
   }
+
+  void RenderPage::batch() {
+
+  }
 } //namespace WeexCore

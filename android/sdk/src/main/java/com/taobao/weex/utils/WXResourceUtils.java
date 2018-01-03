@@ -44,38 +44,38 @@ public class WXResourceUtils {
   private final static String RGB = "rgb";
   private final static String RGBA = "rgba";
   private final static SingleFunctionParser.FlatMapper<Integer> FUNCTIONAL_RGB_MAPPER =
-      new SingleFunctionParser.FlatMapper<Integer>() {
-        @Override
-        public Integer map(String raw) {
-          int color = WXUtils.parseUnitOrPercent(raw, COLOR_RANGE);
-          if (color < 0) {
-            color = 0;
-          } else if (color > COLOR_RANGE) {
-            color = COLOR_RANGE;
-          }
-          return color;
-        }
-      };
+          new SingleFunctionParser.FlatMapper<Integer>() {
+            @Override
+            public Integer map(String raw) {
+              int color = WXUtils.parseUnitOrPercent(raw, COLOR_RANGE);
+              if (color < 0) {
+                color = 0;
+              } else if (color > COLOR_RANGE) {
+                color = COLOR_RANGE;
+              }
+              return color;
+            }
+          };
 
   private final static SingleFunctionParser.NonUniformMapper<Number> FUNCTIONAL_RGBA_MAPPER =
-      new SingleFunctionParser.NonUniformMapper<Number>() {
-        @Override
-        public List<Number> map(List<String> raw) {
-          List<Number> result = new ArrayList<>(RGBA_SIZE);
-          int i, color;
-          for (i = 0; i < RGB_SIZE; i++) {
-            color = WXUtils.parseUnitOrPercent(raw.get(i), COLOR_RANGE);
-            if (color < 0) {
-              color = 0;
-            } else if (color > COLOR_RANGE) {
-              color = COLOR_RANGE;
+          new SingleFunctionParser.NonUniformMapper<Number>() {
+            @Override
+            public List<Number> map(List<String> raw) {
+              List<Number> result = new ArrayList<>(RGBA_SIZE);
+              int i, color;
+              for (i = 0; i < RGB_SIZE; i++) {
+                color = WXUtils.parseUnitOrPercent(raw.get(i), COLOR_RANGE);
+                if (color < 0) {
+                  color = 0;
+                } else if (color > COLOR_RANGE) {
+                  color = COLOR_RANGE;
+                }
+                result.add(color);
+              }
+              result.add(Float.valueOf(raw.get(i)));
+              return result;
             }
-            result.add(color);
-          }
-          result.add(Float.valueOf(raw.get(i)));
-          return result;
-        }
-      };
+          };
 
   static {
     colorMap.put("aliceblue", 0XFFF0F8FF);
@@ -267,9 +267,9 @@ public class WXResourceUtils {
     if (valueList != null && valueList.size() == 3) {
       float[] points = parseGradientDirection(valueList.get(0), width, height);
       Shader shader = new LinearGradient(points[0], points[1],
-                                         points[2], points[3],
-                                         getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
-                                         Shader.TileMode.REPEAT);
+              points[2], points[3],
+              getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
+              Shader.TileMode.REPEAT);
       return shader;
     }
     return null;
@@ -360,6 +360,10 @@ public class WXResourceUtils {
     return points;
   }
 
+  public static boolean isNamedColor(String name) {
+    return colorMap.containsKey(name);
+  }
+
   enum ColorConvertHandler {
     NAMED_COLOR_HANDLER {
       @Override
@@ -409,10 +413,10 @@ public class WXResourceUtils {
         List<Number> rgba = functionParser.parse(RGBA);
         if (rgba.size() == RGBA_SIZE) {
           return new Pair<>(Boolean.TRUE, Color.argb(
-              parseAlpha(rgba.get(3).floatValue()),
-              rgba.get(0).intValue(),
-              rgba.get(1).intValue(),
-              rgba.get(2).intValue()));
+                  parseAlpha(rgba.get(3).floatValue()),
+                  rgba.get(0).intValue(),
+                  rgba.get(1).intValue(),
+                  rgba.get(2).intValue()));
         } else {
           return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }

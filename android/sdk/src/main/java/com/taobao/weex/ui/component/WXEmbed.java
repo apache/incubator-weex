@@ -90,7 +90,8 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public static class ClickToReloadListener implements OnNestedInstanceEventListener {
     @Override
     public void onException(NestedContainer container, String errCode, String msg) {
-      if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
+      if (TextUtils.equals(errCode, WXRenderErrorCode.DegradPassivityCode.
+              WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode()) && container instanceof WXEmbed) {
         final WXEmbed comp = ((WXEmbed)container);
         final ImageView imageView = new ImageView(comp.getContext());
         imageView.setImageResource(R.drawable.error);
@@ -272,15 +273,19 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
 
     if(TextUtils.isEmpty(url)){
-      mListener.mEventListener.onException(this,WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,"degradeToH5");
+      mListener.mEventListener.onException(this,
+              WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+              WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorMsg() + "!!wx embed src url is null"
+      );
       return sdkInstance;
     }
 
     ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            url,
-                            null, null,
-                            WXRenderStrategy.APPEND_ASYNC);
+            url,
+            null, null, layoutParams.width,
+            layoutParams.height,
+            WXRenderStrategy.APPEND_ASYNC);
     return sdkInstance;
   }
 

@@ -18,7 +18,10 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,8 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 
@@ -36,6 +41,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
+  private BoxShadowHost mBoxShadowHost;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
@@ -256,17 +262,26 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public void createChildViewAt(int index) {
+    Pair<WXComponent, Integer> ret = rearrangeIndexAndGetChild(index);
+    if (ret.first != null) {
+      WXComponent child = ret.first;
+      child.createView();
+      if (!child.isVirtualComponent()) {
+        addSubView(child.getHostView(), ret.second);
+      }
+    }
+  }
+
+  protected Pair<WXComponent, Integer> rearrangeIndexAndGetChild(int index) {
     int indexToCreate = index;
     if (indexToCreate < 0) {
       indexToCreate = childCount() - 1;
-      if (indexToCreate < 0) {
-        return;
-      }
     }
-    WXComponent child = getChild(indexToCreate);
-    child.createView();
-    if (!child.isVirtualComponent()) {
-      addSubView(child.getHostView(), indexToCreate);
+
+    if (indexToCreate < 0) {
+      return new Pair<>(null, indexToCreate);
+    } else {
+      return new Pair<>(getChild(indexToCreate), indexToCreate);
     }
   }
 
@@ -428,7 +443,55 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
+  @Override
+  public void onRenderFinish(@RenderState int state) {
+    for (int i = 0; i < getChildCount(); i++) {
+      WXComponent child = getChild(i);
+      child.mTraceInfo.uiQueueTime = mTraceInfo.uiQueueTime;
+      child.onRenderFinish(state);
+    }
+    super.onRenderFinish(state);
+  }
+
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+
+  public @Nullable
+  View getBoxShadowHost(boolean isClear) {
+    if (isClear) {
+      // Return existed host if want clear shadow
+      return mBoxShadowHost;
+    }
+
+    ViewGroup hostView = getHostView();
+    if (hostView == null) {
+      return null;
+    }
+
+    try {
+      String type = getComponentType();
+      if (WXBasicComponentType.DIV.equals(type)) {
+        WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
+        if (mBoxShadowHost == null) {
+          mBoxShadowHost = new BoxShadowHost(getContext());
+          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+          hostView.addView(mBoxShadowHost);
+        }
+        hostView.removeView(mBoxShadowHost);
+        hostView.addView(mBoxShadowHost);
+        return mBoxShadowHost;
+      }
+    } catch (Throwable t) {
+      WXLogUtils.w("BoxShadow", t);
+    }
+    return hostView;
+  }
+
+  private class BoxShadowHost extends View {
+    public BoxShadowHost(Context context) {
+      super(context);
+    }
+  }
 }

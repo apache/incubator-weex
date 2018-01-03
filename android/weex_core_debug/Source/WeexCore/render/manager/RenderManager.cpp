@@ -123,4 +123,13 @@ namespace WeexCore {
     page->getRootRenderObject()->printYGNodeMsg();
   }
 
+  void RenderManager::batch(const std::string &pageId) {
+    RenderPage *page = this->getPage(pageId);
+    if (page == nullptr)
+      return;
+
+    page->batch();
+
+  }
+
 } //namespace WeexCore

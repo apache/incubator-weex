@@ -19,23 +19,33 @@
 package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
+
+import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
 
 /**
  * Root component for components in {@link WXListComponent}
  */
 @Component(lazyload = false)
 
-public class WXCell extends WXVContainer<WXFrameLayout> {
+public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     private int mLastLocationY = 0;
     private ViewGroup mRealView;
@@ -45,15 +55,27 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
 
     /** used in list sticky detect **/
     private int mScrollPosition = -1;
+    private boolean mFlatUIEnabled = false;
 
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-        this(instance, parent, isLazy, commonCompData);
+        super(instance, parent, commonCompData);
     }
 
     public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-        super(instance, parent, true, commonCompData);
+        super(instance, parent, commonCompData);
+        if(Build.VERSION.SDK_INT< Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                //TODO a WTF is necessary if anyone try to change the flat flag during update attrs.
+                WXAttr attr = getAttrs();
+                if (attr.containsKey(Constants.Name.FLAT)) {
+                    mFlatUIEnabled = WXUtils.getBoolean(attr.get(Constants.Name.FLAT), false);
+                }
+            } catch (NullPointerException e) {
+                WXLogUtils.e("Cell", WXLogUtils.getStackTrace(e));
+            }
+        }
     }
 
     @Override
@@ -65,6 +87,12 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         mLazy = lazy;
     }
 
+    @Override
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public boolean isFlatUIEnabled() {
+        return mFlatUIEnabled;
+    }
+
     /**
      * If Cell is Sticky, need wraped FrameLayout
      */
@@ -74,10 +102,17 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
             WXFrameLayout view = new WXFrameLayout(context);
             mRealView = new WXFrameLayout(context);
             view.addView(mRealView);
+            //TODO Maybe there is a better solution for hardware-acceleration view's display list.
+            if (isFlatUIEnabled()) {
+                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
             return view;
         } else {
             WXFrameLayout view = new WXFrameLayout(context);
             mRealView = view;
+            if (isFlatUIEnabled()) {
+                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
             return view;
         }
     }
@@ -104,27 +139,70 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     }
 
     public void removeSticky() {
-        mHeadView = getHostView().getChildAt(0);
-        int[] location = new int[2];
-        int[] parentLocation = new int[2];
-        getHostView().getLocationOnScreen(location);
-        getParentScroller().getView().getLocationOnScreen(parentLocation);
-        int headerViewOffsetX = location[0] - parentLocation[0];
-        int headerViewOffsetY = getParent().getHostView().getTop();
-        getHostView().removeView(mHeadView);
-        mRealView = (ViewGroup) mHeadView;
-        mTempStickyView = new FrameLayout(getContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getLayoutSize().getWidth(),
-                (int) getLayoutSize().getHeight());
-        getHostView().addView(mTempStickyView, lp);
-        mHeadView.setTranslationX(headerViewOffsetX);
-        mHeadView.setTranslationY(headerViewOffsetY);
+        if(getHostView().getChildCount() > 0) {
+            mHeadView = getHostView().getChildAt(0);
+            int[] location = new int[2];
+            int[] parentLocation = new int[2];
+            getHostView().getLocationOnScreen(location);
+            getParentScroller().getView().getLocationOnScreen(parentLocation);
+            int headerViewOffsetX = location[0] - parentLocation[0];
+            int headerViewOffsetY = getParent().getHostView().getTop();
+            getHostView().removeView(mHeadView);
+            mRealView = (ViewGroup) mHeadView;
+            mTempStickyView = new FrameLayout(getContext());
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getLayoutWidth(),
+                    (int) getLayoutHeight());
+            getHostView().addView(mTempStickyView, lp);
+            mHeadView.setTranslationX(headerViewOffsetX);
+            mHeadView.setTranslationY(headerViewOffsetY);
+        }
     }
 
     public void recoverySticky() {
-        getHostView().removeView(mTempStickyView);
-        getHostView().addView(mHeadView);
-        mHeadView.setTranslationX(0);
-        mHeadView.setTranslationY(0);
+        if(mHeadView != null){
+            if(mHeadView.getLayoutParams() != null){
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mHeadView.getLayoutParams();
+                if(params.topMargin > 0){
+                    params.topMargin = 0;
+                }
+            }
+            if(mHeadView.getVisibility() != View.VISIBLE){
+                mHeadView.setVisibility(View.VISIBLE);
+            }
+            if(mHeadView.getParent() != null){
+                ((ViewGroup)mHeadView.getParent()).removeView(mHeadView);
+            }
+            getHostView().removeView(mTempStickyView);
+            getHostView().addView(mHeadView);
+            mHeadView.setTranslationX(0);
+            mHeadView.setTranslationY(0);
+        }
+    }
+
+    @Override
+    protected void mountFlatGUI() {
+        if(getHostView()!=null) {
+            getHostView().mountFlatGUI(widgets);
+        }
+    }
+
+    @Override
+    public void unmountFlatGUI() {
+        if (getHostView() != null) {
+            getHostView().unmountFlatGUI();
+        }
+    }
+
+    @Override
+    public boolean intendToBeFlatContainer() {
+        return getInstance().getFlatUIContext().isFlatUIEnabled(this) && WXCell.class.equals(getClass()) && !isSticky();
+    }
+
+    public int getStickyOffset(){
+        if(getAttrs().get(STICKY_OFFSET) == null){
+            return 0;
+        }
+        float  offset = WXUtils.getFloat(getAttrs().get(STICKY_OFFSET));
+        return (int)(WXViewUtils.getRealPxByWidth(offset,getViewPortWidth()));
     }
 }
