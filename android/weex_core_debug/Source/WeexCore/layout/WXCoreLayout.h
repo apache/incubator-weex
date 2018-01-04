@@ -203,10 +203,10 @@ namespace WeexCore {
       }
       mFlexLines.clear();
 
-//      if (mCssStyle != nullptr) {
-//        delete mCssStyle;
-//        mCssStyle = nullptr;
-//      }
+      if (mCssStyle != nullptr) {
+        delete mCssStyle;
+        mCssStyle = nullptr;
+      }
 
       if (mLayoutResult != nullptr) {
         delete mLayoutResult;
