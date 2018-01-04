@@ -28,6 +28,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> BORDER_MAP;
 
   class RenderObject : public WXCoreLayoutNode {
+    friend class RenderPage;
   public:
 
   private:
@@ -55,6 +56,22 @@ namespace WeexCore {
     jobject mMeasureFunc_Impl_Android;
 
     void *mComponent_Impl_iOS;
+
+    void layoutBefore(){
+      onLayoutBefore();
+      for(Index i=0;i<getChildCount();i++){
+        RenderObject *child = getChild(i);
+        child->layoutBefore();
+      }
+    }
+
+    void layoutAfter(){
+      onLayoutAfter(getLayoutWidth(), getLayoutHeight());
+      for(Index i=0;i<getChildCount();i++){
+        RenderObject *child = getChild(i);
+        child->layoutAfter();
+      }
+    }
 
   public:
 
@@ -88,17 +105,17 @@ namespace WeexCore {
       return mMeasureFunc_Impl_Android;
     }
 
-    inline RenderObject *getChild(uint32_t &index) {
+    inline RenderObject *getChild(Index &index) {
       return (RenderObject *) getChildAt(index);
     }
 
-    inline uint32_t indexOf(RenderObject *render) {
+    inline Index indexOf(RenderObject *render) {
       if (render == nullptr) {
-        for (uint32_t i = 0; i < getChildCount(); i++)
+        for (Index i = 0; i < getChildCount(); i++)
           if (getChild(i) == nullptr)
             return i;
       } else {
-        for (uint32_t i = 0; i < getChildCount(); i++)
+        for (Index i = 0; i < getChildCount(); i++)
           if (render->getRef() == getChild(i)->getRef())
             return i;
       }
@@ -111,7 +128,7 @@ namespace WeexCore {
         return;
       }
 
-      int count = getChildCount();
+      Index count = getChildCount();
       index = index >= count ? -1 : index;
       if (index == -1) {
         addChildAt(child, getChildCount());

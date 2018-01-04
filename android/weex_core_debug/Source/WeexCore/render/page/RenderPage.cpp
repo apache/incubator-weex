@@ -72,9 +72,12 @@ namespace WeexCore {
   void RenderPage::calculateLayout() {
     if (pRoot == nullptr)
       return;
+
+    pRoot->layoutBefore();
     long long startTime = getCurrentTime();
     pRoot->calculateLayout();
     cssLayoutTime(getCurrentTime() - startTime);
+    pRoot->layoutAfter();
 
     float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
     float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();

@@ -145,34 +145,27 @@ public class WXText extends WXComponent<WXTextView> {
 
       @Override
       public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
-        float measureWidth, measureHeight;
-        if (Float.isNaN(width)) {
-          width = getStyles().getMaxWidth();
-        }
-
-        boolean forceWidth = false;
+        float measureWidth = width, measureHeight = height;
         hasBeenMeasured = true;
-        float textWidth = getTextWidth(mTextPaint, width, forceWidth);
+        float textWidth = getTextWidth(mTextPaint, width, false);
 
         if (textWidth > 0 && mText != null) {
           layout = createLayout(textWidth, false, null);
           previousWidth = layout.getWidth();
-
-          if (widthMeasureMode == MeasureMode.ATMOST) {
-            measureWidth = Math.min(layout.getWidth(), width);
-          } else {
-            measureWidth = width;
+          if (Float.isNaN(width) ) {
+            measureWidth = layout.getWidth();
           }
-          if (heightMeasureMode == MeasureMode.ATMOST) {
-            measureHeight = Math.min(layout.getHeight(), height);
-          } else {
-            measureHeight = height;
+          if (Float.isNaN(height)) {
+            measureHeight = layout.getHeight();
           }
         } else {
-          measureWidth = widthMeasureMode == MeasureMode.EXACTLY ? width : 0;
-          measureHeight = heightMeasureMode == MeasureMode.EXACTLY ? height : 0;
+          if (widthMeasureMode == MeasureMode.ATMOST) {
+            measureWidth = 0;
+          }
+          if (heightMeasureMode == MeasureMode.ATMOST) {
+            measureHeight = 0;
+          }
         }
-
         MeasureSize ret = new MeasureSize();
         ret.setWidth(measureWidth);
         ret.setHeight(measureHeight);

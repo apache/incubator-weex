@@ -53,7 +53,7 @@ namespace WeexCore {
 
     freeWXCoreNode();
 
-    for (uint32_t i = 0; i < getChildCount(); i++) {
+    for (Index i = 0; i < getChildCount(); i++) {
       RenderObject *render = getChild(i);
       if (nullptr != render) {
         delete render;
