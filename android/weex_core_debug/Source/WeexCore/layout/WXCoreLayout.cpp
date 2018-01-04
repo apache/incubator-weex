@@ -206,7 +206,7 @@ namespace WeexCore {
     }
 
     void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* flexLine, const Index i, const WXCoreLayoutNode* child){
-      flexLine->mMainSize = calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
+      flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
       sumFlexGrow(child, flexLine, i, isMainAxisHorizontal(this));
       flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
       if (i == childCount - 1 && flexLine->mItemCount != 0) {
