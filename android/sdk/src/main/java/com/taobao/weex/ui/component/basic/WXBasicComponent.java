@@ -229,21 +229,21 @@ public abstract class WXBasicComponent<T extends View> {
     }
   }
 
-  public void addMargin(CSSShorthand.EDGE spacingType, float margin) {
+  private void addMargin(CSSShorthand.EDGE spacingType, float margin) {
     if (mMargins == null) {
       mMargins = new CSSShorthand();
     }
     mMargins.set(spacingType, margin);
   }
 
-  public void addPadding(CSSShorthand.EDGE spacingType, float padding) {
+  private void addPadding(CSSShorthand.EDGE spacingType, float padding) {
     if (mPaddings == null) {
       mPaddings = new CSSShorthand();
     }
     mPaddings.set(spacingType, padding);
   }
 
-  public void addBorder(CSSShorthand.EDGE spacingType, float border) {
+  private void addBorder(CSSShorthand.EDGE spacingType, float border) {
     if (mBorders == null) {
       mBorders = new CSSShorthand();
     }

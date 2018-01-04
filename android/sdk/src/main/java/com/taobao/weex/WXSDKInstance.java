@@ -659,6 +659,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return mRenderStrategy;
   }
 
+  public Context getUIContext() {
+    return mContext;
+  }
+
   public String getInstanceId() {
     return mInstanceId;
   }
