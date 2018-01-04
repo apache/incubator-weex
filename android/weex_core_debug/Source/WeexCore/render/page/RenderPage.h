@@ -73,16 +73,20 @@ namespace WeexCore {
 
     bool createRootRender(RenderObject *root);
 
-    bool addRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
+    bool
+    addRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
 
     bool removeRenderObject(const std::string &ref);
 
     bool moveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
 
-    bool updateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    bool
+    updateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
     bool updateAttr(const std::string &ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
+
+    void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
     bool addEvent(const std::string &ref, const std::string &event);
 

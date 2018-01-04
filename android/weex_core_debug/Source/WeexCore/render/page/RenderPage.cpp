@@ -344,6 +344,13 @@ namespace WeexCore {
     return true;
   }
 
+  void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
+                                                          const float defaultHeight) {
+    pRoot->setStyleWidth(defaultWidth);
+    pRoot->setStyleHeight(defaultHeight);
+    calculateLayout();
+  }
+
   bool RenderPage::addEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);

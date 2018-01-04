@@ -33,6 +33,11 @@ static void BindInstanceToWXCore(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jobject instance);
 
+static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jfloat defaultWidth,
+    jfloat defaultHeight);
+
 static void PrintFirstScreenLog(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
@@ -82,6 +87,13 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "Lcom/taobao/weex/WXSDKInstance;"
 ")"
 "V", reinterpret_cast<void*>(BindInstanceToWXCore) },
+    { "nativeSetDefaultHeightAndWidthIntoRootDom",
+"("
+"Ljava/lang/String;"
+"F"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetDefaultHeightAndWidthIntoRootDom) },
     { "nativePrintFirstScreenLog",
 "("
 "Ljava/lang/String;"
