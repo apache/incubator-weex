@@ -24,7 +24,7 @@ public class MeasureMode {
 
   public static int EXACTLY = 0;
 
-  public static int ATMOST = 1;
+  public static int UNSPECIFIED = 1;
 
   @CalledByNative
   public static int getEXACTLY() {
@@ -32,7 +32,7 @@ public class MeasureMode {
   }
 
   @CalledByNative
-  public static int getATMOST() {
-    return ATMOST;
+  public static int getUNSPECIFIED() {
+    return UNSPECIFIED;
   }
 }

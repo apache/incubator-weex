@@ -11,8 +11,8 @@ namespace WeexCore {
     return Java_MeasureMode_getEXACTLY(env);
   }
 
-  jint getATMOST(JNIEnv *env) {
-    return Java_MeasureMode_getATMOST(env);
+  jint getUNSPECIFIED(JNIEnv *env) {
+    return Java_MeasureMode_getUNSPECIFIED(env);
   }
 }
 

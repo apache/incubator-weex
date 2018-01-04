@@ -86,8 +86,8 @@ namespace WeexCore {
     if (node == nullptr || ((RenderObject *) node)->getMeasureFunc_Impl_Android() == nullptr)
       return size;
 
-    int widthMode = getATMOST(env);
-    int heightMode = getATMOST(env);
+    int widthMode = getUNSPECIFIED(env);
+    int heightMode = getUNSPECIFIED(env);
     if (widthMeasureMode == EXACTLY)
       widthMode = getEXACTLY(env);
     if (heightMeasureMode == EXACTLY)
