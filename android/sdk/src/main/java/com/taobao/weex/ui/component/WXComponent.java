@@ -260,7 +260,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     setBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, bottom);
   }
 
-  private void applyPadding(CSSShorthand padding, CSSShorthand border) {
+  public void applyPadding(CSSShorthand padding, CSSShorthand border) {
     int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
     int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
     int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
