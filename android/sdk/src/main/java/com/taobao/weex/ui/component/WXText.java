@@ -191,10 +191,10 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
             measureHeight = layout.getHeight();
           }
         } else {
-          if (widthMeasureMode == MeasureMode.ATMOST) {
+          if (widthMeasureMode == MeasureMode.UNSPECIFIED) {
             measureWidth = 0;
           }
-          if (heightMeasureMode == MeasureMode.ATMOST) {
+          if (heightMeasureMode == MeasureMode.UNSPECIFIED) {
             measureHeight = 0;
           }
         }

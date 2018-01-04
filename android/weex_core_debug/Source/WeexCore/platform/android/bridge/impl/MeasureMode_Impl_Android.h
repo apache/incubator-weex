@@ -8,7 +8,7 @@ namespace WeexCore {
 
   jint getEXACTLY(JNIEnv *env);
 
-  jint getATMOST(JNIEnv *env);
+  jint getUNSPECIFIED(JNIEnv *env);
 }
 
 
