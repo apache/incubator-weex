@@ -377,14 +377,6 @@ namespace WeexCore {
         return mCssStyle->mFlexWrap == WXCore_Wrap_NoWrap || isnan(mainSize);
       }
 
-      float getLargestMainSize() {
-        float largestSize = 0;
-        for (WXCoreFlexLine *flexLine : mFlexLines) {
-          largestSize = std::max(largestSize, flexLine->mMainSize);
-        }
-        return largestSize;
-      }
-
       void sumFlexGrow(const WXCoreLayoutNode* child, WXCoreFlexLine* flexLine, const Index i, const bool horizontal) {
         if (child->mCssStyle->mFlexGrow> 0) {
           flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
@@ -880,7 +872,6 @@ namespace WeexCore {
       return true;
     }
 
-
       //TODO this should replace by dirty
     bool isDirty() {
       return true;
@@ -911,7 +902,13 @@ namespace WeexCore {
       return isnan(value);
     }
 
-   float getTotalMainSize();
+    float getLargestMainSize() {
+      float largestSize = 0;
+      for (WXCoreFlexLine *flexLine : mFlexLines) {
+        largestSize = std::max(largestSize, flexLine->mMainSize);
+      }
+      return largestSize;
+    }
 
   };
 }

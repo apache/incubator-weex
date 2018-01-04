@@ -398,14 +398,6 @@ namespace WeexCore {
       }
     }
 
-    float WXCoreLayoutNode::getTotalMainSize() {
-      float sum = 0;
-      for (WXCoreFlexLine *flexLine : mFlexLines) {
-        sum += flexLine->mMainSize;
-      }
-      return sum;
-    }
-
   void WXCoreLayoutNode::layout(float left, float top, float right, float bottom) {
     switch (mCssStyle->mPositionType) {
       case WXCore_PositionType_Absolute:
