@@ -823,6 +823,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   }
 
   private static boolean shouldDirty(Map<String,Object> updates){
+    if(updates.size() > 0){
+      return  true;
+    }
     Set<Map.Entry<String, Object>>   entries =  updates.entrySet();
     for(Map.Entry<String, Object> entry : entries){
       if(dirtyStyle.contains(entry.getKey())){
