@@ -1781,27 +1781,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             performance.appendErrMsg("|");
             performance.appendErrMsg(response.errorMsg);
 
-			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
-					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
-					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
-					"\n response.errorCode=" + response.errorCode +
-					"\n response.errorMsg=" +  response.errorMsg +
-					"\n response=" + getTemplateInfo(),
-					null);
-
           }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
             performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
             performance.appendErrMsg(response.statusCode);
             performance.appendErrMsg("|template is null!");
-
-			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
-					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
-					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED_TEMPLATE_NULL", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
-							"\n response.errorCode=" + response.errorCode +
-							"\n response.errorMsg=" +  response.errorMsg +
-							"\n response=" + getTemplateInfo(),
-					null);
-
           }else {
             performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
 		  }
@@ -1817,10 +1800,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         render(pageName, template, options, jsonInitData, flag);
 
 		// check content-type
-      } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+      } else if (TextUtils.equals(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
 			  response.statusCode)) {
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
-        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+        onRenderError(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
 				"|response.errorMsg==" + response.errorMsg +
 				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
 				"|instance bundleUrl = \n" + instance.getBundleUrl() +
@@ -1831,13 +1814,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
 		WXLogUtils.e("user intercept: WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED");
 		onRenderError(
-				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorCode(),
-				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorMsg() +
+				WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode(),
+                WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode() +
 				"|response.errorMsg==" + response.errorMsg +
 				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
 	  }
       else {
-        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode(),
+        onRenderError(WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode(),
 				response.errorMsg);
       }
     }

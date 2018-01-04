@@ -33,7 +33,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -1284,8 +1283,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
         if (instance != null) {
           instance.onRenderError(
-				  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-				  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg()
+				 WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+				  WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg()
 				  + "invokeRefreshInstance FAILED for JSFrameworkInit FAILED, intance will invoke instance.onRenderError"
 		  );
         }
@@ -1398,8 +1397,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(template) || mJSHandler == null) {
       instance.onRenderError(
-			  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-			  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg() +
+			  WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+			  WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
 	  " instanceId==" + instanceId + " template ==" + template + " mJSHandler== " + mJSHandler.toString()
 	  );
       return;
@@ -1407,8 +1406,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (!isJSFrameworkInit() && reInitCount == 1 && !WXEnvironment.sDebugServerConnectable) {
       instance.onRenderError(
-			  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-			  WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg() +
+			  WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+              WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
 	  " isJSFrameworkInit==" + isJSFrameworkInit() + " reInitCount == 1" );
       post(new Runnable() {
         @Override
@@ -1450,8 +1449,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (!isJSFrameworkInit()) {
 		String err = "[WXBridgeManager] invokeCreateInstance: framework.js uninitialized.";
 		instance.onRenderError(
-				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg()
+				WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg()
 		);
         WXLogUtils.e(err);
         return;
@@ -1481,8 +1480,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 				+ instance.getTemplateInfo();
 
         instance.onRenderError(
-        		WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg() + err);
+        		WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() + err);
 		WXLogUtils.e(err);
       }
     }
@@ -1955,15 +1954,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             return;
           } else {
             instance.onRenderError(//DegradPassivity to H5
-            		WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorCode(),
-					WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getDegradErrorMsg() +
+            		WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
 							"reportJSException >>>> instanceId:" + instanceId
 							+ ", exception function:" + function + ", exception:"
 							+ exception
 			);
             //doReportJSException(instanceId,function,exception);
-            WXErrorCode code = instance.mEnd?WXErrorCode.WX_RENDER_ERR_JS_RUNTIME:WXErrorCode.WX_RENDER_ERR_NATIVE_RUNTIME;
-            WXExceptionUtils.commitCriticalExceptionRT(instanceId,code.getErrorCode(),function,exception,null);
+            WXExceptionUtils.commitCriticalExceptionRT(instanceId,WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE.getErrorCode(),function,exception,null);
             return;
           }
         } catch (Exception e) {

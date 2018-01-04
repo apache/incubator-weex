@@ -61,6 +61,7 @@ public class WXJSExceptionInfo {
    */
   private String mJsFrameworkVersion = WXEnvironment.JS_LIB_SDK_VERSION;
 
+  private WXErrorCode.ErrorType mErrorType = WXErrorCode.ErrorType.NATIVE_ERROR;
 
   public WXJSExceptionInfo(String instanceId, String bundleUrl, String errCode, String function, String exception, Map<String,String> extParams) {
     this.mInstanceId = instanceId;
