@@ -1392,16 +1392,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           godView.setLayoutParams(layoutParams);
         }
 
-//        JSONObject style = new JSONObject();
         WXComponent rootComponent = mRootComp;
         if(rootComponent == null){
           return;
         }
         rootComponent.applyLayoutAndEvent(rootComponent);
-        // TODO
-//        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
-//        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
-//        updateRootComponentStyle(style);
+        nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
       }
     }
   }
@@ -1780,6 +1776,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 
   public native void nativeBindInstanceToWXCore(String instanceId, WXSDKInstance instance);
+
+  public native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
 
   public native void nativePrintFirstScreenLog(String instanceId);
 

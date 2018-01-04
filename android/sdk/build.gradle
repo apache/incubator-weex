@@ -76,7 +76,6 @@ android {
     println "ARMEABI_Size: "+ARMEABI_Size;
     println "X86_Size:" + X86_Size;
 
-
     defaultConfig {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
         buildConfigField "long", "X86_Size", "${X86_Size}"

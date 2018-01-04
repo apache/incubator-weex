@@ -43,6 +43,17 @@ static void BindInstanceToWXCore(JNIEnv *env, jobject jcaller,
   page->bindInstance_Impl_Android(instance);
 }
 
+static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
+                                                jstring instanceId,
+                                                jfloat defaultWidth,
+                                                jfloat defaultHeight) {
+  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  if (page == nullptr)
+    return;
+
+  page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight);
+}
+
 static void PrintFirstScreenLog(JNIEnv *env, jobject jcaller,
                                 jstring instanceId) {
   RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
