@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(461)
+	__vue_exports__ = __webpack_require__(68)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(470)
+	var __vue_template__ = __webpack_require__(77)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,7 +66,7 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/tabbar.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
@@ -84,13 +84,31 @@
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 437:
-/***/ function(module, exports) {
+/***/ 41:
+/***/ (function(module, exports) {
 
+	/*
+	 * Licensed to the Apache Software Foundation (ASF) under one
+	 * or more contributor license agreements.  See the NOTICE file
+	 * distributed with this work for additional information
+	 * regarding copyright ownership.  The ASF licenses this file
+	 * to you under the Apache License, Version 2.0 (the
+	 * "License"); you may not use this file except in compliance
+	 * with the License.  You may obtain a copy of the License at
+	 *
+	 *   http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing,
+	 * software distributed under the License is distributed on an
+	 * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	 * KIND, either express or implied.  See the License for the
+	 * specific language governing permissions and limitations
+	 * under the License.
+	 */
 	exports.getBaseURL = function (vm) {
-	  var bundleUrl = vm.$getConfig().bundleUrl;
+	  var bundleUrl = weex.config.bundleUrl;
 	  var nativeBase;
 	  var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0 || bundleUrl.indexOf('file://assets/')>=0;
 	  var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
@@ -104,7 +122,7 @@
 	  }
 	  else {
 	    var host = 'localhost:12580';
-	    var matches = /\/\/([^\/]+?)\//.exec(vm.$getConfig().bundleUrl);
+	    var matches = /\/\/([^\/]+?)\//.exec(weex.config.bundleUrl);
 	    if (matches && matches.length >= 2) {
 	      host = matches[1];
 	    }
@@ -121,10 +139,10 @@
 	}
 
 
-/***/ },
+/***/ }),
 
-/***/ 461:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 68:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -135,7 +153,7 @@
 	//
 	//
 
-	var getBaseURL = __webpack_require__(437).getBaseURL;
+	var getBaseURL = __webpack_require__(41).getBaseURL;
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -171,7 +189,7 @@
 	    };
 	  },
 	  components: {
-	    tabbar: __webpack_require__(462)
+	    tabbar: __webpack_require__(69)
 	  },
 	  created: function created() {
 	    var baseURL = getBaseURL(this);
@@ -187,23 +205,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 462:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 69:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(463)
+	__vue_styles__.push(__webpack_require__(70)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(464)
+	__vue_exports__ = __webpack_require__(71)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(469)
+	var __vue_template__ = __webpack_require__(76)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -215,10 +233,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/tabbar.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-72e74326"
+	__vue_options__._scopeId = "data-v-285878a6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -232,10 +250,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 463:
-/***/ function(module, exports) {
+/***/ 70:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "wrapper": {
@@ -265,13 +283,15 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 464:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 71:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	//
+	//
 	//
 	//
 	//
@@ -335,7 +355,7 @@
 	    };
 	  },
 	  components: {
-	    tabitem: __webpack_require__(465)
+	    tabitem: __webpack_require__(72)
 	  },
 	  created: function created() {
 	    this.select(this.selectedIndex);
@@ -363,23 +383,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 465:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 72:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(466)
+	__vue_styles__.push(__webpack_require__(73)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(467)
+	__vue_exports__ = __webpack_require__(74)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(468)
+	var __vue_template__ = __webpack_require__(75)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -391,10 +411,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/tabitem.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/tabitem.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-8733b9ae"
+	__vue_options__._scopeId = "data-v-400b65e9"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -408,10 +428,10 @@
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 466:
-/***/ function(module, exports) {
+/***/ 73:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "container": {
@@ -440,10 +460,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 467:
-/***/ function(module, exports) {
+/***/ 74:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -510,10 +530,10 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 468:
-/***/ function(module, exports) {
+/***/ 75:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -543,17 +563,53 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 469:
-/***/ function(module, exports) {
+/***/ 76:
+/***/ (function(module, exports) {
 
-	module.exports={render:function(){},staticRenderFns:[]}
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', {
+	    staticClass: ["wrapper"]
+	  }, [_vm._l((_vm.tabItems), function(item, i) {
+	    return _c('embed', {
+	      key: i,
+	      staticClass: ["content"],
+	      style: {
+	        visibility: item.visibility
+	      },
+	      attrs: {
+	        "src": item.src,
+	        "type": "weex"
+	      }
+	    })
+	  }), _c('div', {
+	    staticClass: ["tabbar"],
+	    appendAsTree: true,
+	    attrs: {
+	      "append": "tree"
+	    }
+	  }, _vm._l((_vm.tabItems), function(item) {
+	    return _c('tabitem', {
+	      key: item.index,
+	      attrs: {
+	        "index": item.index,
+	        "icon": item.icon,
+	        "title": item.title,
+	        "titleColor": item.titleColor
+	      },
+	      on: {
+	        "tabItemOnClick": _vm.tabItemOnClick
+	      }
+	    })
+	  }))], 2)
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 470:
-/***/ function(module, exports) {
+/***/ 77:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
@@ -567,10 +623,10 @@
 	    on: {
 	      "tabBarOnClick": _vm.tabBarOnClick
 	    }
-	  })], 1)
+	  })])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(612)
+	__vue_styles__.push(__webpack_require__(272)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(613)
+	__vue_exports__ = __webpack_require__(273)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(614)
+	var __vue_template__ = __webpack_require__(274)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,25 +70,29 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/syntax/template-repeat-update.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/syntax/template-repeat-update.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-dd21c108"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 612:
-/***/ function(module, exports) {
+/***/ 272:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "title": {
@@ -102,15 +106,18 @@
 	    "textAlign": "center",
 	    "color": "#FFFFFF",
 	    "backgroundColor": "#808080",
-	    "padding": 20,
+	    "paddingTop": 20,
+	    "paddingRight": 20,
+	    "paddingBottom": 20,
+	    "paddingLeft": 20,
 	    "borderRadius": 5
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 613:
-/***/ function(module, exports) {
+/***/ 273:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -161,35 +168,35 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 614:
-/***/ function(module, exports) {
+/***/ 274:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('text', {
+	  return _c('div', [_c('text', {
 	    staticClass: ["title"]
-	  }, ["Track by"]), _vm._l((_vm.list), function(item, k, $index) {
-	    return _h('text', {
+	  }, [_vm._v("Track by")]), _vm._l((_vm.list), function(item, k, $index) {
+	    return _c('text', {
 	      staticClass: ["subtitle"],
 	      attrs: {
-	        "track-by": "item.key"
+	        "trackBy": "item.key"
 	      }
-	    }, [_vm._s($index) + "-" + _vm._s(item.text)])
-	  }), _h('text', {
+	    }, [_vm._v(_vm._s($index) + "-" + _vm._s(item.text))])
+	  }), _c('text', {
 	    staticClass: ["btn"],
 	    on: {
 	      "click": _vm.update
 	    }
-	  }, ["Update"]), _h('text', {
+	  }, [_vm._v("Update")]), _c('text', {
 	    staticClass: ["btn"],
 	    on: {
 	      "click": _vm.mutate
 	    }
-	  }, ["Mutate"])])
+	  }, [_vm._v("Mutate")])], 2)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

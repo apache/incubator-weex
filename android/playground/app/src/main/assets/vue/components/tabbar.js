@@ -45,16 +45,16 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(445)
+	__vue_exports__ = __webpack_require__(68)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(454)
+	var __vue_template__ = __webpack_require__(77)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,28 +66,49 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/components/tabbar.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 421:
-/***/ function(module, exports) {
+/***/ 41:
+/***/ (function(module, exports) {
 
+	/*
+	 * Licensed to the Apache Software Foundation (ASF) under one
+	 * or more contributor license agreements.  See the NOTICE file
+	 * distributed with this work for additional information
+	 * regarding copyright ownership.  The ASF licenses this file
+	 * to you under the Apache License, Version 2.0 (the
+	 * "License"); you may not use this file except in compliance
+	 * with the License.  You may obtain a copy of the License at
+	 *
+	 *   http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing,
+	 * software distributed under the License is distributed on an
+	 * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	 * KIND, either express or implied.  See the License for the
+	 * specific language governing permissions and limitations
+	 * under the License.
+	 */
 	exports.getBaseURL = function (vm) {
-	  var bundleUrl = vm.$getConfig().bundleUrl;
+	  var bundleUrl = weex.config.bundleUrl;
 	  var nativeBase;
 	  var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0 || bundleUrl.indexOf('file://assets/')>=0;
 	  var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
@@ -101,13 +122,13 @@
 	  }
 	  else {
 	    var host = 'localhost:12580';
-	    var matches = /\/\/([^\/]+?)\//.exec(vm.$getConfig().bundleUrl);
+	    var matches = /\/\/([^\/]+?)\//.exec(weex.config.bundleUrl);
 	    if (matches && matches.length >= 2) {
 	      host = matches[1];
 	    }
 	    nativeBase = 'http://' + host + '/' + vm.dir + '/build/';
 	  }
-	  var h5Base = './index.html?page=./' + vm.dir + '/build/';
+	  var h5Base = './vue.html?page=./' + vm.dir + '/build/';
 	  // in Native
 	  var base = nativeBase;
 	  if (typeof window === 'object') {
@@ -118,10 +139,10 @@
 	}
 
 
-/***/ },
+/***/ }),
 
-/***/ 445:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 68:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -132,7 +153,7 @@
 	//
 	//
 
-	var getBaseURL = __webpack_require__(421).getBaseURL;
+	var getBaseURL = __webpack_require__(41).getBaseURL;
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -168,7 +189,7 @@
 	    };
 	  },
 	  components: {
-	    tabbar: __webpack_require__(446)
+	    tabbar: __webpack_require__(69)
 	  },
 	  created: function created() {
 	    var baseURL = getBaseURL(this);
@@ -184,23 +205,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 446:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 69:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(447)
+	__vue_styles__.push(__webpack_require__(70)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(448)
+	__vue_exports__ = __webpack_require__(71)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(453)
+	var __vue_template__ = __webpack_require__(76)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -212,23 +233,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/tabbar.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-285878a6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 447:
-/***/ function(module, exports) {
+/***/ 70:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "wrapper": {
@@ -258,13 +283,15 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 448:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 71:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	//
+	//
 	//
 	//
 	//
@@ -328,7 +355,7 @@
 	    };
 	  },
 	  components: {
-	    tabitem: __webpack_require__(449)
+	    tabitem: __webpack_require__(72)
 	  },
 	  created: function created() {
 	    this.select(this.selectedIndex);
@@ -356,23 +383,23 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 449:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 72:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(450)
+	__vue_styles__.push(__webpack_require__(73)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(451)
+	__vue_exports__ = __webpack_require__(74)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(452)
+	var __vue_template__ = __webpack_require__(75)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -384,23 +411,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/tabitem.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/tabitem.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-400b65e9"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 450:
-/***/ function(module, exports) {
+/***/ 73:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "container": {
@@ -429,10 +460,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 451:
-/***/ function(module, exports) {
+/***/ 74:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -499,13 +530,13 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 452:
-/***/ function(module, exports) {
+/***/ 75:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["container"],
 	    style: {
 	      backgroundColor: _vm.backgroundColor
@@ -513,35 +544,36 @@
 	    on: {
 	      "click": _vm.onclickitem
 	    }
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["top-line"],
 	    attrs: {
 	      "src": "http://gtms03.alicdn.com/tps/i3/TB1mdsiMpXXXXXpXXXXNw4JIXXX-640-4.png"
 	    }
-	  }), _h('image', {
+	  }), _c('image', {
 	    staticClass: ["tab-icon"],
 	    attrs: {
 	      "src": _vm.icon
 	    }
-	  }), _h('text', {
+	  }), _c('text', {
 	    staticClass: ["tab-text"],
 	    style: {
 	      color: _vm.titleColor
 	    }
-	  }, [_vm._s(_vm.title)])])
+	  }, [_vm._v(_vm._s(_vm.title))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 453:
-/***/ function(module, exports) {
+/***/ 76:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["wrapper"]
-	  }, [_vm._l((_vm.tabItems), function(item) {
-	    return _h('embed', {
+	  }, [_vm._l((_vm.tabItems), function(item, i) {
+	    return _c('embed', {
+	      key: i,
 	      staticClass: ["content"],
 	      style: {
 	        visibility: item.visibility
@@ -551,14 +583,15 @@
 	        "type": "weex"
 	      }
 	    })
-	  }), _h('div', {
+	  }), _c('div', {
 	    staticClass: ["tabbar"],
 	    appendAsTree: true,
 	    attrs: {
 	      "append": "tree"
 	    }
-	  }, [_vm._l((_vm.tabItems), function(item) {
-	    return _h('tabitem', {
+	  }, _vm._l((_vm.tabItems), function(item) {
+	    return _c('tabitem', {
+	      key: item.index,
 	      attrs: {
 	        "index": item.index,
 	        "icon": item.icon,
@@ -569,21 +602,21 @@
 	        "tabItemOnClick": _vm.tabItemOnClick
 	      }
 	    })
-	  })])])
+	  }))], 2)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 454:
-/***/ function(module, exports) {
+/***/ 77:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticStyle: {
 	      flexDirection: "column"
 	    }
-	  }, [_h('tabbar', {
+	  }, [_c('tabbar', {
 	    attrs: {
 	      "tabItems": _vm.tabItems
 	    },
@@ -594,6 +627,6 @@
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

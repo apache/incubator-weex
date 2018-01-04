@@ -70,7 +70,7 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
 }
 
 
-- (void)doBlock:(void (^)())block
+- (void)doBlock:(void (^)(void))block
 {
     block();
 }

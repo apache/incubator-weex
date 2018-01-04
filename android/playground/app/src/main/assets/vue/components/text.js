@@ -45,20 +45,20 @@
 /******/ ({
 
 /***/ 0:
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(455)
+	__vue_styles__.push(__webpack_require__(78)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(456)
+	__vue_exports__ = __webpack_require__(79)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(457)
+	var __vue_template__ = __webpack_require__(80)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,38 +70,42 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/components/text.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/components/text.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-c5678ba4"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
 	new Vue(module.exports)
 
 
-/***/ },
+/***/ }),
 
-/***/ 383:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 3:
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(384)
+	__vue_styles__.push(__webpack_require__(4)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(385)
+	__vue_exports__ = __webpack_require__(5)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(386)
+	var __vue_template__ = __webpack_require__(6)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,23 +117,27 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/lixinke/git/other/weex/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/Hanks/Codes/work/incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-58511ff6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
-/***/ },
+/***/ }),
 
-/***/ 384:
-/***/ function(module, exports) {
+/***/ 4:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "panel": {
@@ -177,13 +185,19 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
+	  },
+	  "panel-body": {
+	    "paddingLeft": 12,
+	    "paddingRight": 12,
+	    "paddingTop": 20,
+	    "paddingBottom": 20
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 385:
-/***/ function(module, exports) {
+/***/ 5:
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -225,18 +239,18 @@
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 386:
-/***/ function(module, exports) {
+/***/ 6:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -244,7 +258,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -252,14 +266,14 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ },
+/***/ }),
 
-/***/ 455:
-/***/ function(module, exports) {
+/***/ 78:
+/***/ (function(module, exports) {
 
 	module.exports = {
 	  "txt": {
@@ -268,10 +282,10 @@
 	  }
 	}
 
-/***/ },
+/***/ }),
 
-/***/ 456:
-/***/ function(module, exports, __webpack_require__) {
+/***/ 79:
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -331,183 +345,183 @@
 
 	module.exports = {
 	  components: {
-	    panel: __webpack_require__(383)
+	    panel: __webpack_require__(3)
 	  }
 	};
 
-/***/ },
+/***/ }),
 
-/***/ 457:
-/***/ function(module, exports) {
+/***/ 80:
+/***/ (function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', [_h('panel', {
+	  return _c('scroller', [_c('panel', {
 	    attrs: {
 	      "title": "color",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"]
-	  }, ["default is black"]), _h('text', {
+	  }, [_vm._v("default is black")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      color: "#286090"
 	    }
-	  }, ["#286090"]), _h('text', {
+	  }, [_vm._v("#286090")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      color: "#0f0"
 	    }
-	  }, ["#0f0"]), _h('text', {
+	  }, [_vm._v("#0f0")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      color: "red"
 	    }
-	  }, ["keyword"]), _h('text', {
+	  }, [_vm._v("keyword")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      color: "rgb(238, 162, 54)"
 	    }
-	  }, ["rgb(238, 162, 54)"]), _h('text', {
+	  }, [_vm._v("rgb(238, 162, 54)")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      color: "rgba(238, 162, 54, 0.5)"
 	    }
-	  }, ["rgba(238, 162, 54, 0.5)"])]), _h('panel', {
+	  }, [_vm._v("rgba(238, 162, 54, 0.5)")])]), _c('panel', {
 	    attrs: {
 	      "title": "font-size",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontSize: "32px"
 	    }
-	  }, ["32"]), _h('text', {
+	  }, [_vm._v("32")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontSize: "64px"
 	    }
-	  }, ["64"]), _h('text', {
+	  }, [_vm._v("64")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontSize: "100px"
 	    }
-	  }, ["100"])]), _h('panel', {
+	  }, [_vm._v("100")])]), _c('panel', {
 	    attrs: {
 	      "title": "font-style",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontStyle: "normal"
 	    }
-	  }, ["normal"]), _h('text', {
+	  }, [_vm._v("normal")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontStyle: "italic"
 	    }
-	  }, ["italic"])]), _h('panel', {
+	  }, [_vm._v("italic")])]), _c('panel', {
 	    attrs: {
 	      "title": "font-weight",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontWeight: "normal"
 	    }
-	  }, ["normal"]), _h('text', {
+	  }, [_vm._v("normal")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      fontWeight: "bold"
 	    }
-	  }, ["bold"])]), _h('panel', {
+	  }, [_vm._v("bold")])]), _c('panel', {
 	    attrs: {
 	      "title": "text-decoration",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textDecoration: "none"
 	    }
-	  }, ["none"]), _h('text', {
+	  }, [_vm._v("none")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textDecoration: "underline"
 	    }
-	  }, ["underline"]), _h('text', {
+	  }, [_vm._v("underline")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textDecoration: "line-through"
 	    }
-	  }, ["line-through"])]), _h('panel', {
+	  }, [_vm._v("line-through")])]), _c('panel', {
 	    attrs: {
 	      "title": "text-align",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textAlign: "left"
 	    }
-	  }, ["left"]), _h('text', {
+	  }, [_vm._v("left")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textAlign: "center"
 	    }
-	  }, ["center"]), _h('text', {
+	  }, [_vm._v("center")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textAlign: "right"
 	    }
-	  }, ["right"])]), _h('panel', {
+	  }, [_vm._v("right")])]), _c('panel', {
 	    attrs: {
 	      "title": "text-overflow",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      lines: "1"
 	    }
-	  }, ["no text-overflow, no text-overflow"]), _h('text', {
+	  }, [_vm._v("no text-overflow, no text-overflow")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textOverflow: "clip",
 	      width: "450px",
 	      lines: "1"
 	    }
-	  }, ["text-overflow: clip, text-overflow: clip"]), _h('text', {
+	  }, [_vm._v("text-overflow: clip, text-overflow: clip")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
 	      textOverflow: "ellipsis",
 	      width: "450px",
 	      lines: "1"
 	    }
-	  }, ["text-overflow: ellipsis, text-overflow: ellipsis"])]), _h('panel', {
+	  }, [_vm._v("text-overflow: ellipsis, text-overflow: ellipsis")])]), _c('panel', {
 	    attrs: {
 	      "title": "line-height",
 	      "type": "primary"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticClass: ["txt"]
-	  }, ["no lineheight setting"]), _h('text', {
+	  }, [_vm._v("no lineheight setting")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
-	      lineHeight: "50"
+	      lineHeight: "50px"
 	    }
-	  }, ["lineheight 50"]), _h('text', {
+	  }, [_vm._v("lineheight 50")]), _c('text', {
 	    staticClass: ["txt"],
 	    staticStyle: {
-	      lineHeight: "80"
+	      lineHeight: "80px"
 	    }
-	  }, [" lineheight 80"])])])
+	  }, [_vm._v(" lineheight 80")])])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
-/***/ }
+/***/ })
 
 /******/ });

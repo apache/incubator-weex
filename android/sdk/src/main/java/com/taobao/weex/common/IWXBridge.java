@@ -52,6 +52,12 @@ public interface IWXBridge extends IWXObject {
    */
   int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
+  /**
+   * execute javascript function, return execute result as json array
+   */
+  byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args);
+
+
   int execJSService(String javascript);
 
   /**
