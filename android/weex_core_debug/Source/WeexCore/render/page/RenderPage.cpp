@@ -86,14 +86,14 @@ namespace WeexCore {
     switch (pRoot->getFlexDirection()) {
       case WXCore_Flex_Direction_Column:
       case WXCore_Flex_Direction_Column_Reverse:
-        if (pRoot->getTotalMainSize() * radio > deviceHeight / 2) {
+        if (pRoot->getLargestMainSize() * radio > deviceHeight / 2) {
           traverseTree(pRoot);
         }
         break;
       case WXCore_Flex_Direction_Row:
       case WXCore_Flex_Direction_Row_Reverse:
       default:
-        if (pRoot->getTotalMainSize() * radio > deviceWidth / 2) {
+        if (pRoot->getLargestMainSize() * radio > deviceWidth / 2) {
           traverseTree(pRoot);
         }
         break;
