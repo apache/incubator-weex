@@ -347,6 +347,13 @@ namespace WeexCore {
     return true;
   }
 
+  void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
+                                                          const float defaultHeight) {
+    pRoot->setStyleWidth(defaultWidth);
+    pRoot->setStyleHeight(defaultHeight);
+    calculateLayout();
+  }
+
   bool RenderPage::addEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = getRenderObject(ref);
@@ -537,5 +544,9 @@ namespace WeexCore {
   void RenderPage::printRenderSuccessLog() {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->printPerformanceLog(onRenderSuccess);
+  }
+
+  void RenderPage::batch() {
+
   }
 } //namespace WeexCore

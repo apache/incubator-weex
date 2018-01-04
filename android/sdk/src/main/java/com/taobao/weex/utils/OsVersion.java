@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.util;
+package com.taobao.weex.utils;
 
 /**
  * Android OS version utilities.

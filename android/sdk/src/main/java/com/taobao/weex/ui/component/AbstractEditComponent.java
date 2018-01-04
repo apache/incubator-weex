@@ -203,6 +203,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       });
     } else if (type.equals(Constants.Event.INPUT)) {
       text.addTextChangedListener(new TextWatcher() {
+        boolean  hasChangeForDefaultValue = false;
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -220,6 +221,17 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           }
 
           mBeforeText = s.toString();
+
+          if(!hasChangeForDefaultValue){
+            if (getAttrs() != null) {
+              Object val = getAttrs().get(Constants.Name.VALUE);
+              String valString = WXUtils.getString(val, null);
+              if (mBeforeText != null && mBeforeText.equals(valString)) {
+                hasChangeForDefaultValue = true;
+                return;
+              }
+            }
+          }
 
           if (!mIgnoreNextOnInputEvent) {
             fireEvent(Constants.Event.INPUT, s.toString());
@@ -456,7 +468,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
     if (getHostView() != null && fontSize != null ) {
-      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getStyles(),getInstance().getInstanceViewPortWidth()));
+      Map<String, Object> map = new HashMap<>(1);
+      map.put(Constants.Name.FONT_SIZE, fontSize);
+      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(map, getInstance().getInstanceViewPortWidth()));
     }
   }
 

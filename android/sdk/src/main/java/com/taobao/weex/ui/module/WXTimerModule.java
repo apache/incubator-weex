@@ -27,11 +27,13 @@ import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_TIMEOUT;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
-import com.taobao.weex.WXSDKManager;
+
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXHashMap;
@@ -62,16 +64,16 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
 
   @JSMethod(uiThread = false)
-  public void setTimeout(@IntRange(from = 1) int funcId, @IntRange(from = 0) int delay) {
+  public void setTimeout(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float delay) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_TIMEOUT, funcId, delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 
   @JSMethod(uiThread = false)
-  public void setInterval(@IntRange(from = 1) int funcId, @IntRange(from = 0) int interval) {
+  public void setInterval(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float interval) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_INTERVAL, funcId, interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 
@@ -94,7 +96,9 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   @Override
   public void destroy() {
     if (handler != null) {
-      WXLogUtils.d(TAG, "Timer Module removeAllMessages: ");
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "Timer Module removeAllMessages: ");
+      }
       handler.removeCallbacksAndMessages(null);
       antiIntAutoBoxing.clear();
     }
@@ -106,7 +110,9 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     WXJSObject[] args;
     if (msg != null) {
       int what = msg.what;
-      WXLogUtils.d(TAG, "Timer Module handleMessage : " + msg.what);
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "Timer Module handleMessage : " + msg.what);
+      }
       switch (what) {
         case MODULE_TIMEOUT:
           if (msg.obj == null) {
@@ -147,14 +153,13 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     task.put(KEY_ARGS, argsList);
     Object[] tasks = {task};
     return new WXJSObject[]{
-        new WXJSObject(WXJSObject.String, String.valueOf(instanceId)),
-        new WXJSObject(WXJSObject.JSON,
-                       WXJsonUtils.fromObjectToJSONString(tasks))};
+            new WXJSObject(WXJSObject.String, String.valueOf(instanceId)),
+            new WXJSObject(WXJSObject.JSON,
+                    WXJsonUtils.fromObjectToJSONString(tasks))};
   }
 
   private void postOrHoldMessage(@MessageType final int what,final int funcId,final int interval,final int instanceId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      // TODO
 //      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
 //        @Override
 //        public void run() {
@@ -168,7 +173,6 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void removeOrHoldMessage(@MessageType final int what,final int funcId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      // TODO
 //      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
 //        @Override
 //        public void run() {
@@ -181,8 +185,8 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   }
 
   private void postMessage(@MessageType int what,
-      @IntRange(from = 1) int funcId,
-      @IntRange(from = 0) int interval, int instanceId) {
+                           @IntRange(from = 1) int funcId,
+                           @IntRange(from = 0) int interval, int instanceId) {
     if (interval < 0 || funcId <= 0) {
       WXLogUtils.e(TAG, "interval < 0 or funcId <=0");
     } else {
@@ -190,7 +194,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
         antiIntAutoBoxing.put(funcId, funcId);
       }
       Message message = handler
-          .obtainMessage(what, instanceId, interval, antiIntAutoBoxing.get(funcId));
+              .obtainMessage(what, instanceId, interval, antiIntAutoBoxing.get(funcId));
       handler.sendMessageDelayed(message, interval);
     }
   }

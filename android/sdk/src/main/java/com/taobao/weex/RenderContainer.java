@@ -22,8 +22,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
 
 
@@ -35,7 +33,6 @@ import java.lang.ref.WeakReference;
 
 public class RenderContainer extends FrameLayout {
   private WeakReference<WXSDKInstance> mSDKInstance;
-  private WeexFrameRateControl mFrameRateControl;
 
   public RenderContainer(Context context) {
     super(context);
@@ -56,7 +53,6 @@ public class RenderContainer extends FrameLayout {
 
   public void setSDKInstance(WXSDKInstance instance) {
     mSDKInstance = new WeakReference<>(instance);
-    mFrameRateControl = new WeexFrameRateControl(mSDKInstance.get());
   }
 
   @Override
@@ -67,35 +63,5 @@ public class RenderContainer extends FrameLayout {
       //re-render instance
       instance.setSize(w, h);
     }
-  }
-
-  @Override
-  public void onAttachedToWindow() {
-      super.onAttachedToWindow();
-      if (mFrameRateControl != null) {
-          mFrameRateControl.start();
-      }
-  }
-
-  @Override
-  protected void onDetachedFromWindow() {
-      super.onDetachedFromWindow();
-      if (mFrameRateControl != null) {
-          mFrameRateControl.stop();
-          mFrameRateControl = null;
-      }
-  }
-  @Override
-  public void dispatchWindowVisibilityChanged(int visibility) {
-      super.dispatchWindowVisibilityChanged(visibility);
-      if (visibility == View.GONE) {
-          if (mFrameRateControl != null) {
-              mFrameRateControl.stop();
-          }
-      } else if (visibility == View.VISIBLE) {
-          if (mFrameRateControl != null) {
-              mFrameRateControl.start();
-          }
-      }
   }
 }

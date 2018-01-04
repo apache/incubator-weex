@@ -2,6 +2,8 @@
 #include <WeexCore/platform/android/jsengine/multiprocess/WeexProxy.h>
 #include <WeexCore/platform/android/base/jni/android_jni.h>
 #include <WeexCore/platform/android/jniprebuild/jniheader/WXBridge_jni.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
+#include <WeexCore/render/manager/RenderManager.h>
 
 using namespace WeexCore;
 
@@ -57,8 +59,7 @@ static void TakeHeapSnapshot(JNIEnv *env,
 static void OnVsync(JNIEnv *env,
                     jobject object,
                     jstring jinstanceId) {
-
-
+  RenderManager::getInstance()->batch(jString2Str(env, jinstanceId));
   // LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
 }
 

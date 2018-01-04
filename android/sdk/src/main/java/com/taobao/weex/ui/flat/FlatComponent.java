@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,35 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.flat;
 
-import android.app.Application;
 
-import com.taobao.prettyfish.PrettyFishCommon;
-import com.taobao.prettyfish.core.comp.AbstractBaseComp;
-import com.taobao.prettyfish.core.fab.FloatWndManager;
-import com.taobao.prettyfish_base.R;
+import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 
-/**
- * Created by lixinke on 16/5/4.
- */
-public class WXPrettyFish {
+import com.taobao.weex.ui.flat.widget.Widget;
 
-  public static void init(Application application) {
-    PrettyFishCommon.init(application);
-    AbstractBaseComp wxBaseComp=new AbstractBaseComp() {
-      @Override
-      public int iconRes() {
-        return R.drawable.ic_action_weex;
-      }
+@RestrictTo(Scope.LIBRARY)
+public interface FlatComponent<T extends Widget> {
 
-      @Override
-      public String title() {
-        return "WEEX";
-      }
-    };
-    wxBaseComp.registerComp(new WXPFComponent(application));
-    FloatWndManager.registerBaseComp(wxBaseComp);
-  }
+  boolean promoteToView(boolean checkAncestor);
 
+  @NonNull
+  T getOrCreateFlatWidget();
 }

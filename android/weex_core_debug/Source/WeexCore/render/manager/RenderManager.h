@@ -33,7 +33,7 @@ namespace WeexCore {
 
   public:
 
-    void batch();
+    void batch(const std::string &pageId);
 
     // create root node
     bool createPage(const std::string &pageId, const std::string &data);

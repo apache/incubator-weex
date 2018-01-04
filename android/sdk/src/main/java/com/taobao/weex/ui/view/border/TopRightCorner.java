@@ -25,44 +25,39 @@ import android.support.annotation.NonNull;
 class TopRightCorner extends BorderCorner {
 
   TopRightCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
-    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox);
-  }
-
-  @Override
-  protected float getAngleBisectorDegree() {
-    return 315;
+    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 315);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerExist() {
     return new RectF(getBorderBox().width() - (2 * getOuterCornerRadius() - getPostBorderWidth() / 2),
-                     getPreBorderWidth() / 2,
-                     getBorderBox().width() - getPostBorderWidth() / 2,
-                     2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
+            getPreBorderWidth() / 2,
+            getBorderBox().width() - getPostBorderWidth() / 2,
+            2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerNotExist() {
     return new RectF(getBorderBox().width() - 1.5f * getOuterCornerRadius(),
-                     getOuterCornerRadius() / 2,
-                     getBorderBox().width()-getOuterCornerRadius()/2,
-                     getOuterCornerRadius() * 1.5f);
+            getOuterCornerRadius() / 2,
+            getBorderBox().width()-getOuterCornerRadius()/2,
+            getOuterCornerRadius() * 1.5f);
   }
 
   @NonNull
   @Override
   protected PointF getRoundCornerStart() {
     return new PointF(getBorderBox().width() - getOuterCornerRadius(),
-                      getPreBorderWidth() / 2);
+            getPreBorderWidth() / 2);
   }
 
   @NonNull
   @Override
   protected PointF getSharpCornerVertex() {
     return new PointF(getBorderBox().width() - getPostBorderWidth() / 2,
-                      getPreBorderWidth() / 2);
+            getPreBorderWidth() / 2);
   }
 
   @NonNull
@@ -85,6 +80,6 @@ class TopRightCorner extends BorderCorner {
   @Override
   protected PointF getRoundCornerEnd() {
     return new PointF(getBorderBox().width() - getPostBorderWidth() / 2,
-                      getOuterCornerRadius());
+            getOuterCornerRadius());
   }
 }

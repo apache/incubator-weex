@@ -426,28 +426,4 @@ public class WXBridge implements IWXBridge {
     }
     return errorCode;
   }
-
-  public int callAddElement(String instanceId, String parentRef, byte[] dom, String index) {
-    return callAddElement(instanceId, parentRef, new String(dom), index);
-  }
-
-  /**
-   * JSF render Node by callAddElement
-   */
-  public int callAddElement(String instanceId, String parentRef, String dom, String index) {
-
-    int errorCode = IWXBridge.INSTANCE_RENDERING;
-
-    try {
-      errorCode = WXBridgeManager.getInstance().callAddElement(instanceId, parentRef, dom, index);
-    } catch (Throwable e) {
-      e.printStackTrace();
-      WXLogUtils.e(TAG, "callAddElement throw error:" + e.getMessage());
-    }
-
-    if (errorCode == IWXBridge.DESTROY_INSTANCE) {
-      WXLogUtils.w("destroyInstance :" + instanceId + " JSF must stop callAddElement");
-    }
-    return errorCode;
-  }
 }

@@ -25,44 +25,39 @@ import android.support.annotation.NonNull;
 class BottomRightCorner extends BorderCorner {
 
   BottomRightCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
-    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox);
-  }
-
-  @Override
-  protected float getAngleBisectorDegree() {
-    return 45;
+    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 45);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerExist() {
     return new RectF(getBorderBox().width() - (2 * getOuterCornerRadius() - getPreBorderWidth() / 2),
-                     getBorderBox().height() - (2 * getOuterCornerRadius() - getPostBorderWidth() / 2),
-                     getBorderBox().width() - (getPreBorderWidth() / 2),
-                     getBorderBox().height() - (getPostBorderWidth() / 2));
+            getBorderBox().height() - (2 * getOuterCornerRadius() - getPostBorderWidth() / 2),
+            getBorderBox().width() - (getPreBorderWidth() / 2),
+            getBorderBox().height() - (getPostBorderWidth() / 2));
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerNotExist() {
     return new RectF(getBorderBox().width() - 1.5f * getOuterCornerRadius(),
-                     getBorderBox().height() - 1.5f * getOuterCornerRadius(),
-                     getBorderBox().width()-getOuterCornerRadius()/2,
-                     getBorderBox().height()-getOuterCornerRadius()/2);
+            getBorderBox().height() - 1.5f * getOuterCornerRadius(),
+            getBorderBox().width()-getOuterCornerRadius()/2,
+            getBorderBox().height()-getOuterCornerRadius()/2);
   }
 
   @NonNull
   @Override
   protected PointF getRoundCornerStart() {
     return new PointF(getBorderBox().width() - getPreBorderWidth() / 2,
-                      getBorderBox().height() - getOuterCornerRadius());
+            getBorderBox().height() - getOuterCornerRadius());
   }
 
   @NonNull
   @Override
   protected PointF getSharpCornerVertex() {
     return new PointF(getBorderBox().width() - getPreBorderWidth() / 2,
-                      getBorderBox().height() - getPostBorderWidth() / 2);
+            getBorderBox().height() - getPostBorderWidth() / 2);
   }
 
   @NonNull
@@ -85,6 +80,6 @@ class BottomRightCorner extends BorderCorner {
   @Override
   protected PointF getRoundCornerEnd() {
     return new PointF(getBorderBox().width() - getOuterCornerRadius(),
-                      getBorderBox().height() - getPostBorderWidth() / 2);
+            getBorderBox().height() - getPostBorderWidth() / 2);
   }
 }
