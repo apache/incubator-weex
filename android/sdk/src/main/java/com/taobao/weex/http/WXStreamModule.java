@@ -67,9 +67,8 @@ public class WXStreamModule extends WXModule {
    */
   @Deprecated
   @JSMethod(uiThread = false)
-  public void sendHttp(String params, final String callback) {
+  public void sendHttp(JSONObject paramsObj, final String callback) {
 
-    JSONObject paramsObj = JSON.parseObject(params);
     String method = paramsObj.getString("method");
     String url = paramsObj.getString("url");
     JSONObject headers = paramsObj.getJSONObject("header");
@@ -106,33 +105,27 @@ public class WXStreamModule extends WXModule {
    *
    * @param optionsStr request options include:
    *  method: GET 、POST、PUT、DELETE、HEAD、PATCH
-   *  headers：object，请求header
+   *  headers：object，request header
    *  url:
    *  body: "Any body that you want to add to your request"
-   *  type: json、text、jsonp（native实现时等价与json）
+   *  type: json、text、jsonp（json）
    * @param callback finished callback,response object:
    *  status：status code
-   *  ok：boolean 是否成功，等价于status200～299
-   *  statusText：状态消息，用于定位具体错误原因
-   *  data: 响应数据，当请求option中type为json，时data为object，否则data为string类型
-   *  headers: object 响应头
+   *  ok：boolean is success，http status200～299
+   *  statusText： statusText
+   *  data:  option type is json，data is object，not data is string
+   *  headers: headers
    *
    * @param progressCallback in progress callback,for download progress and request state,response object:
-   *  readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
+   *  readyState: number connection status 1 OPENED 2 HEADERS_RECEIVED 3 LOADING
    *  status：status code
-   *  length：当前获取的字节数，总长度从headers里「Content-Length」获取
-   *  statusText：状态消息，用于定位具体错误原因
-   *  headers: object 响应头
+   *  length：headers Content-Length
+   *  statusText：statusText
+   *  headers: headers
    */
   @JSMethod(uiThread = false)
-  public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback){
 
-    JSONObject optionsObj = null;
-    try {
-      optionsObj = JSON.parseObject(optionsStr);
-    }catch (JSONException e){
-      WXLogUtils.e("", e);
-    }
 
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
@@ -309,9 +302,9 @@ public class WXStreamModule extends WXModule {
     @Override
     public void onHttpStart() {
       if(mProgressCallback !=null) {
-        mResponse.put("readyState",1);//readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
+        mResponse.put("readyState",1);//readyState: number 1 OPENED 2 HEADERS_RECEIVED 3 LOADING
         mResponse.put("length",0);
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -339,7 +332,7 @@ public class WXStreamModule extends WXModule {
       mResponse.put("headers", simpleHeaders);
       mRespHeaders = simpleHeaders;
       if (mProgressCallback != null) {
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -347,7 +340,7 @@ public class WXStreamModule extends WXModule {
     public void onHttpResponseProgress(int loadedLength) {
       mResponse.put("length",loadedLength);
       if(mProgressCallback!=null){
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
 
     }
