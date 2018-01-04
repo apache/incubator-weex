@@ -20,6 +20,8 @@ package com.taobao.weex.common;
 
 
 public enum WXErrorCode {
+
+
     /*
      * environment
      **/
@@ -245,7 +247,15 @@ public enum WXErrorCode {
   WX_DEGRAD_ERR_OTHER_CAUSE_DEGRADTOH5("-1005", "degradeToH5|for other reason|",ErrorType.DEGRAD_ERROR,ErrorGroup.NATIVE),
 
 
-  WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS);
+  WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
+
+
+
+  /**
+   * TEST
+   */
+
+  WX_ERR_TEST("test", "test",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE);
 
   private String errorCode;
   private String errorMsg;

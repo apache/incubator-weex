@@ -170,7 +170,7 @@ public class WXModuleManager {
       }
     } catch (Exception e) {
 	  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED,
 			  "callModuleMethod",
 			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
 			  + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "

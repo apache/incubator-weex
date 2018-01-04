@@ -194,7 +194,7 @@ public class WXSDKEngine {
 	if(application == null){
 	  WXLogUtils.e(TAG, " doInitInternal application is null");
 	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
+			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
 			  "doInitInternal",
 			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "WXEnvironment sApplication is null",
 			  null);
@@ -216,7 +216,7 @@ public class WXSDKEngine {
         boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!isSoInitSuccess) {
 		  WXExceptionUtils.commitCriticalExceptionRT(null,
-				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
+				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
 				  "doInitInternal",
 				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
 				  null);
