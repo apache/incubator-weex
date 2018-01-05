@@ -9,7 +9,7 @@ version: 2.1
 
 Vue.js also has many peripheral technology products such as [Vuex](https://github.com/vuejs/vuex) and [vue-router](https://github.com/vuejs/vue-router), etc. Those libraries can also works well in Weex.
 
-> We developed a complete project based on Weex and Vue.js which named [weex-hackernews](https://github.com/weepteam/web-ehackernews). We used Vuex and vue-loader in it, and it works well on both iOS, Android and web.
+> We developed a complete project based on Weex and Vue.js which named [weex-hackernews](https://github.com/weexteam/weex-hackernews). We used Vuex and vue-loader in it, and it works well on both iOS, Android and web.
 
 ## Using Vuex
 
