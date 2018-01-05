@@ -75,6 +75,23 @@ public class GraphicActionAnimation extends BasicGraphicAction {
     this.callback = callBack;
     if (!TextUtils.isEmpty(animation)) {
       this.mAnimationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
+
+      if (null == mAnimationBean || null == mAnimationBean.styles) {
+        return;
+      }
+
+      WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+      if (component == null) {
+        return;
+      }
+
+      WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+      if (instance == null) {
+        return;
+      }
+      this.mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
+              mAnimationBean.styles.transform, (int) component.getLayoutWidth(), (int) component.getLayoutHeight(),
+              instance.getInstanceViewPortWidth());
     }
   }
   public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean,
@@ -100,12 +117,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
       return;
     }
 
-    if (null != mAnimationBean.styles) {
-      mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
-              mAnimationBean.styles.transform, (int) component.getLayoutWidth(), (int) component.getLayoutHeight(),
-              instance.getInstanceViewPortWidth());
-      startAnimation(instance, component);
-    }
+    startAnimation(instance, component);
   }
 
   private void startAnimation(@NonNull WXSDKInstance instance, @Nullable WXComponent component) {
