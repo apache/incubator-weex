@@ -7,11 +7,11 @@ namespace WeexCore {
     RegisterNativesImpl(env);
   }
 
-  jint getEXACTLY(JNIEnv *env) {
+  jint getExactly(JNIEnv *env) {
     return Java_MeasureMode_getEXACTLY(env);
   }
 
-  jint getUNSPECIFIED(JNIEnv *env) {
+  jint getUnspecified(JNIEnv *env) {
     return Java_MeasureMode_getUNSPECIFIED(env);
   }
 }

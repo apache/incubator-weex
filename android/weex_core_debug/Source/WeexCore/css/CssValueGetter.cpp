@@ -7,77 +7,77 @@ namespace WeexCore {
 
   WXCoreFlexDirection getWXCoreFlexDirection(const std::string &value) {
     if (value == COLUMN) {
-      return WeexCore::WXCore_Flex_Direction_Column;
+      return WeexCore::kFlexDirectionColumn;
     } else if (value == ROW) {
-      return WeexCore::WXCore_Flex_Direction_Row;
+      return WeexCore::kFlexDirectionRow;
     } else if (value == COLUMN_REVERSE) {
-      return WeexCore::WXCore_Flex_Direction_Column_Reverse;
+      return WeexCore::kFlexDirectionColumnReverse;
     } else if (value == ROW_REVERSE) {
-      return WeexCore::WXCore_Flex_Direction_Row_Reverse;
+      return WeexCore::kFlexDirectionRowReverse;
     }
-    return WeexCore::WXCore_Flex_Direction_Column;
+    return WeexCore::kFlexDirectionColumn;
   }
 
   WXCoreJustifyContent getWXCoreJustifyContent(const std::string &value) {
     if (value == FLEX_START) {
-      return WeexCore::WXCore_Justify_Flex_Start;
+      return WeexCore::kJustifyFlexStart;
     } else if (value == FLEX_END) {
-      return WeexCore::WXCore_Justify_Flex_End;
+      return WeexCore::kJustifyFlexEnd;
     } else if (value == CENTER) {
-      return WeexCore::WXCore_Justify_Center;
+      return WeexCore::kJustifyCenter;
     } else if (value == SPACE_BETWEEN) {
-      return WeexCore::WXCore_Justify_Space_Between;
+      return WeexCore::kJustifySpaceBetween;
     } else if (value == SPACE_AROUND) {
-      return WeexCore::WXCore_Justify_Space_Around;
+      return WeexCore::kJustifySpaceAround;
     }
-    return WeexCore::WXCore_Justify_Flex_Start;
+    return WeexCore::kJustifyFlexStart;
   }
 
   WXCoreAlignItems getWXCoreAlignItem(const std::string &value) {
     if (value == STRETCH) {
-      return WeexCore::WXCore_AlignItems_Stretch;
+      return WeexCore::kAlignItemsStretch;
     } else if (value == FLEX_START) {
-      return WeexCore::WXCore_AlignItems_Flex_Start;
+      return WeexCore::kAlignItemsFlexStart;
     } else if (value == FLEX_END) {
-      return WeexCore::WXCore_AlignItems_Flex_End;
+      return WeexCore::kAlignItemsFlexEnd;
     } else if (value == CENTER) {
-      return WeexCore::WXCore_AlignItems_Center;
+      return WeexCore::kAlignItemsCenter;
     }
-    return WeexCore::WXCore_AlignItems_Stretch;
+    return WeexCore::kAlignItemsStretch;
   }
 
   WXCoreFlexWrap getWXCoreFlexWrap(const std::string &value) {
     if (value == NOWRAP) {
-      return WeexCore::WXCore_Wrap_NoWrap;
+      return WeexCore::kNoWrap;
     } else if (value == WRAP) {
-      return WeexCore::WXCore_Wrap_Wrap;
+      return WeexCore::kWrap;
     } else if (value == WRAP_REVERSE) {
-      return WeexCore::WXCore_Wrap_WrapReverse;
+      return WeexCore::kWrapReverse;
     }
-    return WeexCore::WXCore_Wrap_NoWrap;
+    return WeexCore::kNoWrap;
   }
 
   WXCoreAlignSelf getWXCoreAlignSelf(const std::string &value) {
     if (value == AUTO) {
-      return WeexCore::WXCore_AlignSelf_Auto;
+      return WeexCore::kAlignSelfAuto;
     } else if (value == STRETCH) {
-      return WeexCore::WXCore_AlignSelf_Stretch;
+      return WeexCore::kAlignSelfStretch;
     } else if (value == FLEX_START) {
-      return WeexCore::WXCore_AlignSelf_Flex_Start;
+      return WeexCore::kAlignSelfFlexStart;
     } else if (value == FLEX_END) {
-      return WeexCore::WXCore_AlignSelf_Flex_End;
+      return WeexCore::kAlignSelfFlexEnd;
     } else if (value == CENTER) {
-      return WeexCore::WXCore_AlignSelf_Center;
+      return WeexCore::kAlignSelfCenter;
     }
-    return WeexCore::WXCore_AlignSelf_Auto;
+    return WeexCore::kAlignSelfAuto;
   }
 
   WXCorePositionType getWXCorePositionType(const std::string &value) {
     if (value == RELATIVE) {
-      return WeexCore::WXCore_PositionType_Relative;
+      return WeexCore::kRelative;
     } else if (value == ABSOLUTE) {
-      return WeexCore::WXCore_PositionType_Absolute;
+      return WeexCore::kAbsolute;
     }
-    return WeexCore::WXCore_PositionType_Relative;
+    return WeexCore::kRelative;
   }
 }

@@ -9,7 +9,7 @@ namespace WeexCore {
 
   public:
 
-    EVENTS_SET *mEvents;
+    EventsSet *mEvents;
     std::string mPageId;
     std::string mRef;
     float mWidth;

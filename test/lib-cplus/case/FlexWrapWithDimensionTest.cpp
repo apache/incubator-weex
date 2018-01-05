@@ -33,9 +33,9 @@ protected:
             if (firstChildInTarget == nullptr) {
                 firstChildInTarget = child;
             }
-            child->setMargin(WXCore_Margin_ALL, margin);
-            child->setPadding(WXCore_Padding_ALL, 10);
-            child->setBorderWidth(WXCore_Border_Width_ALL, 10);
+            child->setMargin(kMarginALL, margin);
+            child->setPadding(kPaddingALL, 10);
+            child->setBorderWidth(kBorderWidthALL, 10);
             child->setStyleWidth(childWidth);
             child->setStyleHeight(childHeight);
             lastChildInTarget = child;
@@ -47,7 +47,7 @@ protected:
     ~FlexWrap() override {
         root->freeWXCoreNode();
         target->freeWXCoreNode();
-        FormattingContext bfc = NON_BFC;
+        FormattingContext bfc = kNonBFC;
         for (auto i = 0; i < root->getChildCount(bfc); i++) {
             root->getChildAt(bfc, i)->freeWXCoreNode();
         }
@@ -57,8 +57,8 @@ protected:
 };
 
 TEST_F(FlexWrap, NoWrapRow) {
-    target->setFlexWrap(WXCore_Wrap_NoWrap);
-    target->setFlexDirection(WXCore_Flex_Direction_Row);
+    target->setFlexWrap(kNoWrap);
+    target->setFlexDirection(kFlexDirectionRow);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionLeft(), margin);
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionRight(), margin + childWidth);
@@ -72,8 +72,8 @@ TEST_F(FlexWrap, NoWrapRow) {
 }
 
 TEST_F(FlexWrap, NoWrapRowReverse) {
-    target->setFlexWrap(WXCore_Wrap_NoWrap);
-    target->setFlexDirection(WXCore_Flex_Direction_Row_Reverse);
+    target->setFlexWrap(kNoWrap);
+    target->setFlexDirection(kFlexDirectionRowReverse);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionLeft(), targetWidth - margin - childWidth);
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionRight(), targetWidth - margin);
@@ -89,8 +89,8 @@ TEST_F(FlexWrap, NoWrapRowReverse) {
 }
 
 TEST_F(FlexWrap, NoWrapColumn) {
-    target->setFlexWrap(WXCore_Wrap_NoWrap);
-    target->setFlexDirection(WXCore_Flex_Direction_Column);
+    target->setFlexWrap(kNoWrap);
+    target->setFlexDirection(kFlexDirectionColumn);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionLeft(), margin);
     EXPECT_FLOAT_EQ(firstChildInTarget->getLayoutPositionRight(), margin + childWidth);

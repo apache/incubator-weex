@@ -12,12 +12,12 @@
 namespace WeexCore {
 
   RenderObject::RenderObject() {
-    mStyles = new STYLES_MAP();
-    mAttributes = new ATTRIBUTES_MAP();
-    mPaddings = new PADDING_MAP();
-    mMargins = new MARGIN_MAP();
-    mBorders = new BORDER_MAP();
-    mEvents = new EVENTS_SET();
+    mStyles = new StylesMap();
+    mAttributes = new AttributesMap();
+    mPaddings = new PaddingsMap();
+    mMargins = new MarginsMap();
+    mBorders = new BordersMap();
+    mEvents = new EventsSet();
     mComponent_Impl_Android = nullptr;
     mMeasureFunc_Impl_Android = nullptr;
   }
@@ -86,12 +86,12 @@ namespace WeexCore {
     if (node == nullptr || ((RenderObject *) node)->getMeasureFunc_Impl_Android() == nullptr)
       return size;
 
-    int widthMode = getUNSPECIFIED(env);
-    int heightMode = getUNSPECIFIED(env);
-    if (widthMeasureMode == EXACTLY)
-      widthMode = getEXACTLY(env);
-    if (heightMeasureMode == EXACTLY)
-      heightMode = getEXACTLY(env);
+    int widthMode = getUnspecified(env);
+    int heightMode = getUnspecified(env);
+    if (widthMeasureMode == kExactly)
+      widthMode = getExactly(env);
+    if (heightMeasureMode == kExactly)
+      heightMode = getExactly(env);
     base::android::ScopedLocalJavaRef<jobject> jsize = cumsmeasure_Imple_Android(env,
                                                                                  ((RenderObject *) node)->getMeasureFunc_Impl_Android(),
                                                                                  width, height,
@@ -137,118 +137,118 @@ namespace WeexCore {
   StyleType RenderObject::applyStyle(const std::string &key, const std::string &value) {
     if (key == ALIGN_ITEMS) {
       setAlignItems(getWXCoreAlignItem(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == ALIGN_SELF) {
       setAlignSelf(getWXCoreAlignSelf(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == FLEX) {
       setFlex(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == FLEX_DIRECTION) {
       setFlexDirection(getWXCoreFlexDirection(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == JUSTIFY_CONTENT) {
       setJustifyContent(getWXCoreJustifyContent(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == FLEX_WRAP) {
       setFlexWrap(getWXCoreFlexWrap(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == MIN_WIDTH) {
       setMinWidth(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == MIN_HEIGHT) {
       setMinHeight(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == MAX_WIDTH) {
       setMaxWidth(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == MAX_HEIGHT) {
       setMaxHeight(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
       setStyleHeight(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
       setStyleWidth(stringToNum<float>(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == POSITION) {
       setStylePositionType(getWXCorePositionType(value));
-      return TypeLayout;
+      return kTypeLayout;
     } else if (key == LEFT) {
-      setStylePosition(WXCore_PositionEdge_Left, stringToNum<float>(value));
-      return TypeLayout;
+      setStylePosition(kPositionEdgeLeft, stringToNum<float>(value));
+      return kTypeLayout;
     } else if (key == TOP) {
-      setStylePosition(WXCore_PositionEdge_Top, stringToNum<float>(value));
-      return TypeLayout;
+      setStylePosition(kPositionEdgeTop, stringToNum<float>(value));
+      return kTypeLayout;
     } else if (key == RIGHT) {
-      setStylePosition(WXCore_PositionEdge_Right, stringToNum<float>(value));
-      return TypeLayout;
+      setStylePosition(kPositionEdgeRight, stringToNum<float>(value));
+      return kTypeLayout;
     } else if (key == BOTTOM) {
-      setStylePosition(WXCore_PositionEdge_Bottom, stringToNum<float>(value));
-      return TypeLayout;
+      setStylePosition(kPositionEdgeBottom, stringToNum<float>(value));
+      return kTypeLayout;
     } else if (key == MARGIN) {
-      setMargin(WXCore_Margin_ALL, stringToNum<float>(value));
+      setMargin(kMarginALL, stringToNum<float>(value));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
-      return TypeMargin;
+      return kTypeMargin;
     } else if (key == MARGIN_LEFT) {
-      setMargin(WXCore_Margin_Left, stringToNum<float>(value));
+      setMargin(kMarginLeft, stringToNum<float>(value));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
-      return TypeMargin;
+      return kTypeMargin;
     } else if (key == MARGIN_TOP) {
-      setMargin(WXCore_Margin_Top, stringToNum<float>(value));
+      setMargin(kMarginTop, stringToNum<float>(value));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
-      return TypeMargin;
+      return kTypeMargin;
     } else if (key == MARGIN_RIGHT) {
-      setMargin(WXCore_Margin_Right, stringToNum<float>(value));
+      setMargin(kMarginRight, stringToNum<float>(value));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
-      return TypeMargin;
+      return kTypeMargin;
     } else if (key == MARGIN_BOTTOM) {
-      setMargin(WXCore_Margin_Bottom, stringToNum<float>(value));
+      setMargin(kMarginBottom, stringToNum<float>(value));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
-      return TypeMargin;
+      return kTypeMargin;
     } else if (key == BORDER_WIDTH) {
-      setBorderWidth(WXCore_Border_Width_ALL, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthALL, stringToNum<float>(value));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
-      return TypeBorder;
+      return kTypeBorder;
     } else if (key == BORDER_TOP_WIDTH) {
-      setBorderWidth(WXCore_Border_Width_Top, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthTop, stringToNum<float>(value));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
-      return TypeBorder;
+      return kTypeBorder;
     } else if (key == BORDER_RIGHT_WIDTH) {
-      setBorderWidth(WXCore_Border_Width_Right, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthRight, stringToNum<float>(value));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
-      return TypeBorder;
+      return kTypeBorder;
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      setBorderWidth(WXCore_Border_Width_Bottom, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthBottom, stringToNum<float>(value));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
-      return TypeBorder;
+      return kTypeBorder;
     } else if (key == BORDER_LEFT_WIDTH) {
-      setBorderWidth(WXCore_Border_Width_Left, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthLeft, stringToNum<float>(value));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
-      return TypeBorder;
+      return kTypeBorder;
     } else if (key == PADDING) {
-      setPadding(WXCore_Padding_ALL, stringToNum<float>(value));
+      setPadding(kPaddingALL, stringToNum<float>(value));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
-      return TypePadding;
+      return kTypePadding;
     } else if (key == PADDING_LEFT) {
-      setPadding(WXCore_Padding_Left, stringToNum<float>(value));
+      setPadding(kPaddingLeft, stringToNum<float>(value));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
-      return TypePadding;
+      return kTypePadding;
     } else if (key == PADDING_TOP) {
-      setPadding(WXCore_Padding_Top, stringToNum<float>(value));
+      setPadding(kPaddingTop, stringToNum<float>(value));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
-      return TypePadding;
+      return kTypePadding;
     } else if (key == PADDING_RIGHT) {
-      setPadding(WXCore_Padding_Right, stringToNum<float>(value));
+      setPadding(kPaddingRight, stringToNum<float>(value));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
-      return TypePadding;
+      return kTypePadding;
     } else if (key == PADDING_BOTTOM) {
-      setPadding(WXCore_Padding_Bottom, stringToNum<float>(value));
+      setPadding(kPaddingBottom, stringToNum<float>(value));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
-      return TypePadding;
+      return kTypePadding;
     } else {
       mStyles->insert(std::pair<std::string, std::string>(key, value));
-      return TypeStyle;
+      return kTypeStyle;
     }
   }
 
@@ -264,8 +264,8 @@ namespace WeexCore {
 
     result.append("attr:\n");
 
-    ATTR_IT attr_it = getAttrItBegin();
-    ATTR_IT attr_end = getAttrItEnd();
+    AttributesIterator attr_it = getAttrItBegin();
+    AttributesIterator attr_end = getAttrItEnd();
     for (; attr_it != attr_end; ++attr_it) {
       result.append("   ");
       result.append(attr_it->first);
@@ -277,8 +277,8 @@ namespace WeexCore {
 
     result.append("style:\n");
 
-    STYLE_IT style_it = getStyleItBegin();
-    STYLE_IT style_end = getStyleItEnd();
+    StylesIterator style_it = getStyleItBegin();
+    StylesIterator style_end = getStyleItEnd();
     for (; style_it != style_end; ++style_it) {
       result.append("   ");
       result.append(style_it->first);
@@ -291,8 +291,8 @@ namespace WeexCore {
     if (mEvents != nullptr) {
       result.append("event:\n");
 
-      EVENT_IT event_it = getEventItBegin();
-      EVENT_IT event_end = getEventItEnd();
+      EventsIterator event_it = getEventItBegin();
+      EventsIterator event_end = getEventItEnd();
 
       for (; event_it != event_end; ++event_it) {
         result.append("   ");

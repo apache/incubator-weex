@@ -17,7 +17,7 @@ namespace WeexCore {
   class RenderPage {
 
   private:
-    const float LAYOUT_FIRSTSCREEN_OVERFLOW_RADIO = 1.2;
+    const float kLayoutFirstScreenOverflowRadio = 1.2;
 
     float mViewPortWidth;
 

@@ -5,7 +5,7 @@ namespace WeexCore {
   bool WXCoreMargin::setMargin(const WXCoreMarginEdge &edge, const float &margin) {
     bool dirty = false;
     switch (edge) {
-      case WXCore_Margin_ALL:
+      case kMarginALL:
         if (mMarginLeft != margin
             || mMarginTop != margin
             || mMarginRight != margin
@@ -17,25 +17,25 @@ namespace WeexCore {
           dirty = true;
         }
         break;
-      case WXCore_Margin_Left:
+      case kMarginLeft:
         if (mMarginLeft != margin) {
           mMarginLeft = margin;
           dirty = true;
         }
         break;
-      case WXCore_Margin_Top:
+      case kMarginTop:
         if (mMarginTop != margin) {
           mMarginTop = margin;
           dirty = true;
         }
         break;
-      case WXCore_Margin_Right:
+      case kMarginRight:
         if (mMarginRight != margin) {
           mMarginRight = margin;
           dirty = true;
         }
         break;
-      case WXCore_Margin_Bottom:
+      case kMarginBottom:
         if (mMarginBottom != margin) {
           mMarginBottom = margin;
           dirty = true;
@@ -48,16 +48,16 @@ namespace WeexCore {
   float WXCoreMargin::getMargin(const WXCoreMarginEdge &edge) {
     float margin = 0;
     switch (edge) {
-      case WXCore_Margin_Left:
+      case kMarginLeft:
         margin = mMarginLeft;
         break;
-      case WXCore_Margin_Top:
+      case kMarginTop:
         margin = mMarginTop;
         break;
-      case WXCore_Margin_Right:
+      case kMarginRight:
         margin = mMarginRight;
         break;
-      case WXCore_Margin_Bottom:
+      case kMarginBottom:
         margin = mMarginBottom;
         break;
       default:
@@ -69,7 +69,7 @@ namespace WeexCore {
   bool WXCorePadding::setPadding(const WXCorePaddingEdge &edge, const float &padding) {
     bool dirty = false;
     switch (edge) {
-      case WXCore_Padding_ALL:
+      case kPaddingALL:
         if (mPaddingLeft != padding
             || mPaddingTop != padding
             || mPaddingRight != padding
@@ -81,25 +81,25 @@ namespace WeexCore {
           dirty = true;
         }
         break;
-      case WXCore_Padding_Left:
+      case kPaddingLeft:
         if (mPaddingLeft != padding) {
           mPaddingLeft = padding;
           dirty = true;
         }
         break;
-      case WXCore_Padding_Top:
+      case kPaddingTop:
         if (mPaddingTop != padding) {
           mPaddingTop = padding;
           dirty = true;
         }
         break;
-      case WXCore_Padding_Right:
+      case kPaddingRight:
         if (mPaddingRight != padding) {
           mPaddingRight = padding;
           dirty = true;
         }
         break;
-      case WXCore_Padding_Bottom:
+      case kPaddingBottom:
         if (mPaddingBottom != padding) {
           mPaddingBottom = padding;
           dirty = true;
@@ -112,16 +112,16 @@ namespace WeexCore {
   float WXCorePadding::getPadding(const WXCorePaddingEdge &edge) {
     float padding = 0;
     switch (edge) {
-      case WXCore_Padding_Left:
+      case kPaddingLeft:
         padding = mPaddingLeft;
         break;
-      case WXCore_Padding_Top:
+      case kPaddingTop:
         padding = mPaddingTop;
         break;
-      case WXCore_Padding_Right:
+      case kPaddingRight:
         padding = mPaddingRight;
         break;
-      case WXCore_Padding_Bottom:
+      case kPaddingBottom:
         padding = mPaddingBottom;
         break;
       default:
@@ -133,7 +133,7 @@ namespace WeexCore {
   bool WXCoreBorderWidth::setBorderWidth(const WXCoreBorderWidthEdge &edge, const float &borderWidth) {
     bool dirty = false;
     switch (edge) {
-      case WXCore_Border_Width_ALL:
+      case kBorderWidthALL:
         if (mBorderWidthLeft != borderWidth
             || mBorderWidthTop != borderWidth
             || mBorderWidthRight != borderWidth
@@ -145,25 +145,25 @@ namespace WeexCore {
           dirty = true;
         }
         break;
-      case WXCore_Border_Width_Left:
+      case kBorderWidthLeft:
         if (mBorderWidthLeft != borderWidth) {
           mBorderWidthLeft = borderWidth;
           dirty = true;
         }
         break;
-      case WXCore_Border_Width_Top:
+      case kBorderWidthTop:
         if (mBorderWidthTop != borderWidth) {
           mBorderWidthTop = borderWidth;
           dirty = true;
         }
         break;
-      case WXCore_Border_Width_Right:
+      case kBorderWidthRight:
         if (mBorderWidthRight != borderWidth) {
           mBorderWidthRight = borderWidth;
           dirty = true;
         }
         break;
-      case WXCore_Border_Width_Bottom:
+      case kBorderWidthBottom:
         if (mBorderWidthBottom != borderWidth) {
           mBorderWidthBottom = borderWidth;
           dirty = true;
@@ -176,16 +176,16 @@ namespace WeexCore {
   float WXCoreBorderWidth::getBorderWidth(const WXCoreBorderWidthEdge &edge) {
     float borderWidth = 0;
     switch (edge) {
-      case WXCore_Border_Width_Left:
+      case kBorderWidthLeft:
         borderWidth = mBorderWidthLeft;
         break;
-      case WXCore_Border_Width_Top:
+      case kBorderWidthTop:
         borderWidth = mBorderWidthTop;
         break;
-      case WXCore_Border_Width_Right:
+      case kBorderWidthRight:
         borderWidth = mBorderWidthRight;
         break;
-      case WXCore_Border_Width_Bottom:
+      case kBorderWidthBottom:
         borderWidth = mBorderWidthBottom;
         break;
       default:
@@ -197,25 +197,25 @@ namespace WeexCore {
   bool WXCorePosition::setPosition(const WXCorePositionEdge &edge, const float &position) {
     bool dirty = false;
     switch (edge) {
-      case WXCore_PositionEdge_Left:
+      case kPositionEdgeLeft:
         if (mLeft != position) {
           mLeft = position;
           dirty = true;
         }
         break;
-      case WXCore_PositionEdge_Top:
+      case kPositionEdgeTop:
         if (mTop != position) {
           mTop = position;
           dirty = true;
         }
         break;
-      case WXCore_PositionEdge_Right:
+      case kPositionEdgeRight:
         if (mRight != position) {
           mRight = position;
           dirty = true;
         }
         break;
-      case WXCore_PositionEdge_Bottom:
+      case kPositionEdgeBottom:
         if (mBottom != position) {
           mBottom = position;
           dirty = true;
@@ -228,16 +228,16 @@ namespace WeexCore {
   float WXCorePosition::getPosition(const WXCorePositionEdge &edge) {
     float position = 0;
     switch (edge) {
-      case WXCore_PositionEdge_Left:
+      case kPositionEdgeLeft:
         position = mLeft;
         break;
-      case WXCore_PositionEdge_Top:
+      case kPositionEdgeTop:
         position = mTop;
         break;
-      case WXCore_PositionEdge_Right:
+      case kPositionEdgeRight:
         position = mRight;
         break;
-      case WXCore_PositionEdge_Bottom:
+      case kPositionEdgeBottom:
         position = mBottom;
         break;
     }

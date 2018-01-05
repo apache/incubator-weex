@@ -6,9 +6,9 @@
 namespace WeexCore {
   bool RegisterJNIMeasureMode(JNIEnv *env);
 
-  jint getEXACTLY(JNIEnv *env);
+  jint getExactly(JNIEnv *env);
 
-  jint getUNSPECIFIED(JNIEnv *env);
+  jint getUnspecified(JNIEnv *env);
 }
 
 

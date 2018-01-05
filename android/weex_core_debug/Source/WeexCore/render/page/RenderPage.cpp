@@ -17,8 +17,8 @@
 
 namespace WeexCore {
 
-  typedef std::vector<RenderAction *>::iterator RENDERACTION_IT;
-  typedef std::map<std::string, RenderObject *>::iterator RENDEROBJECT_COLLECTION_IT;
+  typedef std::vector<RenderAction *>::iterator RenderActionIterator;
+  typedef std::map<std::string, RenderObject *>::iterator RenderObjectMapIterator;
 
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
@@ -37,7 +37,7 @@ namespace WeexCore {
       pRoot = nullptr;
     }
 
-    for (RENDERACTION_IT it = mRenderActions.begin();
+    for (RenderActionIterator it = mRenderActions.begin();
          it != mRenderActions.end(); it++) {
       if (nullptr != *it) {
         delete *it;
@@ -46,8 +46,8 @@ namespace WeexCore {
     }
     mRenderActions.clear();
 
-    RENDEROBJECT_COLLECTION_IT begin = mRenderObjectRegisterMap.begin();
-    RENDEROBJECT_COLLECTION_IT end = mRenderObjectRegisterMap.end();
+    RenderObjectMapIterator begin = mRenderObjectRegisterMap.begin();
+    RenderObjectMapIterator end = mRenderObjectRegisterMap.end();
     for (; begin != end; ++begin) {
       delete begin->second;
     }
@@ -81,17 +81,17 @@ namespace WeexCore {
 
     float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
     float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
-    float radio = deviceWidth / (mViewPortWidth * LAYOUT_FIRSTSCREEN_OVERFLOW_RADIO);
+    float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
 
     switch (pRoot->getFlexDirection()) {
-      case WXCore_Flex_Direction_Column:
-      case WXCore_Flex_Direction_Column_Reverse:
+      case kFlexDirectionColumn:
+      case kFlexDirectionColumnReverse:
         if (pRoot->getLargestMainSize() * radio > deviceHeight / 2) {
           traverseTree(pRoot);
         }
         break;
-      case WXCore_Flex_Direction_Row:
-      case WXCore_Flex_Direction_Row_Reverse:
+      case kFlexDirectionRow:
+      case kFlexDirectionRowReverse:
       default:
         if (pRoot->getLargestMainSize() * radio > deviceWidth / 2) {
           traverseTree(pRoot);
@@ -220,25 +220,25 @@ namespace WeexCore {
     for (int i = 0; i < styles->size(); ++i) {
       if ((*styles)[i] != nullptr) {
         switch (render->addStyle((*styles)[i]->first, (*styles)[i]->second)) {
-          case TypeStyle:
+          case kTypeStyle:
             if (style == nullptr)
               style = new std::vector<std::pair<std::string, std::string> *>();
             style->insert(style->end(), (*styles)[i]);
             flag = true;
             break;
-          case TypeMargin:
+          case kTypeMargin:
             if (margin == nullptr)
               margin = new std::vector<std::pair<std::string, std::string> *>();
             margin->insert(margin->end(), (*styles)[i]);
             flag = true;
             break;
-          case TypePadding:
+          case kTypePadding:
             if (padding == nullptr)
               padding = new std::vector<std::pair<std::string, std::string> *>();
             padding->insert(padding->end(), (*styles)[i]);
             flag = true;
             break;
-          case TypeBorder:
+          case kTypeBorder:
             if (border == nullptr)
               border = new std::vector<std::pair<std::string, std::string> *>();
             border->insert(border->end(), (*styles)[i]);

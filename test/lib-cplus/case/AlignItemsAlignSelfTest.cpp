@@ -36,9 +36,9 @@ protected:
             WXCoreLayoutNode *child = WXCoreLayoutNode::newWXCoreNode();
             if (alignSelfWithoutCrossSize == nullptr) {
                 alignSelfWithoutCrossSize = child;
-                if (get<0>(GetParam()) == WXCore_Flex_Direction_Row) {
+                if (get<0>(GetParam()) == kFlexDirectionRow) {
                     child->setStyleWidth(childWidth);
-                } else if (get<0>(GetParam()) == WXCore_Flex_Direction_Column) {
+                } else if (get<0>(GetParam()) == kFlexDirectionColumn) {
                     child->setStyleHeight(childHeight);
                 }
             } else {
@@ -49,7 +49,7 @@ protected:
             target->appendChild(child);
         }
         WXCoreAlignSelf alignSelf = get<3>(GetParam());
-        if (alignSelf != WXCore_AlignSelf_Auto) {
+        if (alignSelf != kAlignSelfAuto) {
             alignSelfWithoutCrossSize->setAlignSelf(alignSelf);
         }
         root->appendChild(target);
@@ -59,7 +59,7 @@ protected:
     ~AlignmentItemsAlignSelf() override {
         root->freeWXCoreNode();
         target->freeWXCoreNode();
-        FormattingContext bfc = NON_BFC;
+        FormattingContext bfc = kNonBFC;
         for (auto i = 0; i < root->getChildCount(bfc); i++) {
             root->getChildAt(bfc, i)->freeWXCoreNode();
         }
@@ -77,7 +77,7 @@ TEST_P(AlignmentItemsAlignSelf, row) {
         WXCoreAlignSelf alignSelf = get<3>(GetParam());
         float height = 0;
         float alignSelfWithoutCrossSizeBottom = -1;
-        if (get<1>(GetParam()) == WXCore_Wrap_Wrap) {
+        if (get<1>(GetParam()) == kWrap) {
             auto flexCap = static_cast<int>(targetWidth / childWidth);
             auto linesBeforeLast = childCount / flexCap - (childCount % flexCap == 0 ? 1 : 0);
             auto itemsBeforeLast = childCount % flexCap == 0 ? flexCap - 1 : childCount % flexCap - 1;

@@ -8,12 +8,12 @@ namespace WeexCore {
 
   public:
 
-    STYLES_MAP *mStyles;
-    ATTRIBUTES_MAP *mAttributes;
-    EVENTS_SET *mEvents;
-    PADDING_MAP *mPaddings;
-    MARGIN_MAP *mMargins;
-    BORDER_MAP *mBorders;
+    StylesMap *mStyles;
+    AttributesMap *mAttributes;
+    EventsSet *mEvents;
+    PaddingsMap *mPaddings;
+    MarginsMap *mMargins;
+    BordersMap *mBorders;
     std::string mPageId;
     std::string mComponentType;
     std::string mRef;

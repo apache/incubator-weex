@@ -200,28 +200,28 @@ namespace WeexCore {
 
     WXCorePositionType mPositionType;
 
-    const static WXCoreFlexDirection FLEX_DIRECTION_DEFAULT;
+    const static WXCoreFlexDirection kFlexDirectionDefault;
 
-    const static WXCoreFlexWrap FLEX_WRAP_DEFAULT;
+    const static WXCoreFlexWrap kFlexWrapDefault;
 
-    const static WXCoreJustifyContent FLEX_JUSTIFY_CONTENT_DEFAULT;
+    const static WXCoreJustifyContent kFlexJustifyContentDefault;
 
-    const static WXCoreAlignItems FLEX_ALIGN_ITEMS_DEFAULT;
+    const static WXCoreAlignItems kFlexAlignItemsDefault;
 
-    const static WXCoreAlignSelf FLEX_ALIGN_SELF_DEFAULT;
+    const static WXCoreAlignSelf kFlexAlignSelfDefault;
 
-    const static float FLEX_DEFAULT;
+    const static float kFlexDefault;
 
-    const static float FLEX_GROW_DEFAULT;
+    const static float kFlexGrowDefault;
 
-    const static float MAX_SIZE;
+    const static float kMaxSize;
 
-    WXCoreCSSStyle() : mFlexDirection(FLEX_DIRECTION_DEFAULT),
-                       mFlexWrap(FLEX_WRAP_DEFAULT),
-                       mJustifyContent(FLEX_JUSTIFY_CONTENT_DEFAULT),
-                       mAlignItems(FLEX_ALIGN_ITEMS_DEFAULT),
-                       mAlignSelf(FLEX_ALIGN_SELF_DEFAULT),
-                       mFlexGrow(FLEX_GROW_DEFAULT),
+    WXCoreCSSStyle() : mFlexDirection(kFlexDirectionDefault),
+                       mFlexWrap(kFlexWrapDefault),
+                       mJustifyContent(kFlexJustifyContentDefault),
+                       mAlignItems(kFlexAlignItemsDefault),
+                       mAlignSelf(kFlexAlignSelfDefault),
+                       mFlexGrow(kFlexGrowDefault),
                        mStyleWidth(NAN), mStyleHeight(NAN),
                        mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
                        mMinWidth(NAN), mMinHeight(NAN) {
@@ -229,12 +229,12 @@ namespace WeexCore {
     }
 
     ~WXCoreCSSStyle() {
-      mFlexDirection = FLEX_DIRECTION_DEFAULT;
-      mFlexWrap = FLEX_WRAP_DEFAULT;
-      mJustifyContent = FLEX_JUSTIFY_CONTENT_DEFAULT;
-      mAlignItems = FLEX_ALIGN_ITEMS_DEFAULT;
-      mAlignSelf = FLEX_ALIGN_SELF_DEFAULT;
-      mFlexGrow = FLEX_GROW_DEFAULT;
+      mFlexDirection = kFlexDirectionDefault;
+      mFlexWrap = kFlexWrapDefault;
+      mJustifyContent = kFlexJustifyContentDefault;
+      mAlignItems = kFlexAlignItemsDefault;
+      mAlignSelf = kFlexAlignSelfDefault;
+      mFlexGrow = kFlexGrowDefault;
       mStyleWidth = NAN;
       mStyleHeight = NAN;
       mMaxWidth = MAXFLOAT;

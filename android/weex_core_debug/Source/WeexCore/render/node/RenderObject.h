@@ -14,22 +14,22 @@ namespace WeexCore {
   class RenderPage;
 
   typedef enum StyleType {
-    TypeStyle, TypeLayout, TypeMargin, TypePadding, TypeBorder
-  } Style_Type;
+    kTypeStyle, kTypeLayout, kTypeMargin, kTypePadding, kTypeBorder
+  } StyleType;
 
-  typedef std::map<std::string, std::string>::const_iterator STYLE_IT;
-  typedef std::map<std::string, std::string>::const_iterator ATTR_IT;
-  typedef std::set<std::string>::const_iterator EVENT_IT;
-  typedef std::map<std::string, std::string> STYLES_MAP;
-  typedef std::map<std::string, std::string> ATTRIBUTES_MAP;
-  typedef std::set<std::string> EVENTS_SET;
-  typedef std::map<std::string, std::string> MARGIN_MAP;
-  typedef std::map<std::string, std::string> PADDING_MAP;
-  typedef std::map<std::string, std::string> BORDER_MAP;
+  typedef std::map<std::string, std::string>::const_iterator StylesIterator;
+  typedef std::map<std::string, std::string>::const_iterator AttributesIterator;
+  typedef std::set<std::string>::const_iterator EventsIterator;
+  typedef std::map<std::string, std::string> StylesMap;
+  typedef std::map<std::string, std::string> AttributesMap;
+  typedef std::set<std::string> EventsSet;
+  typedef std::map<std::string, std::string> MarginsMap;
+  typedef std::map<std::string, std::string> PaddingsMap;
+  typedef std::map<std::string, std::string> BordersMap;
 
   class RenderObject : public WXCoreLayoutNode {
+
     friend class RenderPage;
-  public:
 
   private:
     std::string mRef = "";
@@ -38,17 +38,17 @@ namespace WeexCore {
 
     RenderObject *mParentRender;
 
-    STYLES_MAP *mStyles;
+    StylesMap *mStyles;
 
-    ATTRIBUTES_MAP *mAttributes;
+    AttributesMap *mAttributes;
 
-    MARGIN_MAP *mMargins;
+    MarginsMap *mMargins;
 
-    PADDING_MAP *mPaddings;
+    PaddingsMap *mPaddings;
 
-    BORDER_MAP *mBorders;
+    BordersMap *mBorders;
 
-    EVENTS_SET *mEvents;
+    EventsSet *mEvents;
 
     // TODO / WXComponent bind
     jobject mComponent_Impl_Android;
@@ -57,17 +57,17 @@ namespace WeexCore {
 
     void *mComponent_Impl_iOS;
 
-    void layoutBefore(){
+    void layoutBefore() {
       onLayoutBefore();
-      for(Index i=0;i<getChildCount();i++){
+      for (Index i = 0; i < getChildCount(); i++) {
         RenderObject *child = getChild(i);
         child->layoutBefore();
       }
     }
 
-    void layoutAfter(){
+    void layoutAfter() {
       onLayoutAfter(getLayoutWidth(), getLayoutHeight());
-      for(Index i=0;i<getChildCount();i++){
+      for (Index i = 0; i < getChildCount(); i++) {
         RenderObject *child = getChild(i);
         child->layoutAfter();
       }
@@ -181,51 +181,51 @@ namespace WeexCore {
       return mParentRender;
     }
 
-    inline STYLES_MAP *getStyles() {
+    inline StylesMap *getStyles() {
       return mStyles;
     }
 
-    inline ATTRIBUTES_MAP *getAttributes() {
+    inline AttributesMap *getAttributes() {
       return mAttributes;
     }
 
-    inline EVENTS_SET *getEvents() {
+    inline EventsSet *getEvents() {
       return mEvents;
     }
 
-    inline PADDING_MAP *getPaddings() {
+    inline PaddingsMap *getPaddings() {
       return mPaddings;
     }
 
-    inline MARGIN_MAP *getMargins() {
+    inline MarginsMap *getMargins() {
       return mMargins;
     }
 
-    inline BORDER_MAP *getBorders() {
+    inline BordersMap *getBorders() {
       return mBorders;
     }
 
-    inline STYLE_IT getStyleItBegin() {
+    inline StylesIterator getStyleItBegin() {
       return mStyles->begin();
     }
 
-    inline STYLE_IT getStyleItEnd() {
+    inline StylesIterator getStyleItEnd() {
       return mStyles->end();
     }
 
-    inline ATTR_IT getAttrItBegin() {
+    inline AttributesIterator getAttrItBegin() {
       return mAttributes->begin();
     }
 
-    inline ATTR_IT getAttrItEnd() {
+    inline AttributesIterator getAttrItEnd() {
       return mAttributes->end();
     }
 
-    inline EVENT_IT getEventItBegin() {
+    inline EventsIterator getEventItBegin() {
       return mEvents->begin();
     }
 
-    inline EVENT_IT getEventItEnd() {
+    inline EventsIterator getEventItEnd() {
       return mEvents->end();
     }
   };
