@@ -8,7 +8,12 @@ namespace WeexCore {
   class RenderActionAddElement : public RenderAction {
 
   public:
+    RenderActionAddElement(const std::string &pageId, RenderObject *render, RenderObject *parent,
+                           const int &index);
 
+    void ExecuteAction();
+
+  public:
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
@@ -20,11 +25,6 @@ namespace WeexCore {
     std::string mParentRef;
     std::string mRef;
     int mIndex;
-
-    RenderActionAddElement(const std::string &pageId, RenderObject *render, RenderObject *parent,
-                           const int &index);
-
-    void ExecuteAction();
   };
 }
 

@@ -32,31 +32,6 @@ namespace WeexCore {
     friend class RenderPage;
 
   private:
-    std::string mRef = "";
-
-    std::string mType = "";
-
-    RenderObject *mParentRender;
-
-    StylesMap *mStyles;
-
-    AttributesMap *mAttributes;
-
-    MarginsMap *mMargins;
-
-    PaddingsMap *mPaddings;
-
-    BordersMap *mBorders;
-
-    EventsSet *mEvents;
-
-    // TODO / WXComponent bind
-    jobject mComponent_Impl_Android;
-
-    jobject mMeasureFunc_Impl_Android;
-
-    void *mComponent_Impl_iOS;
-
     void layoutBefore() {
       onLayoutBefore();
       for (Index i = 0; i < getChildCount(); i++) {
@@ -228,6 +203,20 @@ namespace WeexCore {
     inline EventsIterator getEventItEnd() {
       return mEvents->end();
     }
+
+  private:
+    std::string mRef = "";
+    std::string mType = "";
+    RenderObject *mParentRender;
+    StylesMap *mStyles;
+    AttributesMap *mAttributes;
+    MarginsMap *mMargins;
+    PaddingsMap *mPaddings;
+    BordersMap *mBorders;
+    EventsSet *mEvents;
+    jobject mComponent_Impl_Android; // TODO / WXComponent bind
+    jobject mMeasureFunc_Impl_Android;
+    void *mComponent_Impl_iOS;
   };
 } //end WeexCore
 #endif //RenderObject_h

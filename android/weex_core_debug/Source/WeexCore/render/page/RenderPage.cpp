@@ -32,9 +32,9 @@ namespace WeexCore {
 
     JNIEnv *env = getJNIEnv();
 
-    if (pRoot != nullptr) {
-      delete pRoot;
-      pRoot = nullptr;
+    if (render_root != nullptr) {
+      delete render_root;
+      render_root = nullptr;
     }
 
     for (RenderActionIterator it = mRenderActions.begin();
@@ -70,31 +70,31 @@ namespace WeexCore {
   }
 
   void RenderPage::calculateLayout() {
-    if (pRoot == nullptr)
+    if (render_root == nullptr)
       return;
 
-    pRoot->layoutBefore();
+    render_root->layoutBefore();
     long long startTime = getCurrentTime();
-    pRoot->calculateLayout();
+    render_root->calculateLayout();
     cssLayoutTime(getCurrentTime() - startTime);
-    pRoot->layoutAfter();
+    render_root->layoutAfter();
 
     float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
     float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
     float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
 
-    switch (pRoot->getFlexDirection()) {
+    switch (render_root->getFlexDirection()) {
       case kFlexDirectionColumn:
       case kFlexDirectionColumnReverse:
-        if (pRoot->getLargestMainSize() * radio > deviceHeight / 2) {
-          traverseTree(pRoot);
+        if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
+          traverseTree(render_root);
         }
         break;
       case kFlexDirectionRow:
       case kFlexDirectionRowReverse:
       default:
-        if (pRoot->getLargestMainSize() * radio > deviceWidth / 2) {
-          traverseTree(pRoot);
+        if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
+          traverseTree(render_root);
         }
         break;
     }
@@ -349,8 +349,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    pRoot->setStyleWidth(defaultWidth);
-    pRoot->setStyleHeight(defaultHeight);
+    render_root->setStyleWidth(defaultWidth);
+    render_root->setStyleHeight(defaultHeight);
     calculateLayout();
   }
 
@@ -379,10 +379,10 @@ namespace WeexCore {
   }
 
   bool RenderPage::createFinish() {
-    if (pRoot == nullptr) {
+    if (render_root == nullptr) {
       return false;
     }
-    traverseTree(pRoot);
+    traverseTree(render_root);
     sendCreateFinishAction();
     return true;
   }

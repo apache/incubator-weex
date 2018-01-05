@@ -8,7 +8,13 @@ namespace WeexCore {
   class RenderActionLayout : public RenderAction {
 
   public:
+    RenderActionLayout(const std::string &pageId, RenderObject *render);
 
+    void ExecuteAction();
+
+    void getLayoutInfo(WXCoreLayoutNode *node);
+
+  public:
     EventsSet *mEvents;
     std::string mPageId;
     std::string mRef;
@@ -18,12 +24,6 @@ namespace WeexCore {
     float mLeft;
     float mBottom;
     float mRight;
-
-    RenderActionLayout(const std::string &pageId, RenderObject *render);
-
-    void ExecuteAction();
-
-    void getLayoutInfo(WXCoreLayoutNode *node);
   };
 }
 

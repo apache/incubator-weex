@@ -15,10 +15,6 @@ namespace WeexCore {
 
     ~RenderManager() {}
 
-    static RenderManager *m_pInstance;
-
-    std::map<std::string, RenderPage *> mPages;
-
     //just to release singleton object
     class Garbo {
     public:
@@ -67,6 +63,10 @@ namespace WeexCore {
       }
       return m_pInstance;
     }
+
+  private:
+    static RenderManager *m_pInstance;
+    std::map<std::string, RenderPage *> mPages;
   };
 }
 

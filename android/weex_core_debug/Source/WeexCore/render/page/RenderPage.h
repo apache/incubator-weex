@@ -17,20 +17,6 @@ namespace WeexCore {
   class RenderPage {
 
   private:
-    const float kLayoutFirstScreenOverflowRadio = 1.2;
-
-    float mViewPortWidth;
-
-    RenderObject *pRoot;
-
-    std::string mPageId;
-
-    std::vector<RenderAction *> mRenderActions;
-
-    std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
-
-    RenderPerformance *mWXCorePerformance;
-
     void pushRenderToRegisterMap(RenderObject *render);
 
     void removeRenderFromRegisterMap(RenderObject *render);
@@ -59,11 +45,6 @@ namespace WeexCore {
 
     void sendCreateFinishAction();
 
-    // TODO / SDKInstance bind
-    jobject mInstance_Impl_Android;
-
-    void *mInstance_Impl_iOS;
-
   public:
     RenderPage(const std::string &pageID);
 
@@ -86,7 +67,8 @@ namespace WeexCore {
     bool updateAttr(const std::string &ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
+    void
+    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
     bool addEvent(const std::string &ref, const std::string &event);
 
@@ -130,12 +112,12 @@ namespace WeexCore {
 
     inline void setRootRenderObject(RenderObject *root) {
       if (root != nullptr) {
-        pRoot = root;
+        render_root = root;
       }
     }
 
     inline RenderObject *getRootRenderObject() {
-      return pRoot;
+      return render_root;
     }
 
     inline std::string getPageId() {
@@ -149,6 +131,17 @@ namespace WeexCore {
     inline void setViewPortWidth(float &viewPortWidth) {
       this->mViewPortWidth = viewPortWidth;
     }
+
+  private:
+    const float kLayoutFirstScreenOverflowRadio = 1.2;
+    float mViewPortWidth;
+    RenderObject *render_root;
+    std::string mPageId;
+    std::vector<RenderAction *> mRenderActions;
+    std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
+    RenderPerformance *mWXCorePerformance;
+    jobject mInstance_Impl_Android; // TODO / SDKInstance bind
+    void *mInstance_Impl_iOS;
   };
 }
 

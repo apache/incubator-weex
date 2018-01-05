@@ -15,7 +15,6 @@ namespace WeexCore {
   public:
     virtual void ExecuteAction() = 0;
   };
-
 }
 
 #endif //WEEXV8_RENDERACTION_H

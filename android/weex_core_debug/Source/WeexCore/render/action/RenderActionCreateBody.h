@@ -7,7 +7,11 @@ namespace WeexCore {
   class RenderActionCreateBody : public RenderAction {
 
   public:
+    RenderActionCreateBody(const std::string &pageId, RenderObject *render);
 
+    void ExecuteAction();
+
+  public:
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
@@ -17,10 +21,6 @@ namespace WeexCore {
     std::string mPageId;
     std::string mComponentType;
     std::string mRef;
-
-    RenderActionCreateBody(const std::string &pageId, RenderObject *render);
-
-    void ExecuteAction();
   };
 }
 
