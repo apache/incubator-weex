@@ -1176,12 +1176,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.mActionOtherCount++;
     }
 
-  public void clearCallTime() {
-        mWXPerformance.mCallCreateBodySumTime = 0;
-        mWXPerformance.mCallAddElementByWeexCoreSumTime = 0;
-        mWXPerformance.mCallLayoutByWeexCoreSumTime = 0;
-  }
-
   public void jsonParseTime(long time) {
     mWXPerformance.parseJsonTime += time;
   }

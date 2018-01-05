@@ -45,7 +45,6 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -1049,7 +1048,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public void createInstance(final String instanceId, final String template,
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    instance.clearCallTime();
     if (instance == null) {
       WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
       return;
@@ -1802,7 +1800,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXEnvironment.isApkDebugable()) {
 //      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
 //              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-//              .append(", parentRef:").append(parentRef);
+//              .append(", parentRef:").append(parentRef).append(", attributes:").append(attributes);
 //      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -1892,7 +1890,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                        HashMap<String, String> borders) {
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyleByWeexCore >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref);
+              .append(", ref:").append(ref).append(", styles:").append(styles);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -1919,7 +1917,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callUpdateAttrsByWeexCore(String instanceId, String ref, HashMap<String, String> attrs) {
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callUpdateAttrsByWeexCore >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref);
+              .append(", ref:").append(ref).append(", attrs:").append(attrs);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
