@@ -56,6 +56,7 @@ import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
+import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -67,6 +68,7 @@ import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
+import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -348,6 +350,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void unbindStickStyle(WXComponent component) {
     stickyHelper.unbindStickStyle(component, mStickyMap);
+    WXHeader cell = (WXHeader) findTypeParent(component, WXHeader.class);
+    if(cell != null && getHostView() != null) {
+      getHostView().notifyStickyRemove(cell);
+    }
   }
 
   private
@@ -607,8 +613,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
     }
 
-    if(currentStickyPos>=0){
-      bounceRecyclerView.updateStickyView(currentStickyPos);
+    if(currentStickyPos >= 0){
+        bounceRecyclerView.updateStickyView(currentStickyPos);
+    }else{
+      if(bounceRecyclerView instanceof BounceRecyclerView){
+        ((BounceRecyclerView) bounceRecyclerView).getStickyHeaderHelper().clearStickyHeaders();
+      }
     }
   }
 

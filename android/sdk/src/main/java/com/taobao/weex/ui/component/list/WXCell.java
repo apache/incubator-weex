@@ -180,8 +180,10 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             if(mHeadView.getParent() != null){
                 ((ViewGroup)mHeadView.getParent()).removeView(mHeadView);
             }
-            getHostView().removeView(mTempStickyView);
-            getHostView().addView(mHeadView);
+            if(getHostView() != null) {
+                getHostView().removeView(mTempStickyView);
+                getHostView().addView(mHeadView);
+            }
             mHeadView.setTranslationX(0);
             mHeadView.setTranslationY(0);
         }
