@@ -197,7 +197,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       style.put(Constants.Name.FLEX_DIRECTION, "column");
     }
     if (!domStyles.containsKey(Constants.Name.BACKGROUND_COLOR)) {
-      style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
+      style.put(Constants.Name.BACKGROUND_COLOR, "transparent");
     }
 
     style.put(Constants.Name.DEFAULT_WIDTH, defaultWidth);
