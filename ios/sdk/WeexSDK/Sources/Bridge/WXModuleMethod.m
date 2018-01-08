@@ -28,6 +28,8 @@
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
 
+#define ARGUMENTS @"arguments"
+
 @implementation WXModuleMethod
 
 - (instancetype)initWithModuleName:(NSString *)moduleName
@@ -59,7 +61,10 @@
                 WXLogError(@"%@", errorMessage);
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
                 if ([result.error respondsToSelector:@selector(userInfo)]) {
-                    // NSError instance won't work as target instance.
+                    // In order to pass the argument count check in -[WXBridgeMethod invocationWithTarget:selector:]
+                    if ([self respondsToSelector:NSSelectorFromString(ARGUMENTS)]) {
+                        [self setValue:nil forKey:ARGUMENTS];
+                    }
                     NSInvocation *invocation = [self invocationWithTarget:result.error selector:@selector(userInfo)];
                     [invocation invoke];
                     return invocation;
