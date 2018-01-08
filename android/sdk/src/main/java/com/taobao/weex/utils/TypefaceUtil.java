@@ -145,11 +145,11 @@ public class TypefaceUtil {
           dir.mkdirs();
         }
         final String fullPath =  dir.getAbsolutePath()+ File.separator +fileName;
-        if (!loadLocalFontFile(fullPath, fontFamily)) {
+        if (!loadLocalFontFile(fullPath, fontFamily, false)) {
           downloadFontByNetwork(url, fullPath, fontFamily);
         }
       } else if (fontDo.getType() == FontDO.TYPE_FILE) {
-        boolean result = loadLocalFontFile(fontDo.getUrl(), fontDo.getFontFamilyName());
+        boolean result = loadLocalFontFile(fontDo.getUrl(), fontDo.getFontFamilyName(), false);
         if (!result) {
           fontDo.setState(FontDO.STATE_FAILED);
         }
@@ -204,7 +204,7 @@ public class TypefaceUtil {
         if (statusCode >= 200 && statusCode <= 299 && response.originalData != null) {
           result = WXFileUtils.saveFile(fullPath, response.originalData, WXEnvironment.getApplication());
           if (result) {
-            result = loadLocalFontFile(fullPath, fontFamily);
+            result = loadLocalFontFile(fullPath, fontFamily, true);
           } else {
             if(WXEnvironment.isApkDebugable()) {
               WXLogUtils.d(TAG, "downloadFontByNetwork() onHttpFinish success, but save file failed.");
@@ -224,7 +224,7 @@ public class TypefaceUtil {
     });
   }
 
-  private static boolean loadLocalFontFile(String path, String fontFamily) {
+  private static boolean loadLocalFontFile(String path, final String fontFamily, boolean hasNetworkDowload) {
     if (TextUtils.isEmpty(path) || TextUtils.isEmpty(fontFamily)) {
       return false;
     }
@@ -243,9 +243,25 @@ public class TypefaceUtil {
             WXLogUtils.d(TAG, "load local font file success");
           }
 
-          Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-          intent.putExtra("fontFamily", fontFamily);
-          LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+          if(hasNetworkDowload) {
+            /**
+             * wxtext may be measured when font not load, when register broadcast receiver,
+             * this broadcast has been send, which cause textview not rendered right.
+             * delay broadcast ensure text will render right
+             * */
+            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+                intent.putExtra("fontFamily", fontFamily);
+                LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+              }
+            }, 50);
+          }else{
+            Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+            intent.putExtra("fontFamily", fontFamily);
+            LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+          }
           return true;
         }
       } else {
