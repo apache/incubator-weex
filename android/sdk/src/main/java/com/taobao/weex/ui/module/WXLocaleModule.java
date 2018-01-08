@@ -29,6 +29,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Locale;
 
@@ -38,16 +39,25 @@ import java.util.Locale;
  * Ref: https://tools.ietf.org/html/bcp47
  */
 
-public class WXLocalModule extends WXModule {
+public class WXLocaleModule extends WXModule {
 
   @JSMethod
   public void getLanguage(JSCallback callback) {
-    callback.invoke(getLanguageTags());
+    String languageTags = getLanguageTags();
+    WXLogUtils.d("[WXLocaleModule] getLanguage=" + languageTags);
+    callback.invoke(languageTags);
   }
 
   @JSMethod
   public void getLanguages(JSCallback callback) {
-    callback.invoke(getLanguageTags().split(","));
+    String languageTags = getLanguageTags();
+    if (TextUtils.isEmpty(languageTags)) {
+      callback.invoke("");
+      WXLogUtils.d("[WXLocaleModule] getLanguages is empty");
+    } else {
+      callback.invoke(languageTags.split(","));
+      WXLogUtils.d("[WXLocaleModule] getLanguages=" + languageTags);
+    }
   }
 
   private String getLanguageTags() {
