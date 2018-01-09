@@ -75,7 +75,8 @@ public class WXViewUtils {
   public static final int OPAQUE = PixelFormat.OPAQUE;
 
   public static final int DIMENSION_UNSET = -1;
-  private static final boolean mUseWebPx = true;
+  private static final boolean mUseWebPx = false;
+
   private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
   @SuppressLint("NewApi")
