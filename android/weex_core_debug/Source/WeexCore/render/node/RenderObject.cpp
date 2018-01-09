@@ -9,7 +9,9 @@
 #include <WeexCore/css/ConstantsName.h>
 #include <WeexCore/css/CssValueGetter.h>
 #include <base/ViewUtils.h>
+#include <string.h>
 
+using namespace std;
 namespace WeexCore {
 
   RenderObject::RenderObject() {
@@ -188,64 +190,79 @@ namespace WeexCore {
       setStylePosition(kPositionEdgeBottom, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
       return kTypeLayout;
     } else if (key == MARGIN) {
-      setMargin(kMarginALL, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mMargins->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setMargin(kMarginALL, realValue);
+      mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_LEFT) {
-      setMargin(kMarginLeft, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mMargins->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setMargin(kMarginLeft, realValue);
+      mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_TOP) {
-      setMargin(kMarginTop, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mMargins->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setMargin(kMarginTop, realValue);
+      mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_RIGHT) {
-      setMargin(kMarginRight, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mMargins->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setMargin(kMarginRight, realValue);
+      mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_BOTTOM) {
-      setMargin(kMarginBottom, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mMargins->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setMargin(kMarginBottom, realValue);
+      mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == BORDER_WIDTH) {
-      setBorderWidth(kBorderWidthALL, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mBorders->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setBorderWidth(kBorderWidthALL, realValue);
+      mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_TOP_WIDTH) {
-      setBorderWidth(kBorderWidthTop, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mBorders->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setBorderWidth(kBorderWidthTop, realValue);
+      mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_RIGHT_WIDTH) {
-      setBorderWidth(kBorderWidthRight, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mBorders->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setBorderWidth(kBorderWidthRight, realValue);
+      mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      setBorderWidth(kBorderWidthBottom, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mBorders->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setBorderWidth(kBorderWidthBottom, realValue);
+      mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_LEFT_WIDTH) {
-      setBorderWidth(kBorderWidthLeft, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mBorders->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setBorderWidth(kBorderWidthLeft, realValue);
+      mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == PADDING) {
-      setPadding(kPaddingALL, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mPaddings->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setPadding(kPaddingALL, realValue);
+      mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_LEFT) {
-      setPadding(kPaddingLeft, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mPaddings->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setPadding(kPaddingLeft, realValue);
+      mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_TOP) {
-      setPadding(kPaddingTop, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mPaddings->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setPadding(kPaddingTop, realValue);
+      mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_RIGHT) {
-      setPadding(kPaddingRight, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mPaddings->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setPadding(kPaddingRight, realValue);
+      mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_BOTTOM) {
-      setPadding(kPaddingBottom, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
-      mPaddings->insert(std::pair<std::string, std::string>(key, value));
+      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      setPadding(kPaddingBottom, realValue);
+      mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else {
       mStyles->insert(std::pair<std::string, std::string>(key, value));
