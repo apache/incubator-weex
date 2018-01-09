@@ -312,8 +312,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(defaultWidth);
-    render_root->setStyleHeight(defaultHeight);
+    render_root->setDefaultWidth(defaultWidth);
+    render_root->setDefaultHeight(defaultHeight);
     calculateLayout();
   }
 

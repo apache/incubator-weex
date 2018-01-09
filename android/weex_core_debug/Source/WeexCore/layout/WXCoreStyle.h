@@ -190,6 +190,10 @@ namespace WeexCore {
 
     float mStyleHeight;
 
+    float mDefaultWidth;
+
+    float mDefaultHeight;
+
     WXCoreMargin mMargin;
 
     WXCorePadding mPadding;
@@ -223,6 +227,7 @@ namespace WeexCore {
                        mAlignSelf(kFlexAlignSelfDefault),
                        mFlexGrow(kFlexGrowDefault),
                        mStyleWidth(NAN), mStyleHeight(NAN),
+                       mDefaultWidth(NAN), mDefaultHeight(NAN),
                        mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
                        mMinWidth(NAN), mMinHeight(NAN) {
 
@@ -237,6 +242,8 @@ namespace WeexCore {
       mFlexGrow = kFlexGrowDefault;
       mStyleWidth = NAN;
       mStyleHeight = NAN;
+      mDefaultWidth = NAN;
+      mDefaultHeight = NAN;
       mMaxWidth = MAXFLOAT;
       mMaxHeight = MAXFLOAT;
       mMinWidth = NAN;
