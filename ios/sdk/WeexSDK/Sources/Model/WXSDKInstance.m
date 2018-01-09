@@ -225,18 +225,6 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
-        
-        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXCycleSliderComponent" isDefault:NULL];
-        if(sliderConfig){
-            NSString *sliderClassName = [WXConvert NSString:sliderConfig];
-            if(sliderClassName.length>0){
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
-            }else{
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
-            }
-        }else{
-            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
-        }
     }
 }
 
