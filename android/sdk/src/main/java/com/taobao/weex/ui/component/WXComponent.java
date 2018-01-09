@@ -771,6 +771,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
+
     int realWidth = (int) getLayoutSize().getWidth();
     int realHeight = (int) getLayoutSize().getHeight();
     int realLeft = (int) (getLayoutPosition().getLeft() -
