@@ -18,21 +18,21 @@
  */
 package com.taobao.weex.ui.action;
 
-public abstract class BasicGraphicAction extends BasicAction {
+public abstract class BasicAction {
 
-  private String mRef;
+  private String mPageId;
 
-  public BasicGraphicAction(String pageId, String ref) {
-    super(pageId);
-    this.mRef = ref;
+  public BasicAction(String pageId) {
+    this.mPageId = pageId;
   }
 
-  public String getRef() {
-    return mRef;
+  public abstract void executeAction();
+
+  public String getPageId() {
+    return mPageId;
   }
 
-  public void setRef(String ref) {
-    this.mRef = ref;
+  public void setPageId(String pageId) {
+    this.mPageId = pageId;
   }
-
 }
