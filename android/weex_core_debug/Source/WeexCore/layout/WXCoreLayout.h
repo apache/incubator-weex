@@ -16,15 +16,15 @@ namespace WeexCore {
 
   class WXCoreFlexLine;
 
-  typedef enum FormattingContext {
+  enum FormattingContext {
     kBFC,
     kNonBFC,
-  } FormattingContext;
+  } ;
 
-  typedef enum MeasureMode {
+  enum MeasureMode {
     kUnspecified,
     kExactly,
-  } MeasureMode;
+  } ;
 
   struct WXCoreSize {
     float width;
@@ -875,14 +875,12 @@ namespace WeexCore {
 
   public:
 
-    //TODO this should replace by hasNewLayout
     bool hasNewLayout() {
-      return true;
+      return mHasNewLayout;
     }
 
-    //TODO this should replace by dirty
     bool isDirty() {
-      return true;
+      return dirty;
     }
 
     void markDirty(bool recursion = true) {
