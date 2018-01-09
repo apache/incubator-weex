@@ -1250,6 +1250,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!isDestroy()) {
       WXSDKManager.getInstance().destroyInstance(mInstanceId);
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
+      nativeOnInstanceClose(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
         getContext().unregisterReceiver(mGlobalEventReceiver);
@@ -1774,6 +1775,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 
   public native void nativeBindInstanceToWXCore(String instanceId, WXSDKInstance instance);
+
+  public native void nativeOnInstanceClose(String instanceId);
 
   public native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
 

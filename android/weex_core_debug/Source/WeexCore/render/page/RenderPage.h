@@ -132,6 +132,20 @@ namespace WeexCore {
       this->mViewPortWidth = viewPortWidth;
     }
 
+    // ****** Life Cycle ****** //
+
+    void OnRenderPageInit();
+
+    void OnRenderProcessStart();
+
+    void OnRenderProcessExited();
+
+    void OnRenderProcessGone();
+
+    void OnRenderPageClose();
+
+    void Destory();
+
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
     float mViewPortWidth;

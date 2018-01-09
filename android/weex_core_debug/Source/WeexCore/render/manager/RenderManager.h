@@ -57,6 +57,8 @@ namespace WeexCore {
 
     void printRenderAndLayoutTree(const std::string &pageId);
 
+    bool ClosePage(std::string pageId);
+
     static RenderManager *getInstance() {
       if (!m_pInstance) {
         m_pInstance = new RenderManager();

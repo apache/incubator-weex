@@ -29,44 +29,7 @@ namespace WeexCore {
   }
 
   RenderPage::~RenderPage() {
-
-    JNIEnv *env = getJNIEnv();
-
-    if (render_root != nullptr) {
-      delete render_root;
-      render_root = nullptr;
-    }
-
-    for (RenderActionIterator it = mRenderActions.begin();
-         it != mRenderActions.end(); it++) {
-      if (nullptr != *it) {
-        delete *it;
-        *it = nullptr;
-      }
-    }
-    mRenderActions.clear();
-
-    RenderObjectMapIterator begin = mRenderObjectRegisterMap.begin();
-    RenderObjectMapIterator end = mRenderObjectRegisterMap.end();
-    for (; begin != end; ++begin) {
-      delete begin->second;
-    }
-    mRenderObjectRegisterMap.clear();
-
-    if (mWXCorePerformance != nullptr) {
-      delete mWXCorePerformance;
-      mWXCorePerformance = nullptr;
-    }
-
-    if (mInstance_Impl_Android != nullptr) {
-      env->DeleteGlobalRef(mInstance_Impl_Android);
-      mInstance_Impl_Android = nullptr;
-    }
-
-    if (mInstance_Impl_iOS != nullptr) {
-      delete mInstance_Impl_iOS;
-      mInstance_Impl_iOS = nullptr;
-    }
+    Destory();
   }
 
   void RenderPage::calculateLayout() {
@@ -548,5 +511,65 @@ namespace WeexCore {
 
   void RenderPage::batch() {
 
+  }
+
+  void RenderPage::OnRenderPageInit() {
+
+  }
+
+  void RenderPage::OnRenderProcessStart() {
+
+  }
+
+  void RenderPage::OnRenderProcessExited() {
+
+  }
+
+  void RenderPage::OnRenderProcessGone() {
+
+  }
+
+  void RenderPage::OnRenderPageClose() {
+
+  }
+
+  void RenderPage::Destory() {
+    JNIEnv *env = getJNIEnv();
+
+    if (render_root != nullptr) {
+      delete render_root;
+      render_root = nullptr;
+    }
+
+    for (RenderActionIterator it = mRenderActions.begin();
+         it != mRenderActions.end(); it++) {
+      if (nullptr != *it) {
+        delete *it;
+        *it = nullptr;
+      }
+    }
+    mRenderActions.clear();
+
+    RenderObjectMapIterator begin = mRenderObjectRegisterMap.begin();
+    RenderObjectMapIterator end = mRenderObjectRegisterMap.end();
+    for (; begin != end; ++begin) {
+      delete begin->second;
+    }
+    mRenderObjectRegisterMap.clear();
+
+    if (mWXCorePerformance != nullptr) {
+      delete mWXCorePerformance;
+      mWXCorePerformance = nullptr;
+    }
+
+    if (mInstance_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mInstance_Impl_Android);
+      mInstance_Impl_Android = nullptr;
+    }
+
+    if (mInstance_Impl_iOS != nullptr) {
+      delete mInstance_Impl_iOS;
+      mInstance_Impl_iOS = nullptr;
+    }
   }
 } //namespace WeexCore

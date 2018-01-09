@@ -43,6 +43,11 @@ static void BindInstanceToWXCore(JNIEnv *env, jobject jcaller,
   page->bindInstance_Impl_Android(instance);
 }
 
+static void OnInstanceClose(JNIEnv *env, jobject jcaller,
+                            jstring instanceId) {
+  RenderManager::getInstance()->ClosePage(jString2Str(env, instanceId));
+}
+
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
                                                 jstring instanceId,
                                                 jfloat defaultWidth,

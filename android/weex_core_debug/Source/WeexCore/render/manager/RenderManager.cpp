@@ -115,6 +115,15 @@ namespace WeexCore {
     return page;
   }
 
+  bool RenderManager::ClosePage(std::string pageId) {
+    RenderPage *page = getPage(pageId);
+    if (page == nullptr)
+      return false;
+
+    mPages.erase(pageId);
+    delete page;
+  }
+
   void RenderManager::printRenderAndLayoutTree(const std::string &pageId) {
     RenderPage *page = this->getPage(pageId);
     if (page == nullptr)
