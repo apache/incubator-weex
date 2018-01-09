@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <jni.h>
+#include <cmath>
 
 namespace WeexCore {
 
@@ -146,6 +147,7 @@ namespace WeexCore {
 
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
+    bool rootViewInit = false;
     float mViewPortWidth;
     RenderObject *render_root;
     std::string mPageId;

@@ -11,6 +11,7 @@
 #include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/env/RenderPerformance.h>
 #include <WeexCore/env/CoreEnvironment.h>
+#include <base/ViewUtils.h>
 #include "RenderPage.h"
 #include "WeexCore/render/manager/RenderManager.h"
 #include "WeexCore/render/node/RenderObject.h"
@@ -64,7 +65,7 @@ namespace WeexCore {
   }
 
   void RenderPage::calculateLayout() {
-    if (render_root == nullptr)
+    if (render_root == nullptr || !rootViewInit)
       return;
 
     render_root->layoutBefore();
@@ -343,8 +344,11 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setDefaultWidth(defaultWidth);
-    render_root->setDefaultHeight(defaultHeight);
+    render_root->setStyleWidth(getRealPxByWidth(defaultWidth, getViewPortWidth()));
+    render_root->setStyleHeight(getRealPxByWidth(defaultHeight, getViewPortWidth()));
+    if(defaultWidth >0 && defaultHeight > 0) {
+      rootViewInit = true;
+    }
     calculateLayout();
   }
 

@@ -19,12 +19,12 @@ namespace WeexCore {
   enum FormattingContext {
     kBFC,
     kNonBFC,
-  };
+  } ;
 
   enum MeasureMode {
     kUnspecified,
     kExactly,
-  };
+  } ;
 
   struct WXCoreSize {
     float width;
@@ -727,28 +727,6 @@ namespace WeexCore {
 
     float getStyleHeight() {
       return mCssStyle->mStyleHeight;
-    }
-
-    void setDefaultWidth(float defaultWidth) {
-      if (mCssStyle->mDefaultWidth != defaultWidth) {
-        mCssStyle->mDefaultWidth = defaultWidth;
-        markDirty();
-      }
-    }
-
-    float getDefaultWidth() {
-      return mCssStyle->mDefaultWidth;
-    }
-
-    void setDefaultHeight(float defaultHeight) {
-      if (mCssStyle->mDefaultHeight != defaultHeight) {
-        mCssStyle->mDefaultHeight = defaultHeight;
-        markDirty();
-      }
-    }
-
-    float getDefaultHeight() {
-      return mCssStyle->mDefaultHeight;
     }
 
     void setMinWidth(float minWidth) {
