@@ -323,10 +323,10 @@ public abstract class WXBasicComponent<T extends View> {
   }
 
   public float getLayoutWidth() {
-    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getWidth(), getViewPortWidth());
+    return mLayoutSize == null ? 0 : mLayoutSize.getWidth();
   }
 
   public float getLayoutHeight() {
-    return mLayoutSize == null ? 0 : WXViewUtils.getRealPxByWidth(mLayoutSize.getHeight(), getViewPortWidth());
+    return mLayoutSize == null ? 0 : mLayoutSize.getHeight();
   }
 }
