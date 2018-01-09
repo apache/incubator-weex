@@ -52,6 +52,7 @@ import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
 import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
@@ -1987,7 +1988,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       long start = System.currentTimeMillis();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        instance.firstScreenCreateInstanceTime(start);
+          instance.firstScreenCreateInstanceTime(start);
+          GraphicActionCreateFinish action = new GraphicActionCreateFinish(instanceId);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
