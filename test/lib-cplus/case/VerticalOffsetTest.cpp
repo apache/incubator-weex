@@ -15,8 +15,8 @@ class PositionVertical : public ::testing::TestWithParam<::testing::tuple<float,
 protected:
     PositionVertical() {
         WXCorePositionEdge top, bottom;
-        top = WXCore_PositionEdge_Top;
-        bottom = WXCore_PositionEdge_Bottom;
+        top = kPositionEdgeTop;
+        bottom = kPositionEdgeBottom;
         foo = WXCoreLayoutNode::newWXCoreNode();
         targetChild = WXCoreLayoutNode::newWXCoreNode();
         target = WXCoreLayoutNode::newWXCoreNode();
@@ -150,9 +150,9 @@ TEST_P(PositionVertical, absolute) {
 INSTANTIATE_TEST_CASE_P(Relative, PositionVertical,
                         ::testing::Combine(::testing::Values(NAN, 100, 0), ::testing::Values(NAN, 0, 30, -10),
                                            ::testing::Values(NAN, 0, 70, -20),
-                                           ::testing::Values(WXCore_PositionType_Relative)));
+                                           ::testing::Values(kRelative)));
 
 INSTANTIATE_TEST_CASE_P(Absolute, PositionVertical,
                         ::testing::Combine(::testing::Values(NAN, 100, 0), ::testing::Values(NAN, 0, 30, -10),
                                            ::testing::Values(NAN, 0, 70, -20),
-                                           ::testing::Values(WXCore_PositionType_Absolute)));
+                                           ::testing::Values(kAbsolute)));

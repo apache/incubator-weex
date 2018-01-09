@@ -83,23 +83,23 @@ TEST_P(AlignmentItemsAlignSelf, row) {
             auto itemsBeforeLast = childCount % flexCap == 0 ? flexCap - 1 : childCount % flexCap - 1;
             float alignItemsWithCrossSizeTop, alignItemsWithCrossSizeBottom;
             if (flexCap >= childCount) {
-                if (alignSelf == WXCore_AlignSelf_Stretch ||
-                    (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+                if (alignSelf == kAlignSelfStretch ||
+                    (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                     height = targetHeight;
                     alignSelfWithoutCrossSizeBottom = targetHeight;
                 }
 
                 switch (alignItems) {
-                    case WXCore_AlignItems_Stretch:
-                    case WXCore_AlignItems_Flex_Start:
+                    case kAlignItemsStretch:
+                    case kAlignItemsFlexStart:
                         alignItemsWithCrossSizeTop = 0;
                         alignItemsWithCrossSizeBottom = childHeight;
                         break;
-                    case WXCore_AlignItems_Center:
+                    case kAlignItemsCenter:
                         alignItemsWithCrossSizeTop = targetHeight / 2 - childHeight / 2;
                         alignItemsWithCrossSizeBottom = targetHeight / 2 + childHeight / 2;
                         break;
-                    case WXCore_AlignItems_Flex_End:
+                    case kAlignItemsFlexEnd:
                         alignItemsWithCrossSizeTop = targetHeight - childHeight;
                         alignItemsWithCrossSizeBottom = targetHeight;
                         break;
@@ -109,8 +109,8 @@ TEST_P(AlignmentItemsAlignSelf, row) {
                         break;
                 }
             } else {
-                if (alignSelf == WXCore_AlignSelf_Stretch ||
-                    (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+                if (alignSelf == kAlignSelfStretch ||
+                    (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                     height = childHeight;
                     alignSelfWithoutCrossSizeBottom = childHeight;
                 }
@@ -136,9 +136,9 @@ TEST_P(AlignmentItemsAlignSelf, row) {
                 EXPECT_FLOAT_EQ(alignSelfWithoutCrossSize->getLayoutPositionTop(), 0);
                 EXPECT_FLOAT_EQ(alignSelfWithoutCrossSize->getLayoutPositionBottom(), alignSelfWithoutCrossSizeBottom);
             }
-        } else if (get<1>(GetParam()) == WXCore_Wrap_NoWrap) {
-            if (alignSelf == WXCore_AlignSelf_Stretch ||
-                (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+        } else if (get<1>(GetParam()) == kNoWrap) {
+            if (alignSelf == kAlignSelfStretch ||
+                (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                 height = targetHeight;
                 alignSelfWithoutCrossSizeBottom = targetHeight;
             }
@@ -149,9 +149,9 @@ TEST_P(AlignmentItemsAlignSelf, row) {
             EXPECT_FLOAT_EQ(alignItemsWithCrossSize->getLayoutHeight(), childHeight);
 
             float alignItemsWithCrossSizeTop = 0;
-            if (alignItems == WXCore_AlignItems_Flex_End) {
+            if (alignItems == kAlignItemsFlexEnd) {
                 alignItemsWithCrossSizeTop = targetHeight - childHeight;
-            } else if (alignItems == WXCore_AlignItems_Center) {
+            } else if (alignItems == kAlignItemsCenter) {
                 alignItemsWithCrossSizeTop = targetHeight / 2 - childHeight / 2;
             }
 
@@ -179,29 +179,29 @@ TEST_P(AlignmentItemsAlignSelf, column) {
         WXCoreAlignSelf alignSelf = get<3>(GetParam());
         float width = 0;
         float alignSelfWithoutCrossSizeRight = -1;
-        if (get<1>(GetParam()) == WXCore_Wrap_Wrap) {
+        if (get<1>(GetParam()) == kWrap) {
             auto flexCap = static_cast<int>(targetHeight / childHeight);
             auto linesBeforeLast = childCount / flexCap - (childCount % flexCap == 0 ? 1 : 0);
             auto itemsBeforeLast = childCount % flexCap == 0 ? flexCap - 1 : childCount % flexCap - 1;
             float alignItemsWithCrossSizeLeft, alignItemsWithCrossSizeRight;
             if (flexCap >= childCount) {
-                if (alignSelf == WXCore_AlignSelf_Stretch ||
-                    (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+                if (alignSelf == kAlignSelfStretch ||
+                    (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                     width = targetWidth;
                     alignSelfWithoutCrossSizeRight = targetWidth;
                 }
 
                 switch (alignItems) {
-                    case WXCore_AlignItems_Stretch:
-                    case WXCore_AlignItems_Flex_Start:
+                    case kAlignItemsStretch:
+                    case kAlignItemsFlexStart:
                         alignItemsWithCrossSizeLeft = 0;
                         alignItemsWithCrossSizeRight = childWidth;
                         break;
-                    case WXCore_AlignItems_Center:
+                    case kAlignItemsCenter:
                         alignItemsWithCrossSizeLeft = targetWidth / 2 - childWidth / 2;
                         alignItemsWithCrossSizeRight = targetWidth / 2 + childWidth / 2;
                         break;
-                    case WXCore_AlignItems_Flex_End:
+                    case kAlignItemsFlexEnd:
                         alignItemsWithCrossSizeLeft = targetWidth - childWidth;
                         alignItemsWithCrossSizeRight = targetWidth;
                         break;
@@ -211,8 +211,8 @@ TEST_P(AlignmentItemsAlignSelf, column) {
                         break;
                 }
             } else {
-                if (alignSelf == WXCore_AlignSelf_Stretch ||
-                    (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+                if (alignSelf == kAlignSelfStretch ||
+                    (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                     width = childWidth;
                     alignSelfWithoutCrossSizeRight = childWidth;
                 }
@@ -238,9 +238,9 @@ TEST_P(AlignmentItemsAlignSelf, column) {
             }
             EXPECT_FLOAT_EQ(alignSelfWithoutCrossSize->getLayoutPositionTop(), 0);
             EXPECT_FLOAT_EQ(alignSelfWithoutCrossSize->getLayoutPositionBottom(), childHeight);
-        } else if (get<1>(GetParam()) == WXCore_Wrap_NoWrap) {
-            if (alignSelf == WXCore_AlignSelf_Stretch ||
-                (alignItems == WXCore_AlignItems_Stretch && alignSelf == WXCore_AlignSelf_Auto)) {
+        } else if (get<1>(GetParam()) == kNoWrap) {
+            if (alignSelf == kAlignSelfStretch ||
+                (alignItems == kAlignItemsStretch && alignSelf == kAlignSelfAuto)) {
                 width = targetWidth;
                 alignSelfWithoutCrossSizeRight = targetWidth;
             }
@@ -251,9 +251,9 @@ TEST_P(AlignmentItemsAlignSelf, column) {
             EXPECT_FLOAT_EQ(alignItemsWithCrossSize->getLayoutHeight(), childHeight);
 
             float alignItemsWithCrossSizeLeft = 0;
-            if (alignItems == WXCore_AlignItems_Flex_End) {
+            if (alignItems == kAlignItemsFlexEnd) {
                 alignItemsWithCrossSizeLeft = targetWidth - childWidth;
-            } else if (alignItems == WXCore_AlignItems_Center) {
+            } else if (alignItems == kAlignItemsCenter) {
                 alignItemsWithCrossSizeLeft = targetWidth / 2 - childWidth / 2;
             }
 
@@ -274,28 +274,28 @@ TEST_P(AlignmentItemsAlignSelf, column) {
 }
 
 INSTANTIATE_TEST_CASE_P(Row, AlignmentItemsAlignSelf,
-                        Combine(Values(WXCore_Flex_Direction_Row),
-                                Values(WXCore_Wrap_NoWrap, WXCore_Wrap_Wrap),
-                                Values(WXCore_AlignItems_Flex_Start,
-                                       WXCore_AlignItems_Center,
-                                       WXCore_AlignItems_Flex_End,
-                                       WXCore_AlignItems_Stretch),
-                                Values(WXCore_AlignSelf_Auto,
-                                       WXCore_AlignSelf_Flex_Start,
-                                       WXCore_AlignSelf_Center,
-                                       WXCore_AlignSelf_Flex_End,
-                                       WXCore_AlignSelf_Stretch)));
+                        Combine(Values(kFlexDirectionRow),
+                                Values(kNoWrap, kWrap),
+                                Values(kAlignItemsFlexStart,
+                                       kAlignItemsCenter,
+                                       kAlignItemsFlexEnd,
+                                       kAlignItemsStretch),
+                                Values(kAlignSelfAuto,
+                                       kAlignSelfFlexStart,
+                                       kAlignSelfCenter,
+                                       kAlignSelfFlexEnd,
+                                       kAlignSelfStretch)));
 
 
 INSTANTIATE_TEST_CASE_P(Column, AlignmentItemsAlignSelf,
-                        Combine(Values(WXCore_Flex_Direction_Column),
-                                Values(WXCore_Wrap_NoWrap, WXCore_Wrap_Wrap),
-                                Values(WXCore_AlignItems_Flex_Start,
-                                       WXCore_AlignItems_Center,
-                                       WXCore_AlignItems_Flex_End,
-                                       WXCore_AlignItems_Stretch),
-                                Values(WXCore_AlignSelf_Auto,
-                                       WXCore_AlignSelf_Flex_Start,
-                                       WXCore_AlignSelf_Center,
-                                       WXCore_AlignSelf_Flex_End,
-                                       WXCore_AlignSelf_Stretch)));
+                        Combine(Values(kFlexDirectionColumn),
+                                Values(kNoWrap, kWrap),
+                                Values(kAlignItemsFlexStart,
+                                       kAlignItemsCenter,
+                                       kAlignItemsFlexEnd,
+                                       kAlignItemsStretch),
+                                Values(kAlignSelfAuto,
+                                       kAlignSelfFlexStart,
+                                       kAlignSelfCenter,
+                                       kAlignSelfFlexEnd,
+                                       kAlignSelfStretch)));

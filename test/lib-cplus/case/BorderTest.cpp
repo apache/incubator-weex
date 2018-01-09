@@ -13,11 +13,11 @@ protected:
         root = WXCoreLayoutNode::newWXCoreNode();
         root->setStyleWidth(100);
         root->setStyleHeight(300);
-        borderAll = WXCore_Border_Width_ALL;
-        borderLeft = WXCore_Border_Width_Left;
-        borderTop = WXCore_Border_Width_Top;
-        borderRight = WXCore_Border_Width_Right;
-        borderBottom = WXCore_Border_Width_Bottom;
+        borderAll = kBorderWidthALL;
+        borderLeft = kBorderWidthLeft;
+        borderTop = kBorderWidthTop;
+        borderRight = kBorderWidthRight;
+        borderBottom = kBorderWidthBottom;
     }
 
     virtual void TearDown() {

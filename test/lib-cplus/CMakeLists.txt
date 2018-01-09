@@ -22,17 +22,19 @@ file(GLOB_RECURSE HEAD_FILES ${SOURCE_DIR}/*.h)
 file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 add_library(WXCoreLayout_lib ${HEAD_FILES} ${SOURCE_FILES})
 
-# This adds another subdirectory, which has 'project(gtest)'.
-add_subdirectory(gtest/googletest)
-
-# Include the gtest library. gtest_SOURCE_DIR is available due to
-# 'project(gtest)' above.
-include_directories(${SOURCE_DIR})
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} .)
+# Inclue GoogleTest.
+include(ExternalProject)
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
+ExternalProject_Add(googletest
+        GIT_REPOSITORY https://github.com/google/googletest
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION})
+include_directories(${EXTERNAL_INSTALL_LOCATION}/include ${EXTERNAL_INSTALL_LOCATION} .)
+link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 
 ##############
 # Unit Tests
 ##############
+include_directories(${SOURCE_DIR})
 file(GLOB_RECURSE TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/case/*.cpp)
 
 add_executable(runUnitTests ${TEST_FILES})

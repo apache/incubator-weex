@@ -13,11 +13,11 @@ protected:
         root = WXCoreLayoutNode::newWXCoreNode();
         root->setStyleWidth(100);
         root->setStyleHeight(300);
-        paddingAll = WXCore_Padding_ALL;
-        paddingLeft = WXCore_Padding_Left;
-        paddingTop = WXCore_Padding_Top;
-        paddingRight = WXCore_Padding_Right;
-        paddingBottom = WXCore_Padding_Bottom;
+        paddingAll = kPaddingALL;
+        paddingLeft = kPaddingLeft;
+        paddingTop = kPaddingTop;
+        paddingRight = kPaddingRight;
+        paddingBottom = kPaddingBottom;
     }
 
     virtual void TearDown() {

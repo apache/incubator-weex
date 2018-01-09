@@ -17,10 +17,10 @@ static constexpr float fooWidth = 200;
 class HorizontalRelative : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        direction = WXCore_Flex_Direction_Row;
-        positionType = WXCore_PositionType_Relative;
-        left = WXCore_PositionEdge_Left;
-        right = WXCore_PositionEdge_Right;
+        direction = kFlexDirectionRow;
+        positionType = kRelative;
+        left = kPositionEdgeLeft;
+        right = kPositionEdgeRight;
         foo = WXCoreLayoutNode::newWXCoreNode();
         targetChild = WXCoreLayoutNode::newWXCoreNode();
         target = WXCoreLayoutNode::newWXCoreNode();

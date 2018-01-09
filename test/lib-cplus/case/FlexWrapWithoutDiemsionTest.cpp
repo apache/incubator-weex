@@ -36,7 +36,7 @@ protected:
     ~FlexWrapDimension() override {
         root->freeWXCoreNode();
         target->freeWXCoreNode();
-        FormattingContext bfc = NON_BFC;
+        FormattingContext bfc = kNonBFC;
         for (auto i = 0; i < root->getChildCount(bfc); i++) {
             root->getChildAt(bfc, i)->freeWXCoreNode();
         }
@@ -46,8 +46,8 @@ protected:
 };
 
 TEST_F(FlexWrapDimension, RowNoWrap) {
-    target->setFlexDirection(WXCore_Flex_Direction_Row);
-    target->setFlexWrap(WXCore_Wrap_NoWrap);
+    target->setFlexDirection(kFlexDirectionRow);
+    target->setFlexWrap(kNoWrap);
     root->calculateLayout();
 
     EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
@@ -60,8 +60,8 @@ TEST_F(FlexWrapDimension, RowNoWrap) {
 }
 
 TEST_F(FlexWrapDimension, RowWrap) {
-    target->setFlexDirection(WXCore_Flex_Direction_Row);
-    target->setFlexWrap(WXCore_Wrap_Wrap);
+    target->setFlexDirection(kFlexDirectionRow);
+    target->setFlexWrap(kWrap);
     root->calculateLayout();
 
     auto flexCap = static_cast<int>(rootWidth / childWidth);
@@ -78,8 +78,8 @@ TEST_F(FlexWrapDimension, RowWrap) {
 }
 
 TEST_F(FlexWrapDimension, ColumnNoWrap) {
-    target->setFlexDirection(WXCore_Flex_Direction_Column);
-    target->setFlexWrap(WXCore_Wrap_NoWrap);
+    target->setFlexDirection(kFlexDirectionColumn);
+    target->setFlexWrap(kNoWrap);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), childHeight * childCount);
@@ -91,8 +91,8 @@ TEST_F(FlexWrapDimension, ColumnNoWrap) {
 }
 
 TEST_F(FlexWrapDimension, ColumnWrap) {
-    target->setFlexDirection(WXCore_Flex_Direction_Column);
-    target->setFlexWrap(WXCore_Wrap_Wrap);
+    target->setFlexDirection(kFlexDirectionColumn);
+    target->setFlexWrap(kWrap);
     root->calculateLayout();
     EXPECT_FLOAT_EQ(root->getLayoutWidth(), rootWidth);
     EXPECT_FLOAT_EQ(target->getLayoutHeight(), childHeight * childCount);
