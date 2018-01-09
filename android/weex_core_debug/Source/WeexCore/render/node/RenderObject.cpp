@@ -166,13 +166,19 @@ namespace WeexCore {
     } else if (key == MAX_HEIGHT) {
       setMaxHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
       return kTypeLayout;
-    } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
+    } else if (key == HEIGHT) {
       setStyleHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
       return kTypeLayout;
-    } else if (key == DEFAULT_WIDTH | key == WIDTH) {
+    } else if (key == DEFAULT_HEIGHT) {
+      if (isnan(getStyleHeight()))
+        setDefaultHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+    } else if (key == WIDTH) {
       setStyleWidth(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
       return kTypeLayout;
-    } else if (key == POSITION) {
+    } else if (key == DEFAULT_WIDTH) {
+      if (isnan(getStyleWidth()))
+        setDefaultWidth(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+    }  else if (key == POSITION) {
       setStylePositionType(getWXCorePositionType(value));
       return kTypeLayout;
     } else if (key == LEFT) {
