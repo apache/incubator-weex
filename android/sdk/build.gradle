@@ -96,7 +96,7 @@ android {
             cmake {
                 arguments '-DANDROID_PLATFORM=android-19',
                         '-DANDROID_TOOLCHAIN=gcc',
-                        '-DANDROID_STL=gnustl_static'
+                        '-DANDROID_STL=c++_static'
             }
         }
 
