@@ -251,7 +251,7 @@ namespace WeexCore {
     return -1;
   }
 
-  void parseJsonObject(JsonParser &r, RenderObject *root) {
+  void parseJsonObject(JsonParser &r, RenderObject *root, const std::string &pageId) {
 
     RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
 
@@ -313,9 +313,9 @@ namespace WeexCore {
 
         while (r.NextArrayValue()) {
           RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
-
           RenderObject *child = new RenderObject();
-          parseJsonObject(r, child);
+          child->setPageId(pageId);
+          parseJsonObject(r, child, pageId);
           root->addRenderObject(index, child);
           index++;
         }
@@ -331,10 +331,11 @@ namespace WeexCore {
  * @param page : {@link RenderPage}
  * @return {@link RenderObject*}
  */
-  RenderObject *json2RenderObject(char *data) {
+  RenderObject *json2RenderObject(char *data, const std::string &pageId) {
     RenderObject *root = new RenderObject();
+    root->setPageId(pageId);
     JsonParser r(data);
-    parseJsonObject(r, root);
+    parseJsonObject(r, root, pageId);
     return root;
   }
 

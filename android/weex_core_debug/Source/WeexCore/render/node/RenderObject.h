@@ -6,6 +6,7 @@
 #include <set>
 #include <jni.h>
 #include <WeexCore/layout/WXCoreLayout.h>
+#include <WeexCore/render/manager/RenderManager.h>
 
 namespace WeexCore {
 
@@ -33,7 +34,7 @@ namespace WeexCore {
 
   private:
     void layoutBefore() {
-      if(isDirty()) {
+      if (isDirty()) {
         onLayoutBefore();
       }
       for (Index i = 0; i < getChildCount(); i++) {
@@ -43,7 +44,7 @@ namespace WeexCore {
     }
 
     void layoutAfter() {
-      if(hasNewLayout()) {
+      if (hasNewLayout()) {
         onLayoutAfter(getLayoutWidth(), getLayoutHeight());
       }
       for (Index i = 0; i < getChildCount(); i++) {
@@ -76,19 +77,19 @@ namespace WeexCore {
 
     void printYGNodeMsg();
 
-     jobject getComponent_Impl_Android() {
+    inline jobject getComponent_Impl_Android() {
       return mComponent_Impl_Android;
     }
 
-    jobject getMeasureFunc_Impl_Android() {
+    inline jobject getMeasureFunc_Impl_Android() {
       return mMeasureFunc_Impl_Android;
     }
 
-    RenderObject *getChild(Index &index) {
+    inline RenderObject *getChild(Index &index) {
       return (RenderObject *) getChildAt(index);
     }
 
-    Index indexOf(RenderObject *render) {
+    inline Index indexOf(RenderObject *render) {
       if (render == nullptr) {
         for (Index i = 0; i < getChildCount(); i++)
           if (getChild(i) == nullptr)
@@ -101,7 +102,7 @@ namespace WeexCore {
       return -1;
     }
 
-    void addRenderObject(int index, RenderObject *child) {
+    inline void addRenderObject(int index, RenderObject *child) {
 
       if (child == nullptr || index < -1) {
         return;
@@ -116,99 +117,112 @@ namespace WeexCore {
       }
     }
 
-    void removeRenderObject(RenderObject *child) {
+    inline void removeRenderObject(RenderObject *child) {
       removeChild(child);
     }
 
-    void addAttr(const std::string &key, const std::string &value) {
+    inline void addAttr(const std::string &key, const std::string &value) {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    StyleType addStyle(const std::string &key, const std::string &value) {
+    inline StyleType addStyle(const std::string &key, const std::string &value) {
       return applyStyle(key, value);
     }
 
-    void addEvent(const std::string &event) {
+    inline void addEvent(const std::string &event) {
       mEvents->insert(event);
     }
 
-    void removeEvent(const std::string &event) {
+    inline void removeEvent(const std::string &event) {
       mEvents->erase(event);
     }
 
-    void setRef(const std::string &ref) {
+    inline void setRef(const std::string &ref) {
       mRef = ref;
     }
 
-    const std::string &getRef() {
+    inline const std::string &getRef() {
       return mRef;
     }
 
-    void setType(const std::string &type) {
+    inline void setPageId(const std::string &pageId) {
+      this->mPageId = pageId;
+    }
+
+    inline const std::string &getPageId() {
+      return mPageId;
+    }
+
+    inline const RenderPage *getRenderPage() {
+      return RenderManager::getInstance()->getPage(mPageId);
+    }
+
+    inline void setType(const std::string &type) {
       mType = type;
     }
 
-    std::string getType() {
+    inline std::string getType() {
       return mType;
     }
 
-    void setParentRender(RenderObject *render) {
+    inline void setParentRender(RenderObject *render) {
       mParentRender = render;
     }
 
-    RenderObject *getParentRender() {
+    inline RenderObject *getParentRender() {
       return mParentRender;
     }
 
-    StylesMap *getStyles() {
+    inline StylesMap *getStyles() {
       return mStyles;
     }
 
-    AttributesMap *getAttributes() {
+    inline AttributesMap *getAttributes() {
       return mAttributes;
     }
 
-    EventsSet *getEvents() {
+    inline EventsSet *getEvents() {
       return mEvents;
     }
 
-    PaddingsMap *getPaddings() {
+    inline PaddingsMap *getPaddings() {
       return mPaddings;
     }
 
-    MarginsMap *getMargins() {
+    inline MarginsMap *getMargins() {
       return mMargins;
     }
 
-    BordersMap *getBorders() {
+    inline BordersMap *getBorders() {
       return mBorders;
     }
 
-    StylesIterator getStyleItBegin() {
+    inline StylesIterator getStyleItBegin() {
       return mStyles->begin();
     }
 
-    StylesIterator getStyleItEnd() {
+    inline StylesIterator getStyleItEnd() {
       return mStyles->end();
     }
 
-    AttributesIterator getAttrItBegin() {
+    inline AttributesIterator getAttrItBegin() {
       return mAttributes->begin();
     }
 
-    AttributesIterator getAttrItEnd() {
+    inline AttributesIterator getAttrItEnd() {
       return mAttributes->end();
     }
 
-    EventsIterator getEventItBegin() {
+    inline EventsIterator getEventItBegin() {
       return mEvents->begin();
     }
 
-    EventsIterator getEventItEnd() {
+    inline EventsIterator getEventItEnd() {
       return mEvents->end();
     }
 
   private:
+    std::string mPageId = "";
     std::string mRef = "";
     std::string mType = "";
     RenderObject *mParentRender;

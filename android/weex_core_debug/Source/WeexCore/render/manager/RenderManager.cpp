@@ -14,7 +14,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderObject *root = json2RenderObject(c_data);
+    RenderObject *root = json2RenderObject(c_data, pageId);
     page->parseJsonTime(getCurrentTime() - startTime);
     page->buildRenderObjectTime(getCurrentTime() - startTime);
     return page->createRootRender(root);
@@ -29,7 +29,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderObject *child = json2RenderObject(c_data);
+    RenderObject *child = json2RenderObject(c_data, pageId);
     page->parseJsonTime(getCurrentTime() - startTime);
     page->buildRenderObjectTime(getCurrentTime() - startTime);
     if (child == nullptr)
