@@ -124,7 +124,7 @@ namespace WeexCore {
       return mPageId;
     }
 
-    inline float getViewPortWidth() {
+    inline float getViewPortWidth()const {
       return mViewPortWidth;
     }
 
