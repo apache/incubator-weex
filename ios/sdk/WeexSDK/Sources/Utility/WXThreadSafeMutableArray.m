@@ -18,11 +18,13 @@
  */
 
 #import "WXThreadSafeMutableArray.h"
+#import "WXUtility.h"
 
 @interface WXThreadSafeMutableArray ()
 
 @property (nonatomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) NSMutableArray* array;
+@property (atomic, strong) NSRecursiveLock * arrayRecursiveLock;
 
 @end
 
@@ -34,6 +36,7 @@
     if (self) {
         NSString* uuid = [NSString stringWithFormat:@"com.taobao.weex.array_%p", self];
         _queue = dispatch_queue_create([uuid UTF8String], DISPATCH_QUEUE_CONCURRENT);
+        _arrayRecursiveLock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -89,76 +92,131 @@
 - (NSUInteger)count
 {
     __block NSUInteger count;
-    dispatch_sync(_queue, ^{
-        count = _array.count;
-    });
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            count = _array.count;
+        });
+    } else {
+        [_arrayRecursiveLock lock];
+        count = [_array count];
+        [_arrayRecursiveLock unlock];
+    }
     return count;
 }
 
 - (id)objectAtIndex:(NSUInteger)index
 {
     __block id obj;
-    dispatch_sync(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            obj = _array[index];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         obj = _array[index];
-    });
+        [_arrayRecursiveLock unlock];
+    }
     return obj;
 }
 
 - (NSEnumerator *)keyEnumerator
 {
     __block NSEnumerator *enu;
-    dispatch_sync(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            enu = [_array objectEnumerator];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         enu = [_array objectEnumerator];
-    });
+        [_arrayRecursiveLock unlock];
+    }
     return enu;
 }
 
 - (void)insertObject:(id)anObject atIndex:(NSUInteger)index
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_array insertObject:anObject atIndex:index];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         [_array insertObject:anObject atIndex:index];
-    });
+        [_arrayRecursiveLock unlock];
+    }
 }
 
 - (void)addObject:(id)anObject;
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_array addObject:anObject];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         [_array addObject:anObject];
-    });
+        [_arrayRecursiveLock unlock];
+    }
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_array removeObjectAtIndex:index];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         [_array removeObjectAtIndex:index];
-    });
+        [_arrayRecursiveLock unlock];
+    }
 }
 
 - (void)removeLastObject
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_array removeLastObject];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         [_array removeLastObject];
-    });
+        [_arrayRecursiveLock unlock];
+    }
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_array replaceObjectAtIndex:index withObject:anObject];
+        });
+    } else {
+        [_arrayRecursiveLock lock];
         [_array replaceObjectAtIndex:index withObject:anObject];
-    });
+        [_arrayRecursiveLock unlock];
+    }
 }
 
 - (NSUInteger)indexOfObject:(id)anObject
 {
     __block NSUInteger index = NSNotFound;
-    dispatch_sync(_queue, ^{
-        for (int i = 0; i < [_array count]; i ++) {
-            if ([_array objectAtIndex:i] == anObject) {
-                index = i;
-                break;
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            for (int i = 0; i < [_array count]; i ++) {
+                if ([_array objectAtIndex:i] == anObject) {
+                    index = i;
+                    break;
+                }
             }
-        }
-    });
+        });
+    } else {
+        [_arrayRecursiveLock lock];
+        index = [_array indexOfObject:anObject];
+        [_arrayRecursiveLock unlock];
+    }
+    
     return index;
 }
 
@@ -167,6 +225,7 @@
     if (_queue) {
         _queue = NULL;
     }
+    _arrayRecursiveLock = nil;
 }
 
 @end

@@ -18,10 +18,12 @@
  */
 
 #import "WXThreadSafeMutableDictionary.h"
+#import "WXUtility.h"
 
 @interface WXThreadSafeMutableDictionary ()
 
 @property (nonatomic, strong) dispatch_queue_t queue;
+@property (atomic, strong) NSRecursiveLock * recursiveDicLock;
 @property (nonatomic, strong) NSMutableDictionary* dict;
 
 @end
@@ -34,6 +36,7 @@
     if (self) {
         NSString* uuid = [NSString stringWithFormat:@"com.taobao.weex.dictionary_%p", self];
         _queue = dispatch_queue_create([uuid UTF8String], DISPATCH_QUEUE_CONCURRENT);
+        _recursiveDicLock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -90,56 +93,100 @@
 - (NSUInteger)count
 {
     __block NSUInteger count;
-    dispatch_sync(_queue, ^{
-        count = _dict.count;
-    });
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            count = _dict.count;
+        });
+    } else {
+        [_recursiveDicLock lock];
+        count = [_dict count];
+        [_recursiveDicLock unlock];
+    }
     return count;
 }
 
 - (id)objectForKey:(id)aKey
 {
     __block id obj;
-    dispatch_sync(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            obj = _dict[aKey];
+        });
+    } else {
+        [_recursiveDicLock lock];
         obj = _dict[aKey];
-    });
+        [_recursiveDicLock unlock];
+    }
     return obj;
 }
 
 - (NSEnumerator *)keyEnumerator
 {
     __block NSEnumerator *enu;
-    dispatch_sync(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            enu = [_dict keyEnumerator];
+        });
+    } else {
+        [_recursiveDicLock lock];
         enu = [_dict keyEnumerator];
-    });
+        [_recursiveDicLock unlock];
+    }
     return enu;
 }
 
 - (void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
     aKey = [aKey copyWithZone:NULL];
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
         _dict[aKey] = anObject;
-    });
+        });
+    } else {
+        [_recursiveDicLock lock];
+        _dict[aKey] = anObject;
+        [_recursiveDicLock unlock];
+    }
 }
 
 - (void)removeObjectForKey:(id)aKey
 {
-    dispatch_barrier_async(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_dict removeObjectForKey:aKey];
+        });
+    } else {
+        [_recursiveDicLock lock];
         [_dict removeObjectForKey:aKey];
-    });
+        [_recursiveDicLock unlock];
+    }
 }
 
-- (void)removeAllObjects{
-    dispatch_barrier_async(_queue, ^{
+- (void)removeAllObjects
+{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_barrier_async(_queue, ^{
+            [_dict removeAllObjects];
+        });
+    }else {
+        [_recursiveDicLock lock];
         [_dict removeAllObjects];
-    });
+        [_recursiveDicLock unlock];
+    }
 }
 
 - (id)copy{
     __block id copyInstance;
-    dispatch_sync(_queue, ^{
+    if (![WXUtility threadSafeCollectionUsingLock]) {
+        dispatch_sync(_queue, ^{
+            copyInstance = [_dict copy];
+        });
+    } else {
+        [_recursiveDicLock lock];
         copyInstance = [_dict copy];
-    });
+        [_recursiveDicLock unlock];
+    }
+    
     return copyInstance;
 }
 
