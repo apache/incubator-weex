@@ -144,8 +144,6 @@ namespace WeexCore {
 
     void OnRenderPageClose();
 
-    void Destory();
-
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
     float mViewPortWidth;
