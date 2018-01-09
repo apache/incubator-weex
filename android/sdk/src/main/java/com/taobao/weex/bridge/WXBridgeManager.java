@@ -54,6 +54,7 @@ import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
 import com.taobao.weex.ui.action.GraphicActionRemoveElement;
 import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
@@ -562,11 +563,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getRefreshFinish();
-//        domModule.postAction((DOMAction) action, false);
-      }
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (instance != null) {
+          GraphicActionRefreshFinish action = new GraphicActionRefreshFinish(instanceId);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+        }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRefreshFinish exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
