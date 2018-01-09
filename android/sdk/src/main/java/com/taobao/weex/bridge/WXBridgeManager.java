@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
@@ -733,9 +734,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         boolean reloadThisInstance = shouReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
-//        domModule.postAction((DOMAction) action, true);
+        new ActionReloadPage(instanceId, reloadThisInstance).executeAction();
       }
 
     } catch (Exception e) {
@@ -1601,12 +1600,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
           if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
-            // TODO
-            // JSONObject domObject = JSON.parseObject(tasks);
-//            WXDomModule domModule = getDomModule(instanceId);
-//            Action action = Actions.getReloadPage(instanceId, true);
-//            domModule.postAction((DOMAction) action, true);
-//            instance.setNeedLoad(true);
+            new ActionReloadPage(instanceId, true).executeAction();
+            instance.setNeedLoad(true);
             return;
           } else {
             instance.onRenderError(//DegradPassivity to H5
