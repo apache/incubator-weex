@@ -353,13 +353,14 @@ namespace WeexCore {
     void WXCoreLayoutNode::stretchViewCrossSize(){
       if (mCssStyle->mAlignItems == kAlignItemsStretch) {
         Index viewIndex = 0;
-        for (auto flexLine : mFlexLines) {
-          for (Index i = 0; i < flexLine->mItemCount; i++, viewIndex++) {
-            auto child = getChildAt(kNonBFC, viewIndex);
-            if (child->mCssStyle->mAlignSelf == kAlignSelfAuto ||
-                child->mCssStyle->mAlignSelf == kAlignSelfStretch) {
-              stretchViewCrossSize(child, flexLine->mCrossSize);
-            }
+        for (Index i = 0; i< mFlexLines.size(); i++ ) {
+            auto flexLine = mFlexLines.at(i);
+            for (Index j = 0; j < flexLine->mItemCount; j++, viewIndex++) {
+                WXCoreLayoutNode* child = getChildAt(kNonBFC, viewIndex);
+              if (child->mCssStyle->mAlignSelf == kAlignSelfAuto ||
+                  child->mCssStyle->mAlignSelf == kAlignSelfStretch) {
+                stretchViewCrossSize(child, flexLine->mCrossSize);
+              }
           }
         }
       } else {

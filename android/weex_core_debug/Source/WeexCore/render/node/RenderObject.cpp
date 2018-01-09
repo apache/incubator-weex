@@ -52,7 +52,7 @@ namespace WeexCore {
       mMeasureFunc_Impl_Android = nullptr;
     }
 
-    freeWXCoreNode();
+//    freeWXCoreNode();
 
     for (Index i = 0; i < getChildCount(); i++) {
       RenderObject *render = getChild(i);

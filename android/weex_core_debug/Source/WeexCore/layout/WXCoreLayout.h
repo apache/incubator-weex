@@ -108,6 +108,62 @@ namespace WeexCore {
    * Layout node
    */
   class WXCoreLayoutNode {
+
+  protected:
+      WXCoreLayoutNode() :
+              mChildrenFrozen(nullptr),
+              mParent(nullptr),
+              dirty(true),
+              widthDirty{false},
+              heightDirty{false},
+              mHasNewLayout(true),
+              mVisible(true),
+              measureFunc(nullptr) {
+        mCssStyle = new WXCoreCSSStyle();
+        mLayoutResult = new WXCorelayoutResult();
+        mLastAvailableSize = nullptr;
+        mIsDestroy = false;
+      }
+
+
+      ~WXCoreLayoutNode() {
+          mIsDestroy = true;
+        mHasNewLayout = true;
+        dirty = true;
+        mVisible = true;
+        measureFunc = nullptr;
+        mParent = nullptr;
+        mChildList.clear();
+
+        if (mChildrenFrozen != nullptr) {
+          delete mChildrenFrozen;
+          mChildrenFrozen = nullptr;
+        }
+
+        for (WXCoreFlexLine *flexLine : mFlexLines) {
+          if (flexLine != nullptr) {
+            delete flexLine;
+            flexLine = nullptr;
+          }
+        }
+        mFlexLines.clear();
+
+        if (mCssStyle != nullptr) {
+          delete mCssStyle;
+          mCssStyle = nullptr;
+        }
+
+        if (mLayoutResult != nullptr) {
+          delete mLayoutResult;
+          mLayoutResult = nullptr;
+        }
+
+        if (mLastAvailableSize != nullptr) {
+          delete mLastAvailableSize;
+          mLastAvailableSize = nullptr;
+        }
+      }
+
   private:
 
     /**
@@ -127,7 +183,7 @@ namespace WeexCore {
 
     WXCoreLayoutNode *mParent;
 
-    WXCoreCSSStyle *mCssStyle;
+    WXCoreCSSStyle *mCssStyle = nullptr;
 
     MeasureMode widthMeasureMode;
 
@@ -141,6 +197,8 @@ namespace WeexCore {
 
     bool mVisible;
 
+    bool mIsDestroy = true;
+
     WXCoreMeasureFunc measureFunc;
 
     void *context;
@@ -153,6 +211,9 @@ namespace WeexCore {
 
     MeasureMode mLastHeightMode;
 
+  private:
+
+
   public:
 
 
@@ -163,62 +224,15 @@ namespace WeexCore {
 
     /** ================================ lifeCycle =================================== **/
 
-    inline static WXCoreLayoutNode *newWXCoreNode() {
-      WXCoreLayoutNode *node = new WXCoreLayoutNode();
-      node->markDirty();
-      return node;
-    }
+//    inline static WXCoreLayoutNode *newWXCoreNode() {
+//      WXCoreLayoutNode *node = new WXCoreLayoutNode();
+//      node->markDirty();
+//      return node;
+//    }
+//
 
-    WXCoreLayoutNode() :
-        mChildrenFrozen(nullptr),
-        mParent(nullptr),
-        dirty(true),
-        widthDirty{false},
-        heightDirty{false},
-        mHasNewLayout(true),
-        mVisible(true),
-        measureFunc(nullptr) {
-      mCssStyle = new WXCoreCSSStyle();
-      mLayoutResult = new WXCorelayoutResult();
-      mLastAvailableSize = nullptr;
-    }
 
-    void freeWXCoreNode() {
-      mHasNewLayout = true;
-      dirty = true;
-      mVisible = true;
-      measureFunc = nullptr;
-      mParent = nullptr;
-      mChildList.clear();
 
-      if (mChildrenFrozen != nullptr) {
-        delete mChildrenFrozen;
-        mChildrenFrozen = nullptr;
-      }
-
-      for (WXCoreFlexLine *flexLine : mFlexLines) {
-        if (flexLine != nullptr) {
-          delete flexLine;
-          flexLine = nullptr;
-        }
-      }
-      mFlexLines.clear();
-
-      if (mCssStyle != nullptr) {
-        delete mCssStyle;
-        mCssStyle = nullptr;
-      }
-
-      if (mLayoutResult != nullptr) {
-        delete mLayoutResult;
-        mLayoutResult = nullptr;
-      }
-
-      if (mLastAvailableSize != nullptr) {
-        delete mLastAvailableSize;
-        mLastAvailableSize = nullptr;
-      }
-    }
 
     //TODO this should be private
     void reset() {
@@ -231,7 +245,7 @@ namespace WeexCore {
       }
     }
 
-    void resetLayoutResult() {
+    void resetLayolsutResult() {
       mLayoutResult->reset();
       markDirty();
     }
@@ -250,16 +264,16 @@ namespace WeexCore {
       }
     }
 
-    void copyNode(WXCoreLayoutNode *srcNode) {
-      copyStyle(srcNode);
-      copyMeasureFunc(srcNode);
-      for (WXCoreLayoutNode *node : mChildList) {
-        WXCoreLayoutNode *temp = newWXCoreNode();
-        memcpy(&node, &temp, sizeof(WXCoreLayoutNode));
-        srcNode->appendChild(temp);
-      }
-      markDirty();
-    }
+//    void copyNode(WXCoreLayoutNode *srcNode) {
+//      copyStyle(srcNode);
+//      copyMeasureFunc(srcNode);
+//      for (WXCoreLayoutNode *node : mChildList) {
+//        WXCoreLayoutNode *temp = newWXCoreNode();
+//        memcpy(&node, &temp, sizeof(WXCoreLayoutNode));
+//        srcNode->appendChild(temp);
+//      }
+//      markDirty();
+//    }
 
     /** ================================ measureFunc =================================== **/
 

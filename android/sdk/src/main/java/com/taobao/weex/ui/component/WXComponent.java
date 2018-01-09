@@ -535,6 +535,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       applyAttrs(component);
       applyBorder(component);
       updateExtra(component.getExtra());
+
     }
   }
 
