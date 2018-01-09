@@ -110,7 +110,7 @@ namespace WeexCore {
       render->setHasNewLayout(false);
     }
 
-    for (uint32_t i = 0; i < render->getChildCount(); i++) {
+    for (Index i = 0; i < render->getChildCount(); i++) {
       RenderObject *child = render->getChild(i);
       if (child != nullptr)
         traverseTree(child);
@@ -400,7 +400,7 @@ namespace WeexCore {
     mRenderObjectRegisterMap.insert(
         std::pair<std::string, RenderObject *>(render->getRef(), render));
 
-    for (uint32_t i = 0; i < render->getChildCount(); ++i) {
+    for (Index i = 0; i < render->getChildCount(); ++i) {
       pushRenderToRegisterMap(render->getChild(i));
     }
   }
@@ -411,7 +411,7 @@ namespace WeexCore {
 
     mRenderObjectRegisterMap.erase(render->getRef());
 
-    for (uint32_t i = 0; i < render->getChildCount(); ++i) {
+    for (Index i = 0; i < render->getChildCount(); ++i) {
       removeRenderFromRegisterMap(render->getChild(i));
     }
   }
@@ -432,7 +432,7 @@ namespace WeexCore {
     RenderAction *action = new RenderActionAddElement(getPageId(), child, parent, index);
     postRenderAction(action);
 
-    for (uint32_t i = 0; i < child->getChildCount(); ++i) {
+    for (Index i = 0; i < child->getChildCount(); ++i) {
       sendAddElementAction(child->getChild(i), child, i);
     }
   }
