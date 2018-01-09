@@ -26,8 +26,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
 
-import java.net.URI;
-
 public class FontDO {
   private final String mFontFamilyName;
   private String mUrl = "";
@@ -45,12 +43,21 @@ public class FontDO {
   public final static int TYPE_NETWORK = 1;
   public final static int TYPE_FILE = 2;
   public final static int TYPE_LOCAL = 3;
+  public final static int TYPE_NATIVE = 4;
 
 
   public FontDO (String fontFamilyName, String src, WXSDKInstance instance) {
     this.mFontFamilyName = fontFamilyName;
     parseSrc(src,instance);
   }
+
+  public FontDO (String fontFamilyName, Typeface typeface) {
+    this.mFontFamilyName = fontFamilyName;
+    this.mTypeface = typeface;
+    this.mType = TYPE_NATIVE;
+    this.mState = STATE_SUCCESS;
+  }
+
   public String getFontFamilyName() {
     return mFontFamilyName;
   }

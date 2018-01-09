@@ -138,7 +138,7 @@ public class WXTextDomObject extends WXDomObject {
   private int mFontSize = UNSET;
   private int mLineHeight = UNSET;
   private float previousWidth = Float.NaN;
-  private String mFontFamily = null;
+  private String mFontFamily = WXEnvironment.getGlobalFontFamilyName();
   private String mText = null;
   private TextUtils.TruncateAt textOverflow;
   private Layout.Alignment mAlignment;

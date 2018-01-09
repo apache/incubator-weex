@@ -20,6 +20,7 @@ package com.alibaba.weex;
 
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
@@ -94,6 +95,8 @@ public class WXApplication extends Application {
        * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
        */
 
+      Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
+      WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
 
     } catch (WXException e) {
       e.printStackTrace();
