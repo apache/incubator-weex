@@ -142,7 +142,7 @@ namespace WeexCore {
       setAlignSelf(getWXCoreAlignSelf(value));
       return kTypeLayout;
     } else if (key == FLEX) {
-      setFlex(stringToNum<float>(value));
+      setFlex(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == FLEX_DIRECTION) {
       setFlexDirection(getWXCoreFlexDirection(value));
@@ -154,96 +154,96 @@ namespace WeexCore {
       setFlexWrap(getWXCoreFlexWrap(value));
       return kTypeLayout;
     } else if (key == MIN_WIDTH) {
-      setMinWidth(stringToNum<float>(value));
+      setMinWidth(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == MIN_HEIGHT) {
-      setMinHeight(stringToNum<float>(value));
+      setMinHeight(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == MAX_WIDTH) {
-      setMaxWidth(stringToNum<float>(value));
+      setMaxWidth(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == MAX_HEIGHT) {
-      setMaxHeight(stringToNum<float>(value));
+      setMaxHeight(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == DEFAULT_HEIGHT || key == HEIGHT) {
-      setStyleHeight(stringToNum<float>(value));
+      setStyleHeight(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == DEFAULT_WIDTH | key == WIDTH) {
-      setStyleWidth(stringToNum<float>(value));
+      setStyleWidth(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == POSITION) {
       setStylePositionType(getWXCorePositionType(value));
       return kTypeLayout;
     } else if (key == LEFT) {
-      setStylePosition(kPositionEdgeLeft, stringToNum<float>(value));
+      setStylePosition(kPositionEdgeLeft, atof(value.c_str()));
       return kTypeLayout;
     } else if (key == TOP) {
-      setStylePosition(kPositionEdgeTop, stringToNum<float>(value));
+      setStylePosition(kPositionEdgeTop, atof(value.c_str()));
       return kTypeLayout;
     } else if (key == RIGHT) {
-      setStylePosition(kPositionEdgeRight, stringToNum<float>(value));
+      setStylePosition(kPositionEdgeRight, atof(value.c_str()));
       return kTypeLayout;
     } else if (key == BOTTOM) {
-      setStylePosition(kPositionEdgeBottom, stringToNum<float>(value));
+      setStylePosition(kPositionEdgeBottom, atof(value.c_str()));
       return kTypeLayout;
     } else if (key == MARGIN) {
-      setMargin(kMarginALL, stringToNum<float>(value));
+      setMargin(kMarginALL, atof(value.c_str()));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
       return kTypeMargin;
     } else if (key == MARGIN_LEFT) {
-      setMargin(kMarginLeft, stringToNum<float>(value));
+      setMargin(kMarginLeft, atof(value.c_str()));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
       return kTypeMargin;
     } else if (key == MARGIN_TOP) {
-      setMargin(kMarginTop, stringToNum<float>(value));
+      setMargin(kMarginTop, atof(value.c_str()));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
       return kTypeMargin;
     } else if (key == MARGIN_RIGHT) {
-      setMargin(kMarginRight, stringToNum<float>(value));
+      setMargin(kMarginRight, atof(value.c_str()));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
       return kTypeMargin;
     } else if (key == MARGIN_BOTTOM) {
-      setMargin(kMarginBottom, stringToNum<float>(value));
+      setMargin(kMarginBottom, atof(value.c_str()));
       mMargins->insert(std::pair<std::string, std::string>(key, value));
       return kTypeMargin;
     } else if (key == BORDER_WIDTH) {
-      setBorderWidth(kBorderWidthALL, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthALL, atof(value.c_str()));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
       return kTypeBorder;
     } else if (key == BORDER_TOP_WIDTH) {
-      setBorderWidth(kBorderWidthTop, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthTop, atof(value.c_str()));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
       return kTypeBorder;
     } else if (key == BORDER_RIGHT_WIDTH) {
-      setBorderWidth(kBorderWidthRight, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthRight, atof(value.c_str()));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
       return kTypeBorder;
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      setBorderWidth(kBorderWidthBottom, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthBottom, atof(value.c_str()));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
       return kTypeBorder;
     } else if (key == BORDER_LEFT_WIDTH) {
-      setBorderWidth(kBorderWidthLeft, stringToNum<float>(value));
+      setBorderWidth(kBorderWidthLeft, atof(value.c_str()));
       mBorders->insert(std::pair<std::string, std::string>(key, value));
       return kTypeBorder;
     } else if (key == PADDING) {
-      setPadding(kPaddingALL, stringToNum<float>(value));
+      setPadding(kPaddingALL, atof(value.c_str()));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
       return kTypePadding;
     } else if (key == PADDING_LEFT) {
-      setPadding(kPaddingLeft, stringToNum<float>(value));
+      setPadding(kPaddingLeft, atof(value.c_str()));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
       return kTypePadding;
     } else if (key == PADDING_TOP) {
-      setPadding(kPaddingTop, stringToNum<float>(value));
+      setPadding(kPaddingTop, atof(value.c_str()));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
       return kTypePadding;
     } else if (key == PADDING_RIGHT) {
-      setPadding(kPaddingRight, stringToNum<float>(value));
+      setPadding(kPaddingRight, atof(value.c_str()));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
       return kTypePadding;
     } else if (key == PADDING_BOTTOM) {
-      setPadding(kPaddingBottom, stringToNum<float>(value));
+      setPadding(kPaddingBottom, atof(value.c_str()));
       mPaddings->insert(std::pair<std::string, std::string>(key, value));
       return kTypePadding;
     } else {

@@ -262,7 +262,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
 
   RenderManager::getInstance()->addRenderObject(jString2Str(env, jInstanceId),
                                                 jString2Str(env, jParentRef),
-                                                stringToNum<int>(jString2Str(env, jindex)),
+                                                atoi(jString2Str(env, jindex).c_str()),
                                                 jByteArray2Str(env, jdomString)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
@@ -293,7 +293,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
   RenderManager::getInstance()->moveRenderObject(jString2Str(env, jInstanceId),
                                                  jString2Str(env, jRef),
                                                  jString2Str(env, jParentRef),
-                                                 stringToNum<int>(jString2Str(env, jIndex)));
+                                                 atoi(jString2Str(env, jIndex).c_str()));
 
   return createInt32Result(0);
 }

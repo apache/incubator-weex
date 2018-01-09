@@ -148,14 +148,5 @@ static void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
   size_t charsLength = scopedString.getCharsLength();
   serializer->addJSON(chars, charsLength);
 }
-
-template<class Type>
-static Type stringToNum(const std::string &str) {
-  std::istringstream iss(str);
-  Type num;
-  iss >> num;
-  return num;
-}
-
 }
 #endif //_STRING_UTILS_H_
