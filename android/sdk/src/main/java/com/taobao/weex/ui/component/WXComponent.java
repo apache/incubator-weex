@@ -771,13 +771,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
+    CSSShorthand parentPadding = (nullParent?new CSSShorthand():mParent.getPadding());
+    CSSShorthand parentBorder = (nullParent?new CSSShorthand():mParent.getBorder());
 
     int realWidth = (int) getLayoutSize().getWidth();
     int realHeight = (int) getLayoutSize().getHeight();
     int realLeft = (int) (getLayoutPosition().getLeft() -
-            getPadding().get(CSSShorthand.EDGE.LEFT) - getBorder().get(CSSShorthand.EDGE.LEFT));
+            parentPadding.get(CSSShorthand.EDGE.LEFT) - parentBorder.get(CSSShorthand.EDGE.LEFT));
     int realTop = (int) (getLayoutPosition().getTop() -
-            getPadding().get(CSSShorthand.EDGE.TOP) - getBorder().get(CSSShorthand.EDGE.TOP)) + siblingOffset;
+            parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
     int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
     int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
     Point rawOffset = new Point(
