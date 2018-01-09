@@ -771,11 +771,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
-    int realWidth = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getWidth(), getViewPortWidth());
-    int realHeight = (int) WXViewUtils.getRealPxByWidth(getLayoutSize().getHeight(), getViewPortWidth());
-    int realLeft = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getLeft(), getViewPortWidth()) -
+    int realWidth = (int) getLayoutSize().getWidth();
+    int realHeight = (int) getLayoutSize().getHeight();
+    int realLeft = (int) (getLayoutPosition().getLeft() -
             getPadding().get(CSSShorthand.EDGE.LEFT) - getBorder().get(CSSShorthand.EDGE.LEFT));
-    int realTop = (int) (WXViewUtils.getRealPxByWidth(getLayoutPosition().getTop(), getViewPortWidth()) -
+    int realTop = (int) (getLayoutPosition().getTop() -
             getPadding().get(CSSShorthand.EDGE.TOP) - getBorder().get(CSSShorthand.EDGE.TOP)) + siblingOffset;
     int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
     int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
@@ -1446,19 +1446,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
-          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.ALL, borderWidth);
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
-          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.TOP, borderWidth);
           break;
         case Constants.Name.BORDER_RIGHT_WIDTH:
-          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.RIGHT, borderWidth);
           break;
         case Constants.Name.BORDER_BOTTOM_WIDTH:
-          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.BOTTOM, borderWidth);
           break;
         case Constants.Name.BORDER_LEFT_WIDTH:
-          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth, getInstance().getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.LEFT, borderWidth);
           break;
       }
     }
