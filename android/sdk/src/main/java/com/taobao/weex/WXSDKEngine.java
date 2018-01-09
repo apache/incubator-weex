@@ -78,7 +78,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.module.WXLocalModule;
+import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
@@ -310,7 +310,7 @@ public class WXSDKEngine {
       registerModule("picker", WXPickersModule.class);
       registerModule("meta", WXMetaModule.class,true);
       registerModule("webSocket", WebSocketModule.class);
-      registerModule("local", WXLocalModule.class);
+      registerModule("locale", WXLocaleModule.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }

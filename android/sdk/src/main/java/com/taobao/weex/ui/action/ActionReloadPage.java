@@ -18,21 +18,31 @@
  */
 package com.taobao.weex.ui.action;
 
-public abstract class BasicGraphicAction extends BasicAction {
+import android.util.Log;
 
-  private String mRef;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 
-  public BasicGraphicAction(String pageId, String ref) {
+/**
+ * Created by listen on 18/01/09.
+ */
+public class ActionReloadPage extends BasicAction {
+
+  private final String TAG = "ReloadPageAction";
+  private boolean mReloadThis;
+
+  public ActionReloadPage(String pageId, boolean reloadThis) {
     super(pageId);
-    this.mRef = ref;
+    this.mReloadThis = reloadThis;
   }
 
-  public String getRef() {
-    return mRef;
+  @Override
+  public void executeAction() {
+    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    if (instance != null) {
+      instance.reloadPage(mReloadThis);
+    } else {
+      Log.e(TAG, "ReloadPageAction executeDom reloadPage instance is null");
+    }
   }
-
-  public void setRef(String ref) {
-    this.mRef = ref;
-  }
-
 }

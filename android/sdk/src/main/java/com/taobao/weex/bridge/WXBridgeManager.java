@@ -48,11 +48,14 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
 import com.taobao.weex.ui.action.GraphicActionRemoveElement;
 import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
@@ -561,11 +564,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getRefreshFinish();
-//        domModule.postAction((DOMAction) action, false);
-      }
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (instance != null) {
+          GraphicActionRefreshFinish action = new GraphicActionRefreshFinish(instanceId);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+        }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRefreshFinish exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -733,9 +736,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         boolean reloadThisInstance = shouReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getReloadPage(instanceId, reloadThisInstance);
-//        domModule.postAction((DOMAction) action, true);
+        new ActionReloadPage(instanceId, reloadThisInstance).executeAction();
       }
 
     } catch (Exception e) {
@@ -1601,12 +1602,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (METHOD_CREATE_INSTANCE.equals(function)) {
         try {
           if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
-            // TODO
-            // JSONObject domObject = JSON.parseObject(tasks);
-//            WXDomModule domModule = getDomModule(instanceId);
-//            Action action = Actions.getReloadPage(instanceId, true);
-//            domModule.postAction((DOMAction) action, true);
-//            instance.setNeedLoad(true);
+            new ActionReloadPage(instanceId, true).executeAction();
+            instance.setNeedLoad(true);
             return;
           } else {
             instance.onRenderError(//DegradPassivity to H5
@@ -1991,7 +1988,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       long start = System.currentTimeMillis();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        instance.firstScreenCreateInstanceTime(start);
+          instance.firstScreenCreateInstanceTime(start);
+          GraphicActionCreateFinish action = new GraphicActionCreateFinish(instanceId);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);

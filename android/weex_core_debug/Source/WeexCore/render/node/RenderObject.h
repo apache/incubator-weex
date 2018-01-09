@@ -33,7 +33,9 @@ namespace WeexCore {
 
   private:
     void layoutBefore() {
-      onLayoutBefore();
+      if(isDirty()) {
+        onLayoutBefore();
+      }
       for (Index i = 0; i < getChildCount(); i++) {
         RenderObject *child = getChild(i);
         child->layoutBefore();
@@ -41,7 +43,9 @@ namespace WeexCore {
     }
 
     void layoutAfter() {
-      onLayoutAfter(getLayoutWidth(), getLayoutHeight());
+      if(hasNewLayout()) {
+        onLayoutAfter(getLayoutWidth(), getLayoutHeight());
+      }
       for (Index i = 0; i < getChildCount(); i++) {
         RenderObject *child = getChild(i);
         child->layoutAfter();
@@ -72,19 +76,19 @@ namespace WeexCore {
 
     void printYGNodeMsg();
 
-    inline jobject getComponent_Impl_Android() {
+     jobject getComponent_Impl_Android() {
       return mComponent_Impl_Android;
     }
 
-    inline jobject getMeasureFunc_Impl_Android() {
+    jobject getMeasureFunc_Impl_Android() {
       return mMeasureFunc_Impl_Android;
     }
 
-    inline RenderObject *getChild(Index &index) {
+    RenderObject *getChild(Index &index) {
       return (RenderObject *) getChildAt(index);
     }
 
-    inline Index indexOf(RenderObject *render) {
+    Index indexOf(RenderObject *render) {
       if (render == nullptr) {
         for (Index i = 0; i < getChildCount(); i++)
           if (getChild(i) == nullptr)
@@ -97,7 +101,7 @@ namespace WeexCore {
       return -1;
     }
 
-    inline void addRenderObject(int index, RenderObject *child) {
+    void addRenderObject(int index, RenderObject *child) {
 
       if (child == nullptr || index < -1) {
         return;
@@ -112,95 +116,95 @@ namespace WeexCore {
       }
     }
 
-    inline void removeRenderObject(RenderObject *child) {
+    void removeRenderObject(RenderObject *child) {
       removeChild(child);
     }
 
-    inline void addAttr(const std::string &key, const std::string &value) {
+    void addAttr(const std::string &key, const std::string &value) {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    inline StyleType addStyle(const std::string &key, const std::string &value) {
+    StyleType addStyle(const std::string &key, const std::string &value) {
       return applyStyle(key, value);
     }
 
-    inline void addEvent(const std::string &event) {
+    void addEvent(const std::string &event) {
       mEvents->insert(event);
     }
 
-    inline void removeEvent(const std::string &event) {
+    void removeEvent(const std::string &event) {
       mEvents->erase(event);
     }
 
-    inline void setRef(const std::string &ref) {
+    void setRef(const std::string &ref) {
       mRef = ref;
     }
 
-    inline const std::string &getRef() {
+    const std::string &getRef() {
       return mRef;
     }
 
-    inline void setType(const std::string &type) {
+    void setType(const std::string &type) {
       mType = type;
     }
 
-    inline std::string getType() {
+    std::string getType() {
       return mType;
     }
 
-    inline void setParentRender(RenderObject *render) {
+    void setParentRender(RenderObject *render) {
       mParentRender = render;
     }
 
-    inline RenderObject *getParentRender() {
+    RenderObject *getParentRender() {
       return mParentRender;
     }
 
-    inline StylesMap *getStyles() {
+    StylesMap *getStyles() {
       return mStyles;
     }
 
-    inline AttributesMap *getAttributes() {
+    AttributesMap *getAttributes() {
       return mAttributes;
     }
 
-    inline EventsSet *getEvents() {
+    EventsSet *getEvents() {
       return mEvents;
     }
 
-    inline PaddingsMap *getPaddings() {
+    PaddingsMap *getPaddings() {
       return mPaddings;
     }
 
-    inline MarginsMap *getMargins() {
+    MarginsMap *getMargins() {
       return mMargins;
     }
 
-    inline BordersMap *getBorders() {
+    BordersMap *getBorders() {
       return mBorders;
     }
 
-    inline StylesIterator getStyleItBegin() {
+    StylesIterator getStyleItBegin() {
       return mStyles->begin();
     }
 
-    inline StylesIterator getStyleItEnd() {
+    StylesIterator getStyleItEnd() {
       return mStyles->end();
     }
 
-    inline AttributesIterator getAttrItBegin() {
+    AttributesIterator getAttrItBegin() {
       return mAttributes->begin();
     }
 
-    inline AttributesIterator getAttrItEnd() {
+    AttributesIterator getAttrItEnd() {
       return mAttributes->end();
     }
 
-    inline EventsIterator getEventItBegin() {
+    EventsIterator getEventItBegin() {
       return mEvents->begin();
     }
 
-    inline EventsIterator getEventItEnd() {
+    EventsIterator getEventItEnd() {
       return mEvents->end();
     }
 
