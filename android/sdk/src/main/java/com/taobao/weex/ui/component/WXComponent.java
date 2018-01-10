@@ -60,6 +60,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
@@ -200,12 +201,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mType = component.getType();
   }
 
-  protected void setContentBoxMeasurement(ContentBoxMeasurement contentBoxMeasurement) {
+  protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    nativeBindMeasurementToWXCore(getInstanceId(), getRef(), this.contentBoxMeasurement);
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
+      }
+    });
   }
-
-  public native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
   private void applyStyles(WXComponent component) {
     if (component != null) {
@@ -1938,4 +1942,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
     return false;
   }
+
+  private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 }

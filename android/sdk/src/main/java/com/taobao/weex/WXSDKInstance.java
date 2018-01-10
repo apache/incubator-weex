@@ -1009,7 +1009,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    nativePrintRenderSuccessLog(getInstanceId());
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativePrintRenderSuccessLog(getInstanceId());
+      }
+    });
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1216,7 +1221,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      nativePrintFirstScreenLog(getInstanceId());
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          nativePrintFirstScreenLog(getInstanceId());
+        }
+      });
   }
 
   public void createInstanceFinished(long time) {
@@ -1250,7 +1260,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!isDestroy()) {
       WXSDKManager.getInstance().destroyInstance(mInstanceId);
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
-      nativeOnInstanceClose(getInstanceId());
+
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          nativeOnInstanceClose(getInstanceId());
+        }
+      });
 
       if (mGlobalEventReceiver != null) {
         getContext().unregisterReceiver(mGlobalEventReceiver);
@@ -1378,8 +1394,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
-    float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
+    final float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
+    final float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {
@@ -1396,7 +1412,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           return;
         }
         rootComponent.applyLayoutAndEvent(rootComponent);
-        nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
+
+        WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+            nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
+          }
+        });
       }
     }
   }

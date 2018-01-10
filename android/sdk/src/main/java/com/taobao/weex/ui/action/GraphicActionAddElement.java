@@ -20,6 +20,7 @@ package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
@@ -60,13 +61,18 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
     final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
     CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), getParentRef());
-    WXComponent child = createComponent(instance, parent, commonCompData);
+    final WXComponent child = createComponent(instance, parent, commonCompData);
 
     if (child == null || parent == null) {
       return;
     }
 
-    WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
+      }
+    });
 
     try {
       parent.addChild(child, mIndex);
