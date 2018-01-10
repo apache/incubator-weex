@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.ui.action.ActionAddRule;
 import com.taobao.weex.ui.action.ActionGetComponentRect;
 import com.taobao.weex.ui.action.ActionInvokeMethod;
 import com.taobao.weex.ui.action.GraphicActionScrollToElement;
@@ -79,21 +80,23 @@ public final class WXDomModule extends WXModule {
           String ref = args.size() >= 1 ? args.getString(0) : null;
           JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
           new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options)
-                  .executeActionOnRender(mWXSDKInstance.getInstanceId());
+                  .executeActionOnRender();
           break;
         }
-        case ADD_RULE:
+        case ADD_RULE:{
           if (args == null) {
             return null;
           }
-//        return new AddRuleAction(args.getString(0),args.getJSONObject(1));
+          new ActionAddRule(mWXSDKInstance.getInstanceId(), args.getString(0), args.getJSONObject(1))
+                  .executeAction();
           break;
+        }
         case GET_COMPONENT_RECT:{
             if(args == null){
                 return null;
             }
             new ActionGetComponentRect(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1))
-                    .executeActionOnRender(mWXSDKInstance.getInstanceId());
+                    .executeActionOnRender();
             break;
         }
         case INVOKE_METHOD: {

@@ -18,7 +18,11 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.text.TextUtils;
+
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.utils.WXLogUtils;
 
 public abstract class BasicGraphicAction implements IExecutable {
 
@@ -46,7 +50,14 @@ public abstract class BasicGraphicAction implements IExecutable {
     this.mRef = ref;
   }
 
-  public void executeActionOnRender(String instanceId) {
-    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, this);
+  public void executeActionOnRender() {
+    if (TextUtils.isEmpty(mPageId)) {
+        WXLogUtils.e("[BasicGraphicAction] pageId can not be null");
+        if (WXEnvironment.isApkDebugable()) {
+            throw new RuntimeException("["+getClass().getName()+"] pageId can not be null");
+        }
+        return;
+    }
+    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mPageId, this);
   }
 }
