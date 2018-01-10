@@ -26,9 +26,8 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderActionContext;
-import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.BasicAction;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -90,7 +89,7 @@ public class WXRenderManager {
     }
   }
 
-  public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
+  public void postGraphicAction(final String instanceId, final BasicAction action) {
     mWXRenderHandler.post(WXThread.secure(new Runnable() {
 
       @Override
