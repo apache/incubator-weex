@@ -47,7 +47,8 @@ public class WXPerformance {
     wxdim4,
     wxdim5,
     bizType,
-    templateUrl;
+    templateUrl,
+    useScroller
   }
 
   private enum Measure {
@@ -63,18 +64,17 @@ public class WXPerformance {
     fsCallNativeTotalNum,
     fsRenderTime,
     fsRequestNum,
-    callCreateInstanceTime,
+    fsCreateInstanceTime,
     communicateTotalTime,
     maxDeepViewLayer,
     maxDeepVDomLayer,
     componentCount,
-    useScroller,
     cellExceedNum,
-    timerInvokeCount,
+    timerCount,
     avgFps,
-    maxImproveMemory,
-    backImproveMemory,
-    pushImproveMemory,
+    MaxImproveMemory,
+    BackImproveMemory,
+    PushImproveMemory,
     measureTime1,
     measureTime2,
     measureTime3,
@@ -92,6 +92,9 @@ public class WXPerformance {
     syncTaskTime,
     actualNetworkTime,
     firstScreenJSFExecuteTime,
+    //..
+    fsCallEventTotalNum,
+    callCreateFinishTime,
   }
 
   public static final String DEFAULT = "default";
@@ -123,6 +126,8 @@ public class WXPerformance {
 
   public long fsRenderTime;
 
+  public long callCreateFinishTime;
+
   /**
    * Time used for
    * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
@@ -144,6 +149,8 @@ public class WXPerformance {
   public int cellExceedNum;
 
   public int timerInvokeCount;
+
+  public int fsCallEventTotalNum;
 
   public long avgFPS;
   public long frameSum;
@@ -343,7 +350,7 @@ public class WXPerformance {
     quotas.put(Measure.JSTemplateSize.toString(), JSTemplateSize);
     quotas.put(Measure.pureNetworkTime.toString(),(double)pureNetworkTime);
     quotas.put(Measure.networkTime.toString(), (double)networkTime);
-    quotas.put(Measure.callCreateInstanceTime.toString(), (double) (callCreateInstanceTime- renderTimeOrigin));
+    quotas.put(Measure.fsCreateInstanceTime.toString(), (double) (callCreateInstanceTime- renderTimeOrigin));
     quotas.put(Measure.fsCallJsTotalTime.toString(),(double) fsCallJsTotalTime);
     quotas.put(Measure.fsCallJsTotalNum.toString(), (double) fsCallJsTotalNum);
     quotas.put(Measure.fsCallNativeTotalTime.toString(), (double) fsCallNativeTotalTime);
@@ -354,13 +361,16 @@ public class WXPerformance {
     quotas.put(Measure.maxDeepViewLayer.toString(), (double) maxDeepViewLayer);
     quotas.put(Measure.maxDeepVDomLayer.toString(), (double) maxDeepVDomLayer);
     quotas.put(Measure.componentCount.toString(),(double)componentCount);
-    quotas.put(Measure.useScroller.toString(), (double) useScroller);
     quotas.put(Measure.cellExceedNum.toString(), (double) cellExceedNum);
-    quotas.put(Measure.timerInvokeCount.toString(), (double) timerInvokeCount);
+    quotas.put(Measure.timerCount.toString(), (double) timerInvokeCount);
     quotas.put(Measure.avgFps.toString(), (double) avgFPS);
-    quotas.put(Measure.maxImproveMemory.toString(), 0D);
-    quotas.put(Measure.backImproveMemory.toString(), (double) backImproveMemory);
-    quotas.put(Measure.pushImproveMemory.toString(), 0D);
+    quotas.put(Measure.MaxImproveMemory.toString(), 0D);
+    quotas.put(Measure.BackImproveMemory.toString(), (double) backImproveMemory);
+    quotas.put(Measure.PushImproveMemory.toString(), 0D);
+
+    quotas.put(Measure.fsCallEventTotalNum.toString(),(double)fsCallEventTotalNum);
+    quotas.put(Measure.callCreateFinishTime.toString(),(double)callCreateFinishTime);
+
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double)screenRenderTime);
@@ -390,6 +400,8 @@ public class WXPerformance {
     quotas.put(Dimension.networkType.toString(), "unknown");
     quotas.put(Dimension.connectionType.toString(), connectionType);
     quotas.put(Dimension.cacheType.toString(), cacheType);
+    quotas.put(Dimension.useScroller.toString(),String.valueOf(useScroller));
+
 
     // TODO These attribute will be moved to elsewhere
     // Extra Dimension for 3rd developers.

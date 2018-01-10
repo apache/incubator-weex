@@ -1048,6 +1048,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
 
   public void onCreateFinish() {
+    if (null != mWXPerformance){
+      mWXPerformance.callCreateFinishTime=System.currentTimeMillis()-mWXPerformance
+          .renderTimeOrigin;
+    }
     if (mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1509,6 +1513,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param domChanges
    */
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs){
+    if (null != mWXPerformance && mWXPerformance.fsCallEventTotalNum<Integer.MAX_VALUE){
+      mWXPerformance.fsCallEventTotalNum++;
+    }
+
     WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs);
   }
   /**
