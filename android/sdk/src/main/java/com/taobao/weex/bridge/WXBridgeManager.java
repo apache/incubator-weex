@@ -420,10 +420,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.setLength(0);
     }
     try {
-      // TODO
-//      WXDomModule dom = getDomModule(instanceId);
-//      dom.invokeMethod(componentRef, method, arguments);
-
+      WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+      dom.invokeMethod(componentRef, method, arguments);
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -472,27 +470,26 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
     }
 
-    int size = array.size();
-    if (size > 0) {
+    if (null != array && array.size() > 0) {
+      int size = array.size();
       try {
         JSONObject task;
         for (int i = 0; i < size; ++i) {
           task = (JSONObject) array.get(i);
           if (task != null && WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-            Object target = task.get(MODULE);
-            if (target != null) {
-              if (WXDomModule.WXDOM.equals(target)) {
+            Object module = task.get(MODULE);
+            if (module != null) {
+              if (WXDomModule.WXDOM.equals(module)) {
                 WXDomModule dom = WXModuleManager.getDomModule(instanceId);
                 dom.callDomMethod(task, parseNanos);
               } else {
                 JSONObject optionObj = task.getJSONObject(OPTIONS);
-                callModuleMethod(instanceId, (String) target,
+                callModuleMethod(instanceId, (String) module,
                         (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
               }
             } else if (task.get(COMPONENT) != null) {
-              // TODO
-//              WXDomModule dom = getDomModule(instanceId);
-//              dom.invokeMethod((String) task.get(REF), (String) task.get(METHOD), (JSONArray) task.get(ARGS));
+              WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+              dom.invokeMethod((String) task.get(REF), (String) task.get(METHOD), (JSONArray) task.get(ARGS));
             } else {
               throw new IllegalArgumentException("unknown callNative");
             }

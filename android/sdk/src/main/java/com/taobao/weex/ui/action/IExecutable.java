@@ -18,21 +18,8 @@
  */
 package com.taobao.weex.ui.action;
 
-public abstract class BasicAction {
+public interface IExecutable {
 
-  private String mPageId;
+  void executeAction();
 
-  public BasicAction(String pageId) {
-    this.mPageId = pageId;
-  }
-
-  public abstract void executeAction();
-
-  public String getPageId() {
-    return mPageId;
-  }
-
-  public void setPageId(String pageId) {
-    this.mPageId = pageId;
-  }
 }

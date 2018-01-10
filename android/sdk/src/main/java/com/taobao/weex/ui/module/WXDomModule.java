@@ -24,7 +24,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.ui.action.BasicAction;
+import com.taobao.weex.ui.action.ActionInvokeMethod;
+import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.action.GraphicActionScrollToElement;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -72,15 +73,16 @@ public final class WXDomModule extends WXModule {
 
     try {
       switch (method) {
-        case SCROLL_TO_ELEMENT:
+        case SCROLL_TO_ELEMENT:{
           if (args == null) {
             return null;
           }
           String ref = args.size() >= 1 ? args.getString(0) : null;
           JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
-          BasicAction action = new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options);
+          IExecutable action = new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options);
           postAction(action);
           break;
+        }
         case ADD_RULE:
           if (args == null) {
             return null;
@@ -93,21 +95,18 @@ public final class WXDomModule extends WXModule {
           }
 //        return new GetComponentRectAction(args.getString(0),args.getString(1));
           break;
-        case INVOKE_METHOD:
+        case INVOKE_METHOD: {
           if(args == null){
             return null;
           }
-//        return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
+          // todo：no sure where the request com from
+          new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1), args.getJSONArray(2)).executeAction();
           break;
+        }
         default:
           WXLogUtils.e("Unknown dom action.");
           break;
       }
-
-//      if(action instanceof DOMAction){
-//        postAction((DOMAction)action, CREATE_BODY.equals(method) || ADD_RULE.equals(method));
-//      }else {
-//      }
 
       // todo TraceableAction
 //      if (WXTracing.isAvailable() && action instanceof TraceableAction) {
@@ -151,10 +150,10 @@ public final class WXDomModule extends WXModule {
       return;
     }
 
-//    postAction(Actions.getInvokeMethod(ref,method,args),false);
+    new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), ref, method, args).executeAction();
   }
 
-  public void postAction(BasicAction action){
+  public void postAction(IExecutable action){
     WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mWXSDKInstance.getInstanceId(), action);
   }
 

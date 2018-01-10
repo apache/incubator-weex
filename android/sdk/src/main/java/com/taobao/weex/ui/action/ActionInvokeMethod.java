@@ -18,32 +18,37 @@
  */
 package com.taobao.weex.ui.action;
 
-import android.util.Log;
-
-import com.taobao.weex.WXSDKInstance;
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
- * Created by listen on 18/01/09.
+ * Created by listen on 18/01/10.
  */
-public class ActionReloadPage implements IExecutable {
+public class ActionInvokeMethod implements IExecutable {
 
-  private final String TAG = "ReloadPageAction";
-  private boolean mReloadThis;
+  private static final String TAG = "ActionInvokeMethod";
+
+  private final String mMethod;
+  private final JSONArray mArgs;
   private String mPageId;
+  private String mRef;
 
-  public ActionReloadPage(String pageId, boolean reloadThis) {
+  public ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
     this.mPageId = pageId;
-    this.mReloadThis = reloadThis;
+    this.mRef = ref;
+    this.mMethod = method;
+    this.mArgs = args;
   }
 
   @Override
   public void executeAction() {
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(mPageId);
-    if (instance != null) {
-      instance.reloadPage(mReloadThis);
-    } else {
-      Log.e(TAG, "ReloadPageAction executeDom reloadPage instance is null");
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
+    if(component == null){
+      WXLogUtils.e(TAG,"target component not found.");
+      return;
     }
+    component.invoke(mMethod,mArgs);
   }
 }
