@@ -17,14 +17,14 @@ constexpr int childCount = 20;
 class FlexWrapDimension : public Test {
 protected:
     FlexWrapDimension() {
-        root = WXCoreLayoutNode::newWXCoreNode();
-        target = WXCoreLayoutNode::newWXCoreNode();
+        root = new WXCoreLayoutNode();
+        target = new WXCoreLayoutNode();
 
         root->setStyleWidth(750);
         root->setStyleHeight(1200);
 
         for (auto i = 0; i < childCount; i++) {
-            WXCoreLayoutNode *child = WXCoreLayoutNode::newWXCoreNode();
+            WXCoreLayoutNode *child = new WXCoreLayoutNode();
             child->setStyleWidth(childWidth);
             child->setStyleHeight(childHeight);
             lastChildInTarget = child;
@@ -34,12 +34,8 @@ protected:
     }
 
     ~FlexWrapDimension() override {
-        root->freeWXCoreNode();
-        target->freeWXCoreNode();
-        FormattingContext bfc = kNonBFC;
-        for (auto i = 0; i < root->getChildCount(bfc); i++) {
-            root->getChildAt(bfc, i)->freeWXCoreNode();
-        }
+        delete target;
+        delete root;
     }
 
     WXCoreLayoutNode *root, *target, *lastChildInTarget;

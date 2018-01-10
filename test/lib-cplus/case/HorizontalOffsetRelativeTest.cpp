@@ -16,15 +16,15 @@ static constexpr float fooWidth = 200;
 
 class HorizontalRelative : public ::testing::Test {
 protected:
-    virtual void SetUp() {
+    HorizontalRelative() {
         direction = kFlexDirectionRow;
         positionType = kRelative;
         left = kPositionEdgeLeft;
         right = kPositionEdgeRight;
-        foo = WXCoreLayoutNode::newWXCoreNode();
-        targetChild = WXCoreLayoutNode::newWXCoreNode();
-        target = WXCoreLayoutNode::newWXCoreNode();
-        root = WXCoreLayoutNode::newWXCoreNode();
+        foo = new WXCoreLayoutNode();
+        targetChild = new WXCoreLayoutNode();
+        target = new WXCoreLayoutNode();
+        root = new WXCoreLayoutNode();
 
         foo->setStyleWidth(fooWidth);
         foo->setStyleHeight(100);
@@ -42,11 +42,11 @@ protected:
         root->appendChild(target);
     }
 
-    virtual void TearDown() {
-        root->freeWXCoreNode();
-        foo->freeWXCoreNode();
-        target->freeWXCoreNode();
-        targetChild->freeWXCoreNode();
+    ~HorizontalRelative() override{
+        delete targetChild;
+        delete target;
+        delete foo;
+        delete root;
     }
 
     WXCoreLayoutNode *root, *foo, *targetChild, *target;

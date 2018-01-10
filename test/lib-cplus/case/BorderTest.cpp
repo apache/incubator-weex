@@ -9,8 +9,8 @@ using namespace WeexCore;
 
 class Border : public ::testing::Test {
 protected:
-    virtual void SetUp() {
-        root = WXCoreLayoutNode::newWXCoreNode();
+    Border() {
+        root = new WXCoreLayoutNode();
         root->setStyleWidth(100);
         root->setStyleHeight(300);
         borderAll = kBorderWidthALL;
@@ -20,8 +20,8 @@ protected:
         borderBottom = kBorderWidthBottom;
     }
 
-    virtual void TearDown() {
-        root->freeWXCoreNode();
+    ~Border() override {
+        delete root;
     }
 
     WXCoreLayoutNode *root;

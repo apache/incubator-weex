@@ -9,8 +9,8 @@ using namespace WeexCore;
 
 class Margin : public ::testing::Test {
 protected:
-    virtual void SetUp() {
-        root = WXCoreLayoutNode::newWXCoreNode();
+    Margin() {
+        root = new WXCoreLayoutNode();
         root->setStyleWidth(100);
         root->setStyleHeight(300);
         marginAll = kMarginALL;
@@ -20,8 +20,8 @@ protected:
         marginBottom = kMarginBottom;
     }
 
-    virtual void TearDown() {
-        root->freeWXCoreNode();
+    ~Margin() override {
+        delete root;
     }
 
     WXCoreLayoutNode *root;

@@ -19,8 +19,8 @@ constexpr int childCount = 10;
 class FlexWrap : public Test {
 protected:
     FlexWrap() {
-        root = WXCoreLayoutNode::newWXCoreNode();
-        target = WXCoreLayoutNode::newWXCoreNode();
+        root = new WXCoreLayoutNode();
+        target = new WXCoreLayoutNode();
         firstChildInTarget = nullptr;
 
         root->setStyleWidth(750);
@@ -29,7 +29,7 @@ protected:
         target->setStyleHeight(targetHeight);
 
         for (auto i = 0; i < childCount; i++) {
-            WXCoreLayoutNode *child = WXCoreLayoutNode::newWXCoreNode();
+            WXCoreLayoutNode *child = new WXCoreLayoutNode;
             if (firstChildInTarget == nullptr) {
                 firstChildInTarget = child;
             }
@@ -45,12 +45,8 @@ protected:
     }
 
     ~FlexWrap() override {
-        root->freeWXCoreNode();
-        target->freeWXCoreNode();
-        FormattingContext bfc = kNonBFC;
-        for (auto i = 0; i < root->getChildCount(bfc); i++) {
-            root->getChildAt(bfc, i)->freeWXCoreNode();
-        }
+        delete target;
+        delete root;
     }
 
     WXCoreLayoutNode *root, *target, *firstChildInTarget, *lastChildInTarget;

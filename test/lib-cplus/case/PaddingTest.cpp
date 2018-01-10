@@ -9,8 +9,8 @@ using namespace WeexCore;
 
 class Padding : public ::testing::Test {
 protected:
-    virtual void SetUp() {
-        root = WXCoreLayoutNode::newWXCoreNode();
+    Padding() {
+        root = new WXCoreLayoutNode();
         root->setStyleWidth(100);
         root->setStyleHeight(300);
         paddingAll = kPaddingALL;
@@ -20,8 +20,8 @@ protected:
         paddingBottom = kPaddingBottom;
     }
 
-    virtual void TearDown() {
-        root->freeWXCoreNode();
+    ~Padding() override {
+        delete root;
     }
 
     WXCoreLayoutNode *root;

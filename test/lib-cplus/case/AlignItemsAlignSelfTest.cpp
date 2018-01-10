@@ -20,8 +20,8 @@ class AlignmentItemsAlignSelf
         : public TestWithParam<tuple<WXCoreFlexDirection, WXCoreFlexWrap, WXCoreAlignItems, WXCoreAlignSelf>> {
 protected:
     AlignmentItemsAlignSelf() {
-        root = WXCoreLayoutNode::newWXCoreNode();
-        target = WXCoreLayoutNode::newWXCoreNode();
+        root = new WXCoreLayoutNode();
+        target = new WXCoreLayoutNode();
         alignSelfWithoutCrossSize = nullptr;
 
         root->setStyleWidth(750);
@@ -33,7 +33,7 @@ protected:
         target->setAlignItems(get<2>(GetParam()));
 
         for (auto i = 0; i < childCount; i++) {
-            WXCoreLayoutNode *child = WXCoreLayoutNode::newWXCoreNode();
+            WXCoreLayoutNode *child = new WXCoreLayoutNode();
             if (alignSelfWithoutCrossSize == nullptr) {
                 alignSelfWithoutCrossSize = child;
                 if (get<0>(GetParam()) == kFlexDirectionRow) {
@@ -57,12 +57,8 @@ protected:
     }
 
     ~AlignmentItemsAlignSelf() override {
-        root->freeWXCoreNode();
-        target->freeWXCoreNode();
-        FormattingContext bfc = kNonBFC;
-        for (auto i = 0; i < root->getChildCount(bfc); i++) {
-            root->getChildAt(bfc, i)->freeWXCoreNode();
-        }
+        delete target;
+        delete root;
     }
 
     WXCoreLayoutNode *root, *target, *alignSelfWithoutCrossSize, *alignItemsWithCrossSize;

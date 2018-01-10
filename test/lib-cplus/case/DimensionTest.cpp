@@ -9,18 +9,17 @@ using namespace WeexCore;
 
 class Dimension : public ::testing::Test {
 protected:
-    virtual void SetUp() {
-        root = WXCoreLayoutNode::newWXCoreNode();
-        child = WXCoreLayoutNode::newWXCoreNode();
-        grandChild = WXCoreLayoutNode::newWXCoreNode();
+    Dimension() {
+        root = new WXCoreLayoutNode();
+        child = new WXCoreLayoutNode();
+        grandChild = new WXCoreLayoutNode();
         root->addChildAt(child, 0);
         child->addChildAt(grandChild, 0);
     }
-
-    virtual void TearDown() {
-        root->freeWXCoreNode();
-        child->freeWXCoreNode();
-        grandChild->freeWXCoreNode();
+    ~Dimension() override {
+        delete grandChild;
+        delete child;
+        delete root;
     }
 
     WXCoreLayoutNode *root, *child, *grandChild;

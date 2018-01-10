@@ -17,10 +17,10 @@ protected:
         WXCorePositionEdge top, bottom;
         top = kPositionEdgeTop;
         bottom = kPositionEdgeBottom;
-        foo = WXCoreLayoutNode::newWXCoreNode();
-        targetChild = WXCoreLayoutNode::newWXCoreNode();
-        target = WXCoreLayoutNode::newWXCoreNode();
-        root = WXCoreLayoutNode::newWXCoreNode();
+        foo = new WXCoreLayoutNode();
+        targetChild = new WXCoreLayoutNode();
+        target = new WXCoreLayoutNode();
+        root = new WXCoreLayoutNode();
         WXCorePositionType positionType;
         float height, tvalue, bvalue;
         height = ::testing::get<0>(GetParam());
@@ -53,10 +53,10 @@ protected:
     }
 
     ~PositionVertical() override {
-        root->freeWXCoreNode();
-        foo->freeWXCoreNode();
-        target->freeWXCoreNode();
-        targetChild->freeWXCoreNode();
+      delete targetChild;
+      delete target;
+      delete foo;
+      delete root;
     }
 
     WXCoreLayoutNode *root, *foo, *targetChild, *target;
