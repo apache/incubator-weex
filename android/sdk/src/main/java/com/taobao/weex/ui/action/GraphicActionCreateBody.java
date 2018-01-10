@@ -34,6 +34,8 @@ import java.util.Set;
 
 public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
+  private WXSDKInstance instance;
+  private WXComponent component;
 
   public GraphicActionCreateBody(String pageId, String ref,
                                  String componentType,
@@ -51,24 +53,24 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     this.mPaddings = paddings;
     this.mMargins = margins;
     this.mBorders = borders;
-  }
 
-  @Override
-  public void executeAction() {
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
     if (instance == null || instance.getContext() == null) {
       return;
     }
 
     CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), null);
-    final WXComponent component = createComponent(instance, null, commonCompData);
+    component = createComponent(instance, null, commonCompData);
     if (component == null) {
       return;
     }
 
     instance.nativeBindComponentToWXCore(getPageId(), component, getRef());
     instance.nativeBindInstanceToWXCore(getPageId(), instance);
+  }
 
+  @Override
+  public void executeAction() {
     try {
       component.createView();
 

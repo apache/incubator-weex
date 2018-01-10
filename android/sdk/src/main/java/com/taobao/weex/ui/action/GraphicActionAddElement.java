@@ -31,6 +31,9 @@ import java.util.Set;
 
 public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
+  private WXVContainer parent;
+  private WXComponent child;
+
   public GraphicActionAddElement(String pageId, String ref,
                                  String componentType, String parentRef,
                                  int index,
@@ -50,25 +53,25 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.mPaddings = paddings;
     this.mMargins = margins;
     this.mBorders = borders;
-  }
 
-  @Override
-  public void executeAction() {
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
     if (instance == null || instance.getContext() == null) {
       return;
     }
 
-    final WXVContainer parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
+    parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
     CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), getParentRef());
-    final WXComponent child = createComponent(instance, parent, commonCompData);
+    child = createComponent(instance, parent, commonCompData);
 
     if (child == null || parent == null) {
       return;
     }
 
     WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
+  }
 
+  @Override
+  public void executeAction() {
     try {
       parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
