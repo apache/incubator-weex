@@ -21,11 +21,10 @@ package com.taobao.weex.ui.module;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.ui.action.ActionGetComponentRect;
 import com.taobao.weex.ui.action.ActionInvokeMethod;
-import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.action.GraphicActionScrollToElement;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -79,8 +78,8 @@ public final class WXDomModule extends WXModule {
           }
           String ref = args.size() >= 1 ? args.getString(0) : null;
           JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
-          IExecutable action = new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options);
-          postAction(action);
+          new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options)
+                  .executeActionOnRender(mWXSDKInstance.getInstanceId());
           break;
         }
         case ADD_RULE:
@@ -89,18 +88,21 @@ public final class WXDomModule extends WXModule {
           }
 //        return new AddRuleAction(args.getString(0),args.getJSONObject(1));
           break;
-        case GET_COMPONENT_RECT:
-          if(args == null){
-            return null;
-          }
-//        return new GetComponentRectAction(args.getString(0),args.getString(1));
-          break;
+        case GET_COMPONENT_RECT:{
+            if(args == null){
+                return null;
+            }
+            new ActionGetComponentRect(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1))
+                    .executeActionOnRender(mWXSDKInstance.getInstanceId());
+            break;
+        }
         case INVOKE_METHOD: {
           if(args == null){
             return null;
           }
           // todo：no sure where the request com from
-          new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1), args.getJSONArray(2)).executeAction();
+          new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1), args.getJSONArray(2))
+                  .executeAction();
           break;
         }
         default:
@@ -150,11 +152,7 @@ public final class WXDomModule extends WXModule {
       return;
     }
 
-    new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), ref, method, args).executeAction();
+    new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), ref, method, args)
+            .executeAction();
   }
-
-  public void postAction(IExecutable action){
-    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mWXSDKInstance.getInstanceId(), action);
-  }
-
 }

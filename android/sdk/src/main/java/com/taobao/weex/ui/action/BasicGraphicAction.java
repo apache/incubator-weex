@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKManager;
+
 public abstract class BasicGraphicAction implements IExecutable {
 
   private String mPageId;
@@ -44,4 +46,7 @@ public abstract class BasicGraphicAction implements IExecutable {
     this.mRef = ref;
   }
 
+  public void executeActionOnRender(String instanceId) {
+    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, this);
+  }
 }
