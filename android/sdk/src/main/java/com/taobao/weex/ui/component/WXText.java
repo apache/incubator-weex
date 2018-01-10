@@ -199,11 +199,18 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
         if (!mFontFamily.equals(fontFamily)) {
           return;
         }
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getInstanceId());
-        WXDomObject domObject = domActionContext.getDomByRef(getRef());
-        if(domObject != null){
-            domObject.markDirty();
+        if(isDestoryed()){
+          return;
         }
+        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getInstanceId());
+        if(domActionContext == null){
+          return;
+        }
+        WXDomObject domObject = domActionContext.getDomByRef(getRef());
+        if(domObject == null){
+          return;
+        }
+        domObject.markDirty();
         domActionContext.markDirty();
         WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_START_BATCH, 2);
         if(WXEnvironment.isApkDebugable()) {
