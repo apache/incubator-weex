@@ -199,6 +199,15 @@ public class WXUtils {
     return fastGetFloat(raw, Integer.MAX_VALUE);
   }
 
+  public static int parseInt(String value) {
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
+    }
+    return 0;
+  }
+
   public static int getInt(Object value) {
     return getInteger(value, 0);
   }

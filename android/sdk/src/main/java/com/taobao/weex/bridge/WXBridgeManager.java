@@ -61,6 +61,7 @@ import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
+import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -365,14 +366,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     try {
-      // TODO
-//      if (WXDomModule.WXDOM.equals(module)) {
-//        WXDomModule dom = getDomModule(instanceId);
-//        return dom.callDomMethod(method, arguments);
-//      } else {
-      return callModuleMethod(instanceId, module,
+      if (WXDomModule.WXDOM.equals(module)) {
+        WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+        return dom.callDomMethod(method, arguments);
+      } else {
+        return callModuleMethod(instanceId, module,
               method, arguments);
-//      }
+      }
     } catch (Exception e) {
       String err = "[WXBridgeManager] callNative exception: " + WXLogUtils.getStackTrace(e);
       WXLogUtils.e(err);
@@ -394,14 +394,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     try {
-      // TODO
-//      if (WXDomModule.WXDOM.equals(module)) {
-//        WXDomModule dom = getDomModule(instanceId);
-//        return dom.callDomMethod(method, arguments);
-//      } else {
-      return callModuleMethod(instanceId, module,
+      if (WXDomModule.WXDOM.equals(module)) {
+        WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+        return dom.callDomMethod(method, arguments);
+      } else {
+        return callModuleMethod(instanceId, module,
               method, arguments, options);
-//      }
+      }
     } catch (Exception e) {
       String err = "[WXBridgeManager] callNative exception: " + WXLogUtils.getStackTrace(e);
       WXLogUtils.e(err);
@@ -482,15 +481,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           if (task != null && WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
             Object target = task.get(MODULE);
             if (target != null) {
-              // TODO
-//              if (WXDomModule.WXDOM.equals(target)) {
-//                WXDomModule dom = getDomModule(instanceId);
-//                dom.callDomMethod(task, parseNanos);
-//              } else {
+              if (WXDomModule.WXDOM.equals(target)) {
+                WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+                dom.callDomMethod(task, parseNanos);
+              } else {
                 JSONObject optionObj = task.getJSONObject(OPTIONS);
                 callModuleMethod(instanceId, (String) target,
                         (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
-//              }
+              }
             } else if (task.get(COMPONENT) != null) {
               // TODO
 //              WXDomModule dom = getDomModule(instanceId);
@@ -1076,6 +1074,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
+    WXModuleManager.createDomModule(instance);
     post(new Runnable() {
       @Override
       public void run() {
@@ -1696,10 +1695,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void registerDomModule() throws WXException {
     /** Tell Javascript Framework what methods you have. This is Required.**/
-
-//    Map<String, Object> domMap = new HashMap<>();
-//    domMap.put(WXDomModule.WXDOM, WXDomModule.METHODS);
-//    registerModules(domMap);
+    Map<String, Object> domMap = new HashMap<>();
+    domMap.put(WXDomModule.WXDOM, WXDomModule.METHODS);
+    registerModules(domMap);
   }
 
   //This method is deprecated because of performance issue.
