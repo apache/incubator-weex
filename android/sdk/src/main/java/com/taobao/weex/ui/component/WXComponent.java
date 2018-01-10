@@ -203,12 +203,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
-      }
-    });
+    nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
   }
 
   private void applyStyles(WXComponent component) {

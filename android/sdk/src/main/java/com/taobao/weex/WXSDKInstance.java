@@ -1009,12 +1009,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativePrintRenderSuccessLog(getInstanceId());
-      }
-    });
+    nativePrintRenderSuccessLog(getInstanceId());
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1221,12 +1216,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      WXBridgeManager.getInstance().post(new Runnable() {
-        @Override
-        public void run() {
-          nativePrintFirstScreenLog(getInstanceId());
-        }
-      });
+      nativePrintFirstScreenLog(getInstanceId());
   }
 
   public void createInstanceFinished(long time) {
@@ -1261,12 +1251,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXSDKManager.getInstance().destroyInstance(mInstanceId);
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
-      WXBridgeManager.getInstance().post(new Runnable() {
-        @Override
-        public void run() {
-          nativeOnInstanceClose(getInstanceId());
-        }
-      });
+      nativeOnInstanceClose(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
         getContext().unregisterReceiver(mGlobalEventReceiver);
@@ -1413,12 +1398,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
         rootComponent.applyLayoutAndEvent(rootComponent);
 
-        WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-            nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
-          }
-        });
+        nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
       }
     }
   }

@@ -66,13 +66,8 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
       return;
     }
 
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        instance.nativeBindComponentToWXCore(getPageId(), component, getRef());
-        instance.nativeBindInstanceToWXCore(getPageId(), instance);
-      }
-    });
+    instance.nativeBindComponentToWXCore(getPageId(), component, getRef());
+    instance.nativeBindInstanceToWXCore(getPageId(), instance);
 
     try {
       component.createView();

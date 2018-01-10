@@ -67,12 +67,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       return;
     }
 
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
-      }
-    });
+    WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
 
     try {
       parent.addChild(child, mIndex);
