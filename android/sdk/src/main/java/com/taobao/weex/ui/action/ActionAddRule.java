@@ -63,6 +63,7 @@ public class ActionAddRule implements IExecutable {
         TypefaceUtil.loadTypeface(cacheFontDO);
       }
     }
+
   }
 
   private FontDO parseFontDO(JSONObject jsonObject,WXSDKInstance instance) {
