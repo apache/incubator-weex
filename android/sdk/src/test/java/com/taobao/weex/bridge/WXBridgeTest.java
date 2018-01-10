@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import com.alibaba.fastjson.JSON;
 import com.taobao.weappplus_sdk.BuildConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -46,12 +47,12 @@ public class WXBridgeTest {
 
   @Test
   public void testCallNative() throws Exception {
-    bridge.callNative("1","{}","100");
+    bridge.callNative("1", JSON.parseArray("[]"),"100");
   }
 
   @Test
   public void testCallAddElement() throws Exception {
-    bridge.callAddElement("1","1","{}","0","100");
+    bridge.callAddElement("1","1", JSON.parseObject("{}"),"0","100");
   }
 
 
