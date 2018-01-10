@@ -44,6 +44,7 @@ add_library(weexjsc SHARED
     ./WeexCore/render/page/RenderPage.cpp
     ./WeexCore/render/node/RenderObject.cpp
 
+    ./WeexCore/render/node/RenderRoot.cpp
     ./WeexCore/render/node/RenderText.cpp
     ./WeexCore/render/node/RenderCell.cpp
 

@@ -2,6 +2,7 @@
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
+#include <WeexCore/render/node/RenderRoot.h>
 #include <base/TimeUtils.h>
 
 namespace WeexCore {
@@ -14,7 +15,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderObject *root = json2RenderObject(c_data, pageId);
+    RenderRoot *root = (RenderRoot *) json2RenderObject(c_data, pageId);
     page->parseJsonTime(getCurrentTime() - startTime);
     page->buildRenderObjectTime(getCurrentTime() - startTime);
     return page->createRootRender(root);

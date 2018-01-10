@@ -119,7 +119,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
   private boolean mNeedReLoad = false;
-  private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
@@ -1398,7 +1397,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
         rootComponent.applyLayoutAndEvent(rootComponent);
 
-        nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
+        WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+            nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
+          }
+        });
       }
     }
   }

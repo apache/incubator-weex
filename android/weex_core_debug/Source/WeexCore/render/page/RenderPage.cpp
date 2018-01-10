@@ -19,7 +19,6 @@
 namespace WeexCore {
 
   typedef std::vector<RenderAction *>::iterator RenderActionIterator;
-  typedef std::map<std::string, RenderObject *>::iterator RenderObjectMapIterator;
 
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
@@ -65,7 +64,7 @@ namespace WeexCore {
   }
 
   void RenderPage::calculateLayout() {
-    if (render_root == nullptr || !rootViewInit)
+    if (render_root == nullptr || !render_root->ViewInit())
       return;
 
     render_root->layoutBefore();
@@ -74,25 +73,26 @@ namespace WeexCore {
     cssLayoutTime(getCurrentTime() - startTime);
     render_root->layoutAfter();
 
-    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
-    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
-    float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
+//    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
+//    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
+//    float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
 
-    switch (render_root->getFlexDirection()) {
-      case kFlexDirectionColumn:
-      case kFlexDirectionColumnReverse:
-        if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
-          traverseTree(render_root);
-        }
-        break;
-      case kFlexDirectionRow:
-      case kFlexDirectionRowReverse:
-      default:
-        if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
-          traverseTree(render_root);
-        }
-        break;
-    }
+//    switch (render_root->getFlexDirection()) {
+//      case kFlexDirectionColumn:
+//      case kFlexDirectionColumnReverse:
+//        if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
+//          traverseTree(render_root);
+//        }
+//        break;
+//      case kFlexDirectionRow:
+//      case kFlexDirectionRowReverse:
+//      default:
+//        if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
+//          traverseTree(render_root);
+//        }
+//        break;
+//    }
+    traverseTree(render_root);
   }
 
   void RenderPage::traverseTree(RenderObject *render) {
@@ -112,11 +112,14 @@ namespace WeexCore {
     }
   }
 
-  bool RenderPage::createRootRender(RenderObject *root) {
+  bool RenderPage::createRootRender(RenderRoot *root) {
     if (root == nullptr)
       return false;
     long long startTime = getCurrentTime();
     setRootRenderObject(root);
+
+    render_root->setStyleWidth(getRealPxByWidth(WXCoreEnvironment::getInstance()->getDeviceWidth(), getViewPortWidth()));
+    render_root->setStyleHeight(getRealPxByWidth(WXCoreEnvironment::getInstance()->getDeviceHeight(), getViewPortWidth()));
 
     pushRenderToRegisterMap(root);
 
@@ -146,7 +149,6 @@ namespace WeexCore {
   }
 
   bool RenderPage::removeRenderObject(const std::string &ref) {
-    LOGE("removeRenderObject 11");
     long long startTime = getCurrentTime();
     RenderObject *child = getRenderObject(ref);
     if (child == nullptr)
@@ -346,9 +348,6 @@ namespace WeexCore {
                                                           const float defaultHeight) {
     render_root->setStyleWidth(getRealPxByWidth(defaultWidth, getViewPortWidth()));
     render_root->setStyleHeight(getRealPxByWidth(defaultHeight, getViewPortWidth()));
-    if(defaultWidth >0 && defaultHeight > 0) {
-      rootViewInit = true;
-    }
     calculateLayout();
   }
 

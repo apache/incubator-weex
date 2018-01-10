@@ -6,6 +6,7 @@
 #include <map>
 #include <jni.h>
 #include <cmath>
+#include <WeexCore/render/node/RenderRoot.h>
 
 namespace WeexCore {
 
@@ -53,7 +54,7 @@ namespace WeexCore {
 
     void calculateLayout();
 
-    bool createRootRender(RenderObject *root);
+    bool createRootRender(RenderRoot *root);
 
     bool
     addRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
@@ -111,13 +112,13 @@ namespace WeexCore {
       return mRenderObjectRegisterMap.find(ref)->second;
     }
 
-    inline void setRootRenderObject(RenderObject *root) {
+    inline void setRootRenderObject(RenderRoot *root) {
       if (root != nullptr) {
         render_root = root;
       }
     }
 
-    inline RenderObject *getRootRenderObject() {
+    inline RenderRoot *getRootRenderObject() {
       return render_root;
     }
 
@@ -147,9 +148,8 @@ namespace WeexCore {
 
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
-    bool rootViewInit = false;
     float mViewPortWidth;
-    RenderObject *render_root;
+    RenderRoot *render_root;
     std::string mPageId;
     std::vector<RenderAction *> mRenderActions;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
