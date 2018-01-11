@@ -95,8 +95,8 @@ public class WXApplication extends Application {
        * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
        */
 
-      Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
-      WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
+      //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
+      //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
 
     } catch (WXException e) {
       e.printStackTrace();
