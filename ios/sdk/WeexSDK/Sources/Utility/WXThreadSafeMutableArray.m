@@ -25,7 +25,7 @@
 @interface WXThreadSafeMutableArray () {
     pthread_mutex_t _safeThreadArrayMutex;
     pthread_mutexattr_t _safeThreadArrayMutexAttr;
-    os_unfair_lock_t _osUnfairLock;
+    os_unfair_lock _osUnfairLock;
 }
 
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -45,7 +45,7 @@
         pthread_mutexattr_settype(&(_safeThreadArrayMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_safeThreadArrayMutex), &(_safeThreadArrayMutexAttr));
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            _osUnfairLock = &(OS_UNFAIR_LOCK_INIT);
+            _osUnfairLock = OS_UNFAIR_LOCK_INIT;
         }
     }
     return self;
@@ -108,9 +108,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             count = [_array count];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             count = [_array count];
@@ -129,9 +129,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             obj = _array[index];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             obj = _array[index];
@@ -150,9 +150,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             enu = [_array objectEnumerator];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             enu = [_array objectEnumerator];
@@ -170,9 +170,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             [_array insertObject:anObject atIndex:index];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             [_array insertObject:anObject atIndex:index];
@@ -189,9 +189,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             [_array addObject:anObject];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             [_array addObject:anObject];
@@ -208,9 +208,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             [_array removeObjectAtIndex:index];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             [_array removeObjectAtIndex:index];
@@ -227,9 +227,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             [_array removeLastObject];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             [_array removeLastObject];
@@ -246,9 +246,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             [_array replaceObjectAtIndex:index withObject:anObject];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             [_array replaceObjectAtIndex:index withObject:anObject];
@@ -271,9 +271,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_osUnfairLock);
+            os_unfair_lock_lock(&_osUnfairLock);
             index = [_array indexOfObject:anObject];
-            os_unfair_lock_unlock(_osUnfairLock);
+            os_unfair_lock_unlock(&_osUnfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadArrayMutex);
             index = [_array indexOfObject:anObject];

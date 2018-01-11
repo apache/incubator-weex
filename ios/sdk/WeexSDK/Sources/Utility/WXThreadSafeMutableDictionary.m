@@ -26,7 +26,7 @@
 {
     pthread_mutex_t _safeThreadDictionaryMutex;
     pthread_mutexattr_t _safeThreadDictionaryMutexAttr;
-    os_unfair_lock_t _unfairLock;
+    os_unfair_lock _unfairLock;
 }
 
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -46,7 +46,7 @@
         pthread_mutexattr_settype(&(_safeThreadDictionaryMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_safeThreadDictionaryMutex), &(_safeThreadDictionaryMutexAttr));
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            _unfairLock = &(OS_UNFAIR_LOCK_INIT);
+            _unfairLock = OS_UNFAIR_LOCK_INIT;
         }
     }
     return self;
@@ -110,9 +110,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             count = [_dict count];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             count = [_dict count];
@@ -131,9 +131,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             obj = _dict[aKey];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             obj = _dict[aKey];
@@ -152,9 +152,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             enu = [_dict keyEnumerator];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             enu = [_dict keyEnumerator];
@@ -173,9 +173,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             _dict[aKey] = anObject;
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         }else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             _dict[aKey] = anObject;
@@ -192,9 +192,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             [_dict removeObjectForKey:aKey];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         }else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             [_dict removeObjectForKey:aKey];
@@ -211,9 +211,9 @@
         });
     }else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             [_dict removeAllObjects];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             [_dict removeAllObjects];
@@ -230,9 +230,9 @@
         });
     } else {
         if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(_unfairLock);
+            os_unfair_lock_lock(&_unfairLock);
             copyInstance = [_dict copy];
-            os_unfair_lock_unlock(_unfairLock);
+            os_unfair_lock_unlock(&_unfairLock);
         } else {
             pthread_mutex_lock(&_safeThreadDictionaryMutex);
             copyInstance = [_dict copy];
