@@ -289,10 +289,8 @@
     if (_queue) {
         _queue = NULL;
     }
-    if ([WXUtility threadSafeCollectionUsingLock]) {
-        pthread_mutex_destroy(&_safeThreadArrayMutex);
-        pthread_mutexattr_destroy(&_safeThreadArrayMutexAttr);
-    }
+    pthread_mutex_destroy(&_safeThreadArrayMutex);
+    pthread_mutexattr_destroy(&_safeThreadArrayMutexAttr);
 }
 
 @end
