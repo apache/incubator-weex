@@ -5,7 +5,7 @@
 
 
 #include "WXCoreFlexEnum.h"
-#include <math.h>
+#include <cmath>
 
 namespace WeexCore {
 

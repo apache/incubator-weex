@@ -27,12 +27,17 @@ namespace WeexCore {
   } ;
 
   struct WXCoreSize {
+    float hypotheticalWidth;
+    float hypotheticalHeight;
     float width;
     float height;
 
-    WXCoreSize() : width(0), height(0) {}
+    WXCoreSize() : hypotheticalWidth(NAN), hypotheticalHeight(NAN),
+                   width(0), height(0) {}
 
     void reset() {
+      hypotheticalWidth = NAN;
+      hypotheticalHeight = NAN;
       width = 0;
       height = 0;
     }
@@ -413,8 +418,9 @@ namespace WeexCore {
     }
 
     void setMeasuredDimensionForFlex(
-        float width, MeasureMode widthMeasureMode,
-        float height, MeasureMode heightMeasureMode) {
+        const float width, const MeasureMode widthMeasureMode,
+        const float height, const MeasureMode heightMeasureMode,
+        const bool hypothetical) {
       float actualWidth, actualHeight;
       if (isMainAxisHorizontal(this)) {
         actualWidth = widthMeasureMode == kExactly ? width : getLargestMainSize();
@@ -423,7 +429,7 @@ namespace WeexCore {
         actualHeight = heightMeasureMode == kExactly ? height : getLargestMainSize();
         actualWidth = widthMeasureMode == kExactly ? width : firstLineCrossSize();
       }
-      setMeasuredDimension(actualWidth, actualHeight);
+      setMeasuredDimension(actualWidth, actualHeight, hypothetical);
     }
 
     float calcItemSizeAlongAxis(const WXCoreLayoutNode *node, const bool horizontal) {
@@ -451,12 +457,20 @@ namespace WeexCore {
       return true;
     }
 
+    bool syncSizeFromHypothesis(){
+      mLayoutResult->mLayoutSize.width = mLayoutResult->mLayoutSize.hypotheticalWidth;
+      mLayoutResult->mLayoutSize.height = mLayoutResult->mLayoutSize.hypotheticalHeight;
+      for (Index i = 0; i < getChildCount(kNonBFC); i++) {
+        getChildAt(kNonBFC, i)->syncSizeFromHypothesis();
+      }
+    }
+
     void
     measure(float, float, bool);
 
     void hypotheticalMeasure(float, float, bool);
 
-    void measureLeafNode(float, float);
+    void measureLeafNode(float, float, bool);
 
     void measureInternalNode(float, float, bool, bool);
 
@@ -871,9 +885,15 @@ namespace WeexCore {
 
   private:
 
-    void setMeasuredDimension(const float width, const float height) {
-      mLayoutResult->mLayoutSize.width = width;
-      mLayoutResult->mLayoutSize.height = height;
+    void setMeasuredDimension(const float width, const float height, const bool hypothetical) {
+      if(hypothetical){
+        mLayoutResult->mLayoutSize.hypotheticalWidth = width;
+        mLayoutResult->mLayoutSize.hypotheticalHeight = height;
+      }
+      else {
+        mLayoutResult->mLayoutSize.width = width;
+        mLayoutResult->mLayoutSize.height = height;
+      }
     }
 
 

@@ -3,7 +3,7 @@
 
 #include "WeexCore/platform/android/base/LogUtils.h"
 #include <../WeexCore/env/CoreEnvironment.h>
-#include <math.h>
+#include <cmath>
 
 namespace WeexCore {
     static float getRealPxByWidth(float pxValue, float customViewport) {
