@@ -33,23 +33,23 @@ namespace WeexCore {
     friend class RenderPage;
 
   private:
-    void layoutBefore() {
+    inline void LayoutBefore() {
       if (isDirty()) {
         onLayoutBefore();
       }
       for (Index i = 0; i < getChildCount(); i++) {
-        RenderObject *child = getChild(i);
-        child->layoutBefore();
+        RenderObject *child = GetChild(i);
+        child->LayoutBefore();
       }
     }
 
-    void layoutAfter() {
+    inline void LayoutAfter() {
       if (hasNewLayout()) {
         onLayoutAfter(getLayoutWidth(), getLayoutHeight());
       }
       for (Index i = 0; i < getChildCount(); i++) {
-        RenderObject *child = getChild(i);
-        child->layoutAfter();
+        RenderObject *child = GetChild(i);
+        child->LayoutAfter();
       }
     }
 
@@ -59,50 +59,50 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    bool bindComponent_Impl_Android(jobject component_Impl_Android);
+    bool BindComponentImplAndroid(jobject component_impl_android);
 
-    bool bindComponent_Impl_iOS(void *component_Impl_iOS);
+    bool BindComponentImplIOS(void *component_impl_ios);
 
-    bool bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android);
+    bool BindMeasureFuncImplAndroid(jobject measureFunc_impl_android);
 
-    bool bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS);
+    bool BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
 
     void onLayoutBefore();
 
     void onLayoutAfter(float width, float height);
 
-    StyleType applyStyle(const std::string &key, const std::string &value);
+    StyleType ApplyStyle(const std::string &key, const std::string &value);
 
-    void printRenderMsg();
+    void PrintRenderMsg();
 
-    void printYGNodeMsg();
+    void PrintLayoutMsg();
 
-    inline jobject getComponent_Impl_Android() {
+    inline jobject GetComponentImplAndroid() {
       return mComponent_Impl_Android;
     }
 
-    inline jobject getMeasureFunc_Impl_Android() {
+    inline jobject GetMeasureFuncImplAndroid() {
       return mMeasureFunc_Impl_Android;
     }
 
-    inline RenderObject *getChild(Index &index) {
+    inline RenderObject *GetChild(Index &index) {
       return (RenderObject *) getChildAt(index);
     }
 
-    inline Index indexOf(RenderObject *render) {
+    inline Index IndexOf(RenderObject *render) {
       if (render == nullptr) {
         for (Index i = 0; i < getChildCount(); i++)
-          if (getChild(i) == nullptr)
+          if (GetChild(i) == nullptr)
             return i;
       } else {
         for (Index i = 0; i < getChildCount(); i++)
-          if (render->getRef() == getChild(i)->getRef())
+          if (render->Ref() == GetChild(i)->Ref())
             return i;
       }
       return -1;
     }
 
-    inline void addRenderObject(int index, RenderObject *child) {
+    inline void AddRenderObject(int index, RenderObject *child) {
 
       if (child == nullptr || index < -1) {
         return;
@@ -117,107 +117,107 @@ namespace WeexCore {
       }
     }
 
-    inline void removeRenderObject(RenderObject *child) {
+    inline void RemoveRenderObject(RenderObject *child) {
       removeChild(child);
     }
 
-    inline void addAttr(const std::string &key, const std::string &value) {
+    inline void AddAttr(const std::string &key, const std::string &value) {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    inline StyleType addStyle(const std::string &key, const std::string &value) {
-      return applyStyle(key, value);
+    inline StyleType AddStyle(const std::string &key, const std::string &value) {
+      return ApplyStyle(key, value);
     }
 
-    inline void addEvent(const std::string &event) {
+    inline void AddEvent(const std::string &event) {
       mEvents->insert(event);
     }
 
-    inline void removeEvent(const std::string &event) {
+    inline void RemoveEvent(const std::string &event) {
       mEvents->erase(event);
     }
 
-    inline void setRef(const std::string &ref) {
+    inline void SetRef(const std::string &ref) {
       mRef = ref;
     }
 
-    inline const std::string &getRef() {
+    inline const std::string &Ref() {
       return mRef;
     }
 
-    inline void setPageId(const std::string &pageId) {
+    inline void SetPageId(const std::string &pageId) {
       this->mPageId = pageId;
     }
 
-    inline const std::string &getPageId() {
+    inline const std::string &PageId() {
       return mPageId;
     }
 
-    inline const RenderPage *getRenderPage() {
-      return RenderManager::getInstance()->getPage(mPageId);
+    inline const RenderPage *GetRenderPage() {
+      return RenderManager::GetInstance()->GetPage(mPageId);
     }
 
-    inline void setType(const std::string &type) {
+    inline void SetType(const std::string &type) {
       mType = type;
     }
 
-    inline std::string getType() {
+    inline std::string Type() {
       return mType;
     }
 
-    inline void setParentRender(RenderObject *render) {
+    inline void SetParentRender(RenderObject *render) {
       mParentRender = render;
     }
 
-    inline RenderObject *getParentRender() {
+    inline RenderObject *GetParentRender() {
       return mParentRender;
     }
 
-    inline StylesMap *getStyles() {
+    inline StylesMap *Styles() {
       return mStyles;
     }
 
-    inline AttributesMap *getAttributes() {
+    inline AttributesMap *Attributes() {
       return mAttributes;
     }
 
-    inline EventsSet *getEvents() {
+    inline EventsSet *Events() {
       return mEvents;
     }
 
-    inline PaddingsMap *getPaddings() {
+    inline PaddingsMap *Paddings() {
       return mPaddings;
     }
 
-    inline MarginsMap *getMargins() {
+    inline MarginsMap *Margins() {
       return mMargins;
     }
 
-    inline BordersMap *getBorders() {
+    inline BordersMap *Borders() {
       return mBorders;
     }
 
-    inline StylesIterator getStyleItBegin() {
+    inline StylesIterator StyleItBegin() {
       return mStyles->begin();
     }
 
-    inline StylesIterator getStyleItEnd() {
+    inline StylesIterator StyleItEnd() {
       return mStyles->end();
     }
 
-    inline AttributesIterator getAttrItBegin() {
+    inline AttributesIterator AttrItBegin() {
       return mAttributes->begin();
     }
 
-    inline AttributesIterator getAttrItEnd() {
+    inline AttributesIterator AttrItEnd() {
       return mAttributes->end();
     }
 
-    inline EventsIterator getEventItBegin() {
+    inline EventsIterator EventItBegin() {
       return mEvents->begin();
     }
 
-    inline EventsIterator getEventItEnd() {
+    inline EventsIterator EventItEnd() {
       return mEvents->end();
     }
 

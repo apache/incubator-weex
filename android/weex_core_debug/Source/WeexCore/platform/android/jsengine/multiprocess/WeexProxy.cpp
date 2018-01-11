@@ -198,8 +198,8 @@ void WeexProxy::initFromParam(JNIEnv *env,
                                           "getPlatform",
                                           "()Ljava/lang/String;");
   jobject platform = env->CallObjectMethod(params, m_platform);
-  if (!WXCoreEnvironment::getInstance()->setPlatform(
-          jString2Str(env, (jstring) platform))) {
+  if (!WXCoreEnvironment::getInstance()->SetPlatform(
+      jString2Str(env, (jstring) platform))) {
     LOGD("setPlatform");
   }
   ADDSTRING(platform);
@@ -242,8 +242,8 @@ void WeexProxy::initFromParam(JNIEnv *env,
   jmethodID m_deviceWidth = env->GetMethodID(
           c_params, "getDeviceWidth", "()Ljava/lang/String;");
   jobject deviceWidth = env->CallObjectMethod(params, m_deviceWidth);
-  if (!WXCoreEnvironment::getInstance()->setDeviceWidth(
-          jString2Str(env, (jstring) deviceWidth))) {
+  if (!WXCoreEnvironment::getInstance()->SetDeviceWidth(
+      jString2Str(env, (jstring) deviceWidth))) {
     LOGD("setDeviceWidth");
   }
   ADDSTRING(deviceWidth);
@@ -251,8 +251,8 @@ void WeexProxy::initFromParam(JNIEnv *env,
   jmethodID m_deviceHeight = env->GetMethodID(
           c_params, "getDeviceHeight", "()Ljava/lang/String;");
   jobject deviceHeight = env->CallObjectMethod(params, m_deviceHeight);
-  if (!WXCoreEnvironment::getInstance()->setDeviceHeight(
-          jString2Str(env, (jstring) deviceHeight))) {
+  if (!WXCoreEnvironment::getInstance()->SetDeviceHeight(
+      jString2Str(env, (jstring) deviceHeight))) {
     LOGD("setDeviceHeight");
   }
   ADDSTRING(deviceHeight);

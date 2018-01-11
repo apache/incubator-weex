@@ -8,9 +8,9 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId, mRef);
-    page->jniCallTime(getCurrentTime() - startTime);
+    page->JniCallTime(getCurrentTime() - startTime);
   }
 }

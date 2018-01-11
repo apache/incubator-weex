@@ -20,15 +20,15 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
                                   jstring ref) {
   if (component == nullptr)
     return;
-  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
     return;
-  RenderObject *render = page->getRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
 
   if (render == nullptr)
     return;
-  render->bindComponent_Impl_Android(component);
+  render->BindComponentImplAndroid(component);
 }
 
 static void BindInstanceToWXCore(JNIEnv *env, jobject jcaller,
@@ -36,23 +36,23 @@ static void BindInstanceToWXCore(JNIEnv *env, jobject jcaller,
                                  jobject instance) {
   if (instance == nullptr)
     return;
-  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
     return;
-  page->bindInstance_Impl_Android(instance);
+  page->BindInstanceImplAndroid(instance);
 }
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller,
                             jstring instanceId) {
-  RenderManager::getInstance()->ClosePage(jString2Str(env, instanceId));
+  RenderManager::GetInstance()->ClosePage(jString2Str(env, instanceId));
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
                                                 jstring instanceId,
                                                 jfloat defaultWidth,
                                                 jfloat defaultHeight) {
-  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
   if (page == nullptr)
     return;
 
@@ -61,18 +61,18 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
 
 static void PrintFirstScreenLog(JNIEnv *env, jobject jcaller,
                                 jstring instanceId) {
-  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
     return;
-  page->printFirstScreenLog();
+  page->PrintFirstScreenLog();
 }
 
 static void PrintRenderSuccessLog(JNIEnv *env, jobject jcaller,
                                   jstring instanceId) {
-  RenderPage *page = RenderManager::getInstance()->getPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
     return;
-  page->printRenderSuccessLog();
+  page->PrintRenderSuccessLog();
 }

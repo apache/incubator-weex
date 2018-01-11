@@ -5,7 +5,7 @@
 namespace WeexCore {
   WXCoreEnvironment *WXCoreEnvironment::m_pInstance = nullptr;
 
-  bool WXCoreEnvironment::setPlatform(const std::string &platformName) {
+  bool WXCoreEnvironment::SetPlatform(const std::string &platformName) {
     if (platformName.empty())
       return false;
     this->mPlatformName = platformName;
@@ -16,33 +16,33 @@ namespace WeexCore {
     }
   }
 
-  bool WXCoreEnvironment::isAndroid() {
+  bool WXCoreEnvironment::IsAndroid() {
     return mPlatformName == OS_Android;
   }
 
-  bool WXCoreEnvironment::isIOS() {
+  bool WXCoreEnvironment::IsIOS() {
     return mPlatformName == OS_iOS;
   }
 
-  bool WXCoreEnvironment::setDeviceWidth(const std::string &width) {
+  bool WXCoreEnvironment::SetDeviceWidth(const std::string &width) {
     if (width.empty())
       return false;
     mDeviceWidth = atof(width.c_str());
     return true;
   }
 
-  bool WXCoreEnvironment::setDeviceHeight(const std::string &height) {
+  bool WXCoreEnvironment::SetDeviceHeight(const std::string &height) {
     if (height.empty())
       return false;
     mDeviceHeight = atof(height.c_str());
     return true;
   }
 
-  float WXCoreEnvironment::getDeviceWidth() {
+  float WXCoreEnvironment::DeviceWidth() {
     return mDeviceWidth;
   }
 
-  float WXCoreEnvironment::getDeviceHeight() {
+  float WXCoreEnvironment::DeviceHeight() {
     return mDeviceHeight;
   }
 }

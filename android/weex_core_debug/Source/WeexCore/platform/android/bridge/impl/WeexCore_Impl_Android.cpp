@@ -59,7 +59,7 @@ static void TakeHeapSnapshot(JNIEnv *env,
 static void OnVsync(JNIEnv *env,
                     jobject object,
                     jstring jinstanceId) {
-  RenderManager::getInstance()->batch(jString2Str(env, jinstanceId));
+  RenderManager::GetInstance()->Batch(jString2Str(env, jinstanceId));
   // LOGE("onVsync instanceId:%s", jString2Str(env, jinstanceId).c_str());
 }
 

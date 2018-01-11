@@ -19,118 +19,117 @@ namespace WeexCore {
   class RenderPage {
 
   private:
-    void pushRenderToRegisterMap(RenderObject *render);
 
-    void removeRenderFromRegisterMap(RenderObject *render);
+    void CalculateLayout();
 
-    void sendCreateBodyAction(RenderObject *render);
+    void TraverseTree(RenderObject *render);
 
-    void sendAddElementAction(RenderObject *child, RenderObject *parent, const int &index);
+    void PushRenderToRegisterMap(RenderObject *render);
 
-    void sendRemoveElementAction(const std::string &ref);
+    void RemoveRenderFromRegisterMap(RenderObject *render);
 
-    void sendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
+    void SendCreateBodyAction(RenderObject *render);
 
-    void sendLayoutAction(RenderObject *render);
+    void SendAddElementAction(RenderObject *child, RenderObject *parent, const int &index);
+
+    void SendRemoveElementAction(const std::string &ref);
+
+    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
+
+    void SendLayoutAction(RenderObject *render);
 
     void
-    sendUpdateStyleAction(RenderObject *render,
+    SendUpdateStyleAction(RenderObject *render,
                           std::vector<std::pair<std::string, std::string> *> *style,
                           std::vector<std::pair<std::string, std::string> *> *margin,
                           std::vector<std::pair<std::string, std::string> *> *padding,
                           std::vector<std::pair<std::string, std::string> *> *border);
 
-    void sendUpdateAttrAction(RenderObject *render,
+    void SendUpdateAttrAction(RenderObject *render,
                               std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    void sendAddEventAction(RenderObject *render);
+    void SendCreateFinishAction();
 
-    void sendCreateFinishAction();
+    void PostRenderAction(RenderAction *action);
 
   public:
     RenderPage(const std::string &pageID);
 
     ~RenderPage();
 
-    void calculateLayout();
-
-    bool createRootRender(RenderRoot *root);
+    bool CreateRootRender(RenderRoot *root);
 
     bool
-    addRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
+    AddRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
 
-    bool removeRenderObject(const std::string &ref);
+    bool RemoveRenderObject(const std::string &ref);
 
-    bool moveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
+    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
 
     bool
-    updateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    bool updateAttr(const std::string &ref,
+    bool UpdateAttr(const std::string &ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool addEvent(const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &ref, const std::string &event);
 
-    bool removeEvent(const std::string &ref, const std::string &event);
+    bool RemoveEvent(const std::string &ref, const std::string &event);
 
-    void postRenderAction(RenderAction *action);
+    bool CreateFinish();
 
-    bool createFinish();
+    void Batch();
 
-    void batch();
+    void JniCallTime(const long long &time);
 
-    void traverseTree(RenderObject *render);
+    void CssLayoutTime(const long long &time);
 
-    void jniCallTime(const long long &time);
+    void AddElementActionJNITime(const long long &time);
 
-    void cssLayoutTime(const long long &time);
+    void LayoutActionJniTime(const long long &time);
 
-    void addElementActionJNITime(const long long &time);
+    void ParseJsonTime(const long long &time);
 
-    void layoutActionJniTime(const long long &time);
+    void BuildRenderTreeTime(const long long &time);
 
-    void parseJsonTime(const long long &time);
+    void CreateJMapJNITime(const long long &time);
 
-    void buildRenderObjectTime(const long long &time);
+    void CallBridgeTime(const long long &time);
 
-    void createJMapJNITime(const long long &time);
+    bool BindInstanceImplAndroid(jobject instance);
 
-    void jniCallBridgeTime(const long long &time);
+    bool BindInstanceImplIOS(void *instance);
 
-    bool bindInstance_Impl_Android(jobject instance);
+    void PrintFirstScreenLog();
 
-    bool bindInstance_Impl_iOS(void *instance);
+    void PrintRenderSuccessLog();
 
-    void printFirstScreenLog();
-
-    void printRenderSuccessLog();
-
-    inline RenderObject *getRenderObject(const std::string &ref) {
+    inline RenderObject *GetRenderObject(const std::string &ref) {
       return mRenderObjectRegisterMap.find(ref)->second;
     }
 
-    inline void setRootRenderObject(RenderRoot *root) {
+    inline void SetRootRenderObject(RenderRoot *root) {
       if (root != nullptr) {
         render_root = root;
       }
     }
 
-    inline RenderRoot *getRootRenderObject() {
+    inline RenderRoot *GetRootRenderObject() {
       return render_root;
     }
 
-    inline std::string getPageId() {
+    inline std::string PageId() {
       return mPageId;
     }
 
-    inline float getViewPortWidth()const {
+    inline float ViewPortWidth()const {
       return mViewPortWidth;
     }
 
-    inline void setViewPortWidth(float &viewPortWidth) {
+    inline void SetViewPortWidth(float &viewPortWidth) {
       this->mViewPortWidth = viewPortWidth;
     }
 

@@ -57,7 +57,7 @@ namespace WeexCore {
 //    freeWXCoreNode();
 
     for (Index i = 0; i < getChildCount(); i++) {
-      RenderObject *render = getChild(i);
+      RenderObject *render = GetChild(i);
       if (nullptr != render) {
         delete render;
         render = nullptr;
@@ -65,17 +65,17 @@ namespace WeexCore {
     }
   }
 
-  bool RenderObject::bindComponent_Impl_Android(jobject component_Impl_Android) {
-    if (component_Impl_Android == nullptr)
+  bool RenderObject::BindComponentImplAndroid(jobject component_impl_android) {
+    if (component_impl_android == nullptr)
       return false;
-    this->mComponent_Impl_Android = getJNIEnv()->NewGlobalRef(component_Impl_Android);
+    this->mComponent_Impl_Android = getJNIEnv()->NewGlobalRef(component_impl_android);
     return true;
   }
 
-  bool RenderObject::bindComponent_Impl_iOS(void *component_Impl_iOS) {
-    if (component_Impl_iOS == nullptr)
+  bool RenderObject::BindComponentImplIOS(void *component_impl_ios) {
+    if (component_impl_ios == nullptr)
       return false;
-    this->mComponent_Impl_iOS = component_Impl_iOS;
+    this->mComponent_Impl_iOS = component_impl_ios;
     return true;
   }
 
@@ -86,7 +86,7 @@ namespace WeexCore {
     size.height = 0;
     size.width = 0;
 
-    if (node == nullptr || ((RenderObject *) node)->getMeasureFunc_Impl_Android() == nullptr)
+    if (node == nullptr || ((RenderObject *) node)->GetMeasureFuncImplAndroid() == nullptr)
       return size;
 
     int widthMode = getUnspecified(env);
@@ -96,7 +96,7 @@ namespace WeexCore {
     if (heightMeasureMode == kExactly)
       heightMode = getExactly(env);
     base::android::ScopedLocalJavaRef<jobject> jsize = cumsmeasure_Imple_Android(env,
-                                                                                 ((RenderObject *) node)->getMeasureFunc_Impl_Android(),
+                                                                                 ((RenderObject *) node)->GetMeasureFuncImplAndroid(),
                                                                                  width, height,
                                                                                  widthMode,
                                                                                  heightMode);
@@ -108,159 +108,163 @@ namespace WeexCore {
     return size;
   }
 
-  bool RenderObject::bindMeasureFunc_Impl_Android(jobject measureFunc_Impl_Android) {
-    if (measureFunc_Impl_Android == nullptr)
+  bool RenderObject::BindMeasureFuncImplAndroid(jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android == nullptr)
       return false;
-    this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_Impl_Android);
+    this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_impl_android);
     setMeasureFunc(measureFunc_Impl);
     return true;
   }
 
-  bool RenderObject::bindMeasureFunc_Impl_iOS(WXCoreMeasureFunc measureFunc_Impl_iOS) {
-    if (measureFunc_Impl_iOS == nullptr)
+  bool RenderObject::BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios) {
+    if (measureFunc_impl_ios == nullptr)
       return false;
-    setMeasureFunc(measureFunc_Impl_iOS);
+    setMeasureFunc(measureFunc_impl_ios);
     return true;
   }
 
   void RenderObject::onLayoutBefore() {
-    if (this->getMeasureFunc_Impl_Android() == nullptr)
+    if (this->GetMeasureFuncImplAndroid() == nullptr)
       return;
     JNIEnv *env = getJNIEnv();
-    layoutBefore_Impl_Android(env, this->getMeasureFunc_Impl_Android());
+    layoutBefore_Impl_Android(env, this->GetMeasureFuncImplAndroid());
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
-    if (this->getMeasureFunc_Impl_Android() == nullptr)
+    if (this->GetMeasureFuncImplAndroid() == nullptr)
       return;
     JNIEnv *env = getJNIEnv();
-    layoutAfter_Impl_Android(env, this->getMeasureFunc_Impl_Android(), width, height);
+    layoutAfter_Impl_Android(env, this->GetMeasureFuncImplAndroid(), width, height);
   }
 
-  StyleType RenderObject::applyStyle(const std::string &key, const std::string &value) {
+  StyleType RenderObject::ApplyStyle(const std::string &key, const std::string &value) {
     if (key == ALIGN_ITEMS) {
-      setAlignItems(getWXCoreAlignItem(value));
+      setAlignItems(GetWXCoreAlignItem(value));
       return kTypeLayout;
     } else if (key == ALIGN_SELF) {
-      setAlignSelf(getWXCoreAlignSelf(value));
+      setAlignSelf(GetWXCoreAlignSelf(value));
       return kTypeLayout;
     } else if (key == FLEX) {
       setFlex(atof(value.c_str()));
       return kTypeLayout;
     } else if (key == FLEX_DIRECTION) {
-      setFlexDirection(getWXCoreFlexDirection(value));
+      setFlexDirection(GetWXCoreFlexDirection(value));
       return kTypeLayout;
     } else if (key == JUSTIFY_CONTENT) {
-      setJustifyContent(getWXCoreJustifyContent(value));
+      setJustifyContent(GetWXCoreJustifyContent(value));
       return kTypeLayout;
     } else if (key == FLEX_WRAP) {
-      setFlexWrap(getWXCoreFlexWrap(value));
+      setFlexWrap(GetWXCoreFlexWrap(value));
       return kTypeLayout;
     } else if (key == MIN_WIDTH) {
-      setMinWidth(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setMinWidth(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == MIN_HEIGHT) {
-      setMinHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setMinHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == MAX_WIDTH) {
-      setMaxWidth(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setMaxWidth(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == MAX_HEIGHT) {
-      setMaxHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setMaxHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == HEIGHT) {
-      setStyleHeight(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStyleHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == WIDTH) {
-      setStyleWidth(getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStyleWidth(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == POSITION) {
-      setStylePositionType(getWXCorePositionType(value));
+      setStylePositionType(GetWXCorePositionType(value));
       return kTypeLayout;
     } else if (key == LEFT) {
-      setStylePosition(kPositionEdgeLeft, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStylePosition(kPositionEdgeLeft, getRealPxByWidth(atof(value.c_str()),
+                                                           GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == TOP) {
-      setStylePosition(kPositionEdgeTop, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStylePosition(kPositionEdgeTop, getRealPxByWidth(atof(value.c_str()),
+                                                          GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == RIGHT) {
-      setStylePosition(kPositionEdgeRight, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStylePosition(kPositionEdgeRight, getRealPxByWidth(atof(value.c_str()),
+                                                            GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == BOTTOM) {
-      setStylePosition(kPositionEdgeBottom, getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth()));
+      setStylePosition(kPositionEdgeBottom, getRealPxByWidth(atof(value.c_str()),
+                                                             GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == MARGIN) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setMargin(kMarginALL, realValue);
       mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_LEFT) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setMargin(kMarginLeft, realValue);
       mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_TOP) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setMargin(kMarginTop, realValue);
       mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_RIGHT) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setMargin(kMarginRight, realValue);
       mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == MARGIN_BOTTOM) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setMargin(kMarginBottom, realValue);
       mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeMargin;
     } else if (key == BORDER_WIDTH) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setBorderWidth(kBorderWidthALL, realValue);
       mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_TOP_WIDTH) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setBorderWidth(kBorderWidthTop, realValue);
       mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_RIGHT_WIDTH) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setBorderWidth(kBorderWidthRight, realValue);
       mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_BOTTOM_WIDTH) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setBorderWidth(kBorderWidthBottom, realValue);
       mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == BORDER_LEFT_WIDTH) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setBorderWidth(kBorderWidthLeft, realValue);
       mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypeBorder;
     } else if (key == PADDING) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setPadding(kPaddingALL, realValue);
       mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_LEFT) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setPadding(kPaddingLeft, realValue);
       mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_TOP) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setPadding(kPaddingTop, realValue);
       mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_RIGHT) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setPadding(kPaddingRight, realValue);
       mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
     } else if (key == PADDING_BOTTOM) {
-      float realValue = getRealPxByWidth(atof(value.c_str()), getRenderPage()->getViewPortWidth());
+      float realValue = getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth());
       setPadding(kPaddingBottom, realValue);
       mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
       return kTypePadding;
@@ -270,7 +274,7 @@ namespace WeexCore {
     }
   }
 
-  void RenderObject::printRenderMsg() {
+  void RenderObject::PrintRenderMsg() {
     std::string result("ref: ");
     result.append(mRef);
     result.append("\n");
@@ -282,8 +286,8 @@ namespace WeexCore {
 
     result.append("attr:\n");
 
-    AttributesIterator attr_it = getAttrItBegin();
-    AttributesIterator attr_end = getAttrItEnd();
+    AttributesIterator attr_it = AttrItBegin();
+    AttributesIterator attr_end = AttrItEnd();
     for (; attr_it != attr_end; ++attr_it) {
       result.append("   ");
       result.append(attr_it->first);
@@ -295,8 +299,8 @@ namespace WeexCore {
 
     result.append("style:\n");
 
-    StylesIterator style_it = getStyleItBegin();
-    StylesIterator style_end = getStyleItEnd();
+    StylesIterator style_it = StyleItBegin();
+    StylesIterator style_end = StyleItEnd();
     for (; style_it != style_end; ++style_it) {
       result.append("   ");
       result.append(style_it->first);
@@ -309,8 +313,8 @@ namespace WeexCore {
     if (mEvents != nullptr) {
       result.append("event:\n");
 
-      EventsIterator event_it = getEventItBegin();
-      EventsIterator event_end = getEventItEnd();
+      EventsIterator event_it = EventItBegin();
+      EventsIterator event_end = EventItEnd();
 
       for (; event_it != event_end; ++event_it) {
         result.append("   ");
@@ -329,7 +333,7 @@ namespace WeexCore {
 //    }
   }
 
-  void RenderObject::printYGNodeMsg() {
+  void RenderObject::PrintLayoutMsg() {
 //    LOGE("yoga ref: %s\n", mRef.c_str());
 //    LOGE("yoga type: %s\n", mType.c_str());
 //    YGNodePrint(mYGNode, YGPrintOptionsLayout);

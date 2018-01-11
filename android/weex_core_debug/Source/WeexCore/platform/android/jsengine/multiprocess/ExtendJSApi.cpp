@@ -246,7 +246,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
 
-  RenderManager::getInstance()->createPage(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->CreatePage(jString2Str(env, jInstanceId),
                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jTaskString);
@@ -260,7 +260,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
   jstring jindex = getArgumentAsJString(env, arguments, 3);
 
-  RenderManager::getInstance()->addRenderObject(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->AddRenderObject(jString2Str(env, jInstanceId),
                                                 jString2Str(env, jParentRef),
                                                 atoi(jString2Str(env, jindex).c_str()),
                                                 jByteArray2Str(env, jdomString)) ? 0 : -1;
@@ -277,7 +277,7 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   jstring jRef = getArgumentAsJString(env, arguments, 1);
 
-  RenderManager::getInstance()->removeRenderObject(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->RemoveRenderObject(jString2Str(env, jInstanceId),
                                                    jString2Str(env, jRef));
 
   return createInt32Result(0);
@@ -290,7 +290,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
   jstring jParentRef = getArgumentAsJString(env, arguments, 2);
   jstring jIndex = getArgumentAsJString(env, arguments, 3);
 
-  RenderManager::getInstance()->moveRenderObject(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->MoveRenderObject(jString2Str(env, jInstanceId),
                                                  jString2Str(env, jRef),
                                                  jString2Str(env, jParentRef),
                                                  atoi(jString2Str(env, jIndex).c_str()));
@@ -304,7 +304,7 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   jstring jRef = getArgumentAsJString(env, arguments, 1);
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
-  RenderManager::getInstance()->updateStyle(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->UpdateStyle(jString2Str(env, jInstanceId),
                                             jString2Str(env, jRef),
                                             jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
@@ -320,7 +320,7 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   jstring jRef = getArgumentAsJString(env, arguments, 1);
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 2);
 
-  RenderManager::getInstance()->updateAttr(jString2Str(env, jInstanceId),
+  RenderManager::GetInstance()->UpdateAttr(jString2Str(env, jInstanceId),
                                            jString2Str(env, jRef),
                                            jByteArray2Str(env, jTaskString)) ? 0 : -1;
 
@@ -334,7 +334,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
 
-  RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
+  RenderManager::GetInstance()->CreateFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
 
   env->DeleteLocalRef(jInstanceId);
   return createInt32Result(0);
@@ -348,7 +348,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 
   std::string task = jByteArray2Str(env, jTaskString);
   if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
-    RenderManager::getInstance()->createFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
+    RenderManager::GetInstance()->CreateFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
     env->DeleteLocalRef(jInstanceId);
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);

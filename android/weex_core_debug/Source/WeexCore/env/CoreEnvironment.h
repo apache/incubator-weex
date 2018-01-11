@@ -35,19 +35,19 @@ namespace WeexCore {
 
   public:
 
-    bool setPlatform(const std::string &platformName);
+    bool SetPlatform(const std::string &platformName);
 
-    bool isAndroid();
+    bool IsAndroid();
 
-    bool isIOS();
+    bool IsIOS();
 
-    bool setDeviceWidth(const std::string &width);
+    bool SetDeviceWidth(const std::string &width);
 
-    bool setDeviceHeight(const std::string &height);
+    bool SetDeviceHeight(const std::string &height);
 
-    float getDeviceWidth();
+    float DeviceWidth();
 
-    float getDeviceHeight();
+    float DeviceHeight();
 
     static WXCoreEnvironment *getInstance() {
       if (!m_pInstance) {

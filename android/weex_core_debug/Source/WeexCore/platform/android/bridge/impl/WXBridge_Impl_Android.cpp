@@ -277,17 +277,17 @@ namespace WeexCore {
 
   /****************** WeexCore *****************/
 
-  int Bridge_Impl_Android::callCreateBodyByWeexCore(std::string &pageId, std::string &componentType,
-                                              std::string &ref,
-                                              std::map<std::string, std::string> *styles,
-                                              std::map<std::string, std::string> *attributes,
-                                              std::set<std::string> *events,
-                                              std::map<std::string, std::string> *paddings,
-                                              std::map<std::string, std::string> *margins,
-                                              std::map<std::string, std::string> *borders) {
+  int Bridge_Impl_Android::callCreateBody(std::string &pageId, std::string &componentType,
+                                          std::string &ref,
+                                          std::map<std::string, std::string> *styles,
+                                          std::map<std::string, std::string> *attributes,
+                                          std::set<std::string> *events,
+                                          std::map<std::string, std::string> *paddings,
+                                          std::map<std::string, std::string> *margins,
+                                          std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -315,7 +315,7 @@ namespace WeexCore {
     cpyCMap2JMap(margins, jMargins, env);
     cpyCMap2JMap(borders, jBorders, env);
 
-    page->createJMapJNITime(getCurrentTime() - startTime);
+    page->CreateJMapJNITime(getCurrentTime() - startTime);
 
     long long startTimeCallBridge = getCurrentTime();
 
@@ -334,7 +334,7 @@ namespace WeexCore {
                               jEvents,
                               jPaddings, jMargins, jBorders);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callCreateBody");
@@ -352,18 +352,18 @@ namespace WeexCore {
     return flag;
   }
 
-  int Bridge_Impl_Android::callAddElementByWeexCore(std::string &pageId, std::string &componentType,
-                                              std::string &ref, int &index,
-                                              std::string &parentRef,
-                                              std::map<std::string, std::string> *styles,
-                                              std::map<std::string, std::string> *attributes,
-                                              std::set<std::string> *events,
-                                              std::map<std::string, std::string> *paddings,
-                                              std::map<std::string, std::string> *margins,
-                                              std::map<std::string, std::string> *borders) {
+  int Bridge_Impl_Android::callAddElement(std::string &pageId, std::string &componentType,
+                                          std::string &ref, int &index,
+                                          std::string &parentRef,
+                                          std::map<std::string, std::string> *styles,
+                                          std::map<std::string, std::string> *attributes,
+                                          std::set<std::string> *events,
+                                          std::map<std::string, std::string> *paddings,
+                                          std::map<std::string, std::string> *margins,
+                                          std::map<std::string, std::string> *borders) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -391,7 +391,7 @@ namespace WeexCore {
     cpyCMap2JMap(margins, jMargins, env);
     cpyCMap2JMap(borders, jBorders, env);
 
-    page->createJMapJNITime(getCurrentTime() - startTime);
+    page->CreateJMapJNITime(getCurrentTime() - startTime);
 
     long long startTimeCallBridge = getCurrentTime();
 
@@ -410,7 +410,7 @@ namespace WeexCore {
                               jRef, index, jParentRef,
                               jStyles, jAttributes, jEvents, jPaddings, jMargins, jBorders);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callAddElement");
@@ -478,14 +478,14 @@ namespace WeexCore {
   }
 
   int
-  Bridge_Impl_Android::callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
-                                           std::vector<std::pair<std::string, std::string> *> *style,
-                                           std::vector<std::pair<std::string, std::string> *> *margin,
-                                           std::vector<std::pair<std::string, std::string> *> *padding,
-                                           std::vector<std::pair<std::string, std::string> *> *border) {
+  Bridge_Impl_Android::callUpdateStyle(std::string &pageId, std::string &ref,
+                                       std::vector<std::pair<std::string, std::string> *> *style,
+                                       std::vector<std::pair<std::string, std::string> *> *margin,
+                                       std::vector<std::pair<std::string, std::string> *> *padding,
+                                       std::vector<std::pair<std::string, std::string> *> *border) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -515,7 +515,7 @@ namespace WeexCore {
       cpyCVector2JMap(border, jBorders, env);
     }
 
-    page->createJMapJNITime(getCurrentTime() - startTime);
+    page->CreateJMapJNITime(getCurrentTime() - startTime);
 
     long long startTimeCallBridge = getCurrentTime();
 
@@ -531,7 +531,7 @@ namespace WeexCore {
     flag = env->CallIntMethod(jThis, jCallUpdateStyleByWeexCoreMethodId, jPageId, jRef, jStyles,
                               jMargins, jPaddings, jBorders);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callUpdateStyle");
@@ -546,11 +546,11 @@ namespace WeexCore {
     return flag;
   }
 
-  int Bridge_Impl_Android::callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                              std::vector<std::pair<std::string, std::string> *> *attrs) {
+  int Bridge_Impl_Android::callUpdateAttr(std::string &pageId, std::string &ref,
+                                          std::vector<std::pair<std::string, std::string> *> *attrs) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -565,7 +565,7 @@ namespace WeexCore {
       cpyCVector2JMap(attrs, jAttrs, env);
     }
 
-    page->createJMapJNITime(getCurrentTime() - startTime);
+    page->CreateJMapJNITime(getCurrentTime() - startTime);
 
     long long startTimeCallBridge = getCurrentTime();
 
@@ -581,7 +581,7 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallUpdateAttrsByWeexCoreMethodId, jPageId, jRef, jAttrs);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callUpdateStyle");
@@ -593,12 +593,12 @@ namespace WeexCore {
     return flag;
   }
 
-  int Bridge_Impl_Android::callLayoutByWeexCore(std::string &pageId, std::string &ref, int top,
-                                          int bottom, int left, int right, int height,
-                                          int width) {
+  int Bridge_Impl_Android::callLayout(std::string &pageId, std::string &ref, int top,
+                                      int bottom, int left, int right, int height,
+                                      int width) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallLayoutByWeexCoreMethodId == NULL)
@@ -613,7 +613,7 @@ namespace WeexCore {
     flag = env->CallIntMethod(jThis, jCallLayoutByWeexCoreMethodId, jPageId,
                               jRef, top, bottom, left, right, height, width);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callLayoutByWeexCore");
@@ -624,10 +624,10 @@ namespace WeexCore {
     return flag;
   }
 
-  int Bridge_Impl_Android::callCreateFinishByWeexCore(std::string &pageId) {
+  int Bridge_Impl_Android::callCreateFinish(std::string &pageId) {
     JNIEnv *env = getJNIEnv();
 
-    RenderPage *page = RenderManager::getInstance()->getPage(pageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallCreateFinishByWeexCoreMethodId == NULL)
@@ -638,7 +638,7 @@ namespace WeexCore {
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     int flag = env->CallIntMethod(jThis, jCallCreateFinishByWeexCoreMethodId, jPageId);
 
-    page->jniCallBridgeTime(getCurrentTime() - startTimeCallBridge);
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callCreateFinish");

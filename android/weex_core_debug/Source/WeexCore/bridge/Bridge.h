@@ -28,7 +28,6 @@ namespace WeexCore {
 
     virtual void callNativeLog(jbyteArray &str_msg) = 0;
 
-
     virtual int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
                                  jstring &callback) = 0;
 
@@ -42,39 +41,39 @@ namespace WeexCore {
                                 jstring &ref, jstring &event, jstring &callback) = 0;
 
     virtual int
-    callCreateBodyByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                             std::map<std::string, std::string> *styles,
-                             std::map<std::string, std::string> *attributes,
-                             std::set<std::string> *events,
-                             std::map<std::string, std::string> *paddings,
-                             std::map<std::string, std::string> *margins,
-                             std::map<std::string, std::string> *borders) = 0;
+    callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,
+                   std::map<std::string, std::string> *styles,
+                   std::map<std::string, std::string> *attributes,
+                   std::set<std::string> *events,
+                   std::map<std::string, std::string> *paddings,
+                   std::map<std::string, std::string> *margins,
+                   std::map<std::string, std::string> *borders) = 0;
 
     virtual int
-    callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                             int &index,
-                             std::string &parentRef,
-                             std::map<std::string, std::string> *styles,
-                             std::map<std::string, std::string> *attributes,
-                             std::set<std::string> *events,
-                             std::map<std::string, std::string> *paddings,
-                             std::map<std::string, std::string> *margins,
-                             std::map<std::string, std::string> *borders) = 0;
+    callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
+                   int &index,
+                   std::string &parentRef,
+                   std::map<std::string, std::string> *styles,
+                   std::map<std::string, std::string> *attributes,
+                   std::set<std::string> *events,
+                   std::map<std::string, std::string> *paddings,
+                   std::map<std::string, std::string> *margins,
+                   std::map<std::string, std::string> *borders) = 0;
 
-    virtual int callLayoutByWeexCore(std::string &pageId, std::string &ref,
-                                     int top, int bottom, int left, int right,
-                                     int height, int width) = 0;
+    virtual int callLayout(std::string &pageId, std::string &ref,
+                           int top, int bottom, int left, int right,
+                           int height, int width) = 0;
 
-    virtual int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
-                                          std::vector<std::pair<std::string, std::string> *> *style,
-                                          std::vector<std::pair<std::string, std::string> *> *margin,
-                                          std::vector<std::pair<std::string, std::string> *> *padding,
-                                          std::vector<std::pair<std::string, std::string> *> *border) = 0;
+    virtual int callUpdateStyle(std::string &pageId, std::string &ref,
+                                std::vector<std::pair<std::string, std::string> *> *style,
+                                std::vector<std::pair<std::string, std::string> *> *margin,
+                                std::vector<std::pair<std::string, std::string> *> *padding,
+                                std::vector<std::pair<std::string, std::string> *> *border) = 0;
 
-    virtual int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                         std::vector<std::pair<std::string, std::string> *> *attrs) = 0;
+    virtual int callUpdateAttr(std::string &pageId, std::string &ref,
+                               std::vector<std::pair<std::string, std::string> *> *attrs) = 0;
 
-    virtual int callCreateFinishByWeexCore(std::string &pageId) = 0;
+    virtual int callCreateFinish(std::string &pageId) = 0;
 
     virtual int callRemoveElement(std::string &pageId, std::string &ref) = 0;
 

@@ -10,10 +10,10 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateAttr::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callUpdateAttrByWeexCore(mPageId, mRef, mAttrs);
+    Bridge_Impl_Android::getInstance()->callUpdateAttr(mPageId, mRef, mAttrs);
     if (page != nullptr)
-      page->jniCallTime(getCurrentTime() - startTime);
+      page->JniCallTime(getCurrentTime() - startTime);
   }
 }

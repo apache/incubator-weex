@@ -69,43 +69,43 @@ namespace WeexCore {
     int callRemoveEvent(jstring &instanceId,
                         jstring &ref, jstring &event, jstring &callback);
 
-    int callCreateBodyByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 std::map<std::string, std::string> *styles,
-                                 std::map<std::string, std::string> *attributes,
-                                 std::set<std::string> *events,
-                                 std::map<std::string, std::string> *paddings,
-                                 std::map<std::string, std::string> *margins,
-                                 std::map<std::string, std::string> *borders);
+    int callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,
+                       std::map<std::string, std::string> *styles,
+                       std::map<std::string, std::string> *attributes,
+                       std::set<std::string> *events,
+                       std::map<std::string, std::string> *paddings,
+                       std::map<std::string, std::string> *margins,
+                       std::map<std::string, std::string> *borders);
 
-    int callAddElementByWeexCore(std::string &pageId, std::string &componentType, std::string &ref,
-                                 int &index,
-                                 std::string &parentRef,
-                                 std::map<std::string, std::string> *styles,
-                                 std::map<std::string, std::string> *attributes,
-                                 std::set<std::string> *events,
-                                 std::map<std::string, std::string> *paddings,
-                                 std::map<std::string, std::string> *margins,
-                                 std::map<std::string, std::string> *borders);
+    int callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
+                       int &index,
+                       std::string &parentRef,
+                       std::map<std::string, std::string> *styles,
+                       std::map<std::string, std::string> *attributes,
+                       std::set<std::string> *events,
+                       std::map<std::string, std::string> *paddings,
+                       std::map<std::string, std::string> *margins,
+                       std::map<std::string, std::string> *borders);
 
     int callRemoveElement(std::string &pageId, std::string &ref);
 
     int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
                         int index);
 
-    int callLayoutByWeexCore(std::string &pageId, std::string &ref,
-                             int top, int bottom, int left, int right,
-                             int height, int width);
+    int callLayout(std::string &pageId, std::string &ref,
+                   int top, int bottom, int left, int right,
+                   int height, int width);
 
-    int callUpdateStyleByWeexCore(std::string &pageId, std::string &ref,
-                                  std::vector<std::pair<std::string, std::string> *> *style,
-                                  std::vector<std::pair<std::string, std::string> *> *margin,
-                                  std::vector<std::pair<std::string, std::string> *> *padding,
-                                  std::vector<std::pair<std::string, std::string> *> *border);
+    int callUpdateStyle(std::string &pageId, std::string &ref,
+                        std::vector<std::pair<std::string, std::string> *> *style,
+                        std::vector<std::pair<std::string, std::string> *> *margin,
+                        std::vector<std::pair<std::string, std::string> *> *padding,
+                        std::vector<std::pair<std::string, std::string> *> *border);
 
-    int callUpdateAttrByWeexCore(std::string &pageId, std::string &ref,
-                                 std::vector<std::pair<std::string, std::string> *> *attrs);
+    int callUpdateAttr(std::string &pageId, std::string &ref,
+                       std::vector<std::pair<std::string, std::string> *> *attrs);
 
-    int callCreateFinishByWeexCore(std::string &pageId);
+    int callCreateFinish(std::string &pageId);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h
