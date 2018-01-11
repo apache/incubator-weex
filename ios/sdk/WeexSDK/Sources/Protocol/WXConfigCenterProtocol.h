@@ -17,6 +17,7 @@
  */
 - (id)configForKey:(NSString*)key defaultValue:(id)defaultValue isDefault:(BOOL*)isDefault;
 
+@optional
 /**
  get group config from config center handler
  @param group the groupName for config
