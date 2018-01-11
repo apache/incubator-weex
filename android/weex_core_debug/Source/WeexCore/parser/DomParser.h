@@ -118,10 +118,9 @@ namespace WeexCore {
  * @param page : {@link RenderPage*}
  * @return {@link RenderObject*}
  */
-  RenderObject *json2RenderObject(char *data, const std::string &pageId);
+  RenderObject *Json2RenderObject(char *data, const std::string &pageId);
 
-  std::vector<std::pair<std::string, std::string> *> *
-  json2Pairs(char *data);
+  std::vector<std::pair<std::string, std::string> *> *Json2Pairs(char *data);
 }
 
 #endif //WEEX_JSON_TOOLS

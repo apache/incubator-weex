@@ -11,10 +11,10 @@ namespace WeexCore {
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callMoveElement(mPageId, mRef,
                                                         mParentRef, mIndex);
-    page->jniCallTime(getCurrentTime() - startTime);
+    page->JniCallTime(getCurrentTime() - startTime);
   }
 }

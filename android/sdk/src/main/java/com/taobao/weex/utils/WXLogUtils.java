@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class WXLogUtils {
 
@@ -41,6 +42,7 @@ public class WXLogUtils {
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
   private static JsLogWatcher jsLogWatcher;
   private static LogWatcher sLogWatcher;
+  public static LinkedHashMap<String, Long> sFirstScreenLog = new LinkedHashMap<>();
 
   static {
     clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
@@ -302,5 +304,15 @@ public class WXLogUtils {
 
   public interface LogWatcher {
     void onLog(String level, String tag, String msg);
+  }
+
+  public static void logOfFirstScreen(String message){
+    Log.e("weex", "logOfFirstScreen=" + message);
+    String name = Thread.currentThread().getName() + "：" + message;
+    if (null != sFirstScreenLog.get(name)) {
+      sFirstScreenLog.put(name + "-" + System.currentTimeMillis(), System.currentTimeMillis());
+    } else {
+      sFirstScreenLog.put(name, System.currentTimeMillis());
+    }
   }
 }

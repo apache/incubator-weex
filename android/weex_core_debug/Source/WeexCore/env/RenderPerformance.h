@@ -19,6 +19,10 @@ namespace WeexCore {
 
     long long addElementActionJNITime;
 
+    long long addEventActionJNITime;
+
+    long long removeEventActionJNITime;
+
     long long layoutActionJniTime;
 
     long long parseJsonTime;
@@ -32,15 +36,15 @@ namespace WeexCore {
                           layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0),
                           createJMapJNITime(0) {}
 
-    inline void printPerformanceLog(PerformanceStage performanceStage) {
-      printPerformanceLog_Impl_Android(performanceStage);
+    inline void PrintPerformanceLog(PerformanceStage performanceStage) {
+      PrintPerformanceLogImplAndroid(performanceStage);
     }
 
   private:
 
-    void printPerformanceLog_Impl_Android(const PerformanceStage &performanceStage);
+    void PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage);
 
-    void printPerformanceLog_Impl_iOS(const PerformanceStage &performanceStage);
+    void PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage);
   };
 }
 

@@ -1,13 +1,13 @@
 #include "RenderRoot.h"
 
 namespace WeexCore {
-  void RenderRoot::setDefaultWidth(const float &defaultWidth) {
+  void RenderRoot::SetDefaultWidth(const float &defaultWidth) {
     if (isnan(getStyleWidth())) {
       setStyleWidth(defaultWidth);
     }
   }
 
-  void RenderRoot::setDefaultHeight(const float &defaultHeight) {
+  void RenderRoot::SetDefaultHeight(const float &defaultHeight) {
     if (isnan(getStyleHeight())) {
       setStyleHeight(defaultHeight);
     }

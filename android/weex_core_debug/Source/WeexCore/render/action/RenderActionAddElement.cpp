@@ -4,29 +4,29 @@ namespace WeexCore {
 
   RenderActionAddElement::RenderActionAddElement(const std::string &pageId, RenderObject *render,
                                                  RenderObject *parent, const int &index) {
-    this->mAttributes = render->getAttributes();
-    this->mStyles = render->getStyles();
-    this->mEvents = render->getEvents();
-    this->mPaddings = render->getPaddings();
-    this->mMargins = render->getMargins();
-    this->mBorders = render->getBorders();
+    this->mAttributes = render->Attributes();
+    this->mStyles = render->Styles();
+    this->mEvents = render->Events();
+    this->mPaddings = render->Paddings();
+    this->mMargins = render->Margins();
+    this->mBorders = render->Borders();
     this->mPageId = pageId;
-    this->mComponentType = render->getType();
-    this->mRef = render->getRef();
-    this->mParentRef = parent->getRef();
+    this->mComponentType = render->Type();
+    this->mRef = render->Ref();
+    this->mParentRef = parent->Ref();
     this->mIndex = index;
   }
 
   void RenderActionAddElement::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callAddElementByWeexCore(mPageId, mComponentType, mRef,
-                                                           mIndex,
-                                                           mParentRef, mStyles, mAttributes,
-                                                           mEvents,
-                                                           mPaddings, mMargins, mBorders);
-    page->jniCallTime(getCurrentTime() - startTime);
-    page->addElementActionJNITime(getCurrentTime() - startTime);
+    Bridge_Impl_Android::getInstance()->callAddElement(mPageId, mComponentType, mRef,
+                                                       mIndex,
+                                                       mParentRef, mStyles, mAttributes,
+                                                       mEvents,
+                                                       mPaddings, mMargins, mBorders);
+    page->JniCallTime(getCurrentTime() - startTime);
+    page->AddElementActionJNITime(getCurrentTime() - startTime);
   }
 
 }

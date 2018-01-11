@@ -7,10 +7,10 @@ namespace WeexCore {
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callCreateFinishByWeexCore(mPageId);
+    Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId);
 
-    page->jniCallTime(getCurrentTime() - startTime);
+    page->JniCallTime(getCurrentTime() - startTime);
   }
 }

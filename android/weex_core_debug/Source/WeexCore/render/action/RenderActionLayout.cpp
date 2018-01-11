@@ -4,22 +4,22 @@ namespace WeexCore {
 
   RenderActionLayout::RenderActionLayout(const std::string &pageId, RenderObject *render) {
     this->mPageId = pageId;
-    this->mRef = render->getRef();
-    getLayoutInfo(render);
+    this->mRef = render->Ref();
+    GetLayoutInfo(render);
   }
 
   void RenderActionLayout::ExecuteAction() {
-    RenderPage *page = RenderManager::getInstance()->getPage(mPageId);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callLayoutByWeexCore(mPageId, mRef,
-                                                             mTop, mBottom,
-                                                             mLeft, mRight,
-                                                             mHeight, mWidth);
-    page->jniCallTime(getCurrentTime() - startTime);
-    page->layoutActionJniTime(getCurrentTime() - startTime);
+    Bridge_Impl_Android::getInstance()->callLayout(mPageId, mRef,
+                                                   mTop, mBottom,
+                                                   mLeft, mRight,
+                                                   mHeight, mWidth);
+    page->JniCallTime(getCurrentTime() - startTime);
+    page->LayoutActionJniTime(getCurrentTime() - startTime);
   }
 
-  void RenderActionLayout::getLayoutInfo(WXCoreLayoutNode *node) {
+  void RenderActionLayout::GetLayoutInfo(WXCoreLayoutNode *node) {
     mTop = node->getLayoutPositionTop();
     mBottom = node->getLayoutPositionBottom();
     mRight = node->getLayoutPositionRight();

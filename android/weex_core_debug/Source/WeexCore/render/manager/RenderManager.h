@@ -29,37 +29,37 @@ namespace WeexCore {
 
   public:
 
-    void batch(const std::string &pageId);
+    void Batch(const std::string &pageId);
 
     // create root node
-    bool createPage(const std::string &pageId, const std::string &data);
+    bool CreatePage(const std::string &pageId, const std::string &data);
 
-    bool addRenderObject(const std::string &pageId, const std::string &parentRef, const int &index,
+    bool AddRenderObject(const std::string &pageId, const std::string &parentRef, const int &index,
                          const std::string &data);
 
-    bool removeRenderObject(const std::string &pageId, const std::string &ref);
+    bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
 
     bool
-    moveRenderObject(const std::string &pageId, const std::string &ref,
+    MoveRenderObject(const std::string &pageId, const std::string &ref,
                      const std::string &parentRef, int index);
 
-    bool updateAttr(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateAttr(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool updateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool addEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
-    bool removeEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
-    bool createFinish(const std::string &pageId);
+    bool CreateFinish(const std::string &pageId);
 
-    RenderPage *getPage(const std::string &id);
+    RenderPage *GetPage(const std::string &id);
 
-    void printRenderAndLayoutTree(const std::string &pageId);
+    void PrintRenderAndLayoutTree(const std::string &pageId);
 
     bool ClosePage(std::string pageId);
 
-    static RenderManager *getInstance() {
+    static RenderManager *GetInstance() {
       if (!m_pInstance) {
         m_pInstance = new RenderManager();
       }

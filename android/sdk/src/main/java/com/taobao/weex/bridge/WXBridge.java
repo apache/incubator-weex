@@ -228,7 +228,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callAddEvent(String instanceId, String ref, String event, String callback) {
+  public int callAddEvent(String instanceId, String ref, String event) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
@@ -236,7 +236,7 @@ public class WXBridge implements IWXBridge {
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callAddEvent(instanceId, ref, event, callback);
+      errorCode = WXBridgeManager.getInstance().callAddEvent(instanceId, ref, event);
     } catch (Throwable e) {
       //catch everything during call native.
       // if(WXEnvironment.isApkDebugable()){
@@ -250,7 +250,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+  public int callRemoveEvent(String instanceId, String ref, String event) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
@@ -258,7 +258,7 @@ public class WXBridge implements IWXBridge {
     }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callRemoveEvent(instanceId, ref, event, callback);
+      errorCode = WXBridgeManager.getInstance().callRemoveEvent(instanceId, ref, event);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -271,6 +271,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
   public void reportServerCrash(String instanceId, String crashFile) {
     WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -293,6 +294,7 @@ public class WXBridge implements IWXBridge {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
+    WXLogUtils.logOfFirstScreen("start callCreateBodyByWeexCore");
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
@@ -304,6 +306,7 @@ public class WXBridge implements IWXBridge {
         WXLogUtils.e(TAG, "callCreateBody throw exception:" + e.getMessage());
       }
     }
+    WXLogUtils.logOfFirstScreen("end callCreateBodyByWeexCore");
     return errorCode;
   }
 
@@ -418,12 +421,19 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callCreateFinishByWeexCore(String instanceId) {
+    WXLogUtils.logOfFirstScreen("start callCreateFinishByWeexCore");
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callCreateFinishByWeexCore(instanceId);
     } catch (Throwable e) {
       WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
     }
+    WXLogUtils.logOfFirstScreen("end callCreateFinishByWeexCore");
     return errorCode;
+  }
+
+  @Override
+  public void callLogOfFirstScreen(String message) {
+    WXLogUtils.logOfFirstScreen(message);
   }
 }

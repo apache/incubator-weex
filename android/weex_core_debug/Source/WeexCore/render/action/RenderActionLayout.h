@@ -12,7 +12,7 @@ namespace WeexCore {
 
     void ExecuteAction();
 
-    void getLayoutInfo(WXCoreLayoutNode *node);
+    void GetLayoutInfo(WXCoreLayoutNode *node);
 
   public:
     EventsSet *mEvents;

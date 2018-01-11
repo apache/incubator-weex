@@ -7,9 +7,9 @@ namespace WeexCore {
   class RenderRoot : public RenderObject {
   public:
 
-    void setDefaultWidth(const float &defaultWidth);
+    void SetDefaultWidth(const float &defaultWidth);
 
-    void setDefaultHeight(const float &defaultHeight);
+    void SetDefaultHeight(const float &defaultHeight);
 
     bool ViewInit();
   };
