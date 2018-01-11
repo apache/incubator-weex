@@ -46,6 +46,7 @@
 #import "WXJSExceptionProtocol.h"
 #import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
+#import "WXMonitor.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -68,6 +69,7 @@ typedef enum : NSUInteger {
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
+    BOOL  _performanceCommit;
 }
 
 - (void)dealloc
@@ -100,6 +102,7 @@ typedef enum : NSUInteger {
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
         _trackComponent = NO;
+        _performanceCommit = NO;
        
         [self addObservers];
     }
@@ -405,6 +408,11 @@ typedef enum : NSUInteger {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
+    }
+    
+    if (!_performanceCommit && state == WeexInstanceDisappear) {
+        WX_MONITOR_INSTANCE_PERF_COMMIT(self);
+        _performanceCommit = YES;
     }
     
     NSMutableDictionary *data = [NSMutableDictionary dictionary];
