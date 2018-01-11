@@ -308,6 +308,8 @@ public class WXPerformance {
   public String connectionType;
   public String requestType;
 
+  public String zCacheInfo;
+
   /**
    *for network tracker
    */
@@ -399,6 +401,7 @@ public class WXPerformance {
     quotas.put(Dimension.requestType.toString(), requestType);
     quotas.put(Dimension.networkType.toString(), "unknown");
     quotas.put(Dimension.connectionType.toString(), connectionType);
+    quotas.put(Dimension.zcacheInfo.toString(),zCacheInfo);
     quotas.put(Dimension.cacheType.toString(), cacheType);
     quotas.put(Dimension.useScroller.toString(),String.valueOf(useScroller));
 
