@@ -245,10 +245,8 @@
 
 - (void)dealloc
 {
-    if ([WXUtility threadSafeCollectionUsingLock]) {
-        pthread_mutex_destroy(&_safeThreadDictionaryMutex);
-        pthread_mutexattr_destroy(&_safeThreadDictionaryMutexAttr);
-    }
+    pthread_mutex_destroy(&_safeThreadDictionaryMutex);
+    pthread_mutexattr_destroy(&_safeThreadDictionaryMutexAttr);
 }
 
 @end
