@@ -75,9 +75,9 @@ namespace WeexCore {
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool AddEvent(const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &ref, const std::string &event, const std::string &callback);
 
-    bool RemoveEvent(const std::string &ref, const std::string &event);
+    bool RemoveEvent(const std::string &ref, const std::string &event, const std::string &callback);
 
     bool CreateFinish();
 
@@ -86,6 +86,10 @@ namespace WeexCore {
     void JniCallTime(const long long &time);
 
     void CssLayoutTime(const long long &time);
+
+    void AddEventActionJNITime(const long long &time);
+
+    void RemoveEventActionJNITime(const long long &time);
 
     void AddElementActionJNITime(const long long &time);
 

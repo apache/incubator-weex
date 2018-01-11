@@ -19,6 +19,10 @@ namespace WeexCore {
 
     long long addElementActionJNITime;
 
+    long long addEventActionJNITime;
+
+    long long removeEventActionJNITime;
+
     long long layoutActionJniTime;
 
     long long parseJsonTime;

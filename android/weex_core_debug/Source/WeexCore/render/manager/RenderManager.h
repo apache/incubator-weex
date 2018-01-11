@@ -47,9 +47,9 @@ namespace WeexCore {
 
     bool UpdateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event, const std::string &callback);
 
-    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event, const std::string &callback);
 
     bool CreateFinish(const std::string &pageId);
 

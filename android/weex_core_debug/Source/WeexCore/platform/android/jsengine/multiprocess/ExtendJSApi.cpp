@@ -114,11 +114,17 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
-  Bridge_Impl_Android::getInstance()->callAddEvent(jInstanceId, jRef, jEvent, jCallback);
+  RenderManager::GetInstance()->AddEvent(jString2Str(env, jInstanceId),
+                                         jString2Str(env, jRef),
+                                         jString2Str(env, jEvent),
+                                         jString2Str(env, jCallback));
 
+  env->DeleteLocalRef(jInstanceId);
+  env->DeleteLocalRef(jRef);
+  env->DeleteLocalRef(jEvent);
+  env->DeleteLocalRef(jCallback);
   return createInt32Result(0);
 }
-
 std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
   JNIEnv *env = getJNIEnv();
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
@@ -127,8 +133,15 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
   jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
   int flag = 0;
-  flag = Bridge_Impl_Android::getInstance()->callRemoveEvent(jInstanceId, jRef, jEvent, jCallback);
+  flag = RenderManager::GetInstance()->RemoveEvent(jString2Str(env, jInstanceId),
+                                            jString2Str(env, jRef),
+                                            jString2Str(env, jEvent),
+                                            jString2Str(env, jCallback));
 
+  env->DeleteLocalRef(jInstanceId);
+  env->DeleteLocalRef(jRef);
+  env->DeleteLocalRef(jEvent);
+  env->DeleteLocalRef(jCallback);
   return createInt32Result(flag);
 }
 

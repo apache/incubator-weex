@@ -31,6 +31,7 @@ static jmethodID jCallUpdateStyleByWeexCoreMethodId;
 static jmethodID jCallUpdateAttrsByWeexCoreMethodId;
 static jmethodID jCallLayoutByWeexCoreMethodId;
 static jmethodID jCallCreateFinishByWeexCoreMethodId;
+//static jmethodID jCallLogOfFirstScreenMethodId;
 
 namespace WeexCore {
 
@@ -233,44 +234,51 @@ namespace WeexCore {
     return flag;
   }
 
-  int Bridge_Impl_Android::callAddEvent(jstring &instanceId,
-                                  jstring &ref, jstring &event, jstring &Callback) {
+  int Bridge_Impl_Android::callAddEvent(std::string &instanceId,
+                                        std::string &ref, std::string &event, std::string &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallAddEventMethodId == NULL) {
       jCallAddEventMethodId = env->GetMethodID(jBridgeClazz,
                                                "callAddEvent",
                                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
     }
+    jstring jPageId = env->NewStringUTF(instanceId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+    jstring jEventId = env->NewStringUTF(event.c_str());
+    jstring jCallbackId = env->NewStringUTF(callback.c_str());
 
-    int flag = env->CallIntMethod(jThis, jCallAddEventMethodId, instanceId, ref, event, Callback);
+    int flag = env->CallIntMethod(jThis, jCallAddEventMethodId, jPageId, jRef, jEventId, jCallbackId);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callAddEvent");
     }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(ref);
-    env->DeleteLocalRef(event);
-    env->DeleteLocalRef(Callback);
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    env->DeleteLocalRef(jEventId);
+    env->DeleteLocalRef(jCallbackId);
     return flag;
   }
 
-  int Bridge_Impl_Android::callRemoveEvent(jstring &instanceId,
-                                     jstring &ref, jstring &event, jstring &Callback) {
+  int Bridge_Impl_Android::callRemoveEvent(std::string &instanceId,
+                                           std::string &ref, std::string &event, std::string &callback) {
     JNIEnv *env = getJNIEnv();
     if (jCallRemoveEventMethodId == NULL) {
       jCallRemoveEventMethodId = env->GetMethodID(jBridgeClazz,
                                                   "callRemoveEvent",
                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
     }
+    jstring jPageId = env->NewStringUTF(instanceId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+    jstring jEventId = env->NewStringUTF(event.c_str());
+    jstring jCallbackId = env->NewStringUTF(callback.c_str());
 
-    int flag = env->CallIntMethod(jThis, jCallRemoveEventMethodId, instanceId, ref, event,
-                                  Callback);
+    int flag = env->CallIntMethod(jThis, jCallRemoveEventMethodId, jPageId, jRef, jEventId, jCallbackId);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(ref);
-    env->DeleteLocalRef(event);
-    env->DeleteLocalRef(Callback);
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    env->DeleteLocalRef(jEventId);
+    env->DeleteLocalRef(jCallbackId);
     return flag;
   }
 
@@ -647,4 +655,18 @@ namespace WeexCore {
     env->DeleteLocalRef(jPageId);
     return flag;
   }
+
+//  void Bridge_Impl_Android::callLogOfFirstScreen(std::string &message) {
+//    JNIEnv *env = getJNIEnv();
+//
+//    if (jCallLogOfFirstScreenMethodId == NULL)
+//      jCallLogOfFirstScreenMethodId = env->GetMethodID(jBridgeClazz,
+//                                                       "callLogOfFirstScreen",
+//                                                       "(Ljava/lang/String;)V");
+//
+//    jstring jMessageId = env->NewStringUTF(message.c_str());
+//    env->CallVoidMethod(jThis, jCallLogOfFirstScreenMethodId, jMessageId);
+//
+//    env->DeleteLocalRef(jMessageId);
+//  }
 } //end WeexCore

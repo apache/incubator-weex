@@ -12,6 +12,8 @@
 #include <WeexCore/env/RenderPerformance.h>
 #include <WeexCore/env/CoreEnvironment.h>
 #include <base/ViewUtils.h>
+#include <WeexCore/render/action/RenderActionAddEvent.h>
+#include <WeexCore/render/action/RenderActionRemoveEvent.h>
 #include "RenderPage.h"
 #include "WeexCore/render/manager/RenderManager.h"
 #include "WeexCore/render/node/RenderObject.h"
@@ -71,7 +73,11 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     render_root->calculateLayout();
     CssLayoutTime(getCurrentTime() - startTime);
+//    std::string mMessage = "end calculateLayout";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     render_root->LayoutAfter();
+//    mMessage = "end layoutAfter";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
 //    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
 //    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
@@ -126,6 +132,8 @@ namespace WeexCore {
     PushRenderToRegisterMap(root);
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
+//    std::string mMessage = "sendCreateBodyAction";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendCreateBodyAction(root);
     return true;
   }
@@ -144,8 +152,12 @@ namespace WeexCore {
     child->SetParentRender(parent);
     parent->AddRenderObject(insertPosition, child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
+//    std::string mMessage = "start sendAddElementAction";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendAddElementAction(child, parent, insertPosition);
 
+//    mMessage = "start calculateLayout";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     CalculateLayout();
     return true;
   }
@@ -353,7 +365,7 @@ namespace WeexCore {
     CalculateLayout();
   }
 
-  bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
+  bool RenderPage::AddEvent(const std::string &ref, const std::string &event, const std::string &callback) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -362,10 +374,12 @@ namespace WeexCore {
     render->AddEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
+    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event, callback);
+    PostRenderAction(action);
     return true;
   }
 
-  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
+  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event, const std::string &callback) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -374,6 +388,8 @@ namespace WeexCore {
     render->RemoveEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
+    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event, callback);
+    PostRenderAction(action);
     return true;
   }
 
@@ -487,6 +503,16 @@ namespace WeexCore {
   void RenderPage::CssLayoutTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->cssLayoutTime += time;
+  }
+
+  void RenderPage::AddEventActionJNITime(const long long &time) {
+    if (mWXCorePerformance != nullptr)
+        mWXCorePerformance->addEventActionJNITime += time;
+  }
+
+  void RenderPage::RemoveEventActionJNITime(const long long &time) {
+    if (mWXCorePerformance != nullptr)
+        mWXCorePerformance->removeEventActionJNITime += time;
   }
 
   void RenderPage::AddElementActionJNITime(const long long &time) {
