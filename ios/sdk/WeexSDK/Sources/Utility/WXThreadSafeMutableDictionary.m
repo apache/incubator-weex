@@ -19,11 +19,17 @@
 
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXUtility.h"
+#import <pthread/pthread.h>
+#import <os/lock.h>
 
 @interface WXThreadSafeMutableDictionary ()
+{
+    pthread_mutex_t _safeThreadDictionaryMutex;
+    pthread_mutexattr_t _safeThreadDictionaryMutexAttr;
+    os_unfair_lock_t _unfairLock;
+}
 
 @property (nonatomic, strong) dispatch_queue_t queue;
-@property (atomic, strong) NSRecursiveLock * recursiveDicLock;
 @property (nonatomic, strong) NSMutableDictionary* dict;
 
 @end
@@ -36,7 +42,12 @@
     if (self) {
         NSString* uuid = [NSString stringWithFormat:@"com.taobao.weex.dictionary_%p", self];
         _queue = dispatch_queue_create([uuid UTF8String], DISPATCH_QUEUE_CONCURRENT);
-        _recursiveDicLock = [[NSRecursiveLock alloc] init];
+        pthread_mutexattr_init(&(_safeThreadDictionaryMutexAttr));
+        pthread_mutexattr_settype(&(_safeThreadDictionaryMutexAttr), PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&(_safeThreadDictionaryMutex), &(_safeThreadDictionaryMutexAttr));
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            _unfairLock = &(OS_UNFAIR_LOCK_INIT);
+        }
     }
     return self;
 }
@@ -98,9 +109,15 @@
             count = _dict.count;
         });
     } else {
-        [_recursiveDicLock lock];
-        count = [_dict count];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            count = [_dict count];
+            os_unfair_lock_unlock(_unfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            count = [_dict count];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
     return count;
 }
@@ -113,9 +130,15 @@
             obj = _dict[aKey];
         });
     } else {
-        [_recursiveDicLock lock];
-        obj = _dict[aKey];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            obj = _dict[aKey];
+            os_unfair_lock_unlock(_unfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            obj = _dict[aKey];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
     return obj;
 }
@@ -128,9 +151,15 @@
             enu = [_dict keyEnumerator];
         });
     } else {
-        [_recursiveDicLock lock];
-        enu = [_dict keyEnumerator];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            enu = [_dict keyEnumerator];
+            os_unfair_lock_unlock(_unfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            enu = [_dict keyEnumerator];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
     return enu;
 }
@@ -143,9 +172,15 @@
         _dict[aKey] = anObject;
         });
     } else {
-        [_recursiveDicLock lock];
-        _dict[aKey] = anObject;
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            _dict[aKey] = anObject;
+            os_unfair_lock_unlock(_unfairLock);
+        }else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            _dict[aKey] = anObject;
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
 }
 
@@ -156,9 +191,15 @@
             [_dict removeObjectForKey:aKey];
         });
     } else {
-        [_recursiveDicLock lock];
-        [_dict removeObjectForKey:aKey];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            [_dict removeObjectForKey:aKey];
+            os_unfair_lock_unlock(_unfairLock);
+        }else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            [_dict removeObjectForKey:aKey];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
 }
 
@@ -169,9 +210,15 @@
             [_dict removeAllObjects];
         });
     }else {
-        [_recursiveDicLock lock];
-        [_dict removeAllObjects];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            [_dict removeAllObjects];
+            os_unfair_lock_unlock(_unfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            [_dict removeAllObjects];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
 }
 
@@ -182,12 +229,26 @@
             copyInstance = [_dict copy];
         });
     } else {
-        [_recursiveDicLock lock];
-        copyInstance = [_dict copy];
-        [_recursiveDicLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_unfairLock);
+            copyInstance = [_dict copy];
+            os_unfair_lock_unlock(_unfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);
+            copyInstance = [_dict copy];
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+        }
     }
     
     return copyInstance;
+}
+
+- (void)dealloc
+{
+    if ([WXUtility threadSafeCollectionUsingLock]) {
+        pthread_mutex_destroy(&_safeThreadDictionaryMutex);
+        pthread_mutexattr_destroy(&_safeThreadDictionaryMutexAttr);
+    }
 }
 
 @end

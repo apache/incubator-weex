@@ -19,12 +19,17 @@
 
 #import "WXThreadSafeMutableArray.h"
 #import "WXUtility.h"
+#import <os/lock.h>
+#import <pthread/pthread.h>
 
-@interface WXThreadSafeMutableArray ()
+@interface WXThreadSafeMutableArray () {
+    pthread_mutex_t _safeThreadArrayMutex;
+    pthread_mutexattr_t _safeThreadArrayMutexAttr;
+    os_unfair_lock_t _osUnfairLock;
+}
 
 @property (nonatomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) NSMutableArray* array;
-@property (atomic, strong) NSRecursiveLock * arrayRecursiveLock;
 
 @end
 
@@ -36,7 +41,12 @@
     if (self) {
         NSString* uuid = [NSString stringWithFormat:@"com.taobao.weex.array_%p", self];
         _queue = dispatch_queue_create([uuid UTF8String], DISPATCH_QUEUE_CONCURRENT);
-        _arrayRecursiveLock = [[NSRecursiveLock alloc] init];
+        pthread_mutexattr_init(&(_safeThreadArrayMutexAttr));
+        pthread_mutexattr_settype(&(_safeThreadArrayMutexAttr), PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&(_safeThreadArrayMutex), &(_safeThreadArrayMutexAttr));
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            _osUnfairLock = &(OS_UNFAIR_LOCK_INIT);
+        }
     }
     return self;
 }
@@ -97,9 +107,15 @@
             count = _array.count;
         });
     } else {
-        [_arrayRecursiveLock lock];
-        count = [_array count];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            count = [_array count];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            count = [_array count];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
     return count;
 }
@@ -112,9 +128,15 @@
             obj = _array[index];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        obj = _array[index];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            obj = _array[index];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            obj = _array[index];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
     return obj;
 }
@@ -127,9 +149,15 @@
             enu = [_array objectEnumerator];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        enu = [_array objectEnumerator];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            enu = [_array objectEnumerator];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            enu = [_array objectEnumerator];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
     return enu;
 }
@@ -141,9 +169,15 @@
             [_array insertObject:anObject atIndex:index];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        [_array insertObject:anObject atIndex:index];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            [_array insertObject:anObject atIndex:index];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            [_array insertObject:anObject atIndex:index];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
 }
 
@@ -154,9 +188,15 @@
             [_array addObject:anObject];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        [_array addObject:anObject];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            [_array addObject:anObject];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            [_array addObject:anObject];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
 }
 
@@ -167,9 +207,15 @@
             [_array removeObjectAtIndex:index];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        [_array removeObjectAtIndex:index];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            [_array removeObjectAtIndex:index];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            [_array removeObjectAtIndex:index];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
 }
 
@@ -180,9 +226,15 @@
             [_array removeLastObject];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        [_array removeLastObject];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            [_array removeLastObject];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            [_array removeLastObject];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
 }
 
@@ -193,9 +245,15 @@
             [_array replaceObjectAtIndex:index withObject:anObject];
         });
     } else {
-        [_arrayRecursiveLock lock];
-        [_array replaceObjectAtIndex:index withObject:anObject];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            [_array replaceObjectAtIndex:index withObject:anObject];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            [_array replaceObjectAtIndex:index withObject:anObject];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
 }
 
@@ -212,9 +270,15 @@
             }
         });
     } else {
-        [_arrayRecursiveLock lock];
-        index = [_array indexOfObject:anObject];
-        [_arrayRecursiveLock unlock];
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
+            os_unfair_lock_lock(_osUnfairLock);
+            index = [_array indexOfObject:anObject];
+            os_unfair_lock_unlock(_osUnfairLock);
+        } else {
+            pthread_mutex_lock(&_safeThreadArrayMutex);
+            index = [_array indexOfObject:anObject];
+            pthread_mutex_unlock(&_safeThreadArrayMutex);
+        }
     }
     
     return index;
@@ -225,7 +289,10 @@
     if (_queue) {
         _queue = NULL;
     }
-    _arrayRecursiveLock = nil;
+    if ([WXUtility threadSafeCollectionUsingLock]) {
+        pthread_mutex_destroy(&_safeThreadArrayMutex);
+        pthread_mutexattr_destroy(&_safeThreadArrayMutexAttr);
+    }
 }
 
 @end
