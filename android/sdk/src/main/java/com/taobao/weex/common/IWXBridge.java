@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 
@@ -71,9 +74,9 @@ public interface IWXBridge extends IWXObject {
    * js call native
 
    */
-  int callNative(String instanceId, String tasks, String callback);
+  int callNative(String instanceId, JSONArray tasks, String callback);
 
-  int callAddElement(String instanceId, String ref,String dom,String index, String callback);
+  int callAddElement(String instanceId, String ref, JSONObject dom, String index, String callback);
 
   void reportJSException(String instanceId, String func, String exception);
 

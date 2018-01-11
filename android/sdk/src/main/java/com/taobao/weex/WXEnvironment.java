@@ -70,7 +70,7 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
-  public static final boolean sForceEnableDevTool = false;
+  public static boolean sForceEnableDevTool = false;
   public static String sDebugWsUrl = "";
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
@@ -85,7 +85,7 @@ public class WXEnvironment {
   public static long sSDKInitTime =0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
+  private static boolean isApkDebug = false;
   public static boolean isPerf = false;
 
   private static String sGlobalFontFamily;
@@ -305,4 +305,9 @@ public class WXEnvironment {
       }
     }
   }
+    
+  public static void  setApkDebugable(boolean debugable){
+      isApkDebug  = debugable;
+  }
+
 }

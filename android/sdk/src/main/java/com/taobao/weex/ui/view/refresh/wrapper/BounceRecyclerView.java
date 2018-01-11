@@ -116,7 +116,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     mStickyHeaderHelper.notifyStickyRemove(compToRemove);
   }
 
-
+  public StickyHeaderHelper getStickyHeaderHelper() {
+    return mStickyHeaderHelper;
+  }
 
   @Override
   public void registerGestureListener(@Nullable WXGesture wxGesture) {
