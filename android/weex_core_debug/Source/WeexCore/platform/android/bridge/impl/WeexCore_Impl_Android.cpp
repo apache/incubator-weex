@@ -17,28 +17,6 @@ jmethodID jDoubleValueMethodId;
 jobject jThis;
 
 static JavaVM *sVm = NULL;
-std::string jstring2str(JNIEnv* env, jstring jstr);
-
-std::string jstring2str(JNIEnv* env, jstring jstr)
-{
-  char*   rtn   =   NULL;
-  jclass   clsstring   =   env->FindClass("java/lang/String");
-  jstring   strencode   =   env->NewStringUTF("GB2312");
-  jmethodID   mid   =   env->GetMethodID(clsstring,   "getBytes",   "(Ljava/lang/String;)[B");
-  jbyteArray   barr=   (jbyteArray)env->CallObjectMethod(jstr,mid,strencode);
-  jsize   alen   =   env->GetArrayLength(barr);
-  jbyte*   ba   =   env->GetByteArrayElements(barr,JNI_FALSE);
-  if(alen   >   0)
-  {
-    rtn   =   (char*)malloc(alen+1);
-    memcpy(rtn,ba,alen);
-    rtn[alen]=0;
-  }
-  env->ReleaseByteArrayElements(barr,ba,0);
-  std::string stemp(rtn);
-  free(rtn);
-  return   stemp;
-}
 
 JNIEnv *getJNIEnv() {
   JNIEnv *env = NULL;
@@ -100,13 +78,7 @@ static jint ExecJS(JNIEnv *env,
     return false;
   }
 
-
-  int length = 0;
-  if (jargs != NULL) {
-    length = env->GetArrayLength(jargs);
-  }
-
-  std::string mMessage = "start ExecJS：" + jstring2str(env, jfunction);
+  std::string mMessage = "start ExecJS：" + jString2Str(env, jfunction);
   Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
