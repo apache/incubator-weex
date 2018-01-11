@@ -51,12 +51,14 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddEvent;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
 import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
 import com.taobao.weex.ui.action.GraphicActionRemoveElement;
+import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
 import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
@@ -628,13 +630,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddEvent(String instanceId, String ref, String event) {
 
-//    if (WXEnvironment.isApkDebugable()) {
-    mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
-            .append(", ref:").append(ref)
-            .append(", event:").append(event);
-    WXLogUtils.d(mLodBuilder.substring(0));
-    mLodBuilder.setLength(0);
-//    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", event:").append(event);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -642,9 +644,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getAddEvent(ref, event);
-//        domModule.postAction((DOMAction) action, false);
+        new GraphicActionAddEvent(instanceId, ref, event).executeActionOnRender();
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
@@ -674,9 +674,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        Action action = Actions.getRemoveEvent(ref, event);
-//        domModule.postAction((DOMAction) action, false);
+        new GraphicActionRemoveEvent(instanceId, ref, event).executeActionOnRender();
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
