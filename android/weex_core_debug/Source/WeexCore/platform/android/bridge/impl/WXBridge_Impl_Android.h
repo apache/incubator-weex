@@ -64,10 +64,10 @@ namespace WeexCore {
                           jstring &callback);
 
     int callAddEvent(std::string &instanceId,
-                     std::string &ref, std::string &event, std::string &callback);
+                     std::string &ref, std::string &event);
 
     int callRemoveEvent(std::string &instanceId,
-                        std::string &ref, std::string &event, std::string &callback);
+                        std::string &ref, std::string &event);
 
     int callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,
                        std::map<std::string, std::string> *styles,
@@ -107,7 +107,7 @@ namespace WeexCore {
 
     int callCreateFinish(std::string &pageId);
 
-//    void callLogOfFirstScreen(std::string &message);
+    void callLogOfFirstScreen(std::string &message);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

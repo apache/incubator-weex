@@ -10,13 +10,7 @@ namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-    jboolean isAddRenderObject = false;
-    jint count = 0;
-
   bool RenderManager::CreatePage(const std::string &pageId, const std::string &data) {
-    isAddRenderObject = false;
-    count = 0;
-
 //    std::string mMessage = "createPage";
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
@@ -34,10 +28,6 @@ namespace WeexCore {
   bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
                                       const int &index,
                                       const std::string &data) {
-
-    if (!isAddRenderObject) {
-      isAddRenderObject = true;
-    }
 
 //    std::string mMessage = "start addRenderObject";
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
@@ -104,21 +94,21 @@ namespace WeexCore {
   }
 
   bool RenderManager::AddEvent(const std::string &pageId, const std::string &ref,
-                               const std::string &event, const std::string &callback) {
+                               const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
 
-    return page->AddEvent(ref, event, callback);
+    return page->AddEvent(ref, event);
   }
 
   bool RenderManager::RemoveEvent(const std::string &pageId, const std::string &ref,
-                                  const std::string &event, const std::string &callback) {
+                                  const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
 
-    return page->RemoveEvent(ref, event, callback);
+    return page->RemoveEvent(ref, event);
   }
 
   bool RenderManager::CreateFinish(const std::string &pageId) {

@@ -365,7 +365,7 @@ namespace WeexCore {
     CalculateLayout();
   }
 
-  bool RenderPage::AddEvent(const std::string &ref, const std::string &event, const std::string &callback) {
+  bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -374,12 +374,12 @@ namespace WeexCore {
     render->AddEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
-    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event, callback);
+    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event);
     PostRenderAction(action);
     return true;
   }
 
-  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event, const std::string &callback) {
+  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -388,7 +388,7 @@ namespace WeexCore {
     render->RemoveEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
-    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event, callback);
+    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event);
     PostRenderAction(action);
     return true;
   }

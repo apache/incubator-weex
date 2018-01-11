@@ -35,10 +35,10 @@ namespace WeexCore {
                                   jstring &callback) = 0;
 
     virtual int callAddEvent(std::string &instanceId,
-                             std::string &ref, std::string &event, std::string &Callback) = 0;
+                             std::string &ref, std::string &event) = 0;
 
     virtual int callRemoveEvent(std::string &instanceId,
-                                std::string &ref, std::string &event, std::string &callback) = 0;
+                                std::string &ref, std::string &event) = 0;
 
     virtual int
     callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,

@@ -626,7 +626,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
-  public int callAddEvent(String instanceId, String ref, String event, String callback) {
+  public int callAddEvent(String instanceId, String ref, String event) {
 
 //    if (WXEnvironment.isApkDebugable()) {
     mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
@@ -653,15 +653,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
     // get next tick
-    getNextTick(instanceId, callback);
+    getNextTick(instanceId);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+  public int callRemoveEvent(String instanceId, String ref, String event) {
 
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callRemoveEvent >>>> instanceId:").append(instanceId)
@@ -688,11 +685,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
     // get next tick
-    getNextTick(instanceId, callback);
+    getNextTick(instanceId);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -803,6 +797,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     });
     t.start();
+  }
+
+  private void getNextTick(final String instanceId) {
+    addJSTask(METHOD_CALLBACK, instanceId, "", "{}");
+    sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 
   private void getNextTick(final String instanceId, final String callback) {
@@ -1072,11 +1071,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     WXModuleManager.createDomModule(instance);
+    WXLogUtils.logOfFirstScreen("post createInstance");
     post(new Runnable() {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
+        WXLogUtils.logOfFirstScreen("start invokeCreateInstance");
         invokeCreateInstance(instance, template, options, data);
+        WXLogUtils.logOfFirstScreen("end invokeCreateInstance");
         final long totalTime = System.currentTimeMillis() - start;
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
 
@@ -1125,7 +1127,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj};
         instance.setTemplate(template);
+        WXLogUtils.logOfFirstScreen("start invokeExecJS: createInstance");
         invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
+        WXLogUtils.logOfFirstScreen("end invokeExecJS: createInstance");
       } catch (Throwable e) {
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
                 + instance.getTemplateInfo();

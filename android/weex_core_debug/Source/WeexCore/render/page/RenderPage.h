@@ -75,9 +75,9 @@ namespace WeexCore {
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool AddEvent(const std::string &ref, const std::string &event, const std::string &callback);
+    bool AddEvent(const std::string &ref, const std::string &event);
 
-    bool RemoveEvent(const std::string &ref, const std::string &event, const std::string &callback);
+    bool RemoveEvent(const std::string &ref, const std::string &event);
 
     bool CreateFinish();
 

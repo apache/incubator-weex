@@ -112,17 +112,14 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   jstring jRef = getArgumentAsJString(env, arguments, 1);
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
-  jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
   RenderManager::GetInstance()->AddEvent(jString2Str(env, jInstanceId),
                                          jString2Str(env, jRef),
-                                         jString2Str(env, jEvent),
-                                         jString2Str(env, jCallback));
+                                         jString2Str(env, jEvent));
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
   env->DeleteLocalRef(jEvent);
-  env->DeleteLocalRef(jCallback);
   return createInt32Result(0);
 }
 std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
@@ -130,18 +127,15 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
   jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
   jstring jRef = getArgumentAsJString(env, arguments, 1);
   jstring jEvent = getArgumentAsJString(env, arguments, 2);
-  jstring jCallback = getArgumentAsJString(env, arguments, 3);
 
   int flag = 0;
   flag = RenderManager::GetInstance()->RemoveEvent(jString2Str(env, jInstanceId),
                                             jString2Str(env, jRef),
-                                            jString2Str(env, jEvent),
-                                            jString2Str(env, jCallback));
+                                            jString2Str(env, jEvent));
 
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jRef);
   env->DeleteLocalRef(jEvent);
-  env->DeleteLocalRef(jCallback);
   return createInt32Result(flag);
 }
 
