@@ -89,12 +89,12 @@ namespace WeexCore {
     if (node == nullptr || ((RenderObject *) node)->GetMeasureFuncImplAndroid() == nullptr)
       return size;
 
-    int widthMode = getUnspecified(env);
-    int heightMode = getUnspecified(env);
+    int widthMode = Unspecified(env);
+    int heightMode = Unspecified(env);
     if (widthMeasureMode == kExactly)
-      widthMode = getExactly(env);
+      widthMode = Exactly(env);
     if (heightMeasureMode == kExactly)
-      heightMode = getExactly(env);
+      heightMode = Exactly(env);
     base::android::ScopedLocalJavaRef<jobject> jsize = cumsmeasure_Imple_Android(env,
                                                                                  ((RenderObject *) node)->GetMeasureFuncImplAndroid(),
                                                                                  width, height,
@@ -102,8 +102,8 @@ namespace WeexCore {
                                                                                  heightMode);
     if (jsize.Get() == nullptr)
       return size;
-    size.height = getMeasureHeight(env, jsize.Get());
-    size.width = getMeasureWidth(env, jsize.Get());
+    size.height = GetMeasureHeight(env, jsize.Get());
+    size.width = GetMeasureWidth(env, jsize.Get());
 
     return size;
   }
@@ -127,14 +127,14 @@ namespace WeexCore {
     if (this->GetMeasureFuncImplAndroid() == nullptr)
       return;
     JNIEnv *env = getJNIEnv();
-    layoutBefore_Impl_Android(env, this->GetMeasureFuncImplAndroid());
+    LayoutBeforeImplAndroid(env, this->GetMeasureFuncImplAndroid());
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
     if (this->GetMeasureFuncImplAndroid() == nullptr)
       return;
     JNIEnv *env = getJNIEnv();
-    layoutAfter_Impl_Android(env, this->GetMeasureFuncImplAndroid(), width, height);
+    LayoutAfterImplAndroid(env, this->GetMeasureFuncImplAndroid(), width, height);
   }
 
   StyleType RenderObject::ApplyStyle(const std::string &key, const std::string &value) {

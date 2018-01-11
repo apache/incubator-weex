@@ -18,15 +18,15 @@ namespace WeexCore {
                                               widthMeasureMode, heightMeasureMode);
   }
 
-  void layoutBefore_Impl_Android(JNIEnv *env, jobject measureFunc_Impl_Android) {
-    if (measureFunc_Impl_Android != nullptr)
-      Java_ContentBoxMeasurement_layoutBefore(env, measureFunc_Impl_Android);
+  void LayoutBeforeImplAndroid(JNIEnv *env, jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android != nullptr)
+      Java_ContentBoxMeasurement_layoutBefore(env, measureFunc_impl_android);
   }
 
   void
-  layoutAfter_Impl_Android(JNIEnv *env, jobject measureFunc_Impl_Android, float &width,
-                           float &height) {
-    if (measureFunc_Impl_Android != nullptr)
-      Java_ContentBoxMeasurement_layoutAfter(env, measureFunc_Impl_Android, width, height);
+  LayoutAfterImplAndroid(JNIEnv *env, jobject measureFunc_impl_android, float &width,
+                         float &height) {
+    if (measureFunc_impl_android != nullptr)
+      Java_ContentBoxMeasurement_layoutAfter(env, measureFunc_impl_android, width, height);
   }
 }

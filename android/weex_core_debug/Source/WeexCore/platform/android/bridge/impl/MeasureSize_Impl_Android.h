@@ -6,9 +6,9 @@
 namespace WeexCore {
   bool RegisterJNIMeasureSize(JNIEnv *env);
 
-  jfloat getMeasureHeight(JNIEnv *env, jobject size);
+  jfloat GetMeasureHeight(JNIEnv *env, jobject size);
 
-  jfloat getMeasureWidth(JNIEnv *env, jobject size);
+  jfloat GetMeasureWidth(JNIEnv *env, jobject size);
 }
 
 
