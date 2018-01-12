@@ -36,15 +36,15 @@ namespace WeexCore {
                           layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0),
                           createJMapJNITime(0) {}
 
-    inline void PrintPerformanceLog(PerformanceStage performanceStage) {
-      PrintPerformanceLogImplAndroid(performanceStage);
+    inline int PrintPerformanceLog(PerformanceStage performanceStage) {
+      return PrintPerformanceLogImplAndroid(performanceStage);
     }
 
   private:
 
-    void PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage);
+    int PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage);
 
-    void PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage);
+    int PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage);
   };
 }
 

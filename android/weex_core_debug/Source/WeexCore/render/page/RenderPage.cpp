@@ -555,14 +555,16 @@ namespace WeexCore {
     return true;
   }
 
-  void RenderPage::PrintFirstScreenLog() {
+  int RenderPage::PrintFirstScreenLog() {
     if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+      return mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+    return 0;
   }
 
-  void RenderPage::PrintRenderSuccessLog() {
+  int RenderPage::PrintRenderSuccessLog() {
     if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+      return mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+    return 0;
   }
 
   void RenderPage::Batch() {

@@ -59,20 +59,20 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
   page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight);
 }
 
-static void PrintFirstScreenLog(JNIEnv *env, jobject jcaller,
-                                jstring instanceId) {
+static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
+                                       jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
-    return;
-  page->PrintFirstScreenLog();
+    return 0;
+  return page->PrintFirstScreenLog();
 }
 
-static void PrintRenderSuccessLog(JNIEnv *env, jobject jcaller,
+static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
                                   jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
   if (page == nullptr)
-    return;
-  page->PrintRenderSuccessLog();
+    return 0;
+  return page->PrintRenderSuccessLog();
 }

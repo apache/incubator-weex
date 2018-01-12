@@ -107,9 +107,9 @@ namespace WeexCore {
 
     bool BindInstanceImplIOS(void *instance);
 
-    void PrintFirstScreenLog();
+    int PrintFirstScreenLog();
 
-    void PrintRenderSuccessLog();
+    int PrintRenderSuccessLog();
 
     inline RenderObject *GetRenderObject(const std::string &ref) {
       return mRenderObjectRegisterMap.find(ref)->second;
