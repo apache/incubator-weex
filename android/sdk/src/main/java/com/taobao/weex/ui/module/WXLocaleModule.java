@@ -30,22 +30,35 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * Created by moxun on 2017/9/26.
- *
+ * <p>
  * Ref: https://tools.ietf.org/html/bcp47
  */
 
-public class WXLocalModule extends WXModule {
+public class WXLocaleModule extends WXModule {
 
-  @JSMethod
+  @JSMethod(uiThread = false)
+  public String getLanguage() {
+    return getLanguageTags();
+  }
+
+  @JSMethod(uiThread = false)
   public void getLanguage(JSCallback callback) {
     callback.invoke(getLanguageTags());
   }
 
-  @JSMethod
+  @JSMethod(uiThread = false)
+  public List<String> getLanguages() {
+    String[] tags = getLanguageTags().split(",");
+    return Arrays.asList(tags);
+  }
+
+  @JSMethod(uiThread = false)
   public void getLanguages(JSCallback callback) {
     callback.invoke(getLanguageTags().split(","));
   }
