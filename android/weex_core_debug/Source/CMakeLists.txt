@@ -48,6 +48,11 @@ add_library(weexjsc SHARED
     ./WeexCore/render/node/RenderText.cpp
     ./WeexCore/render/node/RenderCell.cpp
 
+    ./WeexCore/render/node/factory/RenderCreator.cpp
+    ./WeexCore/render/node/factory/SimpleRenderFactory.cpp
+    ./WeexCore/render/node/factory/RenderTextFactory.cpp
+    ./WeexCore/render/node/factory/RenderCellFactory.cpp
+
     ./WeexCore/render/action/RenderActionAddElement.cpp
     ./WeexCore/render/action/RenderActionRemoveElement.cpp
     ./WeexCore/render/action/RenderActionMoveElement.cpp
@@ -57,7 +62,7 @@ add_library(weexjsc SHARED
     ./WeexCore/render/action/RenderActionUpdateAttr.cpp
     ./WeexCore/render/action/RenderActionUpdateStyle.cpp
 
-    ./WeexCore/parser/DomParser.cpp
+    ./WeexCore/render/node/factory/parser/DomParser.cpp
 
     ./WeexCore/layout/WXCoreLayout.cpp
     ./WeexCore/layout/WXCoreStyle.cpp
