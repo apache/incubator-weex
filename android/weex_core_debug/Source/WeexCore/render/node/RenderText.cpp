@@ -1,13 +1,11 @@
 #include "RenderText.h"
+#include <WeexCore/render/page/RenderPage.h>
 
 namespace WeexCore {
 
-  RenderText::RenderText() {
-
-  }
-
-  void RenderText::measure(float width, MeasureMode widthMeasureMode, float height,
-                           MeasureMode heightMeasureMode, bool useMeasureFunc) {
-
+  void RenderText::UpdateAttr(const std::string &key, const std::string &value) {
+    RenderObject::UpdateAttr(key, value);
+    markDirty();
+    GetRenderPage()->CalculateLayout();
   }
 }

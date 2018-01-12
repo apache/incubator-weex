@@ -6,12 +6,8 @@
 namespace WeexCore {
   class RenderText : public RenderObject {
   public:
-    RenderText();
-
   private:
-    void
-    measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
-            bool useMeasureFunc);
+    void UpdateAttr(const std::string &key, const std::string &value);
   };
 }
 

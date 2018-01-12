@@ -5,13 +5,7 @@
 
 namespace WeexCore {
   class RenderCell : public RenderObject {
-  public:
-    RenderCell();
 
-  private:
-    void
-    measure(float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode,
-            bool useMeasureFunc);
   };
 }
 

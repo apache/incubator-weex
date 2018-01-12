@@ -206,7 +206,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
   }
 
-  private void applyStyles(WXComponent component) {
+  public void applyStyles(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
     }
@@ -224,7 +224,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  private void applyAttrs(WXComponent component) {
+  public void applyAttrs(WXComponent component) {
     if (component != null) {
       updateProperties(component.getAttrs());
     }

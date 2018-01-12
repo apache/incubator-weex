@@ -29,6 +29,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
   private Map<String, String> mPaddings;
   private Map<String, String> mMargins;
   private Map<String, String> mBorders;
+  private WXComponent component;
 
   public GraphicActionUpdateStyle(String pageId, String ref,
                                   Map<String, String> style,
@@ -40,11 +41,8 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     this.mPaddings = paddings;
     this.mMargins = margins;
     this.mBorders = borders;
-  }
 
-  @Override
-  public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
       return;
     }
@@ -53,7 +51,14 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
       component.updateCSSShorthand(mPaddings);
       component.updateCSSShorthand(mMargins);
       component.updateCSSShorthand(mBorders);
-      component.setLayout(component);
     }
+  }
+
+  @Override
+  public void executeAction() {
+    if (component == null) {
+      return;
+    }
+    component.setLayout(component);
   }
 }

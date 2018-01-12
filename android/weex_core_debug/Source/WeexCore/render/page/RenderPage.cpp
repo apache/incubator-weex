@@ -1,4 +1,4 @@
-#include <WeexCore/parser/DomParser.h>
+#include <WeexCore/render/node/factory/parser/DomParser.h>
 #include <WeexCore/render/action/RenderActionAddElement.h>
 #include <WeexCore/render/action/RenderActionRemoveElement.h>
 #include <WeexCore/render/action/RenderActionMoveElement.h>
@@ -321,15 +321,13 @@ namespace WeexCore {
     if (render == nullptr || attrs == nullptr || attrs->empty())
       return false;
 
+    SendUpdateAttrAction(render, attrs);
+
     for (int i = 0; i < attrs->size(); ++i) {
       if ((*attrs)[i] == nullptr)
         return false;
-      render->AddAttr((*attrs)[i]->first, (*attrs)[i]->second);
+      render->UpdateAttr((*attrs)[i]->first, (*attrs)[i]->second);
     }
-
-    BuildRenderTreeTime(getCurrentTime() - startTime);
-
-    SendUpdateAttrAction(render, attrs);
 
     for (int i = 0; i < attrs->size(); ++i) {
       if ((*attrs)[i] != nullptr) {
