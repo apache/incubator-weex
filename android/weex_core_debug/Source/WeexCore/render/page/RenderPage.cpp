@@ -124,10 +124,8 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->setStyleWidth(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceWidth(),
-                                                ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceHeight(),
-                                                 ViewPortWidth()));
+    render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
 
     PushRenderToRegisterMap(root);
 
@@ -360,8 +358,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(getRealPxByWidth(defaultWidth, ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(defaultHeight, ViewPortWidth()));
+    render_root->setStyleWidth(defaultWidth);
+    render_root->setStyleHeight(defaultHeight);
     CalculateLayout();
   }
 
