@@ -12,6 +12,8 @@
 #include <WeexCore/env/RenderPerformance.h>
 #include <WeexCore/env/CoreEnvironment.h>
 #include <base/ViewUtils.h>
+#include <WeexCore/render/action/RenderActionAddEvent.h>
+#include <WeexCore/render/action/RenderActionRemoveEvent.h>
 #include "RenderPage.h"
 #include "WeexCore/render/manager/RenderManager.h"
 #include "WeexCore/render/node/RenderObject.h"
@@ -71,7 +73,11 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     render_root->calculateLayout();
     CssLayoutTime(getCurrentTime() - startTime);
+//    std::string mMessage = "end calculateLayout";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     render_root->LayoutAfter();
+//    mMessage = "end layoutAfter";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
 //    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
 //    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
@@ -118,14 +124,14 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->setStyleWidth(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceWidth(),
-                                                ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceHeight(),
-                                                 ViewPortWidth()));
+    render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
 
     PushRenderToRegisterMap(root);
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
+//    std::string mMessage = "sendCreateBodyAction";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendCreateBodyAction(root);
     return true;
   }
@@ -144,8 +150,12 @@ namespace WeexCore {
     child->SetParentRender(parent);
     parent->AddRenderObject(insertPosition, child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
+//    std::string mMessage = "start sendAddElementAction";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendAddElementAction(child, parent, insertPosition);
 
+//    mMessage = "start calculateLayout";
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     CalculateLayout();
     return true;
   }
@@ -346,8 +356,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(getRealPxByWidth(defaultWidth, ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(defaultHeight, ViewPortWidth()));
+    render_root->setStyleWidth(defaultWidth);
+    render_root->setStyleHeight(defaultHeight);
     CalculateLayout();
   }
 
@@ -360,6 +370,8 @@ namespace WeexCore {
     render->AddEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
+    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event);
+    PostRenderAction(action);
     return true;
   }
 
@@ -372,6 +384,8 @@ namespace WeexCore {
     render->RemoveEvent(event);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
+    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event);
+    PostRenderAction(action);
     return true;
   }
 
@@ -485,6 +499,16 @@ namespace WeexCore {
   void RenderPage::CssLayoutTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->cssLayoutTime += time;
+  }
+
+  void RenderPage::AddEventActionJNITime(const long long &time) {
+    if (mWXCorePerformance != nullptr)
+        mWXCorePerformance->addEventActionJNITime += time;
+  }
+
+  void RenderPage::RemoveEventActionJNITime(const long long &time) {
+    if (mWXCorePerformance != nullptr)
+        mWXCorePerformance->removeEventActionJNITime += time;
   }
 
   void RenderPage::AddElementActionJNITime(const long long &time) {

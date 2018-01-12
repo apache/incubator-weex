@@ -34,11 +34,11 @@ namespace WeexCore {
     virtual int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                                   jstring &callback) = 0;
 
-    virtual int callAddEvent(jstring &instanceId,
-                             jstring &ref, jstring &event, jstring &Callback) = 0;
+    virtual int callAddEvent(std::string &instanceId,
+                             std::string &ref, std::string &event) = 0;
 
-    virtual int callRemoveEvent(jstring &instanceId,
-                                jstring &ref, jstring &event, jstring &callback) = 0;
+    virtual int callRemoveEvent(std::string &instanceId,
+                                std::string &ref, std::string &event) = 0;
 
     virtual int
     callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,
@@ -79,6 +79,8 @@ namespace WeexCore {
 
     virtual int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
                                 int index) = 0;
+
+    //virtual void callLogOfFirstScreen(std::string &message) = 0;
   };
 } //end WeexCore
 #endif //Bridge_h

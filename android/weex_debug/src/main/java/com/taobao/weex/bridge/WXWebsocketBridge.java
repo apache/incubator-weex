@@ -115,18 +115,18 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int callAddEvent(String instanceId, String ref, String event, String callback) {
+    public int callAddEvent(String instanceId, String ref, String event) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callAddEvent(instanceId, ref, event, callback);
+        mJsManager.callAddEvent(instanceId, ref, event);
         return IWXBridge.INSTANCE_RENDERING;
     }
 
     @Override
-    public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+    public int callRemoveEvent(String instanceId, String ref, String event) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callRemoveEvent(instanceId, ref, event, callback);
+        mJsManager.callRemoveEvent(instanceId, ref, event);
         return IWXBridge.INSTANCE_RENDERING;
     }
 
@@ -298,5 +298,10 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     @Override
     public void onFailure(Throwable cause) {
         Toast.makeText(WXEnvironment.sApplication,"socket connect failure!",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void callLogOfFirstScreen(String message) {
+        WXLogUtils.logOfFirstScreen(message);
     }
 }

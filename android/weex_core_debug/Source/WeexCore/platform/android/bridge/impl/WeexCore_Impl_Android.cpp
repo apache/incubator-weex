@@ -77,6 +77,10 @@ static jint ExecJS(JNIEnv *env,
     LOGE("native_execJS function is NULL");
     return false;
   }
+
+  std::string mMessage = "start ExecJS：" + jString2Str(env, jfunction);
+  Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
 }
 
@@ -138,4 +142,6 @@ void Unload(JavaVM *vm, void *reserved) {
   WeexProxy::reset();
   LOGD(" end JNI_OnUnload");
 }
+
+
 }

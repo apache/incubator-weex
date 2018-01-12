@@ -1378,8 +1378,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    final float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
-    final float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
+    final float realWidth = width;
+    final float realHeight = height;
 
     View godView = mRenderContainer;
     if (godView != null) {

@@ -84,9 +84,9 @@ public interface IWXBridge extends IWXObject {
 
   int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-  int callAddEvent(String instanceId, String ref, String event, String callback);
+  int callAddEvent(String instanceId, String ref, String event);
 
-  int callRemoveEvent(String instanceId, String ref, String event, String callback);
+  int callRemoveEvent(String instanceId, String ref, String event);
 
   void reportServerCrash(String instanceId, String crashFile);
 
@@ -111,11 +111,12 @@ public interface IWXBridge extends IWXObject {
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders);
 
-  public int callUpdateAttrsByWeexCore(String instanceId, String ref,
+  int callUpdateAttrsByWeexCore(String instanceId, String ref,
                                        HashMap<String, String> attrs);
 
-  public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
 
-  public int callCreateFinishByWeexCore(String instanceId);
+  int callCreateFinishByWeexCore(String instanceId);
 
+  void callLogOfFirstScreen(String message);
 }

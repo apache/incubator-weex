@@ -87,6 +87,10 @@ namespace WeexCore {
 
     void CssLayoutTime(const long long &time);
 
+    void AddEventActionJNITime(const long long &time);
+
+    void RemoveEventActionJNITime(const long long &time);
+
     void AddElementActionJNITime(const long long &time);
 
     void LayoutActionJniTime(const long long &time);
