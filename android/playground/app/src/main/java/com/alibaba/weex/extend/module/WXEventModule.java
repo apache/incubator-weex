@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.alibaba.weex.WXPageActivity;
+import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
@@ -44,6 +45,12 @@ public class WXEventModule extends WXModule {
     }
     String scheme = Uri.parse(url).getScheme();
     StringBuilder builder = new StringBuilder();
+
+    if ("weex://go/scan".equals(url)) {
+      mWXSDKInstance.getContext().startActivity(new Intent(mWXSDKInstance.getContext(), CaptureActivity.class));
+      return;
+    }
+
     if (TextUtils.equals("http", scheme) || TextUtils.equals("https", scheme) || TextUtils.equals("file", scheme)) {
       builder.append(url);
     } else {

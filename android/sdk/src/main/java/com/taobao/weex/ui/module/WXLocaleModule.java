@@ -38,7 +38,7 @@ import java.util.Locale;
  * Ref: https://tools.ietf.org/html/bcp47
  */
 
-public class WXLocalModule extends WXModule {
+public class WXLocaleModule extends WXModule {
 
   @JSMethod
   public void getLanguage(JSCallback callback) {
