@@ -20,8 +20,6 @@ namespace WeexCore {
 
   private:
 
-    void CalculateLayout();
-
     void TraverseTree(RenderObject *render);
 
     void PushRenderToRegisterMap(RenderObject *render);
@@ -56,6 +54,8 @@ namespace WeexCore {
     RenderPage(const std::string &pageID);
 
     ~RenderPage();
+
+    void CalculateLayout();
 
     bool CreateRootRender(RenderRoot *root);
 
@@ -107,9 +107,9 @@ namespace WeexCore {
 
     bool BindInstanceImplIOS(void *instance);
 
-    void PrintFirstScreenLog();
+    int PrintFirstScreenLog();
 
-    void PrintRenderSuccessLog();
+    int PrintRenderSuccessLog();
 
     inline RenderObject *GetRenderObject(const std::string &ref) {
       return mRenderObjectRegisterMap.find(ref)->second;
@@ -121,7 +121,7 @@ namespace WeexCore {
       }
     }
 
-    inline RenderRoot *GetRootRenderObject() {
+    inline RenderRoot * GetRootRenderObject() const {
       return render_root;
     }
 
@@ -129,7 +129,7 @@ namespace WeexCore {
       return mPageId;
     }
 
-    inline float ViewPortWidth()const {
+    inline float ViewPortWidth() const {
       return mViewPortWidth;
     }
 

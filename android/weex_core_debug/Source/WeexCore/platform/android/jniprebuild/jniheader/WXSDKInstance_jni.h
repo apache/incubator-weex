@@ -41,10 +41,10 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
     jfloat defaultWidth,
     jfloat defaultHeight);
 
-static void PrintFirstScreenLog(JNIEnv* env, jobject jcaller,
+static jint PrintFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
-static void PrintRenderSuccessLog(JNIEnv* env, jobject jcaller,
+static jint PrintRenderFinishTime(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
 // Step 2: method stubs.
@@ -102,16 +102,16 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetDefaultHeightAndWidthIntoRootDom) },
-    { "nativePrintFirstScreenLog",
+    { "nativePrintFirstScreenRenderTime",
 "("
 "Ljava/lang/String;"
 ")"
-"V", reinterpret_cast<void*>(PrintFirstScreenLog) },
-    { "nativePrintRenderSuccessLog",
+"I", reinterpret_cast<void*>(PrintFirstScreenRenderTime) },
+    { "nativePrintRenderFinishTime",
 "("
 "Ljava/lang/String;"
 ")"
-"V", reinterpret_cast<void*>(PrintRenderSuccessLog) },
+"I", reinterpret_cast<void*>(PrintRenderFinishTime) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

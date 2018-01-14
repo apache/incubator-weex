@@ -54,8 +54,6 @@ namespace WeexCore {
       mMeasureFunc_Impl_Android = nullptr;
     }
 
-//    freeWXCoreNode();
-
     for (Index i = 0; i < getChildCount(); i++) {
       RenderObject *render = GetChild(i);
       if (nullptr != render) {
@@ -276,11 +274,11 @@ namespace WeexCore {
 
   void RenderObject::PrintRenderMsg() {
     std::string result("ref: ");
-    result.append(mRef);
+    result.append(Ref());
     result.append("\n");
 
     result.append("type: ");
-    result.append(mType);
+    result.append(Type());
     result.append("\n");
 
 

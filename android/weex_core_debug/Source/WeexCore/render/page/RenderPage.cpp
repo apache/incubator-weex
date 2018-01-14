@@ -1,4 +1,4 @@
-#include <WeexCore/parser/DomParser.h>
+#include <WeexCore/render/node/factory/parser/DomParser.h>
 #include <WeexCore/render/action/RenderActionAddElement.h>
 #include <WeexCore/render/action/RenderActionRemoveElement.h>
 #include <WeexCore/render/action/RenderActionMoveElement.h>
@@ -124,10 +124,8 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->setStyleWidth(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceWidth(),
-                                                ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(WXCoreEnvironment::getInstance()->DeviceHeight(),
-                                                 ViewPortWidth()));
+    render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
 
     PushRenderToRegisterMap(root);
 
@@ -333,15 +331,13 @@ namespace WeexCore {
     if (render == nullptr || attrs == nullptr || attrs->empty())
       return false;
 
+    SendUpdateAttrAction(render, attrs);
+
     for (int i = 0; i < attrs->size(); ++i) {
       if ((*attrs)[i] == nullptr)
         return false;
-      render->AddAttr((*attrs)[i]->first, (*attrs)[i]->second);
+      render->UpdateAttr((*attrs)[i]->first, (*attrs)[i]->second);
     }
-
-    BuildRenderTreeTime(getCurrentTime() - startTime);
-
-    SendUpdateAttrAction(render, attrs);
 
     for (int i = 0; i < attrs->size(); ++i) {
       if ((*attrs)[i] != nullptr) {
@@ -360,8 +356,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(getRealPxByWidth(defaultWidth, ViewPortWidth()));
-    render_root->setStyleHeight(getRealPxByWidth(defaultHeight, ViewPortWidth()));
+    render_root->setStyleWidth(defaultWidth);
+    render_root->setStyleHeight(defaultHeight);
     CalculateLayout();
   }
 
@@ -559,14 +555,16 @@ namespace WeexCore {
     return true;
   }
 
-  void RenderPage::PrintFirstScreenLog() {
+  int RenderPage::PrintFirstScreenLog() {
     if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+      return mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+    return 0;
   }
 
-  void RenderPage::PrintRenderSuccessLog() {
+  int RenderPage::PrintRenderSuccessLog() {
     if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+      return mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+    return 0;
   }
 
   void RenderPage::Batch() {

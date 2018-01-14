@@ -20,34 +20,33 @@ package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+
 import java.util.Map;
 
 public class GraphicActionUpdateAttr extends BasicGraphicAction {
 
   private Map<String, String> mAttrs;
+  private WXComponent component;
 
   public GraphicActionUpdateAttr(String pageId, String ref,
                                  Map<String, String> attrs) {
     super(pageId, ref);
     this.mAttrs = attrs;
-  }
 
-  @Override
-  public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
       return;
     }
     if (mAttrs != null) {
-      component.updateAttrs(mAttrs);
+      component.addAttr(mAttrs);
     }
   }
 
-  public Map<String, String> getAttrs() {
-    return mAttrs;
-  }
-
-  public void setAttrs(Map<String, String> attrs) {
-    this.mAttrs = attrs;
+  @Override
+  public void executeAction() {
+    if (component == null) {
+      return;
+    }
+    component.applyAttrs(component);
   }
 }

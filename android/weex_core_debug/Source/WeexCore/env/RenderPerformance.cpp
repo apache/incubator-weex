@@ -2,7 +2,7 @@
 #include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
-  void
+  int
   RenderPerformance::PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage) {
     if (performanceStage == onFirstScreen) {
       LOGD("[WeexCore render time]onFirstScreen");
@@ -17,9 +17,10 @@ namespace WeexCore {
     LOGD("[WeexCore render time]      cssLayoutTime: %lld", cssLayoutTime);
     LOGD("[WeexCore render time]      parseJsonTime: %lld", parseJsonTime);
     LOGD("[WeexCore render time]      buildRenderObjectTime: %lld", buildRenderObjectTime);
+    return cssLayoutTime;
   }
 
-  void RenderPerformance::PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage) {
-
+  int RenderPerformance::PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage) {
+    return 0;
   }
 }

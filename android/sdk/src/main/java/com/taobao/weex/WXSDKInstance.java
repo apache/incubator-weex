@@ -1008,7 +1008,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    nativePrintRenderSuccessLog(getInstanceId());
+    nativePrintRenderFinishTime(getInstanceId());
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1215,7 +1215,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      nativePrintFirstScreenLog(getInstanceId());
+      nativePrintFirstScreenRenderTime(getInstanceId());
   }
 
   public void createInstanceFinished(long time) {
@@ -1378,8 +1378,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    final float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
-    final float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
+    final float realWidth = width;
+    final float realHeight = height;
 
     View godView = mRenderContainer;
     if (godView != null) {
@@ -1786,7 +1786,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
 
-  public native void nativePrintFirstScreenLog(String instanceId);
+  public native int nativePrintFirstScreenRenderTime(String instanceId);
 
-  public native void nativePrintRenderSuccessLog(String instanceId);
+  public native int nativePrintRenderFinishTime(String instanceId);
 }

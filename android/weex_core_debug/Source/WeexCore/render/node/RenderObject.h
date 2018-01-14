@@ -7,6 +7,7 @@
 #include <jni.h>
 #include <WeexCore/layout/WXCoreLayout.h>
 #include <WeexCore/render/manager/RenderManager.h>
+#include <WeexCore/render/node/factory/IRenderObject.h>
 
 namespace WeexCore {
 
@@ -28,7 +29,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> PaddingsMap;
   typedef std::map<std::string, std::string> BordersMap;
 
-  class RenderObject : public WXCoreLayoutNode {
+  class RenderObject : public IRenderObject, public WXCoreLayoutNode {
 
     friend class RenderPage;
 
@@ -125,6 +126,10 @@ namespace WeexCore {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
+    virtual void UpdateAttr(const std::string &key, const std::string &value) {
+      AddAttr(key, value);
+    }
+
     inline StyleType AddStyle(const std::string &key, const std::string &value) {
       return ApplyStyle(key, value);
     }
@@ -137,32 +142,8 @@ namespace WeexCore {
       mEvents->erase(event);
     }
 
-    inline void SetRef(const std::string &ref) {
-      mRef = ref;
-    }
-
-    inline const std::string &Ref() {
-      return mRef;
-    }
-
-    inline void SetPageId(const std::string &pageId) {
-      this->mPageId = pageId;
-    }
-
-    inline const std::string &PageId() {
-      return mPageId;
-    }
-
-    inline const RenderPage *GetRenderPage() {
-      return RenderManager::GetInstance()->GetPage(mPageId);
-    }
-
-    inline void SetType(const std::string &type) {
-      mType = type;
-    }
-
-    inline std::string Type() {
-      return mType;
+    inline RenderPage *GetRenderPage() {
+      return RenderManager::GetInstance()->GetPage(PageId());
     }
 
     inline void SetParentRender(RenderObject *render) {
@@ -222,9 +203,6 @@ namespace WeexCore {
     }
 
   private:
-    std::string mPageId = "";
-    std::string mRef = "";
-    std::string mType = "";
     RenderObject *mParentRender;
     StylesMap *mStyles;
     AttributesMap *mAttributes;

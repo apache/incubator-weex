@@ -74,7 +74,7 @@ namespace WeexCore {
 /**
  * Use to parse json data
  */
-  class JsonParser : protected JsonParserHandler {
+  class JsonParser : public JsonParserHandler {
   public:
     JsonParser(char *str) : JsonParserHandler(str) {}
 
