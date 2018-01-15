@@ -100,6 +100,8 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
  */
 public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener {
 
+  private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
+
   //Performance
   public boolean mEnd = false;
   public static final String BUNDLE_URL = "bundleUrl";
@@ -1787,19 +1789,55 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public String getTemplateInfo() {
     String template = getTemplate();
     if(template == null){
-      return " template md5 null";
+      return " template md5 null " + JSONObject.toJSONString(responseHeaders);
     }
     if(TextUtils.isEmpty(template)){
-      return " template md5  length 0";
+      return " template md5  length 0 " + JSONObject.toJSONString(responseHeaders);
     }
     try {
       byte[] bts = template.getBytes("UTF-8");
-      return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
-               + "response header " + JSONObject.toJSONString(responseHeaders);
+      String sourceMD5 = WXFileUtils.md5(bts);
+      String sourceBase64MD5 = WXFileUtils.base64Md5(bts);
+      ArrayList<String> sourceMD5List = new ArrayList<>();
+      ArrayList<String> sourceBase64MD5List = new ArrayList<>();
+      sourceMD5List.add(sourceMD5);
+      sourceBase64MD5List.add(sourceBase64MD5);
+      responseHeaders.put("templateSourceMD5", sourceMD5List);
+      responseHeaders.put(SOURCE_TEMPLATE_BASE64_MD5, sourceBase64MD5List);
+      return " template md5 " + sourceMD5 + " length " +   bts.length
+              + " base64 md5 " + sourceBase64MD5
+               + " response header " + JSONObject.toJSONString(responseHeaders);
     } catch (UnsupportedEncodingException e) {
       return "template md5 getBytes error";
     }
 
+  }
+
+  /**
+   * check template header md5 match with header  content-md5
+   * */
+  public boolean isContentMd5Match(){
+    if(responseHeaders == null){
+      return true;
+    }
+    List<String> contentMD5s = responseHeaders.get("Content-Md5");
+    if(contentMD5s == null){
+      contentMD5s  = responseHeaders.get("content-md5");
+    }
+    if(contentMD5s == null || contentMD5s.size() <= 0){
+      return true;
+    }
+    String md5 = contentMD5s.get(0);
+
+    List<String> sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    if(sourceBase64Md5 == null){
+      getTemplateInfo();
+      sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    }
+    if(sourceBase64Md5 == null || sourceBase64Md5.size() == 0){
+      return  true;
+    }
+    return  md5.equals(sourceBase64Md5.get(0));
   }
 
   public String getTemplate() {
@@ -1810,7 +1848,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void setTemplate(String template) {
-    this.templateRef = new WeakReference<String>(template);
+    this.templateRef = new WeakReference<>(template);
   }
 
   public interface NestedInstanceInterceptor {
