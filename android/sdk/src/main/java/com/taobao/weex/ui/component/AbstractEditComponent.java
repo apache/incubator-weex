@@ -27,6 +27,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -108,28 +109,30 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     return !isDisabled();
   }
 
-  private void applyOnClickListener() {
-    addClickListener(new OnClickListener() {
-      @Override
-      public void onHostViewClick() {
-        switch (mType) {
-          case Constants.Value.DATE:
-            hideSoftKeyboard();
-            if (getParent() != null) {
-              getParent().interceptFocus();
-            }
-            WXTimeInputHelper.pickDate(mMax, mMin, AbstractEditComponent.this);
-            break;
-          case Constants.Value.TIME:
-            hideSoftKeyboard();
-            if (getParent() != null) {
-              getParent().interceptFocus();
-            }
-            WXTimeInputHelper.pickTime(AbstractEditComponent.this);
-            break;
-        }
+  private OnClickListener mOnClickListener = new OnClickListener() {
+    @Override
+    public void onHostViewClick() {
+      switch (mType) {
+        case Constants.Value.DATE:
+          hideSoftKeyboard();
+          if (getParent() != null) {
+            getParent().interceptFocus();
+          }
+          WXTimeInputHelper.pickDate(mMax, mMin, AbstractEditComponent.this);
+          break;
+        case Constants.Value.TIME:
+          hideSoftKeyboard();
+          if (getParent() != null) {
+            getParent().interceptFocus();
+          }
+          WXTimeInputHelper.pickTime(AbstractEditComponent.this);
+          break;
       }
-    });
+    }
+  };
+
+  private void applyOnClickListener() {
+    addClickListener(mOnClickListener);
   }
 
   protected int getVerticalGravity(){
@@ -413,6 +416,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.TYPE)
   public void setType(String type) {
+    Log.e("weex", "setType=" + type);
     if (type == null || getHostView() == null) {
       return;
     }
