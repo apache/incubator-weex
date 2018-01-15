@@ -22,6 +22,8 @@ namespace WeexCore {
 
   typedef std::vector<RenderAction *>::iterator RenderActionIterator;
 
+  static bool useVSync = false;
+
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
     mWXCorePerformance = new RenderPerformance();
@@ -156,7 +158,8 @@ namespace WeexCore {
 
 //    mMessage = "start calculateLayout";
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-    CalculateLayout();
+    if (!useVSync)
+      CalculateLayout();
     return true;
   }
 
@@ -260,7 +263,8 @@ namespace WeexCore {
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
     SendUpdateStyleAction(render, style, margin, padding, border);
-    CalculateLayout();
+    if (!useVSync)
+      CalculateLayout();
 
     if (style != nullptr) {
       for (int i = 0; i < style->size(); ++i) {
@@ -358,7 +362,8 @@ namespace WeexCore {
                                                           const float defaultHeight) {
     render_root->setStyleWidth(defaultWidth);
     render_root->setStyleHeight(defaultHeight);
-    CalculateLayout();
+    if (!useVSync)
+      CalculateLayout();
   }
 
   bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
@@ -503,12 +508,12 @@ namespace WeexCore {
 
   void RenderPage::AddEventActionJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
-        mWXCorePerformance->addEventActionJNITime += time;
+      mWXCorePerformance->addEventActionJNITime += time;
   }
 
   void RenderPage::RemoveEventActionJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
-        mWXCorePerformance->removeEventActionJNITime += time;
+      mWXCorePerformance->removeEventActionJNITime += time;
   }
 
   void RenderPage::AddElementActionJNITime(const long long &time) {
@@ -568,7 +573,9 @@ namespace WeexCore {
   }
 
   void RenderPage::Batch() {
-
+    if (useVSync) {
+      CalculateLayout();
+    }
   }
 
   void RenderPage::OnRenderPageInit() {
