@@ -13,18 +13,19 @@
 
 WX_EXPORT_METHOD(@selector(setTitle:))
 WX_EXPORT_METHOD(@selector(showTitleBar:))
+WX_EXPORT_METHOD(@selector(setStyle:))
 
 - (void)setTitle:(NSString*)title
 {
     if (title) {
-        [weexInstance.viewController.navigationController setTitle:title];
+        [weexInstance.viewController.navigationItem setTitle:title];
     }
 }
 
-- (void)setStytle:(NSDictionary*)styles
+- (void)setStyle:(NSDictionary*)styles
 {
     if (styles[@"backgroundColor"]) {
-        [weexInstance.viewController.navigationController.navigationBar setBackgroundColor:[WXConvert UIColor:styles[@"backgroundColor"]]];
+        weexInstance.viewController.navigationController.navigationBar.barTintColor = [WXConvert UIColor:styles[@"backgroundColor"]];
     }
     if (styles[@"foregroundColor"]) {
         weexInstance.viewController.navigationController.navigationItem.leftBarButtonItem.tintColor = [WXConvert UIColor:styles[@"foregroundColor"]];
