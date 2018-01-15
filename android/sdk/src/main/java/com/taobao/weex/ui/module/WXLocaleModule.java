@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,23 +36,31 @@ import java.util.Locale;
 
 /**
  * Created by moxun on 2017/9/26.
- *
+ * <p>
  * Ref: https://tools.ietf.org/html/bcp47
  */
 
 public class WXLocaleModule extends WXModule {
 
   @JSMethod(uiThread = false)
-  public String getLanguage(JSCallback callback) {
-    String languageTags = getLanguageTags();
-    callback.invoke(getLanguageTags());
-    return languageTags;
+  public String getLanguage() {
+    return getLanguageTags();
   }
 
   @JSMethod(uiThread = false)
-  public List<String> getLanguages(JSCallback callback) {
+  public void getLanguage(JSCallback callback) {
+    callback.invoke(getLanguageTags());
+  }
+
+  @JSMethod(uiThread = false)
+  public List<String> getLanguages() {
     String[] tags = getLanguageTags().split(",");
     return Arrays.asList(tags);
+  }
+
+  @JSMethod(uiThread = false)
+  public void getLanguages(JSCallback callback) {
+    callback.invoke(getLanguageTags().split(","));
   }
 
   private String getLanguageTags() {
