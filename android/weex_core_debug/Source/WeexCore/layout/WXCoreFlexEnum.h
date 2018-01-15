@@ -68,15 +68,15 @@ namespace WeexCore {
     kPositionEdgeBottom,
     kPositionEdgeLeft,
     kPositionEdgeRight,
-  } ;
+  };
 
-   enum WXCoreMarginEdge {
+  enum WXCoreMarginEdge {
     kMarginALL,
     kMarginTop,
     kMarginBottom,
     kMarginLeft,
     kMarginRight,
-  } ;
+  };
 
   enum WXCorePaddingEdge {
     kPaddingALL,
@@ -84,7 +84,7 @@ namespace WeexCore {
     kPaddingBottom,
     kPaddingLeft,
     kPaddingRight,
-  } ;
+  };
 
   enum WXCoreBorderWidthEdge {
     kBorderWidthALL,
@@ -92,7 +92,7 @@ namespace WeexCore {
     kBorderWidthBottom,
     kBorderWidthLeft,
     kBorderWidthRight,
-  } ;
+  };
 
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
