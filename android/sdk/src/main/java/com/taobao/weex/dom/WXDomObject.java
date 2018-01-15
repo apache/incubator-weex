@@ -897,6 +897,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     dirtyStyle.add(Name.MAX);
     dirtyStyle.add(Name.MIN);
     dirtyStyle.add(Name.FONT_FACE);
+    dirtyStyle.add(Name.WORD_BREAK);
 
   }
 
