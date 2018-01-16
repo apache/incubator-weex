@@ -516,7 +516,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           }
         });
       }
-      mHostClickListeners.add(l);
+      if (!mHostClickListeners.contains(l)) {
+        mHostClickListeners.add(l);
+      }
     }
   }
 

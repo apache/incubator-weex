@@ -366,6 +366,12 @@ namespace WeexCore {
         strcpy(value, str);
         myPair = new std::pair<std::string, std::string>(key, value);
         pairs->insert(pairs->end(), myPair);
+      } else if (r.PeekType() == kTrueType) {
+        myPair = new std::pair<std::string, std::string>(key, "true");
+        pairs->insert(pairs->end(), myPair);
+      } else if (r.PeekType() == kFalseType) {
+        myPair = new std::pair<std::string, std::string>(key, "false");
+        pairs->insert(pairs->end(), myPair);
       } else {
         r.SkipValue();
       }
