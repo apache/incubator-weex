@@ -186,6 +186,14 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return truncateAt;
   }
 
+  public static String getWordBreak(Map<String, Object> style){
+    if (style == null) {
+      return "";
+    }
+    Object temp = style.get(Constants.Name.WORD_BREAK);
+    return temp == null ? "" : temp.toString();
+  }
+
   public static int getLines(Map<String, Object> style) {
     return WXUtils.getInt(style.get(Constants.Name.LINES));
   }

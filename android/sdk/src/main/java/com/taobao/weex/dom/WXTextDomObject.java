@@ -37,6 +37,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
@@ -44,6 +45,7 @@ import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.MeasureOutput;
+import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.StaticLayoutProxy;
@@ -107,7 +109,7 @@ public class WXTextDomObject extends WXDomObject {
          }
       }
       textDomObject.hasBeenMeasured = true;
-      width = textDomObject.getTextWidth(textDomObject.mTextPaint,width, forceWidth);
+      width = textDomObject.getTextWidth(textDomObject.mTextPaint, width, forceWidth);
       if(width > 0 && textDomObject.mText != null) {
         textDomObject.layout = textDomObject.createLayout(width, true, null);
         textDomObject.previousWidth = textDomObject.layout.getWidth();
@@ -136,6 +138,7 @@ public class WXTextDomObject extends WXDomObject {
   private int mFontWeight = UNSET;
   private int mNumberOfLines = UNSET;
   private int mFontSize = UNSET;
+  private String mWordBreak = "";
   private int mLineHeight = UNSET;
   private float previousWidth = Float.NaN;
   private String mFontFamily = WXEnvironment.getGlobalFontFamilyName();
@@ -301,6 +304,9 @@ public class WXTextDomObject extends WXDomObject {
       if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         mFontFamily = WXStyle.getFontFamily(style);
       }
+      if (style.containsKey(Constants.Name.WORD_BREAK)) {
+        mWordBreak = WXStyle.getWordBreak(style);
+      }
       mAlignment = WXStyle.getTextAlignment(style);
       textOverflow = WXStyle.getTextOverflow(style);
       int lineHeight = WXStyle.getLineHeight(style,getViewPortWidth());
@@ -335,6 +341,7 @@ public class WXTextDomObject extends WXDomObject {
       layout = previousLayout;
     }
     if (mNumberOfLines != UNSET && mNumberOfLines > 0 && mNumberOfLines < layout.getLineCount()) {
+      int a = layout.getLineCount();
       int lastLineStart, lastLineEnd;
       lastLineStart = layout.getLineStart(mNumberOfLines - 1);
       lastLineEnd = layout.getLineEnd(mNumberOfLines - 1);
@@ -354,6 +361,44 @@ public class WXTextDomObject extends WXDomObject {
       }
     }
     return layout;
+  }
+
+  /**
+   * According the give String break all word and return a new String.
+   * @param text the give text.
+   */
+  @NonNull
+  private String breakAllText(String text) {
+      float contentWidth = WXDomUtils.getContentWidth(this);
+      String[] rawTextLines = text.replaceAll("\r", "").split("\n");
+      StringBuilder builder = new StringBuilder();
+
+      for (String rawTextLine : rawTextLines) {
+          mTextPaint.setTextSize(mFontSize);
+          if (mTextPaint.measureText(rawTextLine) <= (int) Math.ceil(contentWidth)) {
+              builder.append(rawTextLine);
+          } else {
+              float lineWidth = 0;
+              for (int index = 0; index != rawTextLine.length(); ++index) {
+                  char c = rawTextLine.charAt(index);
+                  lineWidth += mTextPaint.measureText(String.valueOf(c));
+                  if (lineWidth <= (int) Math.ceil(contentWidth)) {
+                      builder.append(c);
+                  } else {
+                      builder.append("\n");
+                      lineWidth = 0;
+                      --index;
+                  }
+              }
+          }
+          builder.append("\n");
+      }
+
+      if (!text.endsWith("\n")) {
+          builder.deleteCharAt(builder.length() - 1);
+      }
+
+      return builder.toString();
   }
 
   /**
@@ -460,6 +505,10 @@ public class WXTextDomObject extends WXDomObject {
   @NonNull
   Spanned createSpanned(String text) {
     if (!TextUtils.isEmpty(text)) {
+      Object wordBreak = getStyles().get(Constants.Name.WORD_BREAK);
+      if (wordBreak != null && "break-all".equals(wordBreak)) {
+        text = breakAllText(text);
+      }
       SpannableString spannable = new SpannableString(text);
       updateSpannable(spannable, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
       return spannable;
