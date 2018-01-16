@@ -7,11 +7,22 @@ namespace WeexCore {
   class RenderRoot : public RenderObject {
   public:
 
-    void SetDefaultWidth(const float &defaultWidth);
+    inline void SetDefaultWidth(const float &defaultWidth) {
+      if (isnan(getStyleWidth())) {
+        setStyleWidth(defaultWidth);
+      }
+    }
 
-    void SetDefaultHeight(const float &defaultHeight);
+    inline void SetDefaultHeight(const float &defaultHeight) {
+      if (isnan(getStyleHeight())) {
+        setStyleHeight(defaultHeight);
+      }
+    }
 
-    bool ViewInit();
+    inline bool ViewInit() {
+      return !isnan(getStyleWidth()) && !isnan(getStyleHeight()) && getStyleWidth() > 0 &&
+             getStyleHeight() > 0;
+    }
   };
 }
 

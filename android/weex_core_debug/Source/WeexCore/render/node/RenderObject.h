@@ -56,6 +56,10 @@ namespace WeexCore {
 
   public:
 
+    virtual std::map<std::string, std::string> *GetDefaultStyle() {
+      return nullptr;
+    }
+
     RenderObject();
 
     ~RenderObject();

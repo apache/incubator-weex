@@ -21,6 +21,7 @@ package com.taobao.weex.ui.component.basic;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
