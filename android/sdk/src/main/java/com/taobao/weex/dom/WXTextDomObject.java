@@ -37,7 +37,6 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
@@ -45,7 +44,6 @@ import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.MeasureOutput;
-import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.StaticLayoutProxy;
@@ -335,13 +333,15 @@ public class WXTextDomObject extends WXDomObject {
       if (direction != null && "text".equals(mType)) {
         forceRtl = direction.equals(Constants.Name.RTL);
       }
+      if (mWordBreak != null && "break-all".equals(mWordBreak)) {
+        spanned = createSpanned(breakAllText(mText));
+      }
       layout = StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
           Layout.Alignment.ALIGN_NORMAL, 1, 0, false, forceRtl);
     } else {
       layout = previousLayout;
     }
     if (mNumberOfLines != UNSET && mNumberOfLines > 0 && mNumberOfLines < layout.getLineCount()) {
-      int a = layout.getLineCount();
       int lastLineStart, lastLineEnd;
       lastLineStart = layout.getLineStart(mNumberOfLines - 1);
       lastLineEnd = layout.getLineEnd(mNumberOfLines - 1);
@@ -505,10 +505,6 @@ public class WXTextDomObject extends WXDomObject {
   @NonNull
   Spanned createSpanned(String text) {
     if (!TextUtils.isEmpty(text)) {
-      Object wordBreak = getStyles().get(Constants.Name.WORD_BREAK);
-      if (wordBreak != null && "break-all".equals(wordBreak)) {
-        text = breakAllText(text);
-      }
       SpannableString spannable = new SpannableString(text);
       updateSpannable(spannable, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
       return spannable;
