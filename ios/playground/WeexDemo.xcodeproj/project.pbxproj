@@ -38,6 +38,7 @@
 		C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C43CDA021F1C6E01005A6B03 /* libz.tbd */; };
 		C47B78D21F299E27001D3B0C /* WXExtendCallNativeTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */; };
 		DC15A3C7200C505C009C8977 /* WXTitleBarModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A3C6200C505C009C8977 /* WXTitleBarModule.m */; };
+		DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */; };
 		DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */; };
 		DC5B53691E8CED9400E02125 /* WXScannerHistoryVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DC5B53681E8CED9400E02125 /* WXScannerHistoryVC.m */; };
 		DC5E503E1D0D97130059F0EB /* weex.png in Resources */ = {isa = PBXBuildFile; fileRef = DC5E503C1D0D97130059F0EB /* weex.png */; };
@@ -103,6 +104,8 @@
 		C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtendCallNativeTest.m; sourceTree = "<group>"; };
 		DC15A3C5200C505C009C8977 /* WXTitleBarModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXTitleBarModule.h; path = extend/module/WXTitleBarModule.h; sourceTree = "<group>"; };
 		DC15A3C6200C505C009C8977 /* WXTitleBarModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXTitleBarModule.m; path = extend/module/WXTitleBarModule.m; sourceTree = "<group>"; };
+		DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNavigationHandlerImpl.m; sourceTree = "<group>"; };
+		DC15A3CF200E30FC009C8977 /* WXNavigationHandlerImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXNavigationHandlerImpl.h; sourceTree = "<group>"; };
 		DC20B8E41ECADA2500845F39 /* WXConfigCenterDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterDefaultImpl.h; sourceTree = "<group>"; };
 		DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXConfigCenterDefaultImpl.m; sourceTree = "<group>"; };
 		DC5B53671E8CED9400E02125 /* WXScannerHistoryVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WXScannerHistoryVC.h; path = Scanner/WXScannerHistoryVC.h; sourceTree = "<group>"; };
@@ -322,6 +325,8 @@
 		DCABAFF71D0296E8001C8592 /* handler */ = {
 			isa = PBXGroup;
 			children = (
+				DC15A3CF200E30FC009C8977 /* WXNavigationHandlerImpl.h */,
+				DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */,
 				DC20B8E41ECADA2500845F39 /* WXConfigCenterDefaultImpl.h */,
 				DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */,
 				DCABAFFC1D029753001C8592 /* WXImgLoaderDefaultImpl.h */,
@@ -412,7 +417,6 @@
 				TargetAttributes = {
 					775BEE7A1C1E8ECC008D1629 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = G7EDFK7C8C;
 					};
 					775BEE931C1E8ECC008D1629 = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -613,6 +617,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
+				DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
 				DC5B53691E8CED9400E02125 /* WXScannerHistoryVC.m in Sources */,
@@ -764,7 +769,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = G7EDFK7C8C;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -794,7 +799,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				DEVELOPMENT_TEAM = G7EDFK7C8C;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
