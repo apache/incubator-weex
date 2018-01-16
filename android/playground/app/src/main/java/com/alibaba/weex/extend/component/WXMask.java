@@ -118,7 +118,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
@@ -217,7 +216,7 @@ public class WXMask extends WXVContainer {
     right = get(RIGHT, domObject);
     top = get(TOP, domObject);
     bottom = get(BOTTOM, domObject);
-    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
     params.setMargins(left, top, right, bottom);
     getHostView().setLayoutParams(params);
   }
