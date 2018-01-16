@@ -37,6 +37,7 @@
         // iOS 7.0 or later
         self.navigationController.navigationBar.barTintColor = WEEX_COLOR;
         self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
         self.navigationController.navigationBar.translucent = NO;
     }
     if (!self.navigationItem.leftBarButtonItem) {

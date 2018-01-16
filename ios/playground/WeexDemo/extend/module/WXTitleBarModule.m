@@ -7,6 +7,7 @@
 //
 
 #import "WXTitleBarModule.h"
+#import "WXDemoViewController.h"
 
 @implementation WXTitleBarModule
 @synthesize weexInstance;
@@ -28,15 +29,20 @@ WX_EXPORT_METHOD(@selector(setStyle:))
         weexInstance.viewController.navigationController.navigationBar.barTintColor = [WXConvert UIColor:styles[@"backgroundColor"]];
     }
     if (styles[@"foregroundColor"]) {
-        weexInstance.viewController.navigationController.navigationItem.leftBarButtonItem.tintColor = [WXConvert UIColor:styles[@"foregroundColor"]];
-        weexInstance.viewController.navigationController.navigationItem.rightBarButtonItem.tintColor = [WXConvert UIColor:styles[@"foregroundColor"]];
+        weexInstance.viewController.navigationController.navigationBar.tintColor = [WXConvert UIColor:styles[@"foregroundColor"]];
         [weexInstance.viewController.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[WXConvert UIColor:styles[@"foregroundColor"]]}];
     }
 }
 
-- (void)showTitleBar:(BOOL)show
+- (void)dealloc
+{
+    weexInstance.viewController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+}
+
+- (void)showTitleBar:(bool)show
 {
     [weexInstance.viewController.navigationController setNavigationBarHidden:!show];
+    ((WXDemoViewController*)weexInstance.viewController).showNavigationBar = !show;
 }
 
 @end

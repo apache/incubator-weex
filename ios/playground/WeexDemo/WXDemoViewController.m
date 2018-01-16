@@ -57,15 +57,14 @@
 {
     [super viewDidLoad];
     
-    [self setupNaviBar];
-    [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view setClipsToBounds:YES];
     
     _weexHeight = self.view.frame.size.height - 64;
+    _showNavigationBar = NO;
+    [self.navigationController setNavigationBarHidden:_showNavigationBar];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationRefreshInstance:) name:@"RefreshInstance" object:nil];
-    
     [self render];
 }
 
@@ -84,6 +83,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self setupNaviBar];
+    [self setupRightBarItem];
+    [self.navigationController setNavigationBarHidden:_showNavigationBar];
 }
 
 //TODO get height
@@ -120,6 +122,9 @@
 - (void)render
 {
     CGFloat width = self.view.frame.size.width;
+//    if ([_url.absoluteString isEqualToString:HOME_URL]) {
+//        [self.navigationController setNavigationBarHidden:YES];
+//    }
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
