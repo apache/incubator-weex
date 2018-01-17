@@ -54,11 +54,28 @@ namespace WeexCore {
       }
     }
 
-  public:
+    inline void SetDefaultWidth(const float &defaultWidth) {
+      if (isnan(getStyleWidth())) {
+        setStyleWidth(defaultWidth);
+      }
+    }
+
+    inline void SetDefaultHeight(const float &defaultHeight) {
+      if (isnan(getStyleHeight())) {
+        setStyleHeight(defaultHeight);
+      }
+    }
+
+    inline bool ViewInit() {
+      return !isnan(getStyleWidth()) && !isnan(getStyleHeight()) && getStyleWidth() > 0 &&
+             getStyleHeight() > 0;
+    }
 
     virtual std::map<std::string, std::string> *GetDefaultStyle() {
       return nullptr;
     }
+
+  public:
 
     RenderObject();
 
@@ -77,6 +94,8 @@ namespace WeexCore {
     void onLayoutAfter(float width, float height);
 
     StyleType ApplyStyle(const std::string &key, const std::string &value);
+
+    void ApplyDefaultStyle();
 
     void PrintRenderMsg();
 
@@ -204,6 +223,18 @@ namespace WeexCore {
 
     inline EventsIterator EventItEnd() {
       return mEvents->end();
+    }
+
+    inline const std::string GetStyle(std::string key) {
+      if (mStyles == nullptr)
+        return "";
+      return mStyles->find(key)->second;
+    }
+
+    inline const std::string GetAttr(std::string key) {
+      if (mAttributes == nullptr)
+        return "";
+      return mAttributes->find(key)->second;
     }
 
   private:

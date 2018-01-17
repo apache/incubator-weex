@@ -40,15 +40,6 @@ namespace WeexCore {
       render_root = nullptr;
     }
 
-    for (RenderActionIterator it = mRenderActions.begin();
-         it != mRenderActions.end(); it++) {
-      if (nullptr != *it) {
-        delete *it;
-        *it = nullptr;
-      }
-    }
-    mRenderActions.clear();
-
     mRenderObjectRegisterMap.clear();
 
     if (mWXCorePerformance != nullptr) {
@@ -120,14 +111,14 @@ namespace WeexCore {
     }
   }
 
-  bool RenderPage::CreateRootRender(RenderRoot *root) {
+  bool RenderPage::CreateRootRender(RenderObject *root) {
     if (root == nullptr)
       return false;
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
-    render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
+    render_root->SetDefaultWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    render_root->SetDefaultHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
 
     PushRenderToRegisterMap(root);
 
@@ -360,8 +351,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(defaultWidth);
-    render_root->setStyleHeight(defaultHeight);
+    render_root->SetDefaultWidth(defaultWidth);
+    render_root->SetDefaultHeight(defaultHeight);
     if (!useVSync)
       CalculateLayout();
   }

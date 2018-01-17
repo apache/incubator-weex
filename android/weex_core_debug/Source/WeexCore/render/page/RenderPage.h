@@ -6,7 +6,6 @@
 #include <map>
 #include <jni.h>
 #include <cmath>
-#include <WeexCore/render/node/RenderRoot.h>
 
 namespace WeexCore {
 
@@ -57,7 +56,7 @@ namespace WeexCore {
 
     void CalculateLayout();
 
-    bool CreateRootRender(RenderRoot *root);
+    bool CreateRootRender(RenderObject *root);
 
     bool
     AddRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
@@ -115,13 +114,13 @@ namespace WeexCore {
       return mRenderObjectRegisterMap.find(ref)->second;
     }
 
-    inline void SetRootRenderObject(RenderRoot *root) {
+    inline void SetRootRenderObject(RenderObject *root) {
       if (root != nullptr) {
         render_root = root;
       }
     }
 
-    inline RenderRoot * GetRootRenderObject() const {
+    inline RenderObject * GetRootRenderObject() const {
       return render_root;
     }
 
@@ -152,9 +151,8 @@ namespace WeexCore {
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
     float mViewPortWidth;
-    RenderRoot *render_root;
+    RenderObject *render_root = nullptr;
     std::string mPageId;
-    std::vector<RenderAction *> mRenderActions;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
     jobject mInstance_Impl_Android; // TODO / SDKInstance bind

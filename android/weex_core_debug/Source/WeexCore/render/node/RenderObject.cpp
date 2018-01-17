@@ -63,6 +63,24 @@ namespace WeexCore {
     }
   }
 
+  void RenderObject::ApplyDefaultStyle() {
+    std::map<std::string, std::string> *style = GetDefaultStyle();
+
+    if (style == nullptr)
+      return;
+
+    StylesIterator style_it = style->begin();
+    StylesIterator style_end = style->end();
+
+    for (; style_it != style_end; ++style_it)
+      AddStyle(style_it->first, style_it->second);
+
+    if (style != nullptr) {
+      delete style;
+      style = nullptr;
+    }
+  }
+
   bool RenderObject::BindComponentImplAndroid(jobject component_impl_android) {
     if (component_impl_android == nullptr)
       return false;

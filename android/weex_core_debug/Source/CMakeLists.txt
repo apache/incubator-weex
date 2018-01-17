@@ -45,9 +45,6 @@ add_library(weexjsc SHARED
     ./WeexCore/render/node/RenderObject.cpp
 
     ./WeexCore/render/node/factory/RenderCreator.cpp
-    ./WeexCore/render/node/factory/SimpleRenderFactory.cpp
-    ./WeexCore/render/node/factory/RenderTextFactory.cpp
-    ./WeexCore/render/node/factory/RenderCellFactory.cpp
 
     ./WeexCore/render/action/RenderActionAddEvent.cpp
     ./WeexCore/render/action/RenderActionRemoveEvent.cpp
