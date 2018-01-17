@@ -22,6 +22,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -31,10 +32,10 @@ import android.view.ViewGroup;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.weex.commons.util.AssertUtil;
 import com.alibaba.weex.commons.util.ScreenUtil;
-import com.taobao.weex.common.Constants;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.utils.WXUtils;
 
@@ -248,5 +249,13 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
   @CallSuper
   public boolean onKeyUp(int keyCode, KeyEvent event) {
     return (mWxAnalyzerDelegate != null && mWxAnalyzerDelegate.onKeyUp(keyCode,event)) || super.onKeyUp(keyCode, event);
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (mInstance != null) {
+      mInstance.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
   }
 }
