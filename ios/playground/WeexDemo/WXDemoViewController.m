@@ -60,9 +60,9 @@
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view setClipsToBounds:YES];
     
-    _weexHeight = self.view.frame.size.height - 64;
     _showNavigationBar = NO;
     [self.navigationController setNavigationBarHidden:_showNavigationBar];
+    _weexHeight = self.view.frame.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationRefreshInstance:) name:@"RefreshInstance" object:nil];
     [self render];
@@ -91,7 +91,7 @@
 //TODO get height
 - (void)viewDidLayoutSubviews
 {
-    _weexHeight = self.view.frame.size.height;
+    _weexHeight = self.view.frame.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
     UIEdgeInsets safeArea = UIEdgeInsetsZero;
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
@@ -100,7 +100,7 @@
         // Fallback on earlier versions
     }
 #endif
-    _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.bottom);
+    _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.top-safeArea.bottom);
 }
 
 - (void)didReceiveMemoryWarning {
