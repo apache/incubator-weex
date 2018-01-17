@@ -31,7 +31,7 @@
 
 #define HOME_URL [NSString stringWithFormat:@"http://%@:12580/examples/build/vue/index.js", DEMO_HOST]
 
-#define BUNDLE_URL [NSString stringWithFormat:@"file://%@/bundlejs/index.js",[NSBundle mainBundle].bundlePath]
+#define BUNDLE_URL [NSString stringWithFormat:@"file://%@/bundlejs/landing.weex.js",[NSBundle mainBundle].bundlePath]
 
 #define UITEST_HOME_URL @"http://test?_wx_tpl=http://localhost:12580/test/build/TC__Home.js"
 

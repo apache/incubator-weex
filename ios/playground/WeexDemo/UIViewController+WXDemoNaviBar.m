@@ -37,15 +37,9 @@
         // iOS 7.0 or later
         self.navigationController.navigationBar.barTintColor = WEEX_COLOR;
         self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
         self.navigationController.navigationBar.translucent = NO;
-    }else {
-        // iOS 6.1 or earlier
-        self.navigationController.navigationBar.tintColor = WEEX_COLOR;
     }
-    
-    [self.navigationController.navigationBar setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                      [UIColor whiteColor], NSForegroundColorAttributeName, nil]];
-    self.navigationItem.title = @"Weex Playground";
     if (!self.navigationItem.leftBarButtonItem) {
         UIBarButtonItem *leftItem;
         if(![[self.navigationController.viewControllers objectAtIndex:0] isEqual:self]) {
