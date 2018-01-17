@@ -212,11 +212,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  private void applyStyle(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
-  }
-
   public void updateStyles(Map<String, Object> styles) {
     if (styles != null) {
       addStyle(styles);
@@ -228,11 +223,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (component != null) {
       updateProperties(component.getAttrs());
     }
-  }
-
-  private void applyAttr(String key, String value) {
-    if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value))
-      setProperty(key, value);
   }
 
   public void updateAttrs(Map<String, Object> attrs) {
