@@ -91,7 +91,7 @@
 //TODO get height
 - (void)viewDidLayoutSubviews
 {
-    _weexHeight = self.view.frame.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
+    _weexHeight = [UIScreen mainScreen].bounds.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
     UIEdgeInsets safeArea = UIEdgeInsetsZero;
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
