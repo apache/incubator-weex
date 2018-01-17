@@ -39,7 +39,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -48,7 +48,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string></string>
+	<string>$(PRODUCT_NAME) will access your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>$(PRODUCT_NAME) will access your location</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
