@@ -534,8 +534,14 @@ public class Wson {
             }
 
             if(number instanceof BigDecimal){
-                writeByte(NUMBER_BIG_DECIMAL_TYPE);
-                writeUTF16String(number.toString());
+                String value = number.toString();
+                if(value.equals(Double.toString(number.doubleValue()))){
+                    writeByte(NUMBER_DOUBLE_TYPE);
+                    writeDouble(number.doubleValue());
+                }else {
+                    writeByte(NUMBER_BIG_DECIMAL_TYPE);
+                    writeUTF16String(value);
+                }
                 return;
             }
             writeByte(STRING_TYPE);
