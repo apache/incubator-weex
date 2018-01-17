@@ -191,7 +191,11 @@
     [_instance renderWithURL:[NSURL URLWithString:randomURL] options:@{@"bundleUrl":URL.absoluteString} data:nil];
     [self.navigationController.navigationBar setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
                                                                       [UIColor whiteColor], NSForegroundColorAttributeName, nil]];
-    self.navigationItem.title = _instance.pageName;
+    if([_instance.pageName hasPrefix:@"http://dotwe.org"] || [_instance.pageName hasPrefix:@"https://dotwe.org"]) {
+        self.navigationItem.title = @"Weex Online Example";
+    } else {
+        self.navigationItem.title = _instance.pageName;
+    }
 }
 
 - (void)updateInstanceState:(WXState)state
