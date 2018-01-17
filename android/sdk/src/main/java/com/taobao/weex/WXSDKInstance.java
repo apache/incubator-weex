@@ -889,6 +889,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     destroy();
+
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeOnInstanceClose(getInstanceId());
+      }
+    });
   }
 
   @Override
@@ -1249,8 +1256,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!isDestroy()) {
       WXSDKManager.getInstance().destroyInstance(mInstanceId);
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
-
-      nativeOnInstanceClose(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
         getContext().unregisterReceiver(mGlobalEventReceiver);
