@@ -100,7 +100,7 @@ namespace WeexCore {
     heightDirty = false;
   }
 
-    void WXCoreLayoutNode::measureLeafNode(float width, float height, bool hypothetical) {
+    void WXCoreLayoutNode::measureLeafNode(float width, float height, const bool hypothetical) {
       if ((measureFunc != nullptr) &&
           (widthMeasureMode == kUnspecified
            || heightMeasureMode == kUnspecified)) {
@@ -124,7 +124,7 @@ namespace WeexCore {
   /**
    * Determine the main size by expanding the individual flexGrow attribute.
    */
-  void WXCoreLayoutNode::determineMainSize(float width, float height) {
+  void WXCoreLayoutNode::determineMainSize(const float width, const float height) {
       float maxMainSize;
       bool horizontal = isMainAxisHorizontal(this);
       float paddingAlongMainAxis = sumPaddingBorderAlongAxis(this, horizontal);
@@ -149,7 +149,7 @@ namespace WeexCore {
    * @param height                styleheight by this node
    * @param paddingAlongCrossAxis the padding value for this node along the cross axis
    */
-    void WXCoreLayoutNode::determineCrossSize(float width, float height, bool stretch) {
+    void WXCoreLayoutNode::determineCrossSize(const float width, const float height, const bool stretch) {
       if (mFlexLines.size() == 1 && isCrossExactly()) {
         bool horizontal = isMainAxisHorizontal(this);
         float size = mFlexLines[0]->mCrossSize;
@@ -171,7 +171,8 @@ namespace WeexCore {
     }
 
 
-    void WXCoreLayoutNode::measureInternalNode(float width, float height, bool needMeasure, bool hypotheticalMeasurment) {
+    void WXCoreLayoutNode::measureInternalNode(const float width, const float height, const bool needMeasure,
+                                               const bool hypotheticalMeasurment) {
       for (auto *flexLine : mFlexLines) {
         if(flexLine!= nullptr) {
           delete flexLine;
@@ -207,7 +208,8 @@ namespace WeexCore {
       setMeasuredDimensionForFlex(width, widthMeasureMode, height, heightMeasureMode);
     }
 
-    void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* flexLine, const Index i, const WXCoreLayoutNode* child, bool hypothetical){
+    void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* const flexLine, const Index i,
+                                                 const WXCoreLayoutNode* const child, const bool hypothetical){
       flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), hypothetical);
       sumFlexGrow(child, flexLine, i, isMainAxisHorizontal(this));
       flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this), hypothetical));
@@ -216,8 +218,8 @@ namespace WeexCore {
       }
     }
 
-    void WXCoreLayoutNode::measureChild(WXCoreLayoutNode* child, const float parentWidth, const float parentHeight,
-                                     bool needMeasure, bool hypotheticalMeasurment) {
+    void WXCoreLayoutNode::measureChild(WXCoreLayoutNode* const child, const float parentWidth, const float parentHeight,
+                                     const bool needMeasure, const bool hypotheticalMeasurment) {
       if (needMeasure && child->isDirty()) {
         if (hypotheticalMeasurment) {
           float childWidth = child->mCssStyle->mStyleWidth;
@@ -242,7 +244,7 @@ namespace WeexCore {
       }
     }
 
-    void WXCoreLayoutNode::checkSizeConstraints(WXCoreLayoutNode *node, const bool hypotheticalMeasurment) {
+    void WXCoreLayoutNode::checkSizeConstraints(WXCoreLayoutNode* const node, const bool hypotheticalMeasurment) {
       bool widthRemeasure = false, heightRemeasure = false;
       float nodeWidth,nodeHeight;
       nodeWidth = node->mLayoutResult->mLayoutSize.width;
@@ -285,7 +287,7 @@ namespace WeexCore {
       }
     }
 
-    Index WXCoreLayoutNode::expandItemsInFlexLine(WXCoreFlexLine *flexLine,
+    Index WXCoreLayoutNode::expandItemsInFlexLine(WXCoreFlexLine* const flexLine,
                                       const float maxMainSize, const float paddingBorderAlongMainAxis,
                                       const Index startIndex) {
       Index childIndex = startIndex;
@@ -320,7 +322,7 @@ namespace WeexCore {
       return childIndex;
     }
 
-    inline std::pair<bool, float> WXCoreLayoutNode::limitChildMainSize(WXCoreFlexLine* flexLine, const WXCoreLayoutNode* child,
+    inline std::pair<bool, float> WXCoreLayoutNode::limitChildMainSize(WXCoreFlexLine* const flexLine, const WXCoreLayoutNode* const child,
                                                            float childSizeAlongMainAxis, const Index childIndex){
       bool needsReexpand = false;
       if (isMainAxisHorizontal(this)) {
@@ -343,7 +345,7 @@ namespace WeexCore {
       return std::make_pair(needsReexpand, childSizeAlongMainAxis);
     }
 
-    void WXCoreLayoutNode::adjustChildSize(WXCoreLayoutNode* child, float childMainSize) {
+    void WXCoreLayoutNode::adjustChildSize(WXCoreLayoutNode* const child, const float childMainSize) {
       if (isMainAxisHorizontal(this)) {
         child->setWidthMeasureMode(kExactly);
         child->setLayoutWidth(childMainSize);
@@ -375,7 +377,7 @@ namespace WeexCore {
       }
     }
 
-    void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* child, float crossSize){
+    void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* const child, const float crossSize){
       if (isMainAxisHorizontal(this)) {
         if (child->heightMeasureMode != kExactly) {
           child->setHeightMeasureMode(kExactly);
@@ -488,7 +490,7 @@ namespace WeexCore {
     }
   }
 
-  void WXCoreLayoutNode::onLayout(float left, float top, float right, float bottom) {
+  void WXCoreLayoutNode::onLayout(const float left, const float top, const float right, const float bottom) {
     switch (mCssStyle->mFlexDirection) {
       case kFlexDirectionRow:
         layoutHorizontal(false, left, top, right, bottom);
@@ -520,7 +522,7 @@ namespace WeexCore {
    * @param right  the mStyleRight position of this View
    * @param bottom the mStyleBottom position of this View
    */
-  void WXCoreLayoutNode::layoutHorizontal(bool isRtl, float left, float top, float right, float bottom) {
+  void WXCoreLayoutNode::layoutHorizontal(const bool isRtl, const float left, const float top, const float right, const float bottom) {
 
     float childLeft;
     Index currentViewIndex = 0;
@@ -646,9 +648,9 @@ namespace WeexCore {
    *                   View's mStyleBottom position is shifted depending on the flexWrap and alignItems
    *                   attributes
    */
-  void WXCoreLayoutNode::layoutSingleChildHorizontal(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine,
-                                                     WXCoreFlexWrap flexWrap, WXCoreAlignItems alignItems,
-                                                     float left, float top, float right, float bottom) {
+  void WXCoreLayoutNode::layoutSingleChildHorizontal(WXCoreLayoutNode* const node, WXCoreFlexLine* const flexLine,
+                                                     const WXCoreFlexWrap flexWrap, WXCoreAlignItems alignItems,
+                                                     const float left, const float top, const float right, const float bottom) {
     if (node->mCssStyle->mAlignSelf != kAlignSelfAuto) {
       // Expecting the values for alignItems and alignSelf match except for ALIGN_SELF_AUTO.
       // Assigning the alignSelf value as alignItems should work.
@@ -708,7 +710,10 @@ namespace WeexCore {
    * @param bottom          the mStyleBottom position of this View
    */
   void
-  WXCoreLayoutNode::layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top, float right, float bottom) {
+  WXCoreLayoutNode::layoutVertical(const bool isRtl,
+                                   const bool fromBottomToTop,
+                                   const float left, const float top,
+                                   const float right, const float bottom) {
     float childLeft = getPaddingLeft();
     Index currentViewIndex = 0;
 
@@ -835,9 +840,9 @@ namespace WeexCore {
    * @param bottom     the mStyleBottom position of the View, which the View's margin is already taken
    *                   into account
    */
-  void WXCoreLayoutNode::layoutSingleChildVertical(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine, bool isRtl,
-                                                   WXCoreAlignItems alignItems, float left, float top, float right,
-                                                   float bottom) {
+  void WXCoreLayoutNode::layoutSingleChildVertical(WXCoreLayoutNode* const node, WXCoreFlexLine* const flexLine, const bool isRtl,
+                                                   WXCoreAlignItems alignItems, const float left, const float top, const float right,
+                                                   const float bottom) {
     if (node->mCssStyle->mAlignSelf != kAlignSelfAuto) {
       // Expecting the values for alignItems and alignSelf match except for ALIGN_SELF_AUTO.
       // Assigning the alignSelf value as alignItems should work.
