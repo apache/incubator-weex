@@ -24,6 +24,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.utils.WXLogUtils;
@@ -64,6 +65,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     if (component == null) {
       return;
     }
+    component.setTransition(WXTransition.fromMap(component.getStyles(), component));
 
     instance.nativeBindComponentToWXCore(getPageId(), component, getRef());
     instance.nativeBindInstanceToWXCore(getPageId(), instance);

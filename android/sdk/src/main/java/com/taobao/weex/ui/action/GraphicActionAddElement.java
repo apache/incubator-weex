@@ -21,6 +21,7 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
@@ -62,6 +63,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
     CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), getParentRef());
     child = createComponent(instance, parent, commonCompData);
+    child.setTransition(WXTransition.fromMap(child.getStyles(), child));
 
     if (child == null || parent == null) {
       return;

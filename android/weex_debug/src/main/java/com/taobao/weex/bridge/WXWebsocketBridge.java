@@ -29,6 +29,7 @@ import com.squareup.okhttp.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.websocket.WXWebSocketManager;
 
@@ -220,7 +221,7 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
   }
 
   @Override
-    public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, String> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+    public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, Object> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
       if (!mInit || mJsManager == null)
         return IWXBridge.INSTANCE_RENDERING_ERROR ;
       mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
@@ -303,5 +304,40 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     @Override
     public void callLogOfFirstScreen(String message) {
         WXLogUtils.logOfFirstScreen(message);
+    }
+
+    @Override
+    public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
+        return mJsManager.callHasTransitionPros(instanceId, ref, styles);
+    }
+
+    @Override
+    public void setStyleWidth(String instanceId, String ref, float value) {
+        mJsManager.setStyleWidth(instanceId, ref, value);
+    }
+
+    @Override
+    public void setStyleHeight(String instanceId, String ref, float value) {
+        mJsManager.setStyleHeight(instanceId, ref, value);
+    }
+
+    @Override
+    public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+        mJsManager.setMargin(instanceId, ref, edge, value);
+    }
+
+    @Override
+    public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+        mJsManager.setPadding(instanceId, ref, edge, value);
+    }
+
+    @Override
+    public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+        mJsManager.setPosition(instanceId, ref, edge, value);
+    }
+
+    @Override
+    public void calculateLayout(String instanceId, String ref) {
+        mJsManager.calculateLayout(instanceId, ref);
     }
 }

@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
@@ -63,6 +64,7 @@ import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
@@ -1878,7 +1880,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, String> styles,
+  public int callUpdateStyleByWeexCore(String instanceId, String ref, HashMap<String, Object> styles,
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders) {
@@ -1947,6 +1949,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
+//      mLodBuilder.append("[WXBridgeManager] callLayoutByWeexCore >>>> instanceId:").append(pageId)
+//            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width);
+//      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 
@@ -1998,4 +2003,43 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     return IWXBridge.INSTANCE_RENDERING;
   }
+
+  public void setStyleWidth(String instanceId, String ref, float value) {
+    mWXBridge.setStyleWidth(instanceId, ref, value);
+  }
+
+  public void setStyleHeight(String instanceId, String ref, float value) {
+    mWXBridge.setStyleHeight(instanceId, ref, value);
+  }
+
+  public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    mWXBridge.setMargin(instanceId, ref, edge, value);
+  }
+
+  public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    mWXBridge.setPadding(instanceId, ref, edge, value);
+  }
+
+  public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    mWXBridge.setPosition(instanceId, ref, edge, value);
+  }
+
+  public void calculateLayout(String instanceId, String ref) {
+    mWXBridge.calculateLayout(instanceId, ref);
+  }
+
+  public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId, ref);
+    if (null == component || null == component.getTransition() || null == component.getTransition().getProperties()) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    for(String property : component.getTransition().getProperties()){
+      if(styles.containsKey(property)){
+        return IWXBridge.INSTANCE_RENDERING;
+      }
+    }
+    return IWXBridge.INSTANCE_RENDERING_ERROR;
+  }
+
 }

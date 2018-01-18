@@ -49,6 +49,38 @@ static jint ExecJSService(JNIEnv* env, jobject jcaller,
 static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
 
+static void SetStyleWidth(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jfloat value);
+
+static void SetStyleHeight(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jfloat value);
+
+static void SetMargin(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jint edge,
+    jfloat value);
+
+static void SetPadding(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jint edge,
+    jfloat value);
+
+static void SetPosition(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jint edge,
+    jfloat value);
+
+static void CalculateLayout(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref);
+
 // Step 2: method stubs.
 
 // Step 3: RegisterNatives.
@@ -91,6 +123,50 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(TakeHeapSnapshot) },
+    { "nativeSetStyleWidth",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetStyleWidth) },
+    { "nativeSetStyleHeight",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetStyleHeight) },
+    { "nativeSetMargin",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"I"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetMargin) },
+    { "nativeSetPadding",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"I"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetPadding) },
+    { "nativeSetPosition",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"I"
+"F"
+")"
+"V", reinterpret_cast<void*>(SetPosition) },
+    { "nativeCalculateLayout",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(CalculateLayout) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

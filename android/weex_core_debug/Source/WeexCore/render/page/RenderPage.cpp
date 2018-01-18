@@ -221,36 +221,43 @@ namespace WeexCore {
 
     bool flag = false;
 
-    for (int i = 0; i < styles->size(); ++i) {
-      if ((*styles)[i] != nullptr) {
-        switch (render->AddStyle((*styles)[i]->first, (*styles)[i]->second)) {
-          case kTypeStyle:
-            if (style == nullptr)
-              style = new std::vector<std::pair<std::string, std::string> *>();
-            style->insert(style->end(), (*styles)[i]);
-            flag = true;
-            break;
-          case kTypeMargin:
-            if (margin == nullptr)
-              margin = new std::vector<std::pair<std::string, std::string> *>();
-            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
-            margin->insert(margin->end(), (*styles)[i]);
-            flag = true;
-            break;
-          case kTypePadding:
-            if (padding == nullptr)
-              padding = new std::vector<std::pair<std::string, std::string> *>();
-            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
-            padding->insert(padding->end(), (*styles)[i]);
-            flag = true;
-            break;
-          case kTypeBorder:
-            if (border == nullptr)
-              border = new std::vector<std::pair<std::string, std::string> *>();
-            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
-            border->insert(border->end(), (*styles)[i]);
-            flag = true;
-            break;
+    int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId, ref, styles);
+
+    if (result == 1) {
+      BuildRenderTreeTime(getCurrentTime() - startTime);
+      SendUpdateStyleAction(render, styles, margin, padding, border);
+    } else {
+      for (int i = 0; i < styles->size(); ++i) {
+        if ((*styles)[i] != nullptr) {
+          switch (render->AddStyle((*styles)[i]->first, (*styles)[i]->second)) {
+            case kTypeStyle:
+              if (style == nullptr)
+                style = new std::vector<std::pair<std::string, std::string> *>();
+                  style->insert(style->end(), (*styles)[i]);
+                  flag = true;
+                  break;
+            case kTypeMargin:
+              if (margin == nullptr)
+                margin = new std::vector<std::pair<std::string, std::string> *>();
+                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  margin->insert(margin->end(), (*styles)[i]);
+                  flag = true;
+                  break;
+            case kTypePadding:
+              if (padding == nullptr)
+                padding = new std::vector<std::pair<std::string, std::string> *>();
+                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  padding->insert(padding->end(), (*styles)[i]);
+                  flag = true;
+                  break;
+            case kTypeBorder:
+              if (border == nullptr)
+                border = new std::vector<std::pair<std::string, std::string> *>();
+                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  border->insert(border->end(), (*styles)[i]);
+                  flag = true;
+                  break;
+          }
         }
       }
     }

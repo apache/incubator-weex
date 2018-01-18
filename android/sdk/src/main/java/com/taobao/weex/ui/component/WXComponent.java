@@ -63,6 +63,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.CommonCompData;
@@ -153,6 +154,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private boolean waste = false;
 
   private ContentBoxMeasurement contentBoxMeasurement;
+  private WXTransition mTransition;
 
 
   @Deprecated
@@ -1917,4 +1919,12 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+
+  public WXTransition getTransition() {
+    return mTransition;
+  }
+
+  public void setTransition(WXTransition transition) {
+    this.mTransition = transition;
+  }
 }

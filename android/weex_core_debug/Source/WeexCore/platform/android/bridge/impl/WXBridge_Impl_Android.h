@@ -108,6 +108,13 @@ namespace WeexCore {
     int callCreateFinish(std::string &pageId);
 
     void callLogOfFirstScreen(std::string &message);
+
+
+
+    int callHasTransitionPros(std::string &pageId, const std::string &ref,
+                      std::vector<std::pair<std::string, std::string> *> *style);
+
+
   };
 } //end WeexCore
 #endif //BridgeAndroid_h
