@@ -21,6 +21,7 @@ package com.taobao.weex.wson;
 
 import android.support.v4.util.LruCache;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.utils.WXLogUtils;
@@ -325,8 +326,15 @@ public class Wson {
             return  number;
         }
 
-        private  final double readDouble(){
+        private  final Object readDouble(){
             double number = Double.longBitsToDouble(readLong());
+            if(number > Integer.MAX_VALUE){
+                long numberLong = (long) number;
+                double doubleLong = (numberLong);
+                if(number - doubleLong < Double.MIN_NORMAL){
+                    return numberLong;
+                }
+            }
             return  number;
         }
 
@@ -488,7 +496,11 @@ public class Wson {
                     writeByte(NULL_TYPE);
                 }else {
                     refs.add(object);
-                    writeMap(toMap(object));
+                    if(object.getClass().isEnum()){
+                        writeObject(JSON.toJSONString(object));
+                    }else{
+                        writeMap(toMap(object));
+                    }
                     refs.remove(refs.size()-1);
                 }
                 return;
@@ -534,8 +546,15 @@ public class Wson {
             }
 
             if(number instanceof BigDecimal){
-                writeByte(NUMBER_BIG_DECIMAL_TYPE);
-                writeUTF16String(number.toString());
+                String value = number.toString();
+                double doubleValue = number.doubleValue();
+                if(value.equals(Double.toString(doubleValue))){
+                    writeByte(NUMBER_DOUBLE_TYPE);
+                    writeDouble(doubleValue);
+                }else {
+                    writeByte(NUMBER_BIG_DECIMAL_TYPE);
+                    writeUTF16String(value);
+                }
                 return;
             }
             writeByte(STRING_TYPE);
