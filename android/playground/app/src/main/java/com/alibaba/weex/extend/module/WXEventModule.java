@@ -18,11 +18,18 @@
  */
 package com.alibaba.weex.extend.module;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.alibaba.weex.WXPageActivity;
+import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
@@ -36,6 +43,8 @@ public class WXEventModule extends WXModule {
   private static final String WEEX_CATEGORY = "com.taobao.android.intent.category.WEEX";
   private static final String WEEX_ACTION = "com.taobao.android.intent.action.WEEX";
 
+  private static final int CAMERA_PERMISSION_REQUEST_CODE = 0x9;
+
 
   @JSMethod(uiThread = true)
   public void openURL(String url) {
@@ -44,6 +53,20 @@ public class WXEventModule extends WXModule {
     }
     String scheme = Uri.parse(url).getScheme();
     StringBuilder builder = new StringBuilder();
+
+    if ("weex://go/scan".equals(url)) {
+      if (ContextCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mWXSDKInstance.getContext(), Manifest.permission.CAMERA)) {
+          Toast.makeText(mWXSDKInstance.getContext(), "Weex playground need the camera permission to scan QR code", Toast.LENGTH_SHORT).show();
+        } else {
+          ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+      } else {
+        mWXSDKInstance.getContext().startActivity(new Intent(mWXSDKInstance.getContext(), CaptureActivity.class));
+      }
+      return;
+    }
+
     if (TextUtils.equals("http", scheme) || TextUtils.equals("https", scheme) || TextUtils.equals("file", scheme)) {
       builder.append(url);
     } else {
@@ -80,6 +103,14 @@ public class WXEventModule extends WXModule {
       Map<String, Boolean> result = new HashMap<String, Boolean>();
       result.put("ok",true);
       callback.invoke(result);
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+      mWXSDKInstance.getContext().startActivity(new Intent(mWXSDKInstance.getContext(), CaptureActivity.class));
     }
   }
 }

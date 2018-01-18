@@ -18,14 +18,19 @@
  */
 package com.taobao.weex.ui.module;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.net.URLDecoder;
@@ -59,6 +64,29 @@ public class WXMetaModule extends WXModule {
                 }
             } catch (Exception e) {
                 WXLogUtils.e("[WXModalUIModule] alert param parse error ", e);
+            }
+        }
+    }
+
+
+    @JSMethod(uiThread = true)
+    public void openLog(String open) {
+        Application application = WXEnvironment.getApplication();
+        if(application == null){
+            return;
+        }
+        ApplicationInfo info = application.getApplicationInfo();
+        if((info.flags & ApplicationInfo.FLAG_DEBUGGABLE)!= 0){
+            if(WXUtils.getBoolean(open, true)) {
+                WXEnvironment.setApkDebugable(true);
+                if(mWXSDKInstance != null) {
+                    Toast.makeText(mWXSDKInstance.getContext(), "log open success", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                WXEnvironment.setApkDebugable(false);
+                if(mWXSDKInstance != null) {
+                    Toast.makeText(mWXSDKInstance.getContext(), "log close success", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

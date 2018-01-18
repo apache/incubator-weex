@@ -41,6 +41,8 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
+static BOOL threadSafeCollectionUsingLock = NO;
+
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
@@ -134,6 +136,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
 }
 
 @implementation WXUtility
+
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
+{
+    threadSafeCollectionUsingLock = usingLock;
+}
+
++ (BOOL)threadSafeCollectionUsingLock
+{
+    return threadSafeCollectionUsingLock;
+}
 
 + (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {

@@ -523,6 +523,10 @@ _Pragma("clang diagnostic pop") \
             [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
         }
         
+        if (script) {
+             [WXAppConfiguration setJSFrameworkLibSize:[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding]];
+        }
+        
         //execute methods which has been stored in methodQueue temporarily.
         for (NSDictionary *method in _methodQueue) {
             [self callJSMethod:method[@"method"] args:method[@"args"]];

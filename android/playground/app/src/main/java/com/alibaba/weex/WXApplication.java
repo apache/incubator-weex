@@ -37,6 +37,7 @@ import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
+import com.alibaba.weex.extend.module.WXTitleBar;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
@@ -89,11 +90,15 @@ public class WXApplication extends Application {
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);
+
+      WXSDKEngine.registerModule("titleBar", WXTitleBar.class);
       /**
        * override default image tag
        * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
        */
 
+      //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
+      //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
 
     } catch (WXException e) {
       e.printStackTrace();

@@ -206,6 +206,23 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(key, prop, type, defaultValue,needLayout)\
+do {\
+    id value = styles[@#key];\
+    if (value) {\
+        if([WXUtility isBlankString:value]){\
+            _##prop = defaultValue;\
+        }else {\
+            _##prop = [WXConvert type:value];\
+        }\
+        [self setNeedsRepaint];\
+        if (needLayout) {\
+            [self setNeedsLayout];\
+        }\
+    }\
+} while(0);
+
+
 #define WX_STYLE_FILL_TEXT_PIXEL(key, prop, needLayout)\
 do {\
     id value = styles[@#key];\
@@ -220,7 +237,7 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
+    WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(color, color, UIColor, [UIColor blackColor], NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -623,8 +640,11 @@ do {\
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
     [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
-    
-    [self fillCSSStyles:styles];
+    NSMutableDictionary * newStyles = [styles mutableCopy];
+    for (NSString * key in [resetStyles copy]) {
+        [newStyles setObject:@"" forKey:key];
+    }
+    [self fillCSSStyles:newStyles];
     
     [self syncTextStorageForView];
 }

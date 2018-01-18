@@ -26,6 +26,7 @@ public class WXJSObject {
     public static final int NUMBER = 1;
     public static final int String = 2;
     public static final int JSON = 3;
+    public static final int WSON = 4;
 
     public Object data;
     public int type;

@@ -196,9 +196,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if (!domStyles.containsKey(Constants.Name.FLEX_DIRECTION)) {
       style.put(Constants.Name.FLEX_DIRECTION, "column");
     }
-    if (!domStyles.containsKey(Constants.Name.BACKGROUND_COLOR)) {
-      style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
-    }
+//    if (!domStyles.containsKey(Constants.Name.BACKGROUND_COLOR)) {
+//      style.put(Constants.Name.BACKGROUND_COLOR, "transparent");
+//    }
 
     style.put(Constants.Name.DEFAULT_WIDTH, defaultWidth);
     style.put(Constants.Name.DEFAULT_HEIGHT, defaultHeight);
@@ -823,6 +823,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   }
 
   private static boolean shouldDirty(Map<String,Object> updates){
+    if(updates.size() > 0){
+      return  true;
+    }
     Set<Map.Entry<String, Object>>   entries =  updates.entrySet();
     for(Map.Entry<String, Object> entry : entries){
       if(dirtyStyle.contains(entry.getKey())){
