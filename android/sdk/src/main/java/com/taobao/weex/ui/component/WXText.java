@@ -168,6 +168,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       Layout layout;
       private AtomicReference<Layout> atomicReference = new AtomicReference<>();
 
+      /** uiThread = false **/
       @Override
       public void layoutBefore() {
         hasBeenMeasured = false;
@@ -175,6 +176,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
         spanned = createSpanned(mText);
       }
 
+      /** uiThread = false **/
       @Override
       public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         float measureWidth = width, measureHeight = height;
@@ -204,6 +206,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
         return ret;
       }
 
+      /** uiThread = false **/
       @Override
       public void layoutAfter(float computedWidth, float computedHeight) {
         if (hasBeenMeasured) {

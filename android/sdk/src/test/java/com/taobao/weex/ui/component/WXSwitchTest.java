@@ -62,7 +62,7 @@ public class WXSwitchTest {
 
   @Test
   public void testAddEvent() throws Exception {
-    component.applyEvent(Constants.Event.CHANGE);
+    component.addEvent(Constants.Event.CHANGE);
   }
 
   @Test

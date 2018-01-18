@@ -47,10 +47,10 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
       return;
     }
     if (mStyle != null) {
-      component.updateStyles(mStyle);
-      component.updateCSSShorthand(mPaddings);
-      component.updateCSSShorthand(mMargins);
-      component.updateCSSShorthand(mBorders);
+      component.addStyle(mStyle);
+      component.addShorthand(mPaddings);
+      component.addShorthand(mMargins);
+      component.addShorthand(mBorders);
     }
   }
 
@@ -59,7 +59,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     if (component == null) {
       return;
     }
-    component.setLayout(component);
+    component.updateStyles(mStyle);
   }
 }
 

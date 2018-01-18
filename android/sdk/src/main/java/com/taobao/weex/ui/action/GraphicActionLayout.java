@@ -44,6 +44,6 @@ public class GraphicActionLayout extends BasicGraphicAction {
     WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutUpdateDemissionTime(System.currentTimeMillis() - start);
 
     component.setLayout(component);
-    component.applyPadding(component.getPadding(), component.getBorder());
+    component.setPadding(component.getPadding(), component.getBorder());
   }
 }

@@ -78,7 +78,7 @@ public class ComponentTest {
   public static void addEvent(WXComponent comp){
     for (String event :
         TestConstants.Events) {
-      comp.applyEvent(event);
+      comp.addEvent(event);
     }
   }
 

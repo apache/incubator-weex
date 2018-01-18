@@ -47,6 +47,6 @@ public class GraphicActionUpdateAttr extends BasicGraphicAction {
     if (component == null) {
       return;
     }
-    component.applyAttrs(component);
+    component.updateAttrs(mAttrs);
   }
 }

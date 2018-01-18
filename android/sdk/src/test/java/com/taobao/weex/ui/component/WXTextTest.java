@@ -112,7 +112,7 @@ public class WXTextTest {
     @Test
     public void testSetPadding(){
         testCreateView();
-        mWXText.applyPadding(mDomObject.getPadding(), mDomObject.getBorder());
+        mWXText.setPadding(mDomObject.getPadding(), mDomObject.getBorder());
         assertEquals(0, mWXText.getHostView().getPaddingLeft());
         assertEquals(0, mWXText.getHostView().getPaddingTop());
         assertEquals(0, mWXText.getHostView().getPaddingRight());
@@ -139,7 +139,7 @@ public class WXTextTest {
     @Test
     public void testAddEvent(){
         testBind();
-        mWXText.applyEvent(Constants.Event.CLICK);
+        mWXText.addEvent(Constants.Event.CLICK);
         assertTrue(mWXText.getHostView().isEnabled());
         mWXText.getHostView().performClick();
     }

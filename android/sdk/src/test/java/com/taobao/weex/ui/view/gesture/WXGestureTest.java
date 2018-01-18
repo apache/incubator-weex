@@ -47,10 +47,10 @@ public class WXGestureTest {
     component = WXDivTest.create();
     ComponentTest.create(component);
 
-    component.applyEvent(WXGestureType.LowLevelGesture.ACTION_CANCEL.toString());
-    component.applyEvent(WXGestureType.LowLevelGesture.ACTION_DOWN.toString());
-    component.applyEvent(WXGestureType.LowLevelGesture.ACTION_MOVE.toString());
-    component.applyEvent(WXGestureType.LowLevelGesture.ACTION_UP.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_CANCEL.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_DOWN.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_MOVE.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_UP.toString());
 
     TestActivity activity = Robolectric.setupActivity(TestActivity.class);
     mGesture = new WXGesture(component, activity);

@@ -109,6 +109,6 @@ public class WXComponentTest {
 
   @Test
   public void testAddEvent() throws Exception {
-    component.applyEvent(Constants.Event.FOCUS);
+    component.addEvent(Constants.Event.FOCUS);
   }
 }

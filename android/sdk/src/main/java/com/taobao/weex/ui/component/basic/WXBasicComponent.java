@@ -21,16 +21,16 @@ package com.taobao.weex.ui.component.basic;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +54,21 @@ public abstract class WXBasicComponent<T extends View> {
 
   private int mViewPortWidth = 750;
 
-  public @NonNull
+  public WXBasicComponent(CommonCompData commonCompData) {
+    this.mPageId = commonCompData.mPageId;
+    this.mRef = commonCompData.mRef;
+    this.mParentRef = commonCompData.mParentRef;
+    this.mComponentType = commonCompData.mComponentType;
+  }
+
+  protected void copyData(WXComponent component) {
+    mPageId = component.getPageId();
+    mComponentType = component.getComponentType();
+    mParentRef = component.getParentRef();
+    mRef = component.getRef();
+  }
+
+  public final @NonNull
   WXStyle getStyles() {
     if (mStyles == null) {
       mStyles = new WXStyle();
@@ -62,7 +76,7 @@ public abstract class WXBasicComponent<T extends View> {
     return mStyles;
   }
 
-  public @NonNull
+  public final @NonNull
   WXAttr getAttrs() {
     if (mAttributes == null) {
       mAttributes = new WXAttr();
@@ -70,7 +84,7 @@ public abstract class WXBasicComponent<T extends View> {
     return mAttributes;
   }
 
-  public @NonNull
+  public final @NonNull
   WXEvent getEvents() {
     if (mEvents == null) {
       mEvents = new WXEvent();
@@ -81,7 +95,7 @@ public abstract class WXBasicComponent<T extends View> {
   /**
    * Get this node's margin, as defined by cssstyle + default margin.
    */
-  public @NonNull
+  public final @NonNull
   CSSShorthand getMargin() {
     if (mMargins == null) {
       mMargins = new CSSShorthand();
@@ -92,7 +106,7 @@ public abstract class WXBasicComponent<T extends View> {
   /**
    * Get this node's padding, as defined by cssstyle + default padding.
    */
-  public @NonNull
+  public final @NonNull
   CSSShorthand getPadding() {
     if (mPaddings == null) {
       mPaddings = new CSSShorthand();
@@ -123,7 +137,7 @@ public abstract class WXBasicComponent<T extends View> {
     this.mBorders = mBorders;
   }
 
-  public void addAttr(Map<String, Object> attrs) {
+  public final void addAttr(Map<String, Object> attrs) {
     if (attrs == null || attrs.isEmpty()) {
       return;
     }
@@ -133,7 +147,7 @@ public abstract class WXBasicComponent<T extends View> {
     mAttributes.putAll(attrs);
   }
 
-  public void addStyle(Map<String, Object> styles) {
+  public final void addStyle(Map<String, Object> styles) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
@@ -143,7 +157,7 @@ public abstract class WXBasicComponent<T extends View> {
     addStyle(styles, false);
   }
 
-  public void addStyle(Map<String, Object> styles, boolean byPesudo) {
+  public final void addStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
@@ -163,7 +177,7 @@ public abstract class WXBasicComponent<T extends View> {
     mEvents.addAll(events);
   }
 
-  public void addShorthand(Map<String, String> shorthand) {
+  public final void addShorthand(Map<String, String> shorthand) {
     if (!shorthand.isEmpty()) {
       for (Map.Entry<String, String> item : shorthand.entrySet()) {
         String key = item.getKey();
@@ -239,14 +253,6 @@ public abstract class WXBasicComponent<T extends View> {
     mBorders.set(spacingType, border);
   }
 
-  public void setViewPortWidth(int viewPortWidth) {
-    this.mViewPortWidth = viewPortWidth;
-  }
-
-  public int getViewPortWidth() {
-    return mViewPortWidth;
-  }
-
   public Object getExtra() {
     return mExtra;
   }
@@ -259,32 +265,16 @@ public abstract class WXBasicComponent<T extends View> {
     return mPageId;
   }
 
-  public void setPageId(String mPageId) {
-    this.mPageId = mPageId;
-  }
-
   public String getComponentType() {
     return mComponentType;
-  }
-
-  public void setComponentType(String mComponentType) {
-    this.mComponentType = mComponentType;
   }
 
   public String getParentRef() {
     return mParentRef;
   }
 
-  public void setParentRef(String mParentRef) {
-    this.mParentRef = mParentRef;
-  }
-
   public String getRef() {
     return mRef;
-  }
-
-  public void setRef(String mRef) {
-    this.mRef = mRef;
   }
 
   public GraphicPosition getLayoutPosition() {

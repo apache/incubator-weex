@@ -169,7 +169,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
   @Override
   public void bindData(WXComponent component) {
     super.bindData(component);
-    applyEvent(Constants.Event.APPEAR);
+    addEvent(Constants.Event.APPEAR);
   }
 
   @Override

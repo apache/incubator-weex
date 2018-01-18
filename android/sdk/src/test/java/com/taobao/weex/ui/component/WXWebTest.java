@@ -135,10 +135,10 @@ public class WXWebTest {
 
   @Test
   public void testListener() throws Exception {
-    component.applyEvent(Constants.Event.RECEIVEDTITLE);
-    component.applyEvent(Constants.Event.PAGESTART);
-    component.applyEvent(Constants.Event.PAGEFINISH);
-    component.applyEvent(Constants.Event.ERROR);
+    component.addEvent(Constants.Event.RECEIVEDTITLE);
+    component.addEvent(Constants.Event.PAGESTART);
+    component.addEvent(Constants.Event.PAGEFINISH);
+    component.addEvent(Constants.Event.ERROR);
     mWebView.mOnPageListener.onPageFinish("http://taobao.com",true,true);
     mWebView.mOnPageListener.onReceivedTitle("test");
     mWebView.mOnPageListener.onPageStart("http://taobao.com");

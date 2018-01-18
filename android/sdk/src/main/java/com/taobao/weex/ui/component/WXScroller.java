@@ -145,8 +145,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   @Override
-  public void applyEvent(String type) {
-    super.applyEvent(type);
+  public void addEvent(String type) {
+    super.addEvent(type);
     if (Constants.Event.SCROLL.equals(type) && getInnerView() != null) {
       if (getInnerView() instanceof WXScrollView) {
         ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {

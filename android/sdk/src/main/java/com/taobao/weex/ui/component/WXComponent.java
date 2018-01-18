@@ -45,7 +45,6 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +59,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
@@ -172,18 +170,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, CommonCompData commonCompData) {
-    setPageId(commonCompData.mPageId);
-    setRef(commonCompData.mRef);
-    setParentRef(commonCompData.mParentRef);
-    setComponentType(commonCompData.mComponentType);
+    super(commonCompData);
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
     mGestureType = new HashSet<>();
     ++mComponentNum;
-    if (instance != null)
-      setViewPortWidth(instance.getInstanceViewPortWidth());
 
     onCreate();
     ComponentObserver observer;
@@ -192,11 +185,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  private void copyData(WXComponent component) {
-    setPageId(component.getPageId());
-    setComponentType(component.getComponentType());
-    setParentRef(component.getParentRef());
-    setRef(component.getRef());
+  protected final void copyData(WXComponent component) {
+    super.copyData(component);
     mParent = component.getParent();
     mType = component.getType();
   }
@@ -206,7 +196,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
   }
 
-  public void applyStyles(WXComponent component) {
+  public void updateStyles(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
     }
@@ -214,12 +204,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void updateStyles(Map<String, Object> styles) {
     if (styles != null) {
-      addStyle(styles);
       updateProperties(styles);
     }
   }
 
-  public void applyAttrs(WXComponent component) {
+  public void updateAttrs(WXComponent component) {
     if (component != null) {
       updateProperties(component.getAttrs());
     }
@@ -227,7 +216,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void updateAttrs(Map<String, Object> attrs) {
     if (attrs != null) {
-      addAttr(attrs);
       updateProperties(attrs);
     }
   }
@@ -249,7 +237,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     setBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, bottom);
   }
 
-  public void applyPadding(CSSShorthand padding, CSSShorthand border) {
+  public void setPadding(CSSShorthand padding, CSSShorthand border) {
     int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
     int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
     int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
@@ -262,15 +250,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void updateCSSShorthand(Map<String, String> cssShorthand) {
-    addShorthand(cssShorthand);
-  }
-
   private void applyEvents() {
     if (getEvents() == null || getEvents().isEmpty())
       return;
     for (String type : getEvents()) {
-      applyEvent(type);
+      addEvent(type);
     }
     setActiveTouchListener();
   }
@@ -280,7 +264,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    *
    * @param type
    */
-  public void applyEvent(String type) {
+  public void addEvent(String type) {
 
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
@@ -522,8 +506,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         component = this;
       }
       copyData(component);
-      applyStyles(component);
-      applyAttrs(component);
+      updateStyles(component);
+      updateAttrs(component);
       applyBorder(component);
       updateExtra(component.getExtra());
 
@@ -537,7 +521,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       copyData(component);
       setLayout(component);
-      applyPadding(component.getPadding(), component.getBorder());
+      setPadding(component.getPadding(), component.getBorder());
       applyEvents();
     }
   }
@@ -752,7 +736,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
-    setViewPortWidth(component.getViewPortWidth());
     setPaddings(component.getPadding());
     setMargins(component.getMargin());
     setBorders(component.getBorder());
@@ -762,8 +745,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     //offset by sibling
     int siblingOffset = nullParent ? 0 : mParent.getChildrenLayoutTopOffset();
 
-    CSSShorthand parentPadding = (nullParent?new CSSShorthand():mParent.getPadding());
-    CSSShorthand parentBorder = (nullParent?new CSSShorthand():mParent.getBorder());
+    CSSShorthand parentPadding = (nullParent ? new CSSShorthand() : mParent.getPadding());
+    CSSShorthand parentBorder = (nullParent ? new CSSShorthand() : mParent.getBorder());
 
     int realWidth = (int) getLayoutSize().getWidth();
     int realHeight = (int) getLayoutSize().getHeight();
@@ -1706,10 +1689,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public void removeVirtualComponent() {
   }
 
-  public void setType(int type) {
-    mType = type;
-  }
-
   public int getType() {
     return mType;
   }
@@ -1843,7 +1822,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   /**
-   * Trigger a applyStyles invoke to relayout current page
+   * Trigger a updateStyles invoke to relayout current page
    */
   public void notifyNativeSizeChanged(int w, int h) {
     // TODO
@@ -1928,6 +1907,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       //ignore
     }
     return false;
+  }
+
+  public int getViewPortWidth() {
+    if (mInstance != null)
+      return mInstance.getInstanceViewPortWidth();
+    else
+      return 750;
   }
 
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
