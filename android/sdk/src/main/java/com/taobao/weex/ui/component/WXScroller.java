@@ -411,6 +411,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       innerView.addView(mRealView, layoutParams);
       innerView.setVerticalScrollBarEnabled(true);
+      innerView.setNestedScrollingEnabled(WXUtils.getBoolean(getDomObject().getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), true));
       innerView.addScrollViewListener(new WXScrollViewListener() {
         @Override
         public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {

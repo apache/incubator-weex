@@ -220,6 +220,9 @@ public class Constants {
 
     String SHOULD_STOP_PROPAGATION_INIT_RESULT = "shouldStopPropagationInitResult";
     String SHOULD_STOP_PROPAGATION_INTERVAL = "shouldStopPropagationInterval";
+
+
+    String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
   }
 
   public interface Value {
@@ -316,6 +319,8 @@ public class Constants {
 
 
     String SHOULD_STOP_PROPAGATION = "shouldStopPropagation";
+
+
 
   }
 
