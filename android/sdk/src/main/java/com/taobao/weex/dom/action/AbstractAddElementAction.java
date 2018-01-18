@@ -64,7 +64,13 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
       for (int i = 0; i < count; ++i) {
         child = dom.getChild(i);
         if (child != null) {
-          parentC.addChild(generateComponentTree(context, child, parentC));
+          WXComponent createdComponent = generateComponentTree(context, child, parentC);
+          if(createdComponent != null) {
+            parentC.addChild(createdComponent);
+          }else{
+            WXLogUtils.e("[generateComponentTree] " + getStatementName() + " create dom component failed name " + child.getType());
+            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode().getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
+          }
         }
       }
     }

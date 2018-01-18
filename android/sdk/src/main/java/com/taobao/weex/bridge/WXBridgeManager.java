@@ -2033,7 +2033,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
 	  exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
-      if (METHOD_CREATE_INSTANCE.equals(function)) {
+      if (METHOD_CREATE_INSTANCE.equals(function) || !instance.isContentMd5Match()) {
         try {
           if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);
