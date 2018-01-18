@@ -2,14 +2,6 @@
 
 using namespace WeexCore;
 
-const float WXCoreCSSStyle::kFlexGrowDefault = 0;
-const WXCoreFlexDirection WXCoreCSSStyle::kFlexDirectionDefault = kFlexDirectionColumn;
-const WXCoreFlexWrap WXCoreCSSStyle::kFlexWrapDefault = kNoWrap;
-const WXCoreJustifyContent WXCoreCSSStyle::kFlexJustifyContentDefault = kJustifyFlexStart;
-const WXCoreAlignItems WXCoreCSSStyle::kFlexAlignItemsDefault = kAlignItemsStretch;
-const WXCoreAlignSelf WXCoreCSSStyle::kFlexAlignSelfDefault = kAlignSelfAuto;
-
-
 namespace WeexCore {
 
   /**
@@ -76,8 +68,7 @@ namespace WeexCore {
   void WXCoreLayoutNode::measure(const float width, const float height, const bool hypotheticalMeasurment){
     if(hypotheticalMeasurment){
       //Only BFC will enter this case.
-      hypotheticalMeasure(width, height, hypotheticalMeasurment);
-      syncSizeFromHypothesis();
+      hypotheticalMeasure(width, height);
     }
 
     if(getChildCount(kNonBFC) > 0){
@@ -88,6 +79,7 @@ namespace WeexCore {
       determineCrossSize(width, height, true);
       measureInternalNode(width, height, true, false);
       determineCrossSize(width, height, false);
+
     }
     else {
       if (widthDirty || heightDirty) {
@@ -97,16 +89,15 @@ namespace WeexCore {
     clearDirty();
   }
 
-  void WXCoreLayoutNode::hypotheticalMeasure(const float width, const float height, const bool hypotheticalMeasurment){
+  void WXCoreLayoutNode::hypotheticalMeasure(const float width, const float height){
     if (getChildCount(kNonBFC) > 0) {
-      measureInternalNode(width, height, true, hypotheticalMeasurment);
+      measureInternalNode(width, height, true, true);
     } else {
-      measureLeafNode(width, height, hypotheticalMeasurment);
+      measureLeafNode(width, height, true);
     }
+
     widthDirty = false;
     heightDirty = false;
-    mLayoutResult->mLayoutSize.width = mLayoutResult->mLayoutSize.hypotheticalWidth;
-    mLayoutResult->mLayoutSize.height = mLayoutResult->mLayoutSize.hypotheticalHeight;
   }
 
     void WXCoreLayoutNode::measureLeafNode(float width, float height, bool hypothetical) {
@@ -126,7 +117,7 @@ namespace WeexCore {
         height = heightMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, false)
                                                               : height;
       }
-      setMeasuredDimension(width, height, hypothetical);
+      setMeasuredDimension(width, height);
     }
 
 
@@ -181,6 +172,12 @@ namespace WeexCore {
 
 
     void WXCoreLayoutNode::measureInternalNode(float width, float height, bool needMeasure, bool hypotheticalMeasurment) {
+      for (auto *flexLine : mFlexLines) {
+        if(flexLine!= nullptr) {
+          delete flexLine;
+        }
+        flexLine = nullptr;
+      }
       mFlexLines.clear();
       Index childCount = getChildCount(kNonBFC);
       auto *flexLine = new WXCoreFlexLine();
@@ -195,7 +192,7 @@ namespace WeexCore {
         measureChild(child, width, height, needMeasure, hypotheticalMeasurment);
         checkSizeConstraints(child, hypotheticalMeasurment);
         if (isWrapRequired(isMainAxisHorizontal(this) ? width : height, flexLine->mMainSize,
-                           calcItemSizeAlongAxis(child, isMainAxisHorizontal(this)))) {
+                           calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), hypotheticalMeasurment))) {
           if (flexLine->mItemCount > 0) {
             mFlexLines.push_back(flexLine);
           }
@@ -205,15 +202,15 @@ namespace WeexCore {
         } else {
           flexLine->mItemCount++;
         }
-        updateCurrentFlexline(childCount, flexLine, i, child);
+        updateCurrentFlexline(childCount, flexLine, i, child, hypotheticalMeasurment);
       }
-      setMeasuredDimensionForFlex(width, widthMeasureMode, height, heightMeasureMode, hypotheticalMeasurment);
+      setMeasuredDimensionForFlex(width, widthMeasureMode, height, heightMeasureMode);
     }
 
-    void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* flexLine, const Index i, const WXCoreLayoutNode* child){
-      flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
+    void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* flexLine, const Index i, const WXCoreLayoutNode* child, bool hypothetical){
+      flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), hypothetical);
       sumFlexGrow(child, flexLine, i, isMainAxisHorizontal(this));
-      flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
+      flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this), hypothetical));
       if (i == childCount - 1 && flexLine->mItemCount != 0) {
         mFlexLines.push_back(flexLine);
       }
@@ -237,7 +234,7 @@ namespace WeexCore {
               }
             }
           }
-          child->hypotheticalMeasure(childWidth, childHeight, hypotheticalMeasurment);
+          child->hypotheticalMeasure(childWidth, childHeight);
         } else {
           child->measure(child->mLayoutResult->mLayoutSize.width,
                          child->mLayoutResult->mLayoutSize.height, hypotheticalMeasurment);
@@ -247,8 +244,9 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::checkSizeConstraints(WXCoreLayoutNode *node, const bool hypotheticalMeasurment) {
       bool widthRemeasure = false, heightRemeasure = false;
-      float nodeWidth = node->mLayoutResult->mLayoutSize.width;
-      float nodeHeight = node->mLayoutResult->mLayoutSize.height;
+      float nodeWidth,nodeHeight;
+      nodeWidth = node->mLayoutResult->mLayoutSize.width;
+      nodeHeight = node->mLayoutResult->mLayoutSize.height;
 
       if (node->widthMeasureMode != kUnspecified) {
         if (nodeWidth < node->mCssStyle->mMinWidth) {
@@ -275,14 +273,10 @@ namespace WeexCore {
 
       if (hypotheticalMeasurment) {
         if (widthRemeasure) {
-          node->mLayoutResult->mLayoutSize.hypotheticalWidth = nodeWidth;
-          node->markDirty(false);
-          node->widthDirty = true;
+          node->setLayoutWidth(nodeWidth);
         }
         if (heightRemeasure) {
-          node->mLayoutResult->mLayoutSize.hypotheticalHeight = nodeHeight;
-          node->markDirty(false);
-          node->heightDirty = true;
+          node->setLayoutHeight(nodeHeight);
         }
       } else {
         if (widthRemeasure || heightRemeasure) {
@@ -313,7 +307,7 @@ namespace WeexCore {
             needsReexpand = limitSize.first;
             adjustChildSize(child, limitSize.second);
           }
-          flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
+          flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), false);
           childIndex++;
         }
 

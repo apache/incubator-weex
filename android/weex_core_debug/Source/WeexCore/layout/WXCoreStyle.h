@@ -176,6 +176,8 @@ namespace WeexCore {
      */
     WXCoreAlignSelf mAlignSelf;
 
+    WXCorePositionType mPositionType;
+
     float mFlexGrow;
 
     float mMinWidth;
@@ -198,23 +200,19 @@ namespace WeexCore {
 
     WXCorePosition mStylePosition;
 
-    WXCorePositionType mPositionType;
+    constexpr static float kFlexGrowDefault  = 0;
 
-    const static WXCoreFlexDirection kFlexDirectionDefault;
+    constexpr static WXCoreFlexDirection kFlexDirectionDefault= kFlexDirectionColumn;
 
-    const static WXCoreFlexWrap kFlexWrapDefault;
+    constexpr static WXCoreFlexWrap kFlexWrapDefault = kNoWrap;
 
-    const static WXCoreJustifyContent kFlexJustifyContentDefault;
+    constexpr static WXCoreJustifyContent kFlexJustifyContentDefault = kJustifyFlexStart;
 
-    const static WXCoreAlignItems kFlexAlignItemsDefault;
+    constexpr static WXCoreAlignItems kFlexAlignItemsDefault = kAlignItemsStretch;
 
-    const static WXCoreAlignSelf kFlexAlignSelfDefault;
+    constexpr static WXCoreAlignSelf kFlexAlignSelfDefault = kAlignSelfAuto;
 
-    const static float kFlexDefault;
-
-    const static float kFlexGrowDefault;
-
-    const static float kMaxSize;
+    constexpr static WXCorePositionType kWXCorePositionTypeDefault = kRelative;
 
     WXCoreCSSStyle() : mFlexDirection(kFlexDirectionDefault),
                        mFlexWrap(kFlexWrapDefault),
@@ -222,9 +220,10 @@ namespace WeexCore {
                        mAlignItems(kFlexAlignItemsDefault),
                        mAlignSelf(kFlexAlignSelfDefault),
                        mFlexGrow(kFlexGrowDefault),
+                       mPositionType(kWXCorePositionTypeDefault),
                        mStyleWidth(NAN), mStyleHeight(NAN),
                        mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
-                       mMinWidth(NAN), mMinHeight(NAN) {
+                       mMinWidth(0), mMinHeight(0) {
 
     }
 

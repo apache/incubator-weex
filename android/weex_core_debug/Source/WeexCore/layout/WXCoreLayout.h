@@ -123,11 +123,10 @@ namespace WeexCore {
               heightDirty{false},
               mHasNewLayout(true),
               mVisible(true),
+              mIsDestroy(false),
               measureFunc(nullptr) {
         mCssStyle = new WXCoreCSSStyle();
         mLayoutResult = new WXCorelayoutResult();
-        mLastAvailableSize = nullptr;
-        mIsDestroy = false;
       }
 
 
@@ -162,11 +161,6 @@ namespace WeexCore {
           delete mLayoutResult;
           mLayoutResult = nullptr;
         }
-
-        if (mLastAvailableSize != nullptr) {
-          delete mLastAvailableSize;
-          mLastAvailableSize = nullptr;
-        }
       }
 
   private:
@@ -176,7 +170,7 @@ namespace WeexCore {
      * expand regardless of mFlexGrow. Items are indexed by the child's
      * reordered index.
      */
-    bool *mChildrenFrozen;
+    bool *mChildrenFrozen = nullptr;
 
     std::vector<WXCoreFlexLine *> mFlexLines;
 
@@ -186,15 +180,15 @@ namespace WeexCore {
 
     std::vector<WXCoreLayoutNode *> NonBFCs;
 
-    WXCoreLayoutNode *mParent;
+    WXCoreLayoutNode *mParent = nullptr;
 
     WXCoreCSSStyle *mCssStyle = nullptr;
 
-    MeasureMode widthMeasureMode;
+    MeasureMode widthMeasureMode = kUnspecified;
 
-    MeasureMode heightMeasureMode;
+    MeasureMode heightMeasureMode = kUnspecified;
 
-    WXCorelayoutResult *mLayoutResult;
+    WXCorelayoutResult *mLayoutResult = nullptr;
 
     bool mHasNewLayout;
 
@@ -204,20 +198,11 @@ namespace WeexCore {
 
     bool mIsDestroy = true;
 
-    WXCoreMeasureFunc measureFunc;
+    WXCoreMeasureFunc measureFunc = nullptr;
 
     void *context;
 
     /** ================================ Cache：Last calculate result =================================== **/
-
-    WXCoreSize *mLastAvailableSize;
-
-    MeasureMode mLastWidthMode;
-
-    MeasureMode mLastHeightMode;
-
-  private:
-
 
   public:
 
@@ -226,26 +211,23 @@ namespace WeexCore {
 
     void calculateLayout();
 
-
-    /** ================================ lifeCycle =================================== **/
-
-//    inline static WXCoreLayoutNode *newWXCoreNode() {
-//      WXCoreLayoutNode *node = new WXCoreLayoutNode();
-//      node->markDirty();
-//      return node;
-//    }
-//
-
-
-
-
     //TODO this should be private
     void reset() {
       widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
       heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
       if (isDirty()) {
         mLayoutResult->reset();
+        for (WXCoreFlexLine *flexLine : mFlexLines) {
+          if(flexLine != nullptr) {
+            delete flexLine;
+          }
+          flexLine = nullptr;
+        }
         mFlexLines.clear();
+        if(mChildrenFrozen != nullptr) {
+          delete mChildrenFrozen;
+          mChildrenFrozen = nullptr;
+        }
         mChildrenFrozen = new bool[getChildCount(kNonBFC)];
       }
     }
@@ -419,8 +401,7 @@ namespace WeexCore {
 
     void setMeasuredDimensionForFlex(
         const float width, const MeasureMode widthMeasureMode,
-        const float height, const MeasureMode heightMeasureMode,
-        const bool hypothetical) {
+        const float height, const MeasureMode heightMeasureMode) {
       float actualWidth, actualHeight;
       if (isMainAxisHorizontal(this)) {
         actualWidth = widthMeasureMode == kExactly ? width : getLargestMainSize();
@@ -429,23 +410,19 @@ namespace WeexCore {
         actualHeight = heightMeasureMode == kExactly ? height : getLargestMainSize();
         actualWidth = widthMeasureMode == kExactly ? width : firstLineCrossSize();
       }
-      setMeasuredDimension(actualWidth, actualHeight, hypothetical);
+      setMeasuredDimension(actualWidth, actualHeight);
     }
 
-    float calcItemSizeAlongAxis(const WXCoreLayoutNode *node, const bool horizontal) {
+    float calcItemSizeAlongAxis(const WXCoreLayoutNode *node, const bool horizontal, const bool hypothetical) {
       float ret;
       if (horizontal) {
         ret = node->mCssStyle->mMargin.getMargin(kMarginLeft) +
               node->mCssStyle->mMargin.getMargin(kMarginRight);
-        if (!isnan(node->mLayoutResult->mLayoutSize.width)) {
-          ret += node->mLayoutResult->mLayoutSize.width;
-        }
+        ret += node->mLayoutResult->mLayoutSize.width;
       } else {
         ret = node->mCssStyle->mMargin.getMargin(kMarginTop) +
               node->mCssStyle->mMargin.getMargin(kMarginBottom);
-        if (!isnan(node->mLayoutResult->mLayoutSize.height)) {
-          ret += node->mLayoutResult->mLayoutSize.height;
-        }
+        ret += node->mLayoutResult->mLayoutSize.height;
       }
       return ret;
     }
@@ -457,24 +434,16 @@ namespace WeexCore {
       return true;
     }
 
-    bool syncSizeFromHypothesis(){
-      mLayoutResult->mLayoutSize.width = mLayoutResult->mLayoutSize.hypotheticalWidth;
-      mLayoutResult->mLayoutSize.height = mLayoutResult->mLayoutSize.hypotheticalHeight;
-      for (Index i = 0; i < getChildCount(kNonBFC); i++) {
-        getChildAt(kNonBFC, i)->syncSizeFromHypothesis();
-      }
-    }
-
     void
     measure(float, float, bool);
 
-    void hypotheticalMeasure(float, float, bool);
+    void hypotheticalMeasure(float, float);
 
     void measureLeafNode(float, float, bool);
 
     void measureInternalNode(float, float, bool, bool);
 
-    void updateCurrentFlexline(Index, WXCoreFlexLine *, Index, const WXCoreLayoutNode *);
+    void updateCurrentFlexline(Index, WXCoreFlexLine *, Index, const WXCoreLayoutNode *, bool);
 
     void measureChild(WXCoreLayoutNode *, float, float, bool, bool);
 
@@ -885,15 +854,9 @@ namespace WeexCore {
 
   private:
 
-    void setMeasuredDimension(const float width, const float height, const bool hypothetical) {
-      if(hypothetical){
-        mLayoutResult->mLayoutSize.hypotheticalWidth = width;
-        mLayoutResult->mLayoutSize.hypotheticalHeight = height;
-      }
-      else {
-        mLayoutResult->mLayoutSize.width = width;
-        mLayoutResult->mLayoutSize.height = height;
-      }
+    void setMeasuredDimension(const float width, const float height) {
+      mLayoutResult->mLayoutSize.width = width;
+      mLayoutResult->mLayoutSize.height = height;
     }
 
 

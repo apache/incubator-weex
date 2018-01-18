@@ -183,49 +183,49 @@ public abstract class WXBasicComponent<T extends View> {
         String key = item.getKey();
         switch (key) {
           case Constants.Name.MARGIN:
-            addMargin(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.MARGIN_LEFT:
-            addMargin(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.MARGIN_TOP:
-            addMargin(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.MARGIN_RIGHT:
-            addMargin(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.MARGIN_BOTTOM:
-            addMargin(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addMargin(CSSShorthand.EDGE.BOTTOM,WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.BORDER_WIDTH:
-            addBorder(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.BORDER_TOP_WIDTH:
-            addBorder(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.BORDER_RIGHT_WIDTH:
-            addBorder(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.BORDER_BOTTOM_WIDTH:
-            addBorder(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.BOTTOM, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.BORDER_LEFT_WIDTH:
-            addBorder(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addBorder(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.PADDING:
-            addPadding(CSSShorthand.EDGE.ALL, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.PADDING_LEFT:
-            addPadding(CSSShorthand.EDGE.LEFT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.PADDING_TOP:
-            addPadding(CSSShorthand.EDGE.TOP, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.PADDING_RIGHT:
-            addPadding(CSSShorthand.EDGE.RIGHT, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
           case Constants.Name.PADDING_BOTTOM:
-            addPadding(CSSShorthand.EDGE.BOTTOM, WXUtils.getFloatByViewport(shorthand.get(key), mViewPortWidth));
+            addPadding(CSSShorthand.EDGE.BOTTOM, WXUtils.fastGetFloat(shorthand.get(key)));
             break;
         }
       }
