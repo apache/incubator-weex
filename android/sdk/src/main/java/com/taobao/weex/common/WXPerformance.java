@@ -51,50 +51,68 @@ public class WXPerformance {
     useScroller
   }
 
-  private enum Measure {
-    JSLibSize,
-    JSLibInitTime,
-    SDKInitTime,
-    SDKInitInvokeTime,
-    SDKInitExecuteTime,
-    JSTemplateSize,
-    pureNetworkTime,
-    networkTime,
-    fsCallJsTotalNum,
-    fsCallNativeTotalNum,
-    fsRenderTime,
-    fsRequestNum,
-    fsCreateInstanceTime,
-    communicateTotalTime,
-    maxDeepViewLayer,
-    maxDeepVDomLayer,
-    componentCount,
-    cellExceedNum,
-    timerCount,
-    avgFps,
-    MaxImproveMemory,
-    BackImproveMemory,
-    PushImproveMemory,
-    measureTime1,
-    measureTime2,
-    measureTime3,
-    measureTime4,
-    measureTime5,
+  public enum Measure {
+    JSLibSize(0D,Double.MAX_VALUE),
+    JSLibInitTime(0D,2000D),
+    SDKInitTime(0D,2000D),
+    SDKInitInvokeTime(0D,2000D),
+    SDKInitExecuteTime(0D,2000D),
+    JSTemplateSize(0D,2000D),
+    pureNetworkTime(0D,15000D),
+    networkTime(0D,15000D),
+    fsCreateInstanceTime(0D,1000D),
+    fsCallJsTotalTime(0D,5000D),
+    fsCallJsTotalNum(0D,Double.MAX_VALUE),
+    fsCallNativeTotalTime(0D,5000D),
+    fsCallNativeTotalNum(0D,Double.MAX_VALUE),
+    fsCallEventTotalNum(0D,Double.MAX_VALUE),
+    fsRenderTime(0D,5000D),
+    fsRequestNum(0D,20D),
+    callCreateFinishTime(0D,10000D),
+    cellExceedNum(0D,Double.MAX_VALUE),
+    communicateTotalTime(0D,5000D),
+    maxDeepViewLayer(0D,Double.MAX_VALUE),
+    maxDeepVDomLayer(0D,Double.MAX_VALUE),
+    componentCount(0D,Double.MAX_VALUE),
+    avgFps(0D,60D),
+    timerCount(0D,Double.MAX_VALUE),
 
-    fsCallNativeTotalTime,
-    fsCallJsTotalTime,
-    communicateTime,
-    screenRenderTime,
-    totalTime,
-    localReadTime,
-    templateLoadTime,
-    packageSpendTime,
-    syncTaskTime,
-    actualNetworkTime,
-    firstScreenJSFExecuteTime,
+    MaxImproveMemory(0D,Double.MAX_VALUE),
+    BackImproveMemory(0D,Double.MAX_VALUE),
+    PushImproveMemory(0D,Double.MAX_VALUE),
+    measureTime1(0D,Double.MAX_VALUE),
+    measureTime2(0D,Double.MAX_VALUE),
+    measureTime3(0D,Double.MAX_VALUE),
+    measureTime4(0D,Double.MAX_VALUE),
+    measureTime5(0D,Double.MAX_VALUE),
+
+    communicateTime(0D,5000D),
+    screenRenderTime(0D,5000D),
+    totalTime(0D,5000D),
+    localReadTime(0D,5000D),
+    templateLoadTime(0D,5000D),
+    packageSpendTime(0D,5000D),
+    syncTaskTime(0D,5000D),
+    actualNetworkTime(0D,5000D),
+    firstScreenJSFExecuteTime(0D,5000D);
     //..
-    fsCallEventTotalNum,
-    callCreateFinishTime,
+
+
+
+
+    private double mMinRange,mMaxRange;
+
+    Measure(double min, double max){
+      this.mMinRange = min;
+      this.mMinRange =max;
+    }
+
+    public double getMinRange(){
+      return mMinRange;
+    }
+    public double getMaxRange(){
+      return mMinRange;
+    }
   }
 
   public static final String DEFAULT = "default";
