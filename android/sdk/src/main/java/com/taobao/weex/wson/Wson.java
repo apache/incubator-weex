@@ -21,6 +21,7 @@ package com.taobao.weex.wson;
 
 import android.support.v4.util.LruCache;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.utils.WXLogUtils;
@@ -495,7 +496,11 @@ public class Wson {
                     writeByte(NULL_TYPE);
                 }else {
                     refs.add(object);
-                    writeMap(toMap(object));
+                    if(object.getClass().isEnum()){
+                        writeObject(JSON.toJSONString(object));
+                    }else{
+                        writeMap(toMap(object));
+                    }
                     refs.remove(refs.size()-1);
                 }
                 return;
