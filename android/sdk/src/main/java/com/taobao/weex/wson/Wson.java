@@ -325,8 +325,15 @@ public class Wson {
             return  number;
         }
 
-        private  final double readDouble(){
+        private  final Object readDouble(){
             double number = Double.longBitsToDouble(readLong());
+            if(number > Integer.MAX_VALUE){
+                long numberLong = (long) number;
+                double doubleLong = (numberLong);
+                if(number - doubleLong < Double.MIN_NORMAL){
+                    return numberLong;
+                }
+            }
             return  number;
         }
 
@@ -535,9 +542,10 @@ public class Wson {
 
             if(number instanceof BigDecimal){
                 String value = number.toString();
-                if(value.equals(Double.toString(number.doubleValue()))){
+                double doubleValue = number.doubleValue();
+                if(value.equals(Double.toString(doubleValue))){
                     writeByte(NUMBER_DOUBLE_TYPE);
-                    writeDouble(number.doubleValue());
+                    writeDouble(doubleValue);
                 }else {
                     writeByte(NUMBER_BIG_DECIMAL_TYPE);
                     writeUTF16String(value);
