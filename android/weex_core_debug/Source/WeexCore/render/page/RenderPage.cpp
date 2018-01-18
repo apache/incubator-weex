@@ -167,6 +167,7 @@ namespace WeexCore {
     parent->RemoveRenderObject(child);
 
     RemoveRenderFromRegisterMap(child);
+    delete child;
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
@@ -424,7 +425,7 @@ namespace WeexCore {
     for (Index i = 0; i < render->getChildCount(); ++i) {
       RemoveRenderFromRegisterMap(render->GetChild(i));
     }
-    delete render;
+    // delete render;
 
   }
 
