@@ -71,6 +71,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
@@ -89,6 +90,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -173,6 +175,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private ComponentObserver mComponentObserver;
   private boolean mIsCommitedDomAtionExp = false;
 
+  public PriorityQueue<WXEmbed> hiddenEmbeds;
+
+  private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit
+
+
   public boolean getismIsCommitedDomAtionExp() {
 	return mIsCommitedDomAtionExp;
   }
@@ -181,6 +188,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 	this.mIsCommitedDomAtionExp = mIsCommitedDomAtionExp;
   }
 
+  public int getMaxHiddenEmbedsNum() {
+    return maxHiddenEmbedsNum;
+  }
+
+  public void setMaxHiddenEmbedsNum(int maxHiddenEmbedsNum) {
+    this.maxHiddenEmbedsNum = maxHiddenEmbedsNum;
+  }
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
