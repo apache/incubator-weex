@@ -322,29 +322,6 @@ namespace WeexCore {
       return childIndex;
     }
 
-    inline std::pair<bool, float> WXCoreLayoutNode::limitChildMainSize(WXCoreFlexLine* const flexLine, const WXCoreLayoutNode* const child,
-                                                           float childSizeAlongMainAxis, const Index childIndex){
-      bool needsReexpand = false;
-      if (isMainAxisHorizontal(this)) {
-        if (childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
-          childSizeAlongMainAxis = child->mCssStyle->mMaxWidth;
-        } else if (childSizeAlongMainAxis < child->mCssStyle->mMinWidth) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
-          childSizeAlongMainAxis = child->mCssStyle->mMinWidth;
-        }
-      } else {
-        if (childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
-          childSizeAlongMainAxis = child->mCssStyle->mMaxHeight;
-        } else if (childSizeAlongMainAxis < child->mCssStyle->mMinHeight) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
-          childSizeAlongMainAxis = child->mCssStyle->mMinHeight;
-        }
-      }
-      return std::make_pair(needsReexpand, childSizeAlongMainAxis);
-    }
-
     void WXCoreLayoutNode::adjustChildSize(WXCoreLayoutNode* const child, const float childMainSize) {
       if (isMainAxisHorizontal(this)) {
         child->setWidthMeasureMode(kExactly);
@@ -418,7 +395,7 @@ namespace WeexCore {
     onLayout(left, top, right, bottom);
   }
 
-  void WXCoreLayoutNode::calcRelativeOffset(float &left, float &top, float &right, float &bottom) {
+  void WXCoreLayoutNode::calcRelativeOffset(float &left, float &top, float &right, float &bottom) const {
     if (!isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft))) {
       left += mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft);
       right += mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft);
@@ -436,7 +413,7 @@ namespace WeexCore {
     }
   }
 
-  void WXCoreLayoutNode::calcAbsoluteOffset(float &left, float &top, float &right, float &bottom) {
+  void WXCoreLayoutNode::calcAbsoluteOffset(float &left, float &top, float &right, float &bottom) const {
     WXCorePadding parentPadding;
     WXCoreBorderWidth parentBorder;
     WXCoreSize parentSize;
