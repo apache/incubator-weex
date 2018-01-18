@@ -62,3 +62,4 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     component.setLayout(component);
   }
 }
+

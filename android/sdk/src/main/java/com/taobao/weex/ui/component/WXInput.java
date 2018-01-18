@@ -18,10 +18,20 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.text.TextPaint;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.CSSConstants;
+import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.layout.MeasureSize;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXEditText;
+import com.taobao.weex.utils.TypefaceUtil;
+
+import static com.taobao.weex.dom.WXStyle.UNSET;
 
 /**
  *
@@ -43,10 +53,5 @@ public class WXInput extends AbstractEditComponent{
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
     editText.setSingleLine();//default use single line , same to ios
-  }
-
-  @Override
-  protected MeasureOutput measure(int width, int height) {
-    return super.measure(width, height);
   }
 }

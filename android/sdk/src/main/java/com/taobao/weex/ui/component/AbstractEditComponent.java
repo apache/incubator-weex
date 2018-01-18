@@ -24,9 +24,11 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -41,11 +43,15 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.CSSConstants;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.layout.MeasureSize;
 import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;
 import com.taobao.weex.ui.view.WXEditText;
+import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -54,6 +60,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.taobao.weex.dom.WXStyle.UNSET;
 
 /**
  * Created by sospartan on 7/11/16.
@@ -73,10 +81,78 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
   private boolean mIgnoreNextOnInputEvent = false;
+  private TextPaint mPaint = new TextPaint();
+  private int mLineHeight = UNSET;
 
   public AbstractEditComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
     super(instance, parent, isLazy, commonCompData);
     mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    setContentBoxMeasurement(new ContentBoxMeasurement() {
+      /** uiThread = false **/
+      @Override
+      public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+        if (CSSConstants.isUndefined(width)) {
+          width = getStyles().getMaxWidth();
+        }
+        MeasureSize size = new MeasureSize();
+        size.setHeight(getMeasureHeight());
+        size.setWidth(width);
+        return size;
+      }
+
+      /** uiThread = false **/
+      @Override
+      public void layoutBefore() {
+        updateStyleAndAttrs();
+      }
+
+      /** uiThread = false **/
+      @Override
+      public void layoutAfter(float computedWidth, float computedHeight) {
+
+      }
+    });
+  }
+
+  protected final float getMeasuredLineHeight() {
+    return mLineHeight != UNSET && mLineHeight > 0 ? mLineHeight : mPaint.getFontMetrics(null);
+  }
+
+  protected float getMeasureHeight() {
+    return getMeasuredLineHeight();
+  }
+
+  protected void updateStyleAndAttrs() {
+    if (getStyles().size() > 0) {
+      int fontSize = UNSET, fontStyle = UNSET, fontWeight = UNSET;
+      String fontFamily = null;
+      if (getStyles().containsKey(Constants.Name.FONT_SIZE)) {
+        fontSize = WXStyle.getFontSize(getStyles(),getViewPortWidth());
+      }
+
+      if (getStyles().containsKey(Constants.Name.FONT_FAMILY)) {
+        fontFamily = WXStyle.getFontFamily(getStyles());
+      }
+
+      if (getStyles().containsKey(Constants.Name.FONT_STYLE)) {
+        fontStyle = WXStyle.getFontStyle(getStyles());
+      }
+
+      if (getStyles().containsKey(Constants.Name.FONT_WEIGHT)) {
+        fontWeight = WXStyle.getFontWeight(getStyles());
+      }
+
+      int lineHeight = WXStyle.getLineHeight(getStyles(),getViewPortWidth());
+      if (lineHeight != UNSET)
+        mLineHeight = lineHeight;
+
+      if (fontSize != UNSET)
+        mPaint.setTextSize(fontSize);
+
+      if (fontFamily != null) {
+        TypefaceUtil.applyFontStyle(mPaint, fontStyle, fontWeight, fontFamily);
+      }
+    }
   }
 
   @Override
@@ -108,28 +184,30 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     return !isDisabled();
   }
 
-  private void applyOnClickListener() {
-    addClickListener(new OnClickListener() {
-      @Override
-      public void onHostViewClick() {
-        switch (mType) {
-          case Constants.Value.DATE:
-            hideSoftKeyboard();
-            if (getParent() != null) {
-              getParent().interceptFocus();
-            }
-            WXTimeInputHelper.pickDate(mMax, mMin, AbstractEditComponent.this);
-            break;
-          case Constants.Value.TIME:
-            hideSoftKeyboard();
-            if (getParent() != null) {
-              getParent().interceptFocus();
-            }
-            WXTimeInputHelper.pickTime(AbstractEditComponent.this);
-            break;
-        }
+  private OnClickListener mOnClickListener = new OnClickListener() {
+    @Override
+    public void onHostViewClick() {
+      switch (mType) {
+        case Constants.Value.DATE:
+          hideSoftKeyboard();
+          if (getParent() != null) {
+            getParent().interceptFocus();
+          }
+          WXTimeInputHelper.pickDate(mMax, mMin, AbstractEditComponent.this);
+          break;
+        case Constants.Value.TIME:
+          hideSoftKeyboard();
+          if (getParent() != null) {
+            getParent().interceptFocus();
+          }
+          WXTimeInputHelper.pickTime(AbstractEditComponent.this);
+          break;
       }
-    });
+    }
+  };
+
+  private void applyOnClickListener() {
+    addClickListener(mOnClickListener);
   }
 
   protected int getVerticalGravity(){
@@ -413,6 +491,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.TYPE)
   public void setType(String type) {
+    Log.e("weex", "setType=" + type);
     if (type == null || getHostView() == null) {
       return;
     }

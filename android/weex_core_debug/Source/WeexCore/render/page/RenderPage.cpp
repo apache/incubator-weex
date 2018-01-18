@@ -22,6 +22,8 @@ namespace WeexCore {
 
   typedef std::vector<RenderAction *>::iterator RenderActionIterator;
 
+  static bool useVSync = false;
+
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
     mWXCorePerformance = new RenderPerformance();
@@ -37,15 +39,6 @@ namespace WeexCore {
       delete render_root;
       render_root = nullptr;
     }
-
-    for (RenderActionIterator it = mRenderActions.begin();
-         it != mRenderActions.end(); it++) {
-      if (nullptr != *it) {
-        delete *it;
-        *it = nullptr;
-      }
-    }
-    mRenderActions.clear();
 
     mRenderObjectRegisterMap.clear();
 
@@ -118,14 +111,14 @@ namespace WeexCore {
     }
   }
 
-  bool RenderPage::CreateRootRender(RenderRoot *root) {
+  bool RenderPage::CreateRootRender(RenderObject *root) {
     if (root == nullptr)
       return false;
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
-    render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
+    render_root->SetDefaultWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    render_root->SetDefaultHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
 
     PushRenderToRegisterMap(root);
 
@@ -156,7 +149,8 @@ namespace WeexCore {
 
 //    mMessage = "start calculateLayout";
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-    CalculateLayout();
+    if (!useVSync)
+      CalculateLayout();
     return true;
   }
 
@@ -263,7 +257,8 @@ namespace WeexCore {
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
     SendUpdateStyleAction(render, style, margin, padding, border);
-    CalculateLayout();
+    if (!useVSync)
+      CalculateLayout();
 
     if (style != nullptr) {
       for (int i = 0; i < style->size(); ++i) {
@@ -359,9 +354,10 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->setStyleWidth(defaultWidth);
-    render_root->setStyleHeight(defaultHeight);
-    CalculateLayout();
+    render_root->SetDefaultWidth(defaultWidth);
+    render_root->SetDefaultHeight(defaultHeight);
+    if (!useVSync)
+      CalculateLayout();
   }
 
   bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
@@ -506,12 +502,12 @@ namespace WeexCore {
 
   void RenderPage::AddEventActionJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
-        mWXCorePerformance->addEventActionJNITime += time;
+      mWXCorePerformance->addEventActionJNITime += time;
   }
 
   void RenderPage::RemoveEventActionJNITime(const long long &time) {
     if (mWXCorePerformance != nullptr)
-        mWXCorePerformance->removeEventActionJNITime += time;
+      mWXCorePerformance->removeEventActionJNITime += time;
   }
 
   void RenderPage::AddElementActionJNITime(const long long &time) {
@@ -571,7 +567,9 @@ namespace WeexCore {
   }
 
   void RenderPage::Batch() {
-
+    if (useVSync) {
+      CalculateLayout();
+    }
   }
 
   void RenderPage::OnRenderPageInit() {

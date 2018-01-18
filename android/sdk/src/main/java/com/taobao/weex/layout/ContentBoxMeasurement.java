@@ -22,12 +22,15 @@ import com.taobao.weex.base.CalledByNative;
 
 public abstract class ContentBoxMeasurement {
 
+  /** uiThread = false **/
   @CalledByNative
   public abstract MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode);
 
+  /** uiThread = false **/
   @CalledByNative
   public abstract void layoutBefore();
 
+  /** uiThread = false **/
   @CalledByNative
   public abstract void layoutAfter(float computedWidth, float computedHeight);
 }

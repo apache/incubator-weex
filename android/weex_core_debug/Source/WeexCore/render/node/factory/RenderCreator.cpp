@@ -5,6 +5,13 @@
 #include "SimpleRenderFactory.h"
 #include "RenderCellFactory.h"
 #include "RenderType.h"
+#include "RenderIndicatorFactory.h"
+#include "RenderInputFactory.h"
+#include "RenderListFactory.h"
+#include "RenderMaskFactory.h"
+#include "RenderScrollerFactory.h"
+#include "RenderSwitchFactory.h"
+#include "RenderTextAreaFactory.h"
 
 namespace WeexCore {
 
@@ -16,6 +23,20 @@ namespace WeexCore {
       factory = new RenderTextFactory();
     } else if (type == kRenderCell) {
       factory = new RenderCellFactory();
+    } else if (type == kRenderIndicator) {
+      factory = new RenderIndicatorFactory();
+    } else if (type == kRenderInput) {
+      factory = new RenderInputFactory();
+    } else if (type == kRenderList) {
+      factory = new RenderListFactory();
+    } else if (type == kRenderMask) {
+      factory = new RenderMaskFactory();
+    } else if (type == kRenderScroller) {
+      factory = new RenderScrollerFactory();
+    } else if (type == kRenderSwitch) {
+      factory = new RenderSwitchFactory();
+    } else if (type == kRenderTextArea) {
+      factory = new RenderTextAreaFactory();
     } else {
       factory = new RenderCommonFactory();
     }

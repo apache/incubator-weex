@@ -21,6 +21,7 @@ package com.taobao.weex.ui.component.basic;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
@@ -110,27 +111,15 @@ public abstract class WXBasicComponent<T extends View> {
     return mBorders;
   }
 
-  public void setStyles(@NonNull WXStyle mStyles) {
-    this.mStyles = mStyles;
-  }
-
-  public void setAttributes(@NonNull WXAttr mAttributes) {
-    this.mAttributes = mAttributes;
-  }
-
-  public void setEvents(@NonNull WXEvent mEvents) {
-    this.mEvents = mEvents;
-  }
-
-  public void setMargins(@NonNull CSSShorthand mMargins) {
+  protected final void setMargins(@NonNull CSSShorthand mMargins) {
     this.mMargins = mMargins;
   }
 
-  public void setPaddings(@NonNull CSSShorthand mPaddings) {
+  protected final void setPaddings(@NonNull CSSShorthand mPaddings) {
     this.mPaddings = mPaddings;
   }
 
-  public void setBorders(@NonNull CSSShorthand mBorders) {
+  protected final void setBorders(@NonNull CSSShorthand mBorders) {
     this.mBorders = mBorders;
   }
 
@@ -164,7 +153,7 @@ public abstract class WXBasicComponent<T extends View> {
     mStyles.putAll(styles, byPesudo);
   }
 
-  public void addEvent(Set<String> events) {
+  public final void addEvent(Set<String> events) {
     if (events == null || events.isEmpty()) {
       return;
     }

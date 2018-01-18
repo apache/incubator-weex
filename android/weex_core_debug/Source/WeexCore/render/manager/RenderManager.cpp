@@ -2,7 +2,6 @@
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
-#include <WeexCore/render/node/RenderRoot.h>
 #include <base/TimeUtils.h>
 #include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
 
@@ -19,7 +18,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    RenderRoot *root = (RenderRoot *) Json2RenderObject(c_data, pageId);
+    RenderObject *root = Json2RenderObject(c_data, pageId);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);
     return page->CreateRootRender(root);

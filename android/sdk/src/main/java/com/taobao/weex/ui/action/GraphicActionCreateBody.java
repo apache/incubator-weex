@@ -72,6 +72,14 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
   @Override
   public void executeAction() {
     try {
+      long start = System.currentTimeMillis();
+      component.bindData(component);
+      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutBindDataCoreTime(System.currentTimeMillis() - start);
+
+      start = System.currentTimeMillis();
+      component.applyLayoutAndEvent(component);
+      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);
+
       component.createView();
 
       if (component instanceof WXScroller) {

@@ -33,6 +33,7 @@ import com.taobao.weex.utils.WXUtils;
 public class Textarea extends AbstractEditComponent {
 
   public static final int DEFAULT_ROWS = 2;
+  private int mNumberOfLines = DEFAULT_ROWS;
 
   public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
     super(instance, parent, isLazy, commonCompData);
@@ -88,5 +89,31 @@ public class Textarea extends AbstractEditComponent {
     }
 
     text.setLines(rows);
+  }
+
+  @Override
+  protected float getMeasureHeight(){
+    return getMeasuredLineHeight() * mNumberOfLines;
+  }
+
+  @Override
+  protected void updateStyleAndAttrs() {
+    super.updateStyleAndAttrs();
+    Object raw = getAttrs().get(Constants.Name.ROWS);
+    if (raw == null) {
+      return;
+    } else if (raw instanceof String) {
+      String rowsStr = (String) raw;
+      try {
+        int lines = Integer.parseInt(rowsStr);
+        if (lines > 0) {
+          mNumberOfLines = lines;
+        }
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+      }
+    } else if (raw instanceof Integer) {
+      mNumberOfLines = (Integer) raw;
+    }
   }
 }
