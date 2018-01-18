@@ -92,7 +92,10 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
 
   @Override
   public boolean promoteToView(boolean checkAncestor) {
-    return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    if (null != getInstance().getFlatUIContext()) {
+      return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    }
+    return false;
   }
 
   @Override

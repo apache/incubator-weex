@@ -398,7 +398,7 @@ public class WXUtils {
       return parsePercent(raw.substring(0, suffix), unit);
     }
     else {
-      return Integer.parseInt(raw);
+      return WXUtils.parseInt(raw);
     }
   }
 
