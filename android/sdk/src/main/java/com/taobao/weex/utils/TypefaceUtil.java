@@ -256,7 +256,7 @@ public class TypefaceUtil {
                 intent.putExtra("fontFamily", fontFamily);
                 LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
               }
-            }, 50);
+            }, 100);
           }else{
             Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
             intent.putExtra("fontFamily", fontFamily);
