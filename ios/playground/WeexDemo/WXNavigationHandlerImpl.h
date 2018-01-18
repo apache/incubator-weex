@@ -17,16 +17,9 @@
  * under the License.
  */
 
-#import <UIKit/UIKit.h>
-#import <SRWebSocket.h>
+#import <Foundation/Foundation.h>
+#import "WXNavigationProtocol.h"
 
-@interface WXDemoViewController : UIViewController<SRWebSocketDelegate>
-
-@property (nonatomic, strong) NSString *script;
-@property (nonatomic, strong) NSURL *url;
-@property (nonatomic, assign) BOOL showNavigationBar;
-@property (nonatomic, strong) SRWebSocket *hotReloadSocket;
-@property (nonatomic, strong) NSString *source;
+@interface WXNavigationHandlerImpl : NSObject <WXNavigationProtocol>
 
 @end
-

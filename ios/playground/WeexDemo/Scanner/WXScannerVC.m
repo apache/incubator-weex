@@ -23,7 +23,9 @@
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXDemoViewController.h"
 #import "WXDebugTool.h"
+#if DEBUG
 #import <TBWXDevTool/WXDevTool.h>
+#endif
 #import <AudioToolbox/AudioToolbox.h>
 
 @interface WXScannerVC ()
@@ -45,7 +47,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    [self setupNaviBar];
     
 #if !(TARGET_IPHONE_SIMULATOR)
     self.session = [[AVCaptureSession alloc]init];
@@ -68,7 +69,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    [self.navigationController setNavigationBarHidden:NO];
+    [self setupNaviBar];
     [self.view.layer addSublayer:_captureLayer];
     [_session startRunning];
 }
@@ -208,12 +210,14 @@
             }
             return YES;
         } else if ([[elts firstObject] isEqualToString:@"_wx_devtool"]) {
+#ifdef DEBUG
             NSString *devToolURL = [[elts lastObject]  stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
             [WXDevTool launchDevToolDebugWithUrl:devToolURL];
             if ([[[self.navigationController viewControllers] objectAtIndex:0] isKindOfClass:NSClassFromString(@"WXDemoViewController")]) {
                 WXDemoViewController * vc = (WXDemoViewController*)[[self.navigationController viewControllers] objectAtIndex:0];
                 [self.navigationController popToViewController:vc animated:NO];
             }
+#endif
             
             return YES;
         }
