@@ -238,18 +238,21 @@ namespace WeexCore {
           case kTypeMargin:
             if (margin == nullptr)
               margin = new std::vector<std::pair<std::string, std::string> *>();
+            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
             margin->insert(margin->end(), (*styles)[i]);
             flag = true;
             break;
           case kTypePadding:
             if (padding == nullptr)
               padding = new std::vector<std::pair<std::string, std::string> *>();
+            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
             padding->insert(padding->end(), (*styles)[i]);
             flag = true;
             break;
           case kTypeBorder:
             if (border == nullptr)
               border = new std::vector<std::pair<std::string, std::string> *>();
+            (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
             border->insert(border->end(), (*styles)[i]);
             flag = true;
             break;

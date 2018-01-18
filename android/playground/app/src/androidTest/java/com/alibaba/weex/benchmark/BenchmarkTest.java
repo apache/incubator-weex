@@ -36,6 +36,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.alibaba.weex.BenchmarkActivity;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.BufferedReader;
@@ -88,10 +89,13 @@ public class BenchmarkTest {
   public void testFirstScreenPerformance() {
     List<Long> localTotalTime = new ArrayList<>(TIMES);
     List<Long> localLayoutTime = new ArrayList<>(TIMES);
+    WXSDKInstance instance;
+    BenchmarkActivity activity;
     for (int i = 0; i < TIMES; i++) {
-      WXPerformance performance = fetchPerformance();
-      long currentTime = performance.screenRenderTime;
-      long layoutTime = performance.mCallLayoutByWeexCoreSumTime;
+      activity = loadWeexPage();
+      instance =  activity.getWXInstance();
+      long currentTime = instance.nativePrintFirstScreenRenderTime(instance.getInstanceId());
+      long layoutTime = 1;
       localTotalTime.add(currentTime);
       localLayoutTime.add(layoutTime);
       Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity not kill) " + currentTime + "ms");
@@ -107,9 +111,9 @@ public class BenchmarkTest {
   @Repeat(TIMES)
   @Test
   public void testFirstFirstScreenPerformance() {
-    WXPerformance performance = fetchPerformance();
-    long currentTime = performance.screenRenderTime;
-    long layoutTime = performance.mCallLayoutByWeexCoreSumTime;
+    WXSDKInstance instance =  loadWeexPage().getWXInstance();
+    long currentTime = instance.nativePrintFirstScreenRenderTime(instance.getInstanceId());
+    long layoutTime = 1;
     firstScreenRenderTime.add(currentTime);
     firstScreenLayoutTime.add(layoutTime);
     Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity killed) " + currentTime + " ms");
