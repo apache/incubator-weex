@@ -75,17 +75,16 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   @Override
   public void executeAction() {
     try {
-      long start = System.currentTimeMillis();
-      parent.bindData(parent);
-      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutBindDataCoreTime(System.currentTimeMillis() - start);
-
       parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
 
-      start = System.currentTimeMillis();
+      long start = System.currentTimeMillis();
       parent.applyLayoutAndEvent(parent);
       WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);
 
+      start = System.currentTimeMillis();
+      parent.bindData(parent);
+      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutBindDataCoreTime(System.currentTimeMillis() - start);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }
