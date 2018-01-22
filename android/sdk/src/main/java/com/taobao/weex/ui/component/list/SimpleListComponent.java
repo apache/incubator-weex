@@ -21,7 +21,7 @@ package com.taobao.weex.ui.component.list;
 import android.content.Context;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 
@@ -32,8 +32,8 @@ import com.taobao.weex.ui.view.listview.WXRecyclerView;
  */
 public class SimpleListComponent extends BasicListComponent<SimpleRecyclerView>{
 
-  public SimpleListComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public SimpleListComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override

@@ -25,7 +25,7 @@ import android.util.Pair;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
@@ -39,8 +39,8 @@ public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<
 
   protected List<Widget> widgets = new LinkedList<>();
 
-  public WidgetContainer(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WidgetContainer(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   protected abstract void mountFlatGUI();

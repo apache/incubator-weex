@@ -30,7 +30,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
@@ -59,12 +59,12 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
 
     @Deprecated
-    public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-        super(instance, parent, commonCompData);
+    public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, basicComponentData);
     }
 
-    public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-        super(instance, parent, commonCompData);
+    public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, basicComponentData);
         if(Build.VERSION.SDK_INT< Build.VERSION_CODES.LOLLIPOP) {
             try {
                 //TODO a WTF is necessary if anyone try to change the flat flag during update attrs.

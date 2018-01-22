@@ -23,7 +23,7 @@ import android.view.Gravity;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
 
@@ -35,8 +35,8 @@ public class Textarea extends AbstractEditComponent {
   public static final int DEFAULT_ROWS = 2;
   private int mNumberOfLines = DEFAULT_ROWS;
 
-  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    super(instance, parent, isLazy, commonCompData);
+  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override

@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -44,17 +44,17 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private BoxShadowHost mBoxShadowHost;
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
   @Deprecated
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
-  public WXVContainer(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXVContainer(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   /**

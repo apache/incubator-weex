@@ -65,7 +65,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -156,27 +156,30 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
   @Deprecated
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, commonCompData);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    this(instance, parent, TYPE_COMMON, commonCompData);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    this(instance, parent, TYPE_COMMON, basicComponentData);
   }
 
-  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, CommonCompData commonCompData) {
-    super(commonCompData);
+  public WXComponent(WXSDKInstance instance, WXVContainer parent, int type, BasicComponentData basicComponentData) {
+    super(basicComponentData);
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
     mGestureType = new HashSet<>();
     ++mComponentNum;
+
+    if (instance != null)
+      setViewPortWidth(instance.getInstanceViewPortWidth());
 
     onCreate();
     ComponentObserver observer;
@@ -187,6 +190,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected final void copyData(WXComponent component) {
     super.copyData(component);
+    if (getInstance() != null)
+      setViewPortWidth(getInstance().getInstanceViewPortWidth());
     mParent = component.getParent();
     mType = component.getType();
   }
@@ -728,7 +733,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    */
   public final void setLayout(WXComponent component) {
 
-    if (TextUtils.isEmpty(component.getPageId()) || TextUtils.isEmpty(component.getComponentType())
+    if (TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
       return;
@@ -764,8 +769,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
 
-    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getLayoutY());
-    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getLayoutX());
+    mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
+    mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
     if (mHost == null) {
       return;
@@ -1907,13 +1912,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       //ignore
     }
     return false;
-  }
-
-  public int getViewPortWidth() {
-    if (mInstance != null)
-      return mInstance.getInstanceViewPortWidth();
-    else
-      return 750;
   }
 
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);

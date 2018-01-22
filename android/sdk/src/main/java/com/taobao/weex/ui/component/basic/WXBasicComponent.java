@@ -25,7 +25,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.dom.CSSShorthand;
@@ -45,26 +45,20 @@ public abstract class WXBasicComponent<T extends View> {
   private CSSShorthand mBorders;
 
   private Object mExtra;
-  private String mPageId;
   private String mComponentType;
-  private String mParentRef;
   private String mRef;
   private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
   private GraphicSize mLayoutSize = new GraphicSize(0, 0);
 
-  private int mViewPortWidth = 750;
+  private int mViewPortWidth =750;
 
-  public WXBasicComponent(CommonCompData commonCompData) {
-    this.mPageId = commonCompData.mPageId;
-    this.mRef = commonCompData.mRef;
-    this.mParentRef = commonCompData.mParentRef;
-    this.mComponentType = commonCompData.mComponentType;
+  public WXBasicComponent(BasicComponentData basicComponentData) {
+    this.mRef = basicComponentData.mRef;
+    this.mComponentType = basicComponentData.mComponentType;
   }
 
   protected void copyData(WXComponent component) {
-    mPageId = component.getPageId();
     mComponentType = component.getComponentType();
-    mParentRef = component.getParentRef();
     mRef = component.getRef();
   }
 
@@ -253,6 +247,14 @@ public abstract class WXBasicComponent<T extends View> {
     mBorders.set(spacingType, border);
   }
 
+  public int getViewPortWidth() {
+    return mViewPortWidth;
+  }
+
+  public void setViewPortWidth(int mViewPortWidth) {
+    this.mViewPortWidth = mViewPortWidth;
+  }
+
   public Object getExtra() {
     return mExtra;
   }
@@ -261,44 +263,44 @@ public abstract class WXBasicComponent<T extends View> {
     this.mExtra = extra;
   }
 
-  public String getPageId() {
-    return mPageId;
-  }
-
   public String getComponentType() {
     return mComponentType;
-  }
-
-  public String getParentRef() {
-    return mParentRef;
   }
 
   public String getRef() {
     return mRef;
   }
 
-  public GraphicPosition getLayoutPosition() {
+  protected GraphicPosition getLayoutPosition() {
     return mLayoutPosition;
   }
 
-  public void setLayoutPosition(GraphicPosition mLayoutPosition) {
+  protected void setLayoutPosition(GraphicPosition mLayoutPosition) {
     this.mLayoutPosition = mLayoutPosition;
   }
 
-  public GraphicSize getLayoutSize() {
+  protected GraphicSize getLayoutSize() {
     return mLayoutSize;
   }
 
-  public void setLayoutSize(GraphicSize mLayoutSize) {
+  protected void setLayoutSize(GraphicSize mLayoutSize) {
     this.mLayoutSize = mLayoutSize;
   }
 
-  public float getLayoutX() {
+  public float getCSSLayoutTop() {
+    return mLayoutPosition.getTop();
+  }
+
+  public float getCSSLayoutBottom() {
+    return mLayoutPosition.getBottom();
+  }
+
+  public float getCSSLayoutLeft() {
     return mLayoutPosition.getLeft();
   }
 
-  public float getLayoutY() {
-    return mLayoutPosition.getTop();
+  public float getCSSLayoutRight() {
+    return mLayoutPosition.getRight();
   }
 
   public float getLayoutWidth() {

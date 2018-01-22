@@ -30,7 +30,7 @@ import android.widget.FrameLayout;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -63,13 +63,13 @@ public class WXSliderNeighbor extends WXSlider {
 
     private ZoomTransformer mCachedTransformer;
 
-    public WXSliderNeighbor(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-        super(instance, parent, commonCompData);
+    public WXSliderNeighbor(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+        super(instance, parent, basicComponentData);
     }
 
     public static class Creator implements ComponentCreator {
-        public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-            return new WXSliderNeighbor(instance, parent, commonCompData);
+        public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXSliderNeighbor(instance, parent, basicComponentData);
         }
     }
 

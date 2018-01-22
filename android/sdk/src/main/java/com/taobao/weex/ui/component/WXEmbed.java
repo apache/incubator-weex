@@ -35,7 +35,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -166,12 +166,12 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, commonCompData);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     mListener = new EmbedRenderListener(this);
 
     ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270, instance.getInstanceViewPortWidth());

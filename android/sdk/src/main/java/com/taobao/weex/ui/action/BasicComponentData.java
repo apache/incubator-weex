@@ -18,15 +18,13 @@
  */
 package com.taobao.weex.ui.action;
 
-public class CommonCompData {
+public class BasicComponentData {
 
-  public String mPageId;
   public String mRef;
   public String mComponentType;
   public String mParentRef;
 
-  public CommonCompData(String pageId, String ref, String componentType, String parentRef) {
-    this.mPageId = pageId;
+  public BasicComponentData(String ref, String componentType, String parentRef) {
     this.mRef = ref;
     this.mComponentType = componentType;
     this.mParentRef = parentRef;

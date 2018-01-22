@@ -58,7 +58,7 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.layout.MeasureMode;
 import com.taobao.weex.layout.MeasureSize;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
@@ -110,19 +110,19 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   }
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance, parent, commonCompData);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXText(instance, parent, basicComponentData);
     }
   }
 
   @Deprecated
-  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, commonCompData);
+  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
   public WXText(WXSDKInstance instance,
-                WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+                WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       class SetSpanOperation {
 

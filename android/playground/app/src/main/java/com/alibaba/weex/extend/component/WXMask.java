@@ -30,7 +30,7 @@ import android.widget.PopupWindow;
 
 import com.alibaba.weex.extend.view.WXMaskView;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXVContainer;
 
 /**
@@ -42,8 +42,8 @@ public class WXMask extends WXVContainer {
   private PopupWindow mPopupWindow;
   private WXMaskView mContainerView;
 
-  public WXMask(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXMask(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
@@ -56,7 +56,7 @@ public class WXMask extends WXVContainer {
     mPopupWindow.setContentView(mContainerView);
     mPopupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
     mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getLayoutX(), (int) getLayoutY());
+    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getCSSLayoutLeft(), (int) getCSSLayoutTop());
 
     return mContainerView;
   }

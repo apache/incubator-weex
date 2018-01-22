@@ -47,7 +47,7 @@ import com.taobao.weex.dom.CSSConstants;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.layout.MeasureSize;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;
 import com.taobao.weex.ui.view.WXEditText;
@@ -84,8 +84,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private TextPaint mPaint = new TextPaint();
   private int mLineHeight = UNSET;
 
-  public AbstractEditComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    super(instance, parent, isLazy, commonCompData);
+  public AbstractEditComponent(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
     mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       /** uiThread = false **/

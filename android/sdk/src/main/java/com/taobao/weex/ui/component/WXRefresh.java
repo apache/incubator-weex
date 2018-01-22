@@ -25,7 +25,7 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXRefreshLayout;
@@ -45,12 +45,12 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   public static final String HIDE = "hide";
 
   @Deprecated
-  public WXRefresh(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXRefresh(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, CommonCompData commonCompData) {
-    super(instance, parent, lazy, commonCompData);
+  public WXRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, lazy, basicComponentData);
   }
 
   @Override

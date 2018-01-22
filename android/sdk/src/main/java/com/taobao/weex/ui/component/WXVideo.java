@@ -33,7 +33,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXVideoView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -54,12 +54,12 @@ public class WXVideo extends WXComponent<FrameLayout> {
   private boolean mError;
 
   @Deprecated
-  public WXVideo(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXVideo(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXVideo(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    super(instance, parent, isLazy, commonCompData);
+  public WXVideo(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override

@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
@@ -41,18 +41,18 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   private WidgetGroup mWidgetGroup;
 
   public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXDiv(instance, parent, commonCompData);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXDiv(instance, parent, basicComponentData);
     }
   }
 
   @Deprecated
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, commonCompData);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXDiv(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override

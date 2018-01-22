@@ -18,20 +18,10 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.text.TextPaint;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.CSSConstants;
-import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.layout.ContentBoxMeasurement;
-import com.taobao.weex.layout.MeasureSize;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXEditText;
-import com.taobao.weex.utils.TypefaceUtil;
-
-import static com.taobao.weex.dom.WXStyle.UNSET;
 
 /**
  *
@@ -41,12 +31,12 @@ import static com.taobao.weex.dom.WXStyle.UNSET;
 public class WXInput extends AbstractEditComponent{
 
   @Deprecated
-  public WXInput(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXInput(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    super(instance, parent, isLazy, commonCompData);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override

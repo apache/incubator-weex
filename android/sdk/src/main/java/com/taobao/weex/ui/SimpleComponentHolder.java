@@ -27,7 +27,7 @@ import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.MethodInvoker;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -64,16 +64,16 @@ public class SimpleComponentHolder implements IFComponentHolder{
       Class<? extends WXComponent> c = mCompClz;
       Constructor<? extends WXComponent> constructor;
       try {
-        constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, CommonCompData.class);
+        constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, BasicComponentData.class);
       } catch (NoSuchMethodException e) {
         WXLogUtils.d("ClazzComponentCreator", "Use deprecated component constructor");
         try {
           //compatible deprecated constructor with 4 args
-          constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, boolean.class, CommonCompData.class);
+          constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, boolean.class, BasicComponentData.class);
         } catch (NoSuchMethodException e1) {
           try {
             //compatible deprecated constructor with 5 args
-            constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, String.class, boolean.class, CommonCompData.class);
+            constructor = c.getConstructor(WXSDKInstance.class, WXVContainer.class, String.class, boolean.class, BasicComponentData.class);
           } catch (NoSuchMethodException e2) {
             throw new WXRuntimeException("Can't find constructor of component.");
           }
@@ -83,7 +83,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
     }
 
     @Override
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       if(mConstructor == null){
         loadConstructor();
       }
@@ -91,9 +91,9 @@ public class SimpleComponentHolder implements IFComponentHolder{
       WXComponent component;
 
       if(parameters == 3){
-        component =  mConstructor.newInstance(instance,parent,commonCompData);
+        component =  mConstructor.newInstance(instance,parent, basicComponentData);
       }else if(parameters == 4){
-        component =  mConstructor.newInstance(instance,parent,false,commonCompData);
+        component =  mConstructor.newInstance(instance,parent,false, basicComponentData);
       }else{
         //compatible deprecated constructor
         component =  mConstructor.newInstance(instance,parent,instance.getInstanceId(),parent.isLazy());
@@ -179,8 +179,8 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCreator.createInstance(instance, parent, commonCompData);
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    WXComponent component = mCreator.createInstance(instance, parent, basicComponentData);
 
     component.bindHolder(this);
     return component;

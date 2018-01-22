@@ -21,7 +21,7 @@ package com.taobao.weex.ui.component;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.list.WXCell;
 
 /**
@@ -31,12 +31,12 @@ import com.taobao.weex.ui.component.list.WXCell;
 public class WXHeader extends WXCell {
 
   @Deprecated
-  public WXHeader(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXHeader(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXHeader(WXSDKInstance instance, WXVContainer parent, boolean lazy, CommonCompData commonCompData) {
-    super(instance, parent, lazy, commonCompData);
+  public WXHeader(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, lazy, basicComponentData);
     String parantType = parent.getComponentType();
     if(WXBasicComponentType.LIST.equals(parantType)
             || WXBasicComponentType.RECYCLE_LIST.equals(parantType)){

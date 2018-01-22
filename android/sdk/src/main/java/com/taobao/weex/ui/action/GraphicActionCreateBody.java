@@ -22,7 +22,6 @@ import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXScroller;
@@ -59,8 +58,8 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
       return;
     }
 
-    CommonCompData commonCompData = new CommonCompData(getPageId(), getRef(), getComponentType(), null);
-    component = createComponent(instance, null, commonCompData);
+    BasicComponentData basicComponentData = new BasicComponentData(getRef(), getComponentType(), null);
+    component = createComponent(instance, null, basicComponentData);
     if (component == null) {
       return;
     }

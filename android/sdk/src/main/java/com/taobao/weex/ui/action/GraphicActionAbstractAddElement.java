@@ -44,9 +44,9 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     super(pageId, ref);
   }
 
-  protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
+  protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
 
-    WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, commonCompData);
+    WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
 
     if (component != null) {

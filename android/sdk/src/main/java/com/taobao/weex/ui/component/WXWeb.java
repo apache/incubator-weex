@@ -28,7 +28,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXUtils;
@@ -45,12 +45,12 @@ public class WXWeb extends WXComponent {
     protected IWebView mWebView;
 
     @Deprecated
-    public WXWeb(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-        this(instance, parent, isLazy, commonCompData);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+        this(instance, parent, isLazy, basicComponentData);
     }
 
-    public WXWeb(WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-        super(instance, parent, isLazy, commonCompData);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, isLazy, basicComponentData);
         createWebView();
     }
 

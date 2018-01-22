@@ -41,7 +41,7 @@ import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.IWXScroller;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
@@ -80,8 +80,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private Point mLastReport = new Point(-1, -1);
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXScroller(instance, parent, commonCompData);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXScroller(instance, parent, basicComponentData);
     }
   }
   /**
@@ -103,12 +103,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean isScrollable = true;
 
   @Deprecated
-  public WXScroller(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, commonCompData);
+  public WXScroller(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXScroller(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXScroller(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     stickyHelper = new WXStickyHelper(this);
   }
 

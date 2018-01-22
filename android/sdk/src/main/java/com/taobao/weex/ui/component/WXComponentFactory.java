@@ -25,7 +25,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -47,8 +47,8 @@ public class WXComponentFactory {
     sComponentTypes.remove(instanceId);
   }
 
-  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, CommonCompData commonCompData) {
-    if (instance == null || TextUtils.isEmpty(commonCompData.mComponentType)) {
+  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }
 
@@ -56,13 +56,13 @@ public class WXComponentFactory {
       Set<String> types = new HashSet<>();
       sComponentTypes.put(instance.getInstanceId(), types);
     }
-    sComponentTypes.get(instance.getInstanceId()).add(commonCompData.mComponentType);
+    sComponentTypes.get(instance.getInstanceId()).add(basicComponentData.mComponentType);
 
-    IFComponentHolder holder = WXComponentRegistry.getComponent(commonCompData.mComponentType);
+    IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
-                commonCompData.mComponentType + "]" + " class not found";
+                basicComponentData.mComponentType + "]" + " class not found";
         WXLogUtils.e(tag);
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
@@ -73,9 +73,9 @@ public class WXComponentFactory {
     }
 
     try {
-      return holder.createInstance(instance, parent, commonCompData);
+      return holder.createInstance(instance, parent, basicComponentData);
     } catch (Exception e) {
-      WXLogUtils.e("WXComponentFactory Exception type:[" + commonCompData.mComponentType + "] ", e);
+      WXLogUtils.e("WXComponentFactory Exception type:[" + basicComponentData.mComponentType + "] ", e);
     }
 
     return null;

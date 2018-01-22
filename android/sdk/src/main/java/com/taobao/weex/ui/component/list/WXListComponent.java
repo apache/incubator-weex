@@ -23,7 +23,7 @@ import android.content.Context;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
@@ -53,13 +53,13 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private float mPaddingRight;
 
   @Deprecated
-  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, CommonCompData commonCompData) {
-    this(instance, parent, isLazy, commonCompData);
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
 
-  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, CommonCompData commonCompData) {
-    super(instance, parent, commonCompData);
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     // TODO
 //    if (node != null && node instanceof WXRecyclerDomObject) {
 //      mDomObject = (WXRecyclerDomObject) node;
