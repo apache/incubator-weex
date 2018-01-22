@@ -26,10 +26,9 @@ import android.widget.CompoundButton;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.layout.MeasureSize;
-import com.taobao.weex.ui.action.CommonCompData;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -48,10 +47,8 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
     this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXSwitch(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+  public WXSwitch(final WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
     super(instance, parent, isLazy, basicComponentData);
-  public WXSwitch(final WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
-    super(instance, parent, isLazy, commonCompData);
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       /** uiThread = false **/
       @Override
