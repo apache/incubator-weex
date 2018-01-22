@@ -33,7 +33,7 @@
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <coreText/CoreText.h>
+#import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
