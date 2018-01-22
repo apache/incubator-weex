@@ -4,6 +4,8 @@
 #include <WeexCore/platform/android/jniprebuild/jniheader/WXBridge_jni.h>
 #include <WeexCore/platform/android/base/string/StringUtils.h>
 #include <WeexCore/render/manager/RenderManager.h>
+#include <WeexCore/render/page/RenderPage.h>
+#include <WeexCore/render/node/RenderObject.h>
 
 using namespace WeexCore;
 
@@ -34,6 +36,130 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   jThis = env->NewGlobalRef(jcaller);
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
+
+void static
+SetStyleWidth(JNIEnv* env, jobject jcaller,
+              jstring instanceId,
+              jstring ref,
+              jfloat value) {
+
+//    std::string mMessage = "SetStyleWidth=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+        return;
+    RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    render->setStyleWidth(value);
+}
+
+void static
+SetStyleHeight(JNIEnv* env, jobject jcaller,
+                        jstring instanceId,
+                        jstring ref,
+                        jfloat value) {
+
+//    std::string mMessage = "SetStyleHeight=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+      return;
+    RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    render->setStyleHeight(value);
+}
+
+static void SetMargin(JNIEnv* env, jobject jcaller,
+                      jstring instanceId,
+                      jstring ref,
+                      jint edge,
+                      jfloat value) {
+//    std::string mMessage = "SetMargin=" + std::to_string(value);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+        return;
+    RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    if (edge == 0) {
+        render->setMargin(kMarginTop, value);
+    } else if (edge == 1) {
+        render->setMargin(kMarginRight, value);
+    } else if (edge == 2) {
+        render->setMargin(kMarginBottom, value);
+    } else if (edge == 3) {
+        render->setMargin(kMarginLeft, value);
+    } else if (edge == 4) {
+        render->setMargin(kMarginALL, value);
+    }
+}
+
+static void SetPadding(JNIEnv* env, jobject jcaller,
+                      jstring instanceId,
+                      jstring ref,
+                      jint edge,
+                      jfloat value) {
+//    std::string mMessage = "SetPadding=" + std::to_string(value);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+        return;
+    RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    if (edge == 0) {
+        render->setPadding(kPaddingTop, value);
+    } else if (edge == 1) {
+        render->setPadding(kPaddingRight, value);
+    } else if (edge == 2) {
+        render->setPadding(kPaddingBottom, value);
+    } else if (edge == 3) {
+        render->setPadding(kPaddingLeft, value);
+    } else if (edge == 4) {
+        render->setPadding(kPaddingALL, value);
+    }
+}
+
+
+static void SetPosition(JNIEnv* env, jobject jcaller,
+                       jstring instanceId,
+                       jstring ref,
+                       jint edge,
+                       jfloat value) {
+//    std::string mMessage = "SetPosition=" + std::to_string(value);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+        return;
+    RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    if (edge == 0) {
+        render->setStylePosition(kPositionEdgeTop, value);
+    } else if (edge == 1) {
+        render->setStylePosition(kPositionEdgeRight, value);
+    } else if (edge == 2) {
+        render->setStylePosition(kPositionEdgeBottom, value);
+    } else if (edge == 3) {
+        render->setStylePosition(kPositionEdgeLeft, value);
+    }
+}
+
+static void CalculateLayout(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring ref) {
+//    std::string mMessage = "CalculateLayout=" + jString2Str(env, instanceId);
+//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
+    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+
+    if (page == nullptr)
+        return;
+    page->CalculateLayout();
+}
+
 
 static jint InitFramework(JNIEnv *env,
                           jobject object,

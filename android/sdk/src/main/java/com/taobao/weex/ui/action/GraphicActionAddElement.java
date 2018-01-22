@@ -20,6 +20,7 @@ package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
@@ -61,6 +62,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
     BasicComponentData basicComponentData = new BasicComponentData(getRef(), getComponentType(), getParentRef());
     child = createComponent(instance, parent, basicComponentData);
+    child.setTransition(WXTransition.fromMap(child.getStyles(), child));
 
     if (child == null || parent == null) {
       return;
@@ -72,16 +74,16 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   @Override
   public void executeAction() {
     try {
-      long start = System.currentTimeMillis();
-      parent.bindData(parent);
-      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutBindDataCoreTime(System.currentTimeMillis() - start);
+      parent.addChild(child, mIndex);
+      parent.createChildViewAt(mIndex);
 
-      start = System.currentTimeMillis();
+      long start = System.currentTimeMillis();
       parent.applyLayoutAndEvent(parent);
       WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);
 
-      parent.addChild(child, mIndex);
-      parent.createChildViewAt(mIndex);
+      start = System.currentTimeMillis();
+      parent.bindData(parent);
+      WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutBindDataCoreTime(System.currentTimeMillis() - start);
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

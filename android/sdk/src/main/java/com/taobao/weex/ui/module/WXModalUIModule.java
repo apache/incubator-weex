@@ -69,7 +69,9 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
         param = URLDecoder.decode(param, "utf-8");
         JSONObject jsObj = JSON.parseObject(param);
         message = jsObj.getString(MESSAGE);
-        duration = jsObj.getInteger(DURATION);
+        if (null !=  jsObj.getInteger(DURATION)) {
+          duration = jsObj.getInteger(DURATION);
+        }
       } catch (Exception e) {
         WXLogUtils.e("[WXModalUIModule] alert param parse error ", e);
       }

@@ -25,6 +25,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -47,6 +48,18 @@ public class WXBridge implements IWXBridge {
   private native int nativeExecJSService(String javascript);
 
   private native void nativeTakeHeapSnapshot(String filename);
+
+  private native void nativeSetStyleWidth(String instanceId, String ref, float value);
+
+  private native void nativeSetStyleHeight(String instanceId, String ref, float value);
+
+  private native void nativeSetMargin(String instanceId, String ref, int edge, float value);
+
+  private native void nativeSetPadding(String instanceId, String ref, int edge, float value);
+
+  private native void nativeSetPosition(String instanceId, String ref, int edge, float value);
+
+  private native void nativeCalculateLayout(String instanceId, String ref);
 
   public static final boolean MULTIPROCESS = true;
 
@@ -374,7 +387,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callUpdateStyleByWeexCore(String instanceId, String ref,
-                                       HashMap<String, String> styles,
+                                       HashMap<String, Object> styles,
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders) {
@@ -435,5 +448,48 @@ public class WXBridge implements IWXBridge {
   @Override
   public void callLogOfFirstScreen(String message) {
     WXLogUtils.logOfFirstScreen(message);
+  }
+
+  @Override
+  public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callHasTransitionPros(instanceId, ref, styles);
+    } catch (Throwable e) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "callLayout throw exception:" + e.getMessage());
+      }
+    }
+    return errorCode;
+  }
+
+  @Override
+  public void setStyleWidth(String instanceId, String ref, float value) {
+    nativeSetStyleWidth(instanceId, ref, value);
+  }
+
+  @Override
+  public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    nativeSetMargin(instanceId, ref, edge.ordinal(), value);
+  }
+
+  @Override
+  public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    nativeSetPadding(instanceId, ref, edge.ordinal(), value);
+  }
+
+  @Override
+  public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    nativeSetPosition(instanceId, ref, edge.ordinal(), value);
+  }
+
+  @Override
+  public void calculateLayout(String instanceId, String ref) {
+    nativeCalculateLayout(instanceId, ref);
+  }
+
+  @Override
+  public void setStyleHeight(String instanceId, String ref, float value) {
+    nativeSetStyleHeight(instanceId, ref, value);
   }
 }

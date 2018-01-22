@@ -18,11 +18,9 @@
  */
 package com.taobao.weex.common;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.dom.CSSShorthand;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,7 +104,7 @@ public interface IWXBridge extends IWXObject {
   int callMoveElement(String instanceId, String ref, String parentref, int index);
 
   public int callUpdateStyleByWeexCore(String instanceId, String ref,
-                                       HashMap<String, String> styles,
+                                       HashMap<String, Object> styles,
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders);
@@ -119,4 +117,18 @@ public interface IWXBridge extends IWXObject {
   int callCreateFinishByWeexCore(String instanceId);
 
   void callLogOfFirstScreen(String message);
+
+  int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
+
+  void setStyleWidth(String instanceId, String ref, float value);
+
+  void setStyleHeight(String instanceId, String ref, float value);
+
+  void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void calculateLayout(String instanceId, String ref);
 }

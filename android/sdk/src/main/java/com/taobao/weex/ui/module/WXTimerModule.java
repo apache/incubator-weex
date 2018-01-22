@@ -46,6 +46,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import com.taobao.weex.utils.WXUtils;
 
 public class WXTimerModule extends WXModule implements Destroyable, Handler.Callback {
 
@@ -66,14 +67,14 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   @JSMethod(uiThread = false)
   public void setTimeout(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float delay) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, WXUtils.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 
   @JSMethod(uiThread = false)
   public void setInterval(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float interval) {
     if(mWXSDKInstance != null) {
-      postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+      postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, WXUtils.parseInt(mWXSDKInstance.getInstanceId()));
     }
   }
 
@@ -160,12 +161,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void postOrHoldMessage(@MessageType final int what,final int funcId,final int interval,final int instanceId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-//      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
-//        @Override
-//        public void run() {
-//          postMessage(what,funcId,interval,instanceId);
-//        }
-//      }),false);
+      postMessage(what,funcId,interval,instanceId);
     } else {
       postMessage(what,funcId,interval,instanceId);
     }
@@ -173,12 +169,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void removeOrHoldMessage(@MessageType final int what,final int funcId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-//      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
-//        @Override
-//        public void run() {
-//          handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
-//        }
-//      }),false);
+      handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
     } else {
       handler.removeMessages(what, antiIntAutoBoxing.get(funcId, funcId));
     }

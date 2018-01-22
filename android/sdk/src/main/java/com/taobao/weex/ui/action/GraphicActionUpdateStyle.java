@@ -19,20 +19,21 @@
 package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.Map;
 
 public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
-  private Map<String, String> mStyle;
+  private Map<String, Object> mStyle;
   private Map<String, String> mPaddings;
   private Map<String, String> mMargins;
   private Map<String, String> mBorders;
   private WXComponent component;
 
   public GraphicActionUpdateStyle(String pageId, String ref,
-                                  Map<String, String> style,
+                                  Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,
                                   Map<String, String> borders) {
@@ -59,7 +60,15 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     if (component == null) {
       return;
     }
-    component.updateStyles(mStyle);
+    if(component.getTransition() != null){
+      component.getTransition().updateTranstionParams(mStyle);
+      if(component.getTransition().hasTransitionProperty(mStyle)){
+        component.getTransition().startTransition(mStyle);
+      }
+    } else {
+      component.setTransition(WXTransition.fromMap(mStyle, component));
+      component.updateStyles(mStyle);
+    }
   }
 }
 

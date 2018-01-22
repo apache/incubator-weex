@@ -2,6 +2,7 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <base/TimeUtils.h>
+#include <WeexCore/platform/android/base/string/StringUtils.h>
 #include "WXBridge_Impl_Android.h"
 
 static jmethodID jSetJSFrmVersionMethodId;
@@ -28,6 +29,7 @@ static jmethodID jSetAddMethodId;
 static jmethodID jCallCreateBodyByWeexCoreMethodId;
 static jmethodID jCallAddElementByWeexCoreMethodId;
 static jmethodID jCallUpdateStyleByWeexCoreMethodId;
+static jmethodID jCallHasTransitionProsByWeexCoreMethodId;
 static jmethodID jCallUpdateAttrsByWeexCoreMethodId;
 static jmethodID jCallLayoutByWeexCoreMethodId;
 static jmethodID jCallCreateFinishByWeexCoreMethodId;
@@ -665,4 +667,52 @@ namespace WeexCore {
 
     env->DeleteLocalRef(jMessageId);
   }
+
+  int
+  Bridge_Impl_Android::callHasTransitionPros(std::string &pageId, const std::string &ref,
+                                       std::vector<std::pair<std::string, std::string> *> *style) {
+    JNIEnv *env = getJNIEnv();
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    long long startTime = getCurrentTime();
+
+    if (jMapConstructorMethodId == NULL)
+      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
+    if (jMapPutMethodId == NULL)
+      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
+                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+    jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
+
+    if (style != nullptr) {
+      cpyCVector2JMap(style, jStyles, env);
+    }
+
+    page->CreateJMapJNITime(getCurrentTime() - startTime);
+
+    long long startTimeCallBridge = getCurrentTime();
+
+    if (jCallHasTransitionProsByWeexCoreMethodId == NULL)
+        jCallHasTransitionProsByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
+                                                            "callHasTransitionPros",
+                                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;)I");
+
+    jstring jPageId = env->NewStringUTF(pageId.c_str());
+    jstring jRef = env->NewStringUTF(ref.c_str());
+
+    int flag = 0;
+    flag = env->CallIntMethod(jThis, jCallHasTransitionProsByWeexCoreMethodId, jPageId, jRef, jStyles);
+
+    page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
+
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callHasTransitionPros");
+    }
+
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
+    env->DeleteLocalRef(jStyles);
+    return flag;
+  }
+
 } //end WeexCore
