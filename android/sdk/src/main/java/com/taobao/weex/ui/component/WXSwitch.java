@@ -20,13 +20,18 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.layout.MeasureSize;
+import com.taobao.weex.ui.action.CommonCompData;
 import com.taobao.weex.ui.view.WXSwitchView;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
@@ -45,6 +50,43 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
 
   public WXSwitch(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
     super(instance, parent, isLazy, basicComponentData);
+  public WXSwitch(final WXSDKInstance instance, WXVContainer parent, boolean isLazy, CommonCompData commonCompData) {
+    super(instance, parent, isLazy, commonCompData);
+    setContentBoxMeasurement(new ContentBoxMeasurement() {
+      /** uiThread = false **/
+      @Override
+      public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+        try {
+          WXSwitchView wxSwitchView = new WXSwitchView(instance.getContext());
+          int widthSpec, heightSpec;
+          heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+          if (Float.isNaN(width)) {
+            widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+          } else {
+            widthSpec = View.MeasureSpec.makeMeasureSpec((int) width, View.MeasureSpec.AT_MOST);
+          }
+
+          wxSwitchView.measure(widthSpec, heightSpec);
+          MeasureSize ret = new MeasureSize();
+          ret.setWidth(wxSwitchView.getMeasuredWidth());
+          ret.setHeight(wxSwitchView.getMeasuredHeight());
+          return ret;
+        } catch (RuntimeException e) {
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
+        }
+        return null;
+      }
+
+      /** uiThread = false **/
+      @Override
+      public void layoutBefore() {
+      }
+
+      /** uiThread = false **/
+      @Override
+      public void layoutAfter(float computedWidth, float computedHeight) {
+      }
+    });
   }
 
   @Override
