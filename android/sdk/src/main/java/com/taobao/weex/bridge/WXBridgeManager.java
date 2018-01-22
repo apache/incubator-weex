@@ -147,6 +147,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * Whether JS Framework(main.js) has been initialized.
    */
   private volatile static boolean mInit = false;
+
+
+
+  private static String globalConfig = "none";
+  private static String GLOBAL_CONFIG_KEY = "global_switch_config";
+
   /**
    * package
    **/
@@ -1667,7 +1673,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     builder.append("[");
     for(WXJSObject object : args){
       if(object.type == WXJSObject.WSON){
-        object = new WXJSObject(WXJSObject.WSON, Wson.parse((byte[]) object.data));
+        object = new WXJSObject(WXJSObject.WSON, WXJsonUtils.parseWson(((byte[]) object.data)));
       }
       builder.append(WXJsonUtils.fromObjectToJSONString(object));
       builder.append(",");
@@ -2137,6 +2143,43 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
+  /**
+   * update js server global config, current support turn wson off
+   * by pass wson_off
+   * */
+  public static void  updateGlobalConfig(String config){
+    if(TextUtils.isEmpty(config)){
+      config = "none";
+    }
+    if(!TextUtils.equals(config, globalConfig)){
+      globalConfig = config;
+      WXEnvironment.getCustomOptions().put(GLOBAL_CONFIG_KEY, globalConfig);
+      Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+          if(mBridgeManager != null){
+            if(mBridgeManager.isJSFrameworkInit()){
+              if(mBridgeManager.mWXBridge instanceof WXBridge) {
+                final WXBridge bridge = (WXBridge) mBridgeManager.mWXBridge;
+                bridge.updateGlobalConfig(globalConfig);
+              }
+            }
+          }
+          if(globalConfig.contains("wson_off")){
+            WXJsonUtils.USE_WSON = false;
+          }else{
+            WXJsonUtils.USE_WSON = true;
+          }
+        }
+      };
+      if(mBridgeManager != null && mBridgeManager.isJSFrameworkInit()){
+         mBridgeManager.post(runnable);
+      }else{
+         runnable.run();
+      }
+    }
+  }
+
   public
   @Nullable
   Looper getJSLooper() {
@@ -2173,5 +2216,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     public long time;
     public String instanceId;
   }
+
+
 
 }

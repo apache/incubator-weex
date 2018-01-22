@@ -104,5 +104,5 @@ dependencies {
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-    compile 'com.taobao.android:weex_inspector:0.11.0'
+    compile 'com.taobao.android:weex_inspector:0.13.4'
 }

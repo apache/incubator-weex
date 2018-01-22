@@ -92,6 +92,12 @@ class WXBridge implements IWXBridge {
   public native void takeHeapSnapshot(String filename);
 
 
+  /**
+   * update global config,
+   * @param config params
+   * */
+  public native void  updateGlobalConfig(String config);
+
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
     if (MULTIPROCESS) {
       return initFrameworkMultiProcess(framework, params, cacheDir, pieSupport);

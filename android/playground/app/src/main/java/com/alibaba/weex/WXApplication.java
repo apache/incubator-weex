@@ -43,6 +43,7 @@ import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
@@ -61,6 +62,8 @@ public class WXApplication extends Application {
      * Fresco.initialize(this,config);
      **/
 //    initDebugEnvironment(true, false, "DEBUG_SERVER_HOST");
+    WXBridgeManager.updateGlobalConfig("wson_off");
+    WXEnvironment.setApkDebugable(true);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
