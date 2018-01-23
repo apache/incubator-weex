@@ -140,7 +140,6 @@ namespace WeexCore {
     PushRenderToRegisterMap(child);
 
     // add child to Render Tree
-    child->SetParentRender(parent);
     parent->AddRenderObject(insertPosition, child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
 //    std::string mMessage = "start sendAddElementAction";

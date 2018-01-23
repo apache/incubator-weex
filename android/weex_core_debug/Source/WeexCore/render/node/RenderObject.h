@@ -139,6 +139,8 @@ namespace WeexCore {
       } else {
         addChildAt(child, index);
       }
+
+      child->SetParentRender(this);
     }
 
     inline void RemoveRenderObject(RenderObject *child) {
