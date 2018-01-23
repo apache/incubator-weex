@@ -123,6 +123,15 @@ public class ImageDrawable extends PaintDrawable {
     super.setCornerRadii(radii);
   }
 
+  @Override
+  protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP && paint != null) {
+      // API21 set antiAlias false，fix native crash on API21
+      paint.setAntiAlias(false);
+    }
+    super.onDraw(shape, canvas, paint);
+  }
+
   public
   @Nullable
   float[] getCornerRadii() {
