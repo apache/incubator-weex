@@ -51,7 +51,7 @@ typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
 @property(nonatomic,strong) NSMutableArray *propertyArray;
 @property(nonatomic,assign) WXTransitionOptions transitionOptions;
 - (instancetype) initWithStyles:(NSDictionary *)styles;
-- (void)_handleTransitionWithStyles:(NSDictionary *)styles withTarget:(WXComponent *)targetComponent;
+- (void)_handleTransitionWithStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles  target:(WXComponent *)targetComponent;
 @end
 
 

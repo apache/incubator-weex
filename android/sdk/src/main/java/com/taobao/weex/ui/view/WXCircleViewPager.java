@@ -143,11 +143,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     if(!scrollable) {
       return true;
     }
-    boolean result = super.onTouchEvent(ev);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, ev);
-    }
-    return result;
+    return super.onTouchEvent(ev);
   }
 
   @Override
@@ -237,7 +233,11 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
         }
         break;
     }
-    return super.dispatchTouchEvent(ev);
+    boolean result = super.dispatchTouchEvent(ev);
+    if (wxGesture != null) {
+      result |= wxGesture.onTouch(this, ev);
+    }
+    return result;
   }
 
   public void destory() {

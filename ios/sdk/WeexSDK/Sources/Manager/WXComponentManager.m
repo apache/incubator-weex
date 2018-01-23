@@ -124,7 +124,7 @@ static NSThread *WXComponentThread;
     }
 }
 
-+ (void)_performBlockOnComponentThread:(void (^)())block
++ (void)_performBlockOnComponentThread:(void (^)(void))block
 {
     if([NSThread currentThread] == [self componentThread]){
         block();
@@ -136,7 +136,7 @@ static NSThread *WXComponentThread;
     }
 }
 
-+ (void)_performBlockSyncOnComponentThread:(void (^)())block
++ (void)_performBlockSyncOnComponentThread:(void (^)(void))block
 {
     if([NSThread currentThread] == [self componentThread]){
         block();
@@ -180,7 +180,7 @@ static NSThread *WXComponentThread;
     _rootCSSNode->style.dimensions[CSS_HEIGHT] =  self.weexInstance.frame.size.height ?: CSS_UNDEFINED;
 }
 
-- (void)_addUITask:(void (^)())block
+- (void)_addUITask:(void (^)(void))block
 {
     if(!_uiPrerenderTaskQueue){
         _uiPrerenderTaskQueue = [NSMutableDictionary new];
@@ -668,7 +668,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
         
-        WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
+        //WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTAllRender, instance);
         WX_MONITOR_SUCCESS(WXMTJSBridge);
         WX_MONITOR_SUCCESS(WXMTNativeRender);
@@ -895,12 +895,12 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 @end
 
-void WXPerformBlockOnComponentThread(void (^block)())
+void WXPerformBlockOnComponentThread(void (^block)(void))
 {
     [WXComponentManager _performBlockOnComponentThread:block];
 }
 
-void WXPerformBlockSyncOnComponentThread(void (^block)())
+void WXPerformBlockSyncOnComponentThread(void (^block)(void))
 {
     [WXComponentManager _performBlockSyncOnComponentThread:block];
 }

@@ -88,14 +88,18 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     if(!scrollable) {
       return true;
     }
+    return super.onTouchEvent(event);
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent event) {
     hasTouch = true;
-    boolean result = super.onTouchEvent(event);
+    boolean result = super.dispatchTouchEvent(event);
     if (mGesture != null) {
       result |= mGesture.onTouch(this, event);
     }
     return result;
   }
-
 
   public void scrollTo(boolean smooth, int position, final  int offset, final int orientation){
     if (!smooth) {
@@ -130,22 +134,17 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   }
 
   public void setOnSmoothScrollEndListener(final ExtendedLinearLayoutManager.OnSmoothScrollEndListener onSmoothScrollEndListener){
-    if(getLayoutManager() instanceof ExtendedLinearLayoutManager && !hasTouch){
-       ExtendedLinearLayoutManager extendedLinearLayoutManager = (ExtendedLinearLayoutManager)getLayoutManager();
-      extendedLinearLayoutManager.setOnScrollEndListener(onSmoothScrollEndListener);
-    }else{
-      addOnScrollListener(new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-          if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-              recyclerView.removeOnScrollListener(this);
-              if(onSmoothScrollEndListener != null){
-                   onSmoothScrollEndListener.onStop();
-              }
+    addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+          recyclerView.removeOnScrollListener(this);
+          if(onSmoothScrollEndListener != null){
+            onSmoothScrollEndListener.onStop();
           }
         }
-      });
-    }
+      }
+    });
   }
 
 }

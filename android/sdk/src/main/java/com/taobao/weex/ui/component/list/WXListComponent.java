@@ -83,7 +83,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   protected BounceRecyclerView generateListView(Context context, int orientation) {
     BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
     if(bounceRecyclerView.getSwipeLayout()  != null){
-      if(WXUtils.getBoolean(getDomObject().getAttrs().get("nestedScrollingEnabled"), false)) {
+      if(WXUtils.getBoolean(getDomObject().getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), false)) {
           bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }

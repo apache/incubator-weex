@@ -157,7 +157,7 @@
     if (_async) {
         WXThreadSafeCounter *displayCounter = _displayCounter;
         int32_t displayValue = [displayCounter increase];
-        BOOL (^isCancelled)() = ^BOOL(){
+        BOOL (^isCancelled)(void) = ^BOOL(){
             return displayValue != displayCounter.value;
         };
         

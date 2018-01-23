@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#00B4FF</color>
+    <color name="colorPrimaryDark">#00B4FF</color>
     <color name="colorAccent">#FF4081</color>
 
     <color name="black_overlay">#66000000</color>

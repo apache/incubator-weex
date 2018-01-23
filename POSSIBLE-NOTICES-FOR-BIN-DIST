@@ -10,24 +10,6 @@ by Tom Preston-Werner , licensed under the Creative Commons - CC BY 3.0 License.
 This product contains software core-js(https://github.com/zloirock/core-js) developed
 by Denis Pushkarev , licensed under the MIT License.
 
-This product contains software animaitonjs(https://github.com/MrRaindrop/animationjs) developed
-by mr.raindrop  , licensed under the MIT License.
-
-This product contains software cubicbezier(https://github.com/MrRaindrop/cubicbezier) developed
-by mr.raindrop  , licensed under the MIT License.
-
-This product contains software envd(https://github.com/MrRaindrop/envd) developed
-by mr.raindrop  , licensed under the MIT License.
-
-This product contains software httpurl(https://github.com/MrRaindrop/httpurl) developed
-by mr.raindrop  , licensed under the MIT License.
-
-This product contains software lazyimg(https://github.com/MrRaindrop/lazyimg) developed
-by mr.raindrop  , licensed under the MIT License.
-
-This product contains software modals(https://github.com/MrRaindrop/modals) developed
-by mr.raindrop  , licensed under the MIT License.
-
 This product contains software autoprefixer(https://github.com/postcss/autoprefixer) developed
 by postcss , licensed under the MIT License.
 
@@ -43,18 +25,14 @@ by yuanyan  , licensed under the BSD-3-Clause License.
 This product contains software weex-vue-framework(https://github.com/vuejs/vue) developed
 by fkysly  , licensed under the MIT License.
 
+This product contains software weex-vue-render(https://github.com/vuejs/vue) developed
+by MrRaindrop  , licensed under the Apache 2.0 License.
+
 This product contains software weex-styler(https://github.com/weexteam/weex-styler) developed
 by songsiqi  , licensed under the MIT License.
 
 This product contains software vuejs(https://github.com/vuejs/vue) developed
 by Yuxi Evan You , licensed under the MIT License.
-
-This product contains software scroll-to (https://github.com/component/scroll-to) developed
-by TooTallNate , licensed under the MIT License.
-
-This product contains software inline-style-prefixer
-(https://github.com/rofrischmann/inline-style-prefixer) developed by
-rofrischmann , licensed under the MIT License.
 
 This product contains software fastjson(https://github.com/alibaba/fastjson) developed
 by alibaba inc.  , licensed under the Apache 2.0 License.

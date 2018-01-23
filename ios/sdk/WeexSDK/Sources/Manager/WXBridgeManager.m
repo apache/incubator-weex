@@ -110,12 +110,12 @@ static NSThread *WXBridgeThread;
 }
 
 
-void WXPerformBlockOnBridgeThread(void (^block)())
+void WXPerformBlockOnBridgeThread(void (^block)(void))
 {
     [WXBridgeManager _performBlockOnBridgeThread:block];
 }
 
-+ (void)_performBlockOnBridgeThread:(void (^)())block
++ (void)_performBlockOnBridgeThread:(void (^)(void))block
 {
     if ([NSThread currentThread] == [self jsThread]) {
         block();

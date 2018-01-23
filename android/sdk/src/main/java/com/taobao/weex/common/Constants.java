@@ -192,6 +192,17 @@ public class Constants {
     String HAS_FIXED_SIZE = "hasFixedSize";
     String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
 
+    String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
+    String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
+
+    String PRIORITY  = "priority";
+
+    String STRATEGY  = "strategy";
+
+
+
+
+
     interface  Recycler{
       String LIST_DATA = "listData";
       String LIST_DATA_ITEM  ="alias";
@@ -209,6 +220,13 @@ public class Constants {
     String UNDEFINED = "undefined";
     String FLAT = "flat";
     String RIPPLE_ENABLED = "rippleEnabled";
+
+
+    String SHOULD_STOP_PROPAGATION_INIT_RESULT = "shouldStopPropagationInitResult";
+    String SHOULD_STOP_PROPAGATION_INTERVAL = "shouldStopPropagationInterval";
+
+
+    String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
   }
 
   public interface Value {
@@ -302,6 +320,11 @@ public class Constants {
       String DETACH = "detach";
       String DESTORY = "destroy";
     }
+
+
+    String SHOULD_STOP_PROPAGATION = "shouldStopPropagation";
+
+
 
   }
 

@@ -29,6 +29,7 @@ import android.widget.ImageView;
 
 import com.taobao.weappplus_sdk.R;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -39,8 +40,22 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
 @Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer{
+
+
+  public static final  String STRATEGY_NONE =  "none";
+  public static final  String STRATEGY_NORMAL =  "normal";
+  public static final  String STRATEGY_HIGH =  "high";
+
+
+  public static final  String PRIORITY_LOW =  "low";
+  public static final  String PRIORITY_NORMAL =  "normal";
+  public static final  String PRIORITY_HIGH =  "high";
 
   public static final String ITEM_ID = "itemId";
 
@@ -51,6 +66,13 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private boolean mIsVisible = true;
   private EmbedRenderListener mListener;
+
+
+  private String priority = PRIORITY_NORMAL;
+
+  private String strategy = "normal";  //none, normal, high(ignore priority)
+
+  private long hiddenTime;
 
   public interface EmbedManager {
     WXEmbed getEmbed(String itemId);
@@ -182,6 +204,8 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
       }
     }
+    this.priority = WXUtils.getString(node.getAttrs().get(Constants.Name.PRIORITY), PRIORITY_NORMAL);
+    this.strategy = WXUtils.getString(node.getAttrs().get(Constants.Name.STRATEGY), STRATEGY_NONE);
   }
 
   @Override
@@ -201,6 +225,12 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         String src = WXUtils.getString(param,null);
         if (src != null)
           setSrc(src);
+        return true;
+      case Constants.Name.PRIORITY:
+        String priority = WXUtils.getString(param,null);
+        if (priority != null){
+           setPriority(priority);
+        }
         return true;
     }
     return super.setProperty(key, param);
@@ -245,6 +275,15 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     return src;
   }
 
+
+  @WXComponentProp(name = Constants.Name.PRIORITY)
+  public void setPriority(String priority) {
+       if(TextUtils.isEmpty(priority)){
+         return;
+       }
+       this.priority = priority;
+  }
+
   /**
    * Load embed content, default behavior is create a nested instance.
    */
@@ -256,6 +295,20 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         mListener.mEventListener.onCreated(this, mNestedInstance);
       }
     }
+  }
+
+  private static final int getLevel(WXEmbed embed){
+    String priority = embed.priority;
+    String strategy = embed.strategy;
+    int level  = 5;
+    if(!STRATEGY_HIGH.equals(strategy)) {
+      if (TextUtils.equals(priority, PRIORITY_LOW)) {
+        level = 0;
+      } else if (TextUtils.equals(priority, PRIORITY_HIGH)) {
+        level = 10;
+      }
+    }
+    return  level;
   }
 
   private WXSDKInstance createInstance() {
@@ -293,33 +346,83 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public void setVisibility(String visibility) {
     super.setVisibility(visibility);
     boolean visible = TextUtils.equals(visibility, Constants.Value.VISIBLE);
-    if (!TextUtils.isEmpty(src) && visible) {
-      if (mNestedInstance == null) {
-        loadContent();
-      } else {
-        mNestedInstance.onViewAppear();
+    if(mIsVisible != visible){
+      
+      if (!TextUtils.isEmpty(src) && visible) {
+        if (mNestedInstance == null) {
+          loadContent();
+        } else {
+          mNestedInstance.onViewAppear();
+        }
       }
-    }
 
-    if (!visible) {
-      if (mNestedInstance != null) {
-        mNestedInstance.onViewDisappear();
+      if (!visible) {
+        if (mNestedInstance != null) {
+          mNestedInstance.onViewDisappear();
+        }
       }
+      mIsVisible = visible;
+      doAutoEmbedMemoryStrategy();
     }
-    mIsVisible = visible;
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    if (mNestedInstance != null) {
-      mNestedInstance.destroy();
-      mNestedInstance = null;
-    }
+    destoryNestInstance();
     src = null;
     if (getInstance() != null) {
       getInstance().removeOnInstanceVisibleListener(this);
     }
+  }
+
+
+  private void  doAutoEmbedMemoryStrategy(){
+    /**
+     * auto manage embed amount in current instance, save memory
+     * */
+    if(!STRATEGY_NONE.equals(this.strategy)){
+      if(!mIsVisible && mNestedInstance != null){
+        if(PRIORITY_LOW.equals(this.priority)){
+          destoryNestInstance();
+        }else{
+          if(getInstance().hiddenEmbeds == null){ // low is in front, when priority is same, hidden time pre in first
+            getInstance().hiddenEmbeds = new PriorityQueue<>(8, new Comparator<WXEmbed>() {
+              @Override
+              public int compare(WXEmbed o1, WXEmbed o2) {
+                int level =  getLevel(o1) - getLevel(o2);
+                if(level != 0){
+                  return  level;
+                }
+                return (int) (o1.hiddenTime - o2.hiddenTime);
+              }
+            });
+          }
+          //getInstance().hiddenEmbeds.remove(this);
+          if(!getInstance().hiddenEmbeds.contains(this)) {
+            this.hiddenTime = System.currentTimeMillis();
+            getInstance().hiddenEmbeds.add(this);
+          }
+          if(getInstance().hiddenEmbeds != null && getInstance().getMaxHiddenEmbedsNum() >= 0){
+            while (getInstance().hiddenEmbeds.size() > getInstance().getMaxHiddenEmbedsNum()){
+              WXEmbed embed = getInstance().hiddenEmbeds.poll();
+              if(embed.mIsVisible){
+                continue;
+              }
+              if(embed != null) {
+                embed.destoryNestInstance();
+              }
+            }
+          }
+        }
+      }
+      if(mIsVisible && mNestedInstance != null){
+        if(getInstance().hiddenEmbeds != null && getInstance().hiddenEmbeds.contains(this)){
+          getInstance().hiddenEmbeds.remove(this);
+        }
+      }
+    }
+
   }
 
   @Override
@@ -379,6 +482,25 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     super.onActivityDestroy();
     if (mNestedInstance != null) {
       mNestedInstance.onActivityDestroy();
+    }
+  }
+
+  public void setStrategy(String strategy) {
+    this.strategy = strategy;
+  }
+
+  private void destoryNestInstance(){
+    if(getInstance().hiddenEmbeds != null && getInstance().hiddenEmbeds.contains(this)){
+        getInstance().hiddenEmbeds.remove(this);
+    }
+    if (mNestedInstance != null) {
+       mNestedInstance.destroy();
+       mNestedInstance = null;
+    }
+    if(WXEnvironment.isApkDebugable()){
+       WXLogUtils.w("WXEmbed destoryNestInstance priority " + priority + " index " + getDomObject().getAttrs().get("index")
+        + "  " + hiddenTime  + " embeds size " + (getInstance().hiddenEmbeds == null ?  0 : getInstance().hiddenEmbeds.size())
+       + " strategy " + this.strategy);
     }
   }
 }

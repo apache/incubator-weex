@@ -273,7 +273,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             [infos addObject:info];
         } else if ([property isEqualToString:@"width"]) {
             if (_needLayout) {
-                [self animationWithLayoutAnimationTarget:target handleProperty:property withDic:args];
+                [self animationWithTransitionTarget:target handleProperty:property withDic:args];
             }
             else
             {
@@ -286,7 +286,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
         } else if ([property isEqualToString:@"height"]) {
             if (_needLayout) {
-                [self animationWithLayoutAnimationTarget:target handleProperty:property withDic:args];
+                [self animationWithTransitionTarget:target handleProperty:property withDic:args];
             }
             else
             {
@@ -302,7 +302,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     return infos;
 }
 
-- (void)animationWithLayoutAnimationTarget:(WXComponent *)target handleProperty:(NSString *)property withDic:(NSDictionary *)args
+- (void)animationWithTransitionTarget:(WXComponent *)target handleProperty:(NSString *)property withDic:(NSDictionary *)args
 {
     NSDictionary *styles = args[@"styles"];
     _transition.addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
@@ -361,7 +361,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction commit];
     if (_needLayout) {
         WXPerformBlockOnComponentThread(^{
-            [_transition _handleTransitionWithStyles:_transition.addStyles withTarget:targetComponent];
+            [_transition _handleTransitionWithStyles:_transition.addStyles resetStyles:nil target:targetComponent];
         });
     }
 }

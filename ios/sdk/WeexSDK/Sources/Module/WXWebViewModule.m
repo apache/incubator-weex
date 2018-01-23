@@ -50,7 +50,7 @@ WX_EXPORT_METHOD(@selector(goForward:))
     });
 }
 
-- (void)doBlock:(void (^)())block {
+- (void)doBlock:(void (^)(void))block {
     block();
 }
 
