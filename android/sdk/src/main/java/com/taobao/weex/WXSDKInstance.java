@@ -115,6 +115,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private RenderContainer mRenderContainer;
   private WXComponent mRootComp;
   private boolean mRendered;
+  private boolean mIsPaused = false;
   private WXRefreshData mLastRefreshData;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
@@ -907,12 +908,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       mContext.sendBroadcast(intent);
       this.mCurrentGround = true;
     }
+    mIsPaused = true;
   }
 
 
   @Override
   public void onActivityResume() {
-
+    mIsPaused = false;
     // notify onActivityResume callback to module
     WXModuleManager.onActivityResume(getInstanceId());
 
@@ -1431,7 +1433,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void setSize(int width, int height) {
-    if (width < 0 || height < 0 || isDestroy || !mRendered) {
+    if (width < 0 || height < 0 || isDestroy || !mRendered || mIsPaused) {
       return;
     }
     float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());

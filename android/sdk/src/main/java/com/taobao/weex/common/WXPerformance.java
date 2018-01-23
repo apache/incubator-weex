@@ -165,6 +165,11 @@ public class WXPerformance {
   public String errCode;
 
   /**
+   * 网络连接耗时
+   */
+  public long connectTime = 0;
+
+  /**
    * Error message
    */
   @Deprecated
@@ -272,43 +277,51 @@ public class WXPerformance {
   public String toString() {
     if (WXEnvironment.isApkDebugable()) {
       return "bizType:" + bizType + ",pageName:" + pageName + ",templateLoadTime" + templateLoadTime
-             + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
-             + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
-             + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
-             + ",screenRenderTime:" + screenRenderTime
-             + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-             + ",componentCount:" + componentCount
-             + ",syncTaskTime:" + syncTaskTime
-             + ",pureNetworkTime:" + pureNetworkTime
-             + ",networkTime:" + networkTime
-             + ",actualNetworkTime:" + actualNetworkTime
-             + ",packageSpendTime:" + packageSpendTime
-             + ",connectionType:" + connectionType
-             + ",requestType:" + requestType
-             + ",initInvokeTime:"+WXEnvironment.sSDKInitInvokeTime+",initExecuteTime:"+WXEnvironment.sSDKInitExecuteTime
-             + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
-             + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
-             + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
-             + ",arg:" + args
-             + ",errMsg:" + getErrMsg();
+              + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
+              + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
+              + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
+              + ",screenRenderTime:" + screenRenderTime
+              + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + ",componentCount:" + componentCount
+              + ",syncTaskTime:" + syncTaskTime
+              + ",pureNetworkTime:" + pureNetworkTime
+              + ",networkTime:" + networkTime
+              + ",actualNetworkTime:" + actualNetworkTime
+              + ",packageSpendTime:" + packageSpendTime
+              + ",connectionType:" + connectionType
+              + ",requestType:" + requestType
+              + ",initInvokeTime:"+WXEnvironment.sSDKInitInvokeTime+",initExecuteTime:"+WXEnvironment.sSDKInitExecuteTime
+              + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
+              + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
+              + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
+              + ",arg:" + args
+              + ",errMsg:" + getErrMsg();
     }
     return super.toString();
   }
+
   public String getPerfData(){
-      return  "networkTime:" + networkTime
-              + " actualNetworkTime:" + actualNetworkTime
-              + " connectionType:" + connectionType
-              + " requestType:" + requestType
-              + " firstScreenRenderTime:" + screenRenderTime
-              + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-              + " componentCount:" + componentCount
-              + " JSTemplateSize:" + JSTemplateSize
-              + " SDKInitTime:" + WXEnvironment.sSDKInitTime
-              + " totalTime:" + totalTime
-              + " JSLibVersion:" + JSLibVersion
-              + " WXSDKVersion:" + WXSDKVersion
-              + " pageName:" + pageName
-              + " useScroller:" + useScroller;
+    return  "networkTime:" + networkTime
+            + " actualNetworkTime:" + actualNetworkTime
+            + " connectionType:" + connectionType
+            + " requestType:" + requestType
+            + " firstScreenRenderTime:" + screenRenderTime
+            + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+            + " callNativeTime:" + callNativeTime
+            + " parseJsonTime:" + parseJsonTime
+            + " batchTime:" + batchTime
+            + " updateDomObjectTime:" + updateDomObjTime
+            + " cssLayoutTime:" + cssLayoutTime
+            + " applyUpdateStateTime:" + applyUpdateTime
+            + " connectTime:" + connectTime
+            + " componentCount:" + componentCount
+            + " JSTemplateSize:" + JSTemplateSize
+            + " SDKInitTime:" + WXEnvironment.sSDKInitTime
+            + " totalTime:" + totalTime
+            + " JSLibVersion:" + JSLibVersion
+            + " WXSDKVersion:" + WXSDKVersion
+            + " pageName:" + pageName
+            + " useScroller:" + useScroller;
 
   }
 
