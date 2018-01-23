@@ -705,10 +705,6 @@ namespace WeexCore {
 
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
-    if (flag == -1) {
-      LOGE("instance destroy JFM must stop callHasTransitionPros");
-    }
-
     env->DeleteLocalRef(jPageId);
     env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);

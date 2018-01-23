@@ -329,6 +329,10 @@ namespace WeexCore {
       }
     }
 
+    if (render != nullptr) {
+      render->ApplyDefaultStyle();
+    }
+
     return render;
   }
 
