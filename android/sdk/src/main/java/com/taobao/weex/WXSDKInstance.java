@@ -1015,7 +1015,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    nativePrintRenderFinishTime(getInstanceId());
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativePrintRenderFinishTime(getInstanceId());
+      }
+    });
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1222,7 +1227,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      nativePrintFirstScreenRenderTime(getInstanceId());
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativePrintFirstScreenRenderTime(getInstanceId());
+      }
+    });
   }
 
   public void createInstanceFinished(long time) {
