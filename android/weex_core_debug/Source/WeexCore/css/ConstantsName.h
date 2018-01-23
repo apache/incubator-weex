@@ -7,6 +7,7 @@
 namespace WeexCore {
 
   const std::string FLEX = "flex";
+  const std::string HORIZONTAL = "horizontal";
   const std::string ALIGN_ITEMS = "alignItems";
   const std::string ALIGN_SELF = "alignSelf";
   const std::string FLEX_DIRECTION = "flexDirection";
@@ -23,6 +24,7 @@ namespace WeexCore {
 
   const std::string DEFAULT_WIDTH = "defaultWidth";
   const std::string WIDTH = "width";
+  const std::string SCROLL_DIRECTION = "scrollDirection";
 
   const std::string POSITION = "position";
 
