@@ -55,12 +55,12 @@ WX_EXPORT_METHOD(@selector(fireNativeGlobalEvent:callback:))
  a test method for macaca case, you can fire globalEvent when download finish、device shaked and so on.
  @param event event name
  */
-- (void)fireNativeGlobalEvent:(NSString *)event callback:(WXModuleCallback)callback
+- (void)fireNativeGlobalEvent:(NSString *)event callback:(WXKeepAliveCallback)callback
 {
     [weexInstance fireGlobalEvent:event params:@{@"eventParam":@"eventValue"}];
     if (callback) {
         NSDictionary * result = @{@"ok": @true};
-        callback(result);
+        callback(result,false);
     }
 }
 
