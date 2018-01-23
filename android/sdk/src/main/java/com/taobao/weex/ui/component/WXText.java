@@ -25,18 +25,19 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Layout;
-import android.view.ViewGroup;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
-import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -198,23 +199,28 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
         if (!mFontFamily.equals(fontFamily)) {
           return;
         }
-
-        FontDO fontDO = TypefaceUtil.getFontDO(fontFamily);
-        if (fontDO != null && fontDO.getTypeface() != null && getHostView() != null) {
-          WXTextView hostView = getHostView();
-          Layout layout = hostView.getTextLayout();
-          if (layout != null) {
-            layout.getPaint().setTypeface(fontDO.getTypeface());
-            WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
-          } else {
-            WXLogUtils.w("WXText", "Layout not created");
-          }
-          hostView.invalidate();
+        if(isDestoryed()){
+          return;
         }
-        WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
+        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getInstanceId());
+        if(domActionContext == null){
+          return;
+        }
+        WXDomObject domObject = domActionContext.getDomByRef(getRef());
+        if(domObject == null){
+          return;
+        }
+        domObject.markDirty();
+        domActionContext.markDirty();
+        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_START_BATCH, 2);
+        if(WXEnvironment.isApkDebugable()) {
+           WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
+        }
       }
     };
-
+    if(WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("WXText", "Font family register " + desiredFontFamily + " is available" + getRef());
+    }
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
   }
 }

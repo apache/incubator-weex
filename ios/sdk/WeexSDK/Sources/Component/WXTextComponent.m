@@ -131,6 +131,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     
     pthread_mutex_t _ctAttributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    BOOL _observerIconfont;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -187,7 +188,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_fontFamily) {
+    if (_fontFamily && _observerIconfont) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -206,6 +207,23 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(key, prop, type, defaultValue,needLayout)\
+do {\
+    id value = styles[@#key];\
+    if (value) {\
+        if([WXUtility isBlankString:value]){\
+            _##prop = defaultValue;\
+        }else {\
+            _##prop = [WXConvert type:value];\
+        }\
+        [self setNeedsRepaint];\
+        if (needLayout) {\
+            [self setNeedsLayout];\
+        }\
+    }\
+} while(0);
+
+
 #define WX_STYLE_FILL_TEXT_PIXEL(key, prop, needLayout)\
 do {\
     id value = styles[@#key];\
@@ -220,7 +238,7 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
+    WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(color, color, UIColor, [UIColor blackColor], NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -233,7 +251,11 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
     WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
-    
+    if (_fontFamily && !_observerIconfont) {
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        _observerIconfont = YES;
+    }
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
         WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
@@ -364,6 +386,9 @@ do {\
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
         _ctAttributedString = [self buildCTAttributeString];
+        WXPerformBlockOnComponentThread(^{
+            [self.weexInstance.componentManager startComponentTasks];
+        });
     }
     attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
@@ -395,11 +420,6 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        // notification received when custom icon font file download finish
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
@@ -486,11 +506,6 @@ do {\
     // set textColor
     if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        // notification received when custom icon font file download finish
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
@@ -623,8 +638,11 @@ do {\
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
     [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
-    
-    [self fillCSSStyles:styles];
+    NSMutableDictionary * newStyles = [styles mutableCopy];
+    for (NSString * key in [resetStyles copy]) {
+        [newStyles setObject:@"" forKey:key];
+    }
+    [self fillCSSStyles:newStyles];
     
     [self syncTextStorageForView];
 }

@@ -69,5 +69,6 @@ public class WXFileUtilsTest {
   @Test
   public void  testMd5(){
     Assert.assertEquals("77963b7a931377ad4ab5ad6a9cd718aa", WXFileUtils.md5("ddd"));
+    Assert.assertEquals("d5Y7epMTd61Kta1qnNcYqg==", WXFileUtils.base64Md5("ddd"));
   }
 }

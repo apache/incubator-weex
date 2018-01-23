@@ -141,9 +141,10 @@
     if (styles.count == 0) {
         return;
     }
-    NSString *singleProperty = styles.allKeys[0];
-    if ([propertyNames containsString:singleProperty]) {
-        [self _dealTransitionWithProperty:singleProperty styles:styles];
+    for (NSString * name  in styles.allKeys) {
+        if ([propertyNames containsString:name]) {
+            [self _dealTransitionWithProperty:name styles:styles];
+        }
     }
 }
 

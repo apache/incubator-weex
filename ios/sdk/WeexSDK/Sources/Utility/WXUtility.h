@@ -459,7 +459,8 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock;
 
-+ (void)setShouldRoudPixel:(BOOL)shouldRoundPixel;
++ (BOOL)threadSafeCollectionUsingLock;
 
 @end
