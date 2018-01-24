@@ -61,6 +61,7 @@ namespace WeexCore {
     kRelative,
     kAbsolute,
     kFixed = kAbsolute,
+    kSticky = kRelative
   };
 
   enum WXCorePositionEdge {

@@ -30,5 +30,7 @@ namespace WeexCore {
   // position
   const std::string RELATIVE = "relative";
   const std::string ABSOLUTE = "absolute";
+  const std::string FIXED = "fixed";
+  const std::string STICKY = "sticky";
 }
 #endif //WEEXV8_CONSTANTSVALUE_H
