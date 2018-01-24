@@ -307,6 +307,7 @@ public class WXLogUtils {
   }
 
   public static void logOfFirstScreen(String message){
+
 //    if (WXSDKInstance.sIsFinish) {
 //      return;
 //    }
