@@ -204,7 +204,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
         @Override
         public void onAnimationEnd(Animator animation) {
           if (instance == null || instance.isDestroy()) {
-            WXLogUtils.e("RenderActionContextImpl-onAnimationEnd WXSDKInstance == null NPE or instance is destroyed");
+            WXLogUtils.e("RenderContextImpl-onAnimationEnd WXSDKInstance == null NPE or instance is destroyed");
           } else {
             WXSDKManager.getInstance().callback(instance.getInstanceId(),
                                                 callBack,

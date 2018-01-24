@@ -18,23 +18,29 @@
  */
 package com.taobao.weex.ui;
 
+import android.util.Log;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.ui.component.WXComponent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Class for rendering view. Method in this class should be run in main thread.
  * This class is also <strong>not</storng> thread safe.
  */
-class RenderActionContextImpl implements RenderActionContext {
+class RenderContextImpl implements RenderContext {
 
   private Map<String, WXComponent> mRegistry;
   private WXSDKInstance mWXSDKInstance;
 
-  public RenderActionContextImpl(WXSDKInstance instance) {
+  public RenderContextImpl(WXSDKInstance instance) {
     mWXSDKInstance = instance;
     mRegistry = new HashMap<>();
   }

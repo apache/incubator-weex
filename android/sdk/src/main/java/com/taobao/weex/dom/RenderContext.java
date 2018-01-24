@@ -25,7 +25,7 @@ import com.taobao.weex.ui.component.WXComponent;
  * Created by sospartan on 23/02/2017.
  */
 
-public interface RenderActionContext {
+public interface RenderContext {
   WXSDKInstance getInstance();
   WXComponent getComponent(String ref);
   WXComponent unregisterComponent(String ref);

@@ -25,7 +25,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
@@ -36,21 +36,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manager class for render operation, mainly for managing {@link RenderActionContextImpl}.
+ * Manager class for render operation, mainly for managing {@link RenderContextImpl}.
  * This is <strong>not</strong> a thread-safe class
  */
 public class WXRenderManager {
 
-  private ConcurrentHashMap<String, RenderActionContextImpl> mRegistries;
+  private ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
 
   public WXRenderManager() {
-    mRegistries = new ConcurrentHashMap<>();
+    mRenderContext = new ConcurrentHashMap<>();
     mWXRenderHandler = new WXRenderHandler();
   }
 
-  public RenderActionContext getRenderContext(String instanceId) {
-    return mRegistries.get(instanceId);
+  public RenderContext getRenderContext(String instanceId) {
+    return mRenderContext.get(instanceId);
   }
 
   public @Nullable
@@ -58,12 +58,12 @@ public class WXRenderManager {
     if (instanceId == null || TextUtils.isEmpty(ref)) {
       return null;
     }
-    RenderActionContext stmt = getRenderContext(instanceId);
+    RenderContext stmt = getRenderContext(instanceId);
     return stmt == null ? null : stmt.getComponent(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement == null) {
       return null;
     }
@@ -83,55 +83,60 @@ public class WXRenderManager {
     if (!WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
     }
-    RenderActionContextImpl statement = mRegistries.remove(instanceId);
+    RenderContextImpl statement = mRenderContext.remove(instanceId);
+
     if (statement != null) {
       statement.destroy();
     }
+    mWXRenderHandler.removeCallbacksAndMessages(null);
   }
 
   public void postGraphicAction(final String instanceId, final IExecutable action) {
-    mWXRenderHandler.post(WXThread.secure(new Runnable() {
 
+    final RenderContextImpl renderContext = mRenderContext.get(instanceId);
+    if (renderContext == null) {
+      return;
+    }
+
+    Runnable renderTask = WXThread.secure(new Runnable() {
       @Override
       public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
-        }
         long start = System.currentTimeMillis();
         action.executeAction();
         long time = System.currentTimeMillis() - start;
-
         // WXLogUtils.e("" + Thread.currentThread() + "," + Thread.currentThread().getPriority());
-        if ("com.taobao.weex.ui.action.GraphicActionAddElement".equals(action.getClass().getName())) {
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementCount();
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementTime(time);
-
-        } else if ("com.taobao.weex.ui.action.GraphicActionLayout".equals(action.getClass().getName())) {
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutCount();
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutTime(time);
-
-        } else if("com.taobao.weex.ui.action.GraphicActionCreateBody".equals(action.getClass().getName())) {
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyCount();
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyTime(time);
-
-        } else {
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherCount();
-          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherTime(time);
-        }
+//        if ("com.taobao.weex.ui.action.GraphicActionAddElement".equals(action.getClass().getName())) {
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementCount();
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementTime(time);
+//
+//        } else if ("com.taobao.weex.ui.action.GraphicActionLayout".equals(action.getClass().getName())) {
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutCount();
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutTime(time);
+//
+//        } else if ("com.taobao.weex.ui.action.GraphicActionCreateBody".equals(action.getClass().getName())) {
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyCount();
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyTime(time);
+//
+//        } else {
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherCount();
+//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherTime(time);
+//        }
       }
-    }));
+    });
+
+    mWXRenderHandler.post(renderTask);
   }
 
   public void registerInstance(WXSDKInstance instance) {
-    mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
+    mRenderContext.put(instance.getInstanceId(), new RenderContextImpl(instance));
   }
 
   public List<WXSDKInstance> getAllInstances() {
     ArrayList<WXSDKInstance> instances = null;
-    if (mRegistries != null && !mRegistries.isEmpty()) {
+    if (mRenderContext != null && !mRenderContext.isEmpty()) {
       instances = new ArrayList<WXSDKInstance>();
-      for (Map.Entry<String, RenderActionContextImpl> entry : mRegistries.entrySet()) {
-        RenderActionContextImpl renderStatement = entry.getValue();
+      for (Map.Entry<String, RenderContextImpl> entry : mRenderContext.entrySet()) {
+        RenderContextImpl renderStatement = entry.getValue();
         if (renderStatement != null) {
           instances.add(renderStatement.getWXSDKInstance());
         }
@@ -141,14 +146,14 @@ public class WXRenderManager {
   }
 
   public void registerComponent(String instanceId, String ref, WXComponent comp) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
       statement.registerComponent(ref, comp);
     }
   }
 
   public WXComponent unregisterComponent(String instanceId, String ref) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
       return statement.unregisterComponent(ref);
     } else {
