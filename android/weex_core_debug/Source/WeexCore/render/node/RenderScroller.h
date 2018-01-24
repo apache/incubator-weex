@@ -21,11 +21,9 @@ namespace WeexCore {
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
 
-        std::string mMessage = "GetStyle(prop).empty()=" + std::to_string(GetStyle(prop).empty()) + "   GetStyle(FLEX).empty()=" + std::to_string(GetStyle(FLEX).empty());
-        Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
-      if (GetStyle(prop).empty() &&
-          GetStyle(FLEX).empty()) {
+      if (prop == HEIGHT && isnan(getStyleHeight()) && GetStyle(FLEX).empty()) {
+        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
+      } else if (prop == WIDTH && isnan(getStyleWidth()) && GetStyle(FLEX).empty()) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 

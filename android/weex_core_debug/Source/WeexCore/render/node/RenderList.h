@@ -21,8 +21,10 @@ namespace WeexCore {
       }
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
-      if (GetStyle(prop).empty() &&
-          GetStyle(FLEX).empty()) {
+
+      if (prop == HEIGHT && getStyleHeight() == 0.0 && GetStyle(FLEX).empty()) {
+        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
+      } else if (prop == WIDTH && getStyleWidth() == 0.0 && GetStyle(FLEX).empty()) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 
