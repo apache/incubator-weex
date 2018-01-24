@@ -73,11 +73,16 @@ namespace WeexCore {
   }
 
   WXCorePositionType GetWXCorePositionType(const std::string &value) {
+    auto ret = kRelative;
     if (value == RELATIVE) {
-      return WeexCore::kRelative;
+      ret = kRelative;
     } else if (value == ABSOLUTE) {
-      return WeexCore::kAbsolute;
+      ret = kAbsolute;
+    } else if(value == STICKY){
+      ret = kSticky;
+    }else if(value == FIXED){
+      ret = kFixed;
     }
-    return WeexCore::kRelative;
+    return ret;
   }
 }
