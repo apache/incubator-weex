@@ -708,6 +708,16 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       case Constants.Name.RIGHT:
       case Constants.Name.BOTTOM:
         return true;
+      case Constants.Name.BOX_SHADOW:
+        try {
+          updateBoxShadow();
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
+        return true;
+      case Constants.Name.ROLE:
+        setRole(WXUtils.getString(param, ""));
+        return true;
       default:
         return false;
     }
