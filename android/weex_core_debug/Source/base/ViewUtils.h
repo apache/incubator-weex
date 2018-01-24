@@ -13,6 +13,13 @@ namespace WeexCore {
         // LOGE("getRealPxByWidth=%f, result=%f", pxValue, result);
         return result;
     }
+
+    static float getWebPxByWidth(float pxValue, float customViewport) {
+        float realPx = (pxValue * customViewport/ WXCoreEnvironment::getInstance()->DeviceWidth());
+        float result = realPx > 0.005 && realPx < 1 ? 1 : (float) rint(realPx);
+        // LOGE("getRealPxByWidth=%f, result=%f", pxValue, result);
+        return result;
+    }
 }
 
 #endif //WEEX_PROJECT_VIEWUTILS_H
