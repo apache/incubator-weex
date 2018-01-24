@@ -23,6 +23,7 @@ namespace WeexCore {
   typedef std::vector<RenderAction *>::iterator RenderActionIterator;
 
   static bool useVSync = false;
+  static bool splitScreenRendering = true;
 
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
@@ -72,26 +73,29 @@ namespace WeexCore {
 //    mMessage = "end layoutAfter";
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-//    float deviceHeight = WXCoreEnvironment::getInstance()->getDeviceHeight();
-//    float deviceWidth = WXCoreEnvironment::getInstance()->getDeviceWidth();
-//    float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
+    if (splitScreenRendering) {
+      float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
+      float deviceWidth = WXCoreEnvironment::getInstance()->DeviceWidth();
+      float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
 
-//    switch (render_root->getFlexDirection()) {
-//      case kFlexDirectionColumn:
-//      case kFlexDirectionColumnReverse:
-//        if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
-//          traverseTree(render_root);
-//        }
-//        break;
-//      case kFlexDirectionRow:
-//      case kFlexDirectionRowReverse:
-//      default:
-//        if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
-//          traverseTree(render_root);
-//        }
-//        break;
-//    }
-    TraverseTree(render_root);
+      switch (render_root->getFlexDirection()) {
+        case kFlexDirectionColumn:
+        case kFlexDirectionColumnReverse:
+          if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
+            TraverseTree(render_root);
+          }
+          break;
+        case kFlexDirectionRow:
+        case kFlexDirectionRowReverse:
+        default:
+          if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
+            TraverseTree(render_root);
+          }
+          break;
+      }
+    } else {
+      TraverseTree(render_root);
+    }
   }
 
   void RenderPage::TraverseTree(RenderObject *render) {
