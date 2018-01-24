@@ -307,12 +307,25 @@ public class WXLogUtils {
   }
 
   public static void logOfFirstScreen(String message){
-    Log.e("weex", "logOfFirstScreen=" + message);
-    String name = Thread.currentThread().getName() + "：" + message;
-    if (null != sFirstScreenLog.get(name)) {
-      sFirstScreenLog.put(name + "-" + System.currentTimeMillis(), System.currentTimeMillis());
-    } else {
-      sFirstScreenLog.put(name, System.currentTimeMillis());
-    }
+//    if (WXSDKInstance.sIsFinish) {
+//      return;
+//    }
+//    String threadName = Thread.currentThread().getName();
+//
+//    if ("main".equals(threadName)) {
+//
+//    } else {
+//      threadName = "             " + threadName;
+//    }
+//
+//    if (WXEnvironment.isApkDebugable()) {
+//      Log.e(WEEX_TAG, "logOfFirstScreen=" + message);
+//    }
+//    String name = threadName + "-" + message;
+//    if (null != sFirstScreenLog.get(name)) {
+//      sFirstScreenLog.put(name + "-" + System.currentTimeMillis(), System.currentTimeMillis());
+//    } else {
+//      sFirstScreenLog.put(name, System.currentTimeMillis());
+//    }
   }
 }
