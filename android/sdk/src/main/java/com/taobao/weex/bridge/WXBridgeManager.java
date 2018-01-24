@@ -1794,11 +1794,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
-              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-              .append(", parentRef:").append(parentRef);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
+//      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+//              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
+//              .append(", parentRef:").append(parentRef);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
@@ -1949,10 +1949,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      mLodBuilder.append("[WXBridgeManager] callLayoutByWeexCore >>>> instanceId:").append(pageId)
-            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
+//      mLodBuilder.append("[WXBridgeManager] callLayoutByWeexCore >>>> instanceId:").append(pageId)
+//            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
