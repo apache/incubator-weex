@@ -67,11 +67,7 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     render_root->calculateLayout();
     CssLayoutTime(getCurrentTime() - startTime);
-//    std::string mMessage = "end calculateLayout";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     render_root->LayoutAfter();
-//    mMessage = "end layoutAfter";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
     if (splitScreenRendering) {
       float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
@@ -121,14 +117,23 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
-    render_root->SetDefaultWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
-    render_root->SetDefaultHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
+    if (isnan(render_root->getStyleWidth())) {
+      render_root->setStyleWidthLevel(3);
+      render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+    } else {
+      render_root->setStyleWidthLevel(1);
+    }
+
+    if (isnan(render_root->getStyleHeight())) {
+      render_root->setStyleHeightLevel(3);
+      render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
+    } else {
+      render_root->setStyleHeightLevel(1);
+    }
 
     PushRenderToRegisterMap(root);
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
-//    std::string mMessage = "sendCreateBodyAction";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendCreateBodyAction(root);
     return true;
   }
@@ -146,14 +151,11 @@ namespace WeexCore {
     // add child to Render Tree
     parent->AddRenderObject(insertPosition, child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
-//    std::string mMessage = "start sendAddElementAction";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     SendAddElementAction(child, parent, insertPosition);
 
-//    mMessage = "start calculateLayout";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-    if (!useVSync)
+    if (!useVSync) {
       CalculateLayout();
+    }
     return true;
   }
 
@@ -365,8 +367,17 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-    render_root->SetDefaultWidth(defaultWidth);
-    render_root->SetDefaultHeight(defaultHeight);
+
+    if (render_root->getStyleWidthLevel() >= 2) {
+      render_root->setStyleWidthLevel(2);
+      render_root->setStyleWidth(defaultWidth);
+    }
+
+    if (render_root->getStyleHeightLevel() >= 2) {
+      render_root->setStyleHeightLevel(2);
+      render_root->setStyleHeight(defaultHeight);
+    }
+
     if (!useVSync)
       CalculateLayout();
   }

@@ -689,6 +689,26 @@ namespace WeexCore {
 
     /** ================================ dimension =================================== **/
 
+    void setStyleWidthLevel(const int level) {
+      if (mCssStyle->mStyleWidthLevel != level) {
+        mCssStyle->mStyleWidthLevel = level;
+      }
+    }
+
+    void setStyleHeightLevel(const int level) {
+      if (mCssStyle->mStyleHeightLevel != level) {
+        mCssStyle->mStyleHeightLevel = level;
+      }
+    }
+
+    int getStyleHeightLevel() const {
+      return mCssStyle->mStyleHeightLevel;
+    }
+
+    int getStyleWidthLevel() const {
+      return mCssStyle->mStyleWidthLevel;
+    }
+
     void setStyleWidth(const float width) {
       if (mCssStyle->mStyleWidth != width) {
         mCssStyle->mStyleWidth = width;
