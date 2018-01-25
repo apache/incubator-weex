@@ -19,7 +19,9 @@
 
 package com.taobao.weex.utils;
 
+import android.support.annotation.NonNull;
 import com.taobao.weex.dom.CSSConstants;
+import com.taobao.weex.dom.CSSShorthand.EDGE;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.dom.CSSShorthand;
@@ -80,20 +82,23 @@ public class WXDomUtils {
     return rawHeight;
   }
 
-  public static float getContentWidth(WXStyle style, float layoutWidth, int viewport){
+  public static float getContentWidth(
+      @NonNull CSSShorthand padding,
+      @NonNull CSSShorthand border,
+      float layoutWidth){
     float leftPadding, rightPadding, leftBorder, rightBorder;
 
-    if (!CSSConstants.isUndefined((leftPadding = style.getPaddingLeft(viewport)))) {
+    if (!CSSConstants.isUndefined((leftPadding = padding.get(EDGE.LEFT)))) {
       layoutWidth -= leftPadding;
     }
-    if (!CSSConstants.isUndefined((rightPadding = style.getPaddingRight(viewport)))) {
+    if (!CSSConstants.isUndefined((rightPadding = padding.get(EDGE.RIGHT)))) {
       layoutWidth -= rightPadding;
     }
 
-    if (!CSSConstants.isUndefined(leftBorder = style.getBorderLeftWidth(viewport))) {
+    if (!CSSConstants.isUndefined(leftBorder = border.get(EDGE.LEFT))) {
       layoutWidth -= leftBorder;
     }
-    if (!CSSConstants.isUndefined(rightBorder = style.getBorderRightWidth(viewport))) {
+    if (!CSSConstants.isUndefined(rightBorder = border.get(EDGE.RIGHT))) {
       layoutWidth -= rightBorder;
     }
     return layoutWidth;
