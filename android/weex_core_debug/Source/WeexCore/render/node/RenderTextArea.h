@@ -1,7 +1,7 @@
 #ifndef WEEX_PROJECT_RENDERTEXTAREA_H
 #define WEEX_PROJECT_RENDERTEXTAREA_H
 
-#include "RenderInput.h"
+#include <WeexCore/render/node/RenderInput.h>
 
 namespace WeexCore {
   class RenderTextArea : public RenderInput {

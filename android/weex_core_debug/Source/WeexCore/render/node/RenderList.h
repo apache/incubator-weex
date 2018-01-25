@@ -2,7 +2,7 @@
 #define WEEX_PROJECT_RENDERLIST_H
 
 #include <WeexCore/css/ConstantsName.h>
-#include "RenderObject.h"
+#include <WeexCore/render/node/RenderObject.h>
 
 namespace WeexCore {
 

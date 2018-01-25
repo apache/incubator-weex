@@ -3,7 +3,6 @@
 
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/render/page/RenderPage.h>
-#include "RenderObject.h"
 
 namespace WeexCore {
   class RenderText : public RenderObject {

@@ -1,7 +1,7 @@
 #ifndef WEEX_PROJECT_RENDERMASK_H
 #define WEEX_PROJECT_RENDERMASK_H
 
-#include "RenderObject.h"
+#include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/env/CoreEnvironment.h>
 #include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
 #include <base/ViewUtils.h>

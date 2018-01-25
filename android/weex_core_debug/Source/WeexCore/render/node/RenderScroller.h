@@ -2,7 +2,7 @@
 #define WEEX_PROJECT_RENDERSCROLLER_H
 
 #include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
-#include "RenderObject.h"
+#include <WeexCore/render/node/RenderObject.h>
 
 namespace WeexCore {
   class RenderScroller : public RenderObject {
