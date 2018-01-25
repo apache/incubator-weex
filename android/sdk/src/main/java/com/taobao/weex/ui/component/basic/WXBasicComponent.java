@@ -119,15 +119,15 @@ public abstract class WXBasicComponent<T extends View> {
     return mBorders;
   }
 
-  protected final void setMargins(@NonNull CSSShorthand mMargins) {
+  public final void setMargins(@NonNull CSSShorthand mMargins) {
     this.mMargins = mMargins;
   }
 
-  protected final void setPaddings(@NonNull CSSShorthand mPaddings) {
+  public final void setPaddings(@NonNull CSSShorthand mPaddings) {
     this.mPaddings = mPaddings;
   }
 
-  protected final void setBorders(@NonNull CSSShorthand mBorders) {
+  public final void setBorders(@NonNull CSSShorthand mBorders) {
     this.mBorders = mBorders;
   }
 

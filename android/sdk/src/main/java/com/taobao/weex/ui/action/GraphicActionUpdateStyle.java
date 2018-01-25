@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 
@@ -27,31 +28,74 @@ import java.util.Map;
 public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
   private Map<String, Object> mStyle;
-  private Map<String, String> mPaddings;
-  private Map<String, String> mMargins;
-  private Map<String, String> mBorders;
   private WXComponent component;
+  private boolean mIsCausedByPesudo;
 
   public GraphicActionUpdateStyle(String pageId, String ref,
                                   Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,
                                   Map<String, String> borders) {
+    this(pageId, ref, style, paddings, margins, borders, false);
+  }
+
+  public GraphicActionUpdateStyle(String pageId, String ref,
+                                  Map<String, Object> style,
+                                  CSSShorthand paddings,
+                                  CSSShorthand margins,
+                                  CSSShorthand borders, boolean byPesudo) {
     super(pageId, ref);
     this.mStyle = style;
-    this.mPaddings = paddings;
-    this.mMargins = margins;
-    this.mBorders = borders;
+    this.mIsCausedByPesudo = byPesudo;
 
     component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
       return;
     }
-    if (mStyle != null) {
-      component.addStyle(mStyle);
-      component.addShorthand(mPaddings);
-      component.addShorthand(mMargins);
-      component.addShorthand(mBorders);
+    if (null != mStyle) {
+      component.addStyle(mStyle, mIsCausedByPesudo);
+    }
+
+    if (null != paddings) {
+      component.setPaddings(paddings);
+    }
+
+    if (null != margins) {
+      component.setMargins(margins);
+    }
+
+    if (null != borders) {
+      component.setBorders(borders);
+    }
+  }
+
+  public GraphicActionUpdateStyle(String pageId, String ref,
+                                  Map<String, Object> style,
+                                  Map<String, String> paddings,
+                                  Map<String, String> margins,
+                                  Map<String, String> borders, boolean byPesudo) {
+    super(pageId, ref);
+    this.mStyle = style;
+    this.mIsCausedByPesudo = byPesudo;
+
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
+      return;
+    }
+    if (null != mStyle) {
+      component.addStyle(mStyle, mIsCausedByPesudo);
+    }
+
+    if (null != paddings) {
+      component.addShorthand(paddings);
+    }
+
+    if (null != margins) {
+      component.addShorthand(margins);
+    }
+
+    if (null != borders) {
+      component.addShorthand(borders);
     }
   }
 

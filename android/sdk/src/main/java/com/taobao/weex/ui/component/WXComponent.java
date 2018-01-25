@@ -59,6 +59,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
@@ -67,6 +68,7 @@ import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -155,6 +157,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
+  private GraphicSize mPseudoResetGraphicSize;
 
 
   @Deprecated
@@ -790,6 +793,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     //calculate first screen time
     if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+      WXLogUtils.logOfFirstScreen("firstScreenRenderFinished in component");
       mInstance.firstScreenRenderFinished();
     }
 
@@ -1786,23 +1790,34 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
             status,
             pesudoStyles,
             styles.getPesudoResetStyles());
+
+    if (null != resultStyles) {
+      if (status) {
+        mPseudoResetGraphicSize = new GraphicSize(getLayoutSize().getWidth(), getLayoutSize().getHeight());
+        if (resultStyles.keySet().contains(Constants.Name.WIDTH)) {
+          getLayoutSize().setWidth(WXViewUtils.getRealPxByWidth(WXUtils.parseFloat(styles.getPesudoResetStyles().get(Constants.Name.WIDTH + Constants.PSEUDO.ACTIVE)), getViewPortWidth()));
+        } else if (resultStyles.keySet().contains(Constants.Name.HEIGHT)){
+          getLayoutSize().setHeight(WXViewUtils.getRealPxByWidth(WXUtils.parseFloat(styles.getPesudoResetStyles().get(Constants.Name.HEIGHT + Constants.PSEUDO.ACTIVE)), getViewPortWidth()));
+        }
+      } else {
+        if (null != mPseudoResetGraphicSize) {
+          setLayoutSize(mPseudoResetGraphicSize);
+        }
+      }
+    }
+
     updateStyleByPesudo(resultStyles);
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
-    // TODO
-//    Message message = Message.obtain();
-//    WXDomTask task = new WXDomTask();
-//    task.instanceId = getInstanceId();
-//    task.args = new ArrayList<>();
-//
-//    JSONObject styleJson = new JSONObject(styles);
-//    task.args.add(getRef());
-//    task.args.add(styleJson);
-//    task.args.add(true);//flag pesudo
-//    message.obj = task;
-//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+    new GraphicActionUpdateStyle(getInstanceId(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
+            .executeActionOnRender();
+    if (getLayoutWidth() == 0 && getLayoutWidth() == 0) {
+    } else {
+      WXBridgeManager.getInstance().setStyleWidth(getInstanceId(), getRef(), getLayoutWidth());
+      WXBridgeManager.getInstance().setStyleHeight(getInstanceId(), getRef(), getLayoutHeight());
+      WXBridgeManager.getInstance().calculateLayout(getInstanceId(), getRef());
+    }
   }
 
   public int getStickyOffset() {

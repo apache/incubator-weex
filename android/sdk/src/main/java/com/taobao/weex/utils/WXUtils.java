@@ -208,6 +208,19 @@ public class WXUtils {
     return 0;
   }
 
+  public static float parseFloat(Object value) {
+    return parseFloat(String.valueOf(value));
+  }
+
+  public static float parseFloat(String value) {
+    try {
+      return Float.parseFloat(value);
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
+    }
+    return 0;
+  }
+
   public static int getInt(Object value) {
     return getInteger(value, 0);
   }
