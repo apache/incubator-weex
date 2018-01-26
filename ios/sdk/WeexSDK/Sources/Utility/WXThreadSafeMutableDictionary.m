@@ -169,9 +169,6 @@
 
 - (void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
-    if (nil == anObject || nil == aKey) {  // if an object or anKey is nil, it will do nothing
-        return;
-    }
     aKey = [aKey copyWithZone:NULL];
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
@@ -192,9 +189,6 @@
 
 - (void)removeObjectForKey:(id)aKey
 {
-    if (nil == aKey) { // if aKey is nil, do nothing.
-        return;
-    }
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
             [_dict removeObjectForKey:aKey];
