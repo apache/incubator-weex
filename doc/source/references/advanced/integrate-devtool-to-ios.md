@@ -18,8 +18,7 @@ There are two choices to install dependencies:
 #### No.1 From cocoapods
 
 ```
-source https://github.com/CocoaPods/Specs.git，
-pod  'WXDevtool',   '0.7.0', :configurations => ['Debug']，
+source https://github.com/CocoaPods/Specs.git， pod 'WXDevtool', '0.7.0', :configurations => ['Debug']
 ```
 
 I strongly recommend you use the latest version since both Weex SDK and devtools are developed iteratively and rapidly.
@@ -44,9 +43,9 @@ I strongly recommend you use the latest version since both Weex SDK and devtools
 
     ```
     #import <TBWXDevtool/WXDevtool.h>
-    ``
+    ```
   
-  - From source code
+  - From source code:
 
     ```
     #import "WXDevtool.h"
@@ -61,24 +60,24 @@ You can see the WXDevtool header file as follows:
 
 @interface WXDevTool : NSObject
 /**
-*  set debug status
-*  @param isDebug  : YES:open debug model and inspect model;
-*                    default is NO,if isDebug is NO, open inspect only;
-* */
+ *  set debug status
+ *  @param isDebug  : YES:open debug model and inspect model;
+ *                    default is NO,if isDebug is NO, open inspect only;
+ **/
 + (void)setDebug:(BOOL)isDebug;
 
 
 /**
-*  get debug status
-* */  
+ *  get debug status
+ **/  
 + (BOOL)isDebug;
 
 
 /**
-*  launch weex debug
-*  @param url  : ws://ip:port/debugProxy/native, ip and port is your devtool server address
-* eg:@"ws://30.30.29.242:8088/debugProxy/native"
-* */
+ *  launch weex debug
+ *  @param url  : ws://ip:port/debugProxy/native, ip and port is your devtool server address
+ *                eg:@"ws://30.30.29.242:8088/debugProxy/native"
+ **/
 + (void)launchDevToolDebugWithUrl:(NSString *)url;
 
 @end
@@ -99,16 +98,22 @@ open debug model and inspector model
 eg：
 
 ```object-c 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions { [WXDevTool setDebug:YES]; [WXDevTool launchDevToolDebugWithUrl:@"ws://wssip/debugProxy/native"]; }
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    [WXDevTool setDebug:YES];
+    [WXDevTool launchDevToolDebugWithUrl:@"ws://wssip/debugProxy/native"];
+}
 ```
 
-open inspect model, remove the `@selector
-(setDebug:)` or add `[WXDevTool setDebug:NO]`
+open inspect model, remove the `@selector (setDebug:)` or add `[WXDevTool setDebug:NO]`
 
 eg：
 
 ```object-c 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions { [WXDevTool launchDevToolDebugWithUrl:@"ws://wssip/debugProxy/native"]; }
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    [WXDevTool launchDevToolDebugWithUrl:@"ws://wssip/debugProxy/native"];
+}
 ```
 
 #### Step 3. Auto refresh
@@ -125,7 +130,7 @@ Q: What kind of scene need to add refresh feature?
 - Switch remoteDebug
 - Refresh inspect page
 
-Q: How to add auto refresh feature?
+Q: How do you add the auto refresh feature?
 
 Register events when Weex initialization.
 
@@ -144,16 +149,6 @@ Register events when Weex initialization.
 
 For example, First you can destroy the current instance, and then re-create instance:
 
-    
-```
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-```
-
-页面刷新实现，先销毁当前 instance，然后重新创建 instance，举例如下:
-
 ```
   - (void)render
   {
@@ -162,7 +157,7 @@ For example, First you can destroy the current instance, and then re-create inst
     _instance = [[WXSDKInstance alloc] init];
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
-    
+
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
         [weakSelf.weexView removeFromSuperview];
@@ -170,16 +165,15 @@ For example, First you can destroy the current instance, and then re-create inst
         [weakSelf.view addSubview:weakSelf.weexView];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification,  weakSelf.weexView);
     };
-    _instance.onFailed = ^(NSError *error) {
-        
-    };
-    
+
+    _instance.onFailed = ^(NSError *error) { };
+
     _instance.renderFinish = ^(UIView *view) {
         [weakSelf updateInstanceState:WeexInstanceAppear];
     };
-    
-    _instance.updateFinish = ^(UIView *view) {
-    };
+
+    _instance.updateFinish = ^(UIView *view) { };
+
     if (!self.url) {
         return;
     }
