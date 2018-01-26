@@ -44,7 +44,6 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -54,10 +53,10 @@ import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCustomStyleSpan;
 import com.taobao.weex.dom.WXLineHeightSpan;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.layout.MeasureMode;
 import com.taobao.weex.layout.MeasureSize;
+import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
@@ -67,7 +66,6 @@ import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -213,7 +211,9 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       @Override
       public void layoutAfter(float computedWidth, float computedHeight) {
         if (hasBeenMeasured) {
-          if (layout != null && WXDomUtils.getContentWidth(getStyles(), computedWidth, getInstance().getInstanceViewPortWidth()) != previousWidth) {
+          if (layout != null &&
+              WXDomUtils.getContentWidth(getPadding(), getBorder(), computedWidth)
+                  != previousWidth) {
             recalculateLayout(computedWidth);
           }
         } else {
@@ -479,7 +479,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       }
 
       private void recalculateLayout(float computedWidth) {
-        float contentWidth = WXDomUtils.getContentWidth(getStyles(), computedWidth, getInstance().getInstanceViewPortWidth());
+        float contentWidth = WXDomUtils.getContentWidth(getPadding(), getBorder(), computedWidth);
         if (contentWidth > 0) {
           spanned = createSpanned(mText);
           if (mText != null) {

@@ -392,14 +392,23 @@ public class WXSDKEngine {
 
 
   public static <T extends WXModule> boolean registerModuleWithFactory(String moduleName, IExternalModuleGetter factory, boolean global) throws WXException {
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("registerModule=" + moduleName);
+    }
     return registerModule(moduleName, factory.getExternalModuleClass(moduleName,WXEnvironment.getApplication()),global);
   }
 
   private static <T extends WXModule> boolean registerModule(String moduleName, ModuleFactory factory, boolean global) throws WXException {
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("WXModuleManager.registerModule=" + moduleName);
+    }
     return WXModuleManager.registerModule(moduleName, factory,global);
   }
 
   public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("registerModule=" + moduleName + ",moduleClass=" + moduleClass.getClass().getName());
+    }
     return registerModule(moduleName, moduleClass,false);
   }
 

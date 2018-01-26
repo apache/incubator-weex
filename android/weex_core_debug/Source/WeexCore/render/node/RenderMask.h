@@ -11,13 +11,7 @@ namespace WeexCore {
     std::map<std::string, std::string> *GetDefaultStyle() {
       std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
 
-//        std::string mMessage = "DeviceHeight=" + std::to_string(WXCoreEnvironment::getInstance()->DeviceHeight())
-//                               + ", DeviceWidth=" + std::to_string(WXCoreEnvironment::getInstance()->DeviceWidth())
-//                               + ", StatusBarHeight=" + std::to_string(WXCoreEnvironment::getInstance()->StatusBarHeight());
-//        Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
       int height = WXCoreEnvironment::getInstance()->DeviceHeight();
-//      int height = WXCoreEnvironment::getInstance()->DeviceHeight() - WXCoreEnvironment::getInstance()->StatusBarHeight();
       int width = WXCoreEnvironment::getInstance()->DeviceWidth();
 
       style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));

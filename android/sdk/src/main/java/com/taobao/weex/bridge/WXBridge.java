@@ -434,14 +434,12 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callCreateFinishByWeexCore(String instanceId) {
-    WXLogUtils.logOfFirstScreen("start callCreateFinishByWeexCore");
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callCreateFinishByWeexCore(instanceId);
     } catch (Throwable e) {
       WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
     }
-    WXLogUtils.logOfFirstScreen("end callCreateFinishByWeexCore");
     return errorCode;
   }
 

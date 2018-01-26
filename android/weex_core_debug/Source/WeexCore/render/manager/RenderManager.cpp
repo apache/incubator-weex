@@ -3,16 +3,12 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <base/TimeUtils.h>
-#include <WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.h>
 
 namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
   bool RenderManager::CreatePage(const std::string &pageId, const std::string &data) {
-//    std::string mMessage = "createPage";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
 
@@ -27,9 +23,6 @@ namespace WeexCore {
   bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
                                       const int &index,
                                       const std::string &data) {
-
-//    std::string mMessage = "start addRenderObject";
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
