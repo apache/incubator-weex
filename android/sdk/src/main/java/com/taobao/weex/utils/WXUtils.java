@@ -208,6 +208,10 @@ public class WXUtils {
     return 0;
   }
 
+  public static int parseInt(Object value) {
+    return parseInt(String.valueOf(value));
+  }
+
   public static float parseFloat(Object value) {
     return parseFloat(String.valueOf(value));
   }

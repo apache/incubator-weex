@@ -1753,7 +1753,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
-              .append(", componentType:").append(componentType).append(", ref:").append(ref);
+              .append(", componentType:").append(componentType).append(", ref:").append(ref)
+              .append(", styles:").append(styles)
+              .append(", attributes:").append(attributes)
+              .append(", events:").append(events)
+              .append(", paddings:").append(paddings)
+              .append(", margins:").append(margins)
+              .append(", borders:").append(borders);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -1796,7 +1802,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXEnvironment.isApkDebugable()) {
 //      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
 //              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-//              .append(", parentRef:").append(parentRef);
+//              .append(", parentRef:").append(parentRef)
+//              .append(", styles:").append(styles)
+//              .append(", attributes:").append(attributes)
+//              .append(", events:").append(events)
+//              .append(", paddings:").append(paddings)
+//              .append(", margins:").append(margins)
+//              .append(", borders:").append(borders);
 //      WXLogUtils.d(mLodBuilder.substring(0));
 //      mLodBuilder.setLength(0);
     }
@@ -1950,7 +1962,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXEnvironment.isApkDebugable()) {
 //      mLodBuilder.append("[WXBridgeManager] callLayoutByWeexCore >>>> instanceId:").append(pageId)
-//            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width);
+//            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width)
+//              .append(", top:").append(top)
+//              .append(", bottom:").append(bottom)
+//              .append(", left:").append(left)
+//              .append(", right:").append(right);
 //      WXLogUtils.d(mLodBuilder.substring(0));
 //      mLodBuilder.setLength(0);
     }
