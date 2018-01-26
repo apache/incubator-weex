@@ -204,9 +204,6 @@ static jint ExecJS(JNIEnv *env,
     return false;
   }
 
-  std::string mMessage = "start ExecJS：" + jString2Str(env, jfunction);
-  Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
 }
 
