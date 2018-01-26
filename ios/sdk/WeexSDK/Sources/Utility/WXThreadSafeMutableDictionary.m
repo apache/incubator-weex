@@ -26,7 +26,7 @@
 {
     pthread_mutex_t _safeThreadDictionaryMutex;
     pthread_mutexattr_t _safeThreadDictionaryMutexAttr;
-    os_unfair_lock _unfairLock;
+    os_unfair_lock _unfairLock;// this type of lock is not recurisive
 }
 
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -124,6 +124,9 @@
 
 - (id)objectForKey:(id)aKey
 {
+    if (nil == aKey){
+        return nil;
+    }
     __block id obj;
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_sync(_queue, ^{
@@ -166,6 +169,9 @@
 
 - (void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
+    if (nil == anObject || nil == aKey) {  // if an object or anKey is nil, it will do nothing
+        return;
+    }
     aKey = [aKey copyWithZone:NULL];
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
@@ -186,6 +192,9 @@
 
 - (void)removeObjectForKey:(id)aKey
 {
+    if (nil == aKey) { // if aKey is nil, do nothing.
+        return;
+    }
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
             [_dict removeObjectForKey:aKey];

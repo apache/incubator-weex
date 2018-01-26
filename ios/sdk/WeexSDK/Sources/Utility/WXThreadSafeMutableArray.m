@@ -164,6 +164,9 @@
 
 - (void)insertObject:(id)anObject atIndex:(NSUInteger)index
 {
+    if (nil == anObject) {// if anObject is nil ,just ignore this operation.
+        return;
+    }
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
             [_array insertObject:anObject atIndex:index];
@@ -183,6 +186,9 @@
 
 - (void)addObject:(id)anObject;
 {
+    if (nil == anObject) { // if anObject is nil, nothing happened.
+        return;
+    }
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_barrier_async(_queue, ^{
             [_array addObject:anObject];
