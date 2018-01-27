@@ -32,5 +32,13 @@ namespace WeexCore {
   const std::string ABSOLUTE = "absolute";
   const std::string FIXED = "fixed";
   const std::string STICKY = "sticky";
+
+  const std::string NORMAL = "normal";
+  const int COLUMN_COUNT_NORMAL = 1;
+  const float AUTO_VALUE = -1;
+  const float COLUMN_GAP_NORMAL = 32;
+
+  const int HORIZONTAL_VALUE = 0;
+  const int VERTICAL_VALUE = 1;
 }
 #endif //WEEXV8_CONSTANTSVALUE_H

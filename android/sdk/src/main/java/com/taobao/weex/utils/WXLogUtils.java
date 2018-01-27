@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class WXLogUtils {
 
@@ -230,6 +231,17 @@ public class WXLogUtils {
     if (WXEnvironment.isApkDebugable()) {
       wtf(prefix + getStackTrace(e));
     }
+  }
+
+  public static String parseMap(Map<String, Object> map){
+    if (null != map && map.size() > 0) {
+      StringBuilder sb = new StringBuilder();
+      for (Map.Entry<String, Object> stringObjectEntry : map.entrySet()) {
+        sb.append(stringObjectEntry.getKey()).append("=").append(stringObjectEntry.getValue()).append(" ");
+      }
+      return sb.toString();
+    }
+    return "map is null";
   }
 
   /**

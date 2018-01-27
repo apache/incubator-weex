@@ -27,7 +27,7 @@ namespace WeexCore {
       factory = new RenderIndicatorFactory();
     } else if (type == kRenderInput) {
       factory = new RenderInputFactory();
-    } else if (type == kRenderList) {
+    } else if (type == kRenderList || type == kRenderWaterfall) {
       factory = new RenderListFactory();
     } else if (type == kRenderMask) {
       factory = new RenderMaskFactory();

@@ -50,6 +50,11 @@ namespace WeexCore {
   const std::string PADDING_TOP = "paddingTop";
   const std::string PADDING_RIGHT = "paddingRight";
   const std::string PADDING_BOTTOM = "paddingBottom";
+
+  const std::string FONT_STYLE = "fontStyle";
+  const std::string COLUMN_WIDTH= "columnWidth";
+  const std::string COLUMN_COUNT= "columnCount";
+  const std::string COLUMN_GAP= "columnGap";
 }
 
 #endif //WEEXV8_CONSTANTSNAME_H

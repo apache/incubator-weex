@@ -75,6 +75,10 @@ namespace WeexCore {
       return nullptr;
     }
 
+    virtual std::map<std::string, std::string> *GetDefaultAttr() {
+      return nullptr;
+    }
+
   public:
 
     RenderObject();
@@ -96,6 +100,8 @@ namespace WeexCore {
     StyleType ApplyStyle(const std::string &key, const std::string &value);
 
     void ApplyDefaultStyle();
+
+    void ApplyDefaultAttr();
 
     void PrintRenderMsg();
 
@@ -126,7 +132,7 @@ namespace WeexCore {
       return -1;
     }
 
-    inline void AddRenderObject(int index, RenderObject *child) {
+    virtual void AddRenderObject(int index, RenderObject *child) {
 
       if (child == nullptr || index < -1) {
         return;

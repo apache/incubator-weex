@@ -4,6 +4,7 @@
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/factory/RenderCreator.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -284,12 +285,14 @@ namespace WeexCore {
               char value[len + 1];
               strcpy(value, temp);
               render->AddAttr(key2, value);
+              LOGD("AddAttr Int: %s, %s", key2, value);
             } else if (0 == strcmp(key, "style")) {
               int len = fpconv_dtoa(r.GetDouble(), temp);
               temp[len] = '\0';
               char value[len + 1];
               strcpy(value, temp);
               render->AddStyle(key2, value);
+              LOGD("AddStyle Int: %s, %s", key2, value);
             }
             delete temp;
           } else if (r.PeekType() == kStringType) {
@@ -298,9 +301,11 @@ namespace WeexCore {
             if (0 == strcmp(key, "attr")) {
               strcpy(value, str);
               render->AddAttr(key2, value);
+              LOGD("AddAttr String: %s, %s", key2, value);
             } else if (0 == strcmp(key, "style")) {
               strcpy(value, str);
               render->AddStyle(key2, value);
+              LOGD("AddStyle String: %s, %s", key2, value);
             }
           } else {
             r.SkipValue();
@@ -331,6 +336,7 @@ namespace WeexCore {
 
     if (render != nullptr) {
       render->ApplyDefaultStyle();
+      render->ApplyDefaultAttr();
     }
 
     return render;
