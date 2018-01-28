@@ -70,24 +70,28 @@ namespace WeexCore {
     render_root->LayoutAfter();
 
     if (splitScreenRendering) {
-      float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
-      float deviceWidth = WXCoreEnvironment::getInstance()->DeviceWidth();
-      float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
+      if (mAlreadyCreateFinish) {
+        TraverseTree(render_root);
+      } else {
+        float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
+        float deviceWidth = WXCoreEnvironment::getInstance()->DeviceWidth();
+        float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
 
-      switch (render_root->getFlexDirection()) {
-        case kFlexDirectionColumn:
-        case kFlexDirectionColumnReverse:
-          if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
-            TraverseTree(render_root);
-          }
-          break;
-        case kFlexDirectionRow:
-        case kFlexDirectionRowReverse:
-        default:
-          if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
-            TraverseTree(render_root);
-          }
-          break;
+        switch (render_root->getFlexDirection()) {
+          case kFlexDirectionColumn:
+          case kFlexDirectionColumnReverse:
+            if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
+              TraverseTree(render_root);
+            }
+            break;
+          case kFlexDirectionRow:
+          case kFlexDirectionRowReverse:
+          default:
+            if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
+              TraverseTree(render_root);
+            }
+            break;
+        }
       }
     } else {
       TraverseTree(render_root);
@@ -414,6 +418,7 @@ namespace WeexCore {
     if (render_root == nullptr) {
       return false;
     }
+    mAlreadyCreateFinish = true;
     TraverseTree(render_root);
     SendCreateFinishAction();
     return true;

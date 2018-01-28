@@ -150,6 +150,7 @@ namespace WeexCore {
 
   private:
     const float kLayoutFirstScreenOverflowRadio = 1.2;
+    bool mAlreadyCreateFinish = false;
     float mViewPortWidth;
     RenderObject *render_root = nullptr;
     std::string mPageId;
