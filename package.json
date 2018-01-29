@@ -35,7 +35,6 @@
     "node": ">=8"
   },
   "scripts": {
-    "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",
