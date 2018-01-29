@@ -41,7 +41,7 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-static BOOL threadSafeCollectionUsingLock = NO;
+static BOOL threadSafeCollectionUsingLock = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {

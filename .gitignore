@@ -48,12 +48,5 @@ android/playground/app/gradle/wrapper/gradle-wrapper.jar
 android/playground/app/gradle/wrapper/gradle-wrapper.properties
 android/sdk/.externalNativeBuild/ndkBuild/
 
-# doc
-doc/Thumbs.db
-doc/db.json
-doc/node_modules/
-doc/public/
-doc/.deploy*/
-
 # release
 apache_release_temp
