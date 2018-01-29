@@ -28,8 +28,6 @@ namespace WeexCore {
   RenderPage::RenderPage(const std::string &pageID) {
     mPageId = pageID;
     mWXCorePerformance = new RenderPerformance();
-    mInstance_Impl_Android = nullptr;
-    mInstance_Impl_iOS = nullptr;
     mViewPortWidth = 750.0f;
   }
 
@@ -46,16 +44,6 @@ namespace WeexCore {
     if (mWXCorePerformance != nullptr) {
       delete mWXCorePerformance;
       mWXCorePerformance = nullptr;
-    }
-
-    if (mInstance_Impl_Android != nullptr) {
-      env->DeleteGlobalRef(mInstance_Impl_Android);
-      mInstance_Impl_Android = nullptr;
-    }
-
-    if (mInstance_Impl_iOS != nullptr) {
-      delete mInstance_Impl_iOS;
-      mInstance_Impl_iOS = nullptr;
     }
   }
 
@@ -565,20 +553,6 @@ namespace WeexCore {
   void RenderPage::CallBridgeTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->jniCallBridgeTime += time;
-  }
-
-  bool RenderPage::BindInstanceImplAndroid(jobject instance) {
-    if (instance == nullptr)
-      return false;
-    this->mInstance_Impl_Android = getJNIEnv()->NewGlobalRef(instance);
-    return true;
-  }
-
-  bool RenderPage::BindInstanceImplIOS(void *instance) {
-    if (instance == nullptr)
-      return false;
-    this->mInstance_Impl_iOS = instance;
-    return true;
   }
 
   int RenderPage::PrintFirstScreenLog() {

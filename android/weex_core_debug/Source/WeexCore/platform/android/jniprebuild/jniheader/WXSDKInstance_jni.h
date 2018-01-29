@@ -29,10 +29,6 @@ static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
     jobject component,
     jstring ref);
 
-static void BindInstanceToWXCore(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jobject instance);
-
 static void OnInstanceClose(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
@@ -84,12 +80,6 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(BindComponentToWXCore) },
-    { "nativeBindInstanceToWXCore",
-"("
-"Ljava/lang/String;"
-"Lcom/taobao/weex/WXSDKInstance;"
-")"
-"V", reinterpret_cast<void*>(BindInstanceToWXCore) },
     { "nativeOnInstanceClose",
 "("
 "Ljava/lang/String;"

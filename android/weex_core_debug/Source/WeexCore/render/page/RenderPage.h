@@ -102,10 +102,6 @@ namespace WeexCore {
 
     void CallBridgeTime(const long long &time);
 
-    bool BindInstanceImplAndroid(jobject instance);
-
-    bool BindInstanceImplIOS(void *instance);
-
     int PrintFirstScreenLog();
 
     int PrintRenderSuccessLog();
@@ -156,8 +152,6 @@ namespace WeexCore {
     std::string mPageId;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
-    jobject mInstance_Impl_Android; // TODO / SDKInstance bind
-    void *mInstance_Impl_iOS;
   };
 }
 

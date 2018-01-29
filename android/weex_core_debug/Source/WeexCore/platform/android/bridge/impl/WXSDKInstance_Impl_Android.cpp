@@ -31,18 +31,6 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
   render->BindComponentImplAndroid(component);
 }
 
-static void BindInstanceToWXCore(JNIEnv *env, jobject jcaller,
-                                 jstring instanceId,
-                                 jobject instance) {
-  if (instance == nullptr)
-    return;
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
-  if (page == nullptr)
-    return;
-  page->BindInstanceImplAndroid(instance);
-}
-
 static void OnInstanceClose(JNIEnv *env, jobject jcaller,
                             jstring instanceId) {
   RenderManager::GetInstance()->ClosePage(jString2Str(env, instanceId));
