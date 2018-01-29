@@ -174,7 +174,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   @Override
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
-    WXLogUtils.e("updateProperties instanceId="+ getInstanceId()+", ref=" + getRef() + ", " + WXLogUtils.parseMap(props));
     if (isRecycler(this)) {
       if(WXBasicComponentType.WATERFALL.equals(getComponentType())){
         mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
