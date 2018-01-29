@@ -1410,7 +1410,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         if(rootComponent == null){
           return;
         }
-        rootComponent.applyLayoutAndEvent(rootComponent);
+//        rootComponent.applyLayoutAndEvent(rootComponent);
 
         WXBridgeManager.getInstance().post(new Runnable() {
           @Override
