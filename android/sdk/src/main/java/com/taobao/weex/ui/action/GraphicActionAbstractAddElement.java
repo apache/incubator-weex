@@ -45,18 +45,17 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   }
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    if (basicComponentData != null) {
+      basicComponentData.addStyle(mStyle);
+      basicComponentData.addAttr(mAttributes);
+      basicComponentData.addEvent(mEvents);
+      basicComponentData.addShorthand(mPaddings);
+      basicComponentData.addShorthand(mMargins);
+      basicComponentData.addShorthand(mBorders);
+    }
 
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
-
-    if (component != null) {
-      component.addStyle(mStyle);
-      component.addAttr(mAttributes);
-      component.addEvent(mEvents);
-      component.addShorthand(mPaddings);
-      component.addShorthand(mMargins);
-      component.addShorthand(mBorders);
-    }
 
     return component;
   }

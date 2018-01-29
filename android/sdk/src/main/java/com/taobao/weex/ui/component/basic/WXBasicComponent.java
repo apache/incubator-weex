@@ -37,22 +37,17 @@ import java.util.Set;
 
 public abstract class WXBasicComponent<T extends View> {
 
-  private WXStyle mStyles;
-  private WXAttr mAttributes;
-  private WXEvent mEvents;
-  private CSSShorthand mMargins;
-  private CSSShorthand mPaddings;
-  private CSSShorthand mBorders;
-
   private Object mExtra;
   private String mComponentType;
   private String mRef;
   private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
   private GraphicSize mLayoutSize = new GraphicSize(0, 0);
+  private BasicComponentData mBasicComponentData;
 
   private int mViewPortWidth =750;
 
   public WXBasicComponent(BasicComponentData basicComponentData) {
+    this.mBasicComponentData = basicComponentData;
     this.mRef = basicComponentData.mRef;
     this.mComponentType = basicComponentData.mComponentType;
   }
@@ -64,26 +59,26 @@ public abstract class WXBasicComponent<T extends View> {
 
   public final @NonNull
   WXStyle getStyles() {
-    if (mStyles == null) {
-      mStyles = new WXStyle();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getStyles();
     }
-    return mStyles;
+    return null;
   }
 
   public final @NonNull
   WXAttr getAttrs() {
-    if (mAttributes == null) {
-      mAttributes = new WXAttr();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getAttrs();
     }
-    return mAttributes;
+    return null;
   }
 
   public final @NonNull
   WXEvent getEvents() {
-    if (mEvents == null) {
-      mEvents = new WXEvent();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getEvents();
     }
-    return mEvents;
+    return null;
   }
 
   /**
@@ -91,10 +86,10 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public final @NonNull
   CSSShorthand getMargin() {
-    if (mMargins == null) {
-      mMargins = new CSSShorthand();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getMargin();
     }
-    return mMargins;
+    return null;
   }
 
   /**
@@ -102,10 +97,10 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public final @NonNull
   CSSShorthand getPadding() {
-    if (mPaddings == null) {
-      mPaddings = new CSSShorthand();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getPadding();
     }
-    return mPaddings;
+    return null;
   }
 
   /**
@@ -113,138 +108,71 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public @NonNull
   CSSShorthand getBorder() {
-    if (mBorders == null) {
-      mBorders = new CSSShorthand();
+    if (mBasicComponentData != null) {
+      return mBasicComponentData.getBorder();
     }
-    return mBorders;
+    return null;
   }
 
-  public final void setMargins(@NonNull CSSShorthand mMargins) {
-    this.mMargins = mMargins;
+  public final void setMargins(@NonNull CSSShorthand margins) {
+    if (mBasicComponentData != null) {
+      mBasicComponentData.setMargins(margins);
+    }
   }
 
-  public final void setPaddings(@NonNull CSSShorthand mPaddings) {
-    this.mPaddings = mPaddings;
+  public final void setPaddings(@NonNull CSSShorthand paddings) {
+    if (mBasicComponentData != null) {
+      mBasicComponentData.setPaddings(paddings);
+    }
   }
 
-  public final void setBorders(@NonNull CSSShorthand mBorders) {
-    this.mBorders = mBorders;
+  public final void setBorders(@NonNull CSSShorthand borders) {
+    if (mBasicComponentData != null) {
+      mBasicComponentData.setBorders(borders);
+    }
   }
 
   public final void addAttr(Map<String, Object> attrs) {
     if (attrs == null || attrs.isEmpty()) {
       return;
     }
-    if (mAttributes == null) {
-      mAttributes = new WXAttr();
+    if (mBasicComponentData != null) {
+      mBasicComponentData.addAttr(attrs);
     }
-    mAttributes.putAll(attrs);
   }
 
   public final void addStyle(Map<String, Object> styles) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
-    if (mStyles == null) {
-      mStyles = new WXStyle();
+    if (mBasicComponentData != null) {
+      mBasicComponentData.addStyle(styles);
     }
-    addStyle(styles, false);
   }
 
   public final void addStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
-    if (mStyles == null) {
-      mStyles = new WXStyle();
+    if (mBasicComponentData != null) {
+      mBasicComponentData.addStyle(styles, byPesudo);
     }
-    mStyles.putAll(styles, byPesudo);
   }
 
   public final void addEvent(Set<String> events) {
     if (events == null || events.isEmpty()) {
       return;
     }
-    if (mEvents == null) {
-      mEvents = new WXEvent();
+
+    if (mBasicComponentData != null) {
+      mBasicComponentData.addEvent(events);
     }
-    mEvents.addAll(events);
   }
 
   public final void addShorthand(Map<String, String> shorthand) {
-    if (!shorthand.isEmpty()) {
-      for (Map.Entry<String, String> item : shorthand.entrySet()) {
-        String key = item.getKey();
-        switch (key) {
-          case Constants.Name.MARGIN:
-            addMargin(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.MARGIN_LEFT:
-            addMargin(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.MARGIN_TOP:
-            addMargin(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.MARGIN_RIGHT:
-            addMargin(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.MARGIN_BOTTOM:
-            addMargin(CSSShorthand.EDGE.BOTTOM,WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.BORDER_WIDTH:
-            addBorder(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.BORDER_TOP_WIDTH:
-            addBorder(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.BORDER_RIGHT_WIDTH:
-            addBorder(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.BORDER_BOTTOM_WIDTH:
-            addBorder(CSSShorthand.EDGE.BOTTOM, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.BORDER_LEFT_WIDTH:
-            addBorder(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.PADDING:
-            addPadding(CSSShorthand.EDGE.ALL, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.PADDING_LEFT:
-            addPadding(CSSShorthand.EDGE.LEFT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.PADDING_TOP:
-            addPadding(CSSShorthand.EDGE.TOP, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.PADDING_RIGHT:
-            addPadding(CSSShorthand.EDGE.RIGHT, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-          case Constants.Name.PADDING_BOTTOM:
-            addPadding(CSSShorthand.EDGE.BOTTOM, WXUtils.fastGetFloat(shorthand.get(key)));
-            break;
-        }
-      }
+    if (!shorthand.isEmpty() && mBasicComponentData != null) {
+      mBasicComponentData.addShorthand(shorthand);
     }
-  }
-
-  private void addMargin(CSSShorthand.EDGE spacingType, float margin) {
-    if (mMargins == null) {
-      mMargins = new CSSShorthand();
-    }
-    mMargins.set(spacingType, margin);
-  }
-
-  private void addPadding(CSSShorthand.EDGE spacingType, float padding) {
-    if (mPaddings == null) {
-      mPaddings = new CSSShorthand();
-    }
-    mPaddings.set(spacingType, padding);
-  }
-
-  private void addBorder(CSSShorthand.EDGE spacingType, float border) {
-    if (mBorders == null) {
-      mBorders = new CSSShorthand();
-    }
-    mBorders.set(spacingType, border);
   }
 
   public int getViewPortWidth() {
