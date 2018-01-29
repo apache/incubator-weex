@@ -21,12 +21,16 @@ package com.taobao.weex.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
+import android.graphics.drawable.shapes.Shape;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -121,6 +125,15 @@ public class ImageDrawable extends PaintDrawable {
   public void setCornerRadii(float[] radii) {
     this.radii = radii;
     super.setCornerRadii(radii);
+  }
+
+  @Override
+  protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+      // fix api 21 PaintDrawable crash
+      paint.setAntiAlias(false);
+    }
+    super.onDraw(shape, canvas, paint);
   }
 
   public

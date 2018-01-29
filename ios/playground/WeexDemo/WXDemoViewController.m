@@ -57,15 +57,14 @@
 {
     [super viewDidLoad];
     
-    [self setupNaviBar];
-    [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view setClipsToBounds:YES];
     
-    _weexHeight = self.view.frame.size.height - 64;
+    _showNavigationBar = NO;
+    [self.navigationController setNavigationBarHidden:_showNavigationBar];
+    _weexHeight = self.view.frame.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationRefreshInstance:) name:@"RefreshInstance" object:nil];
-    
     [self render];
 }
 
@@ -84,13 +83,24 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBarHidden = NO;
+    [self setupNaviBar];
+    [self setupRightBarItem];
+    [self.navigationController setNavigationBarHidden:_showNavigationBar];
 }
 
 //TODO get height
 - (void)viewDidLayoutSubviews
 {
-    _weexHeight = self.view.frame.size.height;
+    _weexHeight = [UIScreen mainScreen].bounds.size.height - CGRectGetMaxY(self.navigationController.navigationBar.frame);
+    UIEdgeInsets safeArea = UIEdgeInsetsZero;
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        safeArea = self.view.safeAreaInsets;
+    } else {
+        // Fallback on earlier versions
+    }
+#endif
+    _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.top-safeArea.bottom);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -112,6 +122,9 @@
 - (void)render
 {
     CGFloat width = self.view.frame.size.width;
+//    if ([_url.absoluteString isEqualToString:HOME_URL]) {
+//        [self.navigationController setNavigationBarHidden:YES];
+//    }
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
@@ -119,7 +132,17 @@
     }
     
     _instance.viewController = self;
-    _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
+    UIEdgeInsets safeArea = UIEdgeInsetsZero;
+    
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        safeArea = self.view.safeAreaInsets;
+    } else {
+        // Fallback on earlier versions
+    }
+#endif
+    
+    _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight-safeArea.bottom);
     
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
@@ -162,9 +185,17 @@
         [WXPrerenderManager renderFromCache:[self.url absoluteString]];
         return;
     }
+    _instance.viewController = self;
     NSURL *URL = [self testURL: [self.url absoluteString]];
     NSString *randomURL = [NSString stringWithFormat:@"%@%@random=%d",URL.absoluteString,URL.query?@"&":@"?",arc4random()];
     [_instance renderWithURL:[NSURL URLWithString:randomURL] options:@{@"bundleUrl":URL.absoluteString} data:nil];
+    [self.navigationController.navigationBar setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+                                                                      [UIColor whiteColor], NSForegroundColorAttributeName, nil]];
+    if([_instance.pageName hasPrefix:@"http://dotwe.org"] || [_instance.pageName hasPrefix:@"https://dotwe.org"]) {
+        self.navigationItem.title = @"Weex Online Example";
+    } else {
+        self.navigationItem.title = _instance.pageName;
+    }
 }
 
 - (void)updateInstanceState:(WXState)state

@@ -24,11 +24,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.NativeInvokeHelper;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 class ModuleInvocationAction implements DOMAction, RenderAction {
@@ -61,6 +63,12 @@ class ModuleInvocationAction implements DOMAction, RenderAction {
         try {
             helper.invoke(mWXModule,mInvoker,mArgs);
         } catch (Exception e) {
+		  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_MODULEINVO.getErrorCode(),
+				  "updateAttr",
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_MODULEINVO.getErrorMsg() + "callModuleMethod >>> invoke module:"
+						  + mWXModule.getClass().getSimpleName() + " failed. " + WXLogUtils.getStackTrace(e),null);
+
             WXLogUtils.e("callModuleMethod >>> invoke module:" + mWXModule.getClass().getSimpleName()
                     + " failed. ", e);
         }

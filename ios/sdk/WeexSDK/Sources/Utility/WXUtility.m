@@ -33,7 +33,7 @@
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <coreText/CoreText.h>
+#import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
@@ -41,9 +41,9 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-static BOOL utilityShouldRoundPixel = NO;
+static BOOL threadSafeCollectionUsingLock = YES;
 
-void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -56,7 +56,7 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -69,7 +69,7 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *thread)
 {
     [WXUtility performBlock:block onThread:thread];
 }
@@ -119,34 +119,35 @@ CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor)
 
 CGFloat WXRoundPixelValue(CGFloat value)
 {
-    if (utilityShouldRoundPixel) {
-        CGFloat scale = WXScreenScale();
-        return round(value * scale) / scale;
-    }
-    return value;
+    CGFloat scale = WXScreenScale();
+    return round(value * scale) / scale;
 }
 
 CGFloat WXCeilPixelValue(CGFloat value)
 {
-    if (utilityShouldRoundPixel) {
-        CGFloat scale = WXScreenScale();
-        return ceil(value * scale) / scale;
-    }
-    return value;
+    CGFloat scale = WXScreenScale();
+    return ceil(value * scale) / scale;
 }
 
 CGFloat WXFloorPixelValue(CGFloat value)
 {
-    if (utilityShouldRoundPixel) {
-        CGFloat scale = WXScreenScale();
-        return floor(value * scale) / scale;
-    }
-    return value;
+    CGFloat scale = WXScreenScale();
+    return floor(value * scale) / scale;
 }
 
 @implementation WXUtility
 
-+ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
+{
+    threadSafeCollectionUsingLock = usingLock;
+}
+
++ (BOOL)threadSafeCollectionUsingLock
+{
+    return threadSafeCollectionUsingLock;
+}
+
++ (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {
     if (!thread || !block) return;
     
@@ -160,18 +161,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
 }
 
-+ (void)_performBlock:(void (^)())block
++ (void)_performBlock:(void (^)(void))block
 {
     block();
-}
-
-+ (void)setShouldRoudPixel:(BOOL)shouldRoundPixel
-{
-    utilityShouldRoundPixel = shouldRoundPixel;
-}
-+ (BOOL)shouldRoudPixel
-{
-    return utilityShouldRoundPixel;
 }
 
 + (NSDictionary *)getEnvironment

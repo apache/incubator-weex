@@ -47,6 +47,7 @@
 + (void)_registerDefaultModules
 {
     [self registerModule:@"dom" withClass:NSClassFromString(@"WXDomModule")];
+    [self registerModule:@"locale" withClass:NSClassFromString(@"WXLocaleModule")];
     [self registerModule:@"navigator" withClass:NSClassFromString(@"WXNavigatorModule")];
     [self registerModule:@"stream" withClass:NSClassFromString(@"WXStreamModule")];
     [self registerModule:@"animation" withClass:NSClassFromString(@"WXAnimationModule")];
@@ -100,7 +101,7 @@
     [self registerComponent:@"input" withClass:NSClassFromString(@"WXTextInputComponent")];
     [self registerComponent:@"video" withClass:NSClassFromString(@"WXVideoComponent")];
     [self registerComponent:@"indicator" withClass:NSClassFromString(@"WXIndicatorComponent")];
-    [self registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+    [self registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
     [self registerComponent:@"cycleslider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
     [self registerComponent:@"web" withClass:NSClassFromString(@"WXWebComponent")];
     [self registerComponent:@"loading" withClass:NSClassFromString(@"WXLoadingComponent")];

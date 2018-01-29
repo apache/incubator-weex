@@ -1,7 +1,7 @@
 
 buildscript {
     repositories {
-        mavenCentral()
+        mavenLocal()
         jcenter()
     }
     dependencies {
@@ -15,18 +15,18 @@ plugins {
 }
 
 repositories {
-        mavenCentral()
-        jcenter()
+    mavenLocal()
+    jcenter()
 }
 
 subprojects {
     repositories {
-        mavenCentral()
+        mavenLocal()
         jcenter()
     }
     buildscript {
         repositories {
-            mavenCentral()
+            mavenLocal()
             jcenter()
         }
         dependencies {

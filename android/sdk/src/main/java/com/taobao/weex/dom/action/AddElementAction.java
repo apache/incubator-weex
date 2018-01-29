@@ -41,6 +41,7 @@ final class AddElementAction extends AbstractAddElementAction {
   private final String mParentRef;
   private final int mAddIndex;
   private final JSONObject mData;
+  private StringBuilder mErrMsg = new StringBuilder("AddElementAction Error:");
 
   private String mRef;
 
@@ -55,6 +56,8 @@ final class AddElementAction extends AbstractAddElementAction {
   protected WXComponent createComponent(DOMActionContext context, WXDomObject domObject) {
     WXComponent comp = context.getCompByRef(mParentRef);
     if (comp == null || !(comp instanceof WXVContainer)) {
+	  mErrMsg.append("WXComponent comp = context.getCompByRef(mParentRef) is null or \n")
+			  .append("!(comp instanceof WXVContainer)");
       return null;
     }
     return generateComponentTree(context, domObject, (WXVContainer) comp);
@@ -66,7 +69,8 @@ final class AddElementAction extends AbstractAddElementAction {
     WXDomObject parent;
     mRef = domObject.getRef();
     if ((parent = context.getDomByRef(mParentRef)) == null) {
-      context.getInstance().commitUTStab(IWXUserTrackAdapter.DOM_MODULE, getErrorCode());
+	  mErrMsg.append("parent = context.getDomByRef(mParentRef)) == null");
+//      context.getInstance().commitUTStab(IWXUserTrackAdapter.DOM_MODULE, getErrorCode());
       return;
     } else {
       //non-root and parent exist
@@ -82,7 +86,12 @@ final class AddElementAction extends AbstractAddElementAction {
 
   @Override
   protected WXErrorCode getErrorCode() {
-    return WXErrorCode.WX_ERR_DOM_ADDELEMENT;
+    return WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_ELEMENT;
+  }
+
+  @Override
+  protected String getErrorMsg() {
+	return mErrMsg.toString();
   }
 
   @Override
@@ -96,12 +105,15 @@ final class AddElementAction extends AbstractAddElementAction {
     WXSDKInstance instance = context.getInstance();
     if (instance == null || instance.getContext() == null) {
       WXLogUtils.e("instance is null or instance is destroy!");
+	  mErrMsg.append("instance is null or instance is destroy!");
       return;
     }
     try {
       WXVContainer parent = (WXVContainer) context.getComponent(mParentRef);
       if (parent == null || component == null) {
-        return;
+		mErrMsg.append("parent == null || component == null")
+				.append("parent=" + parent).append("component=" + component);
+		return;
       }
 
       Stopwatch.tick();
@@ -130,6 +142,7 @@ final class AddElementAction extends AbstractAddElementAction {
       }
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
+	  mErrMsg.append("add component failed.").append(WXLogUtils.getStackTrace(e));
     }
   }
 }

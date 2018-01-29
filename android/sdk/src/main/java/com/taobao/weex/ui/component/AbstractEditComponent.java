@@ -41,6 +41,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
@@ -203,6 +204,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       });
     } else if (type.equals(Constants.Event.INPUT)) {
       text.addTextChangedListener(new TextWatcher() {
+        boolean  hasChangeForDefaultValue = false;
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -221,11 +223,14 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
           mBeforeText = s.toString();
 
-          if (getDomObject() != null && getDomObject().getAttrs() != null) {
-            Object val = getDomObject().getAttrs().get(Constants.Name.VALUE);
-            String valString = WXUtils.getString(val, null);
-            if (mBeforeText != null && mBeforeText.equals(valString)) {
-              return;
+          if(!hasChangeForDefaultValue){
+            if (getDomObject() != null && getDomObject().getAttrs() != null) {
+              Object val = getDomObject().getAttrs().get(Constants.Name.VALUE);
+              String valString = WXUtils.getString(val, null);
+              if (mBeforeText != null && mBeforeText.equals(valString)) {
+                hasChangeForDefaultValue = true;
+                return;
+              }
             }
           }
 
@@ -569,24 +574,24 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (getHostView() == null) {
       return false;
     } else {
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
         }
-      }, 100);
+      }), 100);
     }
     return true;
   }
 
   private void hideSoftKeyboard() {
     if (getHostView() != null) {
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
         }
-      }, 16);
+      }), 16);
     }
   }
 
@@ -647,7 +652,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if ((hostView = getHostView()) != null) {
       final Context context = getContext();
       if (context != null && context instanceof Activity) {
-        hostView.postDelayed(new Runnable() {
+        hostView.postDelayed(WXThread.secure(new Runnable() {
           @Override
           public void run() {
             View currentFocus = ((Activity) context).getCurrentFocus();
@@ -655,7 +660,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
               mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
             }
           }
-        }, 16);
+        }), 16);
       }
     }
   }

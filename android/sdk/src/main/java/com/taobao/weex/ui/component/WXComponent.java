@@ -43,7 +43,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -59,6 +61,8 @@ import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
+import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
@@ -106,6 +110,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * abstract component
@@ -137,7 +143,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
-  private WXGesture mGesture;
+  protected WXGesture mGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
@@ -307,16 +313,42 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public final void fireEvent(String type, Map<String, Object> params){
-    fireEvent(type,params,null);
+    fireEvent(type, params,null, null);
+  }
+
+  public final EventResult fireEventWait(String type, Map<String, Object> params){
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+    EventResult callback = new EventResult(){
+      @Override
+      public void onCallback(Object result) {
+        super.onCallback(result);
+        waitLatch.countDown();
+      }
+    };
+    try{
+      fireEvent(type, params, null, callback);
+      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      return  callback;
+    }catch (Exception e){
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e("fireEventWait", e);
+      }
+      return  callback;
+    }
   }
 
   protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
+      fireEvent(type, params, domChanges, null);
+  }
+
+
+    private final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges, EventResult callback){
     if(mInstance != null && mDomObj != null) {
         List<Object> eventArgsValues = null;
         if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
              eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
         }
-        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues);
+        mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues, callback);
     }
   }
 
@@ -859,6 +891,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           t.printStackTrace();
         }
         return true;
+      case Constants.Name.ROLE:
+        setRole(WXUtils.getString(param, ""));
+        return true;
       default:
         return false;
     }
@@ -889,8 +924,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       float quality = WXUtils.getFloat(shadowQuality, 0.5f);
       int viewPort = getInstance().getInstanceViewPortWidth();
       String token = new StringBuilder(boxShadow.toString()).append(" / [")
-          .append(getDomObject().getStyles().getWidth(viewPort)).append(",")
-          .append(getDomObject().getStyles().getHeight(viewPort)).append("] / ")
+          .append(target.getMeasuredWidth()).append(",")
+          .append(target.getMeasuredHeight()).append("] / ")
           .append(quality).toString();
 
       if (mLastBoxShadowId != null && mLastBoxShadowId.equals(token)) {
@@ -941,7 +976,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (getDomObject() != null && getDomObject().getStyles() != null) {
       Object obj = getDomObject().getStyles().get(Constants.Name.BOX_SHADOW);
       if (obj == null) {
-        WXLogUtils.d("BoxShadow", "no box-shadow");
         return;
       }
     }
@@ -957,6 +991,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         overlay.clear();
       }
     }
+    mLastBoxShadowId = null;
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -971,6 +1006,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     View host = getHostView();
     if(host != null){
       host.setContentDescription(label);
+    }
+  }
+
+  protected void setRole(String roleKey) {
+    View host = getHostView();
+    String role = roleKey;
+    if (host != null && !TextUtils.isEmpty(roleKey)) {
+      IWXAccessibilityRoleAdapter roleAdapter = WXSDKManager.getInstance().getAccessibilityRoleAdapter();
+      if (roleAdapter != null) {
+        role = roleAdapter.getRole(roleKey);
+      }
+      final String finalRole = role;
+      AccessibilityDelegateCompat delegate = new AccessibilityDelegateCompat() {
+        @Override
+        public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+          super.onInitializeAccessibilityNodeInfo(host, info);
+          info.setRoleDescription(finalRole);
+        }
+      };
+      ViewCompat.setAccessibilityDelegate(host, delegate);
     }
   }
 
@@ -1089,6 +1144,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           return true;
         }
       }
+    }
+    if(Constants.Event.SHOULD_STOP_PROPAGATION.equals(type)){
+      return  true;
     }
     return false;
   }
@@ -1580,10 +1638,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+  @CallSuper
   public void recycled() {
     if(mDomObj.isFixed())
       return;
 
+    clearBoxShadow();
   }
 
   public void destroy() {
@@ -1656,25 +1716,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  protected boolean containsEvent(String event){
+  public boolean containsEvent(String event){
     return mDomObj.getEvents().contains(event) || mAppendEvents.contains(event);
   }
 
   public void notifyAppearStateChange(String wxEventType,String direction){
-    if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("direction", direction);
-      fireEvent(wxEventType, params);
+    if(containsEvent(wxEventType)) {
+       Map<String, Object> params = new HashMap<>();
+       params.put("direction", direction);
+       fireEvent(wxEventType, params);
     }
   }
 
-  public void notifyWatchAppearDisappearEvent(String wxEventType,String direction){
-    if(containsEvent(wxEventType)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("direction", direction);
-      fireEvent(wxEventType, params);
-    }
-  }
 
   public boolean isUsing() {
     return isUsing;

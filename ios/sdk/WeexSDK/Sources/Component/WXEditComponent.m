@@ -40,6 +40,7 @@
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
 @property (nonatomic) NSUInteger rows;
+@property (nonatomic) BOOL hideDoneButton;
 
 //style
 @property (nonatomic) WXPixelType fontSize;
@@ -105,6 +106,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
             _rows = 2;
         }
         
+        if (attributes[@"hideDoneButton"]) {
+            _hideDoneButton = [attributes[@"hideDoneButton"] boolValue];
+        }
+        
         // handle styles
         if (styles[@"color"]) {
             _colorForStyle = [WXConvert UIColor:styles[@"color"]];
@@ -159,12 +164,15 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     [self setReturnKeyType:_returnKeyType];
     [self updatePattern];
     
-    UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
-    UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];
-    toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
-    
-    self.inputAccessoryView = toolbar;
+    if (!self.hideDoneButton) {
+        UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
+        UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];
+        toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
+        
+        self.inputAccessoryView = toolbar;
+    }
+
     [self handlePseudoClass];
 }
 

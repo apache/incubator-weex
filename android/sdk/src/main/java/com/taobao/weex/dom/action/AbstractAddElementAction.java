@@ -33,6 +33,7 @@ import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.List;
@@ -63,7 +64,13 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
       for (int i = 0; i < count; ++i) {
         child = dom.getChild(i);
         if (child != null) {
-          parentC.addChild(generateComponentTree(context, child, parentC));
+          WXComponent createdComponent = generateComponentTree(context, child, parentC);
+          if(createdComponent != null) {
+            parentC.addChild(createdComponent);
+          }else{
+            WXLogUtils.e("[generateComponentTree] " + getStatementName() + " create dom component failed name " + child.getType());
+            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode().getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
+          }
         }
       }
     }
@@ -85,9 +92,12 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     if (instance == null) {
       return;
     }
-    WXErrorCode errCode = getErrorCode();
-    if (dom == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+    String errCode = getErrorCode().getErrorCode();
+	String errMsg  = getErrorMsg();
+
+	if (dom == null) {
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
     }
 
     //only non-root has parent.
@@ -97,8 +107,9 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
       WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-      return;
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  return;
     }
     appendDomToTree(context, domObject);
     Stopwatch.split("appendDomToTree");
@@ -113,9 +124,11 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     //Create component in dom thread
     WXComponent component = createComponent(context, domObject);
     if (component == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
       //stop redner, some fatal happened.
-      return;
+//	  errMsg = "component == null";
+//	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  return;
     }
     Stopwatch.split("createComponent");
 
@@ -123,7 +136,7 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     context.postRenderTask(this);
     addAnimationForDomTree(context, domObject);
 
-    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+//    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     if (WXTracing.isAvailable()) {
       List<Stopwatch.ProcessEvent> events = Stopwatch.getProcessEvents();
       for (Stopwatch.ProcessEvent event : events) {
@@ -146,4 +159,7 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
   protected abstract String getStatementName();
 
   protected abstract WXErrorCode getErrorCode();
+
+  protected abstract String getErrorMsg();
+
 }

@@ -44,6 +44,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
+import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -70,10 +71,12 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.Trace;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -87,6 +90,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -97,6 +101,8 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
  * It can be a pure weex view, or mixed with native view
  */
 public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener {
+
+  private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
 
   //Performance
   public boolean mEnd = false;
@@ -112,6 +118,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private WXRefreshData mLastRefreshData;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
+  public static String requestUrl = "requestUrl";
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
@@ -166,6 +173,28 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
+  private boolean mIsCommitedDomAtionExp = false;
+
+  public PriorityQueue<WXEmbed> hiddenEmbeds;
+
+  private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit
+
+
+  public boolean getismIsCommitedDomAtionExp() {
+	return mIsCommitedDomAtionExp;
+  }
+
+  public void setmIsCommitedDomAtionExp(boolean mIsCommitedDomAtionExp) {
+	this.mIsCommitedDomAtionExp = mIsCommitedDomAtionExp;
+  }
+
+  public int getMaxHiddenEmbedsNum() {
+    return maxHiddenEmbedsNum;
+  }
+
+  public void setMaxHiddenEmbedsNum(int maxHiddenEmbedsNum) {
+    this.maxHiddenEmbedsNum = maxHiddenEmbedsNum;
+  }
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -468,7 +497,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
+	mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
+	if (TextUtils.isEmpty(mBundleUrl)) {
+	  mBundleUrl = mWXPerformance.pageName;
+	}
+
+	WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
@@ -493,7 +527,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    mWXPerformance.pageName = pageName;
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
     mRenderStartTime = System.currentTimeMillis();
@@ -503,10 +536,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
-
-    if (TextUtils.isEmpty(mBundleUrl)) {
-      mBundleUrl = pageName;
-    }
   }
 
   private void renderByUrlInternal(String pageName,
@@ -540,6 +569,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = rewriteUri(Uri.parse(url),URIAdapter.BUNDLE).toString();
+	if(wxRequest != null && !TextUtils.isEmpty(wxRequest.url)){
+	  requestUrl = wxRequest.url;
+	}else {
+	  requestUrl = pageName;
+	}
+
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
@@ -605,7 +640,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private String wrapPageName(String pageName, String url) {
     if(TextUtils.equals(pageName, WXPerformance.DEFAULT)){
-      pageName=url;
+      pageName = url;
+	  WXExceptionUtils.degradeUrl = pageName;
       try {
         Uri uri=Uri.parse(url);
         if(uri!=null){
@@ -1214,38 +1250,38 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /**
-   * UserTrack Log
+   * UserTrack Log instead by {@code WXExceptionUtils#commitCriticalExceptionRT}
    */
-  public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (TextUtils.isEmpty(type) || errorCode == null) {
-      return;
-    }
-
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        // Record exception if a render error happened.
-        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
-          mStatisticsListener.onException(mInstanceId,
-                                          errorCode.getErrorCode(),
-                                          errorCode.getErrorMsg());
-        }
-
-        WXPerformance performance = new WXPerformance();
-        performance.errCode = errorCode.getErrorCode();
-        performance.args = errorCode.getArgs();
-        if (errorCode != WXErrorCode.WX_SUCCESS) {
-          performance.errMsg = errorCode.getErrorMsg();
-          if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(performance.toString());
-          }
-        }
-        if( mUserTrackAdapter!= null) {
-          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
-        }
-      }
-    });
-  }
+//  public void commitUTStab(final String type, final WXErrorCode errorCode) {
+//    if (TextUtils.isEmpty(type) || errorCode == null) {
+//      return;
+//    }
+//
+//    runOnUiThread(new Runnable() {
+//      @Override
+//      public void run() {
+//        // Record exception if a render error happened.
+//        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
+//          mStatisticsListener.onException(mInstanceId,
+//                                          errorCode.getErrorCode(),
+//                                          errorCode.getErrorMsg());
+//        }
+//
+//        WXPerformance performance = new WXPerformance();
+//        performance.errCode = errorCode.getErrorCode();
+//        performance.args = errorCode.getArgs();
+//        if (errorCode != WXErrorCode.WX_SUCCESS) {
+//          performance.errMsg = errorCode.getErrorMsg();
+//          if (WXEnvironment.isApkDebugable()) {
+//            WXLogUtils.d(performance.toString());
+//          }
+//        }
+//        if( mUserTrackAdapter!= null) {
+//          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
+//        }
+//      }
+//    });
+//  }
 
   private void destroyView(View rootView) {
     try {
@@ -1444,7 +1480,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param domChanges
    */
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs){
-    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs);
+    fireEvent(elementRef, type, data, domChanges, eventArgs, null);
+  }
+
+  public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs, EventResult callback) {
+    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs, callback);
   }
   /**
    * Fire event callback on a element.
@@ -1694,13 +1734,32 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             performance.appendErrMsg(response.errorCode);
             performance.appendErrMsg("|");
             performance.appendErrMsg(response.errorMsg);
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+					"\n response.errorCode=" + response.errorCode +
+					"\n response.errorMsg=" +  response.errorMsg +
+					"\n response=" + getTemplateInfo(),
+					null);
+
           }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
             performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
             performance.appendErrMsg(response.statusCode);
             performance.appendErrMsg("|template is null!");
+
+			WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+					WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorCode(),
+					"WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED_TEMPLATE_NULL", WXErrorCode.WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED.getErrorMsg() +
+							"\n response.errorCode=" + response.errorCode +
+							"\n response.errorMsg=" +  response.errorMsg +
+							"\n response=" + getTemplateInfo(),
+					null);
+
           }else {
             performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
-          }
+		  }
+
           if (mUserTrackAdapter != null) {
             mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
           }
@@ -1710,11 +1769,30 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
-      } else if (TextUtils.equals(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR, response.statusCode)) {
-        WXLogUtils.d("user intercept");
-        onRenderError(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,response.errorMsg);
-      } else {
-        onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
+
+		// check content-type
+      } else if (TextUtils.equals(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+			  response.statusCode)) {
+        WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getDegradErrorCode(),
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
+				"|instance bundleUrl = \n" + instance.getBundleUrl() +
+				"|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
+		);
+
+		// check content-length
+      } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
+		WXLogUtils.e("user intercept: WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED");
+		onRenderError(
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorCode(),
+				WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getDegradErrorMsg() +
+				"|response.errorMsg==" + response.errorMsg +
+				"|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+	  }
+      else {
+        onRenderError(WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode(),
+				response.errorMsg);
       }
     }
   }
@@ -1725,19 +1803,55 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public String getTemplateInfo() {
     String template = getTemplate();
     if(template == null){
-      return " template md5 null";
+      return " template md5 null " + JSONObject.toJSONString(responseHeaders);
     }
     if(TextUtils.isEmpty(template)){
-      return " template md5  length 0";
+      return " template md5  length 0 " + JSONObject.toJSONString(responseHeaders);
     }
     try {
       byte[] bts = template.getBytes("UTF-8");
-      return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
-               + "response header " + JSONObject.toJSONString(responseHeaders);
+      String sourceMD5 = WXFileUtils.md5(bts);
+      String sourceBase64MD5 = WXFileUtils.base64Md5(bts);
+      ArrayList<String> sourceMD5List = new ArrayList<>();
+      ArrayList<String> sourceBase64MD5List = new ArrayList<>();
+      sourceMD5List.add(sourceMD5);
+      sourceBase64MD5List.add(sourceBase64MD5);
+      responseHeaders.put("templateSourceMD5", sourceMD5List);
+      responseHeaders.put(SOURCE_TEMPLATE_BASE64_MD5, sourceBase64MD5List);
+      return " template md5 " + sourceMD5 + " length " +   bts.length
+              + " base64 md5 " + sourceBase64MD5
+               + " response header " + JSONObject.toJSONString(responseHeaders);
     } catch (UnsupportedEncodingException e) {
       return "template md5 getBytes error";
     }
 
+  }
+
+  /**
+   * check template header md5 match with header  content-md5
+   * */
+  public boolean isContentMd5Match(){
+    if(responseHeaders == null){
+      return true;
+    }
+    List<String> contentMD5s = responseHeaders.get("Content-Md5");
+    if(contentMD5s == null){
+      contentMD5s  = responseHeaders.get("content-md5");
+    }
+    if(contentMD5s == null || contentMD5s.size() <= 0){
+      return true;
+    }
+    String md5 = contentMD5s.get(0);
+
+    List<String> sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    if(sourceBase64Md5 == null){
+      getTemplateInfo();
+      sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    }
+    if(sourceBase64Md5 == null || sourceBase64Md5.size() == 0){
+      return  true;
+    }
+    return  md5.equals(sourceBase64Md5.get(0));
   }
 
   public String getTemplate() {
@@ -1748,7 +1862,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void setTemplate(String template) {
-    this.templateRef = new WeakReference<String>(template);
+    this.templateRef = new WeakReference<>(template);
   }
 
   public interface NestedInstanceInterceptor {

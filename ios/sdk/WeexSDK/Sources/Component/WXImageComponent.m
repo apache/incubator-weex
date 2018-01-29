@@ -54,7 +54,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     pthread_mutexattr_t _propertMutexAttr;
 }
 
-@property (nonatomic, strong) NSString *placeholdSrc;
+@property (atomic, strong) NSString *placeholdSrc;
 @property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
@@ -113,7 +113,7 @@ WX_EXPORT_METHOD(@selector(save:))
 - (void)configPlaceHolder:(NSDictionary*)attributes
 {
     if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
-        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        self.placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
 }
 
@@ -384,8 +384,8 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     
     WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-    NSString *newURL = [_placeholdSrc copy];
-    WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance)
+    NSString *newURL = [self.placeholdSrc copy];
+    WX_REWRITE_URL(self.placeholdSrc, WXResourceTypeImage, self.weexInstance)
     
     __weak typeof(self) weakSelf = self;
     self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {

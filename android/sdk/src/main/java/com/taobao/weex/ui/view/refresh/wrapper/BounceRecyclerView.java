@@ -22,7 +22,6 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.component.list.ListComponentView;
 import com.taobao.weex.ui.component.list.StickyHeaderHelper;
 import com.taobao.weex.ui.component.list.WXCell;
@@ -41,12 +40,6 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   private int mColumnCount = DEFAULT_COLUMN_COUNT;
   private float mColumnGap = DEFAULT_COLUMN_GAP;
   private StickyHeaderHelper mStickyHeaderHelper;
-
-
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
 
   public BounceRecyclerView(Context context,int type,int columnCount,float columnGap,int orientation) {
     super(context, orientation);
@@ -73,8 +66,8 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   }
 
   @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    boolean result = super.onTouchEvent(event);
+  public boolean dispatchTouchEvent(MotionEvent event) {
+    boolean result = super.dispatchTouchEvent(event);
     if (mGesture != null) {
       result |= mGesture.onTouch(this, event);
     }
@@ -123,7 +116,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     mStickyHeaderHelper.notifyStickyRemove(compToRemove);
   }
 
-
+  public StickyHeaderHelper getStickyHeaderHelper() {
+    return mStickyHeaderHelper;
+  }
 
   @Override
   public void registerGestureListener(@Nullable WXGesture wxGesture) {
