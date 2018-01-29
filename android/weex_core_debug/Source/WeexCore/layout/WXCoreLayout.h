@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <WeexCore/css/ConstantsName.h>
 
 namespace WeexCore {
 
@@ -27,17 +28,18 @@ namespace WeexCore {
   } ;
 
   struct WXCoreSize {
-    float hypotheticalWidth;
-    float hypotheticalHeight;
+   private:
+    float hypotheticalSize;
+   public:
+    friend class WXCoreLayoutNode;
     float width;
     float height;
 
-    WXCoreSize() : hypotheticalWidth(NAN), hypotheticalHeight(NAN),
+    WXCoreSize() : hypotheticalSize(NAN),
                    width(0), height(0) {}
 
     void reset() {
-      hypotheticalWidth = NAN;
-      hypotheticalHeight = NAN;
+      hypotheticalSize = NAN ;
       width = 0;
       height = 0;
     }
@@ -207,27 +209,6 @@ namespace WeexCore {
 
     void calculateLayout();
 
-    //TODO this should be private
-    void reset() {
-      widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
-      heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
-      if (isDirty()) {
-        mLayoutResult->reset();
-        for (WXCoreFlexLine *flexLine : mFlexLines) {
-          if(flexLine != nullptr) {
-            delete flexLine;
-          }
-          flexLine = nullptr;
-        }
-        mFlexLines.clear();
-        if(mChildrenFrozen != nullptr) {
-          delete mChildrenFrozen;
-          mChildrenFrozen = nullptr;
-        }
-        mChildrenFrozen = new bool[getChildCount(kNonBFC)];
-      }
-    }
-
     /** ================================ measureFunc =================================== **/
 
     void setMeasureFunc(WXCoreMeasureFunc measure) {
@@ -258,6 +239,28 @@ namespace WeexCore {
 
     /** ================================ measure =================================== **/
 
+    void reset() {
+      widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
+      heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
+      if (isDirty()) {
+        mLayoutResult->reset();
+        for (WXCoreFlexLine *flexLine : mFlexLines) {
+          if(flexLine != nullptr) {
+            delete flexLine;
+          }
+          flexLine = nullptr;
+        }
+        mFlexLines.clear();
+        if(mChildrenFrozen != nullptr) {
+          delete mChildrenFrozen;
+          mChildrenFrozen = nullptr;
+        }
+        mChildrenFrozen = new bool[getChildCount(kNonBFC)];
+        for(int i=0;i<getChildCount(kNonBFC);i++){
+          mChildrenFrozen[i] = false;
+        }
+      }
+    }
 
     void setLayoutWidth(const float width) {
       if (mLayoutResult->mLayoutSize.width != width &&
@@ -347,18 +350,11 @@ namespace WeexCore {
       return mCssStyle->mFlexWrap == kNoWrap || isnan(mainSize);
     }
 
-    void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i,
-                     const bool horizontal) const {
+    void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i) const {
       if (child->mCssStyle->mFlexGrow > 0) {
         flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
-        if (horizontal) {
-          if (!isnan(child->mLayoutResult->mLayoutSize.width)) {
-            flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.width;
-          }
-        } else {
-          if (!isnan(child->mLayoutResult->mLayoutSize.height)) {
-            flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.height;
-          }
+        if(!isnan(child->mLayoutResult->mLayoutSize.hypotheticalSize)){
+          flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.hypotheticalSize;
         }
       } else {
         mChildrenFrozen[i] = true;
@@ -379,7 +375,7 @@ namespace WeexCore {
       setMeasuredDimension(actualWidth, actualHeight);
     }
 
-    float calcItemSizeAlongAxis(const WXCoreLayoutNode* const node, const bool horizontal, const bool hypothetical) const {
+    float calcItemSizeAlongAxis(const WXCoreLayoutNode* const node, const bool horizontal) const {
       float ret;
       if (horizontal) {
         ret = node->mCssStyle->mMargin.getMargin(kMarginLeft) +
@@ -409,6 +405,8 @@ namespace WeexCore {
                                                                        float childSizeAlongMainAxis, const Index childIndex){
       bool needsReexpand = false;
       if (isMainAxisHorizontal(this)) {
+        childSizeAlongMainAxis -= child->mCssStyle->mMargin.getMargin(kMarginLeft) +
+            child->mCssStyle->mMargin.getMargin(kMarginRight);
         if (childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxWidth;
@@ -417,6 +415,8 @@ namespace WeexCore {
           childSizeAlongMainAxis = child->mCssStyle->mMinWidth;
         }
       } else {
+        childSizeAlongMainAxis -= child->mCssStyle->mMargin.getMargin(kMarginTop) +
+            child->mCssStyle->mMargin.getMargin(kMarginBottom);
         if (childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxHeight;
