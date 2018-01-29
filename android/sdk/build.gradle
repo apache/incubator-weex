@@ -44,6 +44,7 @@ android {
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
 
+    delete 'libs/armeabi/libweexjsc.so'
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
@@ -99,8 +100,6 @@ android {
                         '-DANDROID_STL=c++_static'
             }
         }
-
-
     }
     buildTypes {
         release {
