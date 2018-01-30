@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -162,7 +163,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       private TextUtils.TruncateAt textOverflow;
       private Layout.Alignment mAlignment;
       private WXTextDecoration mTextDecoration = WXTextDecoration.NONE;
-      private TextPaint mTextPaint = new TextPaint();
+      private TextPaint mTextPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
       private @Nullable
       Spanned spanned;
       private @Nullable
