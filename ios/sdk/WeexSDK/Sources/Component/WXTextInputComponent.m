@@ -18,6 +18,7 @@
  */
 
 #import "WXTextInputComponent.h"
+#import "WXConvert.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -51,6 +52,12 @@
     return bounds;
 }
 
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
+{
+    // this behavior will hide the action like copy, cut, paste, selectAll and so on.
+    return [[self.wx_component valueForKey:@"disableActionMenu"] boolValue];
+}
+
 - (CGRect)editingRectForBounds:(CGRect)bounds
 {
     return [self textRectForBounds:bounds];
@@ -60,15 +67,33 @@
 @interface WXTextInputComponent()
 
 @property (nonatomic, strong) WXTextInputView *inputView;
+@property (nonatomic, assign) BOOL disableAction;
 
 @end
 
 @implementation WXTextInputComponent
 
+- (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+{
+    if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+        if (attributes[@"disableAction"]) {
+            _disableAction = [WXConvert BOOL:attributes[@"disableActionMenu"]];
+        }
+    }
+    return self;
+}
+
 - (UIView *)loadView
 {
     _inputView = [[WXTextInputView alloc] init];
     return _inputView;
+}
+
+- (void)updateAttributes:(NSDictionary *)attributes {
+    [super updateAttributes:attributes];
+    if (attributes[@"disableAction"]) {
+        _disableAction = [WXConvert BOOL:attributes[@"disableActionMenu"]];
+    }
 }
 
 -(void)viewDidLoad

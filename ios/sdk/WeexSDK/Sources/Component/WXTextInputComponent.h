@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "WXEditComponent.h"
 
 @interface WXTextInputComponent : WXEditComponent
