@@ -61,6 +61,8 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeCalculateLayout(String instanceId, String ref);
 
+  private native void nativeRegisterCoreEnv(String key, String value);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -489,5 +491,10 @@ public class WXBridge implements IWXBridge {
   @Override
   public void setStyleHeight(String instanceId, String ref, float value) {
     nativeSetStyleHeight(instanceId, ref, value);
+  }
+
+  @Override
+  public void registerCoreEnv(String key, String value) {
+    nativeRegisterCoreEnv(key, value);
   }
 }

@@ -513,4 +513,8 @@ public class WXSDKEngine {
   public static void reload() {
     reload(WXEnvironment.getApplication(), WXEnvironment.sRemoteDebugMode);
   }
+
+  public static void registerCoreEnv(String key, String value) {
+    WXBridgeManager.getInstance().registerCoreEnv(key, value);
+  }
 }

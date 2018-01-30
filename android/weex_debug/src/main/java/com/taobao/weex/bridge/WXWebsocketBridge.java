@@ -340,4 +340,9 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     public void calculateLayout(String instanceId, String ref) {
         mJsManager.calculateLayout(instanceId, ref);
     }
+
+  @Override
+  public void registerCoreEnv(String key, String value) {
+    mJsManager.registerCoreEnv(key, value);
+  }
 }

@@ -44,12 +44,17 @@ public abstract class WXBasicComponent<T extends View> {
   private GraphicSize mLayoutSize = new GraphicSize(0, 0);
   private BasicComponentData mBasicComponentData;
 
-  private int mViewPortWidth =750;
+  private int mViewPortWidth = 750;
 
   public WXBasicComponent(BasicComponentData basicComponentData) {
     this.mBasicComponentData = basicComponentData;
+    this.mBasicComponentData.addStyle(getDefaultAttrs());
     this.mRef = basicComponentData.mRef;
     this.mComponentType = basicComponentData.mComponentType;
+  }
+
+  protected Map<String, String> getDefaultAttrs() {
+    return null;
   }
 
   protected void copyData(WXComponent component) {

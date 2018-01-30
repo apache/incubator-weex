@@ -81,6 +81,10 @@ static void CalculateLayout(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring ref);
 
+static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
+    jstring key,
+    jstring value);
+
 // Step 2: method stubs.
 
 // Step 3: RegisterNatives.
@@ -167,6 +171,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(CalculateLayout) },
+    { "nativeRegisterCoreEnv",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(RegisterCoreEnv) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

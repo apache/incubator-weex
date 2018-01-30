@@ -12,6 +12,7 @@
 #include "RenderScrollerFactory.h"
 #include "RenderSwitchFactory.h"
 #include "RenderTextAreaFactory.h"
+#include "RenderAppBarFactory.h"
 
 namespace WeexCore {
 
@@ -37,6 +38,8 @@ namespace WeexCore {
       factory = new RenderSwitchFactory();
     } else if (type == kRenderTextArea) {
       factory = new RenderTextAreaFactory();
+    } else if (type == kRenderAppBar) {
+      factory = new RenderAppBarFactory();
     } else {
       factory = new RenderCommonFactory();
     }

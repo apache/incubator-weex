@@ -2058,4 +2058,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING_ERROR;
   }
 
+  public void registerCoreEnv(String key, String value) {
+    mWXBridge.registerCoreEnv(key, value);
+  }
 }

@@ -16,6 +16,7 @@ namespace WeexCore {
   const std::string kRenderTextArea = "textarea";
   const std::string kRenderHeader = "header";
   const std::string kRenderWaterfall = "waterfall";
+  const std::string kRenderAppBar = "appbar";
 }
 
 #endif //WEEX_PROJECT_RENDERTYPE_H
