@@ -8,6 +8,7 @@
 #include <WeexCore/layout/WXCoreLayout.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/node/factory/IRenderObject.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
 
@@ -154,6 +155,9 @@ namespace WeexCore {
     }
 
     inline void AddEvent(const std::string &event) {
+      if (mEvents == nullptr || mEvents->empty()) {
+          mEvents = new EventsSet();
+      }
       mEvents->insert(event);
     }
 
