@@ -139,7 +139,7 @@ public class Constants {
     String ITEM_SELECTED_COLOR = "itemSelectedColor";
     String ITEM_SIZE = "itemSize";
     String DISPLAY = "display";
-    String SHOW_LOADING = "show-loading";
+    String SHOW_LOADING = "showLoading";
     String SUFFIX = "suffix";
     String RESIZE = "resize";
     String IMAGE_SHARPEN = "imageSharpen";
