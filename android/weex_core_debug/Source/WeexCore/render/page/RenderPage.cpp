@@ -236,21 +236,21 @@ namespace WeexCore {
             case kTypeMargin:
               if (margin == nullptr)
                 margin = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
                   margin->insert(margin->end(), (*styles)[i]);
                   flag = true;
                   break;
             case kTypePadding:
               if (padding == nullptr)
                 padding = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
                   padding->insert(padding->end(), (*styles)[i]);
                   flag = true;
                   break;
             case kTypeBorder:
               if (border == nullptr)
                 border = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getRealPxByWidth(atof((*styles)[i]->second.c_str()), ViewPortWidth()));
+                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
                   border->insert(border->end(), (*styles)[i]);
                   flag = true;
                   break;
