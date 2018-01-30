@@ -51,14 +51,14 @@
     }
     if ([self isKindOfClass:[WXScannerVC class]]) {
         UIBarButtonItem *historyItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"scan_history"]
-                                                          style:UIBarButtonItemStyleBordered
+                                                          style:UIBarButtonItemStylePlain
                                                          target:self
                                                          action:@selector(historyButtonClicked:)];
         self.navigationItem.rightBarButtonItems = @[historyItem];
     }
     if([self isKindOfClass:[WXScannerHistoryVC class]]) {
         UIBarButtonItem *historyItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"delete"]
-                                                                        style:UIBarButtonItemStyleBordered
+                                                                        style:UIBarButtonItemStylePlain
                                                                        target:self
                                                                        action:@selector(clearScannerHistory:)];
         self.navigationItem.rightBarButtonItems = @[historyItem];
@@ -89,7 +89,7 @@
     if (!leftItem) {
         leftItem = [[UIBarButtonItem alloc]
                     initWithImage:[UIImage imageNamed:@"scan"]
-                     style:UIBarButtonItemStyleBordered
+                     style:UIBarButtonItemStylePlain
                     target:self
                     action:@selector(scanQR:)];
         leftItem.accessibilityHint = @"click to scan qr code";
@@ -104,7 +104,7 @@
     UIBarButtonItem *backButtonItem = objc_getAssociatedObject(self, _cmd);
     if (!backButtonItem) {
         backButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"]
-                                                          style:UIBarButtonItemStyleBordered
+                                                          style:UIBarButtonItemStylePlain
                                                          target:self
                                                          action:@selector(backButtonClicked:)];
         objc_setAssociatedObject(self, _cmd, backButtonItem, OBJC_ASSOCIATION_RETAIN_NONATOMIC);

@@ -131,6 +131,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     
     pthread_mutex_t _ctAttributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    BOOL _observerIconfont;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -187,7 +188,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_fontFamily) {
+    if (_fontFamily && _observerIconfont) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -250,7 +251,11 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
     WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
-    
+    if (_fontFamily && !_observerIconfont) {
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        _observerIconfont = YES;
+    }
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
         WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
@@ -381,6 +386,9 @@ do {\
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
         _ctAttributedString = [self buildCTAttributeString];
+        WXPerformBlockOnComponentThread(^{
+            [self.weexInstance.componentManager startComponentTasks];
+        });
     }
     attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
@@ -412,11 +420,6 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        // notification received when custom icon font file download finish
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font
@@ -503,11 +506,6 @@ do {\
     // set textColor
     if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        // notification received when custom icon font file download finish
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     
     // set font

@@ -39,7 +39,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -48,13 +48,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string></string>
+	<string>$(PRODUCT_NAME) will access your camera,so that you can scan qr code to show your page</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) will access your location</string>
+	<string>$(PRODUCT_NAME) will access your location, so that you can get current location where you are</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access your photo Album</string>
+	<string>$(PRODUCT_NAME) needs access your photo Album, so that you can save image to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access your photo Album</string>
+	<string>$(PRODUCT_NAME) needs access your photo Album,so that you can save image to your photo library.</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>

@@ -195,6 +195,10 @@ public class Constants {
     String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
     String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
 
+    String PRIORITY  = "priority";
+
+    String STRATEGY  = "strategy";
+
 
 
 
@@ -220,6 +224,9 @@ public class Constants {
 
     String SHOULD_STOP_PROPAGATION_INIT_RESULT = "shouldStopPropagationInitResult";
     String SHOULD_STOP_PROPAGATION_INTERVAL = "shouldStopPropagationInterval";
+
+
+    String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
   }
 
   public interface Value {
@@ -316,6 +323,8 @@ public class Constants {
 
 
     String SHOULD_STOP_PROPAGATION = "shouldStopPropagation";
+
+
 
   }
 

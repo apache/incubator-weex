@@ -102,6 +102,7 @@
     if ([_scanner_history count]) {
         [_qrCodeImageView removeFromSuperview];
         [_scanner_history removeAllObjects];
+        _scanner_history =  [[[NSUserDefaults standardUserDefaults] objectForKey:WX_SCANNER_HISTORY] mutableCopy];
         [self.tableView reloadData];
     }
 }

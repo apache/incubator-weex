@@ -85,7 +85,7 @@ public class WXEnvironment {
   public static long sSDKInitTime =0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = false;
+  private static boolean isApkDebug = true;
   public static boolean isPerf = false;
 
   private static String sGlobalFontFamily;
