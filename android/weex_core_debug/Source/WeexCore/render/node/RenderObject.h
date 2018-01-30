@@ -59,18 +59,6 @@ namespace WeexCore {
       }
     }
 
-    inline void SetDefaultWidth(const float &defaultWidth) {
-      if (isnan(getStyleWidth())) {
-        setStyleWidth(defaultWidth);
-      }
-    }
-
-    inline void SetDefaultHeight(const float &defaultHeight) {
-      if (isnan(getStyleHeight())) {
-        setStyleHeight(defaultHeight);
-      }
-    }
-
     inline bool ViewInit() {
       return !isnan(getStyleWidth()) && !isnan(getStyleHeight()) && getStyleWidth() > 0 &&
              getStyleHeight() > 0;
@@ -134,9 +122,11 @@ namespace WeexCore {
         setMaxHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
         return kTypeLayout;
       } else if (key == HEIGHT) {
+        setStyleHeightLevel(CSS_STYLE);
         setStyleHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
         return kTypeLayout;
       } else if (key == WIDTH) {
+        setStyleWidthLevel(CSS_STYLE);
         setStyleWidth(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
         return kTypeLayout;
       } else if (key == POSITION) {
@@ -306,6 +296,9 @@ namespace WeexCore {
     }
 
     inline void AddEvent(const std::string &event) {
+      if (mEvents == nullptr || mEvents->empty()) {
+          mEvents = new EventsSet();
+      }
       mEvents->insert(event);
     }
 
