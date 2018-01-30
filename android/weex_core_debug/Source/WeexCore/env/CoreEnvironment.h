@@ -2,6 +2,7 @@
 #define WEEX_PROJECT_WXCOREENVIRONMENT_H
 
 #include <string>
+#include <map>
 
 namespace WeexCore {
 
@@ -33,6 +34,8 @@ namespace WeexCore {
 
     float mDeviceHeight;
 
+    std::map<std::string, std::string> mOptions;
+
   public:
 
     bool SetPlatform(const std::string &platformName);
@@ -48,6 +51,10 @@ namespace WeexCore {
     float DeviceWidth();
 
     float DeviceHeight();
+
+    std::string GetOption(std::string key);
+
+    std::string AddOption(std::string key, std::string value);
 
     static WXCoreEnvironment *getInstance() {
       if (!m_pInstance) {

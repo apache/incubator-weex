@@ -45,4 +45,17 @@ namespace WeexCore {
   float WXCoreEnvironment::DeviceHeight() {
     return mDeviceHeight;
   }
+
+  std::string WXCoreEnvironment::GetOption(std::string key) {
+    std::map<std::string, std::string>::iterator iter = mOptions.find(key);
+    if (iter != mOptions.end()) {
+      return iter->second;
+    } else {
+      return "";
+    }
+  }
+
+  std::string WXCoreEnvironment::AddOption(std::string key, std::string value) {
+    mOptions.insert(std::pair<std::string, std::string>(key, value));
+  }
 }

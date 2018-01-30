@@ -300,6 +300,7 @@ void WeexProxy::initFromParam(JNIEnv *env,
     for (int i = 0; i < arraysize; i++) {
       jstring jkey = (jstring) env->GetObjectArrayElement(jobjArray, i);
       jstring jvalue = (jstring) env->CallObjectMethod(options, jgetmid, jkey);
+
       if (jkey != NULL) {
         // const char* c_key = env->GetStringUTFChars(jkey, NULL);
         // addString(vm, WXEnvironment, c_key, jString2String(env, jvalue));
@@ -316,6 +317,7 @@ void WeexProxy::initFromParam(JNIEnv *env,
         int c_value_len = strlen(c_value_chars);
         serializer->add(c_key_chars, c_key_len);
         serializer->add(c_value_chars, c_value_len);
+        WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey), jString2Str(env, jvalue));
       }
     }
     env->DeleteLocalRef(jobjArray);
