@@ -11,8 +11,8 @@ namespace WeexCore {
     BFCs.clear();
     initFormatingContext(BFCs);
     auto bfcDimension = calculateBFCDimension();
-    if(isDirty()) {
-      measure(bfcDimension.first, bfcDimension.second, true);
+    if (std::get<0>(bfcDimension) || isDirty()) {
+      measure(std::get<1>(bfcDimension), std::get<2>(bfcDimension), true);
     }
     layout(mCssStyle->mMargin.getMargin(kMarginLeft),
            mCssStyle->mMargin.getMargin(kMarginTop),
@@ -38,7 +38,8 @@ namespace WeexCore {
     reset();
   }
 
-  std::pair<float, float> WXCoreLayoutNode::calculateBFCDimension() {
+  std::tuple<bool, float, float> WXCoreLayoutNode::calculateBFCDimension() {
+    bool sizeChanged = false;
     float width=mCssStyle->mStyleWidth, height=mCssStyle->mStyleHeight;
     if (mCssStyle->mPositionType == kAbsolute) {
       if (isnan(width) &&
@@ -49,6 +50,7 @@ namespace WeexCore {
                 mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft) -
                 mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
         setWidthMeasureMode(kExactly);
+        sizeChanged = true;
       }
 
       if (isnan(mCssStyle->mStyleHeight) &&
@@ -59,10 +61,10 @@ namespace WeexCore {
                  mCssStyle->mStylePosition.getPosition(kPositionEdgeTop) -
                  mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom);
         setHeightMeasureMode(kExactly);
+        sizeChanged = true;
       }
     }
-
-    return std::make_pair(width, height);
+    return std::make_tuple(sizeChanged, width, height);
   }
 
   void WXCoreLayoutNode::measure(const float width, const float height, const bool hypotheticalMeasurment){

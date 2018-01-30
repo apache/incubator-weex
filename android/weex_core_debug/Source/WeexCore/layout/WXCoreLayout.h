@@ -494,7 +494,7 @@ namespace WeexCore {
 
     void initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs);
 
-    std::pair<float, float> calculateBFCDimension();
+    std::tuple<bool, float, float> calculateBFCDimension();
 
     virtual void onLayoutBefore() {
 
@@ -689,23 +689,23 @@ namespace WeexCore {
 
     /** ================================ dimension =================================== **/
 
-    void setStyleWidthLevel(const int level) {
+    void setStyleWidthLevel(const DimensionLevel level) const {
       if (mCssStyle->mStyleWidthLevel != level) {
         mCssStyle->mStyleWidthLevel = level;
       }
     }
 
-    void setStyleHeightLevel(const int level) {
+    void setStyleHeightLevel(const DimensionLevel level) const {
       if (mCssStyle->mStyleHeightLevel != level) {
         mCssStyle->mStyleHeightLevel = level;
       }
     }
 
-    int getStyleHeightLevel() const {
+    DimensionLevel getStyleHeightLevel() const {
       return mCssStyle->mStyleHeightLevel;
     }
 
-    int getStyleWidthLevel() const {
+    DimensionLevel getStyleWidthLevel() const {
       return mCssStyle->mStyleWidthLevel;
     }
 

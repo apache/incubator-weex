@@ -206,9 +206,11 @@ namespace WeexCore {
       setMaxHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == HEIGHT) {
+      setStyleHeightLevel(CSS_STYLE);
       setStyleHeight(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == WIDTH) {
+      setStyleWidthLevel(CSS_STYLE);
       setStyleWidth(getRealPxByWidth(atof(value.c_str()), GetRenderPage()->ViewPortWidth()));
       return kTypeLayout;
     } else if (key == POSITION) {

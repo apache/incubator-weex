@@ -132,6 +132,11 @@ namespace WeexCore {
     float getPosition(const WXCorePositionEdge &edge);
   };
 
+  enum DimensionLevel{
+    CSS_STYLE = 1,
+    INSTANCE_STYLE = 2,
+    FALLBACK_STYLE = 3
+  };
 
   /**
    * css-style
@@ -192,9 +197,9 @@ namespace WeexCore {
 
     float mStyleHeight;
 
-    int mStyleWidthLevel = 1;
+    DimensionLevel mStyleWidthLevel;
 
-    int mStyleHeightLevel = 1;
+    DimensionLevel mStyleHeightLevel;
 
     WXCoreMargin mMargin;
 
@@ -225,7 +230,8 @@ namespace WeexCore {
                        mAlignSelf(kFlexAlignSelfDefault),
                        mFlexGrow(kFlexGrowDefault),
                        mPositionType(kWXCorePositionTypeDefault),
-                       mStyleWidth(NAN), mStyleHeight(NAN), mStyleHeightLevel(NAN), mStyleWidthLevel(NAN),
+                       mStyleWidth(NAN), mStyleHeight(NAN),
+                       mStyleHeightLevel(FALLBACK_STYLE), mStyleWidthLevel(FALLBACK_STYLE),
                        mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
                        mMinWidth(0), mMinHeight(0) {
 
@@ -240,8 +246,8 @@ namespace WeexCore {
       mFlexGrow = kFlexGrowDefault;
       mStyleWidth = NAN;
       mStyleHeight = NAN;
-      mStyleWidthLevel = NAN;
-      mStyleHeightLevel = NAN;
+      mStyleWidthLevel = FALLBACK_STYLE;
+      mStyleHeightLevel = FALLBACK_STYLE;
       mMaxWidth = MAXFLOAT;
       mMaxHeight = MAXFLOAT;
       mMinWidth = NAN;

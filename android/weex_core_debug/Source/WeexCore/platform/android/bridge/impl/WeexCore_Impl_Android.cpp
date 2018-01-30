@@ -51,6 +51,7 @@ SetStyleWidth(JNIEnv* env, jobject jcaller,
     if (page == nullptr)
         return;
     RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    render->setStyleWidthLevel(CSS_STYLE);
     render->setStyleWidth(value);
 }
 
@@ -68,6 +69,7 @@ SetStyleHeight(JNIEnv* env, jobject jcaller,
     if (page == nullptr)
       return;
     RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+    render->setStyleHeightLevel(CSS_STYLE);
     render->setStyleHeight(value);
 }
 

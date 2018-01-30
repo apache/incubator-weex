@@ -122,17 +122,17 @@ namespace WeexCore {
     SetRootRenderObject(root);
 
     if (isnan(render_root->getStyleWidth())) {
-      render_root->setStyleWidthLevel(3);
+      render_root->setStyleWidthLevel(FALLBACK_STYLE);
       render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
     } else {
-      render_root->setStyleWidthLevel(1);
+      render_root->setStyleWidthLevel(CSS_STYLE);
     }
 
     if (isnan(render_root->getStyleHeight())) {
-      render_root->setStyleHeightLevel(3);
+      render_root->setStyleHeightLevel(FALLBACK_STYLE);
       render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
     } else {
-      render_root->setStyleHeightLevel(1);
+      render_root->setStyleHeightLevel(CSS_STYLE);
     }
 
     PushRenderToRegisterMap(root);
@@ -372,13 +372,13 @@ namespace WeexCore {
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
 
-    if (render_root->getStyleWidthLevel() >= 2) {
-      render_root->setStyleWidthLevel(2);
+    if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
+      render_root->setStyleWidthLevel(INSTANCE_STYLE);
       render_root->setStyleWidth(defaultWidth);
     }
 
-    if (render_root->getStyleHeightLevel() >= 2) {
-      render_root->setStyleHeightLevel(2);
+    if (render_root->getStyleHeightLevel() >= INSTANCE_STYLE) {
+      render_root->setStyleHeightLevel(INSTANCE_STYLE);
       render_root->setStyleHeight(defaultHeight);
     }
 
