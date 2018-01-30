@@ -53,12 +53,30 @@
     return [WXLayer class];
 }
 
+- (void)copy:(id)sender
+{
+    [[UIPasteboard generalPasteboard] setString:((WXTextComponent*)self.wx_component).text];
+}
+
 - (void)setTextStorage:(NSTextStorage *)textStorage
 {
     if (_textStorage != textStorage) {
         _textStorage = textStorage;
         [self.wx_component setNeedsDisplay];
     }
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
+{
+    if (action == @selector(copy:)) {
+        return [[self.wx_component valueForKey:@"_enableCopy"] boolValue];
+    }
+    return [super canPerformAction:action withSender:sender];
 }
 
 - (NSString *)description
@@ -132,6 +150,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     pthread_mutex_t _ctAttributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
     BOOL _observerIconfont;
+    BOOL _enableCopy;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -277,6 +296,9 @@ do {\
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
+    if (attributes[@"enableCopy"]) {
+        _enableCopy = [WXConvert BOOL:attributes[@"enableCopy"]];
+    }
 }
 
 - (void)setNeedsRepaint
@@ -306,9 +328,24 @@ do {\
     if (!useCoreText) {
         ((WXTextView *)self.view).textStorage = _textStorage;
     }
+    if (_enableCopy) {
+        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(displayMenuController:)];
+        [self.view addGestureRecognizer:longPress];
+    }
     self.view.isAccessibilityElement = YES;
     
     [self setNeedsDisplay];
+}
+
+- (void)displayMenuController:(id)sender
+{
+    if ([self.view becomeFirstResponder] && ((UILongPressGestureRecognizer*)sender).state == UIGestureRecognizerStateBegan) {
+        UIMenuController *theMenu = [UIMenuController sharedMenuController];
+        CGSize size = [self ctAttributedString].size;
+        CGRect selectionRect = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, size.width, size.height);
+        [theMenu setTargetRect:selectionRect inView:self.view.superview];
+        [theMenu setMenuVisible:YES animated:YES];
+    }
 }
 
 - (UIView *)loadView
