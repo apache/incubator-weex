@@ -8,7 +8,7 @@ namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-  bool RenderManager::CreatePage(const std::string &pageId, const std::string &data) {
+  bool RenderManager::CreatePage(std::string pageId, const std::string &data) {
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
 
@@ -20,8 +20,8 @@ namespace WeexCore {
     return page->CreateRootRender(root);
   }
 
-  bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
-                                      const int &index,
+  bool RenderManager::AddRenderObject(const std::string &pageId, std::string parentRef,
+                                      int index,
                                       const std::string &data) {
 
     RenderPage *page = GetPage(pageId);
@@ -86,7 +86,7 @@ namespace WeexCore {
   }
 
   bool RenderManager::AddEvent(const std::string &pageId, const std::string &ref,
-                               const std::string &event) {
+                               std::string event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;

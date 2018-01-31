@@ -1752,16 +1752,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-//      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
-//              .append(", componentType:").append(componentType).append(", ref:").append(ref)
-//              .append(", styles:").append(styles)
-//              .append(", attributes:").append(attributes)
-//              .append(", events:").append(events)
-//              .append(", paddings:").append(paddings)
-//              .append(", margins:").append(margins)
-//              .append(", borders:").append(borders);
-//      WXLogUtils.d(mLodBuilder.substring(0));
-//      mLodBuilder.setLength(0);
+      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref)
+              .append(", styles:").append(styles)
+              .append(", attributes:").append(attributes)
+              .append(", events:").append(events)
+              .append(", paddings:").append(paddings)
+              .append(", margins:").append(margins)
+              .append(", borders:").append(borders);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
@@ -1800,17 +1800,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-//      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
-//              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-//              .append(", parentRef:").append(parentRef)
-//              .append(", styles:").append(styles)
-//              .append(", attributes:").append(attributes)
-//              .append(", events:").append(events)
-//              .append(", paddings:").append(paddings)
-//              .append(", margins:").append(margins)
-//              .append(", borders:").append(borders);
-//      WXLogUtils.d(mLodBuilder.substring(0));
-//      mLodBuilder.setLength(0);
+      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
+              .append(", parentRef:").append(parentRef)
+              .append(", styles:").append(styles)
+              .append(", attributes:").append(attributes)
+              .append(", events:").append(events)
+              .append(", paddings:").append(paddings)
+              .append(", margins:").append(margins)
+              .append(", borders:").append(borders);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {

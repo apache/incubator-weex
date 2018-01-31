@@ -32,9 +32,9 @@ namespace WeexCore {
     void Batch(const std::string &pageId);
 
     // create root node
-    bool CreatePage(const std::string &pageId, const std::string &data);
+    bool CreatePage(std::string pageId, const std::string &data);
 
-    bool AddRenderObject(const std::string &pageId, const std::string &parentRef, const int &index,
+    bool AddRenderObject(const std::string &pageId, std::string parentRef, int index,
                          const std::string &data);
 
     bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
@@ -47,7 +47,7 @@ namespace WeexCore {
 
     bool UpdateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
 
-    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &pageId, const std::string &ref, std::string event);
 
     bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
