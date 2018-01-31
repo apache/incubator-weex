@@ -99,12 +99,8 @@ namespace WeexCore {
 
     widthDirty = false;
     heightDirty = false;
-    WXCoreLayoutNode *parent;
-    if ((parent = getParent()) && (mCssStyle->mPositionType == kRelative)) {
-      mLayoutResult->mLayoutSize.hypotheticalSize = isMainAxisHorizontal(parent) ?
-                                                    mLayoutResult->mLayoutSize.width :
-                                                    mLayoutResult->mLayoutSize.height;
-    }
+    mLayoutResult->mLayoutSize.hypotheticalWidth = mLayoutResult->mLayoutSize.width;
+    mLayoutResult->mLayoutSize.hypotheticalHeight = mLayoutResult->mLayoutSize.height;
   }
 
     void WXCoreLayoutNode::measureLeafNode(float width, float height, const bool hypothetical) {
@@ -215,11 +211,18 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* const flexLine, const Index i,
                                                  const WXCoreLayoutNode* const child, const bool useHypotheticalSize){
-      flexLine->mMainSize += useHypotheticalSize ?
-                             child->mLayoutResult->mLayoutSize.hypotheticalSize :
-                             calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
+      if (useHypotheticalSize) {
+        if (isMainAxisHorizontal(this)) {
+          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalWidth;
+        } else {
+          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalHeight;
+        }
+      } else {
+        flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
+      }
       sumFlexGrow(child, flexLine, i);
-      flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
+      flexLine->mCrossSize =
+          std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
       if (i == childCount - 1 && flexLine->mItemCount != 0) {
         mFlexLines.push_back(flexLine);
       }
