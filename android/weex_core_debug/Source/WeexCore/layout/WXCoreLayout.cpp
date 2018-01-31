@@ -99,8 +99,12 @@ namespace WeexCore {
 
     widthDirty = false;
     heightDirty = false;
-    mLayoutResult->mLayoutSize.hypotheticalWidth = mLayoutResult->mLayoutSize.width;
-    mLayoutResult->mLayoutSize.hypotheticalHeight = mLayoutResult->mLayoutSize.height;
+    WXCoreLayoutNode *parent;
+    if ((parent = getParent()) && (mCssStyle->mPositionType == kRelative)) {
+      mLayoutResult->mLayoutSize.hypotheticalSize = isMainAxisHorizontal(parent) ?
+                                                    mLayoutResult->mLayoutSize.width :
+                                                    mLayoutResult->mLayoutSize.height;
+    }
   }
 
     void WXCoreLayoutNode::measureLeafNode(float width, float height, const bool hypothetical) {
@@ -211,18 +215,11 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* const flexLine, const Index i,
                                                  const WXCoreLayoutNode* const child, const bool useHypotheticalSize){
-      if (useHypotheticalSize) {
-        if (isMainAxisHorizontal(this)) {
-          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalWidth;
-        } else {
-          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalHeight;
-        }
-      } else {
-        flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
-      }
+      flexLine->mMainSize += useHypotheticalSize ?
+                             child->mLayoutResult->mLayoutSize.hypotheticalSize :
+                             calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
       sumFlexGrow(child, flexLine, i);
-      flexLine->mCrossSize =
-          std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
+      flexLine->mCrossSize = std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
       if (i == childCount - 1 && flexLine->mItemCount != 0) {
         mFlexLines.push_back(flexLine);
       }
@@ -237,16 +234,12 @@ namespace WeexCore {
           if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
               && mCssStyle->mAlignItems == kAlignItemsStretch) {
             if (isMainAxisHorizontal(this)) {
-              if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)) {
-                childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
-                    child->mCssStyle->mMargin.getMargin(kMarginTop) -
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
+              if(!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)){
+                childHeight = (parentHeight-sumPaddingBorderAlongAxis(this, false));
               }
             } else {
-              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
-                childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
-                    child->mCssStyle->mMargin.getMargin(kMarginLeft) -
-                    child->mCssStyle->mMargin.getMargin(kMarginRight);
+              if(!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)){
+                childWidth = (parentWidth - sumPaddingBorderAlongAxis(this, true));
               }
             }
           }
@@ -372,16 +365,12 @@ namespace WeexCore {
       if (isMainAxisHorizontal(this)) {
         if (child->heightMeasureMode != kExactly) {
           child->setHeightMeasureMode(kExactly);
-          child->setLayoutHeight(std::max(0.f, crossSize -
-              child->mCssStyle->mMargin.getMargin(kMarginLeft) -
-              child->mCssStyle->mMargin.getMargin(kMarginRight)));
+          child->setLayoutHeight(std::max(0.f, crossSize));
         }
       } else {
         if (child->widthMeasureMode != kExactly) {
           child->setWidthMeasureMode(kExactly);
-          child->setLayoutWidth(std::max(0.f, crossSize -
-              child->mCssStyle->mMargin.getMargin(kMarginTop) -
-                  child->mCssStyle->mMargin.getMargin(kMarginBottom)));
+          child->setLayoutWidth(std::max(0.f, crossSize));
         }
       }
     }

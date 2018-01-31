@@ -29,20 +29,17 @@ namespace WeexCore {
 
   struct WXCoreSize {
    private:
-    float hypotheticalWidth;
-    float hypotheticalHeight;
+    float hypotheticalSize;
    public:
     friend class WXCoreLayoutNode;
     float width;
     float height;
 
-    WXCoreSize() : hypotheticalWidth(NAN),
-                   hypotheticalHeight(NAN),
+    WXCoreSize() : hypotheticalSize(NAN),
                    width(0), height(0) {}
 
     void reset() {
-      hypotheticalWidth = NAN ;
-      hypotheticalHeight = NAN;
+      hypotheticalSize = NAN ;
       width = 0;
       height = 0;
     }
@@ -358,15 +355,8 @@ namespace WeexCore {
     void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i) const {
       if (child->mCssStyle->mFlexGrow > 0) {
         flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
-        if(isMainAxisHorizontal(this)){
-          if(!isnan(child->mLayoutResult->mLayoutSize.hypotheticalWidth)){
-            flexLine->mTotalFlexibleSize +=child->mLayoutResult->mLayoutSize.hypotheticalWidth;
-          }
-          else{
-            if(!isnan(child->mLayoutResult->mLayoutSize.hypotheticalHeight)) {
-              flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.hypotheticalHeight;
-            }
-          }
+        if(!isnan(child->mLayoutResult->mLayoutSize.hypotheticalSize)){
+          flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.hypotheticalSize;
         }
       } else {
         mChildrenFrozen[i] = true;
