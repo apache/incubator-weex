@@ -244,13 +244,15 @@ namespace WeexCore {
       heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
       if (isDirty()) {
         mLayoutResult->reset();
+
         for (WXCoreFlexLine *flexLine : mFlexLines) {
-          if(flexLine != nullptr) {
+          if (flexLine != nullptr) {
             delete flexLine;
+            flexLine = nullptr;
           }
-          flexLine = nullptr;
         }
         mFlexLines.clear();
+
         if(mChildrenFrozen != nullptr) {
           delete mChildrenFrozen;
           mChildrenFrozen = nullptr;
