@@ -27,11 +27,11 @@ namespace WeexCore {
 
     void SendCreateBodyAction(RenderObject *render);
 
-    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
+    void SendAddElementAction(RenderObject *child, RenderObject *parent, const int &index);
 
-    void SendRemoveElementAction(std::string ref);
+    void SendRemoveElementAction(const std::string &ref);
 
-    void SendMoveElementAction(std::string ref, std::string parentRef, int index);
+    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
 
     void SendLayoutAction(RenderObject *render);
 
@@ -50,7 +50,7 @@ namespace WeexCore {
     void PostRenderAction(RenderAction *action);
 
   public:
-    RenderPage(std::string pageID);
+    RenderPage(const std::string &pageID);
 
     ~RenderPage();
 
@@ -59,11 +59,11 @@ namespace WeexCore {
     bool CreateRootRender(RenderObject *root);
 
     bool
-    AddRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
+    AddRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
 
     bool RemoveRenderObject(const std::string &ref);
 
-    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int index);
+    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
 
     bool
     UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
@@ -74,7 +74,7 @@ namespace WeexCore {
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool AddEvent(const std::string &ref, std::string event);
+    bool AddEvent(const std::string &ref, const std::string &event);
 
     bool RemoveEvent(const std::string &ref, const std::string &event);
 
@@ -128,7 +128,7 @@ namespace WeexCore {
       return mViewPortWidth;
     }
 
-    inline void SetViewPortWidth(float viewPortWidth) {
+    inline void SetViewPortWidth(float &viewPortWidth) {
       this->mViewPortWidth = viewPortWidth;
     }
 

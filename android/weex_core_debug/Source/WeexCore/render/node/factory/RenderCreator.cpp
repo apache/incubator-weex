@@ -18,7 +18,7 @@ namespace WeexCore {
 
   RenderCreator *RenderCreator::m_pInstance = nullptr;
 
-  IRenderObject *RenderCreator::CreateRender(std::string type, std::string ref) {
+  IRenderObject *RenderCreator::CreateRender(const std::string &type, const std::string &ref) {
     IRenderFactory *factory;
     if (type == kRenderText) {
       factory = new RenderTextFactory();
