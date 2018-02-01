@@ -138,7 +138,7 @@ namespace WeexCore {
       }
 
       Index childIndex = 0;
-      for (auto flexLine : mFlexLines) {
+      for (WXCoreFlexLine *flexLine : mFlexLines) {
         childIndex = expandItemsInFlexLine(flexLine, maxMainSize, paddingAlongMainAxis, childIndex);
       }
     }
@@ -174,7 +174,7 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::measureInternalNode(const float width, const float height, const bool needMeasure,
                                                const bool hypotheticalMeasurment) {
-      for (auto *flexLine : mFlexLines) {
+      for (WXCoreFlexLine *flexLine : mFlexLines) {
         if(flexLine!= nullptr) {
           delete flexLine;
         }
@@ -182,7 +182,7 @@ namespace WeexCore {
       }
       mFlexLines.clear();
       Index childCount = getChildCount(kNonBFC);
-      auto *flexLine = new WXCoreFlexLine();
+      WXCoreFlexLine *flexLine = new WXCoreFlexLine();
       flexLine->mMainSize = sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
 
       // The index of the view in a same flex line.
@@ -350,7 +350,7 @@ namespace WeexCore {
       if (mCssStyle->mAlignItems == kAlignItemsStretch) {
         Index viewIndex = 0;
         for (Index i = 0; i< mFlexLines.size(); i++ ) {
-            auto flexLine = mFlexLines.at(i);
+            WXCoreFlexLine *flexLine = mFlexLines.at(i);
             for (Index j = 0; j < flexLine->mItemCount; j++, viewIndex++) {
                 WXCoreLayoutNode* child = getChildAt(kNonBFC, viewIndex);
               if (child->mCssStyle->mAlignSelf == kAlignSelfAuto ||
@@ -360,7 +360,7 @@ namespace WeexCore {
           }
         }
       } else {
-        for (auto flexLine : mFlexLines) {
+        for (WXCoreFlexLine *flexLine : mFlexLines) {
           for (auto index : flexLine->mIndicesAlignSelfStretch) {
             stretchViewCrossSize(getChildAt(kNonBFC, index), flexLine->mCrossSize);
           }
@@ -540,7 +540,7 @@ namespace WeexCore {
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
     float childRight;
-    for (auto flexLine: mFlexLines) {
+    for (WXCoreFlexLine *flexLine: mFlexLines) {
       float spaceBetweenItem = 0.f;
 
       switch (mCssStyle->mJustifyContent) {
@@ -732,7 +732,7 @@ namespace WeexCore {
     // Used only for if the direction is from mStyleBottom to mStyleTop
     float childBottom;
 
-    for (auto flexLine:mFlexLines) {
+    for (WXCoreFlexLine *flexLine : mFlexLines) {
       float spaceBetweenItem = 0.f;
 
       switch (mCssStyle->mJustifyContent) {
