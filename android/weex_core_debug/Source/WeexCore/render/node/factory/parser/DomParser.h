@@ -3,6 +3,7 @@
 
 #include "rapidjson/pointer.h"
 #include <vector>
+#include <string>
 
 namespace WeexCore {
 
@@ -118,7 +119,7 @@ namespace WeexCore {
  * @param page : {@link RenderPage*}
  * @return {@link RenderObject*}
  */
-  RenderObject *Json2RenderObject(char *data, const std::string &pageId);
+  RenderObject *Json2RenderObject(char *data, std::string pageId);
 
   std::vector<std::pair<std::string, std::string> *> *Json2Pairs(char *data);
 }
