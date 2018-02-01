@@ -90,7 +90,7 @@ namespace WeexCore {
 
     void onLayoutAfter(float width, float height);
 
-    virtual StyleType ApplyStyle(const std::string &key, const std::string &value) {
+    virtual StyleType ApplyStyle(std::string key, std::string value) {
       if (key == ALIGN_ITEMS) {
         setAlignItems(GetWXCoreAlignItem(value));
         return kTypeLayout;
@@ -283,26 +283,26 @@ namespace WeexCore {
       removeChild(child);
     }
 
-    inline void AddAttr(const std::string &key, const std::string &value) {
+    inline void AddAttr(std::string key, std::string value) {
       mAttributes->insert(std::pair<std::string, std::string>(key, value));
     }
 
-    virtual void UpdateAttr(const std::string &key, const std::string &value) {
+    virtual void UpdateAttr(std::string key, std::string value) {
       AddAttr(key, value);
     }
 
-    inline StyleType AddStyle(const std::string &key, const std::string &value) {
+    inline StyleType AddStyle(std::string key, std::string value) {
       return ApplyStyle(key, value);
     }
 
-    inline void AddEvent(const std::string &event) {
+    inline void AddEvent(std::string event) {
       if (mEvents == nullptr || mEvents->empty()) {
           mEvents = new EventsSet();
       }
       mEvents->insert(event);
     }
 
-    inline void RemoveEvent(const std::string &event) {
+    inline void RemoveEvent(std::string event) {
       mEvents->erase(event);
     }
 

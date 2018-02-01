@@ -8,9 +8,9 @@ namespace WeexCore {
   class RenderActionMoveElement : public RenderAction {
 
   public:
-    RenderActionMoveElement(const std::string &pageId, const std::string &ref,
-                            const std::string &parentRef,
-                            const int &index);
+    RenderActionMoveElement(std::string pageId, std::string ref,
+                            std::string parentRef,
+                            int index);
 
     void ExecuteAction();
 

@@ -9,7 +9,7 @@ namespace WeexCore {
   class RenderAppBar : public RenderObject {
   public:
 
-    StyleType ApplyStyle(const std::string &key, const std::string &value) {
+    StyleType ApplyStyle(std::string key, std::string value) {
       if (key == PADDING) {
         float paddingLeft = getFloatByViewport(value,GetRenderPage()->ViewPortWidth()) +
             getFloatByViewport(WXCoreEnvironment::getInstance()->GetOption("defaultNavWidth"),

@@ -32,7 +32,7 @@ namespace WeexCore {
       mMarginRight = 0;
     }
 
-    bool setMargin(const WXCoreMarginEdge &edge, const float &margin);
+    bool setMargin(const WXCoreMarginEdge &edge, float margin);
 
     float getMargin(const WXCoreMarginEdge &edge);
   };
@@ -61,7 +61,7 @@ namespace WeexCore {
       mPaddingRight = 0;
     }
 
-    bool setPadding(const WXCorePaddingEdge &edge, const float &padding);
+    bool setPadding(const WXCorePaddingEdge &edge, float padding);
 
     float getPadding(const WXCorePaddingEdge &edge);
   };
@@ -90,7 +90,7 @@ namespace WeexCore {
       mBorderWidthRight = 0;
     }
 
-    bool setBorderWidth(const WXCoreBorderWidthEdge &edge, const float &borderWidth);
+    bool setBorderWidth(const WXCoreBorderWidthEdge &edge, float borderWidth);
 
     float getBorderWidth(const WXCoreBorderWidthEdge &edge);
   };
@@ -127,7 +127,7 @@ namespace WeexCore {
       mRight = 0;
     }
 
-    bool setPosition(const WXCorePositionEdge &edge, const float &position);
+    bool setPosition(const WXCorePositionEdge &edge, float position);
 
     float getPosition(const WXCorePositionEdge &edge);
   };

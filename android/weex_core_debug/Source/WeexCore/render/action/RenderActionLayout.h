@@ -8,7 +8,7 @@ namespace WeexCore {
   class RenderActionLayout : public RenderAction {
 
   public:
-    RenderActionLayout(const std::string &pageId, RenderObject *render);
+    RenderActionLayout(std::string pageId, RenderObject *render);
 
     void ExecuteAction();
 

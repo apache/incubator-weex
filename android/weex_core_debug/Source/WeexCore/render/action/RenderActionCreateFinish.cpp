@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionCreateFinish::RenderActionCreateFinish(const std::string &pageId) {
+  RenderActionCreateFinish::RenderActionCreateFinish(std::string pageId) {
     this->mPageId = pageId;
   }
 

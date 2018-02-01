@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  bool WXCoreMargin::setMargin(const WXCoreMarginEdge &edge, const float &margin) {
+  bool WXCoreMargin::setMargin(const WXCoreMarginEdge &edge, float margin) {
     bool dirty = false;
     switch (edge) {
       case kMarginALL:
@@ -66,7 +66,7 @@ namespace WeexCore {
     return margin;
   }
 
-  bool WXCorePadding::setPadding(const WXCorePaddingEdge &edge, const float &padding) {
+  bool WXCorePadding::setPadding(const WXCorePaddingEdge &edge, float padding) {
     bool dirty = false;
     switch (edge) {
       case kPaddingALL:
@@ -130,7 +130,7 @@ namespace WeexCore {
     return padding;
   }
 
-  bool WXCoreBorderWidth::setBorderWidth(const WXCoreBorderWidthEdge &edge, const float &borderWidth) {
+  bool WXCoreBorderWidth::setBorderWidth(const WXCoreBorderWidthEdge &edge, float borderWidth) {
     bool dirty = false;
     switch (edge) {
       case kBorderWidthALL:
@@ -194,7 +194,7 @@ namespace WeexCore {
     return borderWidth;
   }
 
-  bool WXCorePosition::setPosition(const WXCorePositionEdge &edge, const float &position) {
+  bool WXCorePosition::setPosition(const WXCorePositionEdge &edge, float position) {
     bool dirty = false;
     switch (edge) {
       case kPositionEdgeLeft:

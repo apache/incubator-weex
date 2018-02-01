@@ -7,7 +7,7 @@
 namespace WeexCore {
   class RenderText : public RenderObject {
   private:
-    inline void UpdateAttr(const std::string &key, const std::string &value) {
+    inline void UpdateAttr(std::string key, std::string value) {
       RenderObject::UpdateAttr(key, value);
       markDirty();
       GetRenderPage()->CalculateLayout();

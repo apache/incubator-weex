@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionLayout::RenderActionLayout(const std::string &pageId, RenderObject *render) {
+  RenderActionLayout::RenderActionLayout(std::string pageId, RenderObject *render) {
     this->mPageId = pageId;
     this->mRef = render->Ref();
     GetLayoutInfo(render);

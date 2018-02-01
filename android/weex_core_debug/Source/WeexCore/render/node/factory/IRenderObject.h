@@ -6,7 +6,7 @@
 namespace WeexCore {
   class IRenderObject {
   public:
-    inline void SetRef(const std::string &ref) {
+    inline void SetRef(std::string ref) {
       mRef = ref;
     }
 
@@ -14,7 +14,7 @@ namespace WeexCore {
       return mRef;
     }
 
-    inline void SetPageId(const std::string &pageId) {
+    inline void SetPageId(std::string pageId) {
       this->mPageId = pageId;
     }
 
@@ -22,7 +22,7 @@ namespace WeexCore {
       return mPageId;
     }
 
-    inline void SetType(const std::string &type) {
+    inline void SetType(std::string type) {
       mType = type;
     }
 

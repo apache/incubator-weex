@@ -27,11 +27,11 @@ namespace WeexCore {
 
     void SendCreateBodyAction(RenderObject *render);
 
-    void SendAddElementAction(RenderObject *child, RenderObject *parent, const int &index);
+    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
 
-    void SendRemoveElementAction(const std::string &ref);
+    void SendRemoveElementAction(std::string ref);
 
-    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
+    void SendMoveElementAction(std::string ref, std::string parentRef, int index);
 
     void SendLayoutAction(RenderObject *render);
 
@@ -50,7 +50,7 @@ namespace WeexCore {
     void PostRenderAction(RenderAction *action);
 
   public:
-    RenderPage(const std::string &pageID);
+    RenderPage(std::string pageID);
 
     ~RenderPage();
 
@@ -59,24 +59,24 @@ namespace WeexCore {
     bool CreateRootRender(RenderObject *root);
 
     bool
-    AddRenderObject(const std::string &parentRef, const int &insertPosiotn, RenderObject *child);
+    AddRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
 
-    bool RemoveRenderObject(const std::string &ref);
+    bool RemoveRenderObject(std::string ref);
 
-    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int &index);
+    bool MoveRenderObject(std::string ref, std::string parentRef, int index);
 
     bool
-    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    UpdateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    bool UpdateAttr(const std::string &ref,
+    bool UpdateAttr(std::string ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool AddEvent(const std::string &ref, const std::string &event);
+    bool AddEvent(std::string ref, std::string event);
 
-    bool RemoveEvent(const std::string &ref, const std::string &event);
+    bool RemoveEvent(std::string ref, std::string event);
 
     bool CreateFinish();
 
@@ -128,7 +128,7 @@ namespace WeexCore {
       return mViewPortWidth;
     }
 
-    inline void SetViewPortWidth(float &viewPortWidth) {
+    inline void SetViewPortWidth(float viewPortWidth) {
       this->mViewPortWidth = viewPortWidth;
     }
 

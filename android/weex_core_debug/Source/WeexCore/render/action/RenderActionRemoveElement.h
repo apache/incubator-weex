@@ -7,7 +7,7 @@ namespace WeexCore {
 
   class RenderActionRemoveElement : public RenderAction {
   public:
-    RenderActionRemoveElement(const std::string &pageId, const std::string &ref);
+    RenderActionRemoveElement(std::string pageId, std::string ref);
 
     void ExecuteAction();
 
