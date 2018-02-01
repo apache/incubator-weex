@@ -115,14 +115,6 @@ namespace WeexCore {
     } else {
       render_root->setStyleWidthLevel(CSS_STYLE);
     }
-
-    if (isnan(render_root->getStyleHeight())) {
-      render_root->setStyleHeightLevel(FALLBACK_STYLE);
-      render_root->setStyleHeight(WXCoreEnvironment::getInstance()->DeviceHeight());
-    } else {
-      render_root->setStyleHeightLevel(CSS_STYLE);
-    }
-
     PushRenderToRegisterMap(root);
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
