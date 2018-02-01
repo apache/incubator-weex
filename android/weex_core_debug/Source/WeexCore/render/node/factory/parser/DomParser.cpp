@@ -278,7 +278,7 @@ namespace WeexCore {
         r.EnterObject();
         while (const char *key2 = r.NextObjectKey()) {
           if (r.PeekType() == kNumberType) {
-            char *temp = new char;
+            char *temp = new char[0];
             if (0 == strcmp(key, "attr")) {
               int len = fpconv_dtoa(r.GetDouble(), temp);
               temp[len] = '\0';
@@ -294,7 +294,10 @@ namespace WeexCore {
               render->AddStyle(key2, value);
               LOGD("AddStyle Int: %s, %s", key2, value);
             }
-            delete temp;
+            if (temp != nullptr) {
+              delete []temp;
+              temp = nullptr;
+            }
           } else if (r.PeekType() == kStringType) {
             const char *str = r.GetString();
             char value[strlen(str) + 1];
@@ -362,14 +365,17 @@ namespace WeexCore {
     while (const char *key = r.NextObjectKey()) {
       std::pair<std::string, std::string> *myPair = nullptr;
       if (r.PeekType() == kNumberType) {
-        char *temp = new char;
+        char *temp = new char[0];
         int len = fpconv_dtoa(r.GetDouble(), temp);
         temp[len] = '\0';
         char value[len + 1];
         strcpy(value, temp);
         myPair = new std::pair<std::string, std::string>(key, value);
         pairs->insert(pairs->end(), myPair);
-        delete temp;
+        if (temp != nullptr) {
+          delete []temp;
+          temp = nullptr;
+        }
       } else if (r.PeekType() == kStringType) {
         const char *str = r.GetString();
         char value[strlen(str) + 1];
