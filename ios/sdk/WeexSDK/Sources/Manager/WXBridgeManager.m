@@ -326,16 +326,18 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
     [self callJsMethod:method];
 }
 
-- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase option:(NSDictionary*)option
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))complection
 {
-    if (!type || !instanceId || !hookPhase) {
-        WXLogError(@"type and instance id and hookPhase should not be nil");
-        return;
-    }
-    NSArray *args = @[componentId, type, hookPhase, option?:@{}];
-    
-    WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:args instance:[WXSDKManager instanceForID:instanceId]];
-    [self callJsMethod:method];
+    WXPerformBlockOnBridgeThread(^{
+        if (!type || !instanceId || !hookPhase) {
+            WXLogError(@"type and instance id and hookPhase should not be nil");
+            return;
+        }
+        NSArray *newArgs = @[componentId, type, hookPhase, args?:@[]];
+        
+        WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:newArgs instance:[WXSDKManager instanceForID:instanceId]];
+        [self.bridgeCtx callJSMethod:@"callJS" args:@[method.instance.instanceId, @[method.callJSTask]] onContext:nil completion:complection];
+    });
 }
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive

@@ -330,8 +330,8 @@ do {\
     }
     
     [_view removeFromSuperview];
-    if (self->_isTemplate) {
-        [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_componentId type:@"lifecycle" hook:@"detach" option:nil];
+    if (self->_isTemplate && self.attributes[@"@componentId"]) {
+        [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@componentId"] type:@"lifecycle" hook:@"detach" args:nil competion:nil];
     }
     _view = nil;
     [_layer removeFromSuperlayer];

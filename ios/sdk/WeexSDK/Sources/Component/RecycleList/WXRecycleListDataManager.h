@@ -31,4 +31,14 @@
 
 - (NSInteger)numberOfItems;
 
+- (NSInteger)numberOfVirtualComponent;
+
+- (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId;
+
+- (void)updateVirtualComponentData:(NSString*)componentId data:(NSDictionary*)data;
+
+- (NSDictionary*)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath;
+
+- (NSString*)virtualComponentIdWithIndexPath:(NSIndexPath*)indexPath;
+
 @end

@@ -199,8 +199,8 @@
 
 //    [self _removeAllEvents];
     // remove all gesture and all
-    if (_isTemplate) {
-        [[WXSDKManager bridgeMgr] callComponentHook:_weexInstance.instanceId componentId:_componentId type:@"lifecycle" hook:@"destroy" option:nil];
+    if (_isTemplate && self.attributes[@"@componentId"]) {
+        [[WXSDKManager bridgeMgr] callComponentHook:_weexInstance.instanceId componentId:self.attributes[@"@componentId"] type:@"lifecycle" hook:@"destroy" args:nil competion:nil];
     }
     if (_tapGesture) {
         [_tapGesture removeTarget:nil action:NULL];
@@ -394,8 +394,8 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
         
-        if (self->_isTemplate) {
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_componentId type:@"lifecycle" hook:@"attach" option:nil];
+        if (self->_virtualComponentId) {
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:nil competion:nil];
         }
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];

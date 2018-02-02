@@ -28,6 +28,8 @@
 #import "WXRuleManager.h"
 #import "WXSDKInstance.h"
 #import "WXTracingManager.h"
+#import "WXRecycleListComponent.h"
+#import <objc/message.h>
 
 @interface WXDomModule ()
 
@@ -51,6 +53,7 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -220,6 +223,19 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
             });
 
         }
+    }];
+}
+
+- (void)updateComponentData:(NSString*)componentDataId componentData:(NSDictionary*)componentData callback:(NSString*)callbackId
+{
+    NSString *recycleListComponentRef = [[componentDataId componentsSeparatedByString:@"@"] objectAtIndex:0];
+    if (!recycleListComponentRef) {
+        return;
+    }
+    SEL selector = _cmd;
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
+        ((void*(*)(id,SEL,NSString*,NSDictionary*,NSString*))objc_msgSend)(recycleListComponent, selector, componentDataId, componentData,callbackId);
     }];
 }
 

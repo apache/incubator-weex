@@ -146,7 +146,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXDataBindingBlock _bindingRepeat;
     NSString *_repeatIndexIdentify;
     NSString *_repeatLabelIdentify;
-    NSString *_componentId;
+    NSString *_virtualComponentId;// for recycleList subcomponent
     BOOL _isRepeating;
     BOOL _isSkipUpdate;
     

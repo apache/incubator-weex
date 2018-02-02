@@ -29,6 +29,8 @@
 #import "WXRecycleListDataManager.h"
 #import "WXRecycleListTemplateManager.h"
 #import "WXRecycleListUpdateManager.h"
+#import "WXBridgeManager.h"
+#import "WXSDKManager.h"
 
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
@@ -36,10 +38,6 @@
 
 @implementation WXRecycleListComponent
 {
-    WXRecycleListDataManager *_dataManager;
-    WXRecycleListTemplateManager *_templateManager;
-    WXRecycleListUpdateManager *_updateManager;
-    
     NSString *_templateSwitchKey;
     NSString *_aliasKey;
     NSString *_indexKey;
@@ -66,7 +64,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
                weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
-        _dataManager = [[WXRecycleListDataManager alloc] initWithData:attributes[@"listData"]];
+        _dataManager = attributes[@"listData"]? [[WXRecycleListDataManager alloc] initWithData:attributes[@"listData"]] : [WXRecycleListDataManager new];
         _templateManager = [WXRecycleListTemplateManager new];
         _updateManager = [WXRecycleListUpdateManager new];
         _updateManager.delegate = self;
@@ -119,6 +117,15 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     if (attributes[@"listData"]) {
         NSArray *listData = attributes[@"listData"];
         [self _updateListData:listData withCompletion:nil animation:NO];
+    }
+    if (attributes[@"switch"]) {
+        _templateSwitchKey = [WXConvert NSString:attributes[@"switch"]];
+    }
+    if (attributes[@"alias"]) {
+        _aliasKey = [WXConvert NSString:attributes[@"alias"]];
+    }
+    if (attributes[@"index"]) {
+        _indexKey = [WXConvert NSString:attributes[@"index"]];
     }
 }
 
@@ -207,6 +214,40 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     }
 }
 
+- (void)updateComponentData:(NSString*)componentDataId componentData:(NSDictionary*)componentData callback:(NSString*)callbackId
+{
+    NSMutableDictionary * virtualComponentData = [[_dataManager virtualComponentDataWithId:componentDataId] mutableCopy];
+    NSIndexPath * indexPath = virtualComponentData[@"indexPath"];
+    if (!indexPath) {
+        return;
+    }
+    virtualComponentData = virtualComponentData?:[NSMutableDictionary new];
+    [virtualComponentData addEntriesFromDictionary:componentData];
+    [_dataManager updateVirtualComponentData:componentDataId data:[virtualComponentData copy]];
+    virtualComponentData[@"phase"] = @"update";
+    virtualComponentData[@"callbackId"] = callbackId;
+    [self _updateDataForCellSlotAtIndexPath:indexPath data:virtualComponentData];
+}
+
+- (void)_updateDataForCellSlotAtIndexPath:(NSIndexPath*)indexPath data:(NSDictionary*)data
+{
+    if(!indexPath || !data) {
+        return;
+    }
+    WXPerformBlockOnMainThread(^{
+        UICollectionViewCell * cellView = [_collectionView cellForItemAtIndexPath:indexPath];
+        WXCellSlotComponent * cellSlotComponent = (WXCellSlotComponent*)cellView.wx_component;
+        if (cellSlotComponent) {
+            [self _updateBindingData:data forCell:cellSlotComponent atIndexPath:indexPath];
+        }
+        // callback when update virtual component data success.
+        NSString * callbackId = data[@"callbackId"];
+        if (callbackId) {
+            [[WXSDKManager bridgeMgr] callBack:self.weexInstance.instanceId funcId:callbackId params:@{@"result":@"success"}];
+        }
+    });
+}
+
 - (void)updateData:(id)data atIndex:(NSUInteger)index
 {
     // TODO: bring the update logic to UpdateManager
@@ -216,11 +257,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         [_dataManager updateData:newListData];
         
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        UICollectionViewCell *cellView = [_collectionView cellForItemAtIndexPath:indexPath];
-        WXCellSlotComponent *cellComponent = (WXCellSlotComponent *)cellView.wx_component;
-        if (cellComponent) {
-            [self _updateBindingData:data forCell:cellComponent atIndexPath:indexPath];
-        }
+        [self _updateDataForCellSlotAtIndexPath:indexPath data:data];
     }
 }
 
@@ -289,9 +326,20 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 
 - (void)_updateBindingData:(NSDictionary *)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
 {
-    if (_aliasKey) {
-        data = @{_aliasKey:data};
+    if (!data[@"indexPath"] || !data[@"recycleListComponentRef"]) {
+        NSMutableDictionary * dataNew = [data mutableCopy];
+        dataNew[@"recycleListComponentRef"] = self.ref;
+        dataNew[@"indexPath"] = indexPath;
+        data = dataNew;
     }
+    if (_aliasKey &&!data[@"phase"]) {
+        data = @{_aliasKey:data,@"aliasKey":_aliasKey};
+    } else {
+        NSMutableDictionary * dictionTemp = [data mutableCopy];
+        [dictionTemp removeObjectForKey:@"phase"];
+        data = dictionTemp;
+    }
+    
     if (_indexKey) {
         NSMutableDictionary *dataNew = [data mutableCopy];
         dataNew[_indexKey] = @(indexPath.item);
@@ -301,6 +349,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 #ifdef DEBUG
     NSDate *startTime = [NSDate date];
 #endif
+    
     WXPerformBlockSyncOnComponentThread(^{
         [cellComponent updateCellData:data];
     });
@@ -383,9 +432,12 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
             //TODO: How can we avoid this?
             [super _insertSubcomponent:cellComponent atIndex:self.subcomponents.count];
         });
+    } else {
+        NSLog(@"reuse");
     }
     
     // 4. binding the data to the cell component
+    NSLog(@"++++++++++++++ %@", indexPath);
     [self _updateBindingData:data forCell:cellComponent atIndexPath:indexPath];
 
     // 5. Add cell component's view to content view.
@@ -402,9 +454,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     
     WXLogDebug(@"Return cell view:%@, indexPath:%@", cellView, indexPath);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self handleAppear];
-    });
+    [self handleAppear];
     
     return cellView;
 }

@@ -20,6 +20,15 @@
 #import <Foundation/Foundation.h>
 #import "WXScrollerComponent.h"
 
-@interface WXRecycleListComponent : WXScrollerComponent 
+@class WXRecycleListDataManager;
+@class WXRecycleListTemplateManager;
+@class WXRecycleListUpdateManager;
+
+@interface WXRecycleListComponent : WXScrollerComponent
+
+@property(nonatomic, strong) WXRecycleListDataManager *dataManager;
+@property(nonatomic, strong) WXRecycleListTemplateManager *templateManager;
+@property(nonatomic, strong) WXRecycleListUpdateManager *updateManager;
+
 
 @end
