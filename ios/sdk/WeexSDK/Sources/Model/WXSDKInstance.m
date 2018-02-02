@@ -97,7 +97,7 @@ typedef enum : NSUInteger {
         _pageName = @"";
 
         _performanceDict = [WXThreadSafeMutableDictionary new];
-        _moduleInstances = [NSMutableDictionary new];
+        _moduleInstances = [WXThreadSafeMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
