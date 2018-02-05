@@ -12,6 +12,7 @@
 #include <WeexCore/render/node/factory/IRenderObject.h>
 #include <base/ViewUtils.h>
 #include <WeexCore/render/page/RenderPage.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
 
