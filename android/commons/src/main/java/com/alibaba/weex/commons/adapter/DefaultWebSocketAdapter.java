@@ -138,45 +138,60 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
     }
 
     @Override
-    public void send(String data) {
+    public void send(final String data) {
         if (ws != null) {
-            try {
-                Buffer buffer = new Buffer().writeUtf8(data);
-                ws.sendMessage(WebSocket.PayloadType.TEXT, buffer.buffer());
-                buffer.flush();
-                buffer.close();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Buffer buffer = new Buffer().writeUtf8(data);
+                        ws.sendMessage(WebSocket.PayloadType.TEXT, buffer.buffer());
+                        buffer.flush();
+                        buffer.close();
 
-                wsEventReporter.frameSent(data);
-            } catch (Exception e) {
-                e.printStackTrace();
-                reportError(e.getMessage());
-                wsEventReporter.frameError(e.getMessage());
-            }
+                        wsEventReporter.frameSent(data);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        reportError(e.getMessage());
+                        wsEventReporter.frameError(e.getMessage());
+                    }
+                }
+            }).start();
         } else {
             reportError("WebSocket is not ready");
         }
     }
 
     @Override
-    public void close(int code, String reason) {
+    public void close(final int code, final String reason) {
         if (ws != null) {
-            try {
-                ws.close(code, reason);
-            } catch (Exception e) {
-                e.printStackTrace();
-                reportError(e.getMessage());
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ws.close(code, reason);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        reportError(e.getMessage());
+                    }
+                }
+            }).start();
         }
     }
 
     @Override
     public void destroy() {
         if (ws != null) {
-            try {
-                ws.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ws.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
     }
 
