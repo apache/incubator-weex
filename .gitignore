@@ -57,3 +57,18 @@ doc/.deploy*/
 
 # release
 apache_release_temp
+build.gradle
+android/incremental_settings.gradle
+android/incrementalbuild.gradle
+android/incrementalClean.sh
+android/incrementalDeploy.sh
+android/incrementalDeployAssemble.sh
+android/incrementalDeployContinuous.sh
+android/incrementalDeployOld.sh
+android/incrementalDeployOnline.sh
+android/incrementalInstall.sh
+android/sdk/gradlew
+android/sdk/tb-release.gradle
+android/sdk/gradle/gradle/wrapper/gradle-wrapper.jar
+android/sdk/gradle/gradle/wrapper/gradle-wrapper.properties
+android/sdk/gradle/wrapper/gradle-wrapper.properties-e
