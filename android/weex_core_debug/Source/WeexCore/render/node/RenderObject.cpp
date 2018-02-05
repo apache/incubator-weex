@@ -23,6 +23,7 @@ namespace WeexCore {
 
   RenderObject::~RenderObject() {
 
+    LOGEDEBUG("[~RenderObject] Delete tihs=%p",this);
     JNIEnv *env = getJNIEnv();
 
     mParentRender = nullptr;

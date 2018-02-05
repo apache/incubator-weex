@@ -276,7 +276,6 @@ namespace WeexCore {
           delete []temp_ref;
           temp_ref = nullptr;
         }
-        LOGE("ParseJsonObject ref is %s", ref.c_str());
       } else if (0 == strcmp(key, "type")) {
         RAPIDJSON_ASSERT(r.PeekType() == kStringType);
         const char *temp_type = r.GetString();

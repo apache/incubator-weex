@@ -276,10 +276,12 @@ namespace WeexCore {
         addChildAt(child, index);
       }
 
+      LOGEDEBUG("Add render address is %p, ref is %s, type is %s", child, child->Ref().c_str(), child->Type().c_str());
       child->SetParentRender(this);
     }
 
     inline void RemoveRenderObject(RenderObject *child) {
+      LOGEDEBUG("Remove render address is %p, ref is %s, type is %s", child, child->Ref().c_str(), child->Type().c_str());
       removeChild(child);
     }
 
