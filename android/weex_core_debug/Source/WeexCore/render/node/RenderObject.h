@@ -60,8 +60,7 @@ namespace WeexCore {
     }
 
     inline bool ViewInit() {
-      return !isnan(getStyleWidth()) && !isnan(getStyleHeight()) && getStyleWidth() > 0 &&
-             getStyleHeight() > 0;
+      return !isnan(getStyleWidth()) && getStyleWidth() > 0;
     }
 
     virtual std::map<std::string, std::string> *GetDefaultStyle() {

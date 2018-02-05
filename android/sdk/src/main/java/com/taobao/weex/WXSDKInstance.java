@@ -18,7 +18,8 @@
  */
 package com.taobao.weex;
 
-import android.app.AlertDialog;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -29,12 +30,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -73,9 +72,6 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
-import com.taobao.weex.utils.WXViewUtils;
-
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -85,8 +81,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
 /**
@@ -1390,34 +1384,24 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void setSize(int width, int height) {
-    if (width < 0 || height < 0 || isDestroy || !mRendered) {
-      return;
-    }
-    final float realWidth = width;
-    final float realHeight = height;
-
-    View godView = mRenderContainer;
-    if (godView != null) {
-      ViewGroup.LayoutParams layoutParams = godView.getLayoutParams();
+    if (width > 0 && height > 0 & !isDestroy && mRendered && mRenderContainer != null) {
+      ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
       if (layoutParams != null) {
-        if(godView.getWidth() != width || godView.getHeight() != height) {
+        final float realWidth = width;
+        final float realHeight = height;
+        if (mRenderContainer.getWidth() != width || mRenderContainer.getHeight() != height) {
           layoutParams.width = width;
           layoutParams.height = height;
-          godView.setLayoutParams(layoutParams);
+          mRenderContainer.setLayoutParams(layoutParams);
         }
-
-        WXComponent rootComponent = mRootComp;
-        if(rootComponent == null){
-          return;
+        if (mRootComp != null) {
+          WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+              nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
+            }
+          });
         }
-//        rootComponent.applyLayoutAndEvent(rootComponent);
-
-        WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-            nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
-          }
-        });
       }
     }
   }

@@ -107,7 +107,12 @@ namespace WeexCore {
     int PrintRenderSuccessLog();
 
     inline RenderObject *GetRenderObject(const std::string &ref) {
-      return mRenderObjectRegisterMap.find(ref)->second;
+        std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
+        if (iter != mRenderObjectRegisterMap.end()) {
+            return iter->second;
+        } else {
+            return nullptr;
+        }
     }
 
     inline void SetRootRenderObject(RenderObject *root) {
