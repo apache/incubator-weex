@@ -138,10 +138,9 @@ namespace WeexCore {
       return false;
     }
 
-    PushRenderToRegisterMap(child);
-
     // add child to Render Tree
     parent->AddRenderObject(insertPosition, child);
+    PushRenderToRegisterMap(child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
     SendAddElementAction(child, parent, insertPosition);
 
@@ -422,11 +421,15 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    mRenderObjectRegisterMap.insert(
-        std::pair<std::string, RenderObject *>(render->Ref(), render));
+    std::string ref = render->Ref();
+    mRenderObjectRegisterMap.insert(std::pair<std::string, RenderObject *>(ref, render));
 
-    for (Index i = 0; i < render->getChildCount(); ++i) {
-      PushRenderToRegisterMap(render->GetChild(i));
+    LOGEDEBUG("[PrintRef] Parent addr is %p , ref is %s ,type is %s", render, render->Ref().c_str(), render->Type().c_str());
+
+    for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      LOGEDEBUG("[PrintRef] Parent addr is %p , ref is %s ,type is %s", child, child->Ref().c_str(), child->Type().c_str());
+      PushRenderToRegisterMap(child);
     }
   }
 

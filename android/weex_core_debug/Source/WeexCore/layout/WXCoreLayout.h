@@ -73,7 +73,7 @@ namespace WeexCore {
                                          MeasureMode widthMeasureMode,
                                          float height, MeasureMode heightMeasureMode);
 
-  using Index = std::vector<WXCoreFlexLine *>::size_type;
+  using Index = std::vector<WXCoreLayoutNode *>::size_type;
 
   /**
    * flie line
@@ -533,6 +533,14 @@ namespace WeexCore {
 
     Index getChildCount() const {
       return mChildList.size();
+    }
+
+    inline std::vector<WXCoreLayoutNode *>::const_iterator ChildListIterBegin() {
+      return mChildList.cbegin();
+    }
+
+    inline std::vector<WXCoreLayoutNode *>::const_iterator ChildListIterEnd() {
+      return mChildList.cend();
     }
 
     void removeChildAt(const Index index) {
