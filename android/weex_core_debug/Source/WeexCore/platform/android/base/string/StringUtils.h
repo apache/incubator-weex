@@ -101,6 +101,24 @@ static jbyteArray String2JByteArray(JNIEnv *env, std::string &str) {
   return ba;
 }
 
+  static char* getArumentAsCStr(IPCArguments *arguments, int argument) {
+    char* ret = nullptr;
+
+    if (argument >= arguments->getCount())
+      return nullptr;
+    if (arguments->getType(argument) == IPCType::BYTEARRAY) {
+      const IPCByteArray *ipcBA = arguments->getByteArray(argument);
+      int strLen = ipcBA->length;
+      ret = new char[strLen+1];
+      for (int i = 0; i < strLen; ++i) {
+        ret[i] = ipcBA->content[i];
+      }
+      ret[strLen] = '\0';
+    }
+
+    return ret;
+  }
+
 static jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int argument) {
   jstring ret = nullptr;
   if (arguments->getType(argument) == IPCType::STRING) {

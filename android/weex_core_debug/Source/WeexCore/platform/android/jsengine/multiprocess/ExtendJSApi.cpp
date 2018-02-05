@@ -249,33 +249,36 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
 
-  JNIEnv *env = getJNIEnv();
-  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *domStr = getArumentAsCStr(arguments ,1);
 
-  RenderManager::GetInstance()->CreatePage(jString2Str(env, jInstanceId),
-                                           jByteArray2Str(env, jTaskString)) ? 0 : -1;
-  env->DeleteLocalRef(jInstanceId);
-  env->DeleteLocalRef(jTaskString);
+  if (pageId == nullptr || domStr == nullptr)
+    return createInt32Result(0);
+
+  RenderManager::GetInstance()->CreatePage(pageId, domStr) ? 0 : -1;
+
+  delete []pageId;
+  delete []domStr;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jInstanceId = getArgumentAsJString(env, arguments, 0);
-  jstring jParentRef = getArgumentAsJString(env, arguments, 1);
-  jbyteArray jdomString = getArgumentAsJByteArray(env, arguments, 2);
-  jstring jindex = getArgumentAsJString(env, arguments, 3);
 
-  RenderManager::GetInstance()->AddRenderObject(jString2Str(env, jInstanceId),
-                                                jString2Str(env, jParentRef),
-                                                atoi(jString2Str(env, jindex).c_str()),
-                                                jByteArray2Str(env, jdomString)) ? 0 : -1;
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *parentRef = getArumentAsCStr(arguments, 1);
+  char *domStr = getArumentAsCStr(arguments, 2);
+  char *index_cstr = getArumentAsCStr(arguments, 3);
+  int index = atoi(index_cstr);
 
-  env->DeleteLocalRef(jInstanceId);
-  env->DeleteLocalRef(jParentRef);
-  env->DeleteLocalRef(jdomString);
-  env->DeleteLocalRef(jindex);
+  if (pageId == nullptr || parentRef == nullptr || domStr == nullptr || index_cstr == nullptr)
+    return createInt32Result(0);
+
+  RenderManager::GetInstance()->AddRenderObject(pageId, parentRef, index, domStr);
+
+  delete []pageId;
+  delete []parentRef;
+  delete []domStr;
+  delete []index_cstr;
   return createInt32Result(0);
 }
 
