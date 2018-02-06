@@ -18,6 +18,12 @@
  */
 
 buildscript {
+    repositories {
+        mavenLocal()
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+        jcenter()
+    }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
