@@ -137,6 +137,14 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
       }
       Map<String, Object> eventMap = createFireEventParam(event, CUR_EVENT, null);
       eventMap.put("type", "touch");
+      if(event.getAction() == MotionEvent.ACTION_DOWN){
+        eventMap.put("action", START);
+      }else if(event.getAction() == MotionEvent.ACTION_CANCEL
+              ||  event.getAction() == MotionEvent.ACTION_UP){
+        eventMap.put("action", END);
+      }else{
+        eventMap.put("action", MOVE);
+      }
       EventResult result = component.fireEventWait(SHOULD_STOP_PROPAGATION, eventMap);
       if(result.isSuccess() && result.getResult() != null){
         shouldBubbleResult = WXUtils.getBoolean(result.getResult(), shouldBubbleResult);
@@ -198,9 +206,9 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
         if(component.getParent() != null){
           component.getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
         }
-      }
-      if(mIsTouchEventConsumed){//when touch event consumed by one gesture, other component should not consumed
-        event.setAction(MotionEvent.ACTION_CANCEL);
+        if(mIsTouchEventConsumed && WXUtils.getBoolean(component.getDomObject().getAttrs().get("cancelTouchOnConsume"), false)){//when touch event consumed by one gesture, other component should not consumed
+          event.setAction(MotionEvent.ACTION_CANCEL);
+        }
       }
       return result;
     } catch (Exception e) {
