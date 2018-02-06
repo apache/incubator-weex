@@ -34,7 +34,7 @@ namespace WeexCore {
   typedef std::map<std::string, std::string> PaddingsMap;
   typedef std::map<std::string, std::string> BordersMap;
 
-  class RenderObject : public IRenderObject, public WXCoreLayoutNode {
+  class RenderObject : public IRenderObject {
 
     friend class RenderPage;
 
@@ -251,9 +251,7 @@ namespace WeexCore {
 
     inline Index IndexOf(RenderObject *render) {
       if (render == nullptr) {
-        for (Index i = 0; i < getChildCount(); i++)
-          if (GetChild(i) == nullptr)
-            return i;
+        return -1;
       } else {
         for (Index i = 0; i < getChildCount(); i++)
           if (render->Ref() == GetChild(i)->Ref())
@@ -276,12 +274,10 @@ namespace WeexCore {
         addChildAt(child, index);
       }
 
-      LOGEDEBUG("Add render address is %p, ref is %s, type is %s", child, child->Ref().c_str(), child->Type().c_str());
       child->SetParentRender(this);
     }
 
     inline void RemoveRenderObject(RenderObject *child) {
-      LOGEDEBUG("Remove render address is %p, ref is %s, type is %s", child, child->Ref().c_str(), child->Type().c_str());
       removeChild(child);
     }
 

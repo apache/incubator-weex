@@ -2,9 +2,10 @@
 #define WEEX_PROJECT_IRENDEROBJECT_H
 
 #include <string>
+#include <WeexCore/layout/WXCoreLayout.h>
 
 namespace WeexCore {
-  class IRenderObject {
+  class IRenderObject : public WXCoreLayoutNode {
   public:
     inline void SetRef(std::string ref) {
       mRef = ref;

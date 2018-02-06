@@ -10,6 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <WeexCore/css/ConstantsName.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
 
@@ -141,6 +142,8 @@ namespace WeexCore {
         measureFunc = nullptr;
         mParent = nullptr;
         mChildList.clear();
+        BFCs.clear();
+        NonBFCs.clear();
 
         if (mChildrenFrozen != nullptr) {
           delete mChildrenFrozen;
@@ -557,11 +560,6 @@ namespace WeexCore {
       return mChildList.cend();
     }
 
-    void removeChildAt(const Index index) {
-      mChildList.erase(mChildList.begin() + index);
-      markDirty();
-    }
-
     void removeChild(const WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
@@ -574,12 +572,6 @@ namespace WeexCore {
 
     void addChildAt(WXCoreLayoutNode* const child, Index index) {
       mChildList.insert(mChildList.begin() + index, child);
-      child->mParent = this;
-      markDirty();
-    }
-
-    void appendChild(WXCoreLayoutNode* const child) {
-      mChildList.push_back(child);
       child->mParent = this;
       markDirty();
     }
