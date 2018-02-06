@@ -507,7 +507,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     void onHostViewClick();
   }
 
-  interface OnFocusChangeListener {
+  public interface OnFocusChangeListener{
     void onFocusChange(boolean hasFocus);
   }
 
