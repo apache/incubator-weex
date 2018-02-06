@@ -34,6 +34,9 @@ public class MemUtils {
      * bad performance ,40ms-60ms
      */
     public static Debug.MemoryInfo getMemoryInfo(Context context) {
+        if (null == context){
+            return null;
+        }
         Debug.MemoryInfo meminfo = null;
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (activityManager != null) {
@@ -56,14 +59,14 @@ public class MemUtils {
     }
 
     public static long getTotalPss(Context context) {
+
         long totalPss = 0L;
 
         Debug.MemoryInfo meminfo = getMemoryInfo(context);
         if (meminfo != null) {
-            totalPss = meminfo.getTotalPss() / 1024;
+            totalPss = meminfo.getTotalPss();
         }
         return totalPss;
     }
-
 
 }

@@ -444,23 +444,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
-    mWXPerformance.renderTimeOrigin = System.currentTimeMillis();
-    if (WXPerformance.TRACE_DATA ){
-      mWXPerformance.memBeforeRender = MemUtils.getTotalPss(mContext);
-      FpsCollector.getInstance().registerListener(mInstanceId, new FpsCollector.IFrameCallBack() {
-          @Override
-          public void doFrame(long frameTimeNanos) {
-              if (mWXPerformance.frameSum >= Long.MAX_VALUE){
-                 return;
-              }
-              mWXPerformance.frameSum++;
-              if (mWXPerformance.frameStartTime == 0){
-                  mWXPerformance.frameStartTime = System.currentTimeMillis();
-              }
-              mWXPerformance.frameEndTime = System.currentTimeMillis();
-          }
-      });
-    }
+    mWXPerformance.beforeInstanceRender(mInstanceId);
 
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
       WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
@@ -1367,17 +1351,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if(templateRef != null){
         templateRef = null;
       }
-      if (WXPerformance.TRACE_DATA){
-        mWXPerformance.backImproveMemory = MemUtils.getTotalPss(mContext) - mWXPerformance.memBeforeRender;
-
-        FpsCollector.getInstance().unRegister(mInstanceId);
-        long frameDiffTime = mWXPerformance.frameEndTime - mWXPerformance.frameStartTime;
-        if (0L == frameDiffTime){
-            frameDiffTime = 1L;
-        }
-        mWXPerformance.avgFPS = mWXPerformance.frameSum/frameDiffTime;
-      }
       mContext = null;
+      mWXPerformance.afterInstanceDestroy(mInstanceId);
     }
   }
 
