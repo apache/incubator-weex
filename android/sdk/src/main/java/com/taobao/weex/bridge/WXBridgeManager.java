@@ -1809,12 +1809,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           String reinitInfo = "";
           if (reInitCount > 1) {
             reinitInfo = "reinit Framework:";
+            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_REINIT_SUCCESS.getErrorCode(),
+                    "initFramework", reinitInfo + "success", null);
+          } else {
+            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_SUCCESS.getErrorCode(),
+                    "initFramework", reinitInfo + "success", null);
           }
+
         } else {
           if (reInitCount > 1) {
             WXLogUtils.e("[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail");
             String err = "[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail reinit FrameWork";
-			WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK.getErrorCode(),
+			WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK.getErrorCode(),
 					"initFramework", "reInitCount = " + reInitCount + err, null);
           } else {
             WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
@@ -1827,7 +1833,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         if (reInitCount > 1) {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
           String err = "[WXBridgeManager] invokeInitFramework reinit FrameWork exception!#" + e.toString();
-		  WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK.getErrorCode(),
+		  WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK.getErrorCode(),
 				  "initFramework", "reInitCount ==" + reInitCount + err, null);
         } else {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
