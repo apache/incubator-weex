@@ -27,6 +27,7 @@ import com.taobao.weex.common.WXPerformance;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author chenpeihan
@@ -46,12 +47,10 @@ public class FpsCollector {
     }
 
     public void init() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            return;
-        }
-        if (WXPerformance.TRACE_DATA) {
-            Choreographer.getInstance().postFrameCallback(new OnFrameListener());
-        }
+      if (!WXPerformance.TRACE_DATA || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+        return;
+      }
+      Choreographer.getInstance().postFrameCallback(new OnFrameListener());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -62,6 +61,7 @@ public class FpsCollector {
             for (Map.Entry<String, IFrameCallBack> entry : mListenerMap.entrySet()) {
                 entry.getValue().doFrame(frameTimeNanos);
             }
+            Choreographer.getInstance().postFrameCallback(this);
         }
     }
 

@@ -21,6 +21,8 @@ package com.taobao.weex.common;
 import android.os.Debug;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.performance.FpsCollector;
@@ -57,65 +59,66 @@ public class WXPerformance {
   }
 
   public enum Measure {
-    JSLibSize(0D,Double.MAX_VALUE),
-    JSLibInitTime(0D,2000D),
-    SDKInitTime(0D,2000D),
-    SDKInitInvokeTime(0D,2000D),
-    SDKInitExecuteTime(0D,2000D),
-    JSTemplateSize(0D,2000D),
-    pureNetworkTime(0D,15000D),
-    networkTime(0D,15000D),
-    fsCreateInstanceTime(0D,1000D),
-    fsCallJsTotalTime(0D,5000D),
-    fsCallJsTotalNum(0D,Double.MAX_VALUE),
-    fsCallNativeTotalTime(0D,5000D),
-    fsCallNativeTotalNum(0D,Double.MAX_VALUE),
-    fsCallEventTotalNum(0D,Double.MAX_VALUE),
-    fsRenderTime(0D,5000D),
-    fsRequestNum(0D,20D),
-    callCreateFinishTime(0D,10000D),
-    cellExceedNum(0D,Double.MAX_VALUE),
-    communicateTotalTime(0D,5000D),
-    maxDeepViewLayer(0D,Double.MAX_VALUE),
-    maxDeepVDomLayer(0D,Double.MAX_VALUE),
-    componentCount(0D,Double.MAX_VALUE),
-    avgFps(0D,60D),
-    timerCount(0D,Double.MAX_VALUE),
+    JSLibSize(0D, Double.MAX_VALUE),
+    JSLibInitTime(0D, 2000D),
+    SDKInitTime(0D, 2000D),
+    SDKInitInvokeTime(0D, 2000D),
+    SDKInitExecuteTime(0D, 2000D),
+    JSTemplateSize(0D, 2000D),
+    pureNetworkTime(0D, 15000D),
+    networkTime(0D, 15000D),
+    fsCreateInstanceTime(0D, 1000D),
+    fsCallJsTotalTime(0D, 5000D),
+    fsCallJsTotalNum(0D, Double.MAX_VALUE),
+    fsCallNativeTotalTime(0D, 5000D),
+    fsCallNativeTotalNum(0D, Double.MAX_VALUE),
+    fsCallEventTotalNum(0D, Double.MAX_VALUE),
+    fsRenderTime(0D, 5000D),
+    fsRequestNum(0D, 20D),
+    callCreateFinishTime(0D, 10000D),
+    cellExceedNum(0D, Double.MAX_VALUE),
+    communicateTotalTime(0D, 5000D),
+    maxDeepViewLayer(0D, Double.MAX_VALUE),
+    maxDeepVDomLayer(0D, Double.MAX_VALUE),
+    componentCount(0D, Double.MAX_VALUE),
+    avgFps(0D, 60D),
+    timerCount(0D, Double.MAX_VALUE),
 
-    MaxImproveMemory(0D,Double.MAX_VALUE),
-    BackImproveMemory(0D,Double.MAX_VALUE),
-    PushImproveMemory(0D,Double.MAX_VALUE),
-    measureTime1(0D,Double.MAX_VALUE),
-    measureTime2(0D,Double.MAX_VALUE),
-    measureTime3(0D,Double.MAX_VALUE),
-    measureTime4(0D,Double.MAX_VALUE),
-    measureTime5(0D,Double.MAX_VALUE),
+    MaxImproveMemory(0D, Double.MAX_VALUE),
+    BackImproveMemory(0D, Double.MAX_VALUE),
+    PushImproveMemory(0D, Double.MAX_VALUE),
+    measureTime1(0D, Double.MAX_VALUE),
+    measureTime2(0D, Double.MAX_VALUE),
+    measureTime3(0D, Double.MAX_VALUE),
+    measureTime4(0D, Double.MAX_VALUE),
+    measureTime5(0D, Double.MAX_VALUE),
 
-    communicateTime(0D,5000D),
-    screenRenderTime(0D,5000D),
-    totalTime(0D,5000D),
-    localReadTime(0D,5000D),
-    templateLoadTime(0D,5000D),
-    packageSpendTime(0D,5000D),
-    syncTaskTime(0D,5000D),
-    actualNetworkTime(0D,5000D),
-    firstScreenJSFExecuteTime(0D,5000D),
+    communicateTime(0D, 5000D),
+    screenRenderTime(0D, 5000D),
+    totalTime(0D, 5000D),
+    localReadTime(0D, 5000D),
+    templateLoadTime(0D, 5000D),
+    packageSpendTime(0D, 5000D),
+    syncTaskTime(0D, 5000D),
+    actualNetworkTime(0D, 5000D),
+    firstScreenJSFExecuteTime(0D, 5000D),
     //..
 
     fluency(0D, 100D);
 
 
-    private double mMinRange,mMaxRange;
+    private double mMinRange, mMaxRange;
 
-    Measure(double min, double max){
+    Measure(double min, double max) {
       this.mMinRange = min;
-      this.mMinRange =max;
+      this.mMinRange = max;
     }
 
-    public double getMinRange(){
+    public double getMinRange() {
       return mMinRange;
     }
-    public double getMaxRange(){
+
+    public double getMaxRange() {
       return mMinRange;
     }
   }
@@ -125,8 +128,8 @@ public class WXPerformance {
   @RestrictTo(Scope.LIBRARY_GROUP)
   public static final String CACHE_TYPE = "cacheType";
 
-  public static final int VIEW_LIMIT_HEIGHT = WXViewUtils.getScreenHeight()/2;
-  public static final int VIEW_LIMIT_WIDTH = WXViewUtils.getScreenWidth()/2;
+  public static final int VIEW_LIMIT_HEIGHT = WXViewUtils.getScreenHeight() / 2;
+  public static final int VIEW_LIMIT_WIDTH = WXViewUtils.getScreenWidth() / 2;
   public static final boolean TRACE_DATA = true;// WXEnvironment.isApkDebugable();
 
   /**
@@ -142,7 +145,7 @@ public class WXPerformance {
   public String templateUrl;
 
   @RestrictTo(Scope.LIBRARY_GROUP)
-  public String cacheType="unknown";
+  public String cacheType = "unknown";
 
   @RestrictTo(Scope.LIBRARY)
   public long renderTimeOrigin;
@@ -249,18 +252,18 @@ public class WXPerformance {
   public long parseJsonTime;
 
   /**
-   *  UpdateDomObj Time spent when rendering first screen
+   * UpdateDomObj Time spent when rendering first screen
    */
   public long updateDomObjTime;
 
   /**
-   *  ApplyUpdate Time spent when rendering first screen
+   * ApplyUpdate Time spent when rendering first screen
    */
   public long applyUpdateTime;
 
 
   /**
-   *  CssLayout Time spent when rendering first screen
+   * CssLayout Time spent when rendering first screen
    */
   public long cssLayoutTime;
 
@@ -293,7 +296,7 @@ public class WXPerformance {
    * 1:true
    * 0:false
    */
-  public int useScroller=0;
+  public int useScroller = 0;
 
   /**
    * component Count
@@ -327,7 +330,7 @@ public class WXPerformance {
   public String errMsg;
   private StringBuilder mErrMsgBuilder;
 
-  public String args="";
+  public String args = "";
 
   public String connectionType;
   public String requestType;
@@ -352,11 +355,11 @@ public class WXPerformance {
   @Deprecated
   public long measureTimes[] = new long[5];
 
-  public WXPerformance(){
-    mErrMsgBuilder=new StringBuilder();
+  public WXPerformance() {
+    mErrMsgBuilder = new StringBuilder();
   }
 
-  public Map<String,Double> getMeasureMap(){
+  public Map<String, Double> getMeasureMap() {
     double fsRenderTime;
     if (this.fsRenderTime != 0) {
       fsRenderTime = this.fsRenderTime - renderTimeOrigin;
@@ -367,17 +370,17 @@ public class WXPerformance {
         fsRenderTime = -1;
       }
     }
-    Map<String,Double> quotas = new HashMap<>();
+    Map<String, Double> quotas = new HashMap<>();
     quotas.put(Measure.JSLibSize.toString(), JSLibSize);
-    quotas.put(Measure.JSLibInitTime.toString(), (double)JSLibInitTime);
-    quotas.put(Measure.SDKInitTime.toString(),(double)WXEnvironment.sSDKInitTime);
-    quotas.put(Measure.SDKInitInvokeTime.toString(),(double)WXEnvironment.sSDKInitInvokeTime);
-    quotas.put(Measure.SDKInitExecuteTime.toString(),(double)WXEnvironment.sSDKInitExecuteTime);
+    quotas.put(Measure.JSLibInitTime.toString(), (double) JSLibInitTime);
+    quotas.put(Measure.SDKInitTime.toString(), (double) WXEnvironment.sSDKInitTime);
+    quotas.put(Measure.SDKInitInvokeTime.toString(), (double) WXEnvironment.sSDKInitInvokeTime);
+    quotas.put(Measure.SDKInitExecuteTime.toString(), (double) WXEnvironment.sSDKInitExecuteTime);
     quotas.put(Measure.JSTemplateSize.toString(), JSTemplateSize);
-    quotas.put(Measure.pureNetworkTime.toString(),(double)pureNetworkTime);
-    quotas.put(Measure.networkTime.toString(), (double)networkTime);
-    quotas.put(Measure.fsCreateInstanceTime.toString(), (double) (callCreateInstanceTime- renderTimeOrigin));
-    quotas.put(Measure.fsCallJsTotalTime.toString(),(double) fsCallJsTotalTime);
+    quotas.put(Measure.pureNetworkTime.toString(), (double) pureNetworkTime);
+    quotas.put(Measure.networkTime.toString(), (double) networkTime);
+    quotas.put(Measure.fsCreateInstanceTime.toString(), (double) (callCreateInstanceTime - renderTimeOrigin));
+    quotas.put(Measure.fsCallJsTotalTime.toString(), (double) fsCallJsTotalTime);
     quotas.put(Measure.fsCallJsTotalNum.toString(), (double) fsCallJsTotalNum);
     quotas.put(Measure.fsCallNativeTotalTime.toString(), (double) fsCallNativeTotalTime);
     quotas.put(Measure.fsCallNativeTotalNum.toString(), (double) fsCallNativeTotalNum);
@@ -386,7 +389,7 @@ public class WXPerformance {
     quotas.put(Measure.communicateTotalTime.toString(), totalTime);
     quotas.put(Measure.maxDeepViewLayer.toString(), (double) maxDeepViewLayer);
     quotas.put(Measure.maxDeepVDomLayer.toString(), (double) maxDeepVDomLayer);
-    quotas.put(Measure.componentCount.toString(),(double)componentCount);
+    quotas.put(Measure.componentCount.toString(), (double) componentCount);
     quotas.put(Measure.cellExceedNum.toString(), (double) cellExceedNum);
     quotas.put(Measure.timerCount.toString(), (double) timerInvokeCount);
     quotas.put(Measure.avgFps.toString(), (double) avgFPS);
@@ -395,19 +398,18 @@ public class WXPerformance {
     quotas.put(Measure.BackImproveMemory.toString(), (double) backImproveMemory);
     quotas.put(Measure.PushImproveMemory.toString(), 0D);
 
-    quotas.put(Measure.fsCallEventTotalNum.toString(),(double)fsCallEventTotalNum);
-    quotas.put(Measure.callCreateFinishTime.toString(),(double)callCreateFinishTime);
-
+    quotas.put(Measure.fsCallEventTotalNum.toString(), (double) fsCallEventTotalNum);
+    quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
-    quotas.put(Measure.screenRenderTime.toString(), (double)screenRenderTime);
-    quotas.put(Measure.communicateTime.toString(), (double)communicateTime);
+    quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);
+    quotas.put(Measure.communicateTime.toString(), (double) communicateTime);
     quotas.put(Measure.localReadTime.toString(), localReadTime);
-    quotas.put(Measure.templateLoadTime.toString(), (double)templateLoadTime);
-    quotas.put(Measure.firstScreenJSFExecuteTime.toString(),(double) firstScreenJSFExecuteTime);
-    quotas.put(Measure.actualNetworkTime.toString(),(double)actualNetworkTime);
-    quotas.put(Measure.syncTaskTime.toString(),(double)syncTaskTime);
-    quotas.put(Measure.packageSpendTime.toString(),(double)packageSpendTime);
+    quotas.put(Measure.templateLoadTime.toString(), (double) templateLoadTime);
+    quotas.put(Measure.firstScreenJSFExecuteTime.toString(), (double) firstScreenJSFExecuteTime);
+    quotas.put(Measure.actualNetworkTime.toString(), (double) actualNetworkTime);
+    quotas.put(Measure.syncTaskTime.toString(), (double) syncTaskTime);
+    quotas.put(Measure.packageSpendTime.toString(), (double) packageSpendTime);
 
     // TODO These attribute will be moved to elsewhere
     quotas.put(Measure.measureTime1.toString(), (double) measureTimes[0]);
@@ -426,10 +428,9 @@ public class WXPerformance {
     quotas.put(Dimension.requestType.toString(), requestType);
     quotas.put(Dimension.networkType.toString(), "unknown");
     quotas.put(Dimension.connectionType.toString(), connectionType);
-    quotas.put(Dimension.zcacheInfo.toString(),zCacheInfo);
+    quotas.put(Dimension.zcacheInfo.toString(), zCacheInfo);
     quotas.put(Dimension.cacheType.toString(), cacheType);
-    quotas.put(Dimension.useScroller.toString(),String.valueOf(useScroller));
-
+    quotas.put(Dimension.useScroller.toString(), String.valueOf(useScroller));
 
     // TODO These attribute will be moved to elsewhere
     // Extra Dimension for 3rd developers.
@@ -445,17 +446,17 @@ public class WXPerformance {
     return quotas;
   }
 
-  public static String[] getDimensions(){
-    List<String> ret= new LinkedList<>();
-    for(Dimension dimension:Dimension.values()) {
+  public static String[] getDimensions() {
+    List<String> ret = new LinkedList<>();
+    for (Dimension dimension : Dimension.values()) {
       ret.add(dimension.toString());
     }
     return ret.toArray(new String[ret.size()]);
   }
 
-  public static String[] getMeasures(){
-    List<String> ret= new LinkedList<>();
-    for(Measure measure: Measure.values()) {
+  public static String[] getMeasures() {
+    List<String> ret = new LinkedList<>();
+    for (Measure measure : Measure.values()) {
       ret.add(measure.toString());
     }
     return ret.toArray(new String[ret.size()]);
@@ -478,8 +479,8 @@ public class WXPerformance {
              + ",packageSpendTime:" + packageSpendTime
              + ",connectionType:" + connectionType
              + ",requestType:" + requestType
-             + ",initInvokeTime:"+WXEnvironment.sSDKInitInvokeTime+",initExecuteTime:"+WXEnvironment.sSDKInitExecuteTime
-             + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
+             + ",initInvokeTime:" + WXEnvironment.sSDKInitInvokeTime + ",initExecuteTime:" + WXEnvironment.sSDKInitExecuteTime
+             + ",SDKInitTime:" + WXEnvironment.sSDKInitTime
              + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
              + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
              + ",arg:" + args
@@ -487,21 +488,22 @@ public class WXPerformance {
     }
     return super.toString();
   }
-  public String getPerfData(){
-      return  "networkTime:" + networkTime
-              + " actualNetworkTime:" + actualNetworkTime
-              + " connectionType:" + connectionType
-              + " requestType:" + requestType
-              + " firstScreenRenderTime:" + screenRenderTime
-              + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-              + " componentCount:" + componentCount
-              + " JSTemplateSize:" + JSTemplateSize
-              + " SDKInitTime:" + WXEnvironment.sSDKInitTime
-              + " totalTime:" + totalTime
-              + " JSLibVersion:" + JSLibVersion
-              + " WXSDKVersion:" + WXSDKVersion
-              + " pageName:" + pageName
-              + " useScroller:" + useScroller;
+
+  public String getPerfData() {
+    return "networkTime:" + networkTime
+           + " actualNetworkTime:" + actualNetworkTime
+           + " connectionType:" + connectionType
+           + " requestType:" + requestType
+           + " firstScreenRenderTime:" + screenRenderTime
+           + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+           + " componentCount:" + componentCount
+           + " JSTemplateSize:" + JSTemplateSize
+           + " SDKInitTime:" + WXEnvironment.sSDKInitTime
+           + " totalTime:" + totalTime
+           + " JSLibVersion:" + JSLibVersion
+           + " WXSDKVersion:" + WXSDKVersion
+           + " pageName:" + pageName
+           + " useScroller:" + useScroller;
 
   }
 
@@ -515,8 +517,11 @@ public class WXPerformance {
 
   public void beforeInstanceRender(String instanceId) {
     renderTimeOrigin = System.currentTimeMillis();
-
+    tmp = instanceId;
     if (WXPerformance.TRACE_DATA) {
+      if (TextUtils.isEmpty(instanceId)) {
+        return;
+      }
       Debug.MemoryInfo mem = MemUtils.getMemoryInfo(WXEnvironment.getApplication());
       if (null != mem) {
         memTotalBeforeRender = mem.getTotalPss();
@@ -529,9 +534,15 @@ public class WXPerformance {
   //
   //  }
 
+  String tmp;
+
   public void afterInstanceDestroy(String instanceId) {
-    FpsCollector.getInstance().unRegister(instanceId);
+
     if (WXPerformance.TRACE_DATA) {
+      if (TextUtils.isEmpty(instanceId)) {
+        return;
+      }
+      FpsCollector.getInstance().unRegister(instanceId);
       Debug.MemoryInfo mem = MemUtils.getMemoryInfo(WXEnvironment.getApplication());
       if (null != mem) {
         backImproveMemory = mem.getTotalPss() - memTotalBeforeRender;
@@ -544,13 +555,16 @@ public class WXPerformance {
       if (timeDiff == 0) {
         avgFPS = -1;
       } else {
-        avgFPS = frameSum / timeDiff;
+        avgFPS = frameSum / (timeDiff / 1000);
       }
       //Fluency
-      if (totalFpsPointCount > 0){
-        fluency = fluencyFpsPointCount/totalFpsPointCount;
+      if (totalFpsPointCount > 0) {
+        fluency = fluencyFpsPointCount / totalFpsPointCount;
       }
     }
+
+    Log.d("performance", "avgFps :" + avgFPS + " | fluency :" + fluency + "[" + fluencyFpsPointCount + ","
+                         + "" + totalFpsPointCount + "]");
   }
 
   private double totalFpsPointCount;
@@ -558,9 +572,9 @@ public class WXPerformance {
 
   private class FpsCallBack implements FpsCollector.IFrameCallBack {
 
-    private long prePointFrame =-1;
+    private long prePointFrame = -1;
     private long prePointTime = -1;
-    private final long SECOND = 60000;
+    private final long SECOND = 1000;
     private final long FLUENCY_FPS_LIMIT = 35;
 
 
@@ -571,19 +585,35 @@ public class WXPerformance {
     }
 
     private void calculateFpsFluency() {
-      if (prePointFrame == -1) {
-        prePointFrame++;
-        prePointFrame = System.currentTimeMillis();
+      long limitLongSize = Long.MAX_VALUE - 1000L;
+      if (prePointFrame >= limitLongSize || prePointTime >= limitLongSize ||
+          totalFpsPointCount >= limitLongSize || totalFpsPointCount >= limitLongSize) {
         return;
       }
-      prePointFrame++;
-      long currentPointTime = System.currentTimeMillis();
-      if (currentPointTime - prePointTime > SECOND) {
-        totalFpsPointCount++;
-        fluencyFpsPointCount = prePointFrame <= FLUENCY_FPS_LIMIT ? fluencyFpsPointCount : fluencyFpsPointCount + 1;
-        prePointTime = currentPointTime;
-        prePointFrame = 0;
+
+      if (prePointFrame == -1) {
+        prePointFrame = 1;
+        prePointTime = System.currentTimeMillis();
+        return;
       }
+      long currentPointTime = System.currentTimeMillis();
+      long diff = currentPointTime - prePointTime;
+      if (diff < SECOND) {
+        prePointFrame++;
+        return;
+      }
+      totalFpsPointCount++;
+      if (prePointFrame > FLUENCY_FPS_LIMIT) {
+        fluencyFpsPointCount++;
+      }
+
+      Log.d("performance", tmp + "diff :" + diff + "| " + totalFpsPointCount + "," +
+                           fluencyFpsPointCount + "," + prePointFrame);
+
+      prePointTime = currentPointTime;
+      prePointFrame = 0;
+
+
     }
 
     private void calculateAvgFps() {
