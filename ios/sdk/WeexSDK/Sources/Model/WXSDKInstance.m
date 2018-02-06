@@ -103,7 +103,7 @@ typedef enum : NSUInteger {
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
         _trackComponent = NO;
         _performanceCommit = NO;
-       
+
         [self addObservers];
     }
     return self;
@@ -404,7 +404,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_INSTANCE_PERF_COMMIT(self);
         _performanceCommit = YES;
     }
-    
+
     NSMutableDictionary *data = [NSMutableDictionary dictionary];
     [data setObject:[NSString stringWithFormat:@"%ld",(long)state] forKey:@"state"];
     //[[WXSDKManager bridgeMgr] updateState:self.instanceId data:data];

@@ -22,7 +22,6 @@
 #import "WXBoxShadow.h"
 #import "WXLength.h"
 #import "WXAssert.h"
-#import "WXSDKEngine.h"
 
 @implementation WXConvert
 
@@ -66,59 +65,10 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
             valueString = [valueString substringToIndex:(valueString.length - 2)];
         }
-        if ([value hasPrefix:@"env(safe-area-inset-"] &&[value hasSuffix:@")"]){
-            NSUInteger start = [value rangeOfString:@"env(safe-area-inset-"].location +@"env(safe-area-inset-".length;
-            NSUInteger end = [value rangeOfString:@")" options:NSBackwardsSearch].location;
-            value = [value substringWithRange:NSMakeRange(start, end-start)];
-            return [self safeAreaInset:value];
-        }
         return [valueString doubleValue];
     }
     
     return [self double:value];
-}
-
-+ (CGFloat)safeAreaInset:(NSString*)value
-{
-    static NSArray * directionArray = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        directionArray = [NSArray arrayWithObjects:@"top",@"right",@"bottom",@"left", nil];
-    });
-    if ([directionArray containsObject:value]) {
-        __block UIEdgeInsets safeAreaInsets = UIEdgeInsetsZero;
-#if __IPHONE_11_0
-        if (@available(iOS 11.0, *)) {
-            WXSDKInstance * topInstance = [WXSDKEngine topInstance];
-            WXPerformBlockSyncOnMainThread(^{
-                safeAreaInsets = topInstance.rootView.safeAreaInsets;
-            });
-            
-        } else {
-            // Fallback on earlier versions
-        }
-#endif
-        NSUInteger key = [directionArray indexOfObject:value];
-        CGFloat retValue = 0;
-        switch (key) {
-            case 0:
-                retValue = safeAreaInsets.top;
-                break;
-            case 1:
-                retValue = safeAreaInsets.right;
-                break;
-            case 2:
-                retValue = safeAreaInsets.bottom;
-                break;
-            case 3:
-                retValue = safeAreaInsets.left;
-                break;
-            default:
-                break;
-        }
-        return retValue;
-    }
-    return 0;
 }
 
 + (NSString *)NSString:(id)value
@@ -138,7 +88,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     CGFloat pixel = [self CGFloat:value];
     
-    if ([value isKindOfClass:[NSString class]] && ([value hasSuffix:@"wx"]|| [value hasPrefix:@"env(safe-area-inset-"])) {
+    if ([value isKindOfClass:[NSString class]] && [value hasSuffix:@"wx"]) {
         return pixel;
     }
     return pixel * scaleFactor;
@@ -904,7 +854,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 + (WXPixelType)WXPixelType:(id)value
 {
-    CGFloat pixel = [self WXPixelType:value scaleFactor:1.0];
+    CGFloat pixel = [self CGFloat:value];
     
     return pixel * WXScreenResizeRadio();
 }

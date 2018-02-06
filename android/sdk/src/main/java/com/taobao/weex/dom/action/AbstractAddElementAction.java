@@ -92,12 +92,11 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     if (instance == null) {
       return;
     }
-    String errCode = getErrorCode().getErrorCode();
 	String errMsg  = getErrorMsg();
 
 	if (dom == null) {
 //      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), getErrorCode(), "addDomInternal", errMsg, null);
     }
 
     //only non-root has parent.
@@ -108,16 +107,21 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
       WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
 //      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), getErrorCode(), "addDomInternal", errMsg, null);
 	  return;
     }
     appendDomToTree(context, domObject);
     Stopwatch.split("appendDomToTree");
 
-    domObject.traverseTree(
+    int maxDomDep = domObject.traverseTree(
         context.getAddDOMConsumer(),
         context.getApplyStyleConsumer()
     );
+
+    if (instance.getMaxDomDeep()< maxDomDep){
+      instance.setMaxDomDeep(maxDomDep);
+    }
+
     Stopwatch.split("traverseTree");
 
 
