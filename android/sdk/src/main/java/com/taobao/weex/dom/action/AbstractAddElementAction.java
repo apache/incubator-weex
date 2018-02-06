@@ -69,7 +69,7 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
             parentC.addChild(createdComponent);
           }else{
             WXLogUtils.e("[generateComponentTree] " + getStatementName() + " create dom component failed name " + child.getType());
-            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode().getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
+            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
           }
         }
       }
