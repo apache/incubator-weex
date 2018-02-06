@@ -176,6 +176,7 @@ public class Constants {
     String TRANSFORM = "transform";
     String TRANSFORM_ORIGIN = "transformOrigin";
     String KEEP_INDEX = "keepIndex";
+    String KEEP_SELECTION_INDEX = "keepSelectionIndex";
 
     String INSERT_CELL_ANIMATION = "insertAnimation";
     String DELETE_CELL_ANIMATION = "deleteAnimation";
@@ -199,6 +200,7 @@ public class Constants {
 
     String STRATEGY  = "strategy";
 
+    String ALLOW_COPY_PASTE = "allowCopyPaste";
 
 
 
