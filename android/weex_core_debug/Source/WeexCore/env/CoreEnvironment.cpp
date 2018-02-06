@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 namespace WeexCore {
+
   WXCoreEnvironment *WXCoreEnvironment::m_pInstance = nullptr;
 
   bool WXCoreEnvironment::SetPlatform(std::string platformName) {

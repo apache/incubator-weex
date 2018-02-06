@@ -79,7 +79,6 @@ namespace WeexCore {
   }
 
   void RenderObject::ApplyDefaultAttr() {
-//      LOGE("ApplyDefaultAttr %s", Ref().c_str());
     std::map<std::string, std::string> *attrs = GetDefaultAttr();
 
     if (attrs == nullptr)
@@ -89,7 +88,6 @@ namespace WeexCore {
     AttributesIterator attr_end = AttrItEnd();
 
     for (; attr_it != attr_end; ++attr_it) {
-//        LOGE("UpdateAttr %s, %s", attr_it->first.c_str(), attr_it->second.c_str());
         UpdateAttr(attr_it->first, attr_it->second);
     }
 

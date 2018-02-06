@@ -20,19 +20,25 @@
 
 namespace WeexCore {
 
-  typedef std::vector<RenderAction *>::iterator RenderActionIterator;
-
   static bool useVSync = false;
   static bool splitScreenRendering = true;
 
-  RenderPage::RenderPage(std::string pageID) {
-    mPageId = pageID;
+  RenderPage::RenderPage(std::string pageId) {
+
+#if RENDER_LOG
+    LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
+#endif
+
+    mPageId = pageId;
     mWXCorePerformance = new RenderPerformance();
     mViewPortWidth = 750.0f;
   }
 
   RenderPage::~RenderPage() {
-    JNIEnv *env = getJNIEnv();
+
+#if RENDER_LOG
+    LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
+#endif
 
     if (render_root != nullptr) {
       delete render_root;
@@ -51,11 +57,15 @@ namespace WeexCore {
     if (render_root == nullptr || !render_root->ViewInit())
       return;
 
-    render_root->LayoutBefore();
+#if RENDER_LOG
+    LOGD("[RenderPage] CalculateLayout >>>> pageId: %s", mPageId.c_str());
+#endif
+
     long long startTime = getCurrentTime();
+    render_root->LayoutBefore();
     render_root->calculateLayout();
-    CssLayoutTime(getCurrentTime() - startTime);
     render_root->LayoutAfter();
+    CssLayoutTime(getCurrentTime() - startTime);
 
     if (splitScreenRendering) {
       if (mAlreadyCreateFinish) {
@@ -68,14 +78,14 @@ namespace WeexCore {
         switch (render_root->getFlexDirection()) {
           case kFlexDirectionColumn:
           case kFlexDirectionColumnReverse:
-            if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
+            if (render_root->getLargestMainSize() * radio > deviceHeight) {
               TraverseTree(render_root);
             }
             break;
           case kFlexDirectionRow:
           case kFlexDirectionRowReverse:
           default:
-            if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
+            if (render_root->getLargestMainSize() * radio > deviceWidth) {
               TraverseTree(render_root);
             }
             break;
@@ -104,8 +114,10 @@ namespace WeexCore {
   }
 
   bool RenderPage::CreateRootRender(RenderObject *root) {
+
     if (root == nullptr)
       return false;
+
     long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 

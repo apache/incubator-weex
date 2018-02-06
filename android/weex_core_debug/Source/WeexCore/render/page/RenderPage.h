@@ -50,7 +50,7 @@ namespace WeexCore {
     void PostRenderAction(RenderAction *action);
 
   public:
-    RenderPage(std::string pageID);
+    RenderPage(std::string pageId);
 
     ~RenderPage();
 
