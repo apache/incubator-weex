@@ -105,7 +105,6 @@ import com.taobao.weex.utils.batch.BatchOperationHelper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Handler;
 
 public class WXSDKEngine {
 
