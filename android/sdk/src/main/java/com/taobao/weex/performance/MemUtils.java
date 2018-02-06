@@ -22,6 +22,9 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Debug;
+import android.util.Log;
+
+import com.taobao.weex.WXEnvironment;
 
 /**
  * @author chenpeihan
@@ -34,6 +37,7 @@ public class MemUtils {
      * bad performance ,40ms-60ms
      */
     public static Debug.MemoryInfo getMemoryInfo(Context context) {
+        long start = System.currentTimeMillis();
         if (null == context){
             return null;
         }
@@ -55,6 +59,10 @@ public class MemUtils {
                 }
             }
         }
+        if (WXEnvironment.isApkDebugable()){
+            Log.d("MemUtils", "getMemoryInfo , time :"+(System.currentTimeMillis() -start));
+        }
+
         return meminfo;
     }
 
