@@ -6,6 +6,13 @@
 
 namespace WeexCore {
 
+#define RENDER_LOG 1
+#define PERFORMANCE_LOG 1
+#define LAYOUT_LOG 1
+#define JSAPI_LOG 1
+#define RENDER_LOG 1
+#define DOM_PARSER_LOG 1
+
   class WXCoreEnvironment {
 
   private:

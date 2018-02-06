@@ -9,9 +9,13 @@ namespace WeexCore {
   RenderManager *RenderManager::m_pInstance = nullptr;
 
   bool RenderManager::CreatePage(std::string pageId, const std::string &data) {
+
+#if RENDER_LOG
+    LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s", pageId.c_str(), data.c_str());
+#endif
+
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
-
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *root = Json2RenderObject(c_data, pageId);
@@ -28,6 +32,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+#if RENDER_LOG
+    LOGD("[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: %d, dom data: %s",
+         pageId.c_str(), parentRef.c_str(), index, data.c_str());
+#endif
+
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *child = Json2RenderObject(c_data, pageId);
@@ -40,9 +49,15 @@ namespace WeexCore {
   }
 
   bool RenderManager::RemoveRenderObject(std::string pageId, std::string ref) {
+
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
+
+#if RENDER_LOG
+    LOGD("[RenderManager] RemoveRenderObject >>>> pageId: %s, ref: %s", pageId.c_str(),
+         ref.c_str());
+#endif
 
     return page->RemoveRenderObject(ref);
   }
@@ -54,6 +69,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+#if RENDER_LOG
+    LOGD("[RenderManager] MoveRenderObject >>>> pageId: %s, ref: %s, parentRef: %s, index: %d",
+         pageId.c_str(), ref.c_str(), parentRef.c_str(), index);
+#endif
+
     return page->MoveRenderObject(ref, parentRef, index);
   }
 
@@ -62,6 +82,11 @@ namespace WeexCore {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
+
+#if RENDER_LOG
+    LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
+         pageId.c_str(), ref.c_str(), data.c_str());
+#endif
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
@@ -77,6 +102,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+#if RENDER_LOG
+    LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
+         pageId.c_str(), ref.c_str(), data.c_str());
+#endif
+
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     std::vector<std::pair<std::string, std::string> *> *styles = Json2Pairs(c_data);
@@ -91,6 +121,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+#if RENDER_LOG
+    LOGD("[RenderManager] AddEvent >>>> pageId: %s, ref: %s, event: %s",
+         pageId.c_str(), ref.c_str(), event.c_str());
+#endif
+
     return page->AddEvent(ref, event);
   }
 
@@ -100,6 +135,11 @@ namespace WeexCore {
     if (page == nullptr)
       return false;
 
+#if RENDER_LOG
+    LOGD("[RenderManager] RemoveEvent >>>> pageId: %s, ref: %s, event: %s",
+         pageId.c_str(), ref.c_str(), event.c_str());
+#endif
+
     return page->RemoveEvent(ref, event);
   }
 
@@ -107,6 +147,10 @@ namespace WeexCore {
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
       return false;
+
+#if RENDER_LOG
+    LOGD("[RenderManager] CreateFinish >>>> pageId: %s", pageId.c_str());
+#endif
 
     return page->CreateFinish();
   }
@@ -120,6 +164,10 @@ namespace WeexCore {
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
       return false;
+
+#if RENDER_LOG
+    LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
+#endif
 
     mPages.erase(pageId);
     delete page;
@@ -139,7 +187,6 @@ namespace WeexCore {
       return;
 
     page->Batch();
-
   }
 
 } //namespace WeexCore

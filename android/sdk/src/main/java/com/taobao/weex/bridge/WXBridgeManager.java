@@ -150,6 +150,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static String crashUrl = null;
   private static long lastCrashTime = 0;
 
+  private static final boolean BRIDGE_LOG_SWITCH = false;
+
   /**
    * Whether JS Framework(main.js) has been initialized.
    */
@@ -362,7 +364,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, Object options) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -390,7 +392,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, JSONObject options) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -417,7 +419,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public Object callNativeComponent(String instanceId, String componentRef, String method, JSONArray arguments, Object options) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeComponent >>>> instanceId:").append(instanceId)
               .append(", componentRef:").append(componentRef).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -453,7 +455,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
               .append(", tasks:").append(tasks).append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -517,7 +519,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // callUpdateFinish
   public int callUpdateFinish(String instanceId, String callback) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateFinish >>>> instanceId:").append(instanceId)
               .append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -551,7 +553,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // callRefreshFinish
   public int callRefreshFinish(String instanceId, String callback) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callRefreshFinish >>>> instanceId:").append(instanceId)
               .append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -594,7 +596,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateAttrs >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref)
               .append(", task:").append(task)
@@ -632,7 +634,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddEvent(String instanceId, String ref, String event) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref)
               .append(", event:").append(event);
@@ -662,7 +664,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callRemoveEvent(String instanceId, String ref, String event) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callRemoveEvent >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref)
               .append(", event:").append(event);
@@ -1109,7 +1111,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return;
       }
       try {
-        if (WXEnvironment.isApkDebugable()) {
+        if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
           WXLogUtils.d("createInstance >>>> instanceId:" + instance.getInstanceId()
                   + ", options:"
                   + WXJsonUtils.fromObjectToJSONString(options)
@@ -1171,7 +1173,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void invokeDestroyInstance(String instanceId) {
     try {
-      if (WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
         WXLogUtils.d("destroyInstance >>>> instanceId:" + instanceId);
       }
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
@@ -1751,17 +1753,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable()) {
-//      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
-//              .append(", componentType:").append(componentType).append(", ref:").append(ref)
-//              .append(", styles:").append(styles)
-//              .append(", attributes:").append(attributes)
-//              .append(", events:").append(events)
-//              .append(", paddings:").append(paddings)
-//              .append(", margins:").append(margins)
-//              .append(", borders:").append(borders);
-//      WXLogUtils.d(mLodBuilder.substring(0));
-//      mLodBuilder.setLength(0);
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref)
+              .append(", styles:").append(styles)
+              .append(", attributes:").append(attributes)
+              .append(", events:").append(events)
+              .append(", paddings:").append(paddings)
+              .append(", margins:").append(margins)
+              .append(", borders:").append(borders);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
@@ -1799,18 +1801,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable()) {
-//      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
-//              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
-//              .append(", parentRef:").append(parentRef)
-//              .append(", styles:").append(styles)
-//              .append(", attributes:").append(attributes)
-//              .append(", events:").append(events)
-//              .append(", paddings:").append(paddings)
-//              .append(", margins:").append(margins)
-//              .append(", borders:").append(borders);
-//      WXLogUtils.d(mLodBuilder.substring(0));
-//      mLodBuilder.setLength(0);
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
+              .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
+              .append(", parentRef:").append(parentRef)
+              .append(", styles:").append(styles)
+              .append(", attributes:").append(attributes)
+              .append(", events:").append(events)
+              .append(", paddings:").append(paddings)
+              .append(", margins:").append(margins)
+              .append(", borders:").append(borders);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(pageId)) {
@@ -1836,7 +1838,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callRemoveElement(String instanceId, String ref) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -1864,7 +1866,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callMoveElement(String instanceId, String ref, String parentref, int index) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
               .append(", parentref:").append(parentref)
               .append(", index:").append(index)
@@ -1896,7 +1898,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyleByWeexCore >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref).append(", styles:").append(styles.toString());
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -1923,7 +1925,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callUpdateAttrsByWeexCore(String instanceId, String ref, HashMap<String, String> attrs) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateAttrsByWeexCore >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref).append(", attrs:").append(attrs.toString());
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -1960,7 +1962,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
 //      mLodBuilder.append("[WXBridgeManager] callLayoutByWeexCore >>>> instanceId:").append(pageId)
 //            .append(", ref:").append(ref).append(", height:").append(height).append(", width:").append(width)
 //              .append(", top:").append(top)
@@ -1994,9 +1996,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callCreateFinishByWeexCore(String instanceId) {
-    mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId);
-    WXLogUtils.d(mLodBuilder.substring(0));
-    mLodBuilder.setLength(0);
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;

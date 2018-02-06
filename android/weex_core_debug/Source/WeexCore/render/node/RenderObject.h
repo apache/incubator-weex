@@ -387,7 +387,7 @@ namespace WeexCore {
     MarginsMap *mMargins;
     BordersMap *mBorders;
     EventsSet *mEvents;
-    jobject mComponent_Impl_Android; // TODO / WXComponent bind
+    jobject mComponent_Impl_Android;
     jobject mMeasureFunc_Impl_Android;
     void *mComponent_Impl_iOS;
 
