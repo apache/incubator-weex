@@ -175,6 +175,26 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private ComponentObserver mComponentObserver;
   private boolean mIsCommitedDomAtionExp = false;
 
+  // add for clound setting, default value is true
+  // can use it to control weex sandbox
+  // if true will open weex sandbox for multi context
+  private boolean mUseSandBox = true;
+
+  /**
+   * get sandbox switch
+   * @return useSandBox
+   */
+  public boolean getUseSandBox() {
+    return mUseSandBox;
+  }
+
+  /**
+   * set open SandBox
+   * @param flag
+   */
+  public void setUseSandBox(boolean flag) {
+    mUseSandBox = flag;
+  }
   public PriorityQueue<WXEmbed> hiddenEmbeds;
 
   private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit
