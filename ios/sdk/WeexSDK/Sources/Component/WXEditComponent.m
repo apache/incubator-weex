@@ -61,6 +61,13 @@
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
 
+// formatter
+@property (nonatomic, strong) NSString * formatRule;
+@property (nonatomic, strong) NSString * formatReplace;
+@property (nonatomic, strong) NSString * recoverRule;
+@property (nonatomic, strong) NSString * recoverReplace;
+@property (nonatomic, strong) NSDictionary * formaterData;
+
 @end
 
 @implementation WXEditComponent
@@ -73,6 +80,7 @@ WX_EXPORT_METHOD(@selector(focus))
 WX_EXPORT_METHOD(@selector(blur))
 WX_EXPORT_METHOD(@selector(setSelectionRange:selectionEnd:))
 WX_EXPORT_METHOD(@selector(getSelectionRange:))
+WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -225,6 +233,34 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
 }
 
+- (void)setTextFormatter:(NSDictionary*)formater
+{
+    _formaterData = formater;
+    if (formater[@"formatRule"]) {;
+        _formatRule = [self _preProcessInputTextFormatter:[WXConvert NSString:formater[@"formatRule"]]];
+    }
+    if (formater[@"formatReplace"]) {
+        _formatReplace = [self _preProcessInputTextFormatter:[WXConvert NSString:formater[@"formatReplace"]]];
+    }
+    if (formater[@"recoverRule"]) {
+        _recoverRule = [self _preProcessInputTextFormatter:[WXConvert NSString:formater[@"recoverRule"]]];
+    }
+    if (formater[@"recoverReplace"]) {
+        _recoverReplace = [self _preProcessInputTextFormatter:[WXConvert NSString:formater[@"recoverReplace"]]];
+    }
+}
+
+- (NSString*)_preProcessInputTextFormatter:(NSString*)formater
+{
+    NSRange start = [formater rangeOfString:@"/"];
+    NSRange end = [formater rangeOfString:@"/g"];
+    if (start.location == NSNotFound || end.location == NSNotFound || end.location < start.location) {
+        return formater;
+    }
+    NSRange subStringRange = NSMakeRange(start.location+1, end.location - start.location-1);
+    
+    return [formater substringWithRange:subStringRange];
+}
 
 #pragma mark - Overwrite Method
 -(NSString *)text
@@ -521,6 +557,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         
         return newLength <= [_maxLength integerValue] ;
     }
+    
     return YES;
 }
 
@@ -551,8 +588,17 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 
 - (void)textFiledEditChanged:(NSNotification *)notifi
 {
+    UITextField *textField = (UITextField *)notifi.object;
+    if (_formaterData && _recoverRule && _recoverReplace && _formatRule && _formatReplace) {
+        NSMutableString *text = [textField.text mutableCopy];
+        NSRegularExpression *recoverRule = [NSRegularExpression regularExpressionWithPattern:_recoverRule options:NSRegularExpressionCaseInsensitive error:NULL];
+        [recoverRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_recoverReplace];
+        
+        NSRegularExpression *formatRule = [NSRegularExpression regularExpressionWithPattern:_formatRule options:NSRegularExpressionCaseInsensitive error:NULL];
+        [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
+        textField.text = text;
+    }
     if (_inputEvent) {
-        UITextField *textField = (UITextField *)notifi.object;
         // bind each other , the key must be attrs
         [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
     }
