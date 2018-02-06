@@ -35,8 +35,7 @@ import { extend, typof } from '../../util/index'
  * @param  {any}    data
  */
 export function refresh (app, data) {
-  console.debug(`[JS Framework] Refresh with`, data,
-            `in instance[${app.id}]`)
+  console.debug(`[JS Framework] Refresh with`, data, `in instance[${app.id}]`)
   const vm = app.vm
   if (vm && data) {
     if (typeof vm.refreshData === 'function') {
@@ -162,8 +161,7 @@ export function fireEvent (app, ref, type, e, domChanges) {
  * @param  {boolean}  ifKeepAlive
  */
 export function callback (app, callbackId, data, ifKeepAlive) {
-  console.debug(`[JS Framework] Invoke a callback(${callbackId}) with`, data,
-            `in instance(${app.id})`)
+  console.debug(`[JS Framework] Invoke a callback(${callbackId}) with`, data, `in instance(${app.id})`)
   const result = app.doc.taskCenter.callback(callbackId, data, ifKeepAlive)
   updateActions(app)
   app.doc.taskCenter.send('dom', { action: 'updateFinish' }, [])

@@ -17,19 +17,7 @@
  * under the License.
  */
 
-if (!process.env.SUPPORT_ES2015) {
-  require('./polyfill/arrayFrom')
-  require('./polyfill/objectAssign')
-  require('./polyfill/objectSetPrototypeOf')
+import setup from './setup'
+import * as Weex from '../frameworks/legacy/index'
 
-  // import promise hack and polyfills
-  require('./polyfill/promise')
-  require('core-js/modules/es6.object.to-string')
-  require('core-js/modules/es6.string.iterator')
-  require('core-js/modules/web.dom.iterable')
-  require('core-js/modules/es6.promise')
-}
-
-export * from './env/console'
-export * from './env/setTimeout'
-export * from './env/freeze'
+setup({ Weex })
