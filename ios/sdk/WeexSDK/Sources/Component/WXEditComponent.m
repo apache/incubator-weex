@@ -550,9 +550,12 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 {
     if (!string.length) {
         [textField setValue:@(true) forKey:@"deleteWords"];
+        [textField setValue:[textField.text substringWithRange:range] forKey:@"editWords"];
     } else {
         [textField setValue:@(false) forKey:@"deleteWords"];
+        [textField setValue:string forKey:@"editWords"];
     }
+    
     if (_maxLength) {
         NSUInteger oldLength = [textField.text length];
         NSUInteger replacementLength = [string length];
@@ -604,9 +607,12 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
         
         UITextPosition * newPosition = nil;
-        if (![[textField valueForKey:@"deleteWords"] boolValue]) {
+        NSString * editWords = [textField valueForKey:@"editWords"];
+        if ([[textField valueForKey:@"deleteWords"] boolValue] && [editWords isEqualToString:_recoverRule]) {
+            // nothing
+        } else {
             if (![text isEqualToString:textField.text]) {
-                NSInteger offset = (text.length - textField.text.length+cursorPosition);
+                NSInteger offset = (editWords.length +cursorPosition);
                 newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:offset];
             }
             textField.text = text;

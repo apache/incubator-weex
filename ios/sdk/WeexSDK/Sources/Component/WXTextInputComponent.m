@@ -20,12 +20,6 @@
 #import "WXTextInputComponent.h"
 #import "WXConvert.h"
 
-@interface WXTextInputView : UITextField
-@property (nonatomic, assign) UIEdgeInsets border;
-@property (nonatomic, assign) UIEdgeInsets padding;
-@property (nonatomic, assign) BOOL deleteWords;
-@end
-
 @implementation WXTextInputView
 
 - (instancetype)init
