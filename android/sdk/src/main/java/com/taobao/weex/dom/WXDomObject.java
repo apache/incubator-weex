@@ -674,6 +674,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return dom;
   }
 
+  public boolean isDestroy(){
+    if(sDestroy == null){
+      return  true;
+    }
+    return sDestroy.get();
+  }
+
   public void destroy() {
     sDestroy.set(true);
     if (mStyles != null) {
