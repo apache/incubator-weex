@@ -116,16 +116,24 @@ namespace WeexCore {
         setFlexWrap(GetWXCoreFlexWrap(value));
         return kTypeLayout;
       } else if (key == MIN_WIDTH) {
-        setMinWidth(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        setMinWidth(realValue);
+        mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
-        setMinHeight(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        setMinWidth(realValue);
+        mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
-        setMaxWidth(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        setMinWidth(realValue);
+        mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
-        setMaxHeight(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        setMinWidth(realValue);
+        mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == HEIGHT) {
         setStyleHeightLevel(CSS_STYLE);
@@ -137,6 +145,7 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
+        mStyles->insert(std::pair<std::string, std::string>(key, value));
         return kTypeLayout;
       } else if (key == LEFT) {
         setStylePosition(kPositionEdgeLeft, getFloatByViewport(value,

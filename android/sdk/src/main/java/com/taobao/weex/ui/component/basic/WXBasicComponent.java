@@ -243,4 +243,111 @@ public abstract class WXBasicComponent<T extends View> {
   public float getLayoutHeight() {
     return mLayoutSize == null ? 0 : mLayoutSize.getHeight();
   }
+
+
+
+//  public float getPaddingTop() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_TOP));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+//    }
+//    return temp;
+//  }
+//
+//  public float getPaddingLeft() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_LEFT));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+//    }
+//    return temp;
+//  }
+//
+//  public float getPaddingRight() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_RIGHT));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+//    }
+//    return temp;
+//  }
+//
+//  public float getPaddingBottom() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_BOTTOM));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+//    }
+//    return temp;
+//  }
+//
+//  public float getMarginTop() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_TOP));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
+//    }
+//    return temp;
+//  }
+//
+//  public float getMarginLeft() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_LEFT));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
+//    }
+//    return temp;
+//  }
+//
+//  public float getMarginRight() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_RIGHT));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
+//    }
+//    return temp;
+//  }
+//
+//  public float getMarginBottom() {
+//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_BOTTOM));
+//    if (WXUtils.isUndefined(temp)) {
+//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
+//    }
+//    return temp;
+//  }
+//
+//
+//  public float getBorderRightWidth() {
+//    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
+//  }
+//
+//  public float getBorderTopWidth() {
+//    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
+//  }
+//
+//  public float getBorderBottomWidth() {
+//    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH);
+//  }
+//
+//  public float getBorderLeftWidth() {
+//    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
+//  }
+
+//  public float getDefaultWidth() {
+//    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.DEFAULT_WIDTH));
+//  }
+
+  public float getMinWidth() {
+    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_WIDTH));
+  }
+
+  public float getMaxWidth() {
+    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MAX_WIDTH));
+  }
+
+//  public float getDefaultHeight() {
+//    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.DEFAULT_HEIGHT));
+//  }
+
+  public float getMinHeight() {
+    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_HEIGHT));
+  }
+
+  public float getMaxHeight() {
+    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MAX_HEIGHT));
+  }
 }
