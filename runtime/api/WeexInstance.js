@@ -94,20 +94,18 @@ export default class WeexInstance {
       }
 
       // create module Proxy
-      if (typeof Proxy === 'function') {
-        moduleProxies[proxyName] = new Proxy(moduleApis, {
-          get (target, methodName) {
-            if (methodName in target) {
-              return target[methodName]
-            }
-            console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
-            return moduleGetter(id, moduleName, methodName)
-          }
-        })
-      }
-      else {
-        moduleProxies[proxyName] = moduleApis
-      }
+      // if (typeof Proxy === 'function') {
+      //   moduleProxies[proxyName] = new Proxy(moduleApis, {
+      //     get (target, methodName) {
+      //       if (methodName in target) {
+      //         return target[methodName]
+      //       }
+      //       console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
+      //       return moduleGetter(id, moduleName, methodName)
+      //     }
+      //   })
+      // }
+      moduleProxies[proxyName] = moduleApis
     }
 
     return moduleProxies[proxyName]

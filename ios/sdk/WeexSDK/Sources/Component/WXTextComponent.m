@@ -382,6 +382,9 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
+    if (!self.text) {
+        return nil;
+    }
     NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
