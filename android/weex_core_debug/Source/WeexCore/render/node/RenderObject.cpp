@@ -23,7 +23,6 @@ namespace WeexCore {
 
   RenderObject::~RenderObject() {
 
-    LOGEDEBUG("[~RenderObject] Delete tihs=%p",this);
     JNIEnv *env = getJNIEnv();
 
     mParentRender = nullptr;
@@ -51,11 +50,11 @@ namespace WeexCore {
       mMeasureFunc_Impl_Android = nullptr;
     }
 
-    for (Index i = 0; i < getChildCount(); i++) {
-      RenderObject *render = GetChild(i);
-      if (nullptr != render) {
-        delete render;
-        render = nullptr;
+    for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      if (child != nullptr) {
+        delete child;
+        child = nullptr;
       }
     }
   }

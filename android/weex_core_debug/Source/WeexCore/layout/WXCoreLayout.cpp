@@ -26,13 +26,15 @@ namespace WeexCore {
 
   void WXCoreLayoutNode::initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs) {
     NonBFCs.clear();
-    for (Index i = 0; i < getChildCount(); i++) {
-      WXCoreLayoutNode *child = getChildAt(i);
-      if (isBFC(child)) {
-        BFCs.push_back(child);
-      } else {
-        NonBFCs.push_back(child);
-        child->initFormatingContext(BFCs);
+    for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      WXCoreLayoutNode* child = *it;
+      if (child != nullptr) {
+        if (isBFC(child)) {
+          BFCs.push_back(child);
+        } else {
+          NonBFCs.push_back(child);
+          child->initFormatingContext(BFCs);
+        }
       }
     }
     reset();

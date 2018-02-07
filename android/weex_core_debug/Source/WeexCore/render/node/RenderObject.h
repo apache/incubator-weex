@@ -44,9 +44,12 @@ namespace WeexCore {
       if (isDirty()) {
         onLayoutBefore();
       }
-      for (Index i = 0; i < getChildCount(); i++) {
-        RenderObject *child = GetChild(i);
-        child->LayoutBefore();
+
+      for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+        RenderObject* child = static_cast<RenderObject*>(*it);
+        if (child != nullptr) {
+          child->LayoutBefore();
+        }
       }
     }
 
@@ -54,9 +57,12 @@ namespace WeexCore {
       if (hasNewLayout()) {
         onLayoutAfter(getLayoutWidth(), getLayoutHeight());
       }
-      for (Index i = 0; i < getChildCount(); i++) {
-        RenderObject *child = GetChild(i);
-        child->LayoutAfter();
+
+      for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+        RenderObject* child = static_cast<RenderObject*>(*it);
+        if (child != nullptr) {
+          child->LayoutAfter();
+        }
       }
     }
 
@@ -246,16 +252,22 @@ namespace WeexCore {
     }
 
     inline RenderObject *GetChild(Index &index) {
-      return (RenderObject *) getChildAt(index);
+      return static_cast<RenderObject*>(getChildAt(index));
     }
 
     inline Index IndexOf(RenderObject *render) {
       if (render == nullptr) {
         return -1;
       } else {
-        for (Index i = 0; i < getChildCount(); i++)
-          if (render->Ref() == GetChild(i)->Ref())
-            return i;
+        int i = 0;
+        for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+          RenderObject* child = static_cast<RenderObject*>(*it);
+          if (child != nullptr) {
+            if (render->Ref() == child->Ref())
+              return i;
+          }
+          ++i;
+        }
       }
       return -1;
     }

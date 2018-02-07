@@ -40,12 +40,12 @@ namespace WeexCore {
     LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
 #endif
 
+    mRenderObjectRegisterMap.clear();
+
     if (render_root != nullptr) {
       delete render_root;
       render_root = nullptr;
     }
-
-    mRenderObjectRegisterMap.clear();
 
     if (mWXCorePerformance != nullptr) {
       delete mWXCorePerformance;
@@ -106,10 +106,11 @@ namespace WeexCore {
       render->setHasNewLayout(false);
     }
 
-    for (Index i = 0; i < render->getChildCount(); i++) {
-      RenderObject *child = render->GetChild(i);
-      if (child != nullptr)
+    for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      if (child != nullptr) {
         TraverseTree(child);
+      }
     }
   }
 
@@ -442,8 +443,11 @@ namespace WeexCore {
 
     mRenderObjectRegisterMap.erase(render->Ref());
 
-    for (Index i = 0; i < render->getChildCount(); ++i) {
-      RemoveRenderFromRegisterMap(render->GetChild(i));
+    for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      if (child != nullptr) {
+        RemoveRenderFromRegisterMap(child);
+      }
     }
   }
 
@@ -463,8 +467,13 @@ namespace WeexCore {
     RenderAction *action = new RenderActionAddElement(PageId(), child, parent, index);
     PostRenderAction(action);
 
-    for (Index i = 0; i < child->getChildCount(); ++i) {
-      SendAddElementAction(child->GetChild(i), child, i);
+    Index i = 0;
+    for(auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd(); it++) {
+      RenderObject* grandson = static_cast<RenderObject*>(*it);
+      if (grandson != nullptr) {
+        SendAddElementAction(grandson, child, i);
+      }
+      ++i;
     }
   }
 
