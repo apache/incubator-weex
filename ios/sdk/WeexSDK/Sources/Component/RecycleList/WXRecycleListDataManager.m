@@ -96,6 +96,15 @@
 //    }
 }
 
+- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths
+{
+    for (NSIndexPath* indexPath in indexPaths) {
+        NSString * virtualComponentId = [_renderStatus objectForKey:indexPath];
+        [_virtualComponentData removeObjectForKey:virtualComponentId];
+        [_renderStatus removeObjectForKey:indexPath];
+    }
+}
+
 - (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId
 {
     return [_virtualComponentData objectForKey:componentId];

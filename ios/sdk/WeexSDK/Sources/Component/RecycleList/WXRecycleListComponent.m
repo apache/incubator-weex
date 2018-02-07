@@ -50,11 +50,14 @@
 }
 
 WX_EXPORT_METHOD(@selector(appendData:))
+WX_EXPORT_METHOD(@selector(appendRange:))
 WX_EXPORT_METHOD(@selector(insertData:atIndex:))
 WX_EXPORT_METHOD(@selector(updateData:atIndex:))
-WX_EXPORT_METHOD(@selector(removeData:))
+WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
 WX_EXPORT_METHOD(@selector(scrollTo:options:))
+WX_EXPORT_METHOD(@selector(insertRange:range:))
+WX_EXPORT_METHOD(@selector(setListData:))
 
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
@@ -186,17 +189,32 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 
 #pragma mark - Exported Component Methods
 
-- (void)appendData:(NSArray *)appendingData
+- (void)appendData:(id)appendingData
 {
-    if (![appendingData isKindOfClass:[NSArray class]]) {
-        WXLogError(@"wrong format of appending data:%@", appendingData);
+    if (!appendingData){
+        return;
+    }
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    [newListData addObject:appendingData];
+}
+
+- (void)appendRange:(NSArray*)data
+{
+    if (![data isKindOfClass:[NSArray class]]) {
+        WXLogError(@"wrong format of appending data:%@", data);
         return;
     }
     
     NSArray *oldData = [_dataManager data];
-    [_updateManager updateWithAppendingData:appendingData oldData:oldData completion:nil animation:NO];
+    [_updateManager updateWithAppendingData:data oldData:oldData completion:nil animation:NO];
 }
 
+- (void)setListData:(NSArray*)data
+{
+    if ([data count]) {
+        [_dataManager updateData:data];
+    }
+}
 - (void)insertData:(id)data atIndex:(NSUInteger)index
 {
     // TODO: bring the update logic to UpdateManager
@@ -209,7 +227,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         
         [UIView performWithoutAnimation:^{
-            [_collectionView insertItemsAtIndexPaths:@[indexPath]];
+            [self->_collectionView insertItemsAtIndexPaths:@[indexPath]];
         }];
     }
 }
@@ -235,7 +253,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
         return;
     }
     WXPerformBlockOnMainThread(^{
-        UICollectionViewCell * cellView = [_collectionView cellForItemAtIndexPath:indexPath];
+        UICollectionViewCell * cellView = [self->_collectionView cellForItemAtIndexPath:indexPath];
         WXCellSlotComponent * cellSlotComponent = (WXCellSlotComponent*)cellView.wx_component;
         if (cellSlotComponent) {
             [self _updateBindingData:data forCell:cellSlotComponent atIndexPath:indexPath];
@@ -250,36 +268,54 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
 
 - (void)updateData:(id)data atIndex:(NSUInteger)index
 {
-    // TODO: bring the update logic to UpdateManager
-    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
-    if (index < newListData.count) {
-        newListData[index] = data;
-        [_dataManager updateData:newListData];
-        
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        [self _updateDataForCellSlotAtIndexPath:indexPath data:data];
-    }
-}
-
-- (void)removeData:(NSArray *)indexes
-{
-    // TODO: bring the update logic to UpdateManager
-    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
-    NSMutableIndexSet *indexSet = [NSMutableIndexSet new];
-    NSMutableArray *indexPaths = [NSMutableArray array];
-    for (NSNumber *index in indexes) {
-        if ([index unsignedIntegerValue] >= newListData.count) {
-            WXLogError(@"invalid remove index:%@", index);
-            continue;
-        }
-        [indexSet addIndex:[index unsignedIntegerValue]];
-        [indexPaths addObject:[NSIndexPath indexPathForItem:[index unsignedIntegerValue] inSection:0]];
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    if (!data && index > [newListData count]) {
+        return;
     }
     
-    [newListData removeObjectsAtIndexes:indexSet];
+    // TODO: bring the update logic to UpdateManager
+    newListData[index] = data;
     [_dataManager updateData:newListData];
+    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
+    [_dataManager updateVirtualComponentData:virtualComponentId data:data];
+    [self _updateDataForCellSlotAtIndexPath:indexPath data:data];
+}
+
+- (void)insertRange:(NSInteger)index range:(NSArray*)data
+{
+    if (![data count]) {
+        WXLogDebug(@"ignore invalid insertRange");
+        return;
+    }
+    
+    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index,[data count])];
+    [newListData insertObjects:data atIndexes:indexSet];
+}
+
+- (void)removeData:(NSInteger)index count:(NSInteger)count
+{
+    // TODO: bring the update logic to UpdateManager
+    
+    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
+    if (index > [newListData count] || index + count - 1 > [newListData count]) {
+        
+        return;
+    }
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)];
+    [newListData removeObjectsAtIndexes:indexSet];
+    __block NSMutableArray<NSIndexPath*>* indexPaths = [NSMutableArray new];
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:idx inSection:0];
+        [indexPaths addObject:indexPath];
+    }];
+    
+    [_dataManager updateData:newListData];
+    [_dataManager deleteVirtualComponentAtIndexPaths:indexPaths];
     [UIView performWithoutAnimation:^{
-        [_collectionView deleteItemsAtIndexPaths:indexPaths];
+        [self->_collectionView deleteItemsAtIndexPaths:indexPaths];
+        [self->_collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
     }];
 }
 
@@ -295,7 +331,7 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
     NSIndexPath *fromIndexPath = [NSIndexPath indexPathForItem:fromIndex inSection:0];
     NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:toIndex inSection:0];
     [UIView performWithoutAnimation:^{
-        [_collectionView moveItemAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+        [self->_collectionView moveItemAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
     }];
 }
 
@@ -432,12 +468,9 @@ WX_EXPORT_METHOD(@selector(scrollTo:options:))
             //TODO: How can we avoid this?
             [super _insertSubcomponent:cellComponent atIndex:self.subcomponents.count];
         });
-    } else {
-        NSLog(@"reuse");
     }
     
     // 4. binding the data to the cell component
-    NSLog(@"++++++++++++++ %@", indexPath);
     [self _updateBindingData:data forCell:cellComponent atIndexPath:indexPath];
 
     // 5. Add cell component's view to content view.

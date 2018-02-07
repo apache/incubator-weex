@@ -41,4 +41,5 @@
 
 - (NSString*)virtualComponentIdWithIndexPath:(NSIndexPath*)indexPath;
 
+- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths;
 @end
