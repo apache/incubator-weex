@@ -260,11 +260,8 @@ namespace WeexCore {
     /** ================================ measure =================================== **/
 
     void reset() {
-      widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
-      heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
       if (isDirty()) {
         mLayoutResult->reset();
-
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
             delete flexLine;
@@ -278,10 +275,12 @@ namespace WeexCore {
           mChildrenFrozen = nullptr;
         }
         mChildrenFrozen = new bool[getChildCount(kNonBFC)];
-        for(int i=0;i<getChildCount(kNonBFC);i++){
-          mChildrenFrozen[i] = false;
-        }
       }
+      for(int i=0;i<getChildCount(kNonBFC);i++){
+        mChildrenFrozen[i] = false;
+      }
+      widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
+      heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
     }
 
     void setLayoutWidth(const float width) {
