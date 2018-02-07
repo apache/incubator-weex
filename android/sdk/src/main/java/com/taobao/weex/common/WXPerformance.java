@@ -551,11 +551,11 @@ public class WXPerformance {
       if (frameEndTime == 0) {
         frameEndTime = System.currentTimeMillis();
       }
-      long timeDiff = frameEndTime - frameStartTime;
-      if (timeDiff == 0) {
+      long timeDiff = (frameEndTime - frameStartTime)/1000;
+      if (timeDiff <= 0) {
         avgFPS = -1;
       } else {
-        avgFPS = frameSum / (timeDiff / 1000);
+        avgFPS = frameSum / timeDiff;
       }
       //Fluency
       if (totalFpsPointCount > 0) {
