@@ -428,12 +428,11 @@ namespace WeexCore {
     std::string ref = render->Ref();
     mRenderObjectRegisterMap.insert(std::pair<std::string, RenderObject *>(ref, render));
 
-    LOGEDEBUG("[PrintRef] Parent addr is %p , ref is %s ,type is %s", render, render->Ref().c_str(), render->Type().c_str());
-
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
-      LOGEDEBUG("[PrintRef] Parent addr is %p , ref is %s ,type is %s", child, child->Ref().c_str(), child->Type().c_str());
-      PushRenderToRegisterMap(child);
+      if (child != nullptr) {
+        PushRenderToRegisterMap(child);
+      }
     }
   }
 
@@ -446,8 +445,6 @@ namespace WeexCore {
     for (Index i = 0; i < render->getChildCount(); ++i) {
       RemoveRenderFromRegisterMap(render->GetChild(i));
     }
-    // delete render;
-
   }
 
   void RenderPage::SendCreateBodyAction(RenderObject *render) {
