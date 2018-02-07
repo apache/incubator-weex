@@ -262,12 +262,7 @@ public class WXUtils {
         }
       }else {
         try {
-          if (!TextUtils.isEmpty(temp) && temp.indexOf(".") > 0) {
-            temp = subZeroAndDot(temp);
-            return parseInt(temp);
-          } else {
-            return Integer.parseInt(temp);
-          }
+          return Integer.parseInt(temp);
         } catch (NumberFormatException nfe) {
           WXLogUtils.e("Argument format error! value is " + value, nfe);
         } catch (Exception e) {
@@ -277,19 +272,6 @@ public class WXUtils {
     }
 
     return df;
-  }
-
-  /**
-   * 使用java正则表达式去掉多余的.与0
-   * @param s
-   * @return
-   */
-  private static String subZeroAndDot(String s){
-    if(s.indexOf(".") > 0){
-      s = s.replaceAll("0+?$", "");//去掉多余的0
-      s = s.replaceAll("[.]$", "");//如最后一位是.则去掉
-    }
-    return s;
   }
 
   /**
