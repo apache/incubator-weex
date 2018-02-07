@@ -116,7 +116,9 @@ static JSContext *jsContext;
             }
         }
     }
-    
+    if (self->_dataBindOnce && self->_virtualComponentId) {
+        return;
+    }
     if (!_isRepeating) {
         WXDataBindingBlock repeatBlock = templateComponent->_bindingRepeat;
         if (repeatBlock) {
@@ -336,7 +338,9 @@ static JSContext *jsContext;
         }
         
         if (type == WXDataBindingTypeAttributes) {
-            if ([WXBindingMatchIdentify isEqualToString:name]) {
+            if ([WXBindingOnceIdentify isEqualToString:name]) {
+                _dataBindOnce = YES;
+            } else if ([WXBindingMatchIdentify isEqualToString:name]) {
                 WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding];
                 WXJSExpression *expression = [parser parseExpression];
                 _bindingMatch = [self bindingBlockWithExpression:expression];
