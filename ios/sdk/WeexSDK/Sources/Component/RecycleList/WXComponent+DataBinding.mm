@@ -97,7 +97,7 @@ static JSContext *jsContext;
                 self->_virtualComponentId = [NSString stringWithFormat:@"%@@%ld", listRef, __componentId % (2048*1024)];
                 __componentId++;
                 dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-                [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@componentId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
+                [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
                     [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
                     [newData setObject:indexPath forKey:@"indexPath"];
                     [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
