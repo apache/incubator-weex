@@ -590,13 +590,26 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 {
     UITextField *textField = (UITextField *)notifi.object;
     if (_formaterData && _recoverRule && _recoverReplace && _formatRule && _formatReplace) {
+        UITextRange * textRange = textField.selectedTextRange;
+        NSInteger cursorPosition = [textField offsetFromPosition:textField.beginningOfDocument toPosition:textRange.start];
         NSMutableString *text = [textField.text mutableCopy];
         NSRegularExpression *recoverRule = [NSRegularExpression regularExpressionWithPattern:_recoverRule options:NSRegularExpressionCaseInsensitive error:NULL];
         [recoverRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_recoverReplace];
-        
         NSRegularExpression *formatRule = [NSRegularExpression regularExpressionWithPattern:_formatRule options:NSRegularExpressionCaseInsensitive error:NULL];
         [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
+        
+        UITextPosition * newPosition = nil;
+        
+        if (![text isEqualToString:textField.text]) {
+            NSInteger offset = (text.length - textField.text.length+cursorPosition);
+            newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:offset];
+        }
+    
         textField.text = text;
+        if (newPosition) {
+            textField.selectedTextRange = [textField textRangeFromPosition:newPosition toPosition:newPosition];
+        }
+
     }
     if (_inputEvent) {
         // bind each other , the key must be attrs

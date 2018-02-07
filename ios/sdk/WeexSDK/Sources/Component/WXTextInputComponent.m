@@ -55,7 +55,7 @@
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {
     // this behavior will hide the action like copy, cut, paste, selectAll and so on.
-    return [[self.wx_component valueForKey:@"disableActionMenu"] boolValue];
+    return [[self.wx_component valueForKey:@"disableAction"] boolValue];
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds
@@ -76,8 +76,9 @@
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
-        if (attributes[@"disableAction"]) {
-            _disableAction = [WXConvert BOOL:attributes[@"disableActionMenu"]];
+        _disableAction = YES;
+        if (attributes[@"allowCopyPaste"]) {
+            _disableAction = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
         }
     }
     return self;
@@ -91,8 +92,8 @@
 
 - (void)updateAttributes:(NSDictionary *)attributes {
     [super updateAttributes:attributes];
-    if (attributes[@"disableAction"]) {
-        _disableAction = [WXConvert BOOL:attributes[@"disableActionMenu"]];
+    if (attributes[@"allowCopyPaste"]) {
+        _disableAction = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
     }
 }
 
