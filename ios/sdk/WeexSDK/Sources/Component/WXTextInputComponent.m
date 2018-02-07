@@ -55,7 +55,7 @@
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {
     // this behavior will hide the action like copy, cut, paste, selectAll and so on.
-    return [[self.wx_component valueForKey:@"disableAction"] boolValue];
+    return [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds
@@ -67,7 +67,7 @@
 @interface WXTextInputComponent()
 
 @property (nonatomic, strong) WXTextInputView *inputView;
-@property (nonatomic, assign) BOOL disableAction;
+@property (nonatomic, assign) BOOL allowCopyPaste;
 
 @end
 
@@ -76,9 +76,9 @@
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
-        _disableAction = YES;
+        _allowCopyPaste = YES;
         if (attributes[@"allowCopyPaste"]) {
-            _disableAction = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
+            _allowCopyPaste = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
         }
     }
     return self;
@@ -93,7 +93,7 @@
 - (void)updateAttributes:(NSDictionary *)attributes {
     [super updateAttributes:attributes];
     if (attributes[@"allowCopyPaste"]) {
-        _disableAction = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
+        _allowCopyPaste = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
     }
 }
 
