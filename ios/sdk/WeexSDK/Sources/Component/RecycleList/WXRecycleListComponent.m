@@ -51,8 +51,8 @@
 
 WX_EXPORT_METHOD(@selector(appendData:))
 WX_EXPORT_METHOD(@selector(appendRange:))
-WX_EXPORT_METHOD(@selector(insertData:atIndex:))
-WX_EXPORT_METHOD(@selector(updateData:atIndex:))
+WX_EXPORT_METHOD(@selector(insertData:data:))
+WX_EXPORT_METHOD(@selector(updateData:data:))
 WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
 WX_EXPORT_METHOD(@selector(scrollTo:options:))
@@ -215,7 +215,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
         [_dataManager updateData:data];
     }
 }
-- (void)insertData:(id)data atIndex:(NSUInteger)index
+- (void)insertData:(NSUInteger)index data:(id)data
 {
     // TODO: bring the update logic to UpdateManager
     // TODO: update cell because index has changed
@@ -266,7 +266,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     });
 }
 
-- (void)updateData:(id)data atIndex:(NSUInteger)index
+- (void)updateData:(NSUInteger)index data:data
 {
     NSMutableArray * newListData = [[_dataManager data] mutableCopy];
     if (!data && index > [newListData count]) {
@@ -442,16 +442,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     }
     
     // 2. get the template type specified by data
-    NSString *templateType = nil;
-    if (!_templateSwitchKey) {
-        // if switch key is not specified, so use the first template.
-        templateType = [_templateManager topTemplate].templateCaseType;
-    } else if (data[_templateSwitchKey]){
-        templateType = data[_templateSwitchKey];
-    } else if (data[WXDefaultRecycleTemplateType]){
-        // read the default type.
-        templateType = data[WXDefaultRecycleTemplateType];
-    }
+    NSString * templateType = [self templateType:indexPath];
     _templateManager.collectionView = collectionView;
     if (!templateType) {
         WXLogError(@"Each data should have a value for %@ to indicate template type", _templateSwitchKey);
@@ -517,8 +508,8 @@ WX_EXPORT_METHOD(@selector(setListData:))
     if (size) {
         return [size CGSizeValue];
     } else {
-        NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
-        WXCellSlotComponent *cell = [_templateManager templateWithType:data[_templateSwitchKey]];
+
+        WXCellSlotComponent *cell = [_templateManager templateWithType:[self templateType:indexPath]];
         CGSize size = cell.calculatedFrame.size;
         _sizeCache[indexPath] = [NSValue valueWithCGSize:size];
         return CGSizeMake(_collectionView.frame.size.width, size.height);
@@ -547,6 +538,25 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (void)updateManager:(WXRecycleListUpdateManager *)manager didUpdateData:(id)newData withSuccess:(BOOL)finished
 {
     
+}
+
+- (NSString*)templateType:(NSIndexPath*)indexPath
+{
+    NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
+    // default is first template.
+    NSString *templateType = [_templateManager topTemplate].templateCaseType;
+    if (!data || ![data isKindOfClass:[NSDictionary class]]) {
+        WXLogError(@"No data or wrong data format for index:%zd, data:%@", indexPath.item, data);
+        return nil;
+    }
+    
+    if (_templateSwitchKey &&data[_templateSwitchKey]){
+        templateType = data[_templateSwitchKey];
+    } else if (data[WXDefaultRecycleTemplateType]){
+        // read the default type.
+        templateType = data[WXDefaultRecycleTemplateType];
+    }
+    return templateType;
 }
 
 @end

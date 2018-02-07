@@ -336,7 +336,7 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
         NSArray *newArgs = @[componentId, type, hookPhase, args?:@[]];
         
         WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:newArgs instance:[WXSDKManager instanceForID:instanceId]];
-        [self.bridgeCtx callJSMethod:@"callJS" args:@[method.instance.instanceId, @[method.callJSTask]] onContext:nil completion:complection];
+        [self.bridgeCtx callJSMethod:@"callJS" args:@[instanceId, @[method.callJSTask]] onContext:nil completion:complection];
     });
 }
 
