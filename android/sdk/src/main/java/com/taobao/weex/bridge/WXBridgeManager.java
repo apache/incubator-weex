@@ -586,52 +586,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
-  // callUpdateAttrs
-  public int callUpdateAttrs(String instanceId, String ref, String task, String callback) {
-    if (TextUtils.isEmpty(task)) {
-      WXLogUtils.e("[WXBridgeManager] callUpdateAttrs: call UpdateAttrs tasks is null");
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE.getErrorCode(), "callUpdateAttrs",
-              "call UpdateAttrs tasks is null| INSTANCE_RENDERING_ERROR will be set", null);
-
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
-      mLodBuilder.append("[WXBridgeManager] callUpdateAttrs >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref)
-              .append(", task:").append(task)
-              .append(", callback:").append(callback);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
-
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-//        WXDomModule domModule = getDomModule(instanceId);
-//        JSONObject domObject = JSON.parseObject(task);
-//        Action action = Actions.getUpdateAttrs(ref, domObject);
-//        domModule.postAction((DOMAction) action, false);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callUpdateAttrs exception: ", e);
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE.getErrorCode(), "callUpdateAttrs",
-              WXLogUtils.getStackTrace(e), null);
-    }
-
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
-      return IWXBridge.INSTANCE_RENDERING_ERROR;
-    }
-    // get next tick
-    getNextTick(instanceId, callback);
-    return IWXBridge.INSTANCE_RENDERING;
-
-  }
-
   public int callAddEvent(String instanceId, String ref, String event) {
 
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
