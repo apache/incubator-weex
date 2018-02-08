@@ -316,7 +316,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public final void fireEvent(String type, Map<String, Object> params){
-    fireEvent(type, params,null, null);
+    if(WXUtils.getBoolean(getDomObject().getAttrs().get("fireEventSyn"), false)){
+        fireEventWait(type, params);
+    }else{
+        fireEvent(type, params,null, null);
+    }
   }
 
   public final EventResult fireEventWait(String type, Map<String, Object> params){

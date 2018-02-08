@@ -184,6 +184,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       WXLogUtils.e(TAG, "RecyclerView is not found or Adapter is not bound");
       return;
     }
+    if(WXUtils.getBoolean(getDomObject().getAttrs().get("prefetchGapDisable"), false)){
+        if(recyclerView.getLayoutManager() != null){
+           recyclerView.getLayoutManager().setItemPrefetchEnabled(false);
+        }
+    }
 
     if (mChildren == null) {
       WXLogUtils.e(TAG, "children is null");

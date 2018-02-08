@@ -198,10 +198,7 @@ function callFunctionNative (globalObjects, body) {
   try {
     const weex = globalObjects.weex || {}
     const config = weex.config || {}
-    fn = compileAndRunBundle(script,
-                             config.bundleUrl,
-                             config.bundleDigest,
-                             config.codeCachePath)
+    fn = compileAndRunBundle(script, config.bundleUrl, config.bundleDigest, config.codeCachePath)
     if (fn && typeof fn === 'function') {
       fn(...globalValues)
       isNativeCompileOk = true

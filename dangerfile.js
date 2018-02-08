@@ -37,7 +37,6 @@ const flowIgnorePaths = [
   'test',
   'build',
   'examples',
-  'doc',
   'android',
   'ios',
   'bin',
@@ -122,7 +121,6 @@ async function checkBreakChange(file){
 
 var has_sdk_changes = false;
 var has_test_changes = false;
-var has_doc_changes = false;
 var filesToVerifySrcHeader = [];
 var fileCount = 0;
 
@@ -133,7 +131,6 @@ const type_ios_test = 3;
 const type_android_test = 4;
 const type_jsfm = 5;
 const type_jsfm_test = 6;
-const type_doc = 7;
 const type_ui_test = 8;
 
 const getFileType = file => {
@@ -151,8 +148,6 @@ const getFileType = file => {
     return type_jsfm;
   } else if (file.match(/test\/js-framework\/.+\.js/)) {
     return type_jsfm_test;
-  } else if (file.match(/doc\/\.+\.md/)) {
-    return type_doc;
   } else if(file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
     return type_ui_test
   }else{
@@ -176,7 +171,6 @@ const checkChangedFile = file => {
     fileType == type_ios_test ||
     fileType == type_jsfm_test ||
     fileType == type_ui_test
-  has_doc_changes = has_doc_changes || fileType == type_doc;
 
 };
 
@@ -227,11 +221,6 @@ if (has_sdk_changes && !has_test_changes) {
   if(isNotDanger) warn("This PR modify SDK code without add/modify testcases.")
   // else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
 }
-
-if (has_sdk_changes && !has_doc_changes) {
-  warn("This PR should update related documents as well. ");
-}
-
 
 //check ios copyright
 //see scripts/rh/header.template

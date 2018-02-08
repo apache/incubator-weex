@@ -63,7 +63,7 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
     domObject.getAttrs().filterBindingStatement(mData);
     domObject.updateAttr(mData);
     if(mData.size() > 0) {
-       context.postRenderTask(this);
+      context.postRenderTask(this);
     }
   }
 
