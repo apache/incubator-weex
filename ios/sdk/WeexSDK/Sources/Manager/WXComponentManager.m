@@ -459,7 +459,8 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [attributesOrStyles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull attributeOrStyleName, id  _Nonnull attributeOrStyle, BOOL * _Nonnull stop) {
         if ([WXBindingMatchIdentify isEqualToString:attributeOrStyleName] // match
             ||  [WXBindingRepeatIdentify isEqualToString:attributeOrStyleName] // repeat
-            || ([attributeOrStyle isKindOfClass:[NSDictionary class]] && attributeOrStyle[WXBindingIdentify])) {  // {"attributeOrStyleName": {"@binding":"bindingExpression"}
+            ||  [WXBindingOnceIdentify isEqualToString:attributeOrStyleName] // once
+            ||([attributeOrStyle isKindOfClass:[NSDictionary class]] && attributeOrStyle[WXBindingIdentify])) {  // {"attributeOrStyleName": {"@binding":"bindingExpression"}
             bindingAttributesOrStyles[attributeOrStyleName] = attributeOrStyle;
             [newAttributesOrStyles removeObjectForKey:attributeOrStyleName];
         } else if ([attributeOrStyle isKindOfClass:[NSArray class]]) {

@@ -53,6 +53,7 @@ static JSContext *jsContext;
     NSDictionary * dictionary = nil;
     listRef = data[@"recycleListComponentRef"];
     indexPath = data[@"indexPath"];
+    NSString *phase = data[@"@phase"];
     if (!indexPath || !listRef) {
         if (data[@"aliasKey"]) {
             id key = data[@"aliasKey"];
@@ -62,6 +63,9 @@ static JSContext *jsContext;
         }
         listRef = dictionary[@"recycleListComponentRef"];
         indexPath = dictionary[@"indexPath"];
+    }
+    if (!phase && dictionary) {
+        phase = dictionary[@"@phase"];
     }
     
     if (!indexPath || !listRef) {
@@ -105,6 +109,7 @@ static JSContext *jsContext;
                     [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
                     [newData setObject:indexPath forKey:@"indexPath"];
                     [newData setObject:listRef forKey:@"recycleListComponentRef"];
+//                    [newData setObject:@(databindOnce) forKey:WXBindingOnceIdentify];
                     [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
                     dispatch_semaphore_signal(semaphore);
                 }];
@@ -121,7 +126,12 @@ static JSContext *jsContext;
             }
         }
     }
-    if (self->_dataBindOnce && self->_virtualComponentId) {
+    if (phase) {
+        NSMutableDictionary * newData = [data mutableCopy];
+        newData[@"@phase"] = phase;
+        data = newData;
+    }
+    if (self->_templateComponent && self->_templateComponent->_dataBindOnce && recycleListComponent && data[@"@phase"]) {
         return;
     }
     if (!_isRepeating) {
@@ -344,7 +354,7 @@ static JSContext *jsContext;
         
         if (type == WXDataBindingTypeAttributes) {
             if ([WXBindingOnceIdentify isEqualToString:name]) {
-                _dataBindOnce = YES;
+                _dataBindOnce = [WXConvert BOOL:binding];
             } else if ([WXBindingMatchIdentify isEqualToString:name]) {
                 WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding];
                 WXJSExpression *expression = [parser parseExpression];

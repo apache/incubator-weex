@@ -31,6 +31,7 @@
 #import "WXRecycleListUpdateManager.h"
 #import "WXBridgeManager.h"
 #import "WXSDKManager.h"
+#import "WXComponent+DataBinding.h"
 
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
@@ -242,7 +243,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     virtualComponentData = virtualComponentData?:[NSMutableDictionary new];
     [virtualComponentData addEntriesFromDictionary:componentData];
     [_dataManager updateVirtualComponentData:componentDataId data:[virtualComponentData copy]];
-    virtualComponentData[@"phase"] = @"update";
+    virtualComponentData[@"@phase"] = @"update";
     virtualComponentData[@"callbackId"] = callbackId;
     [self _updateDataForCellSlotAtIndexPath:indexPath data:virtualComponentData];
 }
@@ -266,20 +267,32 @@ WX_EXPORT_METHOD(@selector(setListData:))
     });
 }
 
-- (void)updateData:(NSUInteger)index data:data
+- (void)updateData:(NSUInteger)index data:(id)data
 {
     NSMutableArray * newListData = [[_dataManager data] mutableCopy];
     if (!data && index > [newListData count]) {
+        return;
+    }
+    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    NSDictionary * virtualComponentData = [_dataManager virtualComponentDataWithIndexPath:indexPath];
+    if ([virtualComponentData[WXBindingOnceIdentify] boolValue]) {
         return;
     }
     
     // TODO: bring the update logic to UpdateManager
     newListData[index] = data;
     [_dataManager updateData:newListData];
-    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
     NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
     [_dataManager updateVirtualComponentData:virtualComponentId data:data];
-    [self _updateDataForCellSlotAtIndexPath:indexPath data:data];
+    NSMutableDictionary * newData = nil;
+    if (![data isKindOfClass:[NSDictionary class]]) {
+         newData = [NSMutableDictionary new];
+        [newData setObject:@"data" forKey:data];
+        data = newData;
+    }
+    newData = [data mutableCopy];
+    newData[@"@phase"] = @"update";
+    [self _updateDataForCellSlotAtIndexPath:indexPath data:[newData copy]];
 }
 
 - (void)insertRange:(NSInteger)index range:(NSArray*)data
@@ -384,10 +397,6 @@ WX_EXPORT_METHOD(@selector(setListData:))
     
     if (_aliasKey &&!data[@"phase"]) {
         data = @{_aliasKey:data,@"aliasKey":_aliasKey};
-    } else {
-        NSMutableDictionary * dictionTemp = [data mutableCopy];
-        [dictionTemp removeObjectForKey:@"phase"];
-        data = dictionTemp;
     }
     
     if (_indexKey) {
