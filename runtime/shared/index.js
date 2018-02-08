@@ -17,16 +17,18 @@
  * under the License.
  */
 
-import './polyfill/arrayFrom'
-import './polyfill/objectAssign'
-import './polyfill/objectSetPrototypeOf'
+if (!process.env.SUPPORT_ES2015) {
+  require('./polyfill/arrayFrom')
+  require('./polyfill/objectAssign')
+  require('./polyfill/objectSetPrototypeOf')
 
-// import promise hack and polyfills
-import './polyfill/promise'
-import 'core-js/modules/es6.object.to-string'
-import 'core-js/modules/es6.string.iterator'
-import 'core-js/modules/web.dom.iterable'
-import 'core-js/modules/es6.promise'
+  // import promise hack and polyfills
+  require('./polyfill/promise')
+  require('core-js/modules/es6.object.to-string')
+  require('core-js/modules/es6.string.iterator')
+  require('core-js/modules/web.dom.iterable')
+  require('core-js/modules/es6.promise')
+}
 
 export * from './env/console'
 export * from './env/setTimeout'

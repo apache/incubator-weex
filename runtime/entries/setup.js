@@ -18,7 +18,6 @@
  */
 
 import { subversion } from '../../package.json'
-import * as shared from '../shared'
 import runtime from '../api'
 import services from '../services'
 
@@ -36,8 +35,6 @@ export default function (frameworks) {
     runtime.service.register(serviceName, services[serviceName])
   }
 
-  shared.freezePrototype()
-  shared.setNativeConsole()
   runtime.freezePrototype()
 
   // register framework meta info

@@ -18,12 +18,17 @@
  */
 package com.taobao.weex.dom;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Spannable;
@@ -39,6 +44,7 @@ import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -47,6 +53,7 @@ import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.StaticLayoutProxy;
+import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -148,6 +155,8 @@ public class WXTextDomObject extends WXDomObject {
   private @Nullable Layout layout;
   private AtomicReference<Layout> atomicReference = new AtomicReference<>();
 
+  private BroadcastReceiver mTypefaceObserver;
+
   /**
    * Create an instance of current class, and set {@link #TEXT_MEASURE_FUNCTION} as the
    * measureFunction
@@ -157,6 +166,7 @@ public class WXTextDomObject extends WXDomObject {
     super();
     mTextPaint.setFlags(TextPaint.ANTI_ALIAS_FLAG);
     setMeasureFunction(TEXT_MEASURE_FUNCTION);
+    registerTypefaceObserverIfNeed(WXStyle.getFontFamily(getStyles()));
   }
 
   public TextPaint getTextPaint() {
@@ -307,6 +317,7 @@ public class WXTextDomObject extends WXDomObject {
       if (lineHeight != UNSET) {
         mLineHeight = lineHeight;
       }
+      registerTypefaceObserverIfNeed(mFontFamily);
     }
   }
 
@@ -543,5 +554,61 @@ public class WXTextDomObject extends WXDomObject {
       result = false;
     }
     return result;
+  }
+
+  @Override
+  public void destroy() {
+    if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
+      WXLogUtils.d("WXText", "Unregister the typeface observer");
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
+      mTypefaceObserver = null;
+    }
+    super.destroy();
+  }
+
+  private void registerTypefaceObserverIfNeed(String desiredFontFamily) {
+    if(TextUtils.isEmpty(desiredFontFamily)){
+      return;
+    }
+    if (WXEnvironment.getApplication() == null) {
+      WXLogUtils.w("WXText", "ApplicationContent is null on register typeface observer");
+      return;
+    }
+    mFontFamily = desiredFontFamily;
+    if (mTypefaceObserver != null) {
+      return;
+    }
+
+    mTypefaceObserver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        String fontFamily = intent.getStringExtra("fontFamily");
+        if (!mFontFamily.equals(fontFamily)) {
+          return;
+        }
+        if(isDestroy() || getDomContext() == null){
+          return;
+        }
+
+        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getDomContext().getInstanceId());
+        if(domActionContext == null){
+          return;
+        }
+        WXDomObject domObject = domActionContext.getDomByRef(getRef());
+        if(domObject == null){
+          return;
+        }
+        domObject.markDirty();
+        domActionContext.markDirty();
+        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_START_BATCH, 2);
+        if(WXEnvironment.isApkDebugable()) {
+          WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
+        }
+      }
+    };
+    if(WXEnvironment.isApkDebugable()) {
+         WXLogUtils.d("WXText", "Font family register " + desiredFontFamily + " is available" + getRef());
+    }
+    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
   }
 }

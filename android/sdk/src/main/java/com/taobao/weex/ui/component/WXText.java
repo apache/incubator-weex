@@ -55,8 +55,6 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
    * The default text size
    **/
   public static final int sDEFAULT_SIZE = 32;
-  private BroadcastReceiver mTypefaceObserver;
-  private String mFontFamily;
 
   @Override
   public boolean promoteToView(boolean checkAncestor) {
@@ -145,9 +143,6 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       case Constants.Name.VALUE:
         return true;
       case Constants.Name.FONT_FAMILY:
-        if (param != null) {
-          registerTypefaceObserver(param.toString());
-        }
         return true;
       default:
         return super.setProperty(key, param);
@@ -175,52 +170,6 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   @Override
   public void destroy() {
     super.destroy();
-    if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
-      WXLogUtils.d("WXText", "Unregister the typeface observer");
-      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
-      mTypefaceObserver = null;
-    }
   }
 
-  private void registerTypefaceObserver(String desiredFontFamily) {
-    if (WXEnvironment.getApplication() == null) {
-      WXLogUtils.w("WXText", "ApplicationContent is null on register typeface observer");
-      return;
-    }
-    mFontFamily = desiredFontFamily;
-    if (mTypefaceObserver != null) {
-      return;
-    }
-
-    mTypefaceObserver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-        String fontFamily = intent.getStringExtra("fontFamily");
-        if (!mFontFamily.equals(fontFamily)) {
-          return;
-        }
-        if(isDestoryed()){
-          return;
-        }
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getInstanceId());
-        if(domActionContext == null){
-          return;
-        }
-        WXDomObject domObject = domActionContext.getDomByRef(getRef());
-        if(domObject == null){
-          return;
-        }
-        domObject.markDirty();
-        domActionContext.markDirty();
-        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_START_BATCH, 2);
-        if(WXEnvironment.isApkDebugable()) {
-           WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
-        }
-      }
-    };
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXText", "Font family register " + desiredFontFamily + " is available" + getRef());
-    }
-    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
-  }
 }
