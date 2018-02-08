@@ -49,6 +49,10 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
     if (context.isDestory()) {
       return;
     }
+    if(mData == null){
+      return;
+    }
+
     WXSDKInstance instance = context.getInstance();
     final WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {
@@ -60,9 +64,11 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
       }
       return;
     }
-
+    domObject.getAttrs().filterBindingStatement(mData);
     domObject.updateAttr(mData);
-    context.postRenderTask(this);
+    if(mData.size() > 0) {
+      context.postRenderTask(this);
+    }
   }
 
   @Override

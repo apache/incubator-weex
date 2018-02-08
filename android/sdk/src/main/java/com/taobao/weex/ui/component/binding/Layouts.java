@@ -21,14 +21,12 @@ package com.taobao.weex.ui.component.binding;
 
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
-import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.template.TemplateViewHolder;
@@ -87,10 +85,14 @@ public class Layouts {
         try{
             long start = System.currentTimeMillis();
             doLayout(component, layoutContext);
-            if(WXEnvironment.isApkDebugable()){
+            if(WXEnvironment.isOpenDebugLog() && WXRecyclerTemplateList.ENABLE_TRACE_LOG) {
                 WXLogUtils.d(WXRecyclerTemplateList.TAG, "WXTemplateList doSafeLayout" +
-                        component.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_TYPE) + Thread.currentThread().getName() +  " doSafeLayout  used " +
-                                (System.currentTimeMillis() - start));
+                        component.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_CASE) + Thread.currentThread().getName() + " doSafeLayout  used " +
+                        (System.currentTimeMillis() - start));
+            }
+            if(!(component.getLayoutHeight() > 0)){
+                WXLogUtils.e(WXRecyclerTemplateList.TAG, " WXTemplateList doSafeLayout wrong template " +
+                        component.getDomObject().getAttrs().get(Constants.Name.Recycler.SLOT_TEMPLATE_CASE)  + " cell height " + component.getLayoutHeight());
             }
         }catch (Exception e){
             if(WXEnvironment.isApkDebugable()){
@@ -102,7 +104,7 @@ public class Layouts {
     private static void doLayout(WXComponent component, final  CSSLayoutContext layoutContext){
         WXDomObject domObject = (WXDomObject) component.getDomObject();
         final WXSDKInstance instance = component.getInstance();
-        domObject.traverseTree(new WXDomObject.Consumer() {
+        domObject.traverseUpdateTree(new WXDomObject.Consumer() {
             @Override
             public void accept(WXDomObject dom) {
                 if(instance == null || instance.isDestroy()){
@@ -111,16 +113,22 @@ public class Layouts {
                 if(!dom.hasUpdate()){
                     return;
                 }
+                if(!dom.isShow()){ //not show just skip
+                   return;
+                }
                 dom.layoutBefore();
             }
         });
         if(instance != null && !instance.isDestroy()){
             domObject.calculateLayout(layoutContext);
         }
-        domObject.traverseTree( new WXDomObject.Consumer() {
+        domObject.traverseUpdateTree( new WXDomObject.Consumer() {
             @Override
             public void accept(WXDomObject dom) {
                 if(instance == null || instance.isDestroy()){
+                    return;
+                }
+                if(!dom.isShow()){
                     return;
                 }
                 if (dom.hasUpdate()) {
@@ -140,7 +148,6 @@ public class Layouts {
      * */
     public static final void setLayout(WXComponent component, boolean force){
         if(component.isWaste()){
-            setLayoutWaste(component, force);
             return;
         }
         WXDomObject domObject = (WXDomObject) component.getDomObject();

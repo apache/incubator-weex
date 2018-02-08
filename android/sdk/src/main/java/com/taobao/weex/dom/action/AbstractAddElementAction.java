@@ -27,9 +27,11 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -64,7 +66,13 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
       for (int i = 0; i < count; ++i) {
         child = dom.getChild(i);
         if (child != null) {
-          parentC.addChild(generateComponentTree(context, child, parentC));
+          WXComponent createdComponent = generateComponentTree(context, child, parentC);
+          if(createdComponent != null) {
+            parentC.addChild(createdComponent);
+          }else{
+            WXLogUtils.e("[generateComponentTree] " + getStatementName() + " create dom component failed name " + child.getType());
+            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode().getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
+          }
         }
       }
     }
@@ -126,8 +134,19 @@ public abstract class AbstractAddElementAction extends TraceableAction implement
     }
     Stopwatch.split("createComponent");
 
-    context.addDomInfo(domObject.getRef(), component);
+    boolean needAddDomInfo = true;
+    if(domObject.getType().equals(WXBasicComponentType.CELL_SLOT)
+            && domObject instanceof WXCellDomObject){
+       needAddDomInfo = false;
+    }
+
+    if(needAddDomInfo) {
+      context.addDomInfo(domObject.getRef(), component);
+    }
+
+
     context.postRenderTask(this);
+
     addAnimationForDomTree(context, domObject);
 
 //    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);

@@ -122,6 +122,9 @@ public class WXJsonUtils {
       return new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(tasks));
     }
   }
-
-  private static final  boolean USE_WSON = true;
+  /**
+   * config whether use json or wson,  you should update this value by updateGlobalConfig(String config)
+   * in WXBridgeManager class  method
+   * */
+  public static  boolean USE_WSON = true;
 }

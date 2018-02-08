@@ -20,7 +20,9 @@ package com.taobao.weex.utils;
 
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.text.TextUtils;
 
+import com.alibaba.fastjson.util.Base64;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.URIAdapter;
@@ -44,6 +46,7 @@ public class FontDO {
   public final static int TYPE_FILE = 2;
   public final static int TYPE_LOCAL = 3;
   public final static int TYPE_NATIVE = 4;
+  public final static int TYPE_BASE64 = 5;
 
 
   public FontDO (String fontFamilyName, String src, WXSDKInstance instance) {
@@ -78,7 +81,6 @@ public class FontDO {
       }
       mUrl = uri.toString();
       try {
-
         String scheme = uri.getScheme();
         if (Constants.Scheme.HTTP.equals(scheme) ||
                 Constants.Scheme.HTTPS.equals(scheme)) {
@@ -88,7 +90,26 @@ public class FontDO {
           mUrl = uri.getPath();
         } else if (Constants.Scheme.LOCAL.equals(scheme)){
           mType = TYPE_LOCAL;
+        } else if (Constants.Scheme.DATA.equals(scheme)) {
+          long start = System.currentTimeMillis();
+          String[] data = mUrl.split(",");
+          if (data != null && data.length == 2) {
+            String identify = data[0];
+            if (!TextUtils.isEmpty(identify) && identify.endsWith("base64")) {
+              //Do not check mime type and charset for now
+              String base64Data = data[1];
+              if (!TextUtils.isEmpty(base64Data)) {
+                String md5 = WXFileUtils.md5(base64Data);
+                String filePath = WXEnvironment.getApplication().getCacheDir() + "/font-family/" + md5;
+                WXFileUtils.saveFile(filePath, Base64.decodeFast(base64Data), WXEnvironment.getApplication());
+                mUrl = filePath;
+                mType = TYPE_BASE64;
+                WXLogUtils.d("TypefaceUtil", "Parse base64 font cost " + (System.currentTimeMillis() - start) + " ms");
+              }
+            }
+          }
         } else {
+          WXLogUtils.e("TypefaceUtil", "Unknown scheme for font url: " + mUrl);
           mType = TYPE_UNKNOWN;
         }
         mState = STATE_INIT;

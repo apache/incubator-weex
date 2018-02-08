@@ -37,6 +37,7 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.CellRenderContext;
 
 import junit.framework.Assert;
 
@@ -57,7 +58,6 @@ import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created by furture on 2017/8/18.
@@ -166,7 +166,7 @@ public class StatementTest {
         return cell;
     }
 
-    private ArrayStack createContext(int count){
+    private CellRenderContext createContext(int count){
         JSONObject data = new JSONObject();
         data.put("item", new JSONObject());
         data.getJSONObject("item").put("name", "hello world");
@@ -178,7 +178,9 @@ public class StatementTest {
         data.put("dataList", datas);
         ArrayStack context = new ArrayStack();
         context.push(data);
-        return context;
+        CellRenderContext cellRenderContext = new CellRenderContext();
+        cellRenderContext.stack = context;
+        return cellRenderContext;
     }
 
 }

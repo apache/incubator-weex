@@ -19,6 +19,7 @@
 package com.alibaba.weex.commons.adapter;
 
 import android.net.Uri;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -38,8 +39,7 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   @Override
   public void setImage(final String url, final ImageView view,
                        WXImageQuality quality, final WXImageStrategy strategy) {
-
-    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+    Runnable runnable = new Runnable() {
 
       @Override
       public void run() {
@@ -68,28 +68,33 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
         }
 
         Picasso.with(WXEnvironment.getApplication())
-            .load(temp)
-            .transform(new BlurTransformation(strategy.blurRadius))
-            .into(view, new Callback() {
-              @Override
-              public void onSuccess() {
-                if(strategy.getImageListener()!=null){
-                  strategy.getImageListener().onImageFinish(url,view,true,null);
-                }
+                .load(temp)
+                .transform(new BlurTransformation(strategy.blurRadius))
+                .into(view, new Callback() {
+                  @Override
+                  public void onSuccess() {
+                    if(strategy.getImageListener()!=null){
+                      strategy.getImageListener().onImageFinish(url,view,true,null);
+                    }
 
-                if(!TextUtils.isEmpty(strategy.placeHolder)){
-                  ((Picasso) view.getTag(strategy.placeHolder.hashCode())).cancelRequest(view);
-                }
-              }
+                    if(!TextUtils.isEmpty(strategy.placeHolder)){
+                      ((Picasso) view.getTag(strategy.placeHolder.hashCode())).cancelRequest(view);
+                    }
+                  }
 
-              @Override
-              public void onError() {
-                if(strategy.getImageListener()!=null){
-                  strategy.getImageListener().onImageFinish(url,view,false,null);
-                }
-              }
-            });
+                  @Override
+                  public void onError() {
+                    if(strategy.getImageListener()!=null){
+                      strategy.getImageListener().onImageFinish(url,view,false,null);
+                    }
+                  }
+                });
       }
-    },0);
+    };
+    if(Thread.currentThread() == Looper.getMainLooper().getThread()){
+      runnable.run();
+    }else {
+      WXSDKManager.getInstance().postOnUiThread(runnable, 0);
+    }
   }
 }

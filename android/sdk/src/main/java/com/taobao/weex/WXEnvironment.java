@@ -85,8 +85,10 @@ public class WXEnvironment {
   public static long sSDKInitTime =0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = false;
+  private static boolean isApkDebug = true;
   public static boolean isPerf = false;
+
+  private static boolean openDebugLog = false;
 
   private static String sGlobalFontFamily;
 
@@ -305,9 +307,20 @@ public class WXEnvironment {
       }
     }
   }
-    
+
+  public static boolean isOpenDebugLog() {
+    return openDebugLog;
+  }
+
+  public static void setOpenDebugLog(boolean openDebugLog) {
+    WXEnvironment.openDebugLog = openDebugLog;
+  }
+
   public static void  setApkDebugable(boolean debugable){
-      isApkDebug  = debugable;
+    isApkDebug  = debugable;
+    if(!isApkDebug){
+       openDebugLog = false;
+    }
   }
 
 }

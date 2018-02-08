@@ -306,7 +306,7 @@ public class BoxShadowUtil {
     String processedStyle = boxShadowStyle;
     while (matcher.find()) {
       String color = matcher.group();
-      processedStyle = processedStyle.replace(color, "#" + Integer.toHexString(WXResourceUtils.getColor(color, Color.BLACK)));
+      processedStyle = processedStyle.replace(color, "#" + String.format("%8s", Integer.toHexString(WXResourceUtils.getColor(color, Color.BLACK))).replaceAll("\\s", "0"));
     }
 
     String[] styles = processedStyle.split(",");

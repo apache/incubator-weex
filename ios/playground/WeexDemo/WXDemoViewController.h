@@ -24,7 +24,7 @@
 
 @property (nonatomic, strong) NSString *script;
 @property (nonatomic, strong) NSURL *url;
-
+@property (nonatomic, assign) BOOL showNavigationBar;
 @property (nonatomic, strong) SRWebSocket *hotReloadSocket;
 @property (nonatomic, strong) NSString *source;
 
