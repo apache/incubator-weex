@@ -234,8 +234,10 @@ public class Statements {
                                 renderNode = copyComponentTree(component, parent);
                                 renderNode.setWaste(false);
                                 WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
-                                renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_FOR);
-                                renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_IF); //FIXME  clear node's statement
+                                if(renderNodeDomObject.getAttrs().getStatement() != null) {
+                                    renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_FOR);
+                                    renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_IF); //clear node's statement
+                                }
                                 parentDomObject.add(renderNodeDomObject, renderIndex);
                                 parent.addChild(renderNode, renderIndex);
                                 updates.add(renderNode);

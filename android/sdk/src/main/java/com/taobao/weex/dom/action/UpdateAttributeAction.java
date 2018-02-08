@@ -49,6 +49,10 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
     if (context.isDestory()) {
       return;
     }
+    if(mData == null){
+      return;
+    }
+
     WXSDKInstance instance = context.getInstance();
     final WXDomObject domObject = context.getDomByRef(mRef);
     if (domObject == null) {

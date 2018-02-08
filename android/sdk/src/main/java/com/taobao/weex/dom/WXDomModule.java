@@ -101,7 +101,7 @@ public final class WXDomModule extends WXModule {
       Action action = Actions.get(method,args);
       if(action == null){
          WXLogUtils.e("Unknown dom action "
-                 +  method + " "  + args.toJSONString());
+                 +  method + " args "  + (args == null ? " null" : args.toJSONString()));
          return null;
       }
       if(action instanceof DOMAction){
