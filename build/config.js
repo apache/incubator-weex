@@ -30,9 +30,8 @@ const packageJSON = require('../package.json')
 const deps = packageJSON.dependencies
 const subversion = packageJSON.subversion
 
-const frameworkBanner = `;(this.getJSFMVersion = function()`
-  + `{return "${subversion.framework}"});\n`
-  + `var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;\n`
+const frameworkBanner = `var global=this; var process={env:{}}; `
+  + `var setTimeout=global.setTimeout;\n`
 
 const configs = {
   'weex-js-framework': {
@@ -44,6 +43,15 @@ const configs = {
         + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}. `
         + `(Vue: ${deps['weex-vue-framework']}, Rax: ${deps['weex-rax-framework']})');\n`
         + frameworkBanner
+    }
+  },
+  'weex-env': {
+    input: absolute('runtime/entries/env.js'),
+    output: {
+      name: 'WeexEnvironmentAPIs',
+      file: absolute('pre-build/weex-env'),
+      banner: `/* Prepare Weex Environment APIs ${subversion.framework}, Build ${now()}. */\n\n`
+        + `var global = this; var process = {env:{}};`
     }
   },
   'weex-vue': {
@@ -76,12 +84,14 @@ const configs = {
       banner: `/* Weex JS Runtime ${subversion.framework}, Build ${now()}. */\n\n`
     }
   },
-  'weex-legacy-framework': {
-    input: absolute('runtime/frameworks/legacy/index.js'),
+  'weex-legacy': {
+    input: absolute('runtime/entries/legacy.js'),
     output: {
-      name: 'WeexLegacyFramework',
-      file: absolute('packages/weex-legacy-framework/index'),
-      banner: `/* Weex Legacy Framework ${subversion.framework}, Build ${now()}. */\n`
+      name: 'WeexLegacy',
+      file: absolute('pre-build/weex-legacy'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('Weex Legacy Framework ${subversion.framework}, Build ${now()}.');\n`
+        + frameworkBanner
     }
   },
   'weex-vanilla-framework': {
@@ -107,33 +117,34 @@ function getConfig (name, minify, es6) {
       name: output.name,
       file: output.file + suffix,
       format: output.format || 'umd',
-      banner: output.banner
+      banner: output.banner,
+      sourcemap: true
     },
     plugins: opt.plugins.concat([
       nodeResolve({ jsnext: true, main: true }),
       json(),
       replace({
-        '__WEEX_VERSION__': JSON.stringify(subversion.framework),
+        '__WEEX_VERSION__': JSON.stringify(packageJSON.version),
+        '__WEEX_JS_FRAMEWORK_VERSION__': JSON.stringify(subversion.framework),
         'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
+        'process.env.WEEX_FREEZE': JSON.stringify(!!process.env.WEEX_FREEZE),
         'process.env.SUPPORT_ES2015': !!es6,
         'process.env.NODE_DEBUG': false
       }),
-      commonjs()
+      commonjs({ ignoreGlobal: true })
     ])
   }
   if (!es6) {
     config.plugins.push(buble())
   }
   if (minify) {
-    config.output.sourcemap = true
     config.plugins.push(es6
       ? uglify({ safari10: true, toplevel: true }, uglifyES.minify)
       : uglify()
     )
   }
   else {
-    config.output.sourcemap = 'inline'
     config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }
   return config

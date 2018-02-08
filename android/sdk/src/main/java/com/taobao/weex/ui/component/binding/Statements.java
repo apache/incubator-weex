@@ -21,19 +21,19 @@ package com.taobao.weex.ui.component.binding;
 import android.os.Looper;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.annotation.Component;
+import com.taobao.weex.bridge.EventResult;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.dom.binding.WXStatement;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.el.parse.ArrayStack;
 import com.taobao.weex.el.parse.Operators;
 import com.taobao.weex.el.parse.Token;
@@ -42,6 +42,9 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.CellRenderContext;
+import com.taobao.weex.ui.component.list.template.CellDataManager;
+import com.taobao.weex.ui.component.list.template.VirtualComponentLifecycle;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -63,11 +66,7 @@ public class Statements {
      * recursive copy component, none parent connect
      * */
     public static WXComponent copyComponentTree(WXComponent component){
-        long start = System.currentTimeMillis();
         WXComponent copy =  copyComponentTree(component, component.getParent());
-        if(WXEnvironment.isApkDebugable()){
-            WXLogUtils.d(WXRecyclerTemplateList.TAG, Thread.currentThread() + component.getRef() + "copyComponentTree " + "used " + (System.currentTimeMillis() - start));
-        }
         return copy;
     }
 
@@ -91,6 +90,10 @@ public class Statements {
                 }
             }
         }
+        //copy info need be sync
+        if(source.isWaste()){
+            component.setWaste(true);
+        }
         return  component;
     }
 
@@ -104,7 +107,7 @@ public class Statements {
      *  may be next render it can be used.
      *  after statement has executed, render component's binding attrs in context and bind it to component.
      * */
-    public static final List<WXComponent> doRender(WXComponent component, ArrayStack stack){
+    public static final List<WXComponent> doRender(WXComponent component, CellRenderContext stack){
         List<WXComponent> updates = new ArrayList<>(4);
         try{
             doRenderComponent(component, stack, updates);
@@ -143,7 +146,7 @@ public class Statements {
          *  may be next render it can be used.
          *  after statement has executed, render component's binding attrs in context and bind it to component.
          * */
-    private static final int doRenderComponent(WXComponent component, ArrayStack context,
+    private static final int doRenderComponent(WXComponent component, CellRenderContext context,
                                        List<WXComponent> updates){
         WXVContainer parent = component.getParent();
         WXDomObject domObject = (WXDomObject) component.getDomObject();
@@ -168,7 +171,7 @@ public class Statements {
                     String itemKey = vfor.getString(WXStatement.WX_FOR_ITEM);
                     Object data = null;
                     if(listBlock != null) {
-                        data = listBlock.execute(context);
+                        data = listBlock.execute(context.stack);
                     }
                     if((data instanceof List || data instanceof  Map)){
 
@@ -199,15 +202,15 @@ public class Statements {
                             if(itemKey != null){
                                 loop.put(itemKey, value);
                             }else{
-                                context.push(value);
+                                context.stack.push(value);
                             }
                             if(loop.size() > 0){
-                                context.push(loop);
+                                context.stack.push(loop);
                             }
 
 
                             if(vif != null){
-                                if(!Operators.isTrue(vif.execute(context))){
+                                if(!Operators.isTrue(vif.execute(context.stack))){
                                     continue;
                                 }
                             }
@@ -229,8 +232,12 @@ public class Statements {
                             if(renderNode == null){
                                 long start = System.currentTimeMillis();
                                 renderNode = copyComponentTree(component, parent);
+                                renderNode.setWaste(false);
                                 WXDomObject renderNodeDomObject = (WXDomObject) renderNode.getDomObject();
-                                renderNodeDomObject.getAttrs().setStatement(null); // clear node's statement
+                                if(renderNodeDomObject.getAttrs().getStatement() != null) {
+                                    renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_FOR);
+                                    renderNodeDomObject.getAttrs().getStatement().remove(WXStatement.WX_IF); //clear node's statement
+                                }
                                 parentDomObject.add(renderNodeDomObject, renderIndex);
                                 parent.addChild(renderNode, renderIndex);
                                 updates.add(renderNode);
@@ -238,13 +245,13 @@ public class Statements {
                                     WXLogUtils.d(WXRecyclerTemplateList.TAG, Thread.currentThread().getName() +  renderNode.getRef() + renderNode.getDomObject().getType() + "statements copy component tree used " + (System.currentTimeMillis() - start));
                                 }
                             }
-                            doBindingAttrsEventAndRenderChildNode(renderNode, domObject, context, updates);
+                            doBindingAttrsEventAndRenderChildNode(renderNode, (WXDomObject) renderNode.getDomObject(), context, updates);
                             renderIndex++;
                             if(loop.size() > 0){
-                                context.push(loop);
+                                context.stack.push(loop);
                             }
                             if(itemKey == null) {
-                                context.pop();
+                                context.stack.pop();
                             }
                         }
                     }
@@ -264,45 +271,112 @@ public class Statements {
 
             //execute v-if context
             if(vif != null){
-                if(!Operators.isTrue(vif.execute(context))){
+                if(!Operators.isTrue(vif.execute(context.stack))){
                     component.setWaste(true);
-                    if(Thread.currentThread() == Looper.getMainLooper().getThread()) {
-                        return 1;
-                    }
+                    return 1;
                 }else{
                     component.setWaste(false);
                 }
+
             }
         }
         doBindingAttrsEventAndRenderChildNode(component, domObject, context, updates);
         return  1;
     }
 
+
     /**
      * bind attrs and doRender component child
      * */
-    private static void doBindingAttrsEventAndRenderChildNode(WXComponent component, WXDomObject domObject, ArrayStack context,
+    private static void doBindingAttrsEventAndRenderChildNode(WXComponent component, WXDomObject domObject, CellRenderContext context,
                                                               List<WXComponent> updates){
-       WXAttr attr = component.getDomObject().getAttrs();
+        WXAttr attr = component.getDomObject().getAttrs();
+
         /**
          * sub component supported, sub component new stack
          * */
+        ArrayStack stack = context.stack;
+
+
+
         if(attr.get(ELUtils.IS_COMPONENT_ROOT) != null
                 && WXUtils.getBoolean(attr.get(ELUtils.IS_COMPONENT_ROOT), false)){
             if(attr.get(ELUtils.COMPONENT_PROPS) != null
                     && attr.get(ELUtils.COMPONENT_PROPS) instanceof  JSONObject){
-                Map<String, Object>  props  = renderProps((JSONObject) attr.get(ELUtils.COMPONENT_PROPS), context);
-                context = new ArrayStack();
-                context.push(props);
+                 String compoentId = (String) attr.get(CellDataManager.SUB_COMPONENT_TEMPLATE_ID);
+                Object compoentData = null;
+                if(!TextUtils.isEmpty(compoentId)){
+                    String virtualComponentId =  context.getRenderState().getVirtualComponentIds().get(component.getViewTreeKey());
+                   if(virtualComponentId == null){ //none virtualComponentId, create and do attach
+                        virtualComponentId =  CellDataManager.createVirtualComponentId(context.templateList.getRef(),
+                                component.getViewTreeKey(), context.templateList.getItemId(context.position));
+                        Map<String, Object>  props  = renderProps((JSONObject) attr.get(ELUtils.COMPONENT_PROPS), context.stack);
+                        EventResult result = WXBridgeManager.getInstance().syncCallJSEventWithResult(WXBridgeManager.METHD_COMPONENT_HOOK_SYNC, component.getInstanceId(), null, compoentId, VirtualComponentLifecycle.LIFECYCLE, VirtualComponentLifecycle.CREATE,  new Object[]{
+                                virtualComponentId,
+                                props
+                        }, null);
+                        if(result != null
+                                && result.getResult() != null
+                                && result.getResult() instanceof Map){
+                            props.putAll((Map<? extends String, ?>) result.getResult());
+                        }
+                        compoentData  =  props;
+                        context.getRenderState().getVirtualComponentIds().put(component.getViewTreeKey(), virtualComponentId);
+                        context.templateList.getCellDataManager().createVirtualComponentData(context.position, virtualComponentId, compoentData);
+                        //create virtual componentId
+                        WXBridgeManager.getInstance().asyncCallJSEventVoidResult(WXBridgeManager.METHD_COMPONENT_HOOK_SYNC, component.getInstanceId(), null, virtualComponentId, VirtualComponentLifecycle.LIFECYCLE, VirtualComponentLifecycle.ATTACH, null);
+                     }else{ // get virtual component data check has dirty's update
+                       compoentData = context.getRenderState().getVirtualComponentDatas().get(virtualComponentId);
+                       if(context.getRenderState().isHasDataUpdate()){
+                           Map<String, Object>  props  = renderProps((JSONObject) attr.get(ELUtils.COMPONENT_PROPS), context.stack);
+                           EventResult result = WXBridgeManager.getInstance().syncCallJSEventWithResult(WXBridgeManager.METHD_COMPONENT_HOOK_SYNC, component.getInstanceId(), null, virtualComponentId, VirtualComponentLifecycle.LIFECYCLE, VirtualComponentLifecycle.SYNSTATE,  new Object[]{
+                                   virtualComponentId,
+                                   props
+                           }, null);
+
+                           if(result != null
+                                   && result.getResult() != null
+                                   && result.getResult() instanceof Map){
+                               props.putAll((Map<? extends String, ?>) result.getResult());
+                               context.templateList.getCellDataManager().updateVirtualComponentData(virtualComponentId, props);
+                               compoentData = props;
+                           }
+                       }
+                    }
+                    component.getDomObject().getAttrs().put(CellDataManager.VIRTUAL_COMPONENT_ID, virtualComponentId);
+                }else{ //stateless component
+                    Map<String, Object>  props  = renderProps((JSONObject) attr.get(ELUtils.COMPONENT_PROPS), context.stack);
+                    compoentData = props;
+                }
+                //virtual component is new context
+                context.stack = new ArrayStack();
+                if(compoentData != null){
+                    context.stack.push(compoentData);
+                }
             }
         }
+
+        /**
+         * check node is render only once, if render once, and has rendered, just return
+         * */
+        Object vonce = null;
+        if(attr.getStatement() != null){
+            vonce = attr.getStatement().get(WXStatement.WX_ONCE);
+        }
+        if(vonce != null){
+            ArrayStack onceStack = context.getRenderState().getOnceComponentStates().get(component.getViewTreeKey());
+            if(onceStack == null){
+                onceStack = context.templateList.copyStack(context, stack);
+                context.getRenderState().getOnceComponentStates().put(component.getViewTreeKey(), onceStack);
+            }
+            context.stack = onceStack;
+        }
+
         doRenderBindingAttrsAndEvent(component, domObject, context);
         if(component instanceof WXVContainer){
             if(!domObject.isShow()){
                 if(!(component instanceof WXCell)){
-                    if(Thread.currentThread() == Looper.getMainLooper().getThread()){
-                        return;
-                    }
+                    return;
                 }
             }
             WXVContainer container = (WXVContainer) component;
@@ -310,6 +384,9 @@ public class Statements {
                 WXComponent next = container.getChild(k);
                 k += doRenderComponent(next, context, updates);
             }
+        }
+        if(stack != context.stack){
+            context.stack = stack;
         }
     }
 
@@ -325,14 +402,15 @@ public class Statements {
     /**
      * render dynamic binding attrs and bind them to component node.
      * */
-    private static void doRenderBindingAttrsAndEvent(WXComponent component, WXDomObject domObject, ArrayStack context){
+    private static void doRenderBindingAttrsAndEvent(WXComponent component, WXDomObject domObject, CellRenderContext context){
+        ArrayStack stack  = context.stack;
         component.setWaste(false);
         WXAttr attr = domObject.getAttrs();
         if(attr != null
                 && attr.getBindingAttrs() != null
                 && attr.getBindingAttrs().size() > 0){
             ArrayMap<String, Object> bindAttrs = domObject.getAttrs().getBindingAttrs();
-            Map<String, Object> dynamic =  renderBindingAttrs(bindAttrs, context);
+            Map<String, Object> dynamic =  renderBindingAttrs(bindAttrs, stack);
             Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
             /**
              * diff attrs, see attrs has update, remove none update attrs
@@ -364,23 +442,60 @@ public class Statements {
                 }else {
                     domObject.updateAttr(dynamic); //dirty layout
                 }
-                if(Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                if(isMainThread()) {
                     component.updateProperties(dynamic);
                 }
                 dynamic.clear();
             }
         }
+
+
+        WXStyle style = domObject.getStyles();
+        if(style != null && style.getBindingStyle() != null){
+            ArrayMap<String, Object> bindStyle = style.getBindingStyle();
+            Map<String, Object> dynamic =  renderBindingAttrs(bindStyle, stack);
+            Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
+            /**
+             * diff attrs, see attrs has update, remove none update attrs
+             * */
+            Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+            while (iterator.hasNext()){
+                Map.Entry<String, Object> entry = iterator.next();
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                Object oldValue = style.get(key);
+                if(value == null){
+                    if(oldValue == null){
+                        iterator.remove();
+                        continue;
+                    }
+                }else{
+                    if(value.equals(oldValue)){
+                        iterator.remove();
+                    }
+                }
+            }
+            if(dynamic.size() > 0) {
+                 domObject.updateStyle(dynamic, false);
+                 domObject.applyStyle(dynamic);
+                 if(isMainThread()) {
+                    component.updateProperties(dynamic);
+                 }
+            }
+        }
+
         WXEvent event = domObject.getEvents();
         if(event == null || event.getEventBindingArgs() == null){
             return;
         }
         Set<Map.Entry<String, Object>> eventBindArgsEntrySet = event.getEventBindingArgs().entrySet();
         for(Map.Entry<String, Object> eventBindArgsEntry : eventBindArgsEntrySet){
-             List<Object> values = getBindingEventArgs(context, eventBindArgsEntry.getValue());
+             List<Object> values = getBindingEventArgs(stack, eventBindArgsEntry.getValue());
              if(values != null){
                  event.putEventBindingArgsValue(eventBindArgsEntry.getKey(), values);
              }
         }
+
     }
 
 
@@ -390,7 +505,7 @@ public class Statements {
      * return binding attrs rended value in context
      * */
     private static final  ThreadLocal<Map<String, Object>> dynamicLocal = new ThreadLocal<>();
-    public static Map<String, Object> renderBindingAttrs(ArrayMap bindAttrs, ArrayStack context){
+    public static Map<String, Object> renderBindingAttrs(ArrayMap bindAttrs, ArrayStack stack){
         Set<Map.Entry<String, Object>> entrySet = bindAttrs.entrySet();
         Map<String, Object> dynamic = dynamicLocal.get();
         if(dynamic == null) {
@@ -407,7 +522,7 @@ public class Statements {
                     && (((JSONObject) value).get(ELUtils.BINDING)  instanceof Token)){
                 JSONObject binding = (JSONObject) value;
                 Token block = (Token) (binding.get(ELUtils.BINDING));
-                Object blockValue = block.execute(context);
+                Object blockValue = block.execute(stack);
                 dynamic.put(key, blockValue);
             }else if(value instanceof JSONArray){
                 JSONArray array = (JSONArray) value;
@@ -422,7 +537,7 @@ public class Statements {
                             && (((JSONObject) element).get(ELUtils.BINDING) instanceof Token)){
                         JSONObject binding = (JSONObject) element;
                         Token block = (Token) (binding.get(ELUtils.BINDING));
-                        Object blockValue = block.execute(context);
+                        Object blockValue = block.execute(stack);
                         if(blockValue == null){
                             blockValue = "";
                         }
@@ -442,7 +557,7 @@ public class Statements {
     }
 
 
-    public static Map<String, Object> renderProps(JSONObject props, ArrayStack context){
+    public static Map<String, Object> renderProps(JSONObject props, ArrayStack stack){
         Set<Map.Entry<String, Object>> entrySet = props.entrySet();
         Map<String, Object> renderProps = new ArrayMap<>(4);
         for(Map.Entry<String, Object> entry : entrySet){
@@ -452,7 +567,7 @@ public class Statements {
                     && (((JSONObject) value).get(ELUtils.BINDING)  instanceof  Token)){
                 JSONObject binding = (JSONObject) value;
                 Token block = (Token) (binding.get(ELUtils.BINDING));
-                Object blockValue = block.execute(context);
+                Object blockValue = block.execute(stack);
                 renderProps.put(key, blockValue);
             }else{
                 renderProps.put(key, value);
@@ -461,7 +576,7 @@ public class Statements {
         return  renderProps;
     }
 
-    public static List<Object> getBindingEventArgs(ArrayStack context, Object bindings){
+    public static List<Object> getBindingEventArgs(ArrayStack stack, Object bindings){
           List<Object>  params = new ArrayList<>(4);
           if(bindings instanceof  JSONArray){
               JSONArray array = (JSONArray) bindings;
@@ -470,7 +585,7 @@ public class Statements {
                   if(value instanceof  JSONObject
                           && (((JSONObject) value).get(ELUtils.BINDING) instanceof  Token)){
                       Token block = (Token)(((JSONObject) value).get(ELUtils.BINDING));
-                      Object blockValue = block.execute(context);
+                      Object blockValue = block.execute(stack);
                       params.add(blockValue);
                   }else{
                       params.add(value);
@@ -480,7 +595,7 @@ public class Statements {
               JSONObject binding = (JSONObject) bindings;
                if(binding.get(ELUtils.BINDING) instanceof  Token){
                    Token block = (Token) binding.get(ELUtils.BINDING);
-                   Object blockValue = block.execute(context);
+                   Object blockValue = block.execute(stack);
                    params.add(blockValue);
                }else{
                    params.add(bindings.toString());
@@ -489,5 +604,34 @@ public class Statements {
               params.add(bindings.toString());
           }
           return  params;
+    }
+
+    private static volatile int componentIdNext = 0;
+
+
+    private static boolean isMainThread(){
+        return  Thread.currentThread() == Looper.getMainLooper().getThread();
+    }
+
+
+
+    public static String getComponentId(WXComponent component){
+        if(component instanceof  WXCell || component == null){
+            return  null;
+        }
+        WXDomObject domObject = (WXDomObject) component.getDomObject();
+        WXAttr attr = domObject.getAttrs();
+        if(attr.get(ELUtils.IS_COMPONENT_ROOT) != null
+                && WXUtils.getBoolean(attr.get(ELUtils.IS_COMPONENT_ROOT), false)){
+            if(attr.get(ELUtils.COMPONENT_PROPS) != null
+                    && attr.get(ELUtils.COMPONENT_PROPS) instanceof  JSONObject){
+                Object componentId = attr.get(CellDataManager.VIRTUAL_COMPONENT_ID);
+                if(componentId == null){
+                    return null;
+                }
+                return componentId.toString();
+            }
+        }
+        return getComponentId(component.getParent());
     }
 }

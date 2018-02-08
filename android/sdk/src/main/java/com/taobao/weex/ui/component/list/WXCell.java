@@ -52,7 +52,6 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
-    private boolean mLazy = true;
 
     /** used in list sticky detect **/
     private int mScrollPositon = -1;
@@ -63,16 +62,16 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     private boolean isSourceUsed = false;
 
-    private boolean hasLayout = false;
-
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         super(instance, dom, parent);
+        lazy(true);
     }
 
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
         super(instance, dom, parent);
+        lazy(true);
         if(Build.VERSION.SDK_INT< VERSION_CODES.LOLLIPOP) {
             try {
                 //TODO a WTF is necessary if anyone try to change the flat flag during update attrs.
@@ -88,12 +87,10 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     @Override
     public boolean isLazy() {
-        return mLazy && !isFixed();
+        return super.isLazy() && !isFixed();
     }
 
-    public void lazy(boolean lazy) {
-        mLazy = lazy;
-    }
+
 
     @Override
     @RestrictTo(Scope.LIBRARY)
@@ -236,11 +233,4 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         isSourceUsed = sourceUsed;
     }
 
-    public boolean isHasLayout() {
-        return hasLayout;
-    }
-
-    public void setHasLayout(boolean hasLayout) {
-        this.hasLayout = hasLayout;
-    }
 }

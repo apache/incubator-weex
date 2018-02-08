@@ -71,11 +71,13 @@ async function runRollup (config) {
 async function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
+    case 'jsfm':
     case 'native': pkgName = 'weex-js-framework'; break
+    case 'env': pkgName = 'weex-env'; break
     case 'vue': pkgName = 'weex-vue'; break
     case 'rax': pkgName = 'weex-rax'; break
     case 'runtime': pkgName = 'weex-js-runtime'; break
-    case 'legacy': pkgName = 'weex-legacy-framework'; break
+    case 'legacy': pkgName = 'weex-legacy'; break
     case 'vanilla': pkgName = 'weex-vanilla-framework'; break
   }
 
@@ -99,5 +101,5 @@ async function build (name) {
 function report (filePath) {
   const size = (fs.statSync(filePath).size / 1024).toFixed(2) + 'KB'
   const file = path.relative(process.cwd(), filePath)
-  console.log(` => write ${file} (${size})`)
+  console.log(` => ${file} (${size})`)
 }

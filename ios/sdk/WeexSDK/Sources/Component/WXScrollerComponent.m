@@ -33,7 +33,7 @@
 @end
 
 @implementation WXScrollerComponnetView
-@end;
+@end
 
 @interface WXScrollerComponnetView(WXScrollerComponnetView_ContentInsetAdjustmentBehavior)
 @property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
@@ -85,6 +85,7 @@
     BOOL _pagingEnabled;
     
     BOOL _shouldNotifiAppearDescendantView;
+    BOOL _shouldRemoveScrollerListener;
 
     css_node_t *_scrollerCSSNode;
     
@@ -155,6 +156,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
             _shouldNotifiAppearDescendantView = shouldNotifiAppearDescendantView;
+            BOOL shouldRemoveScrollerListener = [[configCenter configForKey:@"iOS_weex_ext_config.shouldRemoveScrollerListener" defaultValue:@(YES) isDefault:NULL] boolValue];
+            _shouldRemoveScrollerListener = shouldRemoveScrollerListener;
             
         }
     }
@@ -394,14 +397,17 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)removeScrollToListener:(WXComponent *)target
 {
-    WXScrollToTarget *targetData = nil;
-    for (WXScrollToTarget *targetData in self.listenerArray) {
-        if (targetData.target == target) {
-            break;
+    if (_shouldRemoveScrollerListener) {
+        WXScrollToTarget *targetData = nil;
+        for (WXScrollToTarget *targetDataTemp in self.listenerArray) {
+            if (targetDataTemp.target == target) {
+                targetData = targetDataTemp;
+                break;
+            }
         }
-    }
-    if(targetData) {
-        [self.listenerArray removeObject:targetData];
+        if(targetData) {
+            [self.listenerArray removeObject:targetData];
+        }
     }
 }
 

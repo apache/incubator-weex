@@ -26,7 +26,7 @@
 {
     pthread_mutex_t _safeThreadDictionaryMutex;
     pthread_mutexattr_t _safeThreadDictionaryMutexAttr;
-    os_unfair_lock _unfairLock;
+    os_unfair_lock _unfairLock;// this type of lock is not recurisive
 }
 
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -124,6 +124,9 @@
 
 - (id)objectForKey:(id)aKey
 {
+    if (nil == aKey){
+        return nil;
+    }
     __block id obj;
     if (![WXUtility threadSafeCollectionUsingLock]) {
         dispatch_sync(_queue, ^{

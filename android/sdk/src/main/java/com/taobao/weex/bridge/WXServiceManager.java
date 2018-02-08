@@ -19,7 +19,6 @@
 package com.taobao.weex.bridge;
 
 import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.WXJSService;
 
@@ -46,13 +45,11 @@ public class WXServiceManager {
         }
         String serviceJs = String.format(";(function(service, options){ ;%s; })({ %s }, { %s });", serviceScript, param1, param2);
 
-        if(WXEnvironment.isApkDebugable()) {
-            WXJSService service = new WXJSService();
-            service.setName(name);
-            service.setScript(serviceScript);
-            service.setOptions(options);
-            sInstanceJSServiceMap.put(name, service);
-        }
+        WXJSService service = new WXJSService();
+        service.setName(name);
+        service.setScript(serviceScript);
+        service.setOptions(options);
+        sInstanceJSServiceMap.put(name, service);
 
         WXBridgeManager.getInstance().execJSService(serviceJs);
         return true;
@@ -83,5 +80,17 @@ public class WXServiceManager {
             return sInstanceJSServiceMap.get(serviceName);
         }
         return null;
+    }
+
+    public static void reload() {
+        WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<String, WXJSService> entry : sInstanceJSServiceMap.entrySet()) {
+                    WXJSService service = entry.getValue();
+                    registerService(service.getName(), service.getScript(), service.getOptions());
+                }
+            }
+        });
     }
 }

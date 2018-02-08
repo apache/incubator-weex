@@ -1306,7 +1306,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public synchronized void destroy() {
     if(!isDestroy()) {
-      WXSDKManager.getInstance().destroyInstance(mInstanceId);
+      if(mRendered) {
+        WXSDKManager.getInstance().destroyInstance(mInstanceId);
+      }
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
