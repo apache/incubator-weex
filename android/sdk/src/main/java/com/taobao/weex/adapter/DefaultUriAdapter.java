@@ -47,8 +47,10 @@ public class DefaultUriAdapter implements URIAdapter {
    if (uri.isRelative()) {
       //When uri is empty, means use the base url instead. Web broswer behave this way.
       if(uri.getEncodedPath().length() == 0){
-        if(TextUtils.isEmpty(uri.toString())){
-          return uri;
+        if(URIAdapter.IMAGE.equals(type)){
+          if(TextUtils.isEmpty(uri.toString())){
+            return uri;
+          }
         }
         return base;
       } else {
