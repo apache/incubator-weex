@@ -17,7 +17,9 @@
  * under the License.
  */
 
+import { freezePrototype } from './env'
 import setup from './setup'
 import frameworks from '../frameworks'
 
 setup(frameworks)
+freezePrototype()

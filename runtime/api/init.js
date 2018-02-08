@@ -52,6 +52,14 @@ function getBundleType (code) {
   return 'Weex'
 }
 
+/**
+ * Get js framework version at runtime.
+ */
+function getJSFMVersion () {
+  // It will be converted into a version string at build time
+  return __WEEX_JS_FRAMEWORK_VERSION__ // eslint-disable-line
+}
+
 function createServices (id, env, config) {
   // Init JavaScript services for this instance.
   const serviceMap = Object.create(null)
@@ -108,6 +116,8 @@ function createInstanceContext (id, options = {}, data) {
   const runtimeContext = Object.create(null)
   Object.assign(runtimeContext, services, {
     weex,
+    getJSFMVersion,
+    __WEEX_CALL_JAVASCRIPT__: receiveTasks,
     services // Temporary compatible with some legacy APIs in Rax
   })
   Object.freeze(runtimeContext)
@@ -216,6 +226,7 @@ const methods = {
   createInstance,
   createInstanceContext,
   getRoot,
+  getJSFMVersion,
   getDocument: getDoc,
   registerService: register,
   unregisterService: unregister,

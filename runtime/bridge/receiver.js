@@ -31,14 +31,14 @@ function callback (document, callbackId, data, ifKeepAlive) {
   return document.taskCenter.callback(callbackId, data, ifKeepAlive)
 }
 
-function componentHook (document, componentId, type, hook, options) {
+function componentHook (document, componentId, type, hook, args) {
   if (!document || !document.taskCenter) {
     console.error(`[JS Framework] Can't find "document" or "taskCenter".`)
     return null
   }
   let result = null
   try {
-    result = document.taskCenter.triggerHook(componentId, type, hook, options)
+    result = document.taskCenter.triggerHook(componentId, type, hook, args)
   }
   catch (e) {
     console.error(`[JS Framework] Failed to trigger the "${type}@${hook}" hook on ${componentId}.`)
