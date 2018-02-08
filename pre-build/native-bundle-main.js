@@ -1,4 +1,4 @@
-(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-30 14:26. (Vue: 2.5.13-weex.2, Rax: 0.4.20)');
+(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.4, Build 2018-02-07 17:13. (Vue: 2.5.13-weex.5, Rax: 0.4.20)');
 var global=this; var process={env:{}}; var setTimeout=global.setTimeout;
 
 (function (global, factory) {
@@ -1887,7 +1887,7 @@ function freezeProtoProperty (proto, propertyName, protoName) {
 
 setNativeConsole();
 
-var subversion = {"framework":"0.24.1","transformer":">=0.1.5 <0.5"};
+var subversion = {"framework":"0.24.4","transformer":">=0.1.5 <0.5"};
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -3261,7 +3261,6 @@ function componentHook (document, componentId, type, hook, args) {
   catch (e) {
     console.error(("[JS Framework] Failed to trigger the \"" + type + "@" + hook + "\" hook on " + componentId + "."));
   }
-  console.log((" => trigger component hook \"" + hook + "\" on (" + componentId + "), args: " + (JSON.stringify(args)) + ", return: " + (JSON.stringify(result))));
   return result
 }
 
@@ -4268,7 +4267,7 @@ function getBundleType (code) {
  */
 function getJSFMVersion () {
   // It will be converted into a version string at build time
-  return "0.24.1" // eslint-disable-line
+  return "0.24.4" // eslint-disable-line
 }
 
 function createServices (id, env, config) {
@@ -5518,7 +5517,7 @@ var _isServer;
 var isServerRendering = function () {
   if (_isServer === undefined) {
     /* istanbul ignore if */
-    if (!inBrowser && typeof global !== 'undefined') {
+    if (!inBrowser && !inWeex && typeof global !== 'undefined') {
       // detect presence of vue-server-renderer and avoid
       // Webpack shimming the process
       _isServer = global['process'].env.VUE_ENV === 'server';
@@ -9058,7 +9057,6 @@ function updateComponentData (
     return
   }
   if (typeof document.taskCenter.updateData === 'function') {
-    console.log((" => update component data (" + componentId + "): " + (JSON.stringify(newData))));
     return document.taskCenter.updateData(componentId, newData, callback)
   }
   warn(("Failed to update component data (" + componentId + ")."));
@@ -9093,7 +9091,6 @@ function initVirtualComponent (options) {
   var vm = this;
   var componentId = options.componentId;
   def(vm, '_vmTemplate', options.vmTemplate);
-  console.log((" => create virtual component (" + componentId + ")"));
 
   // virtual component uid
   vm._uid = componentId || ("virtual-component-" + (uid$3++));
@@ -9131,7 +9128,6 @@ function initVirtualComponent (options) {
   callHook(vm, 'created');
 
   registerComponentHook(componentId, 'lifecycle', 'attach', function () {
-    console.log((" => attach virtual component (" + componentId + ")"));
     callHook(vm, 'beforeMount');
 
     new Watcher(
@@ -9148,8 +9144,21 @@ function initVirtualComponent (options) {
     vm._update(vm._vnode, false);
   });
 
+  registerComponentHook(
+    componentId,
+    'lifecycle',
+    'syncState',
+    function (id, propsData) {
+      if (isPlainObject(propsData)) {
+        for (var key in propsData) {
+          vm[key] = propsData[key];
+        }
+      }
+      return getComponentState(vm)
+    }
+  );
+
   registerComponentHook(componentId, 'lifecycle', 'detach', function () {
-    console.log((" => detach virtual component (" + componentId + ")"));
     vm.$destroy();
     if (vm._vmTemplate) {
       // $flow-disable-line
@@ -9163,7 +9172,6 @@ function initVirtualComponent (options) {
 function updateVirtualComponent (vnode) {
   var vm = this;
   var componentId = vm.$options.componentId;
-  console.log((" => update virtual component (" + componentId + ")"));
   if (vm._isMounted) {
     callHook(vm, 'beforeUpdate');
   }
@@ -9172,7 +9180,6 @@ function updateVirtualComponent (vnode) {
     // TODO: data should be diffed before sending to native
     var data = getComponentState(vm);
     updateComponentData(componentId, data, function () {
-      console.log((" => after virtual component update (" + componentId + ")"));
       callHook(vm, 'updated');
     });
   }
@@ -9185,7 +9192,6 @@ function initVirtualComponentTemplate (options) {
 
   // virtual component template uid
   vm._uid = "virtual-component-template-" + (uid$3++);
-  console.log((" => init virtual component template (" + (vm._uid) + ")"));
 
   // a flag to avoid this being observed
   vm._isVue = true;
@@ -9227,7 +9233,6 @@ function resolveVirtualComponent (vnode) {
     var componentId = this._uid;
     var vmTemplate = this._vmTemplate;
     if (componentId && vmTemplate) {
-      console.log((" => emit custom event on (" + componentId + ")"));
       args.push(componentId);
       originalEmit.apply(vmTemplate, args);
     }
@@ -9258,9 +9263,7 @@ function resolveVirtualComponent (vnode) {
             }
 
             // send initial data to native
-            var data = getComponentState(subVm);
-            console.log((" => send initial component data (" + componentId + "): " + (JSON.stringify(data))));
-            return data
+            return getComponentState(subVm)
           }
         );
       },
@@ -11554,8 +11557,7 @@ function add$1 (
         context = vcs[componentId] || context;
       }
       try {
-        var event = args[0] || {};
-        console.log((" => invoke virtual event handler " + (event.type) + " (" + componentId + ")"));
+        // console.log(' -> invoke virtual handler', args)
         invokeHandler(formerHandler, args, context);
       } catch (err) {
         handleError(err, context, ("Failed to invoke virtual component handler (" + componentId + ")"));
@@ -12076,7 +12078,6 @@ function interceptArrayMethods (vm, array) {
       }
 
       // send mutations to native
-      console.log((" => list data changed, action: " + key));
       var remove$$1 = getComponentMethod(vm, 'removeData');
       var insert = getComponentMethod(vm, 'insertRange');
       var update = getComponentMethod(vm, 'setListData');
@@ -12089,8 +12090,8 @@ function interceptArrayMethods (vm, array) {
           var start = args[0];
           var count = args[1];
           var items = args.slice(2);
-          remove$$1(start, count);
-          insert(start, items);
+          count > 0 && remove$$1(start, count);
+          items.length > 0 && insert(start, items);
         } break
         case 'sort': update(this.slice()); break
         case 'reverse': update(this.slice()); break
@@ -12122,7 +12123,6 @@ function watchArray (vm, array) {
         // send new item data to native
         function () {
           var update = getComponentMethod(vm, 'updateData');
-          console.log((" => update list data item " + (array.indexOf(item)) + ", " + (JSON.stringify(item))));
           update(array.indexOf(item), item);
         },
         { deep: true }
@@ -12142,23 +12142,22 @@ var RecycleList = {
     }
 
     var parent = this.$options.parent;
-    var bindingKey = this.$attrs.bindingKey;
-    if (parent && bindingKey) {
+    var exp = this.$attrs.bindingExpression;
+    if (parent && exp) {
       // prevent the re-render which caused by the binding list data
       parent.$watch(
-        bindingKey,
+        exp,
         function () { return def(this$1.$options, '[[UseCache]]', true); },
         { deep: true, immediate: true }
       );
 
       // watch the list data and send operations to native
       watchArray(this, this.$attrs.listData);
-      parent.$watch(bindingKey, function (newList) {
+      parent.$watch(exp, function (newList) {
         watchArray(this$1, newList);
       });
     }
 
-    console.log(" => render recycle-list");
     return h('weex:recycle-list', {
       on: this._events
     }, this.$slots.default)
@@ -27186,23 +27185,13 @@ module.exports = function () {
 
 var Rax = unwrapExports(framework_weex);
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+/**
+ * This file is used in js build,should not existed in
+ * main weex project.
+ * Extra frameworks can use this file to pack with weex
+ * native's jsf bundle.
+ * If you wanna do that, replace
+ * `weex/html5/frameworks/index.js` with this file.
  */
 var frameworks$1 = {
   Vanilla: Vanilla,
@@ -27210,6 +27199,136 @@ var frameworks$1 = {
   Rax: Rax,
   Weex: Weex
 }
+
+/**
+ * @fileOverview The api for invoking with "$" prefix
+ */
+
+/**
+ * ==========================================================
+ * private for ali
+ * ==========================================================
+ */
+
+/**
+ * invoke user-track on Taobao Moblie
+ * @param {string} type：enter, click, expose
+ * @param {string} name
+ * @param {string} comName
+ * @param {object} param
+*/
+function $userTrack(type, name, comName, param) {
+  console.error('[Upgrade Warning] $userTrack will be removed in the next version!');
+  console.error('[JS Framework] Vm#$userTrack is deprecated, ' +
+          'please use "require(\'@weex-module/userTrack\')' +
+          '.commit(type, name, comName, param)" instead');
+  var userTrack = this._app.requireModule('userTrack');
+  userTrack.commit(type, name, comName, param);
+}
+
+/**
+ * request a restfull api via the mtop gateway
+ * @param  {object}   params
+ * @param  {Function} callback
+ */
+function $sendMtop(params, callback) {
+  console.error('[Upgrade Warning] $sendMtop will be removed in the next version!');
+  console.error('[JS Framework] Vm#$sendMtop is deprecated, ' +
+          'please use "require(\'@weex-module/stream\')' +
+          '.sendMtop(params, callback)" instead');
+  /* istanbul ignore else */
+  if (typeof window === 'undefined') {
+    // in native，use windvane
+    var windvane = this._app.requireModule('windvane');
+    windvane.call({
+      class: 'MtopWVPlugin',
+      method: 'send',
+      data: params
+    }, callback);
+  } else {
+    // in web brwoser，use stream.sendMtop
+    var stream = this._app.requireModule('stream');
+    stream.sendMtop(params, callback);
+  }
+}
+
+/**
+ * request a native api via windvane protocol
+ * @param  {object}   params
+ * @param  {Function} callback
+ */
+function $callWindvane(params, callback) {
+  console.error('[Upgrade Warning] $callWindvane will be removed in the next version!');
+  console.error('[JS Framework] Vm#$callWindvane is deprecated, ' +
+          'please use "require(\'@weex-module/windvane\')' +
+          '.call(params, callback)" instead');
+  var windvane = this._app.requireModule('windvane');
+  windvane.call(params, callback);
+}
+
+/**
+ * set spm for the page
+ * @param  {string} a
+ * @param  {string} b
+ */
+function $setSpm(a, b) {
+  console.error('[Upgrade Warning] $setSpm will be removed in the next version!');
+  console.error('[JS Framework] Vm#$setSpm is deprecated, ' +
+          'please use "require(\'@weex-module/pageInfo\')' +
+          '.setSpm(a, b)" instead');
+  var pageInfo = this._app.requireModule('pageInfo');
+  pageInfo.setSpm(a, b);
+}
+
+/**
+ * get the information of the current logined user
+ * @param  {Function} callback
+ */
+function $getUserInfo(callback) {
+  console.error('[Upgrade Warning] $getUserInfo will be removed in the next version!');
+  console.error('[JS Framework] Vm#$getUserInfo is deprecated, ' +
+          'please use "require(\'@weex-module/user\')' +
+          '.getUserInfo(callback)" instead');
+  var user = this._app.requireModule('user');
+  user.getUserInfo(callback);
+}
+
+/**
+ * perform login
+ * @param  {Function} callback
+ */
+function $login(callback) {
+  console.error('[Upgrade Warning] $login will be removed in the next version!');
+  console.error('[JS Framework] Vm#$login is deprecated, ' +
+          'please use "require(\'@weex-module/user\')' +
+          '.login(callback)" instead');
+  var user = this._app.requireModule('user');
+  user.login(callback);
+}
+
+/**
+ * perform logout
+ * @param  {Function} callback
+ */
+function $logout(callback) {
+  console.error('[Upgrade Warning] $logout will be removed in the next version!');
+  console.error('[JS Framework] Vm#$logout is deprecated, ' +
+          'please use "require(\'@weex-module/user\')' +
+          '.logout(callback)" instead');
+  var user = this._app.requireModule('user');
+  user.logout(callback);
+}
+
+
+var methods$2 = Object.freeze({
+	$userTrack: $userTrack,
+	$sendMtop: $sendMtop,
+	$callWindvane: $callWindvane,
+	$setSpm: $setSpm,
+	$getUserInfo: $getUserInfo,
+	$login: $login,
+	$logout: $logout
+});
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -27232,6 +27351,12 @@ var frameworks$1 = {
 
 setup(frameworks$1);
 freezePrototype();
+
+/**
+ * Register specific methods for taobao.
+ * These methods have been deprecated, and will be removed in the next version.
+ */
+global.registerMethods(methods$2);
 
 })));
 //# sourceMappingURL=weex-js-framework.js.map

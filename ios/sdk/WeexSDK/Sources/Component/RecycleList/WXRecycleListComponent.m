@@ -290,8 +290,11 @@ WX_EXPORT_METHOD(@selector(setListData:))
     }
     
     NSMutableArray * newListData = [[_dataManager data] mutableCopy];
-    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index,[data count])];
+    NSRange range = NSMakeRange(index,[data count]);
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
     [newListData insertObjects:data atIndexes:indexSet];
+    [_dataManager updateData:newListData];
+    [_collectionView reloadData];
 }
 
 - (void)removeData:(NSInteger)index count:(NSInteger)count
