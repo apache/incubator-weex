@@ -132,6 +132,7 @@ static JSContext *jsContext;
         data = newData;
     }
     if (self->_templateComponent && self->_templateComponent->_dataBindOnce && recycleListComponent && data[@"@phase"]) {
+        WXLogInfo(@"interrupt update data: %@ because of v-once ", data);
         return;
     }
     if (!_isRepeating) {
