@@ -373,14 +373,6 @@ WX_EXPORT_METHOD(@selector(setListData:))
         } else {
             return;
         }
-    }else {
-        if (_aliasKey &&!data[@"phase"]) {
-            data = @{_aliasKey:data,@"aliasKey":_aliasKey};
-        } else {
-            NSMutableDictionary * dictionTemp = [data mutableCopy];
-            [dictionTemp removeObjectForKey:@"phase"];
-            data = dictionTemp;
-        }
     }
     
     if (!data[@"indexPath"] || !data[@"recycleListComponentRef"]) {
@@ -388,6 +380,14 @@ WX_EXPORT_METHOD(@selector(setListData:))
         dataNew[@"recycleListComponentRef"] = self.ref;
         dataNew[@"indexPath"] = indexPath;
         data = dataNew;
+    }
+    
+    if (_aliasKey &&!data[@"phase"]) {
+        data = @{_aliasKey:data,@"aliasKey":_aliasKey};
+    } else {
+        NSMutableDictionary * dictionTemp = [data mutableCopy];
+        [dictionTemp removeObjectForKey:@"phase"];
+        data = dictionTemp;
     }
     
     if (_indexKey) {
