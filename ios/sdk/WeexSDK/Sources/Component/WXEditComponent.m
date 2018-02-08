@@ -602,20 +602,26 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         NSInteger cursorPosition = [textField offsetFromPosition:textField.beginningOfDocument toPosition:textRange.start];
         NSMutableString *text = [textField.text mutableCopy];
         NSRegularExpression *recoverRule = [NSRegularExpression regularExpressionWithPattern:_recoverRule options:NSRegularExpressionCaseInsensitive error:NULL];
-        [recoverRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_recoverReplace];
+        NSInteger recoverMatch = [recoverRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_recoverReplace];
         NSRegularExpression *formatRule = [NSRegularExpression regularExpressionWithPattern:_formatRule options:NSRegularExpressionCaseInsensitive error:NULL];
-        [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
+        NSInteger replaceMatch = [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
         
         UITextPosition * newPosition = nil;
         NSString * editWords = [textField valueForKey:@"editWords"];
         if ([[textField valueForKey:@"deleteWords"] boolValue] && [editWords isEqualToString:_recoverRule]) {
             // nothing
         } else {
-            if (![text isEqualToString:textField.text]) {
-                NSInteger offset = (editWords.length +cursorPosition);
-                newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:offset];
+            if (recoverMatch != replaceMatch) {
+                // care about the difference between the replace and recover, so we need to adjust the caret and value.
+                if (![text isEqualToString:textField.text]) {
+                    NSInteger offset = (editWords.length +cursorPosition);
+                    if ([[textField valueForKey:@"deleteWords"] boolValue]) {
+                        offset = offset-1;
+                    }
+                    newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:offset];
+                }
+                textField.text = text;
             }
-            textField.text = text;
         }
         if (newPosition) {
             textField.selectedTextRange = [textField textRangeFromPosition:newPosition toPosition:newPosition];
