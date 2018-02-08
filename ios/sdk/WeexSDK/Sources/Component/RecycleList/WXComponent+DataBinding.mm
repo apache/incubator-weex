@@ -51,16 +51,20 @@ static JSContext *jsContext;
     NSString * listRef = nil;
     NSIndexPath *indexPath  = nil;
     NSDictionary * dictionary = nil;
-    if (data[@"aliasKey"]) {
-        id key = data[@"aliasKey"];
-        dictionary =  data[key];
-    } else {
-        dictionary = data;
+    listRef = data[@"recycleListComponentRef"];
+    indexPath = data[@"indexPath"];
+    if (!indexPath || !listRef) {
+        if (data[@"aliasKey"]) {
+            id key = data[@"aliasKey"];
+            dictionary =  data[key];
+        } else {
+            dictionary = data;
+        }
+        listRef = dictionary[@"recycleListComponentRef"];
+        indexPath = dictionary[@"indexPath"];
     }
-   listRef = dictionary[@"recycleListComponentRef"];
-   indexPath = dictionary[@"indexPath"];
     
-    if (!indexPath) {
+    if (!indexPath || !listRef) {
         return;
     }
     WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[self.weexInstance.componentManager componentForRef:listRef];

@@ -360,20 +360,31 @@ WX_EXPORT_METHOD(@selector(setListData:))
 
 #pragma mark - Private
 
-- (void)_updateBindingData:(NSDictionary *)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
+- (void)_updateBindingData:(id)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
 {
+    if (![data isKindOfClass:[NSDictionary class]]) {
+        if (_aliasKey) {
+            NSMutableDictionary * dictionary = [NSMutableDictionary dictionary];
+            [dictionary setObject:data forKey:_aliasKey];
+            data = dictionary;
+        } else {
+            return;
+        }
+    }else {
+        if (_aliasKey &&!data[@"phase"]) {
+            data = @{_aliasKey:data,@"aliasKey":_aliasKey};
+        } else {
+            NSMutableDictionary * dictionTemp = [data mutableCopy];
+            [dictionTemp removeObjectForKey:@"phase"];
+            data = dictionTemp;
+        }
+    }
+    
     if (!data[@"indexPath"] || !data[@"recycleListComponentRef"]) {
         NSMutableDictionary * dataNew = [data mutableCopy];
         dataNew[@"recycleListComponentRef"] = self.ref;
         dataNew[@"indexPath"] = indexPath;
         data = dataNew;
-    }
-    if (_aliasKey &&!data[@"phase"]) {
-        data = @{_aliasKey:data,@"aliasKey":_aliasKey};
-    } else {
-        NSMutableDictionary * dictionTemp = [data mutableCopy];
-        [dictionTemp removeObjectForKey:@"phase"];
-        data = dictionTemp;
     }
     
     if (_indexKey) {
@@ -387,7 +398,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
 #endif
     
     WXPerformBlockSyncOnComponentThread(^{
-        [cellComponent updateCellData:data];
+        [cellComponent updateCellData:[data copy]];
     });
 #ifdef DEBUG
     double duration = -[startTime timeIntervalSinceNow] * 1000;
@@ -435,11 +446,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     // 1. get the data relating to the cell
-    NSDictionary *data = [_dataManager dataAtIndex:indexPath.row];
-    if (!data || ![data isKindOfClass:[NSDictionary class]]) {
-        WXLogError(@"No data or wrong data format for index:%zd, data:%@", indexPath.item, data);
-        return nil;
-    }
+    id data = [_dataManager dataAtIndex:indexPath.row];
     
     // 2. get the template type specified by data
     NSString * templateType = [self templateType:indexPath];
@@ -546,8 +553,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     // default is first template.
     NSString *templateType = [_templateManager topTemplate].templateCaseType;
     if (!data || ![data isKindOfClass:[NSDictionary class]]) {
-        WXLogError(@"No data or wrong data format for index:%zd, data:%@", indexPath.item, data);
-        return nil;
+        return templateType;
     }
     
     if (_templateSwitchKey &&data[_templateSwitchKey]){
