@@ -292,7 +292,7 @@ namespace WeexCore {
         r.EnterObject();
         while (const char *key2 = r.NextObjectKey()) {
           if (r.PeekType() == kNumberType) {
-            char *temp = new char[64];
+            char *temp = new char[65];
             if (0 == strcmp(key, "attr")) {
               int len = fpconv_dtoa(r.GetDouble(), temp);
               temp[len] = '\0';
@@ -381,7 +381,7 @@ namespace WeexCore {
     while (const char *key = r.NextObjectKey()) {
       std::pair<std::string, std::string> *myPair = nullptr;
       if (r.PeekType() == kNumberType) {
-        char *temp = new char[64];
+        char *temp = new char[65];
         int len = fpconv_dtoa(r.GetDouble(), temp);
         temp[len] = '\0';
         char value[len + 1];
