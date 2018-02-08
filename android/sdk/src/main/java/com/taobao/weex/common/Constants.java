@@ -207,10 +207,9 @@ public class Constants {
       String LIST_DATA = "listData";
       String LIST_DATA_ITEM  ="alias";
       String LIST_DATA_ITEM_INDEX = "index";
-      String LIST_DATA_TEMPLATE_KEY = "templateKey";
-
-      String SLOT_TEMPLATE_TYPE = "templateType";
-      String LIST_DATA_ITEM_ID = "itemId";
+      String LIST_DATA_TEMPLATE_SWITCH_KEY = "switch";
+      String SLOT_TEMPLATE_CASE = "case";
+      String SLOT_TEMPLATE_DEFAULT = "default";
       String CELL_INDEX = "cellIndex";
       String TYPE_INDEX = "typeIndex";
     }

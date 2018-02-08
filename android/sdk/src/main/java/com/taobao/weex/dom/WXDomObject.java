@@ -134,6 +134,27 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     mDomThreadNanos += (System.nanoTime() - startNanos);
   }
 
+  /**
+   * diff with tranverse tree, only tranverse update tree
+   * */
+  public void traverseUpdateTree(Consumer...consumers){
+    if (consumers == null) {
+      return;
+    }
+    if(!hasUpdate()){
+      return;
+    }
+    for (Consumer consumer:consumers){
+      consumer.accept(this);
+    }
+    int count = childCount();
+    WXDomObject child;
+    for (int i = 0; i < count; ++i) {
+      child = getChild(i);
+      child.traverseTree(consumers);
+    }
+  }
+
 
   public int getViewPortWidth() {
     return mViewPortWidth;
@@ -230,15 +251,13 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     this.mRef = (String) map.get("ref");
     Object style = map.get("style");
     if (style != null && style instanceof JSONObject) {
-      WXStyle styles = new WXStyle();
-      styles.putAll((JSONObject) style,false);
+      WXStyle styles = new WXStyle((JSONObject) style,false);
       this.mStyles = styles;
       this.transition = WXTransition.fromMap(styles, this);
     }
     Object attr = map.get("attr");
     if (attr != null && attr instanceof JSONObject) {
       WXAttr attrs = new WXAttr((JSONObject) attr);
-      //WXJsonUtils.putAll(attrs, (JSONObject) attr);
       this.mAttributes = attrs;
     }
     Object event = map.get("event");
@@ -470,7 +489,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if (mAttributes == null) {
       mAttributes = new WXAttr();
     }
-    mAttributes.putAll(updates);
+    mAttributes.skipFilterPutAll(updates);
     if(hasNewLayout()){
       markUpdateSeen();
     }
@@ -658,7 +677,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if (sDestroy.get()) {
       return null;
     }
-    if(cloneThis){
+    if(isCloneThis()){
       return  this;
     }
     WXDomObject dom = null;
