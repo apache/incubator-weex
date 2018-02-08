@@ -104,6 +104,7 @@ static JSContext *jsContext;
                 [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
                     [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
                     [newData setObject:indexPath forKey:@"indexPath"];
+                    [newData setObject:listRef forKey:@"recycleListComponentRef"];
                     [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
                     dispatch_semaphore_signal(semaphore);
                 }];
