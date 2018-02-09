@@ -378,7 +378,8 @@ WX_EXPORT_METHOD(@selector(setListData:))
 
 - (void)_updateBindingData:(id)data forCell:(WXCellSlotComponent *)cellComponent atIndexPath:(NSIndexPath *)indexPath
 {
-    if (![data isKindOfClass:[NSDictionary class]]) {
+    id originalData = data;
+    if (![originalData isKindOfClass:[NSDictionary class]]) {
         if (_aliasKey) {
             NSMutableDictionary * dictionary = [NSMutableDictionary dictionary];
             [dictionary setObject:data forKey:_aliasKey];
@@ -395,7 +396,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
         data = dataNew;
     }
     
-    if (_aliasKey &&!data[@"phase"]) {
+    if ([originalData isKindOfClass:[NSDictionary class]] && _aliasKey &&!data[@"phase"]) {
         data = @{_aliasKey:data,@"aliasKey":_aliasKey};
     }
     

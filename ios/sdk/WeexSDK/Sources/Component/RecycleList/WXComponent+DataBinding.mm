@@ -100,7 +100,7 @@ static JSContext *jsContext;
         }];
         
         if (self.attributes[@"@isComponentRoot"]) {
-            if (!self->_virtualComponentId) {
+            if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath]) {
                 static NSUInteger __componentId = 0;
                 self->_virtualComponentId = [NSString stringWithFormat:@"%@@%ld", listRef, __componentId % (2048*1024)];
                 __componentId++;
@@ -109,11 +109,12 @@ static JSContext *jsContext;
                     [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
                     [newData setObject:indexPath forKey:@"indexPath"];
                     [newData setObject:listRef forKey:@"recycleListComponentRef"];
-//                    [newData setObject:@(databindOnce) forKey:WXBindingOnceIdentify];
                     [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
                     dispatch_semaphore_signal(semaphore);
                 }];
                 dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+                
+                [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:nil competion:nil];
                 if ([newData count]) {
                     data = newData;
                 }

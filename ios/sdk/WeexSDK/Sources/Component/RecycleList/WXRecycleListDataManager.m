@@ -98,11 +98,8 @@
 
 - (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths
 {
-    for (NSIndexPath* indexPath in indexPaths) {
-        NSString * virtualComponentId = [_renderStatus objectForKey:indexPath];
-        [_virtualComponentData removeObjectForKey:virtualComponentId];
-        [_renderStatus removeObjectForKey:indexPath];
-    }
+    [_virtualComponentData removeAllObjects];
+    [_renderStatus removeAllObjects];
 }
 
 - (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId

@@ -394,9 +394,6 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
         
-        if (self->_virtualComponentId) {
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:nil competion:nil];
-        }
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
