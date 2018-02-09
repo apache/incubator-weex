@@ -23,7 +23,7 @@
 
 WX_EXPORT_METHOD(@selector(generateCover:))
 
-- (void)generateCover:(WXModuleCallback)callback
+- (void)generateCover:(WXModuleKeepAliveCallback)callback
 {
 #if DEBUG
 #if !TARGET_IPHONE_SIMULATOR
@@ -37,12 +37,12 @@ WX_EXPORT_METHOD(@selector(generateCover:))
     
     if (callback) {
         NSDictionary * result = @{@"ok": @true};
-        callback(result);
+        callback(result,NO);
     }
 #else
     if (callback) {
         NSDictionary * result = @{@"ok": @false,@"msg":@"only debug mode support"};
-        callback(result);
+        callback(result,NO);
     }
 #endif
 }
