@@ -60,7 +60,7 @@ namespace WeexCore {
   enum WXCorePositionType {
     kRelative,
     kAbsolute,
-    kFixed = kAbsolute,
+    kFixed,
     kSticky = kRelative
   };
 

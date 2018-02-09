@@ -114,6 +114,7 @@ android {
             buildConfigField "boolean", "ENABLE_TRACE", "true"
             jniDebuggable true
             debuggable true
+            consumerProguardFiles 'proguard-rules.pro'
         }
     }
 
