@@ -155,6 +155,7 @@ namespace WeexCore {
     float mViewPortWidth;
     RenderObject *render_root = nullptr;
     std::string mPageId;
+    std::pair<float,float> renderPageSize;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
   };

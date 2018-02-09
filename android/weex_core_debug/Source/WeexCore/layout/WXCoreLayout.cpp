@@ -7,20 +7,20 @@ namespace WeexCore {
   /**
    * Entry function to calculate layout
    */
-  void WXCoreLayoutNode::calculateLayout() {
+  void WXCoreLayoutNode::calculateLayout(const std::pair<float,float> &renderPageSize) {
     BFCs.clear();
     initFormatingContext(BFCs);
-    auto bfcDimension = calculateBFCDimension();
+    auto bfcDimension = calculateBFCDimension(renderPageSize);
     if (std::get<0>(bfcDimension) || isDirty()) {
       measure(std::get<1>(bfcDimension), std::get<2>(bfcDimension), true);
     }
     layout(mCssStyle->mMargin.getMargin(kMarginLeft),
            mCssStyle->mMargin.getMargin(kMarginTop),
            mCssStyle->mMargin.getMargin(kMarginLeft) + getLayoutWidth(),
-           mCssStyle->mMargin.getMargin(kMarginTop) + getLayoutHeight());
+           mCssStyle->mMargin.getMargin(kMarginTop) + getLayoutHeight(), &renderPageSize);
     for (Index i = 0; i < getChildCount(kBFC); ++i) {
       WXCoreLayoutNode *child = getChildAt(kBFC, i);
-      child->calculateLayout();
+      child->calculateLayout(renderPageSize);
     }
   }
 
@@ -40,33 +40,77 @@ namespace WeexCore {
     reset();
   }
 
-  std::tuple<bool, float, float> WXCoreLayoutNode::calculateBFCDimension() {
+  std::tuple<bool, float, float> WXCoreLayoutNode::calculateBFCDimension(const std::pair<float,float>& renderPageSize) {
     bool sizeChanged = false;
-    float width=mCssStyle->mStyleWidth, height=mCssStyle->mStyleHeight;
-    if (mCssStyle->mPositionType == kAbsolute) {
-      if (isnan(width) &&
-          mParent != nullptr &&
-          !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft)) &&
-          !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeRight))) {
-        width = mParent->mLayoutResult->mLayoutSize.width -
-                mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft) -
-                mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
+    float width = mCssStyle->mStyleWidth, height = mCssStyle->mStyleHeight;
+    std::pair<bool,float> ret;
+    if (isBFC(this)) {
+      ret = calculateBFCWidth(width, renderPageSize.first);
+      sizeChanged |=ret.first;
+      width = ret.second;
+
+      ret = calculateBFCHeight(height,renderPageSize.second);
+      sizeChanged |=ret.first;
+      height = ret.second;
+    }
+    return std::make_tuple(sizeChanged, width, height);
+  }
+
+  std::pair<bool,float> WXCoreLayoutNode::calculateBFCWidth(float width, const float renderPageWidth){
+    bool sizeChanged = false;
+    if (isnan(width) &&
+        mParent != nullptr &&
+        !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft)) &&
+        !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeRight))) {
+      float containingBlockWidth = NAN;
+      switch (mCssStyle->mPositionType) {
+        case kAbsolute:
+          containingBlockWidth = mParent->mLayoutResult->mLayoutSize.width;
+          break;
+        case kFixed:
+          if (!isnan(renderPageWidth)) {
+            containingBlockWidth = renderPageWidth;
+          }
+          break;
+      }
+      if (!isnan(containingBlockWidth)) {
+        width = containingBlockWidth -
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft) -
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
         setWidthMeasureMode(kExactly);
         sizeChanged = true;
       }
+    }
+    return std::make_pair(sizeChanged, width);
+  }
 
-      if (isnan(mCssStyle->mStyleHeight) &&
-          mParent != nullptr &&
-          !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeTop)) &&
-          !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom))) {
-        height = mParent->mLayoutResult->mLayoutSize.height -
-                 mCssStyle->mStylePosition.getPosition(kPositionEdgeTop) -
-                 mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom);
+
+  std::pair<bool,float> WXCoreLayoutNode::calculateBFCHeight(float height, const float renderPageHeight){
+    bool sizeChanged = false;
+    if (isnan(mCssStyle->mStyleHeight) &&
+        mParent != nullptr &&
+        !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeTop)) &&
+        !isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom))) {
+      float containingBlockHeight = NAN;
+      switch (mCssStyle->mPositionType) {
+        case kAbsolute:
+          containingBlockHeight = mParent->mLayoutResult->mLayoutSize.height;
+          break;
+        case kFixed:
+          if (!isnan(renderPageHeight)) {
+            containingBlockHeight = renderPageHeight;
+          }
+          break;
+      }
+      if (!isnan(containingBlockHeight)) {
+        height = containingBlockHeight -
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeTop) -
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom);
         setHeightMeasureMode(kExactly);
         sizeChanged = true;
       }
     }
-    return std::make_tuple(sizeChanged, width, height);
+    return std::make_pair(sizeChanged, height);
   }
 
   void WXCoreLayoutNode::measure(const float width, const float height, const bool hypotheticalMeasurment){
@@ -407,10 +451,11 @@ namespace WeexCore {
       }
     }
 
-  void WXCoreLayoutNode::layout(float left, float top, float right, float bottom) {
+  void WXCoreLayoutNode::layout(float left, float top, float right, float bottom, const std::pair<float,float>* const renderPageSize) {
     switch (mCssStyle->mPositionType) {
+      case kFixed:
       case kAbsolute:
-        calcAbsoluteOffset(left, top, right, bottom);
+        calcAbsoluteOffset(left, top, right, bottom, renderPageSize);
         break;
       default:
       case kRelative:
@@ -439,15 +484,18 @@ namespace WeexCore {
     }
   }
 
-  void WXCoreLayoutNode::calcAbsoluteOffset(float &left, float &top, float &right, float &bottom) const {
+  void WXCoreLayoutNode::calcAbsoluteOffset(float &left, float &top, float &right, float &bottom, const std::pair<float,float>* const renderPageSize) const {
     WXCorePadding parentPadding;
     WXCoreBorderWidth parentBorder;
     WXCoreSize parentSize;
 
-    if (mParent != nullptr) {
+    if (mCssStyle->mPositionType == kAbsolute && mParent != nullptr) {
       parentPadding = mParent->mCssStyle->mPadding;
       parentBorder = mParent->mCssStyle->mBorderWidth;
       parentSize = mParent->mLayoutResult->mLayoutSize;
+    } else if(mCssStyle->mPositionType == kFixed && renderPageSize!= nullptr){
+      parentSize.width = renderPageSize->first;
+      parentSize.height = renderPageSize->second;
     }
 
     if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft))) {

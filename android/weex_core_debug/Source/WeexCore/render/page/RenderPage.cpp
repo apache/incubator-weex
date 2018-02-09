@@ -32,6 +32,8 @@ namespace WeexCore {
     mPageId = pageId;
     mWXCorePerformance = new RenderPerformance();
     mViewPortWidth = 750.0f;
+    renderPageSize.first = WXCoreEnvironment::getInstance()->DeviceWidth();
+    renderPageSize.second = NAN;
   }
 
   RenderPage::~RenderPage() {
@@ -63,7 +65,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     render_root->LayoutBefore();
-    render_root->calculateLayout();
+    render_root->calculateLayout(renderPageSize);
     render_root->LayoutAfter();
     CssLayoutTime(getCurrentTime() - startTime);
 
@@ -363,7 +365,8 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight) {
-
+    renderPageSize.first = defaultWidth;
+    renderPageSize.second = defaultHeight;
     if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
       render_root->setStyleWidthLevel(INSTANCE_STYLE);
       render_root->setStyleWidth(defaultWidth);

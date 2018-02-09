@@ -213,7 +213,7 @@ namespace WeexCore {
 
     /** ================================ Engine Entry Function =================================== **/
 
-    void calculateLayout();
+    void calculateLayout(const std::pair<float,float>&);
 
     /** ================================ measureFunc =================================== **/
 
@@ -496,11 +496,11 @@ namespace WeexCore {
 
     /** ================================ layout =================================== **/
 
-    void layout(float left, float top, float right, float bottom);
+    void layout(float left, float top, float right, float bottom, const std::pair<float,float>* = nullptr);
 
     void calcRelativeOffset(float &left, float &top, float &right, float &bottom) const ;
 
-    void calcAbsoluteOffset(float &left, float &top, float &right, float &bottom) const ;
+    void calcAbsoluteOffset(float &left, float &top, float &right, float &bottom, const std::pair<float,float>* = nullptr) const ;
 
     void onLayout(float left, float top, float right, float bottom);
 
@@ -521,7 +521,11 @@ namespace WeexCore {
 
     void initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs);
 
-    std::tuple<bool, float, float> calculateBFCDimension();
+    std::pair<bool,float> calculateBFCWidth(float, float);
+
+    std::pair<bool,float> calculateBFCHeight(float, float);
+
+    std::tuple<bool, float, float> calculateBFCDimension(const std::pair<float,float>&);
 
     virtual void onLayoutBefore() {
 
@@ -595,7 +599,7 @@ namespace WeexCore {
     }
 
     bool isBFC(WXCoreLayoutNode* const node) const {
-      return node->mCssStyle->mPositionType == kAbsolute;
+      return node->mCssStyle->mPositionType == kAbsolute || node->mCssStyle->mPositionType == kFixed;
     }
 
 
