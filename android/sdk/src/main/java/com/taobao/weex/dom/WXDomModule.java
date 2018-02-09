@@ -61,6 +61,9 @@ public final class WXDomModule extends WXModule {
   public static final String UPDATE_FINISH = "updateFinish";
   public static final String SCROLL_TO_ELEMENT = "scrollToElement";
   public static final String ADD_RULE = "addRule";
+
+  public static final String UPDATE_COMPONENT_DATA = "updateComponentData";
+
   public static final String GET_COMPONENT_RECT = "getComponentRect";
 
   public static final String WXDOM = "dom";
@@ -97,7 +100,9 @@ public final class WXDomModule extends WXModule {
     try {
       Action action = Actions.get(method,args);
       if(action == null){
-        WXLogUtils.e("Unknown dom action.");
+         WXLogUtils.e("Unknown dom action "
+                 +  method + " args "  + (args == null ? " null" : args.toJSONString()));
+         return null;
       }
       if(action instanceof DOMAction){
         postAction((DOMAction)action, CREATE_BODY.equals(method) || ADD_RULE.equals(method));

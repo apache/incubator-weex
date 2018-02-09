@@ -78,6 +78,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
@@ -115,6 +117,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_REGISTER_COMPONENTS = "registerComponents";
   public static final String METHOD_FIRE_EVENT = "fireEvent";
   public static final String METHD_FIRE_EVENT_SYNC = "fireEventSync";
+  public static final String METHD_COMPONENT_HOOK_SYNC = "componentHook";
   public static final String METHOD_CALLBACK = "callback";
   public static final String METHOD_REFRESH_INSTANCE = "refreshInstance";
   public static final String METHOD_NOTIFY_TRIM_MEMORY = "notifyTrimMemory";
@@ -361,7 +364,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, Object options) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
           .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -389,7 +392,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, JSONObject options) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
           .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -420,7 +423,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public Object callNativeComponent(String instanceId, String componentRef, String method, JSONArray arguments, Object options) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callNativeComponent >>>> instanceId:").append(instanceId)
           .append(", componentRef:").append(componentRef).append(", method:").append(method).append(", arguments:").append(arguments);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -458,7 +461,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
     mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
         .append(", tasks:").append(tasks).append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
@@ -534,12 +537,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 	  return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    // if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
     mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> instanceId:").append(instanceId)
         .append(", tasks:").append(tasks).append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+    }
 
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
@@ -581,7 +584,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // callUpdateFinish
   public int callUpdateFinish(String instanceId, String callback) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callUpdateFinish >>>> instanceId:").append(instanceId)
           .append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -615,12 +618,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // callCreateFinish
   public int callCreateFinish(String instanceId, String callback) {
-    // if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
     mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId)
         .append(", callback:").append(callback);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-    // }
+     }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -650,7 +653,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // callRefreshFinish
   public int callRefreshFinish(String instanceId, String callback) {
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callRefreshFinish >>>> instanceId:").append(instanceId)
           .append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -693,7 +696,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callUpdateAttrs >>>> instanceId:").append(instanceId)
           .append(", ref:").append(ref)
           .append(", task:").append(task)
@@ -748,7 +751,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 			  "task is empty", null);
 	  return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
-   if (WXEnvironment.isApkDebugable()) {
+   if (WXEnvironment.isOpenDebugLog()) {
     mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
         .append(", ref:").append(ref)
         .append(", task:").append(task)
@@ -796,7 +799,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // callUpdateStyle
   public int callRemoveElement(String instanceId, String ref, String callback) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
           .append(", ref:").append(ref);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -835,7 +838,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // callMoveElement
   public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
           .append(", parentref:").append(parentref)
           .append(", index:").append(index)
@@ -872,13 +875,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddEvent(String instanceId, String ref, String event, String callback) {
 
-//    if (WXEnvironment.isApkDebugable()) {
+   if (WXEnvironment.isOpenDebugLog()) {
     mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
         .append(", ref:").append(ref)
         .append(", event:").append(event);
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
-//    }
+   }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -911,7 +914,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callRemoveEvent >>>> instanceId:").append(instanceId)
           .append(", ref:").append(ref)
           .append(", event:").append(event);
@@ -950,7 +953,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddElement(String instanceId, String ref, JSONObject dom, String index, String callback) {
 
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("[WXBridgeManager] callNative::callAddElement >>>> instanceId:").append(instanceId)
           .append(", ref:").append(ref).append(", dom:").append(dom).append(", callback:").append(callback);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -1108,9 +1111,68 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
 
+
   /**
-   * aync call js event and return result in eventResult callback
+   * ref, type, data, domChanges
    * */
+  public EventResult syncCallJSEventWithResult(final String method, final String instanceId, final List<Object> params, final Object... args) {
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+    EventResult callback = new EventResult(){
+      @Override
+      public void onCallback(Object result) {
+        super.onCallback(result);
+        waitLatch.countDown();
+      }
+    };
+    try{
+      asyncCallJSEventWithResult(callback, method, instanceId, params, args);
+      waitLatch.await(100, TimeUnit.MILLISECONDS);
+      return  callback;
+    }catch (Exception e){
+      WXLogUtils.e("syncCallJSEventWithResult", e);
+      return  callback;
+    }
+  }
+
+  public void asyncCallJSEventVoidResult(final String method, final String instanceId, final List<Object> params, final Object... args) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        try{
+          if (args == null || args.length == 0) {
+            return;
+          }
+
+          ArrayList<Object> argsList = new ArrayList<>();
+          for (Object arg : args) {
+            argsList.add(arg);
+          }
+          if (params != null) {
+            ArrayMap map = new ArrayMap(4);
+            map.put(KEY_PARAMS, params);
+            argsList.add(map);
+          }
+
+          WXHashMap<String, Object> task = new WXHashMap<>();
+          task.put(KEY_METHOD, method);
+          task.put(KEY_ARGS, argsList);
+          Object[] tasks = {task};
+          WXJSObject[] jsArgs = {
+                  new WXJSObject(WXJSObject.String, instanceId),
+                  WXJsonUtils.wsonWXJSObject(tasks)};
+          invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, jsArgs, true);
+          jsArgs[0] = null;
+          jsArgs = null;
+        }catch (Exception e){
+          WXLogUtils.e("asyncCallJSEventVoidResult" , e);
+        }
+      }
+    });
+  }
+
+    /**
+     * aync call js event and return result in eventResult callback
+     * */
   private void asyncCallJSEventWithResult(final EventResult eventCallback, final String method, final String instanceId, final List<Object> params, final Object... args) {
     post(new Runnable() {
       @Override
@@ -1153,7 +1215,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           taskResult = null;
           jsArgs = null;
         }catch (Exception e){
-          WXLogUtils.e("asyncCallJSEventWithResult ");
+          WXLogUtils.e("asyncCallJSEventWithResult" , e);
         }
       }
     });
@@ -1363,7 +1425,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return;
       }
       long start = System.currentTimeMillis();
-      if (WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.isOpenDebugLog()) {
         WXLogUtils.d("refreshInstance >>>> instanceId:" + instanceId
             + ", data:" + refreshData.data + ", isDirty:" + refreshData.isDirty);
       }
@@ -1524,7 +1586,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return;
       }
       try {
-        if (WXEnvironment.isApkDebugable()) {
+        if (WXEnvironment.isOpenDebugLog()) {
           WXLogUtils.d("createInstance >>>> instanceId:" + instance.getInstanceId()
               + ", options:"
               + WXJsonUtils.fromObjectToJSONString(options)
@@ -1584,7 +1646,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void invokeDestroyInstance(String instanceId) {
     try {
-      if (WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.isOpenDebugLog()) {
         WXLogUtils.d("destroyInstance >>>> instanceId:" + instanceId);
       }
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
@@ -1642,7 +1704,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-     if (WXEnvironment.isApkDebugable()) {
+     if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
           .append("function:").append(function);
       if (logTaskDetail) {
@@ -1656,7 +1718,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private byte[] invokeExecJSWithResult(String instanceId, String namespace, String function,
                                        WXJSObject[] args,boolean logTaskDetail){
-    if (WXEnvironment.isApkDebugable()) {
+    if (WXEnvironment.isOpenDebugLog()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
       if(logTaskDetail) {

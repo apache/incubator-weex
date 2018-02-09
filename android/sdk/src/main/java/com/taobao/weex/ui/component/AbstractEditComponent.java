@@ -36,6 +36,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
@@ -55,6 +56,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Created by sospartan on 7/11/16.
@@ -74,6 +77,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
   private boolean mIgnoreNextOnInputEvent = false;
+  private boolean mKeepSelectionIndex = false;
+  private TextFormatter mFormatter = null;
+  private List<TextWatcher> mTextChangedListeners;
+  private TextWatcher mTextChangedEventDispatcher;
+  private int mFormatRepeatCount = 0;
+  private static final int MAX_TEXT_FORMAT_REPEAT = 3;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -88,7 +97,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @Override
-  protected void onHostViewInitialized(WXEditText host) {
+  protected void onHostViewInitialized(final WXEditText host) {
     super.onHostViewInitialized(host);
     addFocusChangeListener(new OnFocusChangeListener() {
       @Override
@@ -96,7 +105,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         if (!hasFocus) {
           decideSoftKeyboard();
         }
-        setPseudoClassStatus(Constants.PSEUDO.FOCUS,hasFocus);
+        setPseudoClassStatus(Constants.PSEUDO.FOCUS, hasFocus);
       }
     });
 
@@ -133,7 +142,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     });
   }
 
-  protected int getVerticalGravity(){
+  protected int getVerticalGravity() {
     return Gravity.CENTER_VERTICAL;
   }
 
@@ -142,19 +151,65 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    *
    * @param editText
    */
-  protected void appleStyleAfterCreated(WXEditText editText) {
+  protected void appleStyleAfterCreated(final WXEditText editText) {
     String alignStr = (String) getDomObject().getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
       textAlign = Gravity.START;
     }
     editText.setGravity(textAlign | getVerticalGravity());
-    int colorInt = WXResourceUtils.getColor("#999999");
+    final int colorInt = WXResourceUtils.getColor("#999999");
     if (colorInt != Integer.MIN_VALUE) {
       editText.setHintTextColor(colorInt);
     }
 
-    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
+    mTextChangedEventDispatcher = new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (mTextChangedListeners != null) {
+          for (TextWatcher watcher : mTextChangedListeners) {
+            watcher.beforeTextChanged(s, start, count, after);
+          }
+        }
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (mFormatter != null) {
+          String raw = mFormatter.recover(s.toString());
+          String result = mFormatter.format(raw);
+          // prevent infinite loop caused by bad format and recover regexp
+          if (!result.equals(s.toString()) && mFormatRepeatCount < MAX_TEXT_FORMAT_REPEAT) {
+            mFormatRepeatCount = mFormatRepeatCount + 1;
+            int index = editText.getSelectionStart();
+            int cursorIndex = mFormatter.format(mFormatter.recover(s.subSequence(0, index).toString())).length();
+            editText.setText(result);
+            editText.setSelection(cursorIndex);
+            return;
+          }
+
+          mFormatRepeatCount = 0;
+        }
+
+        if (mTextChangedListeners != null) {
+          for (TextWatcher watcher : mTextChangedListeners) {
+            watcher.onTextChanged(s, start, before, count);
+          }
+        }
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (mTextChangedListeners != null) {
+          for (TextWatcher watcher : mTextChangedListeners) {
+            watcher.afterTextChanged(s);
+          }
+        }
+      }
+    };
+    editText.addTextChangedListener(mTextChangedEventDispatcher);
+
+    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(), getInstance().getInstanceViewPortWidth()));
   }
 
 
@@ -203,7 +258,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }
       });
     } else if (type.equals(Constants.Event.INPUT)) {
-      text.addTextChangedListener(new TextWatcher() {
+      addTextChangedListener(new TextWatcher() {
         boolean  hasChangeForDefaultValue = false;
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -212,9 +267,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-
           if (mIgnoreNextOnInputEvent) {
             mIgnoreNextOnInputEvent = false;
+            return;
           }
 
           if (mBeforeText.equals(s.toString())) {
@@ -293,17 +348,17 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.PLACEHOLDER:
-        String placeholder = WXUtils.getString(param,null);
+        String placeholder = WXUtils.getString(param, null);
         if (placeholder != null)
           setPlaceholder(placeholder);
         return true;
       case Constants.Name.PLACEHOLDER_COLOR:
-        String placeholder_color = WXUtils.getString(param,null);
+        String placeholder_color = WXUtils.getString(param, null);
         if (placeholder_color != null)
           setPlaceholderColor(placeholder_color);
         return true;
       case Constants.Name.TYPE:
-        String input_type = WXUtils.getString(param,null);
+        String input_type = WXUtils.getString(param, null);
         if (input_type != null)
           setType(input_type);
         return true;
@@ -313,17 +368,17 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           setAutofocus(result);
         return true;
       case Constants.Name.COLOR:
-        String color = WXUtils.getString(param,null);
+        String color = WXUtils.getString(param, null);
         if (color != null)
           setColor(color);
         return true;
       case Constants.Name.FONT_SIZE:
-        String fontsize = WXUtils.getString(param,null);
+        String fontsize = WXUtils.getString(param, null);
         if (fontsize != null)
           setFontSize(fontsize);
         return true;
       case Constants.Name.TEXT_ALIGN:
-        String text_align = WXUtils.getString(param,null);
+        String text_align = WXUtils.getString(param, null);
         if (text_align != null)
           setTextAlign(text_align);
         return true;
@@ -355,6 +410,16 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         return true;
       case Constants.Name.RETURN_KEY_TYPE:
         setReturnKeyType(String.valueOf(param));
+        return true;
+      case Constants.Name.KEEP_SELECTION_INDEX:
+        boolean keepIndex = WXUtils.getBoolean(param, false);
+        mKeepSelectionIndex = keepIndex;
+        return true;
+      case Constants.Name.ALLOW_COPY_PASTE:
+        boolean allowCopyPaste = WXUtils.getBoolean(param, true);
+        if (getHostView() != null) {
+          getHostView().setAllowCopyPaste(allowCopyPaste);
+        }
         return true;
     }
     return super.setProperty(key, param);
@@ -445,15 +510,17 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @WXComponentProp(name = Constants.Name.VALUE)
-  public void setValue(String value){
+  public void setValue(String value) {
     WXEditText view;
-    if((view = getHostView()) == null){
+    if ((view = getHostView()) == null) {
       return;
     }
 
     mIgnoreNextOnInputEvent = true;
+    int oldIndex = view.getSelectionStart();
     view.setText(value);
-    view.setSelection(value == null ? 0 : value.length());
+    int index = mKeepSelectionIndex ? oldIndex : value.length();
+    view.setSelection(value == null ? 0 : index);
   }
 
   @WXComponentProp(name = Constants.Name.COLOR)
@@ -468,7 +535,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
-    if (getHostView() != null && fontSize != null ) {
+    if (getHostView() != null && fontSize != null) {
       Map<String, Object> map = new HashMap<>(1);
       map.put(Constants.Name.FONT_SIZE, fontSize);
       getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(map, getInstance().getInstanceViewPortWidth()));
@@ -501,6 +568,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   /**
    * Compatible with both 'max-length' and 'maxlength'
+   *
    * @param maxLength
    */
   @WXComponentProp(name = Constants.Name.MAX_LENGTH)
@@ -513,6 +581,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   /**
    * Compatible with both 'max-length' and 'maxlength'
+   *
    * @param maxLength
    */
   @WXComponentProp(name = Constants.Name.MAXLENGTH)
@@ -698,6 +767,25 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     WXBridgeManager.getInstance().callback(getInstanceId(), callbackId, result, false);
   }
 
+  @JSMethod
+  public void setTextFormatter(JSONObject params) {
+    try {
+      String formatRule = params.getString("formatRule");
+      String formatReplace = params.getString("formatReplace");
+      String recoverRule = params.getString("recoverRule");
+      String recoverReplace = params.getString("recoverReplace");
+
+      PatternWrapper format = parseToPattern(formatRule, formatReplace);
+      PatternWrapper recover = parseToPattern(recoverRule, recoverReplace);
+
+      if (format != null && recover != null) {
+        mFormatter = new TextFormatter(format, recover);
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
   protected final void addEditorActionListener(TextView.OnEditorActionListener listener) {
     TextView view;
     if (listener != null && (view = getHostView()) != null) {
@@ -719,6 +807,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       }
       mEditorActionListeners.add(listener);
     }
+  }
+
+  public final void addTextChangedListener(TextWatcher watcher) {
+    if (mTextChangedListeners == null) {
+      mTextChangedListeners = new ArrayList<>();
+    }
+    mTextChangedListeners.add(watcher);
   }
 
   private void addKeyboardListener(final WXEditText host) {
@@ -756,6 +851,51 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
   }
 
+  private PatternWrapper parseToPattern(String jsPattern, String replace) {
+    if (jsPattern == null || replace == null) {
+      return null;
+    }
+
+    String checker = "/[\\S]+/[i]?[m]?[g]?";
+    if (!Pattern.compile(checker).matcher(jsPattern).matches()) {
+      WXLogUtils.w("WXInput", "Illegal js pattern syntax: " + jsPattern);
+      return null;
+    }
+
+    int flags = 0;
+    boolean global = false;
+    String flagsStr = jsPattern.substring(jsPattern.lastIndexOf("/") + 1);
+    String regExp = jsPattern.substring(jsPattern.indexOf("/") + 1, jsPattern.lastIndexOf("/"));
+
+    if (flagsStr.contains("i")) {
+      flags |= Pattern.CASE_INSENSITIVE;
+    }
+
+    if (flagsStr.contains("m")) {
+      flags |= Pattern.DOTALL;
+    }
+
+    if (flagsStr.contains("g")) {
+      global = true;
+    }
+
+    Pattern pattern = null;
+    try {
+      pattern = Pattern.compile(regExp, flags);
+    } catch (PatternSyntaxException e) {
+      WXLogUtils.w("WXInput", "Pattern syntax error: " + regExp);
+    }
+    if (pattern == null) {
+      return null;
+    }
+
+    PatternWrapper wrapper = new PatternWrapper();
+    wrapper.global = global;
+    wrapper.matcher = pattern;
+    wrapper.replace = replace;
+    return wrapper;
+  }
+
   private interface ReturnTypes {
     String DEFAULT = "default";
     String GO = "go";
@@ -763,5 +903,53 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     String SEARCH = "search";
     String SEND = "send";
     String DONE = "done";
+  }
+
+  private static class PatternWrapper {
+    private boolean global = false;
+    private Pattern matcher;
+    private String replace;
+  }
+
+  private static class TextFormatter {
+    private PatternWrapper format;
+    private PatternWrapper recover;
+
+    private TextFormatter(PatternWrapper format, PatternWrapper recover) {
+      this.format = format;
+      this.recover = recover;
+    }
+
+    private String format(String src) {
+      try {
+        if (format != null) {
+          if (format.global) {
+            return format.matcher.matcher(src).replaceAll(format.replace);
+          } else {
+            return format.matcher.matcher(src).replaceFirst(format.replace);
+          }
+        }
+      } catch (Throwable t) {
+        //maybe IndexOutOfBoundsException caused by illegal replace
+        WXLogUtils.w("WXInput", "[format] " + t.getMessage());
+      }
+      return src;
+    }
+
+    private String recover(String formatted) {
+      try {
+        if (recover != null) {
+          if (recover.global) {
+            return recover.matcher.matcher(formatted).replaceAll(recover.replace);
+          } else {
+            return recover.matcher.matcher(formatted).replaceFirst(recover.replace);
+          }
+        }
+      } catch (Throwable t) {
+        //same cause as format
+        WXLogUtils.w("WXInput", "[formatted] " + t.getMessage());
+      }
+      return formatted;
+    }
   }
 }

@@ -79,6 +79,7 @@ import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListener;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -124,7 +125,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public static final String PROP_FS_WRAP_CONTENT = "w";
 
   private int mFixedProp = 0;
-  public static int mComponentNum = 0;
+  public static volatile int mComponentNum = 0;
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
@@ -158,12 +159,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
 
+
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
 
   private boolean waste = false;
+
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -352,6 +355,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         if(mDomObj.getEvents() != null && mDomObj.getEvents().getEventBindingArgsValues() != null){
              eventArgsValues = mDomObj.getEvents().getEventBindingArgsValues().get(type);
         }
+        if(params != null){
+          String componentId = Statements.getComponentId(this);
+          if(componentId != null) {
+            params.put("componentId", componentId);
+          }
+        }
         mInstance.fireEvent(mCurrentRef, type, params,domChanges, eventArgsValues, callback);
     }
   }
@@ -375,6 +384,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @return true for lazy
    */
   public boolean isLazy() {
+    if(mLazy){
+      return true;
+    }
     return mParent != null && mParent.isLazy();
   }
 
@@ -1978,44 +1990,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  public boolean isWaste() {
-    return waste;
-  }
-
-  public void setWaste(boolean waste) {
-    if(this.waste != waste){
-      this.waste = waste;
-      WXDomObject domObject = (WXDomObject) getDomObject();
-      if(waste){
-          getDomObject().getStyles().put(Constants.Name.VISIBILITY, Constants.Value.HIDDEN);
-          if(domObject.getAttrs().getStatement() == null) {
-            domObject.setVisible(false);
-            if (getHostView() != null) {
-                getHostView().setVisibility(View.GONE);
-            }
-            return;
-          }
-          if(Constants.Value.VISIBLE.equals(domObject.getAttrs().get(Constants.Name.VIF_FALSE))){
-            domObject.setVisible(true);
-            if(getHostView() != null){
-               getHostView().setVisibility(View.VISIBLE);
-             }
-          }else{
-            domObject.setVisible(false);
-            if(getHostView() != null){
-              getHostView().setVisibility(View.GONE);
-            }
-          }
-      }else{
-        domObject.setVisible(true);
-        if(getHostView() != null){
-           getHostView().setVisibility(View.VISIBLE);
-        }
-        getDomObject().getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
-      }
-    }
-  }
-
   protected boolean isRippleEnabled() {
     try {
       Object obj = getDomObject().getAttrs().get(Constants.Name.RIPPLE_ENABLED);
@@ -2024,5 +1998,77 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       //ignore
     }
     return false;
+  }
+
+
+
+  public boolean isWaste() {
+    return waste;
+  }
+
+  /**
+   * mark node waste,
+   * if node is waster should hidden, and dom tree should allow not show
+   * */
+  public void setWaste(boolean waste) {
+    if(this.waste != waste){
+      this.waste = waste;
+      WXDomObject domObject = (WXDomObject) getDomObject();
+      if(waste){
+          //update dom not show, and put style to hidden
+         domObject.setVisible(false);
+         domObject.getStyles().put(Constants.Name.VISIBILITY, Constants.Value.HIDDEN);
+         //if component not init, mark lazy init when use, reduce view count
+         if(getHostView() == null){
+           if(!mLazy){
+              lazy(true);
+           }
+         }else{
+           getHostView().setVisibility(View.GONE);
+         }
+      }else{
+         domObject.setVisible(true);
+         domObject.getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
+         if(getHostView() == null){
+             if(mLazy) { // when parent is lazy just mark node lazy false
+               if(mParent != null && mParent.isLazy()){
+                  lazy(false);
+               }else{
+                  ComponentUtils.initLazyComponent(this, mParent);
+               }
+             }
+         }else{
+           getHostView().setVisibility(View.VISIBLE);
+         }
+      }
+    }
+  }
+
+
+  /** component key id in native,
+   *  differ with ref, ref + position
+   *  */
+  public  String getViewTreeKey(){
+     if(mViewTreeKey == null){
+        if(getParent() == null){
+          mViewTreeKey = getRef();
+        }else{
+          mViewTreeKey = getRef() + "_" + getParent().indexOf(this);
+        }
+     }
+     return mViewTreeKey;
+  }
+
+  private String mViewTreeKey;
+
+
+  /**
+   * node is lazy
+   * */
+  private boolean mLazy = false;
+
+  /***/
+  public void lazy(boolean lazy) {
+    mLazy = lazy;
   }
 }
