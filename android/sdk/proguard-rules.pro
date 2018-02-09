@@ -16,7 +16,10 @@
 #   public *;
 #}
 -keep class com.taobao.weex.bridge.** { *; }
+-keep class com.taobao.weex.layout.** { *; }
 -keep class com.taobao.weex.WXSDKEngine { *; }
--kepp class com.taobao.weex.layout.** { *; }
 -keep class com.taobao.weex.base.SystemMessageHandler { *; }
 -dontwarn com.taobao.weex.bridge.**
+-dontwarn com.taobao.weex.layout.**
+-dontwarn com.taobao.weex.WXSDKEngine
+-dontwarn com.taobao.weex.base.SystemMessageHandler

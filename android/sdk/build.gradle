@@ -107,7 +107,7 @@ android {
             testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
-
+            consumerProguardFiles 'proguard-rules.pro'
         }
 
         debug {
