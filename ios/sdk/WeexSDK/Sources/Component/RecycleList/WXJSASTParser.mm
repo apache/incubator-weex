@@ -826,10 +826,9 @@ static int binaryPrecedence(WXJSToken *token)
 - (WXJSExpression *)parseMemberExpression
 {
     WXJSExpression *expr = [self parsePrimaryExpression];
-    
     if ([self match:"."]) {
         [self expect:"."];
-        WXJSExpression *property = [self parsePrimaryExpression];
+        WXJSExpression * property = [self parseMemberExpression];
         WXJSMemberExpression *memberExpr = new WXJSMemberExpression();
         memberExpr->object = expr;
         memberExpr->property = property;

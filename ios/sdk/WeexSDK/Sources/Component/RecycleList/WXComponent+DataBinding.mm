@@ -411,9 +411,16 @@ static JSContext *jsContext;
                     return [object objectAtIndex:[propertyName unsignedIntegerValue]];
                 }
             } else {
-                NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
-                *needUpdate = objectNeedUpdate;
-                return object[propertyName];
+                WXJSExpression * memberExpression = member->property;
+                if (memberExpression->is<WXJSIdentifier>()) {
+                    NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
+                    *needUpdate = objectNeedUpdate;
+                    return object[propertyName];
+                } else {
+                    id retvalue = [self bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
+                    *needUpdate = objectNeedUpdate || propertyNeedUpdate;
+                    return retvalue;
+                }
             }
             
             return nil;
