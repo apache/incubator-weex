@@ -552,7 +552,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if (!string.length) {
         ((WXTextInputView*)textField).deleteWords = YES;
         ((WXTextInputView*)textField).editWords = [textField.text substringWithRange:range];
-        NSLog(@"delete %@", ((WXTextInputView*)textField).editWords);
     } else {
         ((WXTextInputView*)textField).deleteWords = FALSE;
         ((WXTextInputView*)textField).editWords = string;
