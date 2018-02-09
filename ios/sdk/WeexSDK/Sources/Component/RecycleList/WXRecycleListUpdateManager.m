@@ -208,11 +208,6 @@
     NSMutableSet<NSIndexPath *> *deleteIndexPaths = [NSMutableSet set];
     NSMutableSet<NSIndexPath *> *insertIndexPaths = [NSMutableSet set];
     
-    for (WXDiffUpdateIndex *update in diffResult.updates) {
-        NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForItem:update.oldIndex inSection:0];
-        [reloadIndexPaths addObject:reloadIndexPath];
-    }
-    
     [diffResult.updates enumerateObjectsUsingBlock:^(WXDiffUpdateIndex * _Nonnull update, NSUInteger idx, BOOL * _Nonnull stop) {
         NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForItem:update.oldIndex inSection:0];
         [reloadIndexPaths addObject:reloadIndexPath];

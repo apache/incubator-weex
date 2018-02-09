@@ -124,7 +124,6 @@ typedef enum : NSUInteger {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         [self _fillPadding];
         
-        
         if ([type isEqualToString:@"waterfall"] || (attributes[@"layout"] && [attributes[@"layout"] isEqualToString:@"multi-column"])) {
             // TODO: abstraction
             _layoutType = WXRecyclerLayoutTypeMultiColumn;

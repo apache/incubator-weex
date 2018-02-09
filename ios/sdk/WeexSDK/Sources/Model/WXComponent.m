@@ -199,6 +199,9 @@
 
 //    [self _removeAllEvents];
     // remove all gesture and all
+    if (_isTemplate && self.attributes[@"@templateId"]) {
+        [[WXSDKManager bridgeMgr] callComponentHook:_weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"destroy" args:nil competion:nil];
+    }
     if (_tapGesture) {
         [_tapGesture removeTarget:nil action:NULL];
     }

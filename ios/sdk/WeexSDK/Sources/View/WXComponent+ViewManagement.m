@@ -25,6 +25,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 #import "WXTracingManager.h"
+#import "WXSDKManager.h"
 
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
@@ -329,6 +330,9 @@ do {\
     }
     
     [_view removeFromSuperview];
+    if (self->_isTemplate && self.attributes[@"@templateId"]) {
+        [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"detach" args:nil competion:nil];
+    }
     _view = nil;
     [_layer removeFromSuperlayer];
     _layer = nil;

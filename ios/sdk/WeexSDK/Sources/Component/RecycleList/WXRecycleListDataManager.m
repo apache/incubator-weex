@@ -25,6 +25,17 @@
 @implementation WXRecycleListDataManager
 {
     NSArray *_data;
+    NSMapTable<NSString*, NSDictionary*>* _virtualComponentData;
+    NSMapTable<NSIndexPath*, NSString*>*  _renderStatus;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _virtualComponentData = [NSMapTable strongToStrongObjectsMapTable];
+        _renderStatus = [NSMapTable strongToStrongObjectsMapTable];
+    }
+    return self;
 }
 
 - (instancetype)initWithData:(NSArray *)data
@@ -66,6 +77,51 @@
     WXAssertMainThread();
     
     return [_data count];
+}
+
+- (void)updateVirtualComponentData:(NSString*)componentId data:(NSDictionary*)data
+{
+    if (!componentId) {
+        return;
+    }
+    NSIndexPath * indexPath = [data objectForKey:@"indexPath"];
+    [_virtualComponentData setObject:data forKey:componentId];
+    [_renderStatus setObject:componentId forKey:indexPath];
+    
+//    NSMutableDictionary* newComponentData = [[_virtualComponentData objectForKey:componentId] mutableCopy];
+//    if (newComponentData) {
+//        [newComponentData addEntriesFromDictionary:data];
+//    } else {
+//        newComponentData = [data mutableCopy];
+//    }
+}
+
+- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths
+{
+    [_virtualComponentData removeAllObjects];
+    [_renderStatus removeAllObjects];
+}
+
+- (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId
+{
+    return [_virtualComponentData objectForKey:componentId];
+}
+
+- (NSString*)virtualComponentIdWithIndexPath:(NSIndexPath*)indexPath
+{
+    return [_renderStatus objectForKey:indexPath];
+}
+
+- (NSDictionary*)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath
+{
+    NSString * componentDataId = [self virtualComponentIdWithIndexPath:indexPath];
+    
+    return [self virtualComponentDataWithId:componentDataId];
+}
+
+- (NSInteger)numberOfVirtualComponent
+{
+    return [_virtualComponentData count];
 }
 
 @end
