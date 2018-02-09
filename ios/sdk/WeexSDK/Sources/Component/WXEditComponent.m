@@ -26,6 +26,7 @@
 #import "WXAssert.h"
 #import "WXComponent_internal.h"
 #import "WXComponent+PseudoClassManagement.h"
+#import "WXTextInputComponent.h"
 
 @interface WXEditComponent()
 
@@ -549,11 +550,12 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     if (!string.length) {
-        [textField setValue:@(true) forKey:@"deleteWords"];
-        [textField setValue:[textField.text substringWithRange:range] forKey:@"editWords"];
+        ((WXTextInputView*)textField).deleteWords = YES;
+        ((WXTextInputView*)textField).editWords = [textField.text substringWithRange:range];
+        NSLog(@"delete %@", ((WXTextInputView*)textField).editWords);
     } else {
-        [textField setValue:@(false) forKey:@"deleteWords"];
-        [textField setValue:string forKey:@"editWords"];
+        ((WXTextInputView*)textField).deleteWords = FALSE;
+        ((WXTextInputView*)textField).editWords = string;
     }
     
     if (_maxLength) {
@@ -596,34 +598,31 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)textFiledEditChanged:(NSNotification *)notifi
 {
-    UITextField *textField = (UITextField *)notifi.object;
+    WXTextInputView *textField = (WXTextInputView *)notifi.object;
     if (_formaterData && _recoverRule && _recoverReplace && _formatRule && _formatReplace) {
         UITextRange * textRange = textField.selectedTextRange;
         NSInteger cursorPosition = [textField offsetFromPosition:textField.beginningOfDocument toPosition:textRange.start];
-        NSMutableString *text = [textField.text mutableCopy];
-        NSRegularExpression *recoverRule = [NSRegularExpression regularExpressionWithPattern:_recoverRule options:NSRegularExpressionCaseInsensitive error:NULL];
-        NSInteger recoverMatch = [recoverRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_recoverReplace];
-        NSRegularExpression *formatRule = [NSRegularExpression regularExpressionWithPattern:_formatRule options:NSRegularExpressionCaseInsensitive error:NULL];
-        NSInteger replaceMatch = [formatRule replaceMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:_formatReplace];
+        NSMutableString * preText = [[textField.text substringToIndex:cursorPosition] mutableCopy];
+        NSMutableString * lastText = [[textField.text substringFromIndex:cursorPosition] mutableCopy];
         
-        UITextPosition * newPosition = nil;
-        NSString * editWords = [textField valueForKey:@"editWords"];
-        if ([[textField valueForKey:@"deleteWords"] boolValue] && [editWords isEqualToString:_recoverRule]) {
-            // nothing
-        } else {
-            if (recoverMatch != replaceMatch) {
-                // care about the difference between the replace and recover, so we need to adjust the caret and value.
-                if (![text isEqualToString:textField.text]) {
-                    NSInteger offset = (editWords.length +cursorPosition);
-                    if ([[textField valueForKey:@"deleteWords"] boolValue]) {
-                        offset = offset-1;
-                    }
-                    newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:offset];
-                }
-                textField.text = text;
-            }
+        NSRegularExpression *recoverRule = [NSRegularExpression regularExpressionWithPattern:_recoverRule options:NSRegularExpressionCaseInsensitive error:NULL];
+        [recoverRule replaceMatchesInString:preText options:0 range:NSMakeRange(0, preText.length) withTemplate:_recoverReplace];
+        [recoverRule replaceMatchesInString:lastText options:0 range:NSMakeRange(0, lastText.length) withTemplate:_recoverReplace];
+        NSMutableString * newString = [NSMutableString stringWithFormat:@"%@%@", preText, lastText];
+        NSRegularExpression *formatRule = [NSRegularExpression regularExpressionWithPattern:_formatRule options:NSRegularExpressionCaseInsensitive error:NULL];
+        [formatRule replaceMatchesInString:newString options:0 range:NSMakeRange(0, newString.length) withTemplate:_formatReplace];
+        NSString * oldText = textField.text;
+        NSInteger adjust = 0;
+        
+        if (cursorPosition == textField.text.length) {
+            adjust = newString.length-oldText.length;
         }
-        if (newPosition) {
+        if (textField.deleteWords &&[textField.editWords isKindOfClass:[NSString class]] && [_recoverRule isEqualToString:textField.editWords]) {
+            // do nothing
+        } else {
+            textField.text = [newString copy];
+            UITextPosition * newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:cursorPosition+adjust];
+            
             textField.selectedTextRange = [textField textRangeFromPosition:newPosition toPosition:newPosition];
         }
 

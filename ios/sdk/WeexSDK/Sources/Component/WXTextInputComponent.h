@@ -25,7 +25,7 @@
 @property (nonatomic, assign) UIEdgeInsets border;
 @property (nonatomic, assign) UIEdgeInsets padding;
 @property (nonatomic, assign) BOOL deleteWords;
-@property (nonatomic, assign) NSString *editWords;
+@property (nonatomic, strong) NSString *editWords;
 @end
 
 @interface WXTextInputComponent : WXEditComponent
