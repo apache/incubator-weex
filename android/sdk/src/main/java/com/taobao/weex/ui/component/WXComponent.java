@@ -45,6 +45,7 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,10 +69,12 @@ import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.IFComponentHolder;
+import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
@@ -104,6 +107,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,6 +162,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
+  private Set <Pair<String, Map<String, Object>>> animations;
 
 
   @Deprecated
@@ -181,6 +186,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mParent = parent;
     mType = type;
     mGestureType = new HashSet<>();
+    animations = new LinkedHashSet<>();
     ++mComponentNum;
 
     if (instance != null)
@@ -802,6 +808,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     realHeight = measureOutput.height;
 
     setComponentLayoutParams(realWidth, realHeight, realLeft, realTop, realRight, realBottom, rawOffset);
+    parseAnimation();
   }
 
   private void setComponentLayoutParams(int realWidth, int realHeight, int realLeft, int realTop,
@@ -1619,6 +1626,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     mIsDestroyed = true;
+    animations.clear();
   }
 
   public boolean isDestoryed() {
@@ -1949,5 +1957,46 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void setTransition(WXTransition transition) {
     this.mTransition = transition;
+  }
+
+  public void addAnimationForElement(Map<String, Object> animMap) {
+    animations.add(new Pair<>(getRef(),animMap));
+  }
+
+  private void parseAnimation() {
+    if (null == animations) {
+      return;
+    }
+    for (final Pair<String, Map<String, Object>> pair : animations) {
+      if (!TextUtils.isEmpty(pair.first)) {
+        final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
+        if (animationBean != null) {
+          GraphicActionAnimation action = new GraphicActionAnimation(getInstanceId(), getRef(), animationBean);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+        }
+      }
+    }
+    animations.clear();
+  }
+
+  private WXAnimationBean createAnimationBean(String ref,Map<String, Object> style){
+    if (style != null) {
+      try {
+        Object transform = style.get(Constants.Name.TRANSFORM);
+        if (transform instanceof String && !TextUtils.isEmpty((String) transform)) {
+          String transformOrigin = (String) style.get(Constants.Name.TRANSFORM_ORIGIN);
+          WXAnimationBean animationBean = new WXAnimationBean();
+          int width = (int) getLayoutWidth();
+          int height = (int) getLayoutHeight();
+          animationBean.styles = new WXAnimationBean.Style();
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()));
+          return animationBean;
+        }
+      }catch (RuntimeException e){
+        WXLogUtils.e("", e);
+        return null;
+      }
+    }
+    return null;
   }
 }

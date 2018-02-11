@@ -69,6 +69,12 @@ public class GraphicActionAnimation extends BasicGraphicAction {
   private
   WXAnimationBean mAnimationBean;
 
+  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
+    super(pageId, ref);
+    this.callback = null;
+    this.mAnimationBean = animationBean;
+  }
+
   public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @Nullable String animation,
                                 @Nullable final String callBack) {
     super(pageId, ref);

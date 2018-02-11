@@ -59,7 +59,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
     component.updateDemission(mLayoutSize, mLayoutPosition);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
-
+    component.addAnimationForElement(mStyle);
     return component;
   }
 

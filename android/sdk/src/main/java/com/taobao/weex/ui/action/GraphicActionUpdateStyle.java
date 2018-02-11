@@ -18,7 +18,10 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.v4.util.ArrayMap;
+
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
@@ -54,6 +57,10 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
     if (null != mStyle) {
       component.addStyle(mStyle, mIsCausedByPesudo);
+      Map<String, Object> animationMap = new ArrayMap<>(2);
+      animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+      animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+      component.addAnimationForElement(animationMap);
     }
 
     if (null != paddings) {
@@ -84,6 +91,10 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
     if (null != mStyle) {
       component.addStyle(mStyle, mIsCausedByPesudo);
+      Map<String, Object> animationMap = new ArrayMap<>(2);
+      animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+      animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+      component.addAnimationForElement(animationMap);
     }
 
     if (null != paddings) {
