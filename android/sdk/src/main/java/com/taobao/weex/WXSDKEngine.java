@@ -89,10 +89,11 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXSDKEngine {
+public class WXSDKEngine implements Serializable {
 
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
 

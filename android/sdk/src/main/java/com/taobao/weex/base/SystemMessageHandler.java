@@ -22,11 +22,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
-public class SystemMessageHandler extends Handler{
+public class SystemMessageHandler extends Handler implements Serializable {
 
     private static final String TAG = "SystemMessageHandler";
 

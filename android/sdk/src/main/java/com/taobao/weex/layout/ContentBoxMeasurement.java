@@ -20,7 +20,9 @@ package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
 
-public abstract class ContentBoxMeasurement {
+import java.io.Serializable;
+
+public abstract class ContentBoxMeasurement implements Serializable {
 
   /** uiThread = false **/
   @CalledByNative

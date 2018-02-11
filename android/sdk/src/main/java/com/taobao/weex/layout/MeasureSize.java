@@ -20,7 +20,9 @@ package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
 
-public class MeasureSize {
+import java.io.Serializable;
+
+public class MeasureSize implements Serializable{
   private float width;
   private float height;
 

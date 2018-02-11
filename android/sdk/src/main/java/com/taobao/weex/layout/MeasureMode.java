@@ -20,7 +20,9 @@ package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
 
-public class MeasureMode {
+import java.io.Serializable;
+
+public class MeasureMode implements Serializable {
 
   public static int EXACTLY = 0;
 

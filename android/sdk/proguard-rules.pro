@@ -20,6 +20,3 @@
 -keep class com.taobao.weex.WXSDKEngine { *; }
 -keep class com.taobao.weex.base.SystemMessageHandler { *; }
 -dontwarn com.taobao.weex.bridge.**
--dontwarn com.taobao.weex.layout.**
--dontwarn com.taobao.weex.WXSDKEngine
--dontwarn com.taobao.weex.base.SystemMessageHandler
