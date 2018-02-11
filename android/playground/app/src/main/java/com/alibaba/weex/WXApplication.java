@@ -99,6 +99,8 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("titleBar", WXTitleBar.class);
 
       WXSDKEngine.registerModule("wsonTest", WXWsonTestModule.class);
+
+
       /**
        * override default image tag
        * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
