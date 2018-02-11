@@ -111,7 +111,7 @@ public class WXPerformance {
 
     Measure(double min, double max) {
       this.mMinRange = min;
-      this.mMinRange = max;
+      this.mMaxRange = max;
     }
 
     public double getMinRange() {
@@ -119,7 +119,7 @@ public class WXPerformance {
     }
 
     public double getMaxRange() {
-      return mMinRange;
+      return mMaxRange;
     }
   }
 
