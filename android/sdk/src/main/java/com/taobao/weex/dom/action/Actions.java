@@ -206,7 +206,7 @@ public class Actions {
   }
 
 
-  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull String animation,
+  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull JSONObject animation,
                                              @Nullable final String callBack){
     return new AnimationAction(ref, animation, callBack);
   }
