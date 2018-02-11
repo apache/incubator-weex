@@ -388,13 +388,25 @@ namespace WeexCore {
     inline const std::string GetStyle(std::string key) {
       if (mStyles == nullptr)
         return "";
-      return mStyles->find(key)->second;
+
+      std::map<std::string, std::string>::iterator iter = mStyles->find(key);
+      if (iter != mStyles->end()) {
+        return iter->second;
+      } else {
+        return "";
+      }
     }
 
     inline const std::string GetAttr(std::string key) {
       if (mAttributes == nullptr)
         return "";
-      return mAttributes->find(key)->second;
+
+      std::map<std::string, std::string>::iterator iter = mAttributes->find(key);
+      if (iter != mAttributes->end()) {
+        return iter->second;
+      } else {
+        return "";
+      }
     }
 
   private:
