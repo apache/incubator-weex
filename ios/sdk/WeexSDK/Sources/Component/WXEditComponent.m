@@ -69,6 +69,9 @@
 @property (nonatomic, strong) NSString * recoverReplace;
 @property (nonatomic, strong) NSDictionary * formaterData;
 
+// disable move rootView up as the keyboard show up.
+@property (nonatomic, assign) BOOL disableMoveViewUp;
+
 @end
 
 @implementation WXEditComponent
@@ -117,6 +120,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         
         if (attributes[@"hideDoneButton"]) {
             _hideDoneButton = [attributes[@"hideDoneButton"] boolValue];
+        }
+        if (attributes[@"disableMoveViewUp"]) {
+            _disableMoveViewUp = [WXConvert BOOL:attributes[@"disableMoveViewUp"]];
         }
         
         // handle styles
@@ -405,6 +411,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     }
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
+    }
+    
+    if (attributes[@"disableMoveViewUp"]) {
+        _disableMoveViewUp = [WXConvert BOOL:attributes[@"disableMoveViewUp"]];
     }
     if (attributes[@"value"]) {
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
@@ -849,19 +859,21 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if(![self.view isFirstResponder]) {
         return;
     }
-    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
-    _keyboardSize = end.size;
-    UIView * rootView = self.weexInstance.rootView;
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGRect keyboardRect = (CGRect){
-        .origin.x = 0,
-        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
-        .size = _keyboardSize
-    };
-    CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
-    if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
-        [self setViewMovedUp:YES];
-        self.weexInstance.isRootViewFrozen = YES;
+    if (!_disableMoveViewUp) {
+        CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
+        _keyboardSize = end.size;
+        UIView * rootView = self.weexInstance.rootView;
+        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        CGRect keyboardRect = (CGRect){
+            .origin.x = 0,
+            .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
+            .size = _keyboardSize
+        };
+        CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
+        if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
+            [self setViewMovedUp:YES];
+            self.weexInstance.isRootViewFrozen = YES;
+        }
     }
     
     if (_keyboardEvent) {
@@ -874,10 +886,12 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if (![self.view isFirstResponder]) {
         return;
     }
-    UIView * rootView = self.weexInstance.rootView;
-    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
-        [self setViewMovedUp:NO];
-        self.weexInstance.isRootViewFrozen = NO;
+    if (!_disableMoveViewUp) {
+        UIView * rootView = self.weexInstance.rootView;
+        if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
+            [self setViewMovedUp:NO];
+            self.weexInstance.isRootViewFrozen = NO;
+        }
     }
     if (_keyboardEvent) {
         [self fireEvent:@"keyboard" params:@{ @"isShow": @NO }];
