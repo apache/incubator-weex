@@ -59,6 +59,9 @@ public class WXPerformance {
   }
 
   public enum Measure {
+    /**
+     *  range : [min,max)
+     */
     JSLibSize(0D, Double.MAX_VALUE),
     JSLibInitTime(0D, 2000D),
     SDKInitTime(0D, 2000D),
@@ -74,14 +77,14 @@ public class WXPerformance {
     fsCallNativeTotalNum(0D, Double.MAX_VALUE),
     fsCallEventTotalNum(0D, Double.MAX_VALUE),
     fsRenderTime(0D, 5000D),
-    fsRequestNum(0D, 20D),
+    fsRequestNum(0D, 21D),
     callCreateFinishTime(0D, 10000D),
     cellExceedNum(0D, Double.MAX_VALUE),
     communicateTotalTime(0D, 5000D),
     maxDeepViewLayer(0D, Double.MAX_VALUE),
     maxDeepVDomLayer(0D, Double.MAX_VALUE),
     componentCount(0D, Double.MAX_VALUE),
-    avgFps(0D, 60D),
+    avgFps(0D, 61D),
     timerCount(0D, Double.MAX_VALUE),
 
     MaxImproveMemory(0D, Double.MAX_VALUE),
@@ -104,7 +107,7 @@ public class WXPerformance {
     firstScreenJSFExecuteTime(0D, 5000D),
     //..
 
-    fluency(0D, 100D);
+    fluency(0D, 101D);
 
 
     private double mMinRange, mMaxRange;
