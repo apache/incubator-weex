@@ -257,15 +257,7 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::updateCurrentFlexline(const Index childCount, WXCoreFlexLine* const flexLine, const Index i,
                                                  const WXCoreLayoutNode* const child, const bool useHypotheticalSize){
-      if (useHypotheticalSize) {
-        if (isMainAxisHorizontal(this)) {
-          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalWidth;
-        } else {
-          flexLine->mMainSize += child->mLayoutResult->mLayoutSize.hypotheticalHeight;
-        }
-      } else {
-        flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this));
-      }
+      flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), useHypotheticalSize);
       sumFlexGrow(child, flexLine, i);
       flexLine->mCrossSize =
           std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));

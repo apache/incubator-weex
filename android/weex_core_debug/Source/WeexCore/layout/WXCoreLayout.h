@@ -402,16 +402,18 @@ namespace WeexCore {
       setMeasuredDimension(actualWidth, actualHeight);
     }
 
-    float calcItemSizeAlongAxis(const WXCoreLayoutNode* const node, const bool horizontal) const {
+    float calcItemSizeAlongAxis(const WXCoreLayoutNode* const node, const bool horizontal, const bool useHypotheticalSize = false) const {
       float ret;
       if (horizontal) {
         ret = node->mCssStyle->mMargin.getMargin(kMarginLeft) +
-              node->mCssStyle->mMargin.getMargin(kMarginRight);
-        ret += node->mLayoutResult->mLayoutSize.width;
+            node->mCssStyle->mMargin.getMargin(kMarginRight);
+        ret += useHypotheticalSize ? node->mLayoutResult->mLayoutSize.hypotheticalWidth
+                                   : node->mLayoutResult->mLayoutSize.width;
       } else {
         ret = node->mCssStyle->mMargin.getMargin(kMarginTop) +
-              node->mCssStyle->mMargin.getMargin(kMarginBottom);
-        ret += node->mLayoutResult->mLayoutSize.height;
+            node->mCssStyle->mMargin.getMargin(kMarginBottom);
+        ret += useHypotheticalSize ? node->mLayoutResult->mLayoutSize.hypotheticalHeight
+                                   : node->mLayoutResult->mLayoutSize.height;
       }
       return ret;
     }
@@ -432,8 +434,6 @@ namespace WeexCore {
                                                                        float childSizeAlongMainAxis, const Index childIndex){
       bool needsReexpand = false;
       if (isMainAxisHorizontal(this)) {
-        childSizeAlongMainAxis -= child->mCssStyle->mMargin.getMargin(kMarginLeft) +
-            child->mCssStyle->mMargin.getMargin(kMarginRight);
         if (childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxWidth;
@@ -442,8 +442,6 @@ namespace WeexCore {
           childSizeAlongMainAxis = child->mCssStyle->mMinWidth;
         }
       } else {
-        childSizeAlongMainAxis -= child->mCssStyle->mMargin.getMargin(kMarginTop) +
-            child->mCssStyle->mMargin.getMargin(kMarginBottom);
         if (childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxHeight;
