@@ -83,8 +83,8 @@ namespace WeexCore {
     if (attrs == nullptr)
       return;
 
-    AttributesIterator attr_it = AttrItBegin();
-    AttributesIterator attr_end = AttrItEnd();
+    AttributesIterator attr_it = attrs->begin();
+    AttributesIterator attr_end = attrs->end();
 
     for (; attr_it != attr_end; ++attr_it) {
         UpdateAttr(attr_it->first, attr_it->second);

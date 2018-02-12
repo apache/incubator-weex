@@ -22,7 +22,7 @@ namespace WeexCore {
     IRenderFactory *factory;
     if (type == kRenderText) {
       factory = new RenderTextFactory();
-    } else if (type == kRenderCell) {
+    } else if (type == kRenderCell || type == kRenderHeader) {
       factory = new RenderCellFactory();
     } else if (type == kRenderIndicator) {
       factory = new RenderIndicatorFactory();
