@@ -128,12 +128,14 @@ namespace WeexCore {
     }
 
     void AddRenderObjectWidth(RenderObject *child) {
-        if(child->Type() == kRenderHeader) {
-            child->ApplyStyle(WIDTH, std::to_string(mAvailableWidth));
-        } else if (child->Type() == kRenderCell){
-            child->ApplyStyle(WIDTH, std::to_string(mColumnWidth));
-        } else if (child->getStypePositionType() == kSticky) {
-            child->ApplyStyle(WIDTH, std::to_string(GetRenderPage()->ViewPortWidth()));
+        if (Type() == kRenderWaterfall) {
+            if(child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
+                child->ApplyStyle(WIDTH, std::to_string(mAvailableWidth));
+            } else if (child->Type() == kRenderCell){
+                child->ApplyStyle(WIDTH, std::to_string(mColumnWidth));
+            } else if (child->getStypePositionType() == kSticky) {
+                child->ApplyStyle(WIDTH, std::to_string(GetRenderPage()->ViewPortWidth()));
+            }
         }
     }
 

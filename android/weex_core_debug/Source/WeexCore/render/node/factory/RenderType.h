@@ -15,6 +15,7 @@ namespace WeexCore {
   const std::string kRenderText = "text";
   const std::string kRenderTextArea = "textarea";
   const std::string kRenderHeader = "header";
+  const std::string kRenderFooter = "footer";
   const std::string kRenderWaterfall = "waterfall";
   const std::string kRenderAppBar = "appbar";
 }
