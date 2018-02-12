@@ -275,9 +275,9 @@ namespace WeexCore {
           mChildrenFrozen = nullptr;
         }
         mChildrenFrozen = new bool[getChildCount(kNonBFC)];
-      }
-      for(int i=0;i<getChildCount(kNonBFC);i++){
-        mChildrenFrozen[i] = false;
+        for(int i=0;i<getChildCount(kNonBFC);i++){
+          mChildrenFrozen[i] = false;
+        }
       }
       widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
       heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
@@ -374,6 +374,7 @@ namespace WeexCore {
     void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i) const {
       if (child->mCssStyle->mFlexGrow > 0) {
         flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
+        mChildrenFrozen[i] = false;
         if (isMainAxisHorizontal(this)) {
           if (!isnan(child->mLayoutResult->mLayoutSize.hypotheticalWidth)) {
             flexLine->mTotalFlexibleSize += child->mLayoutResult->mLayoutSize.hypotheticalWidth;

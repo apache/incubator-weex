@@ -12,6 +12,9 @@ namespace WeexCore {
     initFormatingContext(BFCs);
     auto bfcDimension = calculateBFCDimension(renderPageSize);
     if (std::get<0>(bfcDimension) || isDirty()) {
+      for(int i=0;i<getChildCount(kNonBFC);i++){
+        mChildrenFrozen[i] = false;
+      }
       measure(std::get<1>(bfcDimension), std::get<2>(bfcDimension), true);
     }
     layout(mCssStyle->mMargin.getMargin(kMarginLeft),
