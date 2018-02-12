@@ -93,6 +93,8 @@ namespace WeexCore {
 
     const char *GetString();
 
+    const char *Stringify();
+
     bool GetBool();
 
     void GetNull();

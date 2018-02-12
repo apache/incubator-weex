@@ -172,7 +172,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] handleCallAddElement >>>> pageId: %s, parentRef: %s, domStr: %s, index: %d",
+  LOGD("[ExtendJSApi] functionCallAddElement >>>> pageId: %s, parentRef: %s, domStr: %s, index: %d",
        pageId, parentRef, domStr, index);
 #endif
 
@@ -294,9 +294,15 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
+  std::string pageId = jString2Str(env, jInstanceId);
   std::string task = jByteArray2Str(env, jTaskString);
+
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId.c_str(), task.c_str());
+#endif
+
   if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
-    RenderManager::GetInstance()->CreateFinish(jString2Str(env, jInstanceId)) ? 0 : -1;
+    RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
     env->DeleteLocalRef(jInstanceId);
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);

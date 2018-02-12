@@ -200,11 +200,15 @@ namespace WeexCore {
 
     const char *temp = v_.GetString();
     int len = v_.GetStringLength();
-    char *result = new char[len+1];
+    char *result = new char[len + 1];
     strcpy(result, temp);
     result[len] = '\0';
     ParseNext();
     return result;
+  }
+
+  const char *JsonParser::Stringify() {
+    return ss_.src_;
   }
 
   void JsonParser::SkipOut(int depth) {
@@ -262,7 +266,7 @@ namespace WeexCore {
 
     RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
     r.EnterObject();
-    
+
     RenderObject *render;
     std::string ref;
 
@@ -273,7 +277,7 @@ namespace WeexCore {
         const char *temp_ref = r.GetString();
         ref = temp_ref;
         if (temp_ref != nullptr) {
-          delete []temp_ref;
+          delete[]temp_ref;
           temp_ref = nullptr;
         }
       } else if (0 == strcmp(key, "type")) {
@@ -284,7 +288,7 @@ namespace WeexCore {
         if (parent != nullptr)
           parent->AddRenderObject(index, render);
         if (temp_type != nullptr) {
-          delete []temp_type;
+          delete[]temp_type;
           temp_type = nullptr;
         }
       } else if (0 == strcmp(key, "attr") || 0 == strcmp(key, "style")) {
@@ -292,6 +296,7 @@ namespace WeexCore {
         r.EnterObject();
         while (const char *key2 = r.NextObjectKey()) {
           if (r.PeekType() == kNumberType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kNumberType);
             char *temp = new char[65];
             if (0 == strcmp(key, "attr")) {
               int len = fpconv_dtoa(r.GetDouble(), temp);
@@ -307,10 +312,11 @@ namespace WeexCore {
               render->AddStyle(key2, value);
             }
             if (temp != nullptr) {
-              delete []temp;
+              delete[]temp;
               temp = nullptr;
             }
           } else if (r.PeekType() == kStringType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kStringType);
             const char *temp_str = r.GetString();
             if (0 == strcmp(key, "attr")) {
               render->AddAttr(key2, temp_str);
@@ -318,8 +324,34 @@ namespace WeexCore {
               render->AddStyle(key2, temp_str);
             }
             if (temp_str != nullptr) {
-              delete []temp_str;
+              delete[]temp_str;
               temp_str = nullptr;
+            }
+          } else if (r.PeekType() == kArrayType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
+            std::string temp = "[";
+            temp.append(r.Stringify());
+            int index = temp.find(']');
+            std::string value = temp.substr(0, index + 1);
+            if (0 == strcmp(key, "attr")) {
+              render->AddAttr(key2, value);
+            } else if (0 == strcmp(key, "style")) {
+              render->AddStyle(key2, value);
+            }
+            r.SkipValue();
+          } else if (r.PeekType() == kTrueType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
+            if (0 == strcmp(key, "attr")) {
+              render->AddAttr(key2, "true");
+            } else if (0 == strcmp(key, "style")) {
+              render->AddStyle(key2, "true");
+            }
+          } else if (r.PeekType() == kFalseType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kFalseType);
+            if (0 == strcmp(key, "attr")) {
+              render->AddAttr(key2, "false");
+            } else if (0 == strcmp(key, "style")) {
+              render->AddStyle(key2, "false");
             }
           } else {
             r.SkipValue();
@@ -333,7 +365,7 @@ namespace WeexCore {
           const char *temp_event = r.GetString();
           render->AddEvent(temp_event);
           if (temp_event != nullptr) {
-            delete []temp_event;
+            delete[]temp_event;
             temp_event = nullptr;
           }
         }
@@ -368,6 +400,7 @@ namespace WeexCore {
  * @return {@link RenderObject*}
  */
   RenderObject *Json2RenderObject(char *data, std::string pageId) {
+
     JsonParser r(data);
     return ParseJsonObject(r, nullptr, 0, pageId);
   }
@@ -381,6 +414,7 @@ namespace WeexCore {
     while (const char *key = r.NextObjectKey()) {
       std::pair<std::string, std::string> *myPair = nullptr;
       if (r.PeekType() == kNumberType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kNumberType);
         char *temp = new char[65];
         int len = fpconv_dtoa(r.GetDouble(), temp);
         temp[len] = '\0';
@@ -389,10 +423,11 @@ namespace WeexCore {
         myPair = new std::pair<std::string, std::string>(key, value);
         pairs->insert(pairs->end(), myPair);
         if (temp != nullptr) {
-          delete []temp;
+          delete[]temp;
           temp = nullptr;
         }
       } else if (r.PeekType() == kStringType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kStringType);
         const char *value = r.GetString();
         myPair = new std::pair<std::string, std::string>(key, value);
         pairs->insert(pairs->end(), myPair);
@@ -400,10 +435,21 @@ namespace WeexCore {
           delete value;
           value = nullptr;
         }
+      } else if (r.PeekType() == kArrayType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
+        std::string temp = "[";
+        temp.append(r.Stringify());
+        int index = temp.find(']');
+        std::string value = temp.substr(0, index + 1);
+        myPair = new std::pair<std::string, std::string>(key, value);
+        pairs->insert(pairs->end(), myPair);
+        r.SkipValue();
       } else if (r.PeekType() == kTrueType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
         myPair = new std::pair<std::string, std::string>(key, "true");
         pairs->insert(pairs->end(), myPair);
       } else if (r.PeekType() == kFalseType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kFalseType);
         myPair = new std::pair<std::string, std::string>(key, "false");
         pairs->insert(pairs->end(), myPair);
       } else {
