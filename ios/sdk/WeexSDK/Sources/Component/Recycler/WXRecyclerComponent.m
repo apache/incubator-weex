@@ -132,6 +132,12 @@ typedef enum : NSUInteger {
             WXMultiColumnLayout *layout = (WXMultiColumnLayout *)_collectionViewlayout;
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeAuto];
             layout.columnCount = [WXConvert WXLength:attributes[@"columnCount"] isFloat:NO scaleFactor:1.0] ? : [WXLength lengthWithInt:1 type:WXLengthTypeFixed];
+            if (attributes[@"leftGap"]) {
+                layout.leftGap = [WXConvert WXPixelType:attributes[@"leftGap"] scaleFactor:scaleFactor];
+            }
+            if (attributes[@"rightGap"]) {
+                layout.rightGap = [WXConvert WXPixelType:attributes[@"rightGap"] scaleFactor:scaleFactor];
+            }
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
             
             layout.delegate = self;
@@ -235,6 +241,12 @@ typedef enum : NSUInteger {
         if (attributes[@"columnGap"]) {
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor])];
             needUpdateLayout = YES;
+        }
+        if (attributes[@"leftGap"]) {
+            layout.leftGap = [WXConvert WXPixelType:attributes[@"leftGap"] scaleFactor:scaleFactor];
+        }
+        if (attributes[@"rightGap"]) {
+            layout.rightGap = [WXConvert WXPixelType:attributes[@"rightGap"] scaleFactor:scaleFactor];
         }
         
         if (needUpdateLayout) {

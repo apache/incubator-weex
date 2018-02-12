@@ -120,6 +120,22 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     }
 }
 
+- (void)setLeftGap:(float)leftGap
+{
+    if (_rightGap != leftGap) {
+        _rightGap = leftGap;
+        [self _cleanComputed];
+    }
+}
+
+- (void)setRightGap:(float)rightGap
+{
+    if (_rightGap != rightGap) {
+        _rightGap = rightGap;
+        [self _cleanComputed];
+    }
+}
+
 - (CGFloat)computedColumnWidth
 {
     if (!_computedColumnWidth && !_computedColumnCount) {
@@ -189,7 +205,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
                 CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
                 UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
                 NSUInteger column = [self _minHeightColumnForAllColumns];
-                CGFloat x = insets.left + (columnWidth + columnGap) * column;
+                CGFloat x = insets.left + (columnWidth + columnGap) * column+_leftGap;
                 if (column >= [self.columnsMaxHeights count]) {
                     return;
                 }
@@ -347,7 +363,8 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     
     int columnCount;
     float columnWidth ;
-    float availableWidth = self.contentWidth - (insets.left + insets.right);
+    float availableWidth = self.contentWidth - (insets.left + insets.right+_leftGap + _rightGap);
+    
     computeColumnWidthAndCount(availableWidth, self.columnCount, self.columnWidth, self.columnGap, &columnCount, &columnWidth);
     if (availableWidth <= 0) {
         return;

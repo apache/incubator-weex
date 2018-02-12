@@ -45,6 +45,8 @@ extern NSString * const kCollectionSupplementaryViewKindHeader;
 @property (nonatomic, strong) WXLength *columnCount;
 
 @property (nonatomic, strong) WXLength *columnWidth;
+@property (nonatomic, assign) float leftGap;
+@property (nonatomic, assign) float rightGap;
 
 @property (nonatomic, assign) float columnGap;
 
