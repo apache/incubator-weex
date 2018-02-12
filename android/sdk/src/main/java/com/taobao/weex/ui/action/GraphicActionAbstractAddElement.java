@@ -39,8 +39,6 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   protected HashMap<String, String> mPaddings;
   protected HashMap<String, String> mMargins;
   protected HashMap<String, String> mBorders;
-  private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
-  private GraphicSize mLayoutSize = new GraphicSize(0, 0);
 
   public GraphicActionAbstractAddElement(String pageId, String ref) {
     super(pageId, ref);
@@ -57,7 +55,6 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     }
 
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
-    component.updateDemission(mLayoutSize, mLayoutPosition);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
     component.addAnimationForElement(mStyle);
     return component;
