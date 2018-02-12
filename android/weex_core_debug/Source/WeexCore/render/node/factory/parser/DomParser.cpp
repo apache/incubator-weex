@@ -339,20 +339,6 @@ namespace WeexCore {
               render->AddStyle(key2, value);
             }
             r.SkipValue();
-          } else if (r.PeekType() == kTrueType) {
-            RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
-            if (0 == strcmp(key, "attr")) {
-              render->AddAttr(key2, "true");
-            } else if (0 == strcmp(key, "style")) {
-              render->AddStyle(key2, "true");
-            }
-          } else if (r.PeekType() == kFalseType) {
-            RAPIDJSON_ASSERT(r.PeekType() == kFalseType);
-            if (0 == strcmp(key, "attr")) {
-              render->AddAttr(key2, "false");
-            } else if (0 == strcmp(key, "style")) {
-              render->AddStyle(key2, "false");
-            }
           } else {
             r.SkipValue();
           }
