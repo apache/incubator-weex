@@ -349,7 +349,9 @@
 - (void)parseTranslate:(NSArray *)value
 {
     [self parseTranslatex:@[value[0]]];
-    [self parseTranslatey:@[value[1]]];
+    if (value.count > 1) {
+        [self parseTranslatey:@[value[1]]];
+    }
 }
 
 - (void)parseTranslatex:(NSArray *)value
