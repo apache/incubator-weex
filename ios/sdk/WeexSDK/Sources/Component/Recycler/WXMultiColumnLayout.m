@@ -122,8 +122,8 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (void)setLeftGap:(float)leftGap
 {
-    if (_rightGap != leftGap) {
-        _rightGap = leftGap;
+    if (_leftGap != leftGap) {
+        _leftGap = leftGap;
         [self _cleanComputed];
     }
 }
