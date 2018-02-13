@@ -20,15 +20,18 @@ namespace WeexCore {
       defaultOverflowWidth = Str2Float(
           WXCoreEnvironment::getInstance()->GetOption("defaultOverflowWidth"));
 
-//      std::string appbar_color = WXCoreEnvironment::getInstance()->GetOption("appbar_color");
-//      std::string appbar_background_color = WXCoreEnvironment::getInstance()->GetOption(
-//          "appbar_background_color");
+      std::string appbar_color = WXCoreEnvironment::getInstance()->GetOption("appbar_color");
+      std::string appbar_background_color = WXCoreEnvironment::getInstance()->GetOption(
+          "appbar_background_color");
 
       std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
       style->insert(std::pair<std::string, std::string>(PADDING_LEFT, "0"));
       style->insert(std::pair<std::string, std::string>(PADDING_RIGHT, "0"));
-//      style->insert(std::pair<std::string, std::string>(COLOR, appbar_color));
-//      style->insert(std::pair<std::string, std::string>(BACKGROUND_COLOR, appbar_background_color));
+
+      if (!appbar_color.empty() && appbar_color != "")
+        style->insert(std::pair<std::string, std::string>(COLOR, appbar_color));
+      if (!appbar_background_color.empty() && appbar_background_color != "")
+        style->insert(std::pair<std::string, std::string>(BACKGROUND_COLOR, appbar_background_color));
       return style;
     }
 

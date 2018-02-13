@@ -48,13 +48,8 @@ public abstract class WXBasicComponent<T extends View> {
 
   public WXBasicComponent(BasicComponentData basicComponentData) {
     this.mBasicComponentData = basicComponentData;
-    this.mBasicComponentData.addStyle(getDefaultAttrs());
     this.mRef = basicComponentData.mRef;
     this.mComponentType = basicComponentData.mComponentType;
-  }
-
-  protected Map<String, String> getDefaultAttrs() {
-    return null;
   }
 
   protected void copyData(WXComponent component) {

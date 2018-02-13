@@ -55,6 +55,9 @@ namespace WeexCore {
   const std::string COLUMN_WIDTH= "columnWidth";
   const std::string COLUMN_COUNT= "columnCount";
   const std::string COLUMN_GAP= "columnGap";
+
+  const std::string COLOR = "color";
+  const std::string BACKGROUND_COLOR = "backgroundColor";
 }
 
 #endif //WEEXV8_CONSTANTSNAME_H
