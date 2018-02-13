@@ -114,6 +114,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   protected int mColumnCount = 1;
   protected float mColumnGap = 0;
   protected float mColumnWidth = 0;
+  protected float mLeftGap = 0;
+  protected float mRightGap = 0;
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
