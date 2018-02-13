@@ -269,6 +269,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (attributes[@"offsetAccuracy"]) {
         _offsetAccuracy = [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
+    
+    if (attributes[@"scrollDirection"]) {
+        _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
+    }
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -443,8 +447,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (BOOL)isNeedLoadMore
 {
-    if (_loadMoreOffset >= 0.0 && ((UIScrollView *)self.view).contentOffset.y >= 0) {
-        return _previousLoadMoreContentHeight != ((UIScrollView *)self.view).contentSize.height && ((UIScrollView *)self.view).contentSize.height - ((UIScrollView *)self.view).contentOffset.y -  self.view.frame.size.height <= _loadMoreOffset;
+    if (WXScrollDirectionVertical == _scrollDirection) {
+        if (_loadMoreOffset >= 0.0 && ((UIScrollView *)self.view).contentOffset.y >= 0) {
+            return _previousLoadMoreContentHeight != ((UIScrollView *)self.view).contentSize.height && ((UIScrollView *)self.view).contentSize.height - ((UIScrollView *)self.view).contentOffset.y -  self.view.frame.size.height <= _loadMoreOffset;
+        }
+    } else if (WXScrollDirectionHorizontal == _scrollDirection) {
+        if (_loadMoreOffset >= 0.0 && ((UIScrollView *)self.view).contentOffset.x >= 0) {
+            return _previousLoadMoreContentHeight != ((UIScrollView *)self.view).contentSize.width && ((UIScrollView *)self.view).contentSize.width - ((UIScrollView *)self.view).contentOffset.x -  self.view.frame.size.width <= _loadMoreOffset;
+        }
     }
     
     return NO;
@@ -453,7 +463,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)loadMore
 {
     [self fireEvent:@"loadmore" params:nil];
-    _previousLoadMoreContentHeight = ((UIScrollView *)self.view).contentSize.height;
+    
+    if (WXScrollDirectionVertical == _scrollDirection) {
+        _previousLoadMoreContentHeight = ((UIScrollView *)self.view).contentSize.height;
+    } else if (WXScrollDirectionHorizontal == _scrollDirection) {
+        _previousLoadMoreContentHeight = ((UIScrollView *)self.view).contentSize.width;
+    }
 }
 
 - (CGPoint)contentOffset
@@ -547,11 +562,16 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _direction = @"right";
     } else if (_lastContentOffset.x < scrollView.contentOffset.x) {
         _direction = @"left";
+        if (WXScrollDirectionHorizontal == _scrollDirection) {
+            [self handleLoadMore];
+        }
     } else if(_lastContentOffset.y > scrollView.contentOffset.y) {
         _direction = @"down";
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
-        [self handleLoadMore];
+        if (WXScrollDirectionVertical == _scrollDirection) {
+            [self handleLoadMore];
+        }
     }
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
