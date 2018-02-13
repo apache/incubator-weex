@@ -14,6 +14,12 @@
 
 namespace WeexCore {
 
+static float Str2Float(const std::string &str) {
+  if (str.empty() || str == "")
+    return 0.0f;
+  return std::stof(str);
+}
+
 static std::string jString2Str(JNIEnv *env, jstring jstr) {
   char *rtn = NULL;
   jclass clsstring = env->FindClass("java/lang/String");
