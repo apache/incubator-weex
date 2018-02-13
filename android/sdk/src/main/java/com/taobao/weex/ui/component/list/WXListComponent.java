@@ -87,7 +87,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
           bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }
-    if(mRecyclerDom.getSpanOffsets() != null){
+    if(mRecyclerDom != null && mRecyclerDom.getSpanOffsets() != null){
        bounceRecyclerView.getInnerView().addItemDecoration(new GapItemDecoration(this));
     }
     return  bounceRecyclerView;
