@@ -133,17 +133,17 @@ namespace WeexCore {
     }
     else {
       if (widthDirty || heightDirty) {
-        measureLeafNode(width, height, hypotheticalMeasurment);
+        measureLeafNode(width, height, hypotheticalMeasurment, false);
       }
     }
     clearDirty();
   }
 
-  void WXCoreLayoutNode::hypotheticalMeasure(const float width, const float height){
+  void WXCoreLayoutNode::hypotheticalMeasure(const float width, const float height, const bool stretch){
     if (getChildCount(kNonBFC) > 0) {
       measureInternalNode(width, height, true, true);
     } else {
-      measureLeafNode(width, height, true);
+      measureLeafNode(width, height, true, stretch);
     }
 
     widthDirty = false;
@@ -152,25 +152,25 @@ namespace WeexCore {
     mLayoutResult->mLayoutSize.hypotheticalHeight = mLayoutResult->mLayoutSize.height;
   }
 
-    void WXCoreLayoutNode::measureLeafNode(float width, float height, const bool hypothetical) {
-      if ((measureFunc != nullptr) &&
-          (widthMeasureMode == kUnspecified
-           || heightMeasureMode == kUnspecified)) {
-        WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height, heightMeasureMode);
-        if(widthMeasureMode == kUnspecified && isnan(width)){
-          width = dimension.width + sumPaddingBorderAlongAxis(this, true);
-        }
-        if(heightMeasureMode == kUnspecified && isnan(height)){
-          height = dimension.height + sumPaddingBorderAlongAxis(this, false);
-        }
-      } else {
-        width = widthMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, true)
-                                                            : width;
-        height = heightMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, false)
-                                                              : height;
+  void WXCoreLayoutNode::measureLeafNode(float width, float height, const bool hypothetical, const bool stretch) {
+    if ((measureFunc != nullptr) &&
+        (widthMeasureMode == kUnspecified
+            || heightMeasureMode == kUnspecified)) {
+      WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height, heightMeasureMode);
+      if (widthMeasureMode == kUnspecified && (isnan(width) || !stretch)) {
+        width = dimension.width + sumPaddingBorderAlongAxis(this, true);
       }
-      setMeasuredDimension(width, height);
+      if (heightMeasureMode == kUnspecified && (isnan(height) || !stretch)) {
+        height = dimension.height + sumPaddingBorderAlongAxis(this, false);
+      }
+    } else {
+      width = widthMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, true)
+                                               : width;
+      height = heightMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, false)
+                                                 : height;
     }
+    setMeasuredDimension(width, height);
+  }
 
 
   /**
@@ -272,26 +272,37 @@ namespace WeexCore {
     void WXCoreLayoutNode::measureChild(WXCoreLayoutNode* const child, const float parentWidth, const float parentHeight,
                                      const bool needMeasure, const bool hypotheticalMeasurment) {
       if (needMeasure && child->isDirty()) {
+        bool stretch = false;
         if (hypotheticalMeasurment) {
           float childWidth = child->mCssStyle->mStyleWidth;
           float childHeight = child->mCssStyle->mStyleHeight;
-          if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
-              && mCssStyle->mAlignItems == kAlignItemsStretch) {
+          if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
+            if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
+              childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
+                  child->mCssStyle->mMargin.getMargin(kMarginLeft) -
+                  child->mCssStyle->mMargin.getMargin(kMarginRight);
+            }
+            stretch = isSingleFlexLine(parentHeight) && (mCssStyle->mAlignItems == kAlignItemsStretch);
+          }
+          else if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
+              && (mCssStyle->mAlignItems == kAlignItemsStretch)) {
             if (isMainAxisHorizontal(this)) {
-              if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)) {
+              if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)
+                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto) {
                 childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
                     child->mCssStyle->mMargin.getMargin(kMarginTop) -
                     child->mCssStyle->mMargin.getMargin(kMarginBottom);
               }
             } else {
-              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
+              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)
+                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto) {
                 childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
                     child->mCssStyle->mMargin.getMargin(kMarginLeft) -
                     child->mCssStyle->mMargin.getMargin(kMarginRight);
               }
             }
           }
-          child->hypotheticalMeasure(childWidth, childHeight);
+          child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
           child->measure(child->mLayoutResult->mLayoutSize.width,
                          child->mLayoutResult->mLayoutSize.height, hypotheticalMeasurment);

@@ -465,9 +465,9 @@ namespace WeexCore {
     void
     measure(float, float, bool);
 
-    void hypotheticalMeasure(float, float);
+    void hypotheticalMeasure(float, float, bool = false);
 
-    void measureLeafNode(float, float, bool);
+    void measureLeafNode(float, float, bool, bool);
 
     void measureInternalNode(float, float, bool, bool);
 

@@ -191,6 +191,10 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
           if (Float.isNaN(width) ) {
             measureWidth = layout.getWidth();
           }
+          else {
+            measureWidth = Math.min(layout.getWidth(), measureWidth);
+          }
+
           if (Float.isNaN(height)) {
             measureHeight = layout.getHeight();
           }
