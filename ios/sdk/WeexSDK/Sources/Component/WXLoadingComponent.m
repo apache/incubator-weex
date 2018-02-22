@@ -83,6 +83,14 @@
     }
 }
 
+- (void)layoutDidFinish{
+    [super layoutDidFinish];
+    //subcomponent displaystate
+    for (WXComponent *component in self.subcomponents) {
+        component.view.hidden = YES;
+    }
+}
+
 - (void)addEvent:(NSString *)eventName
 {
     if ([eventName isEqualToString:@"loading"]) {
@@ -120,6 +128,11 @@
         [_indicator stop];
     }
     [scrollerProtocol setContentOffset:contentOffset animated:YES];
+    
+    //subcomponent displaystate
+    for (WXComponent *component in self.subcomponents) {
+        component.view.hidden = !_displayState;
+    }
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
