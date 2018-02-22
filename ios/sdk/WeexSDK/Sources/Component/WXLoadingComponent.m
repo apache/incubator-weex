@@ -121,7 +121,12 @@
     WXComponent *scroller = (WXComponent*)scrollerProtocol;
     CGPoint contentOffset = [scrollerProtocol contentOffset];
     if (_displayState) {
-        contentOffset.y = [scrollerProtocol contentSize].height - scroller.calculatedFrame.size.height + self.calculatedFrame.size.height;
+        CGFloat contentHeight = [scrollerProtocol contentSize].height;
+        CGFloat scrollerHeight = scroller.calculatedFrame.size.height;
+        if (contentHeight < scrollerHeight) {
+            contentHeight = scrollerHeight;
+        }
+        contentOffset.y = contentHeight - scrollerHeight + self.calculatedFrame.size.height;
         [_indicator start];
     } else {
         contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
