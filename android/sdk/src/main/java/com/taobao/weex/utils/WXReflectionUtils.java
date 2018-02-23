@@ -35,8 +35,10 @@ public class WXReflectionUtils {
         if(value.getClass() == paramClazz){
           return  value;
         }
-        if(value.getClass().isAssignableFrom(value.getClass())){
-          return value;
+        if(paramClazz instanceof  Class){
+          if( ((Class<?>) paramClazz).isAssignableFrom(value.getClass()))   {
+            return value;
+          }
         }
     }
     if (paramClazz == String.class) {
