@@ -83,6 +83,14 @@
     }
 }
 
+- (void)layoutDidFinish{
+    [super layoutDidFinish];
+    //subcomponent displaystate
+    for (WXComponent *component in self.subcomponents) {
+        component.view.hidden = YES;
+    }
+}
+
 - (void)addEvent:(NSString *)eventName
 {
     if ([eventName isEqualToString:@"loading"]) {
@@ -113,13 +121,23 @@
     WXComponent *scroller = (WXComponent*)scrollerProtocol;
     CGPoint contentOffset = [scrollerProtocol contentOffset];
     if (_displayState) {
-        contentOffset.y = [scrollerProtocol contentSize].height - scroller.calculatedFrame.size.height + self.calculatedFrame.size.height;
+        CGFloat contentHeight = [scrollerProtocol contentSize].height;
+        CGFloat scrollerHeight = scroller.calculatedFrame.size.height;
+        if (contentHeight < scrollerHeight) {
+            contentHeight = scrollerHeight;
+        }
+        contentOffset.y = contentHeight - scrollerHeight + self.calculatedFrame.size.height;
         [_indicator start];
     } else {
         contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
         [_indicator stop];
     }
     [scrollerProtocol setContentOffset:contentOffset animated:YES];
+    
+    //subcomponent displaystate
+    for (WXComponent *component in self.subcomponents) {
+        component.view.hidden = !_displayState;
+    }
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
