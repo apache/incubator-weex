@@ -360,7 +360,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     [_collectionView scrollToItemAtIndexPath:toIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
 }
 
-#pragma mark - WXComonent Internal Methods
+#pragma mark - WXComponent Internal Methods
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
