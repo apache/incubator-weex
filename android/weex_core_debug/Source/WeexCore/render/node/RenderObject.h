@@ -310,7 +310,7 @@ namespace WeexCore {
       AddAttr(key, value);
     }
 
-    inline StyleType AddStyle(std::string key, std::string value) {
+    virtual StyleType AddStyle(std::string key, std::string value) {
       return ApplyStyle(key, value);
     }
 
