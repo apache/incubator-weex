@@ -91,12 +91,8 @@ public class WXLocaleModule extends WXModule {
     } else {
       StringBuilder sb = new StringBuilder();
       String language = locale.getLanguage();
-      String script = locale.getScript();
       String region = locale.getCountry();
       sb.append(language);
-      if (!TextUtils.isEmpty(script)) {
-        sb.append("-").append(script);
-      }
       if (!TextUtils.isEmpty(region)) {
         sb.append("-").append(region);
       }
