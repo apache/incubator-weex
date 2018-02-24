@@ -18,11 +18,15 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.PopupMenu;
 import android.text.Layout;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -31,6 +35,7 @@ import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 /**
  * TextView wrapper
@@ -117,5 +122,43 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   @Override
   public WXText getComponent() {
      return null != mWeakReference ? mWeakReference.get() : null;
+  }
+
+  public void enableCopy(boolean enable) {
+    if (enable) {
+      setOnLongClickListener(new OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+          PopupMenu popupMenu = new PopupMenu(getContext(), WXTextView.this);
+          boolean isCN = false;
+          try {
+            isCN = Locale.getDefault().toString().startsWith("zh_CN");
+          } catch (Throwable t) {
+            //ignore
+          }
+          final String title = isCN ? "复制" : "Copy";
+          popupMenu.getMenu().add(title);
+          popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+              if (title.equals(item.getTitle())) {
+                String data = getText().toString();
+                ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboardManager != null) {
+                  ClipData clipData = ClipData.newPlainText(data, data);
+                  clipboardManager.setPrimaryClip(clipData);
+                }
+                return true;
+              }
+              return false;
+            }
+          });
+          popupMenu.show();
+          return true;
+        }
+      });
+    } else {
+      setOnLongClickListener(null);
+    }
   }
 }
