@@ -21,6 +21,7 @@ package com.taobao.weex.ui.animation;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
@@ -31,13 +32,14 @@ import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.component.WXComponent;
 
+
 import static com.taobao.weex.dom.action.Actions.getAnimationAction;
 
 public class WXAnimationModule extends WXModule {
 
   @JSMethod
-  public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
-    if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
+  public void transition(@Nullable String ref, @Nullable JSONObject animation, @Nullable String callBack) {
+    if (!TextUtils.isEmpty(ref) && animation != null && mWXSDKInstance != null) {
       DOMAction animationActions = getAnimationAction(ref, animation, callBack);
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
