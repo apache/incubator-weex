@@ -13,7 +13,7 @@ namespace WeexCore {
       GetRenderPage()->CalculateLayout();
     }
 
-    inline StyleType AddStyle(std::string key, std::string value) {
+    inline StyleType UpdateStyle(std::string key, std::string value) {
       StyleType resultType = RenderObject::ApplyStyle(key, value);
       markDirty();
       return resultType;

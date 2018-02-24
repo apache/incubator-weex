@@ -232,7 +232,7 @@ namespace WeexCore {
     } else {
       for (int i = 0; i < styles->size(); ++i) {
         if ((*styles)[i] != nullptr) {
-          switch (render->AddStyle((*styles)[i]->first, (*styles)[i]->second)) {
+          switch (render->UpdateStyle((*styles)[i]->first, (*styles)[i]->second)) {
             case kTypeStyle:
               if (style == nullptr)
                 style = new std::vector<std::pair<std::string, std::string> *>();
