@@ -157,11 +157,21 @@ namespace WeexCore {
         (widthMeasureMode == kUnspecified
             || heightMeasureMode == kUnspecified)) {
       WXCoreSize dimension = measureFunc(this, width, widthMeasureMode, height, heightMeasureMode);
-      if (widthMeasureMode == kUnspecified && (isnan(width) || !stretch)) {
-        width = dimension.width + sumPaddingBorderAlongAxis(this, true);
+      if (widthMeasureMode == kUnspecified) {
+        float actualWidth = dimension.width + sumPaddingBorderAlongAxis(this, true);
+        if (isnan(width)) {
+          width = actualWidth;
+        } else if (!stretch) {
+          width = std::min(width, actualWidth);
+        }
       }
-      if (heightMeasureMode == kUnspecified && (isnan(height) || !stretch)) {
-        height = dimension.height + sumPaddingBorderAlongAxis(this, false);
+      if (heightMeasureMode == kUnspecified) {
+        float actualHeight = dimension.height + sumPaddingBorderAlongAxis(this, false);
+        if (isnan(height)) {
+          height = actualHeight;
+        } else if (!stretch) {
+          height = std::min(height, actualHeight);
+        }
       }
     } else {
       width = widthMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, true)
