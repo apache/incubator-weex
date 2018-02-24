@@ -771,7 +771,7 @@ namespace WeexCore {
                                    const bool fromBottomToTop,
                                    const float left, const float top,
                                    const float right, const float bottom) {
-    float childLeft = getPaddingLeft();
+    float childLeft = getPaddingLeft()+getBorderWidthLeft();
     Index currentViewIndex = 0;
 
     float width = right - left;
