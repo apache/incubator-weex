@@ -24,7 +24,9 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXNativeExceptionAdapter;
 import com.taobao.weex.common.WXJSExceptionInfo;
+import com.taobao.weex.common.WXNativeExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import java.util.Map;
 
@@ -52,9 +54,9 @@ public class WXExceptionUtils {
 											   @Nullable final String function,
 											   @Nullable final String exception,
 											   @Nullable final Map<String,String> extParams ) {
-	IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+	IWXNativeExceptionAdapter adapter = WXSDKManager.getInstance().getIWXNativeExceptionAdapter();
 	WXSDKInstance instance;
-	WXJSExceptionInfo exceptionCommit;
+	WXNativeExceptionInfo exceptionCommit;
 	String bundleUrlCommit = "BundleUrlDefault";
 	String instanceIdCommit = "InstanceIdDefalut";
 	String exceptionMsgCommit = exception;
@@ -85,8 +87,9 @@ public class WXExceptionUtils {
 	}
 
 	if (adapter != null) {
-	  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
-	  adapter.onJSException(exceptionCommit);
+	  exceptionCommit = new WXNativeExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function,
+						      exceptionMsgCommit, commitMap);
+	  adapter.onNativeException(exceptionCommit);
 	  WXLogUtils.e(exceptionCommit.toString());
 	}
   }
