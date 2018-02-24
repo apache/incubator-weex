@@ -523,6 +523,10 @@ _Pragma("clang diagnostic pop") \
             [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
         }
         
+        if (script) {
+             [WXAppConfiguration setJSFrameworkLibSize:[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding]];
+        }
+        
         //execute methods which has been stored in methodQueue temporarily.
         for (NSDictionary *method in _methodQueue) {
             [self callJSMethod:method[@"method"] args:method[@"args"]];
@@ -551,6 +555,33 @@ _Pragma("clang diagnostic pop") \
     
     [sendQueue addObject:method];
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
+}
+
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(JSContext*)context completion:(void (^)(JSValue * value))complection
+{
+    NSMutableArray *newArg = nil;
+    if (!context) {
+        if ([self.jsBridge isKindOfClass:[WXJSCoreBridge class]]) {
+           context = [(NSObject*)_jsBridge valueForKey:@"jsContext"];
+        }
+    }
+    if (self.frameworkLoadFinished) {
+        newArg = [args mutableCopy];
+        if ([newArg containsObject:complection]) {
+            [newArg removeObject:complection];
+        }
+        WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
+        JSValue *value = [[context globalObject] invokeMethod:method withArguments:args];
+        if (complection) {
+            complection(value);
+        }
+    } else {
+        newArg = [args mutableCopy];
+        if (complection) {
+            [newArg addObject:complection];
+        }
+        [_methodQueue addObject:@{@"method":method, @"args":[newArg copy]}];
+    }
 }
 
 - (void)executeAllJsService

@@ -30,7 +30,6 @@ const type_ios_test = 3;
 const type_android_test = 4;
 const type_jsfm = 5;
 const type_jsfm_test = 6;
-const type_doc = 7;
 const type_ui_test = 8;
 
 const getFileType = file => {
@@ -48,11 +47,9 @@ const getFileType = file => {
     return type_jsfm;
   } else if (file.match(/html5\/test\/.+\.js/)) {
     return type_jsfm_test;
-  } else if (file.match(/doc\/\.+\.md/)) {
-    return type_doc;
-  } else if(file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
+  } else if (file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
     return type_ui_test
-  }else{
+  } else {
     return type_unknown
   }
 }

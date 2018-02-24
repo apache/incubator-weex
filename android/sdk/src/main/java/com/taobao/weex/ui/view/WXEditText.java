@@ -20,6 +20,9 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.os.Build;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ViewParent;
 import android.widget.EditText;
@@ -35,6 +38,7 @@ public class WXEditText extends EditText implements WXGestureObservable {
   private WXGesture wxGesture;
   private int mLines = 1;
   private boolean mAllowDisableMovement = true;
+  private boolean mAllowCopyPaste = true;
 
   public WXEditText(Context context) {
     super(context);
@@ -84,16 +88,63 @@ public class WXEditText extends EditText implements WXGestureObservable {
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    int contentH = getLayout().getHeight();
-    //TODO: known issue,set movement to null will make cursor disappear.
-    if(mAllowDisableMovement && h < contentH){
-      setMovementMethod(null);
-    } else {
-      setMovementMethod(getDefaultMovementMethod());
+    if (getLayout() != null) {
+      int contentH = getLayout().getHeight();
+      //TODO: known issue,set movement to null will make cursor disappear.
+      if (mAllowDisableMovement && h < contentH) {
+        setMovementMethod(null);
+      } else {
+        setMovementMethod(getDefaultMovementMethod());
+      }
     }
   }
 
   public void setAllowDisableMovement(boolean allow) {
     mAllowDisableMovement = allow;
+  }
+
+  public void setAllowCopyPaste(boolean allow) {
+    mAllowCopyPaste = allow;
+    if (allow) {
+      setLongClickable(true);
+      setTextIsSelectable(true);
+      setCustomSelectionActionModeCallback(null);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        setCustomInsertionActionModeCallback(null);
+      }
+    } else {
+      setLongClickable(false);
+      setTextIsSelectable(false);
+      ActionMode.Callback callback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+          return false;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+          return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+
+        }
+      };
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        setCustomInsertionActionModeCallback(callback);
+      }
+      setCustomSelectionActionModeCallback(callback);
+    }
+  }
+
+  @Override
+  public boolean onTextContextMenuItem(int id) {
+    return !mAllowCopyPaste || super.onTextContextMenuItem(id);
   }
 }

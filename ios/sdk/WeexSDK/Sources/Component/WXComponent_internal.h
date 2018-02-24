@@ -146,8 +146,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXDataBindingBlock _bindingRepeat;
     NSString *_repeatIndexIdentify;
     NSString *_repeatLabelIdentify;
+    NSString *_virtualComponentId;// for recycleList subcomponent
     BOOL _isRepeating;
     BOOL _isSkipUpdate;
+    BOOL _dataBindOnce;
     
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingProps;
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
@@ -201,8 +203,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 ///--------------------------------------
 /// @name Private Methods
 ///--------------------------------------
-
-- (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles;
 
 - (void)_modifyStyles:(NSDictionary *)styles;
 

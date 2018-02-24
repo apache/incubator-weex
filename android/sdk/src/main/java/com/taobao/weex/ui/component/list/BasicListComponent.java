@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,6 +56,7 @@ import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
+import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -66,6 +68,7 @@ import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
+import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -94,6 +97,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
+  private Runnable mAppearComponentsRunnable = null;
+  private long mAppearDelay = 50;
 
   private boolean isScrollable = true;
   private ArrayMap<String, Long> mRefToViewType;
@@ -179,6 +184,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       WXLogUtils.e(TAG, "RecyclerView is not found or Adapter is not bound");
       return;
     }
+    if(WXUtils.getBoolean(getDomObject().getAttrs().get("prefetchGapDisable"), false)){
+        if(recyclerView.getLayoutManager() != null){
+           recyclerView.getLayoutManager().setItemPrefetchEnabled(false);
+        }
+    }
 
     if (mChildren == null) {
       WXLogUtils.e(TAG, "children is null");
@@ -216,6 +226,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void destroy() {
+    if(mAppearComponentsRunnable != null) {
+      getHostView().removeCallbacks(mAppearComponentsRunnable);
+      mAppearComponentsRunnable = null;
+    }
     super.destroy();
     if (mStickyMap != null)
       mStickyMap.clear();
@@ -223,6 +237,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       mViewTypes.clear();
     if (mRefToViewType != null)
       mRefToViewType.clear();
+
   }
 
   @Override
@@ -253,6 +268,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
     if(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY) != null){
       keepPositionLayoutDelay = WXUtils.getNumberInt(getDomObject().getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY), (int)keepPositionLayoutDelay);
+    }
+    if(getDomObject().getAttrs().get("appearActionDelay") != null){
+      mAppearDelay =  WXUtils.getNumberInt(getDomObject().getAttrs().get("appearActionDelay"), (int)mAppearDelay);
     }
 
     mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
@@ -309,6 +327,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
       }
     });
+
+
     bounceRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
       @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
       @Override
@@ -335,6 +355,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void unbindStickStyle(WXComponent component) {
     stickyHelper.unbindStickStyle(component, mStickyMap);
+    WXHeader cell = (WXHeader) findTypeParent(component, WXHeader.class);
+    if(cell != null && getHostView() != null) {
+      getHostView().notifyStickyRemove(cell);
+    }
   }
 
   private
@@ -369,6 +393,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         boolean draggable = WXUtils.getBoolean(param,false);
         setDraggable(draggable);
         return true;
+      case Constants.Name.SHOW_SCROLLBAR:
+        Boolean result = WXUtils.getBoolean(param,null);
+        if (result != null)
+          setShowScrollbar(result);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -398,6 +427,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
   }
 
+  @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
+  public void setShowScrollbar(boolean show) {
+    if(getHostView() == null || getHostView().getInnerView() == null){
+      return;
+    }
+    if (getOrientation() == Constants.Orientation.VERTICAL) {
+      getHostView().getInnerView().setVerticalScrollBarEnabled(show);
+    } else {
+      getHostView().getInnerView().setHorizontalScrollBarEnabled(show);
+    }
+  }
+
+
   @Override
   public boolean isScrollable() {
     return isScrollable;
@@ -424,6 +466,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void bindAppearEvent(WXComponent component) {
     setAppearanceWatch(component, AppearanceHelper.APPEAR, true);
+    if(mAppearComponentsRunnable == null){
+      mAppearComponentsRunnable =  new Runnable() {
+        @Override
+        public void run() {
+          if(mAppearComponentsRunnable != null) {
+             notifyAppearStateChange(0, 0, 0, 0);
+          }
+        }
+      };
+    }
+    getHostView().removeCallbacks(mAppearComponentsRunnable);
+    getHostView().postDelayed(mAppearComponentsRunnable, mAppearDelay);
   }
 
   @Override
@@ -564,8 +618,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
     }
 
-    if(currentStickyPos>=0){
-      bounceRecyclerView.updateStickyView(currentStickyPos);
+    if(currentStickyPos >= 0){
+        bounceRecyclerView.updateStickyView(currentStickyPos);
+    }else{
+      if(bounceRecyclerView instanceof BounceRecyclerView){
+        ((BounceRecyclerView) bounceRecyclerView).getStickyHeaderHelper().clearStickyHeaders();
+      }
     }
   }
 
@@ -1150,6 +1208,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
+    if(mAppearComponentsRunnable != null) {
+       getHostView().removeCallbacks(mAppearComponentsRunnable);
+       mAppearComponentsRunnable = null;
+    }
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
     String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
@@ -1166,13 +1228,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         continue;
       }
 
-      boolean outOfVisibleRange = item.getCellPositionINScollable() < firstVisible || item.getCellPositionINScollable() > lastVisible;
 
       View view = component.getHostView();
       if (view == null) {
         continue;
       }
 
+      boolean outOfVisibleRange = !ViewCompat.isAttachedToWindow(view);
       boolean visible = (!outOfVisibleRange) && item.isViewVisible(true);
 
       int result = item.setAppearStatus(visible);

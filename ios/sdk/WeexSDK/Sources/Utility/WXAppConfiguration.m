@@ -26,6 +26,7 @@
 @property (nonatomic, strong) NSString * appVersion;
 @property (nonatomic, strong) NSString * externalUA;
 @property (nonatomic, strong) NSString * JSFrameworkVersion;
+@property (nonatomic, assign) NSUInteger JSFrameworkLibSize;
 @property (nonatomic, strong) NSArray  * customizeProtocolClasses;
 @end
 
@@ -89,6 +90,16 @@
 + (void)setJSFrameworkVersion:(NSString *)JSFrameworkVersion
 {
     [WXAppConfiguration sharedConfiguration].JSFrameworkVersion = JSFrameworkVersion;
+}
+
++ (NSUInteger)JSFrameworkLibSize
+{
+    return [WXAppConfiguration sharedConfiguration].JSFrameworkLibSize;
+}
+
++ (void)setJSFrameworkLibSize:(NSUInteger)JSFrameworkLibSize
+{
+    [WXAppConfiguration sharedConfiguration].JSFrameworkLibSize = JSFrameworkLibSize;
 }
 
 + (NSArray*)customizeProtocolClasses{

@@ -37,11 +37,14 @@ import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
+import com.alibaba.weex.extend.module.WXTitleBar;
+import com.alibaba.weex.extend.module.WXWsonTestModule;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
@@ -60,6 +63,9 @@ public class WXApplication extends Application {
      * Fresco.initialize(this,config);
      **/
 //    initDebugEnvironment(true, false, "DEBUG_SERVER_HOST");
+    WXBridgeManager.updateGlobalConfig("wson_on");
+    WXEnvironment.setOpenDebugLog(true);
+    WXEnvironment.setApkDebugable(true);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
@@ -89,11 +95,17 @@ public class WXApplication extends Application {
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);
+
+      WXSDKEngine.registerModule("titleBar", WXTitleBar.class);
+
+      WXSDKEngine.registerModule("wsonTest", WXWsonTestModule.class);
       /**
        * override default image tag
        * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
        */
 
+      //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
+      //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
 
     } catch (WXException e) {
       e.printStackTrace();

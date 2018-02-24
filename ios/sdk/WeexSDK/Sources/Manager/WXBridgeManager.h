@@ -18,11 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 
 @class WXBridgeMethod;
 @class WXSDKInstance;
 
-extern void WXPerformBlockOnBridgeThread(void (^block)());
+extern void WXPerformBlockOnBridgeThread(void (^block)(void));
 
 @interface WXBridgeManager : NSObject
 
@@ -141,6 +142,14 @@ extern void WXPerformBlockOnBridgeThread(void (^block)());
  **/
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments;
 
+/**
+ * componentHook
+ * @param instanceId  : instance id
+ * @param componentId : compoent id
+ * @param type        : component hook Type, such as life-cycle
+ * @param hookPhase   : hook phase
+ */
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))complection;
 /**
  *  callBack
  *

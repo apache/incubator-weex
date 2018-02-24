@@ -124,7 +124,6 @@ typedef enum : NSUInteger {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         [self _fillPadding];
         
-        
         if ([type isEqualToString:@"waterfall"] || (attributes[@"layout"] && [attributes[@"layout"] isEqualToString:@"multi-column"])) {
             // TODO: abstraction
             _layoutType = WXRecyclerLayoutTypeMultiColumn;
@@ -145,15 +144,14 @@ typedef enum : NSUInteger {
         _updateController.delegate = self;
         [self fixFlicker];
         
-        _dragController = [WXRecyclerDragController new];
-        _dragController.delegate = self;
         if ([attributes[@"draggable"] boolValue]) {
+            // lazy load
+            _dragController = [WXRecyclerDragController new];
+            _dragController.delegate = self;
             if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
                 _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
             }
             _dragController.isDragable = YES;
-        }else{
-            _dragController.isDragable = NO;
         }
     }
     
@@ -212,11 +210,15 @@ typedef enum : NSUInteger {
         BOOL needUpdateLayout = NO;
         
         if ([attributes[@"draggable"] boolValue]) {
+            if (!_dragController) {  // lazy load
+                _dragController = [WXRecyclerDragController new];
+                _dragController.delegate = self;
+            }
             if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
                 _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
             }
             _dragController.isDragable = YES;
-        }else{
+        } else {
             _dragController.isDragable = NO;
         }
         

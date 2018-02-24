@@ -21,8 +21,13 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponentManager.h"
+#import "WXSDKManager.h"
 #import "WXAssert.h"
 #import "WXJSASTParser.h"
+#import "WXBridgeManager.h"
+#import "WXUtility.h"
+#import "WXRecycleListComponent.h"
+#import "WXRecycleListDataManager.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
 
@@ -43,7 +48,30 @@ static JSContext *jsContext;
 - (void)updateBindingData:(NSDictionary *)data
 {
     WXAssertComponentThread();
+    NSString * listRef = nil;
+    NSIndexPath *indexPath  = nil;
+    NSDictionary * dictionary = nil;
+    listRef = data[@"recycleListComponentRef"];
+    indexPath = data[@"indexPath"];
+    NSString *phase = data[@"@phase"];
+    if (!indexPath || !listRef) {
+        if (data[@"aliasKey"]) {
+            id key = data[@"aliasKey"];
+            dictionary =  data[key];
+        } else {
+            dictionary = data;
+        }
+        listRef = dictionary[@"recycleListComponentRef"];
+        indexPath = dictionary[@"indexPath"];
+    }
+    if (!phase && dictionary) {
+        phase = dictionary[@"@phase"];
+    }
     
+    if (!indexPath || !listRef) {
+        return;
+    }
+    WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[self.weexInstance.componentManager componentForRef:listRef];
     if (_isSkipUpdate) {
         _isSkipUpdate = NO;
         return;
@@ -62,7 +90,7 @@ static JSContext *jsContext;
     }
     
     if (templateComponent->_bindingProps) {
-        NSMutableDictionary *newData = [NSMutableDictionary dictionary];
+        __block NSMutableDictionary *newData = [NSMutableDictionary dictionary];
         [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
             BOOL needUpdate;
             id value = block(data, &needUpdate);
@@ -71,9 +99,43 @@ static JSContext *jsContext;
             }
         }];
         
+        if (self.attributes[@"@isComponentRoot"]) {
+            if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath]) {
+                static NSUInteger __componentId = 0;
+                self->_virtualComponentId = [NSString stringWithFormat:@"%@@%ld", listRef, __componentId % (2048*1024)];
+                __componentId++;
+                dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+                [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
+                    [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
+                    [newData setObject:indexPath forKey:@"indexPath"];
+                    [newData setObject:listRef forKey:@"recycleListComponentRef"];
+                    [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
+                    dispatch_semaphore_signal(semaphore);
+                }];
+                dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+                
+                [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:nil competion:nil];
+                if ([newData count]) {
+                    data = newData;
+                }
+            } else {
+                newData[@"componentDataId"] = self->_virtualComponentId;
+                NSDictionary * virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath];
+                [newData addEntriesFromDictionary:virtualComponentData];
+                [newData addEntriesFromDictionary:data];
+                data = newData;
+            }
+        }
+    }
+    if (phase) {
+        NSMutableDictionary * newData = [data mutableCopy];
+        newData[@"@phase"] = phase;
         data = newData;
     }
-    
+    if (self->_templateComponent && self->_templateComponent->_dataBindOnce && recycleListComponent && data[@"@phase"]) {
+        WXLogInfo(@"interrupt update data: %@ because of v-once ", data);
+        return;
+    }
     if (!_isRepeating) {
         WXDataBindingBlock repeatBlock = templateComponent->_bindingRepeat;
         if (repeatBlock) {
@@ -126,12 +188,16 @@ static JSContext *jsContext;
                 [self.weexInstance.componentManager updateAttributes:newAttributesOrStyles forComponent:self.ref];
             } else if (i == WXDataBindingTypeEvents) {
                 [self _addEventParams:newAttributesOrStyles];
+            } else if (i == WXDataBindingTypeProp) {
             }
         }
     }
     
     NSArray *subcomponents = self.subcomponents;
     for (WXComponent *subcomponent in subcomponents) {
+        if (subcomponent->_virtualComponentId &&dictionary[@"componentDataId"] && ![subcomponent->_virtualComponentId isEqualToString:dictionary[@"componentDataId"]]) {
+            continue;
+        }
         [subcomponent updateBindingData:data];
     }
 }
@@ -289,7 +355,9 @@ static JSContext *jsContext;
         }
         
         if (type == WXDataBindingTypeAttributes) {
-            if ([WXBindingMatchIdentify isEqualToString:name]) {
+            if ([WXBindingOnceIdentify isEqualToString:name]) {
+                _dataBindOnce = [WXConvert BOOL:binding];
+            } else if ([WXBindingMatchIdentify isEqualToString:name]) {
                 WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding];
                 WXJSExpression *expression = [parser parseExpression];
                 _bindingMatch = [self bindingBlockWithExpression:expression];
@@ -323,7 +391,7 @@ static JSContext *jsContext;
             *needUpdate = NO;
             return nil;
         } else if (expression->is<WXJSIdentifier>()) {
-            NSString *identiferName = [NSString stringWithCString:(((WXJSIdentifier *)expression)->name).c_str() encoding:[NSString defaultCStringEncoding]];
+            NSString *identiferName = [NSString stringWithCString:const_cast<char*>((((WXJSIdentifier *)expression)->name).c_str()) encoding:NSUTF8StringEncoding];
             if (data[identiferName]) {
                 *needUpdate = YES;
                 return data[identiferName];
@@ -344,9 +412,16 @@ static JSContext *jsContext;
                     return [object objectAtIndex:[propertyName unsignedIntegerValue]];
                 }
             } else {
-                NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
-                *needUpdate = objectNeedUpdate;
-                return object[propertyName];
+                WXJSExpression * memberExpression = member->property;
+                if (memberExpression->is<WXJSIdentifier>()) {
+                    NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
+                    *needUpdate = objectNeedUpdate;
+                    return object[propertyName];
+                } else {
+                    id retvalue = [self bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
+                    *needUpdate = objectNeedUpdate || propertyNeedUpdate;
+                    return retvalue;
+                }
             }
             
             return nil;

@@ -70,7 +70,6 @@ do {\
         WX_ENUMBER_CASE(_invocation, idx, _C_LNG, _obj, long, longValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_LNG_LNG, _obj, long long, longLongValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_UCHR, _obj, unsigned char, unsignedCharValue, _ppFree)\
-        WX_ENUMBER_CASE(_invocation, idx, _C_CHR, _obj, char, charValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_UINT, _obj, unsigned int, unsignedIntValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_USHT, _obj, unsigned short, unsignedShortValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_ULNG, _obj, unsigned long, unsignedLongValue, _ppFree)\
@@ -90,19 +89,19 @@ extern "C" {
  * @abstract execute asynchronous action block on the main thread.
  *
  */
-void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute synchronous action block on the main thread.
  *
  */
-void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute action block on the specific thread.
  *
  */
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *_Nonnull thread);
 
 /**
  * @abstract swizzling methods.
@@ -120,7 +119,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 @interface WXUtility : NSObject
 
-+ (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
++ (void)performBlock:(void (^_Nonnull)(void))block onThread:(NSThread *_Nonnull)thread;
 
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
@@ -258,7 +257,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  * @abstract Returns the scale of the main screen.
  *
  */
-CGFloat WXScreenScale();
+CGFloat WXScreenScale(void);
 
 /**
  * @abstract Returns a Round float coordinates to the main screen pixel.
@@ -460,7 +459,8 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock;
 
-+ (void)setShouldRoudPixel:(BOOL)shouldRoundPixel;
++ (BOOL)threadSafeCollectionUsingLock;
 
 @end

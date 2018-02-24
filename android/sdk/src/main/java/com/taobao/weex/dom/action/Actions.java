@@ -42,6 +42,7 @@ import static com.taobao.weex.dom.WXDomModule.REMOVE_ELEMENT;
 import static com.taobao.weex.dom.WXDomModule.REMOVE_EVENT;
 import static com.taobao.weex.dom.WXDomModule.SCROLL_TO_ELEMENT;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_ATTRS;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_COMPONENT_DATA;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_FINISH;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_STYLE;
 
@@ -121,6 +122,11 @@ public class Actions {
           return null;
         }
         return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
+      case UPDATE_COMPONENT_DATA:
+        if(args == null || args.size() < 3){
+          return null;
+        }
+        return new UpdateComponentDataAction(args.getString(0), args.getJSONObject(1), args.getString(2));
     }
 
     return null;

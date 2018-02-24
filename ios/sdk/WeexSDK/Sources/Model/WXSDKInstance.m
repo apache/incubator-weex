@@ -46,6 +46,7 @@
 #import "WXJSExceptionProtocol.h"
 #import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
+#import "WXMonitor.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -68,6 +69,8 @@ typedef enum : NSUInteger {
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
+    BOOL _performanceCommit;
+    BOOL _needDestroy;
 }
 
 - (void)dealloc
@@ -95,11 +98,12 @@ typedef enum : NSUInteger {
         _pageName = @"";
 
         _performanceDict = [WXThreadSafeMutableDictionary new];
-        _moduleInstances = [NSMutableDictionary new];
+        _moduleInstances = [WXThreadSafeMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
         _trackComponent = NO;
+        _performanceCommit = NO;
        
         [self addObservers];
     }
@@ -211,7 +215,7 @@ typedef enum : NSUInteger {
      [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
     
     [self _handleConfigCenter];
-    
+    _needDestroy = YES;
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
@@ -225,22 +229,8 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
-        
-        //handler pixel round
-        BOOL shouldRoudPixel = [[configCenter configForKey:@"iOS_weex_ext_config.utilityShouldRoundPixel" defaultValue:@(NO) isDefault:NULL] boolValue];
-        [WXUtility setShouldRoudPixel:shouldRoudPixel];
-        
-        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXCycleSliderComponent" isDefault:NULL];
-        if(sliderConfig){
-            NSString *sliderClassName = [WXConvert NSString:sliderConfig];
-            if(sliderClassName.length>0){
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
-            }else{
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
-            }
-        }else{
-            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
-        }
+        BOOL useThreadSafeLock = [[configCenter configForKey:@"iOS_weex_ext_config.useThreadSafeLock" defaultValue:@YES isDefault:NULL] boolValue];
+        [WXUtility setThreadSafeCollectionUsingLock:useThreadSafeLock];
     }
 }
 
@@ -381,7 +371,10 @@ typedef enum : NSUInteger {
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
     
-    [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+    if (_needDestroy) {
+        [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+        _needDestroy = NO;
+    }
 
     if (_componentManager) {
         [_componentManager invalidate];
@@ -410,6 +403,11 @@ typedef enum : NSUInteger {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
+    }
+    
+    if (!_performanceCommit && state == WeexInstanceDisappear) {
+        WX_MONITOR_INSTANCE_PERF_COMMIT(self);
+        _performanceCommit = YES;
     }
     
     NSMutableDictionary *data = [NSMutableDictionary dictionary];

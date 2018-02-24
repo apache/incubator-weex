@@ -142,7 +142,7 @@
         return;
     }
     
-    void (^updates)() = [^{
+    void (^updates)(void) = [^{
         [self.delegate updateController:self willPerformUpdateWithNewData:newData];
         [UIView setAnimationsEnabled:NO];
         WXLogDebug(@"UICollectionView update:%@", diffResult);
@@ -162,7 +162,9 @@
     if (!self.delegate || !collectionView.dataSource) {
         return;
     }
-    
+    if (![diffResult hasChanges]) {
+        return;
+    }
     WXLogDebug(@"Diff result:%@", diffResult);
     [collectionView performBatchUpdates:updates completion:completion];
 }

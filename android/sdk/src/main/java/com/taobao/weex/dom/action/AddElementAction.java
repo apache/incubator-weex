@@ -20,13 +20,15 @@ package com.taobao.weex.dom.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.ui.component.ComponentUtils;
+import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
@@ -59,6 +61,10 @@ final class AddElementAction extends AbstractAddElementAction {
 	  mErrMsg.append("WXComponent comp = context.getCompByRef(mParentRef) is null or \n")
 			  .append("!(comp instanceof WXVContainer)");
       return null;
+    }
+    if(domObject.getType().equals(WXBasicComponentType.CELL_SLOT)
+            && domObject instanceof WXCellDomObject){
+      return ComponentUtils.buildTree(domObject, (WXVContainer) comp);
     }
     return generateComponentTree(context, domObject, (WXVContainer) comp);
   }

@@ -62,7 +62,7 @@
 {
     WXAssertMainThread();
     
-    NSString *templateType = component.templateType;
+    NSString *templateType = component.templateCaseType;
     WXAssert(templateType != nil, @"cell-slot:%@ must have a template id!", component);
     
     [_templateTypeMap setObject:component forKey:templateType];
@@ -89,6 +89,18 @@
     WXLogDebug(@"register cell class for template id:%@", templateID);
     //TODO: register class update TemplateId
     [_collectionView registerClass:[WXReusableCollectionViewCell class] forCellWithReuseIdentifier:templateID];
+}
+
+- (WXCellSlotComponent *)topTemplate
+{
+    WXCellSlotComponent * cellTemplate = nil;
+    for (NSString *templateType in [_templateTypeMap.keyEnumerator.allObjects copy]) {
+        cellTemplate = [self templateWithType:templateType];
+        if (!cellTemplate) {
+            break;
+        }
+    }
+    return cellTemplate;
 }
 
 @end

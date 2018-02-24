@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,187 +16,137 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 const path = require('path')
 const json = require('rollup-plugin-json')
 const eslint = require('rollup-plugin-eslint')
 const replace = require('rollup-plugin-replace')
-const postcss = require('rollup-plugin-postcss')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('rollup-plugin-uglify')
+const uglifyES = require('uglify-es')
 const commonjs = require('rollup-plugin-commonjs')
-const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
-const subversion = require('../package.json').subversion
+const packageJSON = require('../package.json')
+const deps = packageJSON.dependencies
+const subversion = packageJSON.subversion
 
-const frameworkBanner = `;(this.getJSFMVersion = function()`
-  + `{return "${subversion.framework}"});\n`
-  + `var global = this, process = { env: {} };var setTimeout = global.setTimeout;\n`
+const frameworkBanner = `var global=this; var process={env:{}}; `
+  + `var setTimeout=global.setTimeout;\n`
 
 const configs = {
   'weex-js-framework': {
-    moduleName: 'Weex',
-    entry: absolute('html5/render/native/index.js'),
-    dest: absolute('packages/weex-js-framework/index.js'),
-    banner: `(this.nativeLog || function(s) {console.log(s)})`
-      + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}.');\n`
-      + frameworkBanner,
-    format: 'umd',
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-    ]
+    input: absolute('runtime/entries/index.js'),
+    output: {
+      name: 'Weex',
+      file: absolute('pre-build/weex-js-framework'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}. `
+        + `(Vue: ${deps['weex-vue-framework']}, Rax: ${deps['weex-rax-framework']})');\n`
+        + frameworkBanner
+    }
+  },
+  'weex-env': {
+    input: absolute('runtime/entries/env.js'),
+    output: {
+      name: 'WeexEnvironmentAPIs',
+      file: absolute('pre-build/weex-env'),
+      banner: `/* Prepare Weex Environment APIs ${subversion.framework}, Build ${now()}. */\n\n`
+        + `var global = this; var process = {env:{}};`
+    }
+  },
+  'weex-vue': {
+    input: absolute('runtime/entries/vue.js'),
+    output: {
+      name: 'WeexVue',
+      file: absolute('pre-build/weex-vue'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('Weex JS Framework ${subversion.framework}, Build ${now()}. `
+        + `(Vue: ${deps['weex-vue-framework']})');\n`
+        + frameworkBanner
+    }
+  },
+  'weex-rax': {
+    input: absolute('runtime/entries/rax.js'),
+    output: {
+      name: 'WeexRax',
+      file: absolute('pre-build/weex-rax'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('Weex JS Framework ${subversion.framework}, Build ${now()}. `
+        + `(Rax: ${deps['weex-rax-framework']})');\n`
+        + frameworkBanner
+    }
   },
   'weex-js-runtime': {
-    moduleName: 'WeexRuntime',
-    entry: absolute('html5/runtime/index.js'),
-    dest: absolute('packages/weex-js-runtime/index.js'),
-    banner: `/* WEEX JS RUNTIME ${subversion.framework}, Build ${now()}. */\n\n`,
-    format: 'umd',
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-    ]
+    input: absolute('runtime/api/index.js'),
+    output: {
+      name: 'WeexJSRuntime',
+      file: absolute('packages/weex-js-runtime/index'),
+      banner: `/* Weex JS Runtime ${subversion.framework}, Build ${now()}. */\n\n`
+    }
   },
-  'weex-legacy-framework': {
-    moduleName: 'WeexLegacyFramework',
-    entry: absolute('html5/frameworks/legacy/index.js'),
-    dest: absolute('packages/weex-legacy-framework/index.js'),
-    banner: `/* Weex Legacy Framework ${subversion.framework}, Build ${now()}. */\n`,
-    format: 'umd',
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-    ]
+  'weex-legacy': {
+    input: absolute('runtime/entries/legacy.js'),
+    output: {
+      name: 'WeexLegacy',
+      file: absolute('pre-build/weex-legacy'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('Weex Legacy Framework ${subversion.framework}, Build ${now()}.');\n`
+        + frameworkBanner
+    }
   },
   'weex-vanilla-framework': {
-    moduleName: 'WeexVanillaFramework',
-    entry: absolute('html5/frameworks/vanilla/index.js'),
-    dest: absolute('packages/weex-vanilla-framework/index.js'),
-    banner: `/* Weex Vanilla Framework ${subversion.framework}, Build ${now()}. */\n`,
-    format: 'umd',
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-    ]
-  },
-  'weex-web-render': {
-    moduleName: 'Weex',
-    entry: absolute('html5/render/browser/index.js'),
-    dest: absolute('packages/weex-html5/index.js'),
-    banner: `(this.nativeLog || function(s) {console.log(s)})`
-      + `('START WEEX HTML5: ${subversion.browser}, Build ${now()}.');\n`
-      + frameworkBanner,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      })
-    ]
-  },
-  'weex-vue-render': {
-    moduleName: 'WeexVueRender',
-    entry: absolute('packages/weex-vue-render/src/index.js'),
-    dest: absolute('packages/weex-vue-render/dist/index.js'),
-    banner:`
-console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      }),
-      replace({
-        'process.env.WEEX_VERSION': subversion['vue-render']
-      })
-    ]
-  },
-  'weex-vue-render-core': {
-    moduleName: 'WeexVueRenderCore',
-    entry: absolute('packages/weex-vue-render/src/index.core.js'),
-    dest: absolute('packages/weex-vue-render/dist/index.core.js'),
-    banner:`
-console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      }),
-      replace({
-        'process.env.WEEX_VERSION': subversion['vue-render']
-      })
-    ]
-  },
-  'weex-vue-render-plugins': {
-    format: 'umd',
-    plugins: [
-      postcss(),
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true
-      })
-    ]
+    input: absolute('runtime/frameworks/vanilla/index.js'),
+    output: {
+      name: 'WeexVanillaFramework',
+      file: absolute('packages/weex-vanilla-framework/index'),
+      banner: `/* Weex Vanilla Framework ${subversion.framework}, Build ${now()}. */\n`
+    }
   }
 }
 
-function getConfig (name, minify, params) {
+function getConfig (name, minify, es6) {
   const opt = configs[name]
-  let isProd
-  if (params) {
-    isProd = params._isProd
-    delete params._isProd
-    for (const k in params) {
-      opt[k] = params[k]
-    }
+  if (!opt.plugins) {
+    opt.plugins = []
   }
+  const output = opt.output
+  const suffix = `${es6 ? '.es6' : ''}${minify ? '.min' : ''}.js`
   const config = {
-    moduleName: opt.moduleName,
-    entry: opt.entry,
-    dest: minify ? opt.dest && opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
-    format: opt.format,
-    banner: opt.banner,
+    input: opt.input,
+    output: {
+      name: output.name,
+      file: output.file + suffix,
+      format: output.format || 'umd',
+      banner: output.banner,
+      sourcemap: true
+    },
     plugins: opt.plugins.concat([
+      nodeResolve({ jsnext: true, main: true }),
       json(),
       replace({
-        'process.env.VIEWPORT_WIDTH': 750,
-        'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : minify ? 'production' : 'development'),
+        '__WEEX_VERSION__': JSON.stringify(packageJSON.version),
+        '__WEEX_JS_FRAMEWORK_VERSION__': JSON.stringify(subversion.framework),
+        'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
+        'process.env.WEEX_FREEZE': JSON.stringify(!!process.env.WEEX_FREEZE),
+        'process.env.SUPPORT_ES2015': !!es6,
         'process.env.NODE_DEBUG': false
       }),
-      commonjs(),
-      flow(/*{ pretty: true }*/),
-      buble()
+      commonjs({ ignoreGlobal: true })
     ])
   }
-
+  if (!es6) {
+    config.plugins.push(buble())
+  }
   if (minify) {
-    config.plugins.push(uglify())
+    config.plugins.push(es6
+      ? uglify({ safari10: true, toplevel: true }, uglifyES.minify)
+      : uglify()
+    )
   }
   else {
-    /**
-     * rollup-plugin-flow will cause soucemap problem.
-     * use rollup-plugin-flow-no-whitespace can fixe this.
-     */
-    config.sourceMap = 'inline'
     config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }
-
   return config
 }
 

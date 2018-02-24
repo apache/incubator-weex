@@ -28,8 +28,8 @@
 extern "C" {
 #endif
     
-void WXPerformBlockOnComponentThread(void (^block)());
-void WXPerformBlockSyncOnComponentThread(void (^block)());
+void WXPerformBlockOnComponentThread(void (^block)(void));
+void WXPerformBlockSyncOnComponentThread(void (^block)(void));
     
 #ifdef __cplusplus
 }
@@ -187,7 +187,7 @@ void WXPerformBlockSyncOnComponentThread(void (^block)());
  */
 - (void)removeFixedComponent:(WXComponent *)fixComponent;
 
-- (void)_addUITask:(void (^)())block;
+- (void)_addUITask:(void (^)(void))block;
 
 - (void)excutePrerenderUITask:(NSString *)url;
 

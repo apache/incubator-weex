@@ -18,40 +18,38 @@
  */
 package com.taobao.weex.bridge;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.WXJSService;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class WXServiceManager {
 
     private static Map<String, WXJSService> sInstanceJSServiceMap = new HashMap<>();
 
-    public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
+    public static boolean registerService(String name, String serviceScript, Map<String, Object> options) {
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(serviceScript)) return false;
 
         String param1 = "register: global.registerService, unregister: global.unregisterService";
         String param2 = "serviceName: \"" + name + "\"";
         for (String key: options.keySet()) {
             // TODO - why always string?
-            String value = options.get(key);
-            param2 += ", " + key + ": \"" + value + "\"";
+            Object value = options.get(key);
+            if (value instanceof  String) {
+                param2 += ", \'" + key + "\': \'" + value + "\'";
+            } else {
+                param2 += ", \'" + key + "\': " + value;
+            }
         }
         String serviceJs = String.format(";(function(service, options){ ;%s; })({ %s }, { %s });", serviceScript, param1, param2);
 
-        if(WXEnvironment.isApkDebugable()) {
-            WXJSService service = new WXJSService();
-            service.setName(name);
-            service.setScript(serviceScript);
-            service.setOptions(options);
-            sInstanceJSServiceMap.put(name, service);
-        }
+        WXJSService service = new WXJSService();
+        service.setName(name);
+        service.setScript(serviceScript);
+        service.setOptions(options);
+        sInstanceJSServiceMap.put(name, service);
 
         WXBridgeManager.getInstance().execJSService(serviceJs);
         return true;
@@ -75,5 +73,24 @@ public class WXServiceManager {
             WXJSService service = sInstanceJSServiceMap.get(serviceName);
             registerService(service.getName(), service.getScript(), service.getOptions());
         }
+    }
+
+    public static WXJSService getService(String serviceName) {
+        if (sInstanceJSServiceMap != null) {
+            return sInstanceJSServiceMap.get(serviceName);
+        }
+        return null;
+    }
+
+    public static void reload() {
+        WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<String, WXJSService> entry : sInstanceJSServiceMap.entrySet()) {
+                    WXJSService service = entry.getValue();
+                    registerService(service.getName(), service.getScript(), service.getOptions());
+                }
+            }
+        });
     }
 }
