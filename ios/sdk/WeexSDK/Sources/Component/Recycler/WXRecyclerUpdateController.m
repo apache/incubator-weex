@@ -162,9 +162,6 @@
     if (!self.delegate || !collectionView.dataSource) {
         return;
     }
-    if (![diffResult hasChanges]) {
-        return;
-    }
     WXLogDebug(@"Diff result:%@", diffResult);
     [collectionView performBatchUpdates:updates completion:completion];
 }

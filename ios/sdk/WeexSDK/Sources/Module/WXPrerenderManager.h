@@ -36,7 +36,7 @@
  *  @param callback  the module method callback
  *
  **/
-+ (void) addTask:(NSString *) url instanceId:(NSString *)instanceId callback:(WXModuleCallback)callback;
++ (void) addTask:(NSString *) url instanceId:(NSString *)instanceId callback:(WXModuleKeepAliveCallback)callback;
 
 /**
  *  @abstract add prerender task
@@ -46,7 +46,7 @@
  *  @param callback  the module method callback
  *
  **/
-+ (void) addGlobalTask:(NSString *) url callback:(WXModuleCallback)callback;
++ (void) addGlobalTask:(NSString *) url callback:(WXModuleKeepAliveCallback)callback;
 
 /**
  *  @abstract Returns true if url is exist in task .
