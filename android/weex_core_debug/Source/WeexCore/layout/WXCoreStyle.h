@@ -253,6 +253,23 @@ namespace WeexCore {
       mMinWidth = NAN;
       mMinHeight = NAN;
     }
+
+    float sumPaddingBorderOfEdge(const WXCoreEdge edge){
+      switch (edge) {
+        case kTop:
+          return mPadding.getPadding(kPaddingLeft)
+              + mBorderWidth.getBorderWidth(kBorderWidthLeft);
+        case kRight:
+          return mPadding.getPadding(kPaddingRight)
+              + mBorderWidth.getBorderWidth(kBorderWidthRight);
+        case kBottom:
+          return mPadding.getPadding(kPaddingBottom)
+              + mBorderWidth.getBorderWidth(kBorderWidthBottom);
+        case kLeft:
+          return mPadding.getPadding(kPaddingLeft)
+              + mBorderWidth.getBorderWidth(kBorderWidthLeft);
+      }
+    }
   };
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H

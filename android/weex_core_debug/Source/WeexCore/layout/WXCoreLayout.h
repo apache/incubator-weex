@@ -481,7 +481,7 @@ namespace WeexCore {
 
     void stretchViewCrossSize(WXCoreLayoutNode *, float);
 
-    Index expandItemsInFlexLine(WXCoreFlexLine *, float, float, Index);
+    Index expandItemsInFlexLine(WXCoreFlexLine *, float, Index);
 
     void checkSizeConstraints(WXCoreLayoutNode *, bool);
 
@@ -922,7 +922,7 @@ namespace WeexCore {
       for (WXCoreFlexLine *flexLine : mFlexLines) {
         largestSize = std::max(largestSize, flexLine->mMainSize);
       }
-      return largestSize;
+      return largestSize + sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
     }
 
   };

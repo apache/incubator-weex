@@ -189,16 +189,16 @@ namespace WeexCore {
   void WXCoreLayoutNode::determineMainSize(const float width, const float height) {
       float maxMainSize;
       bool horizontal = isMainAxisHorizontal(this);
-      float paddingAlongMainAxis = sumPaddingBorderAlongAxis(this, horizontal);
       if (horizontal) {
         maxMainSize = widthMeasureMode == kUnspecified ? getLargestMainSize() : width;
       } else {
         maxMainSize = heightMeasureMode == kUnspecified ? getLargestMainSize() : height;
       }
 
+      maxMainSize -= sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
       Index childIndex = 0;
       for (WXCoreFlexLine *flexLine : mFlexLines) {
-        childIndex = expandItemsInFlexLine(flexLine, maxMainSize, paddingAlongMainAxis, childIndex);
+        childIndex = expandItemsInFlexLine(flexLine, maxMainSize, childIndex);
       }
     }
 
@@ -242,7 +242,6 @@ namespace WeexCore {
       mFlexLines.clear();
       Index childCount = getChildCount(kNonBFC);
       WXCoreFlexLine *flexLine = new WXCoreFlexLine();
-      flexLine->mMainSize = sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
 
       // The index of the view in a same flex line.
       for (Index i = 0; i < childCount; i++) {
@@ -259,7 +258,6 @@ namespace WeexCore {
           }
           flexLine = new WXCoreFlexLine();
           flexLine->mItemCount = 1;
-          flexLine->mMainSize = sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
         } else {
           flexLine->mItemCount++;
         }
@@ -364,7 +362,7 @@ namespace WeexCore {
     }
 
     Index WXCoreLayoutNode::expandItemsInFlexLine(WXCoreFlexLine* const flexLine,
-                                      const float maxMainSize, const float paddingBorderAlongMainAxis,
+                                      const float maxMainSize,
                                       const Index startIndex) {
       Index childIndex = startIndex;
       if (flexLine->mTotalFlexGrow <= 0) {
@@ -374,7 +372,7 @@ namespace WeexCore {
         const float unitSpace = (maxMainSize - flexLine->mMainSize + flexLine->mTotalFlexibleSize) /
                                 (flexLine->mTotalFlexGrow > 1 ? flexLine->mTotalFlexGrow : 1);
         float sizeBeforeExpand = flexLine->mMainSize;
-        flexLine->mMainSize = paddingBorderAlongMainAxis;
+        flexLine->mMainSize = 0;
 
         for (Index i = 0; i < flexLine->mItemCount; i++) {
           WXCoreLayoutNode *child = getChildAt(kNonBFC, childIndex);
@@ -392,7 +390,7 @@ namespace WeexCore {
         if (needsReexpand && sizeBeforeExpand != flexLine->mMainSize) {
           // Re-invoke the method with the same startIndex to distribute the positive free space
           // that wasn't fully distributed (because of maximum/minimum length constraint)
-          expandItemsInFlexLine(flexLine, maxMainSize, paddingBorderAlongMainAxis, startIndex);
+          expandItemsInFlexLine(flexLine, maxMainSize, startIndex);
         }
       }
       return childIndex;
@@ -591,7 +589,6 @@ namespace WeexCore {
    */
   void WXCoreLayoutNode::layoutHorizontal(const bool isRtl, const float left, const float top, const float right, const float bottom) {
 
-    float childLeft;
     Index currentViewIndex = 0;
 
     float height = bottom - top;
@@ -605,42 +602,35 @@ namespace WeexCore {
     // Used only for RTL layout
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
-    float childRight;
+    float childLeft, childRight, denominator;
+    Index visibleCount, visibleItem;
     for (WXCoreFlexLine *flexLine: mFlexLines) {
       float spaceBetweenItem = 0.f;
-
       switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexStart:
-          childLeft = getPaddingLeft() + getBorderWidthLeft();
-          childRight = width - getPaddingRight() - getBorderWidthRight();
-          break;
         case kJustifyFlexEnd:
           childLeft = width - flexLine->mMainSize + getPaddingRight() + getBorderWidthRight();
-          childRight = flexLine->mMainSize - getPaddingLeft() - getBorderWidthLeft();
+          childRight = width - getPaddingLeft() - getBorderWidthLeft();
           break;
         case kJustifyCenter:
-          childLeft = getPaddingLeft() + getBorderWidthLeft() + (width - flexLine->mMainSize) / 2.f;
-          childRight = width - getPaddingRight() - getBorderWidthRight() - (width - flexLine->mMainSize) / 2.f;
+          childLeft = (width - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kRight) + mCssStyle->sumPaddingBorderOfEdge(kLeft)) / 2;
+          childRight = childLeft + flexLine->mMainSize;
           break;
         case kJustifySpaceAround:
-          Index visibleCount;
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (width - flexLine->mMainSize)
-                               / (float) visibleCount;
+            spaceBetweenItem = (width - flexLine->mMainSize) / visibleCount;
           }
           childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
           childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
           break;
         case kJustifySpaceBetween:
           childLeft = getPaddingLeft() + getBorderWidthLeft();
-          Index visibleItem;
           visibleItem = flexLine->mItemCount;
-          float denominator;
           denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (width - flexLine->mMainSize) / denominator;
+          spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / denominator;
           childRight = width - getPaddingRight() - getBorderWidthRight();
           break;
+        case kJustifyFlexStart:
         default:
           childLeft = getPaddingLeft() + getBorderWidthLeft();
           childRight = width - getPaddingRight() - getBorderWidthRight();
@@ -781,7 +771,7 @@ namespace WeexCore {
                                    const bool fromBottomToTop,
                                    const float left, const float top,
                                    const float right, const float bottom) {
-    float childLeft = getPaddingLeft()+getBorderWidthLeft();
+    float childLeft = getPaddingLeft() + getBorderWidthLeft();
     Index currentViewIndex = 0;
 
     float width = right - left;
@@ -793,46 +783,36 @@ namespace WeexCore {
 
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
-    float childTop;
-
-    // Used only for if the direction is from mStyleBottom to mStyleTop
-    float childBottom;
-
+    float childTop, childBottom, denominator;
+    Index visibleCount,visibleItem;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
       float spaceBetweenItem = 0.f;
 
       switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexStart:
-          childTop = getPaddingTop() + getBorderWidthTop();
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
-          break;
         case kJustifyFlexEnd:
           childTop = height - flexLine->mMainSize + getPaddingBottom() + getBorderWidthBottom();
-          childBottom = flexLine->mMainSize - getPaddingTop() - getBorderWidthTop();
+          childBottom = height - getPaddingTop() - getBorderWidthTop();
           break;
         case kJustifyCenter:
-          childTop = getPaddingTop() + getBorderWidthTop() + (height - flexLine->mMainSize) / 2;
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom() - (height - flexLine->mMainSize) / 2;
+          childTop = (height - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kBottom) + mCssStyle->sumPaddingBorderOfEdge(kTop)) / 2;
+          childBottom = childTop + flexLine->mMainSize;
           break;
         case kJustifySpaceAround:
-          Index visibleCount;
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (height - flexLine->mMainSize)
-                               / (float) visibleCount;
+            spaceBetweenItem = (height - flexLine->mMainSize) / visibleCount;
           }
           childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
           childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
           break;
         case kJustifySpaceBetween:
           childTop = getPaddingTop() + getBorderWidthTop();
-          Index visibleItem;
           visibleItem = flexLine->mItemCount;
-          float denominator;
           denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (height - flexLine->mMainSize) / denominator;
+          spaceBetweenItem = (height - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, false)) / denominator;
           childBottom = height - getPaddingBottom() - getBorderWidthBottom();
           break;
+        case kJustifyFlexStart:
         default:
           childTop = getPaddingTop() + getBorderWidthTop();
           childBottom = height - getPaddingBottom() - getBorderWidthBottom();

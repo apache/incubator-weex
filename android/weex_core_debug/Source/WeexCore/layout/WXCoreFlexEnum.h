@@ -95,6 +95,13 @@ namespace WeexCore {
     kBorderWidthRight,
   };
 
+  enum WXCoreEdge{
+    kTop,
+    kRight,
+    kBottom,
+    kLeft,
+  };
+
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #endif
