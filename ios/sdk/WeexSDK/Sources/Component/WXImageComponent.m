@@ -140,7 +140,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
-- (void)save:(WXCallback)resultCallback
+- (void)save:(WXKeepAliveCallback)resultCallback
 {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     if(!info[@"NSPhotoLibraryUsageDescription"]) {
@@ -148,7 +148,7 @@ WX_EXPORT_METHOD(@selector(save:))
             resultCallback(@{
                              @"success" : @(false),
                              @"errorDesc": @"This maybe crash above iOS 10 because it attempted to access privacy-sensitive data without a usage description.  The app's Info.plist must contain an NSPhotoLibraryUsageDescription key with a string value explaining to the user how the app uses this data."
-                             });
+                             }, NO);
         }
         return ;
     }
@@ -160,7 +160,7 @@ WX_EXPORT_METHOD(@selector(save:))
                 resultCallback(@{
                                  @"success" : @(false),
                                  @"errorDesc": @"This maybe crash above iOS 10 because it attempted to access privacy-sensitive data without a usage description.  The app's Info.plist must contain an NSPhotoLibraryUsageDescription key with a string value explaining to the user how the app uses this data."
-                                 });
+                                 }, NO);
             }
             return;
         }
@@ -169,7 +169,7 @@ WX_EXPORT_METHOD(@selector(save:))
     if (![self isViewLoaded]) {
         if (resultCallback) {
             resultCallback(@{@"success": @(false),
-                             @"errorDesc":@"the image is not ready"});
+                             @"errorDesc":@"the image is not ready"}, NO);
         }
         return;
     }
@@ -197,7 +197,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     if (contextInfo) {
         [callbackResult setObject:@(success) forKey:@"success"];
-        ((__bridge WXCallback)contextInfo)(callbackResult);
+        ((__bridge WXKeepAliveCallback)contextInfo)(callbackResult, NO);
         CFRelease(contextInfo);
     }
 }

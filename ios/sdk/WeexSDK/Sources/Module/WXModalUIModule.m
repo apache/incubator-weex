@@ -239,7 +239,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 
 #pragma mark - Alert
 
-- (void)alert:(NSDictionary *)param callback:(WXModuleCallback)callback
+- (void)alert:(NSDictionary *)param callback:(WXModuleKeepAliveCallback)callback
 {
     NSString *message = [self stringValue:param[@"message"]];
     NSString *okTitle = [self stringValue:param[@"okTitle"]];
@@ -253,7 +253,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 
 #pragma mark - Confirm
 
-- (void)confirm:(NSDictionary *)param callback:(WXModuleCallback)callback
+- (void)confirm:(NSDictionary *)param callback:(WXModuleKeepAliveCallback)callback
 {
     NSString *message = [self stringValue:param[@"message"]];
     NSString *okTitle = [self stringValue:param[@"okTitle"]];
@@ -271,7 +271,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 
 #pragma mark - Prompt
 
-- (void)prompt:(NSDictionary *)param callback:(WXModuleCallback)callback
+- (void)prompt:(NSDictionary *)param callback:(WXModuleKeepAliveCallback)callback
 {
     NSString *message = [self stringValue:param[@"message"]];
     NSString *defaultValue = [self stringValue:param[@"default"]];
@@ -291,11 +291,11 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 
 #pragma mark - Private
 
-- (void)alert:(NSString *)message okTitle:(NSString *)okTitle cancelTitle:(NSString *)cancelTitle defaultText:(NSString *)defaultText type:(WXModalType)type callback:(WXModuleCallback)callback
+- (void)alert:(NSString *)message okTitle:(NSString *)okTitle cancelTitle:(NSString *)cancelTitle defaultText:(NSString *)defaultText type:(WXModalType)type callback:(WXModuleKeepAliveCallback)callback
 {
     if (!message) {
         if (callback) {
-            callback(@"Error: message should be passed correctly.");
+            callback(@"Error: message should be passed correctly.",NO);
         }
         return;
     }
@@ -317,7 +317,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    WXModuleCallback callback = objc_getAssociatedObject(alertView, &WXModalCallbackKey);
+    WXModuleKeepAliveCallback callback = objc_getAssociatedObject(alertView, &WXModalCallbackKey);
     if (!callback) return;
     
     id result = @"";
@@ -341,7 +341,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
             break;
     }
     
-    callback(result);
+    callback(result,NO);
     
     [_alertViews removeObject:alertView];
 }

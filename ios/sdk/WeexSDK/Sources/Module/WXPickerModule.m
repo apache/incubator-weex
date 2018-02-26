@@ -53,7 +53,7 @@
 @property(nonatomic,copy)NSArray *items;
 @property(nonatomic)BOOL isAnimating;
 @property(nonatomic)NSInteger index;
-@property(nonatomic,copy)WXModuleCallback callback;
+@property(nonatomic,copy)WXModuleKeepAliveCallback callback;
 
 //date picker
 @property(nonatomic,strong)UIDatePicker *datePicker;
@@ -82,7 +82,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
 }
 
--(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pick:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     if (UIAccessibilityIsVoiceOverRunning()) {
         [self handleA11yFocusback:options];
@@ -133,7 +133,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.callback = callback;
     } else {
         if (callback) {
-            callback(@{ @"result": @"error" });
+            callback(@{ @"result": @"error" },NO);
         }
         self.callback = nil;
     }
@@ -228,7 +228,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"cancel"});
+        self.callback(@{ @"result": @"cancel"},NO);
         self.callback=nil;
     }
 }
@@ -237,7 +237,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"success",@"data":[NSNumber numberWithInteger:self.index]});
+        self.callback(@{ @"result": @"success",@"data":[NSNumber numberWithInteger:self.index]},NO);
         self.callback=nil;
     }
 }
@@ -391,7 +391,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 #pragma mark -
 #pragma Date & Time Picker
--(void)pickDate:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pickDate:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     if (UIAccessibilityIsVoiceOverRunning()) {
         [self handleA11yFocusback:options];
@@ -401,7 +401,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     [self datepick:options callback:callback];
 }
 
--(void)pickTime:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pickTime:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     if (UIAccessibilityIsVoiceOverRunning()) {
         [self handleA11yFocusback:options];
@@ -411,19 +411,19 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     [self datepick:options callback:callback];
 }
     
--(void)datepick:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)datepick:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     if ((UIDatePickerModeTime == self.datePickerMode) || (UIDatePickerModeDate == self.datePickerMode)) {
         [self createDatePicker:options callback:callback];
     } else {
         if (callback) {
-            callback(@{ @"result": @"error" });
+            callback(@{ @"result": @"error" },NO);
         }
         self.callback = nil;
     }
 }
 
-- (void)createDatePicker:(NSDictionary *)options callback:(WXModuleCallback)callback
+- (void)createDatePicker:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     self.callback = callback;
     self.datePicker = [[UIDatePicker alloc]init];
@@ -490,7 +490,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"cancel"});
+        self.callback(@{ @"result": @"cancel"},NO);
         self.callback = nil;
     }
 }
@@ -506,7 +506,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         value = [WXUtility dateToString:self.datePicker.date];
     }
     if (self.callback) {
-        self.callback(@{ @"result": @"success",@"data":value});
+        self.callback(@{ @"result": @"success",@"data":value},NO);
         self.callback=nil;
     }
 }

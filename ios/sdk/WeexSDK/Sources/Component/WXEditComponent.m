@@ -226,11 +226,11 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     [self setEditSelectionRange:selectionStart selectionEnd:selectionEnd];
 }
 
--(void)getSelectionRange:(WXCallback)callback
+-(void)getSelectionRange:(WXKeepAliveCallback)callback
 {
     NSDictionary *res = [self getEditSelectionRange];
     if(callback) {
-        callback(res);
+        callback(res,NO);
     }
 }
 

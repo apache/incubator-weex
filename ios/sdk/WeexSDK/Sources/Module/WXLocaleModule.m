@@ -27,9 +27,9 @@ WX_EXPORT_METHOD_SYNC(@selector(getLanguages))
 /**
  Get preferred language of the user
  */
-- (NSString *)getLanguage:(WXCallback)callback {
+- (NSString *)getLanguage:(WXKeepAliveCallback)callback {
     if (callback) {
-        callback([NSLocale preferredLanguages][0]);
+        callback([NSLocale preferredLanguages][0], NO);
     }
 	return [NSLocale preferredLanguages][0];
 }

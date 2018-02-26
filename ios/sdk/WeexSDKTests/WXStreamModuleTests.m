@@ -44,7 +44,7 @@
 
 - (void)fetch:(NSDictionary*)options {
     __block id callbackRet = nil, progressCallbackRet = nil;
-    [_streamModule fetch:options callback:^(id result) {
+    [_streamModule fetch:options callback:^(id result,BOOL keepAlive) {
         callbackRet = result;
     } progressCallback:^(id result, BOOL keepAlive) {
         progressCallbackRet = result;

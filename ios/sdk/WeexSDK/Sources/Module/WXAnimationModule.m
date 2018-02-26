@@ -146,7 +146,7 @@
 
 WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
-- (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
+- (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
 {
     _needLayout = NO;
     _isAnimationedSuccess = YES;
@@ -156,7 +156,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             if (callback) {
                 NSDictionary *message = @{@"result":@"Fail",
                                           @"message":[NSString stringWithFormat:@"No component find for ref:%@", nodeRef]};
-                callback(message);
+                callback(message, NO);
             }
             return;
         }
@@ -329,7 +329,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [target _modifyStyles:styles];
     
 }
-- (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleCallback)callback
+- (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
 {
     /**
        UIView-style animation functions support the standard timing functions,
@@ -350,7 +350,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 message = @{@"result":@"Fail",
                             @"message":@"Animation did not complete"};
             }
-            callback(message);
+            callback(message,NO);
         }
     }];
     NSArray<WXAnimationInfo *> *infos = [self animationInfoArrayFromArgs:args target:targetComponent];
