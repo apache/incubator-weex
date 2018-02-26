@@ -34,6 +34,34 @@
 
 @end
 
+#define OVERRIDE_METHOD(method,retValue) \
+do { \
+    _Pragma("clang diagnostic push") \
+    _Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
+    if (![WXUtility threadSafeCollectionUsingLock]) {\
+        dispatch_sync(_queue, ^{\
+            if ([_dict respondsToSelector:method]) {\
+            retValue = [_dict performSelector:method];\
+            }\
+        });\
+    } else {\
+        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {\
+            os_unfair_lock_lock(&_unfairLock);\
+            if ([_dict respondsToSelector:method]) {\
+                retValue = [_dict performSelector:method];\
+            }\
+            os_unfair_lock_unlock(&_unfairLock);\
+        } else {\
+            pthread_mutex_lock(&_safeThreadDictionaryMutex);\
+            if ([_dict respondsToSelector:method]) {\
+                retValue = [_dict performSelector:method];\
+            }\
+            pthread_mutex_unlock(&_safeThreadDictionaryMutex);\
+        }\
+    }\
+    _Pragma("clang diagnostic pop")\
+} while (0)
+
 @implementation WXThreadSafeMutableDictionary
 
 - (instancetype)initCommon
@@ -185,6 +213,20 @@
             pthread_mutex_unlock(&_safeThreadDictionaryMutex);
         }
     }
+}
+
+- (NSArray *)allKeys
+{
+    __block NSArray *allKeys = nil;
+    OVERRIDE_METHOD(_cmd, allKeys);
+    return allKeys;
+}
+
+- (NSArray *)allValues
+{
+    __block NSArray *allValues = nil;
+    OVERRIDE_METHOD(_cmd, allValues);
+    return allValues;
 }
 
 - (void)removeObjectForKey:(id)aKey
