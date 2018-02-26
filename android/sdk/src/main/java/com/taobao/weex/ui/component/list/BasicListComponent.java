@@ -601,6 +601,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             if (pos <= firstVisiblePosition || (cell.getStickyOffset() > 0 && firstVisiblePosition < pos && pos <= lastVisiblePosition  &&
                     top <= cell.getStickyOffset())) {
               beforeFirstVisibleItem = true;
+              if(pos > currentStickyPos) {
+                currentStickyPos = pos;
+              }
             }else{
               removeOldSticky = true;
             }
