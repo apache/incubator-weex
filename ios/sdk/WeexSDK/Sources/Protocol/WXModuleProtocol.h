@@ -34,7 +34,8 @@
  * @abstract the module callback , result can be string or dictionary.
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
-typedef void (^WXModuleCallback)(id result) DEPRECATED_MSG_ATTRIBUTE("use WXModuleKeepAliveCallback, you can specify keep the callback or not, if keeped, it can be called multi times, or it will be removed after called.");
+typedef void (^WXModuleCallback)(id result);
+//DEPRECATED_MSG_ATTRIBUTE("use WXModuleKeepAliveCallback, you can specify keep the callback or not, if keeped, it can be called multi times, or it will be removed after called.")
 
 /**
  * @abstract the module callback , result can be string or dictionary.
