@@ -48,7 +48,6 @@
     NSMutableDictionary *_stickyCache;
     
     NSUInteger _previousLoadMoreCellNumber;
-    WXScrollDirection _scrollDirection;
 }
 
 WX_EXPORT_METHOD(@selector(appendData:))
@@ -78,7 +77,6 @@ WX_EXPORT_METHOD(@selector(setListData:))
         _indexKey = [WXConvert NSString:attributes[@"index"]];
         _sizeCache = [NSMutableDictionary dictionary];
         _stickyCache = [NSMutableDictionary dictionary];
-        _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
     }
     
     return self;
@@ -116,6 +114,8 @@ WX_EXPORT_METHOD(@selector(setListData:))
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
+    [super updateAttributes:attributes];
+    
     if (attributes[@"listData"]) {
         NSArray *listData = attributes[@"listData"];
         [self _updateListData:listData withCompletion:nil animation:NO];
@@ -447,11 +447,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
 }
 
 - (void)_updateScrollDirection:(WXScrollDirection)newScrollDirection
-{
-    if (_scrollDirection == newScrollDirection) {
-        return;
-    }
-    _scrollDirection = newScrollDirection;
+{   
     WXRecycleListLayout *layout = [self recycleListLayout];
     _collectionView.collectionViewLayout = layout;
 }
@@ -463,7 +459,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     // to show cells that original width / height is zero, otherwise cellForItemAtIndexPath will not be called
     layout.minimumLineSpacing = 0.01;
     layout.minimumInteritemSpacing = 0.01;
-    if (_scrollDirection == WXScrollDirectionHorizontal) {
+    if (WXScrollDirectionHorizontal == self.scrollDirection) {
         layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     }
     return layout;
