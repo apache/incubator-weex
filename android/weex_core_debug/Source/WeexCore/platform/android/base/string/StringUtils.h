@@ -159,6 +159,15 @@ static jbyteArray getArgumentAsJByteArray(JNIEnv *env, IPCArguments *arguments, 
   return ba;
 }
 
+static int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int argument) {
+  int ret = 0;
+  if (arguments->getType(argument) == IPCType::INT32) {
+    const int32_t type = arguments->get<int32_t>(argument);
+    ret = type;
+  }
+  return ret;
+}
+
 static void addString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
   ScopedJString scopedString(env, str);
   const uint16_t *chars = scopedString.getChars();

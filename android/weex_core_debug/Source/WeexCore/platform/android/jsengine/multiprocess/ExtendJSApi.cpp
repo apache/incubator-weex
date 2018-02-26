@@ -3,6 +3,8 @@
 
 using namespace WeexCore;
 
+static WeexCore::FunType gCanvasFunc = nullptr;
+
 /**
 * This class aim to extend JS Api
 **/
@@ -43,6 +45,7 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
                            functionCallRemoveEvent);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL), handleSetInterval);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL), handleClearInterval);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK), handleCallGCanvasLinkNative);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
@@ -135,6 +138,41 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jCallbackId);
   return createVoidResult();
+}
+
+static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments* arguments)
+{
+//  base::debug::TraceScope traceScope("weex", "callGCanvasLinkNative");
+  JNIEnv* env = getJNIEnv();
+  //instacneID args[0]
+  jstring jContextId = getArgumentAsJString(env, arguments, 0);
+  const char* conextId = env->GetStringUTFChars(jContextId, NULL);
+
+  // jstring jType = getArgumentAsJString(env, arguments, 1);
+  int type = getArgumentAsInt32(env, arguments, 1);
+  // need tansfer jtype to type
+
+  jstring val = getArgumentAsJString(env, arguments, 2);
+  const char* args = env->GetStringUTFChars(val, NULL);
+
+  // LOGE("handleCallGCanvasLinkNative conextId:%s, type:%d, args:%s", conextId, type, args);
+
+  const char* retVal = NULL;
+  if (gCanvasFunc) {
+    retVal = callGCanvasFun(gCanvasFunc, conextId, type, args);
+  }
+  // LOGE("handleCallGCanvasLinkNative retVal:%s", retVal);
+  std::unique_ptr<IPCResult> ret = createVoidResult();
+  if (retVal) {
+    jstring jDataStr = env->NewStringUTF(retVal);
+    ret = std::move(createStringResult(env, jDataStr));
+    env->DeleteLocalRef(jDataStr);
+    retVal = NULL;
+  }
+  env->DeleteLocalRef(jContextId);
+  // env->DeleteLocalRef(jType);
+  env->DeleteLocalRef(val);
+  return ret;
 }
 
 
@@ -434,4 +472,18 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(jInstanceId, jTaskString, jCallback);
 
   return createInt32Result(flag);
+}
+
+namespace WeexCore {
+
+  extern "C" void Inject_GCanvasFunc(FunType fp)
+  {
+    gCanvasFunc = fp;
+    LOGE("weexjsc injectGCanvasFunc gCanvasFunc");
+  }
+
+  const char* callGCanvasFun(FunType fp, const char* conextId, int x, const char* args) {
+    return fp(conextId, x, args);
+  }
+
 }

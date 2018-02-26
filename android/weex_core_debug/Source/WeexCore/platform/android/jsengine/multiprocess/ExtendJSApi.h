@@ -10,6 +10,8 @@
 #include "IPC/IPCString.h"
 #include "IPC/Serializing/IPCSerializer.h"
 #include <WeexCore/render/manager/RenderManager.h>
+#include <jni.h>
+#include <sys/types.h>
 
 
 static std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments);
@@ -52,16 +54,25 @@ static std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments);
 
 static std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments);
 
+static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *arguments);
+
+
 static void reportException(const char *instanceID, const char *func, const char *exception_string);
 
 namespace WeexCore {
 
-class ExtendJSApi {
-public:
+  typedef const char *(*FunType)(const char *, int, const char *);
+
+  const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args);
+
+  extern "C" void Inject_GCanvasFunc(FunType fp);
+
+  class ExtendJSApi {
+  public:
     ExtendJSApi();
 
     void initFunction(IPCHandler *handler);
-};
+  };
 
 } //WeexCore
 
