@@ -45,7 +45,8 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
                            functionCallRemoveEvent);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL), handleSetInterval);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL), handleClearInterval);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK), handleCallGCanvasLinkNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK),
+                           handleCallGCanvasLinkNative);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
@@ -140,24 +141,23 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
   return createVoidResult();
 }
 
-static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments* arguments)
-{
+static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *arguments) {
 //  base::debug::TraceScope traceScope("weex", "callGCanvasLinkNative");
-  JNIEnv* env = getJNIEnv();
+  JNIEnv *env = getJNIEnv();
   //instacneID args[0]
   jstring jContextId = getArgumentAsJString(env, arguments, 0);
-  const char* conextId = env->GetStringUTFChars(jContextId, NULL);
+  const char *conextId = env->GetStringUTFChars(jContextId, NULL);
 
   // jstring jType = getArgumentAsJString(env, arguments, 1);
   int type = getArgumentAsInt32(env, arguments, 1);
   // need tansfer jtype to type
 
   jstring val = getArgumentAsJString(env, arguments, 2);
-  const char* args = env->GetStringUTFChars(val, NULL);
+  const char *args = env->GetStringUTFChars(val, NULL);
 
   // LOGE("handleCallGCanvasLinkNative conextId:%s, type:%d, args:%s", conextId, type, args);
 
-  const char* retVal = NULL;
+  const char *retVal = NULL;
   if (gCanvasFunc) {
     retVal = callGCanvasFun(gCanvasFunc, conextId, type, args);
   }
@@ -224,11 +224,12 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+
+  if (pageId == nullptr || ref == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s", pageId.c_str(),
@@ -237,21 +238,22 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->RemoveRenderObject(pageId, ref);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
+  delete[]pageId;
+  delete[]ref;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  jstring jParentRef = getArgumentAsJString(env, arguments, 2);
-  jstring jIndex = getArgumentAsJString(env, arguments, 3);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
-  std::string parentRef = jString2Str(env, jParentRef);
-  int index = atoi(jString2Str(env, jIndex).c_str());
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *parentRef = getArumentAsCStr(arguments, 2);
+  char *index_str = getArumentAsCStr(arguments, 3);
+  int index = atoi(index_str);
+
+  if (pageId == nullptr || ref == nullptr || parentRef == nullptr || index_str == nullptr ||
+      index < -1)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s, parentRef: %s, index: %d",
@@ -260,21 +262,21 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->MoveRenderObject(pageId, ref, parentRef, index);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
-  env->DeleteLocalRef(jParentRef);
-  env->DeleteLocalRef(jIndex);
+  delete[]pageId;
+  delete[]ref;
+  delete[]parentRef;
+  delete[]index_str;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 2);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
-  std::string data = jByteArray2Str(env, jData);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *data = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || data == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallUpdateStyle >>>> pageId: %s, ref: %s, data: %s", pageId.c_str(),
@@ -283,20 +285,20 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
-  env->DeleteLocalRef(jData);
+  delete[] pageId;
+  delete[] ref;
+  delete[] data;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 2);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
-  std::string data = jByteArray2Str(env, jData);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *data = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || data == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallUpdateAttrs >>>> pageId: %s, ref: %s, data: %s", pageId.c_str(),
@@ -305,16 +307,18 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->UpdateAttr(pageId, ref, data);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
-  env->DeleteLocalRef(jData);
+  delete[] pageId;
+  delete[] ref;
+  delete[] data;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  std::string pageId = jString2Str(env, jPageId);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+
+  if (pageId == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId.c_str());
@@ -322,7 +326,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->CreateFinish(pageId);
 
-  env->DeleteLocalRef(jPageId);
+  delete[]pageId;
   return createInt32Result(0);
 }
 
@@ -352,13 +356,13 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  jstring jEvent = getArgumentAsJString(env, arguments, 2);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
-  std::string event = jString2Str(env, jEvent);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *event = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || event == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId.c_str(),
@@ -367,20 +371,20 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->AddEvent(pageId, ref, event);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
-  env->DeleteLocalRef(jEvent);
+  delete[]pageId;
+  delete[]ref;
+  delete[]event;
   return createInt32Result(0);
 }
 
 std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  jstring jRef = getArgumentAsJString(env, arguments, 1);
-  jstring jEvent = getArgumentAsJString(env, arguments, 2);
-  std::string pageId = jString2Str(env, jPageId);
-  std::string ref = jString2Str(env, jRef);
-  std::string event = jString2Str(env, jEvent);
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *event = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || event == nullptr)
+    return createInt32Result(0);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId.c_str(),
@@ -389,9 +393,9 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
 
   RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
 
-  env->DeleteLocalRef(jPageId);
-  env->DeleteLocalRef(jRef);
-  env->DeleteLocalRef(jEvent);
+  delete[]pageId;
+  delete[]ref;
+  delete[]event;
   return createInt32Result(0);
 }
 
@@ -476,13 +480,12 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
 
 namespace WeexCore {
 
-  extern "C" void Inject_GCanvasFunc(FunType fp)
-  {
+  extern "C" void Inject_GCanvasFunc(FunType fp) {
     gCanvasFunc = fp;
     LOGE("weexjsc injectGCanvasFunc gCanvasFunc");
   }
 
-  const char* callGCanvasFun(FunType fp, const char* conextId, int x, const char* args) {
+  const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args) {
     return fp(conextId, x, args);
   }
 
