@@ -257,8 +257,8 @@ namespace WeexCore {
     float sumPaddingBorderOfEdge(const WXCoreEdge edge){
       switch (edge) {
         case kTop:
-          return mPadding.getPadding(kPaddingLeft)
-              + mBorderWidth.getBorderWidth(kBorderWidthLeft);
+          return mPadding.getPadding(kPaddingTop)
+              + mBorderWidth.getBorderWidth(kBorderWidthTop);
         case kRight:
           return mPadding.getPadding(kPaddingRight)
               + mBorderWidth.getBorderWidth(kBorderWidthRight);
