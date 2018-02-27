@@ -49,6 +49,11 @@
 
 @property (nonatomic, strong) NSString *url;
 
+@property (nonatomic, strong) NSString *source;
+
+// save source during this initialization
+@property (nonatomic, strong) NSString *inInitsource;
+
 @property (nonatomic, assign) BOOL startLoadEvent;
 
 @property (nonatomic, assign) BOOL finishLoadEvent;
@@ -61,6 +66,7 @@
 
 @implementation WXWebComponent
 
+WX_EXPORT_METHOD(@selector(postMessage:))
 WX_EXPORT_METHOD(@selector(goBack))
 WX_EXPORT_METHOD(@selector(reload))
 WX_EXPORT_METHOD(@selector(goForward))
@@ -69,6 +75,11 @@ WX_EXPORT_METHOD(@selector(goForward))
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         self.url = attributes[@"src"];
+        
+        if(attributes[@"source"]){
+            self.inInitsource = attributes[@"source"];
+        }
+        
     }
     return self;
 }
@@ -88,12 +99,39 @@ WX_EXPORT_METHOD(@selector(goForward))
     _webview.opaque = NO;
     _jsContext = [_webview valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     __weak typeof(self) weakSelf = self;
+
+    // This method will be abandoned slowly.
     _jsContext[@"$notifyWeex"] = ^(JSValue *data) {
         if (weakSelf.notifyEvent) {
             [weakSelf fireEvent:@"notify" params:[data toDictionary]];
         }
     };
-    
+
+    //Weex catch postMessage event from web
+    _jsContext[@"postMessage"] = ^() {
+
+        NSArray *args = [JSContext currentArguments];
+
+        if (args && args.count < 2) {
+            return;
+        }
+
+        NSDictionary *data = [args[0] toDictionary];
+        NSString *origin = [args[1] toString];
+
+        if (data == nil) {
+            return;
+        }
+
+        NSDictionary *initDic = @{ @"type" : @"message",
+                                   @"data" : data,
+                                   @"origin" : origin
+        };
+
+        [weakSelf fireEvent:@"message" params:initDic];
+    };
+
+    self.source = _inInitsource;
     if (_url) {
         [self loadURL:_url];
     }
@@ -103,6 +141,11 @@ WX_EXPORT_METHOD(@selector(goForward))
 {
     if (attributes[@"src"]) {
         self.url = attributes[@"src"];
+    }
+
+    if (attributes[@"source"]) {
+        self.inInitsource = attributes[@"source"];
+        self.source = self.inInitsource;
     }
 }
 
@@ -135,6 +178,21 @@ WX_EXPORT_METHOD(@selector(goForward))
     }
 }
 
+- (void) setSource:(NSString *)source
+{
+    NSString *newSource=[source copy];
+    if(!newSource || _url){
+        return;
+    }
+    if(![newSource isEqualToString:_source]){
+        _source=newSource;
+        if(_source){
+            [_webview loadHTMLString:_source baseURL:nil];
+        }
+    }
+    
+}
+
 - (void)loadURL:(NSString *)url
 {
     if (self.webview) {
@@ -162,10 +220,35 @@ WX_EXPORT_METHOD(@selector(goForward))
     }
 }
 
+// This method will be abandoned slowly, use postMessage
 - (void)notifyWebview:(NSDictionary *) data
 {
     NSString *json = [WXUtility JSONString:data];
     NSString *code = [NSString stringWithFormat:@"(function(){var evt=null;var data=%@;if(typeof CustomEvent==='function'){evt=new CustomEvent('notify',{detail:data})}else{evt=document.createEvent('CustomEvent');evt.initCustomEvent('notify',true,true,data)}document.dispatchEvent(evt)}())", json];
+    [_jsContext evaluateScript:code];
+}
+
+// Weex postMessage to web
+- (void)postMessage:(NSDictionary *)data {
+    WXSDKInstance *instance = [WXSDKEngine topInstance];
+
+    NSString *bundleUrlOrigin = @"";
+
+    if (instance.pageName) {
+        NSString *bundleUrl = [instance.scriptURL absoluteString];
+        NSURL *url = [NSURL URLWithString:bundleUrl];
+        bundleUrlOrigin = [NSString stringWithFormat:@"%@://%@%@", url.scheme, url.host, url.port ? [NSString stringWithFormat:@":%@", url.port] : @""];
+    }
+
+    NSDictionary *initDic = @{
+        @"type" : @"message",
+        @"data" : data,
+        @"origin" : bundleUrlOrigin
+    };
+
+    NSString *json = [WXUtility JSONString:initDic];
+
+    NSString *code = [NSString stringWithFormat:@"(function (){window.dispatchEvent(new MessageEvent('message', %@));}())", json];
     [_jsContext evaluateScript:code];
 }
 
@@ -200,15 +283,15 @@ WX_EXPORT_METHOD(@selector(goForward))
         NSMutableDictionary *data = [self baseInfo];
         [data setObject:[error localizedDescription] forKey:@"errorMsg"];
         [data setObject:[NSString stringWithFormat:@"%ld", (long)error.code] forKey:@"errorCode"];
-		
-		NSString * urlString = error.userInfo[NSURLErrorFailingURLStringErrorKey];
-		if (urlString) {
-			// webview.request may not be the real error URL, must get from error.userInfo
-			[data setObject:urlString forKey:@"url"];
-			if (![urlString hasPrefix:@"http"]) {
-				return;
-			}
-		}
+        
+        NSString * urlString = error.userInfo[NSURLErrorFailingURLStringErrorKey];
+        if (urlString) {
+            // webview.request may not be the real error URL, must get from error.userInfo
+            [data setObject:urlString forKey:@"url"];
+            if (![urlString hasPrefix:@"http"]) {
+                return;
+            }
+        }
         [self fireEvent:@"error" params:data];
     }
 }

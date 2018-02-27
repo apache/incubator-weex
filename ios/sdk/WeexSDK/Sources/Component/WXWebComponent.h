@@ -23,6 +23,8 @@
 
 - (void)notifyWebview:(NSDictionary *) data;
 
+- (void)postMessage:(NSDictionary *) data;
+
 - (void)reload;
 
 - (void)goBack;
