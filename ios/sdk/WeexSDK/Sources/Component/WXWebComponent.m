@@ -49,6 +49,8 @@
 
 @property (nonatomic, strong) NSString *url;
 
+@property (nonatomic, strong) NSString *source;
+
 @property (nonatomic, assign) BOOL startLoadEvent;
 
 @property (nonatomic, assign) BOOL finishLoadEvent;
@@ -69,6 +71,11 @@ WX_EXPORT_METHOD(@selector(goForward))
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         self.url = attributes[@"src"];
+        
+        if(attributes[@"source"]){
+            self.source = attributes[@"source"];
+        }
+        
     }
     return self;
 }
@@ -88,14 +95,22 @@ WX_EXPORT_METHOD(@selector(goForward))
     _webview.opaque = NO;
     _jsContext = [_webview valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     __weak typeof(self) weakSelf = self;
+
+    // This method will be abandoned slowly.
     _jsContext[@"$notifyWeex"] = ^(JSValue *data) {
         if (weakSelf.notifyEvent) {
             [weakSelf fireEvent:@"notify" params:[data toDictionary]];
         }
     };
     
+    _jsContext[@"postMessage"] = ^(JSValue *data){
+        [weakSelf fireEvent:@"notify" params:[data toDictionary]];
+    };
+
     if (_url) {
         [self loadURL:_url];
+    }else if(_source){
+        [_webview loadHTMLString:_source baseURL:nil];
     }
 }
 
@@ -104,6 +119,11 @@ WX_EXPORT_METHOD(@selector(goForward))
     if (attributes[@"src"]) {
         self.url = attributes[@"src"];
     }
+    
+    if(attributes[@"source"]){
+        self.source=attributes[@"source"];
+    }
+    
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -133,6 +153,21 @@ WX_EXPORT_METHOD(@selector(goForward))
             [self loadURL:_url];
         }
     }
+}
+
+- (void) setSource:(NSString *)source
+{
+    NSString *newSource=[source copy];
+    if(!newSource){
+        return;
+    }
+    if(![newSource isEqualToString:_source]){
+        _source=newSource;
+        if(_source){
+            [_webview loadHTMLString:_source baseURL:nil];
+        }
+    }
+    
 }
 
 - (void)loadURL:(NSString *)url
