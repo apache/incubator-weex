@@ -323,7 +323,7 @@ public class Constants {
     }
 
 
-    String SHOULD_STOP_PROPAGATION = "shouldStopPropagation";
+    String STOP_PROPAGATION = "stopPropagation";
 
 
 
