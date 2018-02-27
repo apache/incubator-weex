@@ -337,8 +337,8 @@ public class WXImage extends WXComponent<ImageView> {
   }
 
   @Override
-  public void updateProperties(Map<String, Object> props) {
-    super.updateProperties(props);
+  protected void onFinishLayout() {
+    super.onFinishLayout();
     WXImageView imageView;
     if (getHostView() instanceof WXImageView) {
       imageView = (WXImageView) getHostView();
@@ -359,7 +359,6 @@ public class WXImage extends WXComponent<ImageView> {
           imageDrawable.setCornerRadii(borderRadius);
         }
       }
-      readyToRender();
     }
   }
 
