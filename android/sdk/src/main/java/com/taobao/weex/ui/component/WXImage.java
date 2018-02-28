@@ -22,6 +22,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -31,6 +32,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
@@ -323,6 +326,7 @@ public class WXImage extends WXComponent<ImageView> {
               fireEvent(Constants.Event.ONLOAD, params);
             }
           }
+          monitorImgSize(imageView);
         }
       });
 
@@ -437,6 +441,25 @@ public class WXImage extends WXComponent<ImageView> {
     });
   }
 
+  private void monitorImgSize(ImageView imageView){
+    if (null == imageView){
+      return;
+    }
+    WXSDKInstance instance = getInstance();
+    if (null == instance){
+      return;
+    }
+    ViewGroup.LayoutParams params =imageView.getLayoutParams();
+    Drawable img = imageView.getDrawable();
+    if (null == params || null ==img){
+      return;
+    }
+
+    if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
+                                                             imageView.getMeasuredWidth()){
+      instance.getWXPerformance().wrongImgSizeCount++;
+    }
+  }
 
   public void destroy() {
     if(getHostView() instanceof WXImageView){

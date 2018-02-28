@@ -295,6 +295,8 @@ public class WXPerformance {
 
   public int maxDeepVDomLayer;
 
+  public double wrongImgSizeCount;
+
   /**
    * 1:true
    * 0:false
@@ -409,7 +411,7 @@ public class WXPerformance {
 
     quotas.put(Measure.fsCallEventTotalNum.toString(), (double) fsCallEventTotalNum);
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
-    quotas.put(Measure.imgSizeCount.toString(), 0D);
+    quotas.put(Measure.imgSizeCount.toString(), wrongImgSizeCount);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);
