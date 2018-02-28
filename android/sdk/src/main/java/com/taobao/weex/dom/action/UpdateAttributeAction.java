@@ -58,7 +58,7 @@ class UpdateAttributeAction extends TraceableAction implements DOMAction, Render
     if (domObject == null) {
       if (instance != null) {
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS,
 				"updateAttr",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS.getErrorMsg() + "domObject is null",null);
       }

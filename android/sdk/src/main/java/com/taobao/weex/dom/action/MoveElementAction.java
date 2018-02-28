@@ -59,7 +59,7 @@ final class MoveElementAction implements DOMAction, RenderAction {
         || parentObject == null || parentObject.hasNewLayout()) {
       if (instance != null) {
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT,
 				"moveElement",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT.getErrorMsg() +
 						"domObject = " + domObject

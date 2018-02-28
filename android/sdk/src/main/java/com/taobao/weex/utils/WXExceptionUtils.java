@@ -18,12 +18,15 @@
  */
 package com.taobao.weex.utils;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.WXMonitorDataLoger;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import java.util.Map;
@@ -48,7 +51,7 @@ public class WXExceptionUtils {
    * @param extParams
    */
   public static void commitCriticalExceptionRT(@Nullable final String instanceId,
-											   @Nullable final String errCode,
+											   @Nullable final WXErrorCode errCode,
 											   @Nullable final String function,
 											   @Nullable final String exception,
 											   @Nullable final Map<String,String> extParams ) {
@@ -84,10 +87,10 @@ public class WXExceptionUtils {
 	  }
 	}
 
+        exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
 	if (adapter != null) {
-	  exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
 	  adapter.onJSException(exceptionCommit);
-	  WXLogUtils.e(exceptionCommit.toString());
 	}
+        WXMonitorDataLoger.transferError(exceptionCommit,instanceId);
   }
 }

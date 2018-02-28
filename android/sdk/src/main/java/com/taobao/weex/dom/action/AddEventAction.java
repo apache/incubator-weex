@@ -69,7 +69,7 @@ class AddEventAction extends TraceableAction implements DOMAction, RenderAction 
 
 		if(!"_documentElement".equals(mRef)){//Rax framework
 		  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorCode(),
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT,
 				  "addEvent",
 				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ADD_EVENT.getErrorMsg() + "| domObject is null |"
 						  +sbErr.toString(),null);
