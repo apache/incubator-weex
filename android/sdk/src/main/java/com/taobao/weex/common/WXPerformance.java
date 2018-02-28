@@ -24,7 +24,6 @@ import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.performance.FpsCollector;
 import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -60,14 +59,14 @@ public class WXPerformance {
 
   public enum Measure {
     /**
-     *  range : [min,max)
+     * range : [min,max)
      */
     JSLibSize(0D, Double.MAX_VALUE),
     JSLibInitTime(0D, 3000D),
     SDKInitTime(0D, 3000D),
     SDKInitInvokeTime(0D, 3000D),
     SDKInitExecuteTime(0D, 3000D),
-    JSTemplateSize(0D,4000D),
+    JSTemplateSize(0D, 4000D),
     pureNetworkTime(0D, 15000D),
     networkTime(0D, 15000D),
     fsCreateInstanceTime(0D, 3000D),
@@ -365,12 +364,7 @@ public class WXPerformance {
 
   public static void init() {
     if (WXPerformance.TRACE_DATA) {
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          FpsCollector.getInstance().init();
-        }
-      }, 0);
+      FpsCollector.getInstance().init();
     }
   }
 
@@ -415,7 +409,7 @@ public class WXPerformance {
 
     quotas.put(Measure.fsCallEventTotalNum.toString(), (double) fsCallEventTotalNum);
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
-    quotas.put(Measure.imgSizeCount.toString(),0D);
+    quotas.put(Measure.imgSizeCount.toString(), 0D);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);
@@ -426,7 +420,6 @@ public class WXPerformance {
     quotas.put(Measure.actualNetworkTime.toString(), (double) actualNetworkTime);
     quotas.put(Measure.syncTaskTime.toString(), (double) syncTaskTime);
     quotas.put(Measure.packageSpendTime.toString(), (double) packageSpendTime);
-
 
     // TODO These attribute will be moved to elsewhere
     quotas.put(Measure.measureTime1.toString(), (double) measureTimes[0]);

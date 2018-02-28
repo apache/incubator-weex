@@ -76,6 +76,7 @@ public class FpsCollector {
 
     @Override
     public void doFrame(long frameTimeNanos) {
+      Choreographer.getInstance().postFrameCallback(this);
       if (mTimeBegin == 0) {
         mTimeBegin = System.currentTimeMillis();
         mFrameCount++;
@@ -93,7 +94,6 @@ public class FpsCollector {
 
       mTimeBegin = 0;
       mFrameCount = 0;
-      Choreographer.getInstance().postFrameCallback(this);
     }
   }
 
