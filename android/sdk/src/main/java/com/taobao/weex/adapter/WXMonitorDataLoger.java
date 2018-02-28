@@ -11,6 +11,8 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONObject;
 
+import java.util.Map;
+
 /**
  * @author zhongcang
  * @date 2018/2/28
@@ -37,20 +39,27 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
     }
     String data = "";
     try {
-      JSONObject dimen = new JSONObject();
+      JSONObject dimensionMap = new JSONObject();
+      JSONObject measureMap = new JSONObject();
+
+      for (Map.Entry<String, String> entry : performance.getDimensionMap().entrySet()) {
+        dimensionMap.put(entry.getKey(), entry.getValue());
+      }
+      for (Map.Entry<String, Double> entry : performance.getMeasureMap().entrySet()) {
+        measureMap.put(entry.getKey(), entry.getValue());
+      }
 
       data = new JSONObject()
           .put("instanceId", instanceId)
           .put("url", instance.getBundleUrl())
-          // .put()
+          .put("dimensionMap", dimensionMap)
+          .put("measureMap", measureMap)
           .toString();
 
     } catch (Exception e) {
       e.printStackTrace();
     }
     transfer.transfer(MONITOR, MODULE_PERFORMANCE, "instance", data);
-
-
   }
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
@@ -90,26 +99,15 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
     if (null == transfer) {
       return;
     }
-    transfer.transfer(MONITOR, MODULE_PERFORMANCE, "fps", String.valueOf(fps));
-    //
-    //    //for dev-tool
-    //    try {
-    //      JSONObject data = new JSONObject();
-    //      data.put("fps", fps);
-    //      WXJSObject[] args = new WXJSObject[]{
-    //          new WXJSObject(WXJSObject.String, module),
-    //          new WXJSObject(WXJSObject.String, type),
-    //          new WXJSObject(WXJSObject.JSON, data.toString())
-    //      };
-    //      WXBridgeManager.getInstance().invokeExecJS(MONITOR, null, MONITOR, args, false);
-    //    } catch (Exception e) {
-    //      e.printStackTrace();
-    //    }
+    String data = "";
+    try {
+      data = new JSONObject().put("fps", fps).toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    transfer.transfer(MONITOR, MODULE_PERFORMANCE, "fps", data);
   }
 
-  private void logData(String module, String type, String data) {
-
-  }
 
   @Override
   public void transfer(String tag, String module, String type, String data) {

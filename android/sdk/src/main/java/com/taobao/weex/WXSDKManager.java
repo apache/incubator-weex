@@ -35,6 +35,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.adapter.WXMonitorDataLoger;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.storage.DefaultWXStorage;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -369,7 +370,11 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
-    this.mMonitorDataTransfer = config.getMonitorDataTransfer();
+    if (config.getMonitorDataTransfer() == null){
+      this.mMonitorDataTransfer = new WXMonitorDataLoger();
+    }else {
+      this.mMonitorDataTransfer = config.getMonitorDataTransfer();
+    }
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){
