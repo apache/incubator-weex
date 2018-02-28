@@ -46,7 +46,6 @@ public class FpsCollector {
 
   private Map<String, IFPSCallBack> mListenerMap = new ConcurrentHashMap<>();
   private AtomicBoolean mHasInit = new AtomicBoolean(false);
-  public static boolean transferFpsData = false;
 
 
   private static class SingleTonHolder {
@@ -64,13 +63,6 @@ public class FpsCollector {
       return;
     }
     if (mHasInit.compareAndSet(false, true)) {
-      try {
-        transferFpsData = new File(
-            Environment.getExternalStorageDirectory().getAbsolutePath(), "WXPerformance.data"
-        ).exists();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
       Choreographer.getInstance().postFrameCallback(new OnFrameListener());
     }
   }
@@ -97,9 +89,7 @@ public class FpsCollector {
       for (Map.Entry<String, IFPSCallBack> entry : mListenerMap.entrySet()) {
         entry.getValue().fps(mFrameCount);
       }
-      if (transferFpsData) {
-        WXMonitorDataLoger.transferFps(mFrameCount);
-      }
+      WXMonitorDataLoger.transferFps(mFrameCount);
 
       mTimeBegin = 0;
       mFrameCount = 0;

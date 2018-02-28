@@ -1,5 +1,7 @@
 package com.taobao.weex.adapter;
 
+import android.os.Environment;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -11,6 +13,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -23,6 +26,11 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
   private static final String MONITOR = "WXMonitor";
   private static final String MODULE_PERFORMANCE = "WXPerformance";
   private static final String MODULE_ERROR = "WXError";
+  private static boolean transFpsData = false;
+
+  static {
+    judgeTransFerFps();
+  }
 
   public static void transferPerformance(WXPerformance performance, String instanceId) {
     if (!WXEnvironment.isApkDebugable()) {
@@ -92,7 +100,7 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
   }
 
   public static void transferFps(long fps) {
-    if (!WXEnvironment.isApkDebugable()) {
+    if (!transFpsData) {
       return;
     }
     IWXMonitorDataTransfer transfer = WXSDKManager.getInstance().getWXMonitorDataTransfer();
@@ -108,6 +116,18 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
     transfer.transfer(MONITOR, MODULE_PERFORMANCE, "fps", data);
   }
 
+
+  private static void judgeTransFerFps() {
+    if (!WXEnvironment.isApkDebugable()) {
+      return;
+    }
+    try {
+      transFpsData = new File(Environment.getExternalStorageDirectory(), "WXPerformance.dat")
+          .exists();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public void transfer(String tag, String module, String type, String data) {
