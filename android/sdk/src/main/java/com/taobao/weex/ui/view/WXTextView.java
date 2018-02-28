@@ -35,7 +35,6 @@ import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 
 /**
  * TextView wrapper
@@ -130,13 +129,13 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
         @Override
         public boolean onLongClick(View v) {
           PopupMenu popupMenu = new PopupMenu(getContext(), WXTextView.this);
-          boolean isCN = false;
+          String s = "Copy";
           try {
-            isCN = Locale.getDefault().toString().startsWith("zh_CN");
+            s = getContext().getResources().getString(android.R.string.copy);
           } catch (Throwable t) {
             //ignore
           }
-          final String title = isCN ? "复制" : "Copy";
+          final String title = s;
           popupMenu.getMenu().add(title);
           popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
