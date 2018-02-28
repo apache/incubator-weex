@@ -22,9 +22,9 @@ import android.os.Debug;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.performance.FpsCollector;
 import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -107,7 +107,8 @@ public class WXPerformance {
     firstScreenJSFExecuteTime(0D, 5000D),
     //..
 
-    fluency(0D, 101D);
+    fluency(0D, 101D),
+    imgSizeCount(0D, 2000D);
 
 
     private double mMinRange, mMaxRange;
@@ -133,7 +134,7 @@ public class WXPerformance {
 
   public static final int VIEW_LIMIT_HEIGHT = WXViewUtils.getScreenHeight() / 2;
   public static final int VIEW_LIMIT_WIDTH = WXViewUtils.getScreenWidth() / 2;
-  public static final boolean TRACE_DATA = true;// WXEnvironment.isApkDebugable();
+  public static boolean TRACE_DATA = WXEnvironment.isApkDebugable();
 
   /**
    * No longer needed.
@@ -362,6 +363,17 @@ public class WXPerformance {
     mErrMsgBuilder = new StringBuilder();
   }
 
+  public static void init() {
+    if (WXPerformance.TRACE_DATA) {
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          FpsCollector.getInstance().init();
+        }
+      }, 0);
+    }
+  }
+
   public Map<String, Double> getMeasureMap() {
     double fsRenderTime;
     if (this.fsRenderTime != 0) {
@@ -403,6 +415,7 @@ public class WXPerformance {
 
     quotas.put(Measure.fsCallEventTotalNum.toString(), (double) fsCallEventTotalNum);
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
+    quotas.put(Measure.imgSizeCount.toString(),0D);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);
@@ -413,6 +426,7 @@ public class WXPerformance {
     quotas.put(Measure.actualNetworkTime.toString(), (double) actualNetworkTime);
     quotas.put(Measure.syncTaskTime.toString(), (double) syncTaskTime);
     quotas.put(Measure.packageSpendTime.toString(), (double) packageSpendTime);
+
 
     // TODO These attribute will be moved to elsewhere
     quotas.put(Measure.measureTime1.toString(), (double) measureTimes[0]);
@@ -518,9 +532,11 @@ public class WXPerformance {
     mErrMsgBuilder.append(msg);
   }
 
+
+  private FpsRecorder mFpsRecorder = new FpsRecorder();
+
   public void beforeInstanceRender(String instanceId) {
     renderTimeOrigin = System.currentTimeMillis();
-    tmp = instanceId;
     if (WXPerformance.TRACE_DATA) {
       if (TextUtils.isEmpty(instanceId)) {
         return;
@@ -529,7 +545,7 @@ public class WXPerformance {
       if (null != mem) {
         memTotalBeforeRender = mem.getTotalPss();
       }
-      FpsCollector.getInstance().registerListener(instanceId, new FpsCallBack());
+      FpsCollector.getInstance().registerListener(instanceId, mFpsRecorder);
     }
   }
 
@@ -537,10 +553,8 @@ public class WXPerformance {
   //
   //  }
 
-  String tmp;
 
   public void afterInstanceDestroy(String instanceId) {
-
     if (WXPerformance.TRACE_DATA) {
       if (TextUtils.isEmpty(instanceId)) {
         return;
@@ -550,85 +564,31 @@ public class WXPerformance {
       if (null != mem) {
         backImproveMemory = mem.getTotalPss() - memTotalBeforeRender;
       }
-      //fps
-      if (frameEndTime == 0) {
-        frameEndTime = System.currentTimeMillis();
-      }
-      long timeDiff = (frameEndTime - frameStartTime)/1000;
-      if (timeDiff <= 0) {
-        avgFPS = -1;
-      } else {
-        avgFPS = frameSum / timeDiff;
-      }
-      //Fluency
-      if (totalFpsPointCount > 0) {
-        fluency = fluencyFpsPointCount / totalFpsPointCount;
+      if (mFpsRecorder.totalFpsCount > 0) {
+        avgFPS = mFpsRecorder.totalFpsCount / mFpsRecorder.totalFpsCount;
+        fluency = (double) mFpsRecorder.fluncyFpsPointCount / (double) mFpsRecorder.totalFpsCount;
       }
     }
-
-    Log.d("performance", "avgFps :" + avgFPS + " | fluency :" + fluency + "[" + fluencyFpsPointCount + ","
-                         + "" + totalFpsPointCount + "]");
   }
 
-  private double totalFpsPointCount;
-  private double fluencyFpsPointCount;
+  private class FpsRecorder implements FpsCollector.IFPSCallBack {
 
-  private class FpsCallBack implements FpsCollector.IFrameCallBack {
-
-    private long prePointFrame = -1;
-    private long prePointTime = -1;
-    private final long SECOND = 1000;
     private final long FLUENCY_FPS_LIMIT = 35;
 
+    private long totalFpsFrame;
+    private long totalFpsCount;
+    private long fluncyFpsPointCount;
+    private final long LIMIT_LONG = Long.MAX_VALUE - 1000;
 
     @Override
-    public void doFrame(long frameTimeNanos) {
-      calculateAvgFps();
-      calculateFpsFluency();
-    }
-
-    private void calculateFpsFluency() {
-      long limitLongSize = Long.MAX_VALUE - 1000L;
-      if (prePointFrame >= limitLongSize || prePointTime >= limitLongSize ||
-          totalFpsPointCount >= limitLongSize || totalFpsPointCount >= limitLongSize) {
+    public void fps(int fps) {
+      if (totalFpsFrame >= LIMIT_LONG || totalFpsCount >= Long.MAX_VALUE) {
         return;
       }
-
-      if (prePointFrame == -1) {
-        prePointFrame = 1;
-        prePointTime = System.currentTimeMillis();
-        return;
-      }
-      long currentPointTime = System.currentTimeMillis();
-      long diff = currentPointTime - prePointTime;
-      if (diff < SECOND) {
-        prePointFrame++;
-        return;
-      }
-      totalFpsPointCount++;
-      if (prePointFrame > FLUENCY_FPS_LIMIT) {
-        fluencyFpsPointCount++;
-      }
-
-      Log.d("performance", tmp + "diff :" + diff + "| " + totalFpsPointCount + "," +
-                           fluencyFpsPointCount + "," + prePointFrame);
-
-      prePointTime = currentPointTime;
-      prePointFrame = 0;
-
-
-    }
-
-    private void calculateAvgFps() {
-      if (frameSum < Long.MAX_VALUE) {
-        frameSum++;
-        if (frameStartTime == 0) {
-          frameStartTime = System.currentTimeMillis();
-        }
-      } else {
-        if (frameEndTime == 0) {
-          frameEndTime = System.currentTimeMillis();
-        }
+      totalFpsFrame += fps;
+      totalFpsCount++;
+      if (fps >= FLUENCY_FPS_LIMIT) {
+        fluncyFpsPointCount++;
       }
     }
   }

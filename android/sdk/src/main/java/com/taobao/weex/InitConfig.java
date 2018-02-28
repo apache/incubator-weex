@@ -27,6 +27,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+import com.taobao.weex.performance.IWXMonitorDataTransfer;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -41,6 +42,7 @@ public class InitConfig {
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
+  private IWXMonitorDataTransfer mMonitorDataTransfer;
   private String framework;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -83,6 +85,8 @@ public class InitConfig {
     return mJSExceptionAdapter;
   }
 
+  public IWXMonitorDataTransfer getMonitorDataTransfer(){return  mMonitorDataTransfer;}
+
   private InitConfig() {
   }
 
@@ -97,6 +101,7 @@ public class InitConfig {
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
+    IWXMonitorDataTransfer mMonitorDataTransfer;
     public Builder(){
 
     }
@@ -151,6 +156,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setWXMonitorDataTransfer(IWXMonitorDataTransfer transfer){
+      this.mMonitorDataTransfer = transfer;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -163,6 +173,7 @@ public class InitConfig {
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       config.mJSExceptionAdapter=this.mJSExceptionAdapter;
+      config.mMonitorDataTransfer = this.mMonitorDataTransfer;
       return config;
     }
   }

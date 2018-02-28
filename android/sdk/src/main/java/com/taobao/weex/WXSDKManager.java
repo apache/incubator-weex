@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
 import com.taobao.weex.dom.WXDomManager;
+import com.taobao.weex.performance.IWXMonitorDataTransfer;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -78,6 +79,7 @@ public class WXSDKManager {
   private IWXHttpAdapter mIWXHttpAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
   private IWXAccessibilityRoleAdapter mRoleAdapter;
+  private IWXMonitorDataTransfer mMonitorDataTransfer;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -349,6 +351,14 @@ public class WXSDKManager {
     return mIWXSoLoaderAdapter;
   }
 
+  public IWXMonitorDataTransfer getWXMonitorDataTransfer(){
+    return mMonitorDataTransfer;
+  }
+
+  public void setWXMonitorDataTransfer(IWXMonitorDataTransfer transfer){
+    this.mMonitorDataTransfer = transfer;
+  }
+
   void setInitConfig(InitConfig config){
     this.mIWXHttpAdapter = config.getHttpAdapter();
     this.mIWXImgLoaderAdapter = config.getImgAdapter();
@@ -359,6 +369,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
+    this.mMonitorDataTransfer = config.getMonitorDataTransfer();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

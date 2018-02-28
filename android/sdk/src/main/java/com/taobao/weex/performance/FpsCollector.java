@@ -6,9 +6,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,11 +18,21 @@ package com.taobao.weex.performance;
 
 
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.view.Choreographer;
 
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.WXMonitorDataLoger;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.utils.WXLogUtils;
 
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,46 +43,81 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class FpsCollector {
-    private Map<String, IFrameCallBack> mListenerMap = new ConcurrentHashMap<>();
+
+  private Map<String, IFPSCallBack> mListenerMap = new ConcurrentHashMap<>();
+  private AtomicBoolean mHasInit = new AtomicBoolean(false);
+  public static boolean transferFpsData = false;
 
 
-    private static class SingleTonHolder {
-        private static FpsCollector INSTANCE = new FpsCollector();
+  private static class SingleTonHolder {
+
+    private static FpsCollector INSTANCE = new FpsCollector();
+  }
+
+  public static FpsCollector getInstance() {
+    return SingleTonHolder.INSTANCE;
+  }
+
+  public void init() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+        || !WXEnvironment.isApkDebugable() || !WXPerformance.TRACE_DATA) {
+      return;
     }
-
-    public static FpsCollector getInstance() {
-        return SingleTonHolder.INSTANCE;
-    }
-
-    public void init() {
-      if (!WXPerformance.TRACE_DATA || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-        return;
+    if (mHasInit.compareAndSet(false, true)) {
+      try {
+        transferFpsData = new File(
+            Environment.getExternalStorageDirectory().getAbsolutePath(), "WXPerformance.data"
+        ).exists();
+      } catch (Exception e) {
+        e.printStackTrace();
       }
       Choreographer.getInstance().postFrameCallback(new OnFrameListener());
     }
+  }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    private class OnFrameListener implements Choreographer.FrameCallback {
 
-        @Override
-        public void doFrame(long frameTimeNanos) {
-            for (Map.Entry<String, IFrameCallBack> entry : mListenerMap.entrySet()) {
-                entry.getValue().doFrame(frameTimeNanos);
-            }
-            Choreographer.getInstance().postFrameCallback(this);
-        }
+  @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+  private class OnFrameListener implements Choreographer.FrameCallback {
+
+    private int mFrameCount = 0;
+    private long mTimeBegin = 0;
+
+    @Override
+    public void doFrame(long frameTimeNanos) {
+      if (mTimeBegin == 0) {
+        mTimeBegin = System.currentTimeMillis();
+        mFrameCount++;
+        return;
+      }
+      long timeDiff = System.currentTimeMillis() - mTimeBegin;
+      if (timeDiff < 1000) {
+        mFrameCount++;
+        return;
+      }
+      for (Map.Entry<String, IFPSCallBack> entry : mListenerMap.entrySet()) {
+        entry.getValue().fps(mFrameCount);
+      }
+      if (transferFpsData) {
+        WXMonitorDataLoger.transferFps(mFrameCount);
+      }
+
+      mTimeBegin = 0;
+      mFrameCount = 0;
+      Choreographer.getInstance().postFrameCallback(this);
     }
+  }
 
-    public interface IFrameCallBack {
-        void doFrame(long frameTimeNanos);
-    }
+  public interface IFPSCallBack {
+
+    void fps(int fps);
+  }
 
 
-    public void registerListener(String key, IFrameCallBack listener) {
-        mListenerMap.put(key, listener);
-    }
+  public void registerListener(String key, IFPSCallBack listener) {
+    mListenerMap.put(key, listener);
+  }
 
-    public void unRegister(String key) {
-        mListenerMap.remove(key);
-    }
+  public void unRegister(String key) {
+    mListenerMap.remove(key);
+  }
 }

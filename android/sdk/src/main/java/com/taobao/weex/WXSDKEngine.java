@@ -175,14 +175,7 @@ public class WXSDKEngine {
       doInitInternal(application,config);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
-      if (WXPerformance.TRACE_DATA){
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            FpsCollector.getInstance().init();
-          }
-        },0);
-      }
+      WXPerformance.init();
 
       mIsInit = true;
     }
