@@ -20,7 +20,6 @@ package com.taobao.weex.dom.action;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -59,61 +58,49 @@ public class Actions {
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " CREATE_BODY ");
         return new CreateBodyAction(args.getJSONObject(0));
       case UPDATE_ATTRS:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " UPDATE_ATTRS ");
         return new UpdateAttributeAction(args.getString(0),args.getJSONObject(1));
       case UPDATE_STYLE:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " UPDATE_STYLE ");
         return new UpdateStyleAction(args.getString(0),args.getJSONObject(1));
       case REMOVE_ELEMENT:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " REMOVE_ELEMENT ");
         return new RemoveElementAction(args.getString(0));
       case ADD_ELEMENT:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " ADD_ELEMENT ");
         return new AddElementAction(args.getJSONObject(1),args.getString(0),args.getInteger(2));
       case MOVE_ELEMENT:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " MOVE_ELEMENT ");
         return new MoveElementAction(args.getString(0),args.getString(1),args.getInteger(2));
       case ADD_EVENT:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " ADD_EVENT ");
         return new AddEventAction(args.getString(0),args.get(1));
       case REMOVE_EVENT:
         if (args == null) {
           return null;
         }
-        Log.d("Actions", " REMOVE_EVENT ");
         return new RemoveEventAction(args.getString(0),args.get(1));
       case CREATE_FINISH:
-        Log.d("Actions", " CREATE_FINISH ");
         return new CreateFinishAction();
       case REFRESH_FINISH:
-        Log.d("Actions", " REFRESH_FINISH ");
         return new RefreshFinishAction();
       case UPDATE_FINISH:
-        Log.d("Actions", " UPDATE_FINISH ");
         return new UpdateFinishAction();
       case SCROLL_TO_ELEMENT:
-        Log.d("Actions", " SCROLL_TO_ELEMENT ");
         if (args == null) {
           return null;
         }
@@ -121,25 +108,21 @@ public class Actions {
         JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
         return new ScrollToElementAction(ref, options);
       case ADD_RULE:
-        Log.d("Actions", " ADD_RULE ");
         if (args == null) {
           return null;
         }
         return new AddRuleAction(args.getString(0),args.getJSONObject(1));
       case GET_COMPONENT_RECT:
-        Log.d("Actions", " GET_COMPONENT_RECT ");
         if(args == null){
           return null;
         }
         return new GetComponentRectAction(args.getString(0),args.getString(1));
       case INVOKE_METHOD:
-        Log.d("Actions", " INVOKE_METHOD ");
         if(args == null){
           return null;
         }
         return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
       case UPDATE_COMPONENT_DATA:
-        Log.d("Actions", " UPDATE_COMPONENT_DATA ");
         if(args == null || args.size() < 3){
           return null;
         }

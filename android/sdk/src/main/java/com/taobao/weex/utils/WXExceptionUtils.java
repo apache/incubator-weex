@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.utils;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -28,6 +30,8 @@ import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -61,10 +65,21 @@ public class WXExceptionUtils {
 	String instanceIdCommit = "InstanceIdDefalut";
 	String exceptionMsgCommit = exception;
 	Map<String, String> commitMap = extParams;
+	if (null == commitMap){
+	  commitMap = new HashMap<>();
+	}
+	commitMap.put("activity","empty");
 
 	if (!TextUtils.isEmpty(instanceId)) {
 	  instanceIdCommit = instanceId;
 	  instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+
+	  if (null != instance && instance.getContainerView() != null){
+	  	Context c = instance.getContainerView().getContext();
+	  	if (c instanceof Activity){
+	  	  commitMap.put("activity",c.getClass().getSimpleName());
+		}
+	  }
 
 	  if (null != instance && instance.getContext() != null && instance.getBundleUrl() != null) {
 		bundleUrlCommit = instance.getBundleUrl();
@@ -72,10 +87,10 @@ public class WXExceptionUtils {
 		if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
 		  if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
 			bundleUrlCommit = degradeUrl;
-		  } else
+		  } else {
 			bundleUrlCommit = WXSDKInstance.requestUrl;
-		}
-	  }
+		  }
+	  	}
 	} else {//instance is null for instance id is null
 	  if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
 		bundleUrlCommit = WXSDKInstance.requestUrl;

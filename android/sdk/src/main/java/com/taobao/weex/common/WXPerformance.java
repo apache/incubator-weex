@@ -107,7 +107,8 @@ public class WXPerformance {
     //..
 
     fluency(0D, 101D),
-    imgSizeCount(0D, 2000D);
+    imgSizeCount(0D, 2000D),
+    interactionTime(0D,10000D);
 
 
     private double mMinRange, mMaxRange;
@@ -156,6 +157,8 @@ public class WXPerformance {
   public long fsRenderTime;
 
   public long callCreateFinishTime;
+
+  public long interactionTime;
 
   /**
    * Time used for
@@ -412,6 +415,7 @@ public class WXPerformance {
     quotas.put(Measure.fsCallEventTotalNum.toString(), (double) fsCallEventTotalNum);
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
     quotas.put(Measure.imgSizeCount.toString(), wrongImgSizeCount);
+    quotas.put(Measure.interactionTime.toString(), (double) interactionTime);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);

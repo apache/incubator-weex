@@ -85,6 +85,10 @@ final class RemoveElementAction implements DOMAction, RenderAction {
     clearRegistryForComponent(context, component);
     parent.remove(component, true);
     context.unregisterComponent(mRef);
+    WXSDKInstance instance = context.getInstance();
+    if (null != instance){
+      instance.onElementChange();
+    }
   }
 
   private void clearRegistryForComponent(RenderActionContext context, WXComponent component) {

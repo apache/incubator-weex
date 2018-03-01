@@ -1146,6 +1146,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
+  /**
+   * when add/rm element
+   */
+  public void onElementChange(){
+    if (isDestroy() || !mEnd ||null == mRenderContainer || mRenderContainer.isPageHasEvent() ||
+        mWXPerformance == null){
+      return;
+    }
+    long lazyLoadTime = System.currentTimeMillis()- mWXPerformance.renderTimeOrigin - mWXPerformance
+        .callCreateFinishTime;
+    if (lazyLoadTime > 8000){
+      //bad case
+      return;
+    }
+    getWXPerformance().interactionTime = mWXPerformance.callCreateFinishTime + lazyLoadTime;
+  }
+
   public void onRenderError(final String errCode, final String msg) {
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
