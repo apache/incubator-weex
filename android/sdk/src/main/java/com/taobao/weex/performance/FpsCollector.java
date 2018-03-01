@@ -18,10 +18,12 @@ package com.taobao.weex.performance;
 
 
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.view.Choreographer;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXPerformance;
 
 import java.util.Map;
@@ -49,12 +51,19 @@ public class FpsCollector {
   }
 
   public void init() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-        || !WXEnvironment.isApkDebugable() || !WXPerformance.TRACE_DATA) {
+    if (!WXEnvironment.isApkDebugable()) {
       return;
     }
     if (mHasInit.compareAndSet(false, true)) {
-      Choreographer.getInstance().postFrameCallback(new OnFrameListener());
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && WXPerformance.TRACE_DATA) {
+            Choreographer.getInstance().postFrameCallback(new OnFrameListener());
+          }
+        }
+      }, 0);
+
     }
   }
 
