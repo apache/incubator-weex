@@ -34,7 +34,7 @@ import java.util.Map;
 
 public class WXAnalyzerDataTransfer {
 
-  private static final String MONITOR = "WXMonitor";
+  private static final String GROUP = "WXAnalyzer";
   private static final String MODULE_PERFORMANCE = "WXPerformance";
   private static final String MODULE_ERROR = "WXError";
 
@@ -73,7 +73,7 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(MONITOR, MODULE_PERFORMANCE, "instance", data);
+    transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
   }
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
@@ -102,7 +102,7 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(MONITOR, MODULE_ERROR, errorCode.getErrorType().toString(), data);
+    transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
   }
 
   public static void transferFps(long fps) {
@@ -119,7 +119,7 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(MONITOR, MODULE_PERFORMANCE, "fps", data);
+    transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
   }
 
 //  @Override
