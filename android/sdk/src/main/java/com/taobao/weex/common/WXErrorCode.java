@@ -208,6 +208,8 @@ public enum WXErrorCode {
    * renderErrorCode
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "WX_RENDER_ERR_JS_CREATE_INSTANCE",ErrorType.RENDER_ERROR,ErrorGroup.JS),
+  WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR,
+                     ErrorGroup.JS),
 
 
   /**

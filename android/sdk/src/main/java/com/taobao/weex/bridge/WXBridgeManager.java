@@ -28,6 +28,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -2187,12 +2189,41 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
       }
 
-      WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE,
-              function,
-              WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
-              null);
+     if (checkEmptyScreen(instance)){
+        if (WXEnvironment.isApkDebugable()){
+          WXLogUtils.d("render error 4 js error !");
+        }
+       WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
+                                                  function,
+                                                  WXErrorCode.WX_RENDER_ERR_JS_RUNTIME.getErrorMsg() + exception,
+                                                  null);
+     } else {
+       WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE,
+                                                  function,
+                                                  WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
+                                                  null);
+     }
     }
   }
+
+  private boolean checkEmptyScreen(WXSDKInstance instance){
+    if (null == instance || instance.isDestroy()){
+      return false;
+    }
+
+    View rootView = instance.getRootView();
+    if (null == rootView){
+      return true;
+    }
+
+    if (rootView instanceof ViewGroup){
+      return ((ViewGroup) rootView).getChildCount() > 0;
+    }else {
+      return false;
+    }
+  }
+
+
 
   private void registerDomModule() throws WXException {
     /** Tell Javascript Framework what methods you have. This is Required.**/
