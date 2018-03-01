@@ -156,8 +156,12 @@ namespace WeexCore {
   }
 
   RenderPage *RenderManager::GetPage(const std::string &id) {
-    RenderPage *page = mPages.find(id)->second;
-    return page;
+    std::map<std::string, RenderPage *>::iterator iter = mPages.find(id);
+    if (iter != mPages.end()) {
+      return iter->second;
+    } else {
+      return nullptr;
+    }
   }
 
   bool RenderManager::ClosePage(std::string pageId) {
