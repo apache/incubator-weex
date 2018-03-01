@@ -34,6 +34,7 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.ui.config.ConfigModuleFactory;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -217,7 +218,12 @@ public class WXModuleManager {
       wxModule = moduleMap.get(moduleStr);
       if (wxModule == null) {
         try {
-          wxModule = factory.buildInstance();
+          if(factory instanceof ConfigModuleFactory){
+            WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+            wxModule = ((ConfigModuleFactory) factory).buildInstance(instance);
+          }else{
+            wxModule = factory.buildInstance();
+          }
           wxModule.setModuleName(moduleStr);
         } catch (Exception e) {
           WXLogUtils.e(moduleStr + " module build instace failed.", e);

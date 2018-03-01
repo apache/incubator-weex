@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -42,6 +43,7 @@ public class InitConfig {
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
   private String framework;
+  private ClassLoaderAdapter classLoaderAdapter;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -79,6 +81,15 @@ public class InitConfig {
     return webSocketAdapterFactory;
   }
 
+  public ClassLoaderAdapter getClassLoaderAdapter() {
+    return classLoaderAdapter;
+  }
+
+  public InitConfig setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
+    this.classLoaderAdapter = classLoaderAdapter;
+    return this;
+  }
+
   public IWXJSExceptionAdapter getJSExceptionAdapter() {
     return mJSExceptionAdapter;
   }
@@ -97,6 +108,8 @@ public class InitConfig {
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
+    ClassLoaderAdapter classLoaderAdapter;
+
     public Builder(){
 
     }
@@ -151,6 +164,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
+      this.classLoaderAdapter = classLoaderAdapter;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -162,7 +180,8 @@ public class InitConfig {
       config.framework=this.framework;
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
-      config.mJSExceptionAdapter=this.mJSExceptionAdapter;
+      config.mJSExceptionAdapter= this.mJSExceptionAdapter;
+      config.classLoaderAdapter = this.classLoaderAdapter;
       return config;
     }
   }
