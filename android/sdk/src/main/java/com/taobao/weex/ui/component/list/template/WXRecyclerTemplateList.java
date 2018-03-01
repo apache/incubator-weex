@@ -726,6 +726,11 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 boolean scrollable = WXUtils.getBoolean(param, true);
                 setScrollable(scrollable);
                 return true;
+            case Constants.Name.SCROLL_DIRECTION:
+                if(param != null) {
+                    setScrollDirection(param.toString());
+                }
+                return true;
             case Constants.Name.SHOW_SCROLLBAR:
                 Boolean result = WXUtils.getBoolean(param,null);
                 if (result != null)
@@ -757,6 +762,19 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         mColumnWidth = mDomObject.getColumnWidth();
         mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
         mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
+
+    }
+
+
+    @WXComponentProp(name = Constants.Name.SCROLL_DIRECTION)
+    public void setScrollDirection(String direction){
+        if(orientation != mDomObject.getOrientation()) {
+            orientation = mDomObject.getOrientation();
+            updateRecyclerAttr();
+            WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+            wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap, getOrientation());
+
+        }
     }
 
     @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)

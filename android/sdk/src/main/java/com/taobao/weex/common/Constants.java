@@ -123,6 +123,8 @@ public class Constants {
     String COLUMN_WIDTH= "columnWidth";
     String COLUMN_COUNT= "columnCount";
     String COLUMN_GAP= "columnGap";
+    String LEFT_GAP= "leftGap";
+    String RIGHT_GAP= "rightGap";
     String SHOW_SCROLLBAR= "showScrollbar";
     String OVERFLOW = "overflow";
     String TYPE = "type";
