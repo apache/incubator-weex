@@ -104,7 +104,7 @@ WX_EXPORT_METHOD(@selector(goForward))
     };
     
     _jsContext[@"postMessage"] = ^(JSValue *data){
-        [weakSelf fireEvent:@"notify" params:[data toDictionary]];
+        [weakSelf fireEvent:@"message" params:[data toDictionary]];
     };
 
     if (_url) {
@@ -197,10 +197,18 @@ WX_EXPORT_METHOD(@selector(goForward))
     }
 }
 
+// This method will be abandoned slowly, use postMessage
 - (void)notifyWebview:(NSDictionary *) data
 {
     NSString *json = [WXUtility JSONString:data];
     NSString *code = [NSString stringWithFormat:@"(function(){var evt=null;var data=%@;if(typeof CustomEvent==='function'){evt=new CustomEvent('notify',{detail:data})}else{evt=document.createEvent('CustomEvent');evt.initCustomEvent('notify',true,true,data)}document.dispatchEvent(evt)}())", json];
+    [_jsContext evaluateScript:code];
+}
+
+- (void)postMessage:(NSDictionary *)data {
+    NSDictionary *eventDict = @{ @"data" : data };
+    NSString *json = [WXUtility JSONString:eventDict];
+    NSString *code = [NSString stringWithFormat:@"(function (){document.dispatchEvent(new MessageEvent('message', %@));}())",json];
     [_jsContext evaluateScript:code];
 }
 
@@ -235,15 +243,15 @@ WX_EXPORT_METHOD(@selector(goForward))
         NSMutableDictionary *data = [self baseInfo];
         [data setObject:[error localizedDescription] forKey:@"errorMsg"];
         [data setObject:[NSString stringWithFormat:@"%ld", (long)error.code] forKey:@"errorCode"];
-		
-		NSString * urlString = error.userInfo[NSURLErrorFailingURLStringErrorKey];
-		if (urlString) {
-			// webview.request may not be the real error URL, must get from error.userInfo
-			[data setObject:urlString forKey:@"url"];
-			if (![urlString hasPrefix:@"http"]) {
-				return;
-			}
-		}
+        
+        NSString * urlString = error.userInfo[NSURLErrorFailingURLStringErrorKey];
+        if (urlString) {
+            // webview.request may not be the real error URL, must get from error.userInfo
+            [data setObject:urlString forKey:@"url"];
+            if (![urlString hasPrefix:@"http"]) {
+                return;
+            }
+        }
         [self fireEvent:@"error" params:data];
     }
 }
