@@ -123,6 +123,8 @@ public class Constants {
     String COLUMN_WIDTH= "columnWidth";
     String COLUMN_COUNT= "columnCount";
     String COLUMN_GAP= "columnGap";
+    String LEFT_GAP= "leftGap";
+    String RIGHT_GAP= "rightGap";
     String SHOW_SCROLLBAR= "showScrollbar";
     String OVERFLOW = "overflow";
     String TYPE = "type";
@@ -201,6 +203,8 @@ public class Constants {
     String STRATEGY  = "strategy";
 
     String ALLOW_COPY_PASTE = "allowCopyPaste";
+    String INCLUDE_FONT_PADDING = "includeFontPadding";
+    String ENABLE_COPY = "enableCopy";
 
 
 
@@ -323,7 +327,7 @@ public class Constants {
     }
 
 
-    String SHOULD_STOP_PROPAGATION = "shouldStopPropagation";
+    String STOP_PROPAGATION = "stopPropagation";
 
 
 

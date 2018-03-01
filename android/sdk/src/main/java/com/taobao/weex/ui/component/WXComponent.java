@@ -246,7 +246,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     void onHostViewClick();
   }
 
-  interface OnFocusChangeListener{
+  public interface OnFocusChangeListener{
     void onFocusChange(boolean hasFocus);
   }
 
@@ -1161,7 +1161,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         }
       }
     }
-    if(Constants.Event.SHOULD_STOP_PROPAGATION.equals(type)){
+    if(Constants.Event.STOP_PROPAGATION.equals(type)){
       return  true;
     }
     return false;

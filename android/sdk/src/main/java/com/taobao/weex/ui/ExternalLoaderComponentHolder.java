@@ -42,7 +42,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   private Class mClass;
 
 
-  public ExternalLoaderComponentHolder(String type,IExternalComponentGetter clzGetter) {
+  public ExternalLoaderComponentHolder(String type, IExternalComponentGetter clzGetter) {
     this.mClzGetter = clzGetter;
     mType = type;
   }
