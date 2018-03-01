@@ -57,6 +57,7 @@ import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
+import com.taobao.weex.utils.WXUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -144,6 +145,7 @@ public class WXTextDomObject extends WXDomObject {
   private int mNumberOfLines = UNSET;
   private int mFontSize = UNSET;
   private int mLineHeight = UNSET;
+  private boolean mIncludeFontPadding = false;
   private float previousWidth = Float.NaN;
   private String mFontFamily = WXEnvironment.getGlobalFontFamilyName();
   private String mText = null;
@@ -279,6 +281,9 @@ public class WXTextDomObject extends WXDomObject {
    */
   private void updateStyleAndText() {
     updateStyleImp(getStyles());
+    if (getAttrs() != null && getAttrs().containsKey(Constants.Name.INCLUDE_FONT_PADDING)) {
+      mIncludeFontPadding = WXUtils.getBoolean(getAttrs().get(Constants.Name.INCLUDE_FONT_PADDING), false);
+    }
     mText = WXAttr.getValue(getAttrs());
   }
 
@@ -341,7 +346,7 @@ public class WXTextDomObject extends WXDomObject {
         forceRtl = direction.equals(Constants.Name.RTL);
       }
       layout = StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
-          Layout.Alignment.ALIGN_NORMAL, 1, 0, false, forceRtl);
+          Layout.Alignment.ALIGN_NORMAL, 1, 0, mIncludeFontPadding, forceRtl);
     } else {
       layout = previousLayout;
     }
@@ -361,7 +366,7 @@ public class WXTextDomObject extends WXDomObject {
         adjustSpansRange(spanned, builder);
         spanned = builder;
         return new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-            Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+            Layout.Alignment.ALIGN_NORMAL, 1, 0, mIncludeFontPadding);
       }
     }
     return layout;
@@ -405,7 +410,7 @@ public class WXTextDomObject extends WXDomObject {
           startOffset -= 1;
         }
         source.delete(startOffset, startOffset+1);
-        layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, mIncludeFontPadding);
         if (layout.getLineCount() <= 1) {
           ret = source;
           break;

@@ -201,6 +201,7 @@ public class Constants {
     String STRATEGY  = "strategy";
 
     String ALLOW_COPY_PASTE = "allowCopyPaste";
+    String INCLUDE_FONT_PADDING = "includeFontPadding";
 
 
 
