@@ -18,28 +18,19 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Layout;
 
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.DOMActionContext;
-import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
-import com.taobao.weex.utils.TypefaceUtil;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -143,6 +134,12 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       case Constants.Name.VALUE:
         return true;
       case Constants.Name.FONT_FAMILY:
+        return true;
+      case Constants.Name.ENABLE_COPY:
+        boolean enabled = WXUtils.getBoolean(param, false);
+        if (getHostView() != null) {
+          getHostView().enableCopy(enabled);
+        }
         return true;
       default:
         return super.setProperty(key, param);

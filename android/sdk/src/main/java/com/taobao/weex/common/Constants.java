@@ -203,6 +203,7 @@ public class Constants {
     String STRATEGY  = "strategy";
 
     String ALLOW_COPY_PASTE = "allowCopyPaste";
+    String ENABLE_COPY = "enableCopy";
 
 
 
