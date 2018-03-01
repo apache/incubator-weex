@@ -14,9 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.adapter;
-
-import android.os.Environment;
+package com.taobao.weex.performance;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -24,12 +22,9 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.performance.IWXMonitorDataTransfer;
-import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -37,22 +32,17 @@ import java.util.Map;
  * @date 2018/2/28
  */
 
-public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
+public class WXAnalyzerDataTransfer {
 
   private static final String MONITOR = "WXMonitor";
   private static final String MODULE_PERFORMANCE = "WXPerformance";
   private static final String MODULE_ERROR = "WXError";
-  private static boolean transFpsData = false;
-
-  static {
-    judgeTransFerFps();
-  }
 
   public static void transferPerformance(WXPerformance performance, String instanceId) {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXMonitorDataTransfer transfer = WXSDKManager.getInstance().getWXMonitorDataTransfer();
+    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
     if (null == transfer) {
       return;
     }
@@ -90,7 +80,7 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXMonitorDataTransfer transfer = WXSDKManager.getInstance().getWXMonitorDataTransfer();
+    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
     if (null == transfer) {
       return;
     }
@@ -116,10 +106,10 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
   }
 
   public static void transferFps(long fps) {
-    if (!transFpsData) {
+    if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXMonitorDataTransfer transfer = WXSDKManager.getInstance().getWXMonitorDataTransfer();
+    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
     if (null == transfer) {
       return;
     }
@@ -132,21 +122,8 @@ public class WXMonitorDataLoger implements IWXMonitorDataTransfer {
     transfer.transfer(MONITOR, MODULE_PERFORMANCE, "fps", data);
   }
 
-
-  private static void judgeTransFerFps() {
-    if (!WXEnvironment.isApkDebugable()) {
-      return;
-    }
-    try {
-      transFpsData = new File(Environment.getExternalStorageDirectory(), "WXPerformance.dat")
-          .exists();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void transfer(String tag, String module, String type, String data) {
-    WXLogUtils.d(tag, module + ":" + type + ":" + data);
-  }
+//  @Override
+//  public void transfer(String tag, String module, String type, String data) {
+//    WXLogUtils.d(tag, module + ":" + type + ":" + data);
+//  }
 }

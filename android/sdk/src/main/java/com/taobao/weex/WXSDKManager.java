@@ -35,7 +35,6 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.adapter.WXMonitorDataLoger;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.storage.DefaultWXStorage;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -49,7 +48,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
 import com.taobao.weex.dom.WXDomManager;
-import com.taobao.weex.performance.IWXMonitorDataTransfer;
+import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -80,7 +79,7 @@ public class WXSDKManager {
   private IWXHttpAdapter mIWXHttpAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
   private IWXAccessibilityRoleAdapter mRoleAdapter;
-  private IWXMonitorDataTransfer mMonitorDataTransfer;
+  private IWXAnalyzer mWXAnalyzer;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -352,12 +351,12 @@ public class WXSDKManager {
     return mIWXSoLoaderAdapter;
   }
 
-  public IWXMonitorDataTransfer getWXMonitorDataTransfer(){
-    return mMonitorDataTransfer;
+  public IWXAnalyzer getWXAnalyzer(){
+    return mWXAnalyzer;
   }
 
-  public void setWXMonitorDataTransfer(IWXMonitorDataTransfer transfer){
-    this.mMonitorDataTransfer = transfer;
+  public void setWXAnalyzer(IWXAnalyzer analyzer){
+    this.mWXAnalyzer = analyzer;
   }
 
   void setInitConfig(InitConfig config){
@@ -370,11 +369,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
-    if (config.getMonitorDataTransfer() == null){
-      this.mMonitorDataTransfer = new WXMonitorDataLoger();
-    }else {
-      this.mMonitorDataTransfer = config.getMonitorDataTransfer();
-    }
+    this.mWXAnalyzer = config.getWxAnalyzer();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

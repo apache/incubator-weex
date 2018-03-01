@@ -43,7 +43,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.adapter.WXMonitorDataLoger;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
@@ -891,7 +891,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
-      WXMonitorDataLoger.transferPerformance(mWXPerformance,getInstanceId());
+      WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
       isCommit=true;
     }
     // module listen Activity onActivityPause

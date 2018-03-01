@@ -18,14 +18,13 @@
  */
 package com.taobao.weex.utils;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
-import com.taobao.weex.adapter.WXMonitorDataLoger;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
@@ -91,6 +90,6 @@ public class WXExceptionUtils {
 	if (adapter != null) {
 	  adapter.onJSException(exceptionCommit);
 	}
-        WXMonitorDataLoger.transferError(exceptionCommit,instanceId);
+        WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
   }
 }

@@ -24,7 +24,7 @@ package com.taobao.weex.performance;
  * @date 2018/2/28
  */
 
-public interface IWXMonitorDataTransfer {
+public interface IWXAnalyzer {
 
   void transfer(String tag,String module,String type,String data);
 
