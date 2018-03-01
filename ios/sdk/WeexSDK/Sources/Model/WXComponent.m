@@ -582,6 +582,11 @@
     }
     if (isUpdateStyles) {
         [self _modifyStyles:styles];
+        if ([self needsLayout]) {
+            // call update style may take effect on layout, maybe the component
+            // displaylink has been paused, so we need to restart the component task, and it will auto-pause when task queue is empty.
+            [self.weexInstance.componentManager startComponentTasks];
+        }
     }
 }
 
