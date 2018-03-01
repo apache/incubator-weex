@@ -84,7 +84,7 @@ public class FunctionParser<K, V> {
       lexer.moveOn();
       return value;
     }
-    throw new WXInterpretationException("Token doesn't match");
+    throw new WXInterpretationException(token + "Token doesn't match" + lexer.source);
   }
 
   private enum Token {
@@ -225,12 +225,6 @@ public class FunctionParser<K, V> {
         }
       }
       return true;
-    }
-
-    private void reset() {
-      pointer = 0;
-      value = null;
-      current = null;
     }
 
     private boolean isCharacterOrDigit(char letter) {

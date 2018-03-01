@@ -17,14 +17,15 @@
  * under the License.
  */
 
+#import <WeexSDK/WeexSDK.h>
 #import "WXScannerVC.h"
 #import "AppDelegate.h"
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXDemoViewController.h"
 #import "WXDebugTool.h"
+
 #import <TBWXDevTool/WXDevTool.h>
 #import <AudioToolbox/AudioToolbox.h>
-#import <WeexSDK/WeexSDK.h>
 
 @interface WXScannerVC ()
 
@@ -45,7 +46,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    [self setupNaviBar];
     
 #if !(TARGET_IPHONE_SIMULATOR)
     self.session = [[AVCaptureSession alloc]init];
@@ -68,7 +68,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    [self.navigationController setNavigationBarHidden:NO];
+    [self setupNaviBar];
     [self.view.layer addSublayer:_captureLayer];
     [_session startRunning];
 }

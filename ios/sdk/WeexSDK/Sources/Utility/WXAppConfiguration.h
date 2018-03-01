@@ -51,6 +51,11 @@
 + (NSString *)JSFrameworkVersion;
 + (void)setJSFrameworkVersion:(NSString *)JSFrameworkVersion;
 
+/**
+ + * @abstract JSFrameworkLibSize
+ + */
++ (NSUInteger)JSFrameworkLibSize;
++ (void)setJSFrameworkLibSize:(NSUInteger)JSFrameworkLibSize;
 
 /*
  *  @abstract customizeProtocolClasses

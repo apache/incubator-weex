@@ -21,6 +21,7 @@ package com.taobao.weex.bridge;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.dom.WXDomObject;
 
 /**
  * Created by fengjunjie
@@ -28,10 +29,12 @@ import com.taobao.weex.WXSDKInstance;
 public interface WXValidateProcessor {
 
     WXModuleValidateResult onModuleValidate(WXSDKInstance wxsdkInstance, String moduleStr,
-                                            String methodStr, JSONArray params);
+                                            String methodStr, JSONArray params,
+                                            JSONObject options);
 
     WXComponentValidateResult onComponentValidate(WXSDKInstance wxsdkInstance,
-                                                  String componentName);
+                                                  String componentName,
+                                                  WXDomObject parentDomObject);
 
     boolean needValidate(String bundleUrl);
 

@@ -1,0 +1,21 @@
+{
+  "name": "weex-vanilla-framework",
+  "main": "index.js",
+  "description": "Weex Vanilla Framework",
+  "version": "0.21.7",
+  "engines": {
+    "node": ">=4"
+  },
+  "homepage": "https://github.com/apache/incubator-weex/",
+  "keywords": [
+    "weex",
+    "hybrid",
+    "mvvm",
+    "javascript"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/apache/incubator-weex.git"
+  }
+}

@@ -28,6 +28,7 @@ import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 /**
  * Created by sospartan on 01/03/2017.
@@ -57,7 +58,14 @@ final class MoveElementAction implements DOMAction, RenderAction {
     if (domObject == null || domObject.parent == null
         || parentObject == null || parentObject.hasNewLayout()) {
       if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
+		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT.getErrorCode(),
+				"moveElement",
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT.getErrorMsg() +
+						"domObject = " + domObject
+				+ "domObject.parent= " +  domObject.parent
+				+ "parentObject = " + parentObject
+				+ "parentObject.hasNewLayout() =" + parentObject.hasNewLayout(),null);
       }
       return;
     }
@@ -75,9 +83,6 @@ final class MoveElementAction implements DOMAction, RenderAction {
     parentObject.add(domObject, mNewIndex);
 
     context.postRenderTask(this);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
   }
 
   @Override
@@ -91,5 +96,8 @@ final class MoveElementAction implements DOMAction, RenderAction {
     WXVContainer oldParent = component.getParent();
     oldParent.remove(component,false);
     ((WXVContainer) newParent).addChild(component, mNewIndex);
+    if(!component.isVirtualComponent()){
+      ((WXVContainer) newParent).addSubView(component.getHostView(), mNewIndex);
+    }
   }
 }

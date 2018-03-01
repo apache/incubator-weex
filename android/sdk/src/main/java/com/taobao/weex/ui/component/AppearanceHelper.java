@@ -97,9 +97,25 @@ public class AppearanceHelper {
     return RESULT_NO_CHANGE;
   }
 
-  public boolean isViewVisible() {
+  public boolean isViewVisible(boolean isList) {
     View view = mAwareChild.getHostView();
+    if(isList){
+      if(view.getVisibility() == View.VISIBLE){
+        if(view.getMeasuredHeight()  == 0){
+          return  true;
+        }
+      }
+    }
     return view != null && view.getLocalVisibleRect(mVisibleRect);
 
+  }
+
+  public boolean isViewVisible(View view) {
+    if(view.getVisibility() == View.VISIBLE){
+      if(view.getMeasuredHeight()  == 0){
+        return  true;
+      }
+    }
+    return view != null && view.getLocalVisibleRect(mVisibleRect);
   }
 }

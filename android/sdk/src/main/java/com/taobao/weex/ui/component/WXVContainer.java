@@ -18,14 +18,26 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.support.v4.view.ViewCompat;
+import android.util.Pair;
+import android.support.annotation.Nullable;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.view.WXImageView;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 
@@ -36,6 +48,9 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   private static final String TAG="WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
+  private BoxShadowHost mBoxShadowHost;
+  private  boolean requestDisallowInterceptTouchEvent = false;
+
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -93,6 +108,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   @Override
   public void applyLayoutAndEvent(WXComponent component) {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -105,6 +121,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       }
 
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   /**
@@ -112,7 +129,11 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    *
    */
   public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom){
-    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    ViewGroup.LayoutParams lp = null;
+    if (childView != null) {
+      lp = childView.getLayoutParams();
+    }
+
     if(lp == null) {
       lp = new ViewGroup.LayoutParams(width,height);
     }else{
@@ -141,6 +162,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
   @Override
   public void bindData(WXComponent component) {
+    long startNanos = System.nanoTime();
     if(!isLazy()) {
       if (component == null) {
         component = this;
@@ -151,6 +173,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         getChild(i).bindData(((WXVContainer)component).getChild(i));
       }
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   @Override
@@ -223,16 +246,26 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return original;
   }
 
+  /**
+   * Use {@link #getChildCount()} instead
+   * @return
+   */
+  @Deprecated
   public int childCount() {
     return mChildren == null ? 0 : mChildren.size();
   }
 
+  @Nullable
   public WXComponent getChild(int index) {
+    if (mChildren == null || index < 0 || index >= mChildren.size()) {
+      //To avoid index out of bounds
+      return null;
+    }
     return mChildren.get(index);
   }
 
   public int getChildCount() {
-    return mChildren.size();
+    return childCount();
   }
 
   public void addChild(WXComponent child) {
@@ -240,6 +273,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public void addChild(WXComponent child, int index) {
+    long startNanos = System.nanoTime();
     if (child == null || index < -1) {
       return;
     }
@@ -250,28 +284,42 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       mChildren.add(index, child);
     }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
   }
 
   public final int indexOf(WXComponent comp){
     return mChildren.indexOf(comp);
   }
 
-  public void createChildViewAt(int index){
+  public void createChildViewAt(int index) {
+    long startNanos = System.nanoTime();
+    Pair<WXComponent, Integer> ret = rearrangeIndexAndGetChild(index);
+    if (ret.first != null) {
+      WXComponent child = ret.first;
+      child.createView();
+      if (!child.isVirtualComponent()) {
+        addSubView(child.getHostView(), ret.second);
+      }
+    }
+    mTraceInfo.uiThreadNanos += (System.nanoTime() - startNanos);
+  }
+
+  protected Pair<WXComponent, Integer> rearrangeIndexAndGetChild(int index){
     int indexToCreate = index;
     if(indexToCreate < 0){
       indexToCreate = childCount()-1;
-      if(indexToCreate < 0 ){
-        return;
-      }
     }
-    WXComponent child = getChild(indexToCreate);
-    child.createView();
-    if(!child.isVirtualComponent()){
-      addSubView(child.getHostView(),indexToCreate);
+
+    if (indexToCreate<0){
+      return new Pair<>(null, indexToCreate);
+    }
+    else {
+      return new Pair<>(getChild(indexToCreate), indexToCreate);
     }
   }
 
-  protected void addSubView(View child, int index) {
+  @RestrictTo(Scope.LIBRARY)
+  public void addSubView(View child, int index) {
     if (child == null || getRealView() == null) {
       return;
     }
@@ -313,11 +361,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if(getHostView()==null || mChildren==null){
       return;
     }
-    for(WXComponent component:mChildren){
-      if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
-        wxEventType= Constants.Event.DISAPPEAR;
+    //appear should not notify child
+    if(getDomObject().getAttrs().containsKey("appearNotifyChild")){
+      for(WXComponent component:mChildren){
+        if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
+          wxEventType= Constants.Event.DISAPPEAR;
+        }
+        component.notifyAppearStateChange(wxEventType,direction);
       }
-      component.notifyAppearStateChange(wxEventType,direction);
     }
   }
 
@@ -429,7 +480,138 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
+  @Override
+  public void onRenderFinish(@RenderState int state) {
+    for (int i = 0; i < getChildCount(); i++) {
+      WXComponent child = getChild(i);
+      child.mTraceInfo.uiQueueTime = mTraceInfo.uiQueueTime;
+      child.onRenderFinish(state);
+    }
+    super.onRenderFinish(state);
+  }
+
+  @JSMethod
+  public void releaseImageList(String viewTreeRecycle){
+    if(getHostView() == null
+            || !ViewCompat.isAttachedToWindow(getHostView())
+            || !(getHostView() instanceof  ViewGroup)){
+       return;
+    }
+    boolean isViewTree = WXUtils.getBoolean(viewTreeRecycle, false);
+    if(isViewTree){
+      doViewTreeRecycleImageView(getHostView(), true);
+    }else{
+      int count = getChildCount();
+      for(int i=0; i<count; i++){
+        WXComponent component =  getChild(i);
+        if(component instanceof  WXImage && ((WXImage) component).getHostView() instanceof WXImageView){
+          WXImageView imageView = (WXImageView) component.getHostView();
+          if(imageView != null && ViewCompat.isAttachedToWindow(imageView)){
+            imageView.autoReleaseImage();
+          }
+        }else if(component instanceof  WXVContainer){
+          ((WXVContainer) component).releaseImageList(viewTreeRecycle);
+        }
+      }
+    }
+  }
+
+  @JSMethod
+  public void recoverImageList(String viewTreeRecycle){
+    if(getHostView() == null
+            || !ViewCompat.isAttachedToWindow(getHostView())
+            || !(getHostView() instanceof  ViewGroup)){
+         return;
+    }
+    boolean isViewTree = WXUtils.getBoolean(viewTreeRecycle, false);
+    if(isViewTree){
+      doViewTreeRecycleImageView(getHostView(), false);
+    }else{
+      int count = getChildCount();
+      for(int i=0; i<count; i++){
+        WXComponent component =  getChild(i);
+        if(component instanceof  WXImage && ((WXImage) component).getHostView() instanceof WXImageView){
+          WXImageView imageView = (WXImageView) component.getHostView();
+          if(imageView != null && ViewCompat.isAttachedToWindow(imageView)){
+            imageView.autoRecoverImage();
+          }
+        }else if(component instanceof  WXVContainer){
+          ((WXVContainer) component).recoverImageList(viewTreeRecycle);
+        }
+      }
+    }
+  }
+
+  /**
+   * transverse view tree, and recycle wximageview in container
+   * */
+  private void doViewTreeRecycleImageView(ViewGroup viewGroup, boolean isRelease){
+        int count = viewGroup.getChildCount();
+        for(int i=0; i<count; i++){
+            View view = viewGroup.getChildAt(i);
+            if(view instanceof  WXImageView){
+                if(isRelease){
+                   ((WXImageView) view).autoReleaseImage();
+                }else{
+                   ((WXImageView) view).autoRecoverImage();
+                }
+            }else if(view instanceof  ViewGroup){
+               doViewTreeRecycleImageView((ViewGroup) view, isRelease);
+            }
+        }
+  }
+
+
+  public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
+    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
+      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
+      if(mGesture != null){
+        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+      }
+      if(getParent() != null){
+        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+      }
+    }
+  }
+
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+
+  public @Nullable View getBoxShadowHost(boolean isClear) {
+    if (isClear) {
+      // Return existed host if want clear shadow
+      return mBoxShadowHost;
+    }
+
+    ViewGroup hostView = getHostView();
+    if (hostView == null) {
+      return null;
+    }
+
+    try {
+      String type = getDomObject().getType();
+      if (WXBasicComponentType.DIV.equals(type)) {
+        WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
+        if (mBoxShadowHost == null) {
+          mBoxShadowHost = new BoxShadowHost(getContext());
+          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+          hostView.addView(mBoxShadowHost);
+        }
+        hostView.removeView(mBoxShadowHost);
+        hostView.addView(mBoxShadowHost);
+        return mBoxShadowHost;
+      }
+    } catch (Throwable t) {
+      WXLogUtils.w("BoxShadow", t);
+    }
+    return hostView;
+  }
+
+  private class BoxShadowHost extends View {
+    public BoxShadowHost(Context context) {
+      super(context);
+    }
+  }
 }

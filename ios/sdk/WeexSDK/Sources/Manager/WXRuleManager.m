@@ -25,6 +25,7 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXComponentManager.h"
 #import "WXDefine.h"
+#import "WXSDKEngine.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
@@ -83,7 +84,7 @@ static WXRuleManager *_sharedInstance = nil;
             
             fontSrc = newURL;
             NSMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
-            if (fontFamily && [fontFamily[@"src"] isEqualToString:fontSrc]) {
+            if (fontFamily && [fontFamily[@"tempSrc"] isEqualToString:fontSrc]) {
                 // if the new src is same as src in dictionary , ignore it, or update it
                 return;
             }

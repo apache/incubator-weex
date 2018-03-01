@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKManager;
@@ -47,7 +48,7 @@ public final class NativeInvokeHelper {
           try {
             invoker.invoke(target, params);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(target + "Invoker " + invoker.toString() ,e);
           }
         }
       }, 0);
@@ -74,7 +75,11 @@ public final class NativeInvokeHelper {
       value = args.get(i);
 
       if (paramClazz == JSONObject.class) {
-        params[i] = value;
+        if(value instanceof  JSONObject || value == null) {
+          params[i] = value;
+        }else if (value instanceof String){
+          params[i] = JSON.parseObject(value.toString());
+        }
       } else if(JSCallback.class == paramClazz){
         if(value instanceof String){
           params[i] = new SimpleJSCallback(mInstanceId,(String)value);

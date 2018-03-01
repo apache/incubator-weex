@@ -20,6 +20,7 @@ package com.taobao.weex.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,6 +30,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class WXFileUtils {
 
@@ -129,5 +134,48 @@ public class WXFileUtils {
       }
     }
     return false;
+  }
+
+  public static String md5(String  template){
+    try {
+      if(template == null){
+        return  "";
+      }
+      return  md5(template.getBytes("UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      return  "";
+    }
+  }
+
+  public static String md5(byte[] bts){
+    try {
+      MessageDigest digest = MessageDigest.getInstance("MD5");
+      digest.update(bts);
+      BigInteger bigInt = new BigInteger(1, digest.digest());
+      return  bigInt.toString(16);
+    } catch (NoSuchAlgorithmException e) {;
+      return  "";
+    }
+  }
+
+  public static String base64Md5(String  template){
+    try {
+      if(template == null){
+        return  "";
+      }
+      return  base64Md5(template.getBytes("UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      return  "";
+    }
+  }
+
+  public static String base64Md5(byte[] bts){
+    try {
+      MessageDigest digest = MessageDigest.getInstance("MD5");
+      digest.update(bts);
+      return Base64.encodeToString(digest.digest(), Base64.NO_WRAP);
+    } catch (NoSuchAlgorithmException e) {;
+      return  "";
+    }
   }
 }

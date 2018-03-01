@@ -16,21 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-"use strict"
 
 const fs = require('fs')
 const path = require('path')
-const gzip = require('zlib').createGzip()
-const pkg = require('../package.json')
 const rollup = require('rollup')
 const watch = require('rollup-watch')
-
 const getConfig = require('./config')
-
-// create dist folder
-if (!fs.existsSync('dist')) {
-  fs.mkdirSync('dist')
-}
 
 let isWatch = false
 if (process.argv[3]) {
@@ -45,88 +36,70 @@ else {
   console.log('\nPlease specify the package you want to build. [native, runtime, browser, vue]')
 }
 
-function runRollupOnWatch(config) {
+function runRollupOnWatch (config) {
   const watcher = watch(rollup, config)
   watcher.on('event', event => {
-    switch ( event.code ) {
-      case 'STARTING':
-        console.log('checking rollup-watch version...')
-        break
-
-      case 'BUILD_START':
-        console.log('bundling...')
-        break
-
-      case 'BUILD_END':
+    switch (event.code) {
+      case 'STARTING': console.log('checking rollup-watch version...'); break
+      case 'BUILD_START': console.log('bundling...'); break
+      case 'BUILD_END': {
         console.log('bundled in ' + path.relative(process.cwd(), config.dest)
           + ' (' + event.duration + 'ms)')
-        console.log('Watching for changes...' )
-        break
-
-      case 'ERROR':
-        console.error('ERROR: ', event.error)
-        break
-
-      default:
-        console.error('unknown event', event)
+        console.log('Watching for changes...')
+      } break
+      case 'ERROR': console.error('ERROR: ', event.error); break
+      default: console.error('unknown event', event)
     }
   })
 }
 
-function runRollup (config) {
-  return new Promise((resolve, reject) => {
-    rollup.rollup(config).then(bundle => {
-      bundle.write(config).then(() => {
-        report(config.dest)
-        resolve()
-      })
-    })
-  })
+async function runRollup (config) {
+  const bundle = await rollup.rollup(config)
+  const outputOptions = config.output
+  if (Array.isArray(outputOptions)) {
+    for (let i = 0; i < outputOptions.length; ++i) {
+      await bundle.write(outputOptions[i])
+      report(outputOptions[i].output.file)
+    }
+  }
+  else {
+    await bundle.write(outputOptions)
+    report(outputOptions.file)
+  }
 }
 
-function build (name) {
+async function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
-    case 'native': pkgName = 'weex-js-framework'; break;
-    case 'runtime': pkgName = 'weex-js-runtime'; break;
-    case 'browser': pkgName = 'weex-web-render'; break;
-    case 'vue': pkgName = 'weex-vue-render'; break;
+    case 'jsfm':
+    case 'native': pkgName = 'weex-js-framework'; break
+    case 'env': pkgName = 'weex-env'; break
+    case 'vue': pkgName = 'weex-vue'; break
+    case 'rax': pkgName = 'weex-rax'; break
+    case 'runtime': pkgName = 'weex-js-runtime'; break
+    case 'legacy': pkgName = 'weex-legacy'; break
+    case 'vanilla': pkgName = 'weex-vanilla-framework'; break
   }
 
   const config = getConfig(pkgName)
   const minifyConfig = getConfig(pkgName, true)
+  const ES6Config = getConfig(pkgName, false, true)
+  const ES6MinifyConfig = getConfig(pkgName, true, true)
 
   if (isWatch) {
-    return runRollupOnWatch(config)
+    return await runRollupOnWatch(config)
   }
   else {
-    console.log(`\n => start to build ${name} (${pkgName})\n`)
-    return new Promise((resolve, reject) => {
-      runRollup(config).then(() => {
-        runRollup(minifyConfig).then(() => {
-          zip(minifyConfig.dest, resolve)
-        })
-      })
-    })
+    console.log(`\n => start to build ${pkgName}\n`)
+    await runRollup(config)
+    await runRollup(minifyConfig)
+    await runRollup(ES6Config)
+    await runRollup(ES6MinifyConfig)
   }
-}
-
-function zip (filePath, callback) {
-  const read = fs.createReadStream(filePath)
-  const write = fs.createWriteStream(filePath + '.gz')
-  read.pipe(gzip).pipe(write).on('close', () => {
-    report(filePath + '.gz')
-    callback && callback()
-  })
-}
-
-function now () {
-  const time = Date.now() - (new Date()).getTimezoneOffset() * 60000
-  return (new Date(time)).toISOString().replace('T', ' ').substring(0, 16)
 }
 
 function report (filePath) {
   const size = (fs.statSync(filePath).size / 1024).toFixed(2) + 'KB'
   const file = path.relative(process.cwd(), filePath)
-  console.log(` => write ${file} (${size})`)
+  console.log(` => ${file} (${size})`)
 }

@@ -25,19 +25,20 @@
 #import "WXConvert.h"
 #import "WXRuleManager.h"
 #import "WXDefine.h"
+#import "WXView.h"
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
 
-@interface WXText : UIView
+// WXText is a non-public is not permitted
+@interface WXTextView : WXView
 @property (nonatomic, strong) NSTextStorage *textStorage;
 @end
 
-@implementation WXText
+@implementation WXTextView
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame])) {
-        self.isAccessibilityElement = YES;
         self.accessibilityTraits |= UIAccessibilityTraitStaticText;
         
         self.opaque = NO;
@@ -66,7 +67,7 @@
     NSRange semicolonRange = [superDescription rangeOfString:@";"];
     NSString * content = _textStorage.string;
     if ([(WXTextComponent*)self.wx_component useCoreText]) {
-        content = [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+        content = ((WXTextComponent*)self.wx_component).text;
     }
     NSString *replacement = [NSString stringWithFormat:@"; text: %@; frame:%f,%f,%f,%f", content, self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height];
     return [superDescription stringByReplacingCharactersInRange:semicolonRange withString:replacement];
@@ -74,15 +75,23 @@
 
 - (NSString *)accessibilityValue
 {
+    if (self.wx_component && self.wx_component->_ariaLabel) {
+        return [super accessibilityValue];
+    }
+    if (![(WXTextComponent*)self.wx_component useCoreText]) {
+        return _textStorage.string;
+    }
+    return ((WXTextComponent*)self.wx_component).text;
+}
+
+- (NSString *)accessibilityLabel
+{
     if (self.wx_component) {
         if (self.wx_component->_ariaLabel) {
             return self.wx_component->_ariaLabel;
         }
     }
-    if (![(WXTextComponent*)self.wx_component useCoreText]) {
-        return _textStorage.string;
-    }
-    return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+    return [super accessibilityLabel];
 }
 
 @end
@@ -103,7 +112,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     NSTextStorage *_textStorage;
     CGFloat _textStorageWidth;
     
-    NSString *_text;
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
@@ -111,17 +119,19 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
+    NSString *_direction;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
     
-    BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
+    NSString *_wordWrap;
     
     pthread_mutex_t _ctAttributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    BOOL _observerIconfont;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -144,7 +154,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // just for coretext and textkit render replacement
-        _needsRemoveObserver = NO;
         pthread_mutexattr_init(&(_propertMutexAttr));
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
@@ -179,10 +188,9 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_needsRemoveObserver) {
+    if (_fontFamily && _observerIconfont) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
-    _ctAttributedString = nil;
     pthread_mutex_destroy(&_ctAttributedStringMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
 }
@@ -199,6 +207,23 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(key, prop, type, defaultValue,needLayout)\
+do {\
+    id value = styles[@#key];\
+    if (value) {\
+        if([WXUtility isBlankString:value]){\
+            _##prop = defaultValue;\
+        }else {\
+            _##prop = [WXConvert type:value];\
+        }\
+        [self setNeedsRepaint];\
+        if (needLayout) {\
+            [self setNeedsLayout];\
+        }\
+    }\
+} while(0);
+
+
 #define WX_STYLE_FILL_TEXT_PIXEL(key, prop, needLayout)\
 do {\
     id value = styles[@#key];\
@@ -213,7 +238,7 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
+    WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(color, color, UIColor, [UIColor blackColor], NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -224,7 +249,13 @@ do {\
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
-    
+    WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
+    WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
+    if (_fontFamily && !_observerIconfont) {
+        // notification received when custom icon font file download finish
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        _observerIconfont = YES;
+    }
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
         WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
@@ -240,9 +271,9 @@ do {\
 
 - (void)fillAttributes:(NSDictionary *)attributes
 {
-    id text = attributes[@"value"];
-    if (text) {
-        _text = [WXConvert NSString:text];
+    id text = [WXConvert NSString:attributes[@"value"]];
+    if (text && ![self.text isEqualToString:text]) {
+        self.text = text;
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
@@ -251,7 +282,11 @@ do {\
 - (void)setNeedsRepaint
 {
     _textStorage = nil;
+    
+    pthread_mutex_lock(&(_ctAttributedStringMutex));
     _ctAttributedString = nil;
+    pthread_mutex_unlock(&(_ctAttributedStringMutex));
+    
 }
 
 #pragma mark - Subclass
@@ -269,14 +304,16 @@ do {\
         useCoreText = [(WXTextComponent*)self.view.wx_component useCoreText];
     }
     if (!useCoreText) {
-        ((WXText *)self.view).textStorage = _textStorage;
+        ((WXTextView *)self.view).textStorage = _textStorage;
     }
+    self.view.isAccessibilityElement = YES;
+    
     [self setNeedsDisplay];
 }
 
 - (UIView *)loadView
 {
-    return [[WXText alloc] init];
+    return [[WXTextView alloc] init];
 }
 
 - (BOOL)needsDrawRect
@@ -290,7 +327,7 @@ do {\
     if (_isCompositingChild) {
         [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
     } else {
-        WXText *textView = (WXText *)_view;
+        WXTextView *textView = (WXTextView *)_view;
         [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
     }
     
@@ -303,6 +340,16 @@ do {\
     return ^CGSize (CGSize constrainedSize) {
         CGSize computedSize = CGSizeZero;
         NSTextStorage *textStorage = nil;
+        
+        //TODO:more elegant way to use max and min constrained size
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            constrainedSize.width = MAX(constrainedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            constrainedSize.width = MIN(constrainedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        }
+        
         if (![self useCoreText]) {
             textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
@@ -310,15 +357,6 @@ do {\
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
         } else {
             computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
-        }
-    
-        //TODO:more elegant way to use max and min constrained size
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-        }
-        
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
@@ -342,19 +380,22 @@ do {\
 
 #pragma mark Text Building
 
-- (NSString *)text
-{
-    return _text;
-}
-
 - (NSAttributedString *)ctAttributedString
 {
+    if (!self.text) {
+        return nil;
+    }
+    NSAttributedString * attributedString = nil;
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
-        _ctAttributedString = [[self buildCTAttributeString] copy];
+        _ctAttributedString = [self buildCTAttributeString];
+        WXPerformBlockOnComponentThread(^{
+            [self.weexInstance.componentManager startComponentTasks];
+        });
     }
+    attributedString = [_ctAttributedString copy];
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    return [_ctAttributedString copy];
+    return attributedString;
 }
 
 - (void)repaintText:(NSNotification *)notification
@@ -374,23 +415,14 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    NSString * string = self.text;
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"text %@ is invalid", self.text);
+        string = @"";
+    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
     }
     
     // set font
@@ -411,12 +443,32 @@ do {\
     
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
+    // handle text direction style, default ltr
+    if ([_direction isEqualToString:@"rtl"]) {
+        if (0 == _textAlign) {
+            //force text right-align if don't specified any align.
+            _textAlign = NSTextAlignmentRight;
+        }
+        paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
+    } else {
+        //if you specify NSWritingDirectionNaturalDirection, the receiver resolves the writing
+        //directionto eitherNSWritingDirectionLeftToRight or NSWritingDirectionRightToLeft,
+        //depending on the direction for the user’s language preference setting.
+        paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
+    }
+    
     if (_textAlign) {
         paragraphStyle.alignment = _textAlign;
     }
     
-    // set default lineBreakMode
-    paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    } else if ([[_wordWrap lowercaseString] isEqualToString:@"normal"]){
+        paragraphStyle.lineBreakMode = NSLineBreakByClipping;
+    } else {
+         // set default lineBreakMode
+        paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    }
     _truncationLine = NO;
     if (_textOverflow && [_textOverflow length] > 0) {
         if (_lines && [_textOverflow isEqualToString:@"ellipsis"])
@@ -450,26 +502,13 @@ do {\
 
 - (NSAttributedString *)buildAttributeString
 {
-    NSString *string = [self text] ?: @"";
+    NSString *string = self.text ?: @"";
     
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
     if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
-    
-    if (_fontFamily) {
-        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
-        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
-        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        //custom localSrc is cached
-        if (!fontLocalSrc && fontSrc) {
-            // if use custom font, when the custom font download finish, refresh text.
-            _needsRemoveObserver = YES;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
-        }
     }
     
     // set font
@@ -486,6 +525,20 @@ do {\
     
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
+    // handle text direction style, default ltr
+    if ([_direction isEqualToString:@"rtl"]) {
+        if (0 == _textAlign) {
+            //force text right-align if don't specified any align.
+            _textAlign = NSTextAlignmentRight;
+        }
+        paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
+    } else {
+        //if you specify NSWritingDirectionNaturalDirection, the receiver resolves the writing
+        //directionto eitherNSWritingDirectionLeftToRight or NSWritingDirectionRightToLeft,
+        //depending on the direction for the user’s language preference setting.
+        paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
+    }
+    
     if (_textAlign) {
         paragraphStyle.alignment = _textAlign;
     }
@@ -536,7 +589,15 @@ do {\
     NSTextContainer *textContainer = [NSTextContainer new];
     textContainer.lineFragmentPadding = 0.0;
     
-    textContainer.lineBreakMode = NSLineBreakByClipping;
+    if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
+        textContainer.lineBreakMode = NSLineBreakByWordWrapping;
+    } else if ([[_wordWrap lowercaseString] isEqualToString:@"normal"]){
+        textContainer.lineBreakMode = NSLineBreakByClipping;
+    } else {
+        // set default lineBreakMode
+        textContainer.lineBreakMode = NSLineBreakByCharWrapping;
+    }
+    
     if (_textOverflow && [_textOverflow length] > 0) {
         if ([_textOverflow isEqualToString:@"ellipsis"])
             textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -563,7 +624,7 @@ do {\
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
             if (![self useCoreText]) {
-                ((WXText *)self.view).textStorage = textStorage;
+                ((WXTextView *)self.view).textStorage = textStorage;
             }
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
@@ -580,8 +641,11 @@ do {\
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
     [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
-    
-    [self fillCSSStyles:styles];
+    NSMutableDictionary * newStyles = [styles mutableCopy];
+    for (NSString * key in [resetStyles copy]) {
+        [newStyles setObject:@"" forKey:key];
+    }
+    [self fillCSSStyles:newStyles];
     
     [self syncTextStorageForView];
 }
@@ -595,7 +659,7 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXTextView *)view
 {
     if (bounds.size.width <= 0 || bounds.size.height <= 0) {
         return;

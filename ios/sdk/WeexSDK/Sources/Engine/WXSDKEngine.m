@@ -28,7 +28,6 @@
 #import "WXResourceRequestHandlerDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
-#import "WXWebSocketDefaultImpl.h"
 
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
@@ -37,6 +36,8 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXUtility.h"
+#import "WXExtendCallNativeManager.h"
+#import "WXExceptionUtils.h"
 
 @implementation WXSDKEngine
 
@@ -46,6 +47,7 @@
 + (void)_registerDefaultModules
 {
     [self registerModule:@"dom" withClass:NSClassFromString(@"WXDomModule")];
+    [self registerModule:@"locale" withClass:NSClassFromString(@"WXLocaleModule")];
     [self registerModule:@"navigator" withClass:NSClassFromString(@"WXNavigatorModule")];
     [self registerModule:@"stream" withClass:NSClassFromString(@"WXStreamModule")];
     [self registerModule:@"animation" withClass:NSClassFromString(@"WXAnimationModule")];
@@ -60,6 +62,7 @@
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
+    [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -98,7 +101,7 @@
     [self registerComponent:@"input" withClass:NSClassFromString(@"WXTextInputComponent")];
     [self registerComponent:@"video" withClass:NSClassFromString(@"WXVideoComponent")];
     [self registerComponent:@"indicator" withClass:NSClassFromString(@"WXIndicatorComponent")];
-    [self registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+    [self registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
     [self registerComponent:@"cycleslider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
     [self registerComponent:@"web" withClass:NSClassFromString(@"WXWebComponent")];
     [self registerComponent:@"loading" withClass:NSClassFromString(@"WXLoadingComponent")];
@@ -107,11 +110,20 @@
     [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
 	[self registerComponent:@"canvas" withClass:NSClassFromString(@"WXCanvasComponent")];
     [self registerComponent:@"slider-neighbor" withClass:NSClassFromString(@"WXSliderNeighborComponent")];
+    
+    [self registerComponent:@"recycle-list" withClass:NSClassFromString(@"WXRecycleListComponent")];
+    [self registerComponent:@"cell-slot" withClass:NSClassFromString(@"WXCellSlotComponent") withProperties: @{@"append":@"tree", @"isTemplate":@YES}];
+    
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
 {
     [self registerComponent:name withClass:clazz withProperties: @{@"append":@"tree"}];
+}
+
++ (void)registerExtendCallNative:(NSString *)name withClass:(Class)clazz
+{
+    [WXExtendCallNativeManager registerExtendCallNative:name withClass:clazz];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary *)properties
@@ -161,9 +173,6 @@
     [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
-    if (NSClassFromString(@"WXWebSocketDefaultImpl")) {
-        [self registerHandler:[NSClassFromString(@"WXWebSocketDefaultImpl") new] withProtocol:NSProtocolFromString(@"WXWebSocketHandler")];
-    }
     
 }
 
@@ -223,7 +232,9 @@
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
     
     if (!script || script.length <= 0) {
-        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
+        NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] script don't exist:%@",script];
+        [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"initSDKEnvironment" exception:errMsg extParams:nil];
+        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, errMsg);
         return;
     }
     static dispatch_once_t onceToken;

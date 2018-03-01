@@ -22,6 +22,8 @@
 #import "WXLog.h"
 #import "WXHandlerFactory.h"
 #import "WXSDKError.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
 
 //deprecated
 #import "WXNetworkProtocol.h"
@@ -87,7 +89,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *fileData = [[NSFileManager defaultManager] contentsAtPath:[url path]];
         if (self.onFinished) {
-            self.onFinished([WXResourceResponse new], fileData);
+            self.onFinished([[WXResourceResponse alloc]initWithURL:url statusCode:200 HTTPVersion:@"1.1" headerFields:nil], fileData);
         }
     });
 }
@@ -138,6 +140,14 @@
     WXLogDebug(@"request:%@ didReceiveResponse:%@ ", request, response);
     
     _response = response;
+    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL isDefault;
+        BOOL clearResponseData = [[configCenter configForKey:@"iOS_weex_ext_config.clearResponseDataWhenDidReceiveResponse" defaultValue:@(NO) isDefault:&isDefault] boolValue];
+        if(clearResponseData) {
+            _data = nil;
+        }
+    }
     
     if (self.onResponseReceived) {
         self.onResponseReceived(response);

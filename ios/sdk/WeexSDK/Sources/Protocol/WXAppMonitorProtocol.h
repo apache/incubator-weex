@@ -23,8 +23,11 @@
 #define PAGENAME            @"pageName"
 #define WXSDKVERSION        @"WXSDKVersion"
 #define JSLIBVERSION        @"JSLibVersion"
+#define JSLIBSIZE           @"JSLibSize"
 #define WXREQUESTTYPE       @"requestType"
 #define WXCONNECTIONTYPE    @"connectionType"
+#define NETWORKTYPE         @"networkType"
+#define CACHETYPE           @"cacheType"
 #define WXCUSTOMMONITORINFO @"customMonitorInfo"
 
 #define SDKINITTIME         @"SDKInitTime"
@@ -35,7 +38,15 @@
 #define COMMUNICATETIME     @"communicateTime"
 #define SCREENRENDERTIME    @"screenRenderTime"
 #define TOTALTIME           @"totalTime"
+#define FIRSETSCREENJSFEXECUTETIME  @"firstScreenJSFExecuteTime"
 
+#define CALLCREATEINSTANCETIME  @"callCreateInstanceTime"
+#define COMMUNICATETOTALTIME    @"communicateTotalTime"
+#define FSRENDERTIME    @"fsRenderTime"
+#define COMPONENTCOUNT      @"componentCount"
+
+#define CACHEPROCESSTIME    @"cacheProcessTime"
+#define CACHERATIO          @"cacheRatio"
 
 @protocol WXAppMonitorProtocol <WXModuleProtocol>
 

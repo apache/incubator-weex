@@ -28,6 +28,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXLoadingLayout;
 import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
@@ -95,7 +96,9 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
       if (display.equals(HIDE)) {
-        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
+        if (getParent() instanceof WXRecyclerTemplateList
+                || getParent() instanceof WXListComponent
+                || getParent() instanceof WXScroller) {
           if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
             ((BaseBounceView) getParent().getHostView()).finishPullLoad();
             ((BaseBounceView) getParent().getHostView()).onLoadmoreComplete();

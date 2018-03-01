@@ -53,7 +53,6 @@
     NSUInteger val= [WXConvert NSUInteger:@"x"];
     XCTAssertTrue(0==val);
     
-    
     val= [WXConvert NSUInteger:@"9"];
     XCTAssertTrue(9);
     
@@ -62,8 +61,6 @@
     val= [WXConvert NSUInteger:unsignedIntMax];
     XCTAssertTrue(val==NSUIntegerMax);
     
-    
-    
     //test overflow
     unsigned long long uio = NSUIntegerMax;
     uio++;
@@ -71,7 +68,25 @@
     NSString * ulval  = [NSString stringWithFormat:@"%llu", uio ];
     val = [WXConvert NSUInteger:ulval];
     XCTAssertTrue(0==val);//overflowed
+
+}
+
+- (void) testHex2Color{
     
+    UIColor *redColor = [UIColor redColor];
+    NSString *redString = @"#ff0000";
+    //hex2color
+    UIColor *redTestColor = [WXConvert UIColor:redString];
+    XCTAssertTrue(CGColorEqualToColor(redTestColor.CGColor, redColor.CGColor));
+}
+
+- (void) testColor2Hex{
+    
+    UIColor *redColor = [UIColor redColor];
+    NSString *redString = @"#ff0000";
+    //color2hex
+    NSString *hexString = [WXConvert HexWithColor:redColor];
+    XCTAssertTrue([redString isEqualToString:hexString]);
 }
 
 @end

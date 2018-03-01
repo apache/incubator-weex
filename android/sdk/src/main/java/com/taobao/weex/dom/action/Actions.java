@@ -42,6 +42,7 @@ import static com.taobao.weex.dom.WXDomModule.REMOVE_ELEMENT;
 import static com.taobao.weex.dom.WXDomModule.REMOVE_EVENT;
 import static com.taobao.weex.dom.WXDomModule.SCROLL_TO_ELEMENT;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_ATTRS;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_COMPONENT_DATA;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_FINISH;
 import static com.taobao.weex.dom.WXDomModule.UPDATE_STYLE;
 
@@ -87,12 +88,12 @@ public class Actions {
         if (args == null) {
           return null;
         }
-        return new AddEventAction(args.getString(0),args.getString(1));
+        return new AddEventAction(args.getString(0),args.get(1));
       case REMOVE_EVENT:
         if (args == null) {
           return null;
         }
-        return new RemoveEventAction(args.getString(0),args.getString(1));
+        return new RemoveEventAction(args.getString(0),args.get(1));
       case CREATE_FINISH:
         return new CreateFinishAction();
       case REFRESH_FINISH:
@@ -121,6 +122,11 @@ public class Actions {
           return null;
         }
         return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
+      case UPDATE_COMPONENT_DATA:
+        if(args == null || args.size() < 3){
+          return null;
+        }
+        return new UpdateComponentDataAction(args.getString(0), args.getJSONObject(1), args.getString(2));
     }
 
     return null;
@@ -200,7 +206,7 @@ public class Actions {
   }
 
 
-  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull String animation,
+  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull JSONObject animation,
                                              @Nullable final String callBack){
     return new AnimationAction(ref, animation, callBack);
   }
@@ -225,4 +231,7 @@ public class Actions {
     return new ExecutableRenderAction(runnable);
   }
 
+  public static DOMAction getReloadPage(String instanceId, boolean relaod) {
+    return new ReloadPageAction(instanceId, relaod);
+  }
 }

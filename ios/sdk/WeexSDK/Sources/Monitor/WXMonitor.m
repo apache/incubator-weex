@@ -27,6 +27,7 @@
 #import "WXComponentManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXAppConfiguration.h"
+#import "WXTracingManager.h"
 
 NSString *const kStartKey = @"start";
 NSString *const kEndKey = @"end";
@@ -61,9 +62,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     
     dict[kEndKey] = @(CACurrentMediaTime() * 1000);
     
-    if (tag == WXPTAllRender) {
-        [self performanceFinish:instance];
-    }
+//    if (tag == WXPTAllRender) {
+//        [self performanceFinish:instance];
+//    }
 }
 
 + (void)performancePoint:(WXPerformanceTag)tag didSetValue:(double)value withInstance:(WXSDKInstance *)instance
@@ -91,18 +92,37 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
 
 + (void)performanceFinish:(WXSDKInstance *)instance
 {
-    NSMutableDictionary *commitDict = [NSMutableDictionary dictionaryWithCapacity:WXPTEnd+4];
+    NSMutableDictionary *commitDict = [NSMutableDictionary dictionary];
     
     commitDict[BIZTYPE] = instance.bizType ?: @"";
     commitDict[PAGENAME] = instance.pageName ?: @"";
     
     commitDict[WXSDKVERSION] = WX_SDK_VERSION;
     commitDict[JSLIBVERSION] = [WXAppConfiguration JSFrameworkVersion];
+    commitDict[JSLIBSIZE] = [NSNumber numberWithUnsignedInteger:[WXAppConfiguration JSFrameworkLibSize]];
+    
     if (instance.userInfo[@"weex_bundlejs_connectionType"]) {
         commitDict[@"connectionType"] = instance.userInfo[@"weex_bundlejs_connectionType"];
     }
+    
     if (instance.userInfo[@"weex_bundlejs_requestType"]) {
         commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
+    }
+    
+    if (instance.userInfo[@"weex_bundlejs_networkType"]) {
+        commitDict[NETWORKTYPE] = instance.userInfo[@"weex_bundlejs_networkType"];
+    }
+    
+    if (instance.userInfo[@"weex_bundlejs_cacheType"]) {
+        commitDict[CACHETYPE] = instance.userInfo[@"weex_bundlejs_cacheType"];
+    }
+    
+    if (instance.userInfo[CACHEPROCESSTIME]) {
+        commitDict[CACHEPROCESSTIME] = instance.userInfo[CACHEPROCESSTIME];
+    }
+    
+    if (instance.userInfo[CACHERATIO]) {
+        commitDict[CACHERATIO] = instance.userInfo[CACHERATIO];
     }
     if (instance.userInfo[WXCUSTOMMONITORINFO]) {
         if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSDictionary class]]) {
@@ -112,7 +132,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         }
     }
     WXPerformBlockOnComponentThread(^{
-        commitDict[@"componentCount"] = @([instance numberOfComponents]);
+        commitDict[COMPONENTCOUNT] = @([instance numberOfComponents]);
         WXPerformBlockOnMainThread(^{
             [self commitPerformanceWithDict:commitDict instance:instance];
         });
@@ -131,6 +151,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXPTFrameworkExecute) : JSLIBINITTIME,
                           @(WXPTJSDownload) : NETWORKTIME,
                           @(WXPTJSCreateInstance) : COMMUNICATETIME,
+                          @(WXFirstScreenJSFExecuteTime) : FIRSETSCREENJSFEXECUTETIME,
                           @(WXPTFirstScreenRender) : SCREENRENDERTIME,
                           @(WXPTAllRender) : TOTALTIME,
                           @(WXPTBundleSize) : JSTEMPLATESIZE
@@ -156,12 +177,30 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         commitDict[commitKey] = @([end integerValue] - [start integerValue]);
     }
     
+    commitDict[@"instanceId"] = [instance instanceId]?:@"";
+    
+    //new performance point
+    if (!commitDict[SCREENRENDERTIME] && commitDict[TOTALTIME]) {
+        commitDict[SCREENRENDERTIME] = commitDict[TOTALTIME];
+    }
+    
+    commitDict[CALLCREATEINSTANCETIME] = commitDict[COMMUNICATETIME];
+    commitDict[COMMUNICATETOTALTIME] = commitDict[TOTALTIME];
+    
+    if (commitDict[SCREENRENDERTIME]) {
+        commitDict[FSRENDERTIME] = commitDict[SCREENRENDERTIME];
+    }
+    else {
+        commitDict[FSRENDERTIME] = @"-1";
+    }
+    
     id<WXAppMonitorProtocol> appMonitor = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
     if (appMonitor && [appMonitor respondsToSelector:@selector(commitAppMonitorArgs:)]){
         [appMonitor commitAppMonitorArgs:commitDict];
     }
     
     [self printPerformance:commitDict];
+    [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];
 }
 
 + (NSMutableDictionary *)performanceDictForInstance:(WXSDKInstance *)instance

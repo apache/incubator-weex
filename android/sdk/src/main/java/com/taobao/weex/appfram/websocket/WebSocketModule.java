@@ -18,9 +18,12 @@
  */
 package com.taobao.weex.appfram.websocket;
 
+import android.os.Looper;
+
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -39,11 +42,113 @@ public class WebSocketModule extends WXSDKEngine.DestroyableModule {
     private static final String KEY_WAS_CLEAN = "wasClean";
 
     private IWebSocketAdapter webSocketAdapter;
-    private JSCallback onOpen;
-    private JSCallback onMessage;
-    private JSCallback onClose;
-    private JSCallback onError;
-    private IWebSocketAdapter.EventListener eventListener = new IWebSocketAdapter.EventListener() {
+    private WebSocketEventListener eventListener;
+
+    public WebSocketModule() {
+        WXLogUtils.e(TAG, "create new instance");
+    }
+
+    @JSMethod(uiThread = false)
+    public void WebSocket(String url, String protocol) {
+        if (webSocketAdapter != null) {
+            WXLogUtils.w(TAG, "close");
+            webSocketAdapter.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
+        }
+        webSocketAdapter = mWXSDKInstance.getWXWebSocketAdapter();
+        if (!reportErrorIfNoAdapter()) {
+            eventListener = new WebSocketEventListener();
+            webSocketAdapter.connect(url, protocol, eventListener);
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void send(String data) {
+        if (!reportErrorIfNoAdapter()) {
+            webSocketAdapter.send(data);
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void close(String code, String reason) {
+        if (!reportErrorIfNoAdapter()) {
+            int codeNumber = WebSocketCloseCodes.CLOSE_NORMAL.getCode();
+            if (code != null) {
+                try {
+                    codeNumber = Integer.parseInt(code);
+                } catch (NumberFormatException e) {
+                    //ignore
+                }
+            }
+            webSocketAdapter.close(codeNumber, reason);
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void onopen(JSCallback callback) {
+        if (eventListener != null) {
+            eventListener.onOpen = callback;
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void onmessage(JSCallback callback) {
+        if (eventListener != null) {
+            eventListener.onMessage = callback;
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void onclose(JSCallback callback) {
+        if (eventListener != null) {
+            eventListener.onClose = callback;
+        }
+    }
+
+    @JSMethod(uiThread = false)
+    public void onerror(JSCallback callback) {
+        if (eventListener != null) {
+            eventListener.onError = callback;
+        }
+    }
+
+    @Override
+    public void destroy() {
+        Runnable destroyTask = new Runnable() {
+            @Override
+            public void run() {
+                WXLogUtils.w(TAG, "close session with instance id " + mWXSDKInstance.getInstanceId());
+                if (webSocketAdapter != null) {
+                    webSocketAdapter.destroy();
+                }
+                webSocketAdapter = null;
+                eventListener = null;
+            }
+        };
+
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            WXBridgeManager.getInstance().post(destroyTask);
+        } else {
+            destroyTask.run();
+        }
+    }
+
+    private boolean reportErrorIfNoAdapter() {
+        if (webSocketAdapter == null) {
+            if (eventListener != null) {
+                eventListener.onError("No implementation found for IWebSocketAdapter");
+            }
+            WXLogUtils.e(TAG, "No implementation found for IWebSocketAdapter");
+            return true;
+        }
+        return false;
+    }
+
+    private class WebSocketEventListener implements IWebSocketAdapter.EventListener {
+        private JSCallback onOpen;
+        private JSCallback onClose;
+        private JSCallback onError;
+        private JSCallback onMessage;
+
         @Override
         public void onOpen() {
             if (onOpen != null) {
@@ -79,77 +184,5 @@ public class WebSocketModule extends WXSDKEngine.DestroyableModule {
                 onError.invokeAndKeepAlive(info);
             }
         }
-    };
-
-    @JSMethod
-    public void WebSocket(String url, String protocol) {
-        if (webSocketAdapter != null) {
-            webSocketAdapter.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
-        }
-        webSocketAdapter = mWXSDKInstance.getWXWebSocketAdapter();
-        if (!reportErrorIfNoAdapter()) {
-            webSocketAdapter.connect(url, protocol, eventListener);
-        }
-    }
-
-    @JSMethod
-    public void send(String data) {
-        if (!reportErrorIfNoAdapter()) {
-            webSocketAdapter.send(data);
-        }
-    }
-
-    @JSMethod
-    public void close(String code, String reason) {
-        if (!reportErrorIfNoAdapter()) {
-            int codeNumber = WebSocketCloseCodes.CLOSE_NORMAL.getCode();
-            if (code != null) {
-                try {
-                    codeNumber = Integer.parseInt(code);
-                } catch (NumberFormatException e) {
-                    //ignore
-                }
-            }
-            webSocketAdapter.close(codeNumber, reason);
-        }
-    }
-
-    @JSMethod
-    public void onopen(JSCallback callback) {
-        this.onOpen = callback;
-    }
-
-    @JSMethod
-    public void onmessage(JSCallback callback) {
-        this.onMessage = callback;
-    }
-
-    @JSMethod
-    public void onclose(JSCallback callback) {
-        this.onClose = callback;
-    }
-
-    @JSMethod
-    public void onerror(JSCallback callback) {
-        this.onError = callback;
-    }
-
-    @Override
-    public void destroy() {
-        if (webSocketAdapter != null) {
-            webSocketAdapter.destroy();
-        }
-        eventListener = null;
-    }
-
-    private boolean reportErrorIfNoAdapter() {
-        if (webSocketAdapter == null) {
-            if (eventListener != null) {
-                eventListener.onError("No implementation found for IWebSocketAdapter");
-            }
-            WXLogUtils.e(TAG, "No implementation found for IWebSocketAdapter");
-            return true;
-        }
-        return false;
     }
 }

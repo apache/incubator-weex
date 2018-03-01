@@ -1,5 +1,10 @@
 buildscript {
+    repositories {
+        mavenCentral()
+    }
+
     dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
@@ -10,6 +15,7 @@ plugins {
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){
@@ -34,7 +40,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = "0.9.4"
+version = "0.18.0"
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -121,6 +127,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     testOptions {
+        unitTests.returnDefaultValues = true
         unitTests.all {
             maxHeapSize = "1024m"
             jvmArgs += ['-XX:-UseSplitVerifier', '-noverify','-Xverify:none']/* fix VerifyError  */

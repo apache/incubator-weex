@@ -23,11 +23,17 @@
 
 @class WXSDKInstance;
 
+typedef enum : NSUInteger {
+    WXDisplayTypeNone,
+    WXDisplayTypeBlock
+} WXDisplayType;
+
 /**
  * @abstract the component callback , result can be string or dictionary.
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
 typedef void (^WXCallback)(_Nonnull id result);
+// DEPRECATED_MSG_ATTRIBUTE("use WXKeepAliveCallback, you can specify keep the callback or not, if keeped, it can be called multi times, or it will be removed after called.")
 
 /**
  * @abstract the component callback , result can be string or dictionary.
@@ -37,7 +43,7 @@ typedef void (^WXKeepAliveCallback)(_Nonnull id result, BOOL keepAlive);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WXComponent : NSObject
+@interface WXComponent : NSObject <NSCopying>
 
 ///--------------------------------------
 /// @name Component Hierarchy Management
@@ -346,6 +352,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Display
 ///--------------------------------------
 
+@property (nonatomic, assign) WXDisplayType displayType;
+
 /**
  * @abstract Marks the view as needing display. The method should be called on the main thread.
  * @discussion You can use this method to notify the system that your component's contents need to be redrawn. This method makes a note of the request and returns immediately. The component is not actually redrawn until the next drawing cycle, at which point all invalidated components are updated.
@@ -398,6 +406,16 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion You can override this method to use your own graphics context. The image will be set to layer,  if your drawing system do not have layer and do not need image, returning nil is fine.
  */
 - (UIImage *)endDrawContext:(CGContextRef)context;
+
+///--------------------------------------
+/// @name Data Binding
+///--------------------------------------
+
+/**
+ * @abstract Update binding data for the component
+ * @parameter binding data to update
+ */
+- (void)updateBindingData:(NSDictionary *)data;
 
 @end
 

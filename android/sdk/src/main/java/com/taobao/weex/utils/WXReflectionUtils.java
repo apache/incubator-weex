@@ -20,6 +20,8 @@ package com.taobao.weex.utils;
 
 import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +31,16 @@ import java.math.BigDecimal;
 public class WXReflectionUtils {
 
   public static Object parseArgument(Type paramClazz, Object value) {
+    if(value != null){
+        if(value.getClass() == paramClazz){
+          return  value;
+        }
+        if(paramClazz instanceof  Class){
+          if( ((Class<?>) paramClazz).isAssignableFrom(value.getClass()))   {
+            return value;
+          }
+        }
+    }
     if (paramClazz == String.class) {
       return value instanceof String ? value : JSON.toJSONString(value);
     } else if (paramClazz == int.class) {
@@ -39,6 +51,10 @@ public class WXReflectionUtils {
       return value.getClass().isAssignableFrom(double.class) ? value : WXUtils.getDouble(value);
     } else if (paramClazz == float.class) {
       return value.getClass().isAssignableFrom(float.class) ? value : WXUtils.getFloat(value);
+    } else if (paramClazz == JSONArray.class && value != null && value.getClass() == JSONArray.class) {
+      return  value;
+    } else if (paramClazz == JSONObject.class && value != null && value.getClass() == JSONObject.class) {
+      return  value;
     } else {
       return JSON.parseObject(value instanceof String ? (String) value : JSON.toJSONString(value), paramClazz);
     }

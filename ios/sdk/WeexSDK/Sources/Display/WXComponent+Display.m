@@ -157,7 +157,7 @@
     if (_async) {
         WXThreadSafeCounter *displayCounter = _displayCounter;
         int32_t displayValue = [displayCounter increase];
-        BOOL (^isCancelled)() = ^BOOL(){
+        BOOL (^isCancelled)(void) = ^BOOL(){
             return displayValue != displayCounter.value;
         };
         
@@ -331,13 +331,13 @@
     WXRadii *radii = borderRect.radii;
     CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
     
+    CGContextSetAlpha(context, _opacity);
     // fill background color
     if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
         CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
     }
-    
     // Top
     if (_borderTopWidth > 0) {
         if(_borderTopStyle == WXBorderStyleDashed || _borderTopStyle == WXBorderStyleDotted){
@@ -553,7 +553,9 @@ do {\
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
             _layer.borderColor = _borderTopColor.CGColor;
-            _layer.backgroundColor = _backgroundColor.CGColor;
+            if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
+                _layer.backgroundColor = _backgroundColor.CGColor;
+            }
         }
     }
 }

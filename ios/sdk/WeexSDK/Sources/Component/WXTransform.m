@@ -22,6 +22,7 @@
 #import "WXLength.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXConvert.h"
 
 @interface WXTransform()
 
@@ -43,6 +44,7 @@
     float _rotateX;
     float _rotateY;
     float _rotateZ;
+    float _perspective;
     
     CATransform3D _nativeTransform;
     BOOL _useNativeTransform;
@@ -58,6 +60,9 @@
         _rotateY = 0.0;
         _rotateZ = 0.0;
         _rotateAngle = 0.0;
+        
+        // default is parallel projection
+        _perspective = CGFLOAT_MAX;
         
         [self parseTransform:cssValue];
         [self parseTransformOrigin:origin];
@@ -147,19 +152,19 @@
     if (_useNativeTransform) {
         return _nativeTransform;
     }
+    
     CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
+
+    if (_rotateAngle != 0 || _rotateZ != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateAngle?:_rotateZ, 0, 0, 1);
+    }
+    
+    if (_rotateY != 0) {
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateY, 0, 1, 0);
+    }
     
     if (_rotateX != 0) {
-        CATransform3D rotateXTransform = CATransform3DMakeRotation(_rotateX, 1, 0, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateXTransform);
-    }
-    if (_rotateY != 0) {
-        CATransform3D rotateYTransform = CATransform3DMakeRotation(_rotateY, 0, 1, 0);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateYTransform);
-    }
-    if (_rotateAngle != 0 || _rotateZ != 0) {
-        CATransform3D rotateZTransform = CATransform3DMakeRotation(_rotateAngle?:_rotateZ, 0, 0, 1);
-        nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateZTransform);
+        nativeTransform3d = CATransform3DRotate(nativeTransform3d, _rotateX, 1, 0, 0);
     }
     
     return nativeTransform3d;
@@ -169,6 +174,10 @@
 {
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
+    // CGFLOAT_MAX is not INF on 32-bit device
+    if(_perspective && _perspective != CGFLOAT_MAX && !isinf(_perspective)) {
+        nativeTansform3D.m34 = -1.0/_perspective;
+    }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
         return nativeTansform3D;
     }
@@ -219,7 +228,7 @@
           **/
         CGPoint anchorPoint = CGPointMake(
                                           _originX ? [_originX valueForMaximum:view.bounds.size.width] / view.bounds.size.width : 0.5,
-                                          _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
+                                          _originY ? [_originY valueForMaximum:view.bounds.size.height] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
@@ -304,7 +313,6 @@
             }
         }
     }
-    
     _originX = [WXLength lengthWithFloat:originX type:typeX];
     _originY = [WXLength lengthWithFloat:originY type:typeY];
 }
@@ -330,7 +338,23 @@
    _rotateZ = [self getAngle:value[0]];
 }
 
+- (void)parsePerspective:(NSArray *)value
+{
+    _perspective = [WXConvert WXPixelType:value[0] scaleFactor:self.weexInstance.pixelScaleFactor];
+    if (_perspective <= 0 ) {
+        _perspective = CGFLOAT_MAX;
+    }
+}
+
 - (void)parseTranslate:(NSArray *)value
+{
+    [self parseTranslatex:@[value[0]]];
+    if (value.count > 1) {
+        [self parseTranslatey:@[value[1]]];
+    }
+}
+
+- (void)parseTranslatex:(NSArray *)value
 {
     WXLength *translateX;
     double x = [value[0] doubleValue];
@@ -340,30 +364,20 @@
         x = WXPixelScale(x, self.weexInstance.pixelScaleFactor);
         translateX = [WXLength lengthWithFloat:x type:WXLengthTypeFixed];
     }
-
-    WXLength *translateY;
-    if (value.count > 1) {
-        double y = [value[1] doubleValue];
-        if ([value[1] hasSuffix:@"%"]) {
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
-        } else {
-            y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
-        }
-    }
-    
     _translateX = translateX;
-    _translateY = translateY;
-}
-
-- (void)parseTranslatex:(NSArray *)value
-{
-    [self parseTranslate:@[value[0], @"0"]];
 }
 
 - (void)parseTranslatey:(NSArray *)value
 {
-    [self parseTranslate:@[@"0", value[0]]];
+    WXLength *translateY;
+    double y = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
+    } else {
+        y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
+    }
+    _translateY = translateY;
 }
 
 - (void)parseScale:(NSArray *)value

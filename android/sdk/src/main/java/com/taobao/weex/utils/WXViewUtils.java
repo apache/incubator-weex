@@ -28,6 +28,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,6 +40,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.ui.flat.widget.Widget;
+import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -131,6 +134,11 @@ public class WXViewUtils {
   @Deprecated
   public static int getScreenWidth( ) {
     return getScreenWidth(WXEnvironment.sApplication);
+  }
+
+  @Deprecated
+  public static int setScreenWidth(int screenWidth) {
+     return mScreenWidth = screenWidth;
   }
 
   public static float getScreenDensity(Context ctx){
@@ -375,7 +383,7 @@ public class WXViewUtils {
   public static void clipCanvasWithinBorderBox(View targetView, Canvas canvas) {
     Drawable drawable;
     if (clipCanvasDueToAndroidVersion(canvas) &&
-        clipCanvasIfAnimationExist() &&
+        clipCanvasIfAnimationExist(targetView) &&
         ((drawable = targetView.getBackground()) instanceof BorderDrawable)) {
       BorderDrawable borderDrawable = (BorderDrawable) drawable;
       if (borderDrawable.isRounded()) {
@@ -384,6 +392,22 @@ public class WXViewUtils {
               new RectF(0, 0, targetView.getWidth(), targetView.getHeight()));
           canvas.clipPath(path);
         }
+      }
+    }
+  }
+
+  public static void clipCanvasWithinBorderBox(Widget widget, Canvas canvas) {
+    BorderDrawable borderDrawable;
+    if (clipCanvasDueToAndroidVersion(canvas) &&
+        clipCanvasIfAnimationExist(null) &&
+        (borderDrawable=widget.getBackgroundAndBorder())!=null ) {
+      if (borderDrawable.isRounded() && clipCanvasIfBackgroundImageExist(widget, borderDrawable)) {
+          Path path = borderDrawable.getContentPath(
+              new RectF(0, 0, widget.getBorderBox().width(), widget.getBorderBox().height()));
+          canvas.clipPath(path);
+      }
+      else {
+        canvas.clipRect(widget.getBorderBox());
       }
     }
   }
@@ -404,10 +428,13 @@ public class WXViewUtils {
    * clipPath doesn't work with rotation nor scale when API level is 24.
    * As animation will not cause redraw if hardware-acceleration enabled, clipCanvas feature has
    * to be disabled when API level is 24 without considering the animation property.
-   * As the compile version of weex_sdk is 23, so API level 24 has to be hard-code.
    */
-  private static boolean clipCanvasIfAnimationExist() {
-    return Build.VERSION.SDK_INT != 24;
+  private static boolean clipCanvasIfAnimationExist(View targetView) {
+    if (Build.VERSION.SDK_INT != VERSION_CODES.N) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -429,6 +456,19 @@ public class WXViewUtils {
         child = parent.getChildAt(i);
         if (child.getBackground() instanceof BorderDrawable &&
             ((BorderDrawable) child.getBackground()).hasImage() &&
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean clipCanvasIfBackgroundImageExist(@NonNull Widget widget,
+      @NonNull BorderDrawable borderDrawable) {
+    if (widget instanceof WidgetGroup) {
+      for (Widget child : ((WidgetGroup) widget).getChildren()) {
+        if (child.getBackgroundAndBorder().hasImage() &&
             Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
           return false;
         }

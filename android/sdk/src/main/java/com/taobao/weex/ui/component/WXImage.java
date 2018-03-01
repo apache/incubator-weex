@@ -18,13 +18,18 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -34,6 +39,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
@@ -46,6 +53,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.SingleFunctionParser;
+import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -62,8 +70,14 @@ import java.util.Map;
  */
 @Component(lazyload = false)
 public class WXImage extends WXComponent<ImageView> {
+
+  public static final String SUCCEED = "success";
+  public static final String ERRORDESC = "errorDesc";
+  private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 0x2;
+
   private String mSrc;
   private int mBlurRadius;
+  private boolean mAutoRecycle = true;
 
   private static SingleFunctionParser.FlatMapper<Integer> BLUR_RADIUS_MAPPER = new SingleFunctionParser.FlatMapper<Integer>() {
     @Override
@@ -119,6 +133,9 @@ public class WXImage extends WXComponent<ImageView> {
             setSrc(src);
           return true;
         case Constants.Name.IMAGE_QUALITY:
+          return true;
+        case Constants.Name.AUTO_RECYCLE:
+          mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
           return true;
         case Constants.Name.FILTER:
           int blurRadius = 0;
@@ -195,6 +212,13 @@ public class WXImage extends WXComponent<ImageView> {
       return;
     }
 
+    if(image != null){
+      if(image.getDrawable() != null){
+         image.setImageDrawable(null);
+      }
+    }
+
+
     this.mSrc = src;
     WXSDKInstance instance = getInstance();
     Uri rewrited = instance.rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
@@ -252,6 +276,22 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
+  public void autoReleaseImage(){
+    if(mAutoRecycle){
+      if(getHostView() != null){
+        if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+        }
+      }
+    }
+  }
+
+  public void autoRecoverImage() {
+    if(mAutoRecycle) {
+      setSrc(mSrc);
+    }
+  }
+
   private void setRemoteSrc(Uri rewrited,int blurRadius) {
 
       WXImageStrategy imageStrategy = new WXImageStrategy();
@@ -292,7 +332,7 @@ public class WXImage extends WXComponent<ImageView> {
         }else if(getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
             placeholder=(String)getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
         }
-        if(placeholder!=null){
+        if(!TextUtils.isEmpty(placeholder)){
             imageStrategy.placeHolder = getInstance().rewriteUri(Uri.parse(placeholder),URIAdapter.IMAGE).toString();
         }
 
@@ -330,6 +370,81 @@ public class WXImage extends WXComponent<ImageView> {
       }
       readyToRender();
     }
+  }
+
+  /**
+   * Need permission {android.permission.WRITE_EXTERNAL_STORAGE}
+   */
+  @JSMethod(uiThread = false)
+  public void save(final JSCallback saveStatuCallback) {
+
+    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      if (getContext() instanceof Activity) {
+        ActivityCompat.requestPermissions((Activity) getContext(),
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
+      }
+    }
+
+    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Permission denied: android.permission.WRITE_EXTERNAL_STORAGE");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    if (mHost == null) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Image component not initialized");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    if (mSrc == null || mSrc.equals("")) {
+      if (saveStatuCallback != null) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(SUCCEED, false);
+        result.put(ERRORDESC,"Image does not have the correct src");
+        saveStatuCallback.invoke(result);
+      }
+      return;
+    }
+
+    WXViewToImageUtil.generateImage(mHost, 0, 0xfff8f8f8, new WXViewToImageUtil.OnImageSavedCallback() {
+      @Override
+      public void onSaveSucceed(String path) {
+        if (saveStatuCallback != null) {
+          Map<String, Object> result = new HashMap<>();
+          result.put(SUCCEED, true);
+          saveStatuCallback.invoke(result);
+        }
+      }
+
+      @Override
+      public void onSaveFailed(String errorDesc) {
+        if (saveStatuCallback != null) {
+          Map<String, Object> result = new HashMap<>();
+          result.put(SUCCEED, false);
+          result.put(ERRORDESC,errorDesc);
+          saveStatuCallback.invoke(result);
+        }
+      }
+    });
+  }
+
+
+  public void destroy() {
+    if(getHostView() instanceof WXImageView){
+      if (getInstance().getImgLoaderAdapter() != null) {
+          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+      }
+    }
+    super.destroy();
   }
 
   public interface Measurable {

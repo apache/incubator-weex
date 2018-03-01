@@ -33,7 +33,7 @@
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <coreText/CoreText.h>
+#import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
@@ -41,7 +41,9 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
+static BOOL threadSafeCollectionUsingLock = YES;
+
+void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -54,7 +56,7 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -67,7 +69,7 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *thread)
 {
     [WXUtility performBlock:block onThread:thread];
 }
@@ -135,7 +137,17 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 @implementation WXUtility
 
-+ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
+{
+    threadSafeCollectionUsingLock = usingLock;
+}
+
++ (BOOL)threadSafeCollectionUsingLock
+{
+    return threadSafeCollectionUsingLock;
+}
+
++ (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {
     if (!thread || !block) return;
     
@@ -149,11 +161,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
 }
 
-+ (void)_performBlock:(void (^)())block
++ (void)_performBlock:(void (^)(void))block
 {
     block();
 }
-
 
 + (NSDictionary *)getEnvironment
 {
@@ -326,7 +337,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
 }
 
 + (BOOL)isBlankString:(NSString *)string {
+    
     if (string == nil || string == NULL || [string isKindOfClass:[NSNull class]]) {
+        return true;
+    }
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"%@ is not a string", string);
         return true;
     }
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0) {
@@ -900,6 +916,28 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     }
     [custormMonitorDict setObject:value forKey:key];
     instance.userInfo[WXCUSTOMMONITORINFO] = custormMonitorDict;
+}
+
++ (NSDictionary *_Nonnull)dataToBase64Dict:(NSData *_Nullable)data
+{
+    NSMutableDictionary *dataDict = [NSMutableDictionary new];
+    if(data){
+        NSString *base64Encoded = [data base64EncodedStringWithOptions:0];
+        [dataDict setObject:@"binary" forKey:@"@type"];
+        [dataDict setObject:base64Encoded forKey:@"base64"];
+    }
+    
+    return dataDict;
+}
+
++ (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict
+{
+    if([@"binary" isEqualToString:base64Dict[@"@type"]]){
+        NSString *base64 = base64Dict[@"base64"];
+        NSData *sendData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+        return sendData;
+    }
+    return nil;
 }
 @end
 

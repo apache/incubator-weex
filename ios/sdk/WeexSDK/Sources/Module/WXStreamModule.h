@@ -22,7 +22,7 @@
 
 @interface WXStreamModule : NSObject <WXModuleProtocol>
 
-- (void)fetch:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback;
-- (void)sendHttp:(NSDictionary*)param callback:(WXModuleCallback)callback DEPRECATED_MSG_ATTRIBUTE("Use fetch method instead.");
+- (void)fetch:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback;
+- (void)sendHttp:(NSDictionary*)param callback:(WXModuleKeepAliveCallback)callback DEPRECATED_MSG_ATTRIBUTE("Use fetch method instead.");
 
 @end

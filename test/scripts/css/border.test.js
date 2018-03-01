@@ -28,19 +28,18 @@ describe('border test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
       .get(util.getPage('/css/border.js'))
-      .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
   });
 
-  after(function () {
+  afterEach(function () {
     return util.quit(driver);
   })
 
-
   it('#1 border screenshot diff', () => {
     return driver
+    .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
     .sleep(10000)
     .takeScreenshot()
     .then(imgData => {

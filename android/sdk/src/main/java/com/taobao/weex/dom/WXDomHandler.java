@@ -20,9 +20,11 @@ package com.taobao.weex.dom;
 
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.action.TraceableAction;
 
 /**
  * Handler for dom operations.
@@ -33,6 +35,8 @@ public class WXDomHandler implements Handler.Callback {
    * The batch operation in dom thread will run at most once in 16ms.
    */
   public static final int DELAY_TIME = 16;//ms
+  public static final int TRANSITION_DELAY_TIME = 2;//2ms, start transition as soon as
+
   private WXDomManager mWXDomManager;
   private boolean mHasBatch = false;
 
@@ -49,14 +53,24 @@ public class WXDomHandler implements Handler.Callback {
     Object obj = msg.obj;
     WXDomTask task = null;
 
-    if (obj instanceof WXDomTask) {
+    if (obj != null && obj instanceof WXDomTask) {
       task = (WXDomTask) obj;
+      Object action = ((WXDomTask) obj).args.get(0);
+      if (action != null && action instanceof TraceableAction) {
+        ((TraceableAction) action).mDomQueueTime = SystemClock.uptimeMillis() - msg.getWhen();
+      }
     }
 
     if (!mHasBatch) {
       mHasBatch = true;
-      mWXDomManager.sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_BATCH, DELAY_TIME);
-    }
+      if(what != WXDomHandler.MsgType.WX_DOM_BATCH) {
+        int delayTime = DELAY_TIME;
+        if(what == MsgType.WX_DOM_TRANSITION_BATCH){
+          delayTime = TRANSITION_DELAY_TIME;
+        }
+        mWXDomManager.sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_BATCH, delayTime);
+      }
+     }
     switch (what) {
       case MsgType.WX_EXECUTE_ACTION:
         mWXDomManager.executeAction(task.instanceId, (DOMAction) task.args.get(0), (boolean) task.args.get(1));
@@ -118,6 +132,12 @@ public class WXDomHandler implements Handler.Callback {
     public static final int WX_EXECUTE_ACTION = 0xfe;
     public static final int WX_DOM_BATCH = 0xff;
     public static final int WX_CONSUME_RENDER_TASKS = 0xfa;
+
+
+    public static final int WX_DOM_TRANSITION_BATCH = 0xfb;
+
+
+    public static final int WX_DOM_START_BATCH = 0xfc;
 
     @Deprecated
     public static final int WX_COMPONENT_SIZE= 0xff1;

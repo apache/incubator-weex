@@ -18,19 +18,26 @@
  */
 package com.taobao.weex.dom;
 
+import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
+import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
 import static java.lang.Boolean.parseBoolean;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
+import com.taobao.weex.dom.binding.ELUtils;
+import com.taobao.weex.dom.binding.WXStatement;
+import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -42,15 +49,30 @@ import java.util.Set;
 public class WXAttr implements Map<String, Object>,Cloneable {
 
   private static final long serialVersionUID = -2619357510079360946L;
-  private @NonNull final ArrayMap<String, Object> map;
+
+  /**
+   * static attrs
+   * */
+  private @NonNull final ArrayMap<String, Object> attr;
+
+
+  /**
+   * dynamic binding attrs, can be null, only weex use
+   * */
+  private ArrayMap<String, Object>  mBindingAttrs;
+
+  /**
+   * dynamic binding statement for match, can be null, only weex use
+   * */
+  private WXStatement mStatement;
 
   public WXAttr(){
-    map=new ArrayMap<>();
+    attr =new ArrayMap<>();
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
-    map.putAll(standardMap);
+    attr.putAll(filterBindingStatement(standardMap));
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -331,79 +353,188 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public boolean equals(Object o) {
-    return map.equals(o);
+    return attr.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return map.hashCode();
+    return attr.hashCode();
   }
 
   @Override
   public void clear() {
-    map.clear();
+    attr.clear();
   }
 
   @Override
   public boolean containsKey(Object key) {
-    return map.containsKey(key);
+    return attr.containsKey(key);
   }
 
   @Override
   public boolean containsValue(Object value) {
-    return map.containsValue(value);
+    return attr.containsValue(value);
   }
 
   @NonNull
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    return map.entrySet();
+    return attr.entrySet();
   }
 
   @Override
   public Object get(Object key) {
-    return map.get(key);
+    return attr.get(key);
   }
 
   @Override
   public boolean isEmpty() {
-    return map.isEmpty();
+    return attr.isEmpty();
   }
 
   @NonNull
   @Override
   public Set<String> keySet() {
-    return map.keySet();
+    return attr.keySet();
   }
 
   @Override
   public Object put(String key, Object value) {
-    return map.put(key,value);
+    if(filterBindingStatement(key, value)){
+      return null;
+    }
+    return attr.put(key,value);
   }
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.map.putAll(map);
+    this.attr.putAll(filterBindingStatement(map));
   }
 
   @Override
   public Object remove(Object key) {
-    return map.remove(key);
+    return attr.remove(key);
   }
 
   @Override
   public int size() {
-    return map.size();
+    return attr.size();
   }
 
   @NonNull
   @Override
   public Collection<Object> values() {
-    return map.values();
+    return attr.values();
+  }
+
+
+  /**
+   * can by null, in most contion without template list, the value is null
+   * */
+  public ArrayMap<String, Object> getBindingAttrs() {
+    return mBindingAttrs;
+  }
+
+  /**
+   * can by null, in most contion without template list, the value is null
+   * */
+  public WXStatement getStatement() {
+    return mStatement;
+  }
+
+
+  public void setBindingAttrs(ArrayMap<String, Object> mBindingAttrs) {
+    this.mBindingAttrs = mBindingAttrs;
+  }
+
+  public void setStatement(WXStatement mStatement) {
+    this.mStatement = mStatement;
+  }
+
+
+  /**
+   * filter dynamic state ment
+   * */
+  public Map<String, Object> filterBindingStatement(Map attrs) {
+    if(attrs == null || attrs.size() == 0){
+      return attrs;
+    }
+    Set<Map.Entry<String,Object>> entries = attrs.entrySet();
+    Iterator<Entry<String,Object>> it =  entries.iterator();
+    while (it.hasNext()){
+        Map.Entry<String,Object> entry = it.next();
+        if(filterBindingStatement(entry.getKey(), entry.getValue())){
+           it.remove();
+        }
+    }
+    return attrs;
+  }
+
+  /**
+   * filter dynamic attrs and statements
+   * */
+  private boolean filterBindingStatement(String key, Object value) {
+        if(COMPONENT_PROPS.equals(key)){
+          ELUtils.bindingBlock(value);
+          return  false;
+        }
+        for(String exclude : EXCLUDES_BINDING){
+             if(key.equals(exclude)){
+                return  false;
+             }
+        }
+        if(ELUtils.isBinding(value)){
+          if(mBindingAttrs == null){
+              mBindingAttrs = new ArrayMap<String, Object>();
+          }
+          value = ELUtils.bindingBlock(value);
+          mBindingAttrs.put(key, value);
+          return  true;
+        }
+        if(WXStatement.WX_IF.equals(key)){
+          if(mStatement == null){
+             mStatement = new WXStatement();
+          }
+          if(value != null) {
+            mStatement.put(key, Parser.parse(value.toString()));
+          }
+          return  true;
+        }
+
+        if(WXStatement.WX_FOR.equals(key)){
+           if(mStatement == null){
+              mStatement = new WXStatement();
+           }
+           value = ELUtils.vforBlock(value);
+           if(value != null) {
+              mStatement.put(key, value);
+              return  true;
+           }
+        }
+
+        if(WXStatement.WX_ONCE.equals(key)){
+          if(mStatement == null){
+             mStatement = new WXStatement();
+          }
+          mStatement.put(key, true);
+        }
+        return  false;
+  }
+
+  public void skipFilterPutAll(Map<String,Object> attrs){
+    this.attr.putAll(attrs);
   }
 
   @Override
-  protected WXAttr clone(){
-    return new WXAttr(map);
+  protected WXAttr clone() {
+    WXAttr wxAttr = new WXAttr();
+    wxAttr.skipFilterPutAll(attr);
+    if (mBindingAttrs != null) {
+      wxAttr.mBindingAttrs = new ArrayMap<>(mBindingAttrs);
+    }
+    if (mStatement != null){
+       wxAttr.mStatement = new WXStatement(mStatement);
+     }
+    return wxAttr;
   }
 }

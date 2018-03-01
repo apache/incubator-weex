@@ -25,6 +25,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 #import "WXTracingManager.h"
+#import "WXSDKManager.h"
 
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
@@ -94,6 +95,10 @@ do {\
 {
     WXAssertMainThread();
     
+    if (subcomponent.displayType == WXDisplayTypeNone) {
+        return;
+    }
+    
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.rootView addSubview:subcomponent.view];
@@ -138,7 +143,6 @@ do {\
 
 - (void)viewDidLoad
 {
-    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:self.ref className:nil name:_type phase:WXTracingEnd functionName:WXTRender options:nil];
     WXAssertMainThread();
 }
 
@@ -170,6 +174,16 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
 }
+- (void)_transitionUpdateViewProperty:(NSDictionary *)styles
+{
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
+    if (styles[@"backgroundColor"]) {
+        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+    }
+    if (styles[@"opacity"]) {
+        _opacity = [WXConvert CGFloat:styles[@"opacity"]];
+    }
+}
 
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
@@ -188,7 +202,6 @@ do {\
     
     if (styles[@"backgroundImage"]) {
         _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
-        
         if (_backgroundImage) {
             [self setGradientLayer];
         }
@@ -317,6 +330,9 @@ do {\
     }
     
     [_view removeFromSuperview];
+    if (self->_isTemplate && self.attributes[@"@templateId"]) {
+        [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"detach" args:nil competion:nil];
+    }
     _view = nil;
     [_layer removeFromSuperlayer];
     _layer = nil;

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.15.0"
+  s.version      = "0.18.0"
 
   s.summary      = "WeexSDK Source ."
 
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
                      "acton393"     => "zhangxing610321@gmail.com"
                    }
   s.platform     = :ios
-  s.ios.deployment_target = '7.0'
+  s.ios.deployment_target = '8.0'
   s.source =  { :path => '.' }
   s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
   s.resources = 'pre-build/native-bundle-main.js', 'ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
@@ -39,8 +39,6 @@ Pod::Spec.new do |s|
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC'}
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit', 'OpenGLES', 'CoreText', 'QuartzCore', 'CoreGraphics'
-
-  s.dependency 'SocketRocket'
   s.libraries = "stdc++"
 
 end

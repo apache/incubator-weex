@@ -34,5 +34,7 @@
 
 - (void)handleAppear;
 
+- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+
 @end
 

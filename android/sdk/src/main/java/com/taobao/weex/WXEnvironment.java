@@ -23,12 +23,18 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.utils.FontDO;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -64,10 +70,12 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
+  public static boolean sForceEnableDevTool = false;
   public static String sDebugWsUrl = "";
-  public static boolean sDebugServerConnectable = true;
+  public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
+  public static boolean sDebugNetworkEventReporterEnable = false;//debugtool network switch
   public static long sJSLibInitTime = 0;
 
   public static long sSDKInitStart = 0;// init start timestamp
@@ -80,7 +88,9 @@ public class WXEnvironment {
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
 
-  public static boolean sShow3DLayer=true;
+  private static boolean openDebugLog = false;
+
+  private static String sGlobalFontFamily;
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -102,6 +112,7 @@ public class WXEnvironment {
     Map<String, String> configs = new HashMap<>();
     configs.put(WXConfig.os, OS);
     configs.put(WXConfig.appVersion, getAppVersionName());
+    configs.put(WXConfig.cacheDir, getAppCacheFile());
     configs.put(WXConfig.devId, DEV_Id);
     configs.put(WXConfig.sysVersion, SYS_VERSION);
     configs.put(WXConfig.sysModel, SYS_MODEL);
@@ -137,6 +148,21 @@ public class WXEnvironment {
     return versionName;
   }
 
+  /**
+   *
+   * @return string cache file
+   */
+  private static String getAppCacheFile() {
+    String cache = "";
+    try {
+      cache = sApplication.getApplicationContext().getCacheDir().getPath();
+    } catch (Exception e) {
+      WXLogUtils.e("WXEnvironment getAppCacheFile Exception: ", e);
+    }
+    return cache;
+  }
+
+
   public static Map<String, String> getCustomOptions() {
     return options;
   }
@@ -151,8 +177,8 @@ public class WXEnvironment {
    */
   public static boolean isSupport() {
     boolean isInitialized = WXSDKEngine.isInitialized();
-    if(WXEnvironment.isApkDebugable()){
-      WXLogUtils.d("WXSDKEngine.isInitialized():" + isInitialized);
+    if(!isInitialized){
+      WXLogUtils.e("WXSDKEngine.isInitialized():" + isInitialized);
     }
     return isHardwareSupport() && isInitialized;
   }
@@ -233,12 +259,16 @@ public class WXEnvironment {
     if (context == null) {
       return null;
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
+    String cachePath = null;
+    try {
+      if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+              || !Environment.isExternalStorageRemovable()) {
+        cachePath = context.getExternalCacheDir().getPath();
+      } else {
+        cachePath = context.getCacheDir().getPath();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     return cachePath;
   }
@@ -258,6 +288,39 @@ public class WXEnvironment {
     }
 
     return path;
+  }
+
+  public static String getGlobalFontFamilyName() {
+    return sGlobalFontFamily;
+  }
+
+  public static void setGlobalFontFamily(String fontFamilyName, Typeface typeface) {
+    WXLogUtils.d("GlobalFontFamily", "Set global font family: " + fontFamilyName);
+    sGlobalFontFamily = fontFamilyName;
+    if (!TextUtils.isEmpty(fontFamilyName)) {
+      if (typeface == null) {
+        TypefaceUtil.removeFontDO(fontFamilyName);
+      } else {
+        FontDO nativeFontDO = new FontDO(fontFamilyName, typeface);
+        TypefaceUtil.putFontDO(nativeFontDO);
+        WXLogUtils.d("TypefaceUtil", "Add new font: " + fontFamilyName);
+      }
+    }
+  }
+
+  public static boolean isOpenDebugLog() {
+    return openDebugLog;
+  }
+
+  public static void setOpenDebugLog(boolean openDebugLog) {
+    WXEnvironment.openDebugLog = openDebugLog;
+  }
+
+  public static void  setApkDebugable(boolean debugable){
+    isApkDebug  = debugable;
+    if(!isApkDebug){
+       openDebugLog = false;
+    }
   }
 
 }

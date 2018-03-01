@@ -25,6 +25,8 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 
 /**
  * Created by sospartan on 02/03/2017.
@@ -54,5 +56,9 @@ final class CreateFinishAction extends AbstractLayoutFinishAction {
       instance.onCreateFinish();
     }
     instance.onRenderSuccess(mLayoutWidth, mLayoutHeight);
+    if (WXTracing.isAvailable()) {
+      double renderTime = Stopwatch.millisUntilNow(context.getInstance().mRenderStartNanos);
+      submitPerformance("renderFinish", "X", instance.getInstanceId(), renderTime, System.currentTimeMillis());
+    }
   }
 }

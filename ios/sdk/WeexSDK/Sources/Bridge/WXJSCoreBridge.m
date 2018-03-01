@@ -34,7 +34,9 @@
 #import "JSValue+Weex.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXSDKManager.h"
+#import "WXExtendCallNativeManager.h"
 #import "WXTracingManager.h"
+#import "WXExceptionUtils.h"
 
 #import <dlfcn.h>
 
@@ -45,6 +47,8 @@
 
 @property (nonatomic, strong)  JSContext *jsContext;
 @property (nonatomic, strong)  NSMutableArray *timers;
+@property (nonatomic, strong)  NSMutableDictionary *intervaltimers;
+@property (nonatomic)  long long intervalTimerId;
 @property (nonatomic, strong)  NSMutableDictionary *callbacks;
 
 @end
@@ -62,7 +66,9 @@
         }
         _timers = [NSMutableArray new];
         _callbacks = [NSMutableDictionary new];
-        
+        _intervalTimerId = 0;
+        _intervaltimers = [NSMutableDictionary new];
+
         __weak typeof(self) weakSelf = self;
         
         NSDictionary *data = [WXUtility getEnvironment];
@@ -75,16 +81,19 @@
             } afterDelay:[timeout toDouble] / 1000];
         };
         
-        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg ) {
-            [weakSelf triggerTimeout:[appid toString] ret:[ret toString] arg:[arg toString]];
+        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
+            [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
         };
         
-        _jsContext[@"setIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
-            [weakSelf triggerInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+        _jsContext[@"setIntervalWeex"] = ^(JSValue *appId, JSValue *function,JSValue *arg) {
+            return [weakSelf triggerInterval:[appId toString] function:^() {
+                [function callWithArguments:@[]];
+            } arg:[arg toString]];
         };
         
-        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
-            [weakSelf triggerClearInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg) {
+            
+            [weakSelf triggerClearInterval:[appId toString] ret:[[ret toNumber] longLongValue]];
         };
         
         _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
@@ -103,6 +112,9 @@
             NSString *base64Decoded = [[NSString alloc]
                                        initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
             return base64Decoded;
+        };
+        _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
+            return [weakSelf extendCallNative:[value toDictionary]];
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -143,15 +155,21 @@
         
         _jsContext.exceptionHandler = ^(JSContext *context, JSValue *exception){
             context.exception = exception;
-            NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
-            id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
-            if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
-                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_ERR_JS_EXECUTE] functionName:@"" exception:[NSString stringWithFormat:@"[%@:%@] %@\n%@",exception[@"line"], exception[@"column"],[exception toString], exception[@"stack"]] userInfo:nil];
-                [jsExceptionHandler onJSException:jsExceptionInfo];
-            }
+            NSString *bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
+            NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];
+            NSString *message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",@"jsMainBundleStringContentLength",
+                instance.userInfo[@"jsMainBundleStringContentMd5"]?:@"",@"jsMainBundleStringContentMd5",nil];
+            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:userInfo];
+            
+            [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
+            if (instance.onJSRuntimeException) {
+                instance.onJSRuntimeException(jsExceptionInfo);
+            }
         };
         
         if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
@@ -207,7 +225,7 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread,@"componentData":componentData}];
          WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
         
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
@@ -224,7 +242,7 @@
         NSDictionary *bodyData = [body toDictionary];
         
         WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callCreateBody(instanceIdString, bodyData) inContext:[JSContext currentContext]];
     };
     
@@ -272,7 +290,7 @@
         NSDictionary *attrsData = [attrs toDictionary];
         
         WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceIdString, refString,attrsData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callUpdateAttrs(instanceIdString, refString,attrsData) inContext:[JSContext currentContext]];
     };
     
@@ -288,7 +306,7 @@
         NSDictionary *stylessData = [styles toDictionary];
         
         WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceIdString, refString,stylessData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callUpdateStyle(instanceIdString, refString,stylessData) inContext:[JSContext currentContext]];
     };
     
@@ -334,7 +352,7 @@
         NSString *instanceIdString = [instanceId toString];
         
         WXLogDebug(@"callRCreateFinish...%@", instanceIdString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
         return [JSValue valueWithInt32:(int32_t)callCreateFinish(instanceIdString) inContext:[JSContext currentContext]];
     };
         
@@ -404,6 +422,7 @@
 #pragma mark - Public
 -(void)removeTimers:(NSString *)instance
 {
+    // remove timers
     if([_callbacks objectForKey:instance]){
         NSMutableArray *arr = [_callbacks objectForKey:instance];
         if(arr && [arr count]>0){
@@ -413,6 +432,10 @@
                 }
             }
         }
+    }
+    // remove intervaltimers
+    if(_intervaltimers && [_intervaltimers objectForKey:instance]){
+        [_intervaltimers removeObjectForKey:instance];
     }
 }
 
@@ -436,7 +459,7 @@
     }
 }
 
-- (void)triggerTimeout:(void(^)())block
+- (void)triggerTimeout:(void(^)(void))block
 {
     block();
 }
@@ -444,64 +467,81 @@
 - (void)callBack:(NSDictionary *)dic
 {
     if([dic objectForKey:@"ret"] && [_timers containsObject:[dic objectForKey:@"ret"]]) {
-        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
+        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appId"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
     }
+
 }
 
 
 - (void)callBackInterval:(NSDictionary *)dic
 {
-    if([dic objectForKey:@"ret"] && [_timers containsObject:[dic objectForKey:@"ret"]]) {
-        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:nil keepAlive:YES];
-        [self triggerInterval:[dic objectForKey:@"appid"] ret:[dic objectForKey:@"ret"] arg:[dic objectForKey:@"arg"]];
+    if(dic[@"function"] && [dic objectForKey:@"appId"] && [_intervaltimers objectForKey:[dic objectForKey:@"appId"]]){
+        NSMutableArray *timers = [_intervaltimers objectForKey:[dic objectForKey:@"appId"]];
+        void(^block)(void) = ((void(^)(void))dic[@"function"]);
+        if(block && [timers containsObject:[dic objectForKey:@"timerId"]]){
+            block();
+            [self executeInterval:[dic objectForKey:@"appId"] function:block arg:[dic objectForKey:@"arg"] timerId:[[dic objectForKey:@"timerId"] longLongValue]];
+        }
     }
 }
 
-- (void)triggerTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+- (void)triggerTimeout:(NSString *)appId ret:(NSString *)ret arg:(NSString *)arg
 {
+    double interval = [arg doubleValue]/1000.0f;
+    if(WXFloatEqual(interval,0)) {
+        return;
+    }
+    if(![_timers containsObject:ret]){
+        [_timers addObject:ret];
+        [self addInstance:appId callback:ret];
+    }
     
-    double interval = [arg doubleValue]/1000.0f;
-    if(WXFloatEqual(interval,0)) {
-        return;
-    }
-    if(![_timers containsObject:ret]){
-        [_timers addObject:ret];
-        [self addInstance:appid callback:ret];
-    }
-    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
-    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableDictionary *dic = [NSMutableDictionary new];
-        [dic setObject:appid forKey:@"appid"];
-        [dic setObject:ret forKey:@"ret"];
-        [dic setObject:arg forKey:@"arg"];
-        [self performSelector:@selector(callBack:) withObject:dic ];
-    });
+    NSMutableDictionary *timeoutInfo = [NSMutableDictionary new];
+    [timeoutInfo setObject:appId forKey:@"appId"];
+    [timeoutInfo setObject:ret forKey:@"ret"];
+    [timeoutInfo setObject:arg forKey:@"arg"];
+    [self performSelector:@selector(callBack:) withObject:timeoutInfo afterDelay:interval inModes:@[NSRunLoopCommonModes]];
 }
 
-- (void)triggerInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+- (long long)triggerInterval:(NSString *)appId function:(void(^)(void))block arg:(NSString *)arg
 {
     double interval = [arg doubleValue]/1000.0f;
+    _intervalTimerId = _intervalTimerId + 1; // timerId must auto-increment.
+    long long timerId = _intervalTimerId;
     if(WXFloatEqual(interval,0)) {
-        return;
+        return timerId;
     }
-    if(![_timers containsObject:ret]){
-        [_timers addObject:ret];
-        [self addInstance:appid callback:ret];
+    if([_intervaltimers objectForKey:appId]){
+        NSMutableArray *timers = [[_intervaltimers objectForKey:appId] mutableCopy];
+        [timers addObject:@(timerId)];
+        [_intervaltimers setObject:timers forKey:appId];
+    }else {
+        NSMutableArray *timers = [NSMutableArray new];
+        [timers addObject:@(timerId)];
+        [_intervaltimers setObject:timers forKey:appId];
     }
-    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
-    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableDictionary *dic = [NSMutableDictionary new];
-        [dic setObject:appid forKey:@"appid"];
-        [dic setObject:ret forKey:@"ret"];
-        [dic setObject:arg forKey:@"arg"];
-        [self performSelector:@selector(callBackInterval:) withObject:dic ];
-    });
+    [self executeInterval:appId function:block arg:arg timerId:timerId];
+    return timerId;
 }
 
-- (void)triggerClearInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+-(void)executeInterval:(NSString *)appId function:(void(^)(void))block arg:(NSString *)arg timerId:(long long)timerId
 {
-    if([_timers containsObject:ret]){
-        [_timers removeObject:ret];
+    double interval = [arg doubleValue]/1000.0f;
+    NSMutableDictionary *intervalInfo = [NSMutableDictionary new];
+    [intervalInfo setObject:appId forKey:@"appId"];
+    [intervalInfo setObject:arg forKey:@"arg"];
+    [intervalInfo setObject:@(timerId) forKey:@"timerId"];
+    [intervalInfo setObject:[block copy] forKey:@"function"];
+    [self performSelector:@selector(callBackInterval:) withObject:intervalInfo afterDelay:interval inModes:@[NSRunLoopCommonModes]];
+}
+
+- (void)triggerClearInterval:(NSString *)instanceId ret:(long long)timerId
+{
+    if(_intervaltimers && [_intervaltimers objectForKey:instanceId]){
+        NSMutableArray *timers = [_intervaltimers objectForKey:instanceId];
+        if(timers && [timers containsObject:@(timerId)]){
+            [timers removeObject:@(timerId)];
+        }
     }
 }
 
@@ -511,4 +551,13 @@
         [_timers removeObject:ret];
     }
 }
+
+-(id)extendCallNative:(NSDictionary *)dict
+{
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
+    }
+    return @(-1);
+}
+
 @end

@@ -56,7 +56,7 @@
     
 }
 
-- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
 {
     return self == object;
 }
@@ -100,7 +100,7 @@
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
-    if (self.delegate == newSupercomponent) {
+    if (self.delegate == (id<WXCellRenderDelegate>)newSupercomponent) {
         [self.delegate cell:self didMoveToIndex:index];
         [super _removeFromSupercomponent];
         [newSupercomponent _insertSubcomponent:self atIndex:index];

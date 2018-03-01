@@ -20,7 +20,7 @@
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.15.0"
+#define WX_SDK_VERSION @"0.18.0"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
@@ -80,6 +80,10 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_INSTANCE_NOTIFICATION_UPDATE_STATE @"WXInstUpdateState"
 
 #define WX_COMPONENT_NOTIFICATION_VIEW_LOADED    @"WXComponentViewLoaded"
+
+#define WX_INSTANCE_WILL_DESTROY_NOTIFICATION     @"WXSDKInstanceWillDestroyNotification"
+
+#define WX_SDKINSTANCE_WILL_RENDER    @"WXSDKInstanceWillRender"
 
 #define WX_COMPONENT_THREAD_NAME @"com.taobao.weex.component"
 

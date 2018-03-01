@@ -24,11 +24,18 @@ import android.support.annotation.Nullable;
 
 public interface IDrawableLoader {
 
-  public interface DrawableTarget {
+  interface DrawableTarget {
 
+  }
+
+  interface StaticTarget extends DrawableTarget{
     void setDrawable(@Nullable Drawable drawable, boolean resetBounds);
   }
 
-  public void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
+  interface AnimatedTarget extends DrawableTarget{
+    void setAnimatedDrawable(@Nullable Drawable drawable);
+  }
+
+  void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
 }
 

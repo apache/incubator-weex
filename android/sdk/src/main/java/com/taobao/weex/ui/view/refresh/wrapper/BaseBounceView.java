@@ -96,7 +96,7 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         mInnerView = setInnerView(context);
         if (mInnerView == null)
             return null;
-        swipeLayout.addView(mInnerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        swipeLayout.addTargetView(mInnerView);
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
     }

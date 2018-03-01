@@ -27,24 +27,36 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.List;
 
 /**
  * Created by sospartan on 22/02/2017.
  */
 
-abstract class AbstractAddElementAction implements DOMAction, RenderAction {
-
+public abstract class AbstractAddElementAction extends TraceableAction implements DOMAction, RenderAction {
 
   protected WXComponent generateComponentTree(DOMActionContext context, WXDomObject dom, WXVContainer parent) {
     if (dom == null) {
       return null;
     }
+    long startNanos = System.nanoTime();
     WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
+    if (component != null) {
+      component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
+      component.mTraceInfo.rootEventId = mTracingEventId;
+      component.mTraceInfo.domQueueTime = mDomQueueTime;
+    }
 
     context.registerComponent(dom.getRef(), component);
     if (component instanceof WXVContainer) {
@@ -54,11 +66,19 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
       for (int i = 0; i < count; ++i) {
         child = dom.getChild(i);
         if (child != null) {
-          parentC.addChild(generateComponentTree(context, child, parentC));
+          WXComponent createdComponent = generateComponentTree(context, child, parentC);
+          if(createdComponent != null) {
+            parentC.addChild(createdComponent);
+          }else{
+            WXLogUtils.e("[generateComponentTree] " + getStatementName() + " create dom component failed name " + child.getType());
+            WXExceptionUtils.commitCriticalExceptionRT(context.getInstanceId(), getErrorCode().getErrorCode(), "generateComponentTree", " create dom component failed name " + child.getType(), null);
+          }
         }
       }
     }
-
+    if (component != null) {
+      component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
+    }
     return component;
   }
 
@@ -74,40 +94,68 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
     if (instance == null) {
       return;
     }
-    WXErrorCode errCode = getErrorCode();
-    if (dom == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+    String errCode = getErrorCode().getErrorCode();
+	String errMsg  = getErrorMsg();
+
+	if (dom == null) {
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
     }
 
     //only non-root has parent.
-    WXDomObject domObject = WXDomObject.parse(dom, instance);
+    Stopwatch.tick();
+    WXDomObject domObject = WXDomObject.parse(dom, instance, null);
+    Stopwatch.split("parseDomObject");
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
-      }
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-      return;
+      WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  return;
     }
     appendDomToTree(context, domObject);
+    Stopwatch.split("appendDomToTree");
 
     domObject.traverseTree(
         context.getAddDOMConsumer(),
         context.getApplyStyleConsumer()
     );
+    Stopwatch.split("traverseTree");
+
 
     //Create component in dom thread
     WXComponent component = createComponent(context, domObject);
     if (component == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+//      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
       //stop redner, some fatal happened.
-      return;
+//	  errMsg = "component == null";
+//	  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(), errCode, "addDomInternal", errMsg, null);
+	  return;
     }
-    context.addDomInfo(domObject.getRef(), component);
+    Stopwatch.split("createComponent");
+
+    boolean needAddDomInfo = true;
+    if(domObject.getType().equals(WXBasicComponentType.CELL_SLOT)
+            && domObject instanceof WXCellDomObject){
+       needAddDomInfo = false;
+    }
+
+    if(needAddDomInfo) {
+      context.addDomInfo(domObject.getRef(), component);
+    }
+
+
     context.postRenderTask(this);
+
     addAnimationForDomTree(context, domObject);
 
-    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+//    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    if (WXTracing.isAvailable()) {
+      List<Stopwatch.ProcessEvent> events = Stopwatch.getProcessEvents();
+      for (Stopwatch.ProcessEvent event : events) {
+        submitPerformance(event.fname, "X", context.getInstanceId(), event.duration, event.startMillis, true);
+      }
+    }
   }
 
   public void addAnimationForDomTree(DOMActionContext context, WXDomObject domObject) {
@@ -124,4 +172,7 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
   protected abstract String getStatementName();
 
   protected abstract WXErrorCode getErrorCode();
+
+  protected abstract String getErrorMsg();
+
 }

@@ -55,9 +55,11 @@ import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.RenderContainer;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.ImmutableDomObject;
@@ -65,6 +67,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.File;
@@ -205,8 +208,14 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     setSupportActionBar(toolbar);
 
     ActionBar actionBar = getSupportActionBar();
-    actionBar.setDisplayHomeAsUpEnabled(true);
-    actionBar.setTitle(mUri.toString().substring(mUri.toString().lastIndexOf(File.separator) + 1));
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      String title = mUri.toString().substring(mUri.toString().lastIndexOf(File.separator) + 1);
+      if (mUri.toString().startsWith("http://dotwe.org") || mUri.toString().startsWith("https://dotwe.org")) {
+        title = "Weex Online Example";
+      }
+      actionBar.setTitle(title);
+    }
 
     mContainer = (ViewGroup) findViewById(R.id.container);
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
@@ -513,6 +522,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mReceiver = new RefreshBroadcastReceiver();
     IntentFilter filter = new IntentFilter();
     filter.addAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
+    filter.addAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+
     registerReceiver(mReceiver, filter);
   }
 
@@ -574,12 +585,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   public class RefreshBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+      if (IWXDebugProxy.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
+              IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+        // String myUrl = intent.getStringExtra("url");
+        // Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH mBundleUrl:" + myUrl + " mUri:" + mUri);
+
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
-            loadWXfromService(mUri.toString());
+            String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
+            String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
+            // Log.e("WXPageActivity", "loadWXfromService reload url:" + url);
+            loadWXfromService(url);
           } else {
+            // Log.e("WXPageActivity", "loadWXfromLocal reload from local url:" + mUri.toString());
             loadWXfromLocal(true);
           }
         }

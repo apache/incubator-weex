@@ -25,12 +25,7 @@ import android.support.annotation.NonNull;
 class BottomLeftCorner extends BorderCorner {
 
   BottomLeftCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
-    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox);
-  }
-
-  @Override
-  protected float getAngleBisectorDegree() {
-    return 135;
+    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 135);
   }
 
   @NonNull

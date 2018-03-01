@@ -47,8 +47,13 @@ public class WXReflectionUtilsTest {
 
   @Test
   public void testParseArgument() throws Exception {
+
+
    Object value =  WXReflectionUtils.parseArgument(String.class,"dkdkdkdk");
     assertTrue(value instanceof String);
+
+    value = WXReflectionUtils.parseArgument(int.class,123444);
+    assertTrue(value instanceof Integer);
 
     value = WXReflectionUtils.parseArgument(long.class,"123444");
     assertTrue(value instanceof Long);
@@ -70,6 +75,10 @@ public class WXReflectionUtilsTest {
     JSONObject j = new JSONObject();
     j.put("a","b");
     j.put("c",23);
+
+   value = WXReflectionUtils.parseArgument(Map.class,j);
+   assertTrue(value  == j);
+
     value = WXReflectionUtils.parseArgument(String.class,j);
     assertTrue(value instanceof String);
 

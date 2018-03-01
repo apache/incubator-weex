@@ -21,8 +21,11 @@
 #import "WXComponent.h"
 #import "WXConvert.h"
 #import "WXTransform.h"
+#import "WXTransition.h"
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
+
+typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
@@ -42,6 +45,10 @@
     CGPoint _absolutePosition;
     WXPositionType _positionType;
     
+    
+    //Transition
+    WXTransition *_transition;
+    
     /**
      *  View
      */
@@ -58,10 +65,15 @@
     /**
      * accessibility support
      */
-    UIAccessibilityTraits _role; //accessibility
+    NSString * _roles; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
-    BOOL _ariaHidden; // accessibilityElementsHidden
+    NSString * _ariaHidden; // accessibilityElementsHidden
+    NSString * _accessible; // accessible
+    NSString * _accessibilityHintContent; // hint for the action
+    NSString * _groupAccessibilityChildren; // voice-over navigation order
     NSString * _testId;// just for auto-test
+    
+    BOOL _accessibilityMagicTapEvent;
     
     /**
      *  PseudoClass
@@ -124,6 +136,27 @@
     BOOL _lazyCreateView;
     
     WXTransform *_transform;
+    
+    /**
+     * Data Binding
+     */
+    BOOL _isTemplate;
+    WXComponent *_templateComponent;
+    WXDataBindingBlock _bindingMatch;
+    WXDataBindingBlock _bindingRepeat;
+    NSString *_repeatIndexIdentify;
+    NSString *_repeatLabelIdentify;
+    NSString *_virtualComponentId;// for recycleList subcomponent
+    BOOL _isRepeating;
+    BOOL _isSkipUpdate;
+    BOOL _dataBindOnce;
+    
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingProps;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingStyles;
+    NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingEvents;
+    
+    NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
 ///--------------------------------------
@@ -171,6 +204,10 @@
 /// @name Private Methods
 ///--------------------------------------
 
+- (void)_modifyStyles:(NSDictionary *)styles;
+
+- (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
@@ -193,6 +230,10 @@
 
 - (void)_removeAllEvents;
 
+- (void)_addEventParams:(NSDictionary *)params;
+
+- (NSArray *)_paramsForEvent:(NSString *)eventName;
+
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
 
 - (void)_initCompositingAttribute:(NSDictionary *)attributes;
@@ -213,4 +254,10 @@
 
 - (void)setGradientLayer;
 
+- (void)_storeBindingsWithProps:(NSDictionary *)props styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSDictionary *)events;
+
+- (void)_didInserted;
+
 @end
+
+

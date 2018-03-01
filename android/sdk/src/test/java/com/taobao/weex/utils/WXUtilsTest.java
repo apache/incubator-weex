@@ -19,6 +19,7 @@
 package com.taobao.weex.utils;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
@@ -49,7 +50,7 @@ import static org.mockito.Matchers.any;
 @RunWith(PowerMockRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest( {WXEnvironment.class, WXViewUtils.class, WXSDKInstance.class, TextUtils.class})
+@PrepareForTest( {WXEnvironment.class, WXViewUtils.class, WXSDKInstance.class, TextUtils.class, Log.class, WXUtils.class, WXLogUtils.class})
 public class WXUtilsTest extends TestCase {
 
     public static final float TEST_DENSITY = 3.0f;

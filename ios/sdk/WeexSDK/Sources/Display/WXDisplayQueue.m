@@ -37,7 +37,7 @@ static dispatch_semaphore_t WXDisplayConcurrentSemaphore;
     return displayQueue;
 }
 
-+ (void)addBlock:(void(^)())block
++ (void)addBlock:(void(^)(void))block
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

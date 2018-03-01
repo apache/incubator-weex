@@ -24,9 +24,8 @@ import android.content.res.Configuration;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
@@ -50,8 +49,14 @@ public class WXUtils {
     if (value == null) {
       return Float.NaN;
     }
-
     String temp = value.toString().trim();
+    if (Constants.Name.AUTO.equals(temp)
+        || Constants.Name.UNDEFINED.equals(temp)
+        || TextUtils.isEmpty(temp)) {
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:" + Float.NaN);
+      return Float.NaN;
+    }
+
     if (temp.endsWith("wx")) {
       try {
         return transferWx(temp, viewport);
@@ -60,7 +65,7 @@ public class WXUtils {
       } catch (Exception e) {
         WXLogUtils.e("Argument error! value is " + value, e);
       }
-    }else if (temp.endsWith("px")) {
+    } else if (temp.endsWith("px")) {
       try {
         temp = temp.substring(0, temp.indexOf("px"));
         return Float.parseFloat(temp);
@@ -69,7 +74,7 @@ public class WXUtils {
       } catch (Exception e) {
         WXLogUtils.e("Argument error! value is " + value, e);
       }
-    }else {
+    } else {
       try {
         return Float.parseFloat(temp);
       } catch (NumberFormatException nfe) {
@@ -91,7 +96,10 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
-    if(TextUtils.isEmpty(temp)){
+    if(Constants.Name.AUTO.equals(temp)
+        || Constants.Name.UNDEFINED.equals(temp)
+        || TextUtils.isEmpty(temp)){
+      WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:"+Float.NaN);
       return df;
     }
     if (temp.endsWith("wx")) {
@@ -470,5 +478,26 @@ private static String[] splitLineBreak(String str) {
 
     return items;
 }
+
+
+  /**
+   * get number
+   * */
+  public static int getNumberInt(Object value, int defaultValue){
+    if(value == null){
+      return  defaultValue;
+    }
+    if(value instanceof  Number){
+      return  ((Number) value).intValue();
+    }
+    try{
+      String number = value.toString();
+      if(number.indexOf('.') >= 0) {
+        return (int) Float.parseFloat(value.toString());
+      }else{
+        return  Integer.parseInt(number);
+      }
+    }catch (Exception e){return  defaultValue;}
+  }
 
 }

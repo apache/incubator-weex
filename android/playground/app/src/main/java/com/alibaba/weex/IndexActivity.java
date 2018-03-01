@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -51,6 +51,7 @@ public class IndexActivity extends AbstractWeexActivity {
 
   private static final String TAG = "IndexActivity";
   private static final int CAMERA_PERMISSION_REQUEST_CODE = 0x1;
+  private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 0x2;
   private static final String DEFAULT_IP = "your_current_IP";
   private static String sCurrentIp = DEFAULT_IP; // your_current_IP
 
@@ -82,7 +83,7 @@ public class IndexActivity extends AbstractWeexActivity {
     }
 
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("index.js", this), getIndexUrl());
+      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
     } else {
       renderPageByURL(getIndexUrl());
     }
@@ -93,7 +94,7 @@ public class IndexActivity extends AbstractWeexActivity {
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
         if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("index.js", getApplicationContext()), getIndexUrl());
+          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
         } else {
           renderPageByURL(getIndexUrl());
         }
@@ -147,6 +148,7 @@ public class IndexActivity extends AbstractWeexActivity {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
       startActivity(new Intent(this, CaptureActivity.class));
+    } else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
     } else {
       Toast.makeText(this, "request camara permission fail!", Toast.LENGTH_SHORT).show();
     }
@@ -164,10 +166,10 @@ public class IndexActivity extends AbstractWeexActivity {
     super.onException(wxsdkInstance,s,s1);
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.VISIBLE);
-    if (TextUtils.equals(s, WXRenderErrorCode.WX_NETWORK_ERROR)) {
+    if (TextUtils.equals(s, WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode())) {
       mTipView.setText(R.string.index_tip);
     } else {
-      mTipView.setText("render error:" + s1);
+      mTipView.setText("network render error:" + s1);
     }
   }
 
