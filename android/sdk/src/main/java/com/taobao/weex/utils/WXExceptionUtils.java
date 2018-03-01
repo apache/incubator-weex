@@ -87,10 +87,10 @@ public class WXExceptionUtils {
 		if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
 		  if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
 			bundleUrlCommit = degradeUrl;
-		  } else {
+		  } else
 			bundleUrlCommit = WXSDKInstance.requestUrl;
 		  }
-	  	}
+          }
 	} else {//instance is null for instance id is null
 	  if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
 		bundleUrlCommit = WXSDKInstance.requestUrl;
