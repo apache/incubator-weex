@@ -151,7 +151,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     WXDomObject child;
     for (int i = 0; i < count; ++i) {
       child = getChild(i);
-      child.traverseTree(consumers);
+      child.traverseUpdateTree(consumers);
     }
   }
 

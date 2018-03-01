@@ -49,7 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.taobao.weex.common.Constants.Event.SHOULD_STOP_PROPAGATION;
+import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION;
 
 public class WXGesture extends GestureDetector.SimpleOnGestureListener implements OnTouchListener {
 
@@ -130,7 +130,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
    * shouldBubbleEvent default true
    * */
   private boolean shouldBubbleTouchEvent(MotionEvent event){
-    if(component.containsEvent(SHOULD_STOP_PROPAGATION)){
+    if(component.containsEvent(STOP_PROPAGATION)){
       if(shouldBubbleInterval > 0 && shouldBubbleCallRemainTimes > 0){
         shouldBubbleCallRemainTimes--;
         return  shouldBubbleResult;
@@ -145,9 +145,10 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
       }else{
         eventMap.put("action", MOVE);
       }
-      EventResult result = component.fireEventWait(SHOULD_STOP_PROPAGATION, eventMap);
+      EventResult result = component.fireEventWait(STOP_PROPAGATION, eventMap);
       if(result.isSuccess() && result.getResult() != null){
-        shouldBubbleResult = WXUtils.getBoolean(result.getResult(), shouldBubbleResult);
+        boolean stopPropagation = WXUtils.getBoolean(result.getResult(), !shouldBubbleResult);
+        shouldBubbleResult = !stopPropagation;
       }
       shouldBubbleCallRemainTimes = shouldBubbleInterval;
       return shouldBubbleResult;
@@ -194,7 +195,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           result |= handlePanMotionEvent(event);
           break;
       }
-      if(component.containsEvent(SHOULD_STOP_PROPAGATION)){
+      if(component.containsEvent(STOP_PROPAGATION)){
         ViewGroup parent = (ViewGroup) v.getParent();
         boolean requestDisallowInterceptTouchEvent = false;
         if(parent != null){

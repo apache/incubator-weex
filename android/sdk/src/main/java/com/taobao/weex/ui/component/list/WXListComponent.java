@@ -87,6 +87,9 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
           bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }
+    if(mRecyclerDom != null && mRecyclerDom.getSpanOffsets() != null){
+       bounceRecyclerView.getInnerView().addItemDecoration(new GapItemDecoration(this));
+    }
     return  bounceRecyclerView;
   }
 
@@ -135,6 +138,31 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       mColumnWidth = mRecyclerDom.getColumnWidth();
       mPaddingLeft = mRecyclerDom.getPadding().get(Spacing.LEFT);
       mPaddingRight = mRecyclerDom.getPadding().get(Spacing.RIGHT);
+      mLeftGap = mRecyclerDom.getLeftGap();
+      mRightGap = mRecyclerDom.getRightGap();
+      mRecyclerDom.preCalculateCellWidth();
+    }
+  }
+
+  @WXComponentProp(name = Constants.Name.LEFT_GAP)
+  public void setLeftGap(float leftGap)  {
+    if(mRecyclerDom != null && mRecyclerDom.getLeftGap() != mLeftGap){
+      markComponentUsable();
+      mRecyclerDom.preCalculateCellWidth();
+      updateRecyclerAttr();
+      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+    }
+  }
+
+  @WXComponentProp(name = Constants.Name.RIGHT_GAP)
+  public void setRightGap(float rightGap)  {
+    if(mRecyclerDom != null && mRecyclerDom.getRightGap() != mRightGap){
+      markComponentUsable();
+      mRecyclerDom.preCalculateCellWidth();
+      updateRecyclerAttr();
+      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
     }
   }
 
@@ -223,6 +251,10 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
   }
 
+  public WXRecyclerDomObject getRecyclerDom() {
+    return mRecyclerDom;
+  }
+
   public void remove(WXComponent child, boolean destroy) {
     super.remove(child, destroy);
     if (child instanceof WXLoading) {
@@ -231,4 +263,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       getHostView().removeHeaderView(child);
     }
   }
+
+
 }
