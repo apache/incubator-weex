@@ -35,10 +35,6 @@
 @implementation WXScrollerComponnetView
 @end
 
-@interface WXScrollerComponnetView(WXScrollerComponnetView_ContentInsetAdjustmentBehavior)
-@property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
-@end
-
 @interface WXScrollToTarget : NSObject
 
 @property (nonatomic, weak)   WXComponent *target;
@@ -189,12 +185,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (_alwaysScrollableVertical) {
         scrollView.alwaysBounceVertical = [WXConvert BOOL:_alwaysScrollableVertical];
     }
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
-        // now use the runtime to forbid the contentInset being Adjusted.
-        // here we add a category for scoller component view class compatible for new API,
-        // as we are concerning about weexSDK build as framework by Xcode8, using in Xcode9 project,
-        // so the the macro __IPHONE_11_0 will be useless in this case.
-        scrollView.contentInsetAdjustmentBehavior = 2;
+    
+    if (@available(iOS 11.0, *)) {
+        if ([scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+            scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        }
+    } else {
+        // Fallback on earlier versions
     }
     
     if (self.ancestorScroller) {
