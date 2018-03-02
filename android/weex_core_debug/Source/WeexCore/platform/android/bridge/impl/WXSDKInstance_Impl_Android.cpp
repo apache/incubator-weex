@@ -20,14 +20,15 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
                                   jstring ref) {
   if (component == nullptr)
     return;
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
 
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
   if (page == nullptr)
     return;
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
 
+  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
   if (render == nullptr)
     return;
+
   render->BindComponentImplAndroid(component);
 }
 
@@ -50,17 +51,17 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
 static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
                                        jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return 0;
+
   return page->PrintFirstScreenLog();
 }
 
 static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
                                   jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return 0;
+
   return page->PrintRenderSuccessLog();
 }

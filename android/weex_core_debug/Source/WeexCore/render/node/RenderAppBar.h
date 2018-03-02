@@ -41,10 +41,10 @@ namespace WeexCore {
 
       if (key == PADDING) {
         float paddingLeft =
-            getFloatByViewport(value, GetRenderPage()->ViewPortWidth()) + defaultNavWidth;
+            getFloatByViewport(value, GetViewPortWidth()) + defaultNavWidth;
         float paddingRight =
-            getFloatByViewport(value, GetRenderPage()->ViewPortWidth()) + defaultOverflowWidth;
-        float padding = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+            getFloatByViewport(value, GetViewPortWidth()) + defaultOverflowWidth;
+        float padding = getFloatByViewport(value, GetViewPortWidth());
 
         setPadding(kPaddingLeft, paddingLeft);
         setPadding(kPaddingRight, paddingRight);
@@ -61,23 +61,23 @@ namespace WeexCore {
         return kTypePadding;
       } else if (key == PADDING_LEFT) {
         float paddingLeft =
-            getFloatByViewport(value, GetRenderPage()->ViewPortWidth()) + defaultNavWidth;
+            getFloatByViewport(value, GetViewPortWidth()) + defaultNavWidth;
         setPadding(kPaddingLeft, paddingLeft);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(paddingLeft)));
         return kTypePadding;
       } else if (key == PADDING_RIGHT) {
         float paddingRight =
-            getFloatByViewport(value, GetRenderPage()->ViewPortWidth()) + defaultOverflowWidth;
+            getFloatByViewport(value, GetViewPortWidth()) + defaultOverflowWidth;
         setPadding(kPaddingRight, paddingRight);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(paddingRight)));
         return kTypePadding;
       } else if (key == PADDING_TOP) {
-        float padding = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float padding = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingTop, padding);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(padding)));
         return kTypePadding;
       } else if (key == PADDING_BOTTOM) {
-        float padding = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float padding = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingBottom, padding);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(padding)));
         return kTypePadding;

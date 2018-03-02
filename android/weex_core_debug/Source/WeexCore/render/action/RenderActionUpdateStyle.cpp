@@ -17,6 +17,9 @@ namespace WeexCore {
 
   void RenderActionUpdateStyle::ExecuteAction() {
     RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
+    if (page == nullptr)
+      return;
+
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId, mRef, mStyle, mMargin,
                                                         mPadding, mBorder);

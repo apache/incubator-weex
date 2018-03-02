@@ -109,7 +109,7 @@ namespace WeexCore {
             }
         }
         if (isnan(width) || width <= 0){
-            width = GetRenderPage()->ViewPortWidth();
+            width = GetViewPortWidth();
         }
         return width;
     }
@@ -134,7 +134,7 @@ namespace WeexCore {
             } else if (child->Type() == kRenderCell){
                 child->ApplyStyle(WIDTH, std::to_string(mColumnWidth));
             } else if (child->getStypePositionType() == kSticky) {
-                child->ApplyStyle(WIDTH, std::to_string(GetRenderPage()->ViewPortWidth()));
+                child->ApplyStyle(WIDTH, std::to_string(GetViewPortWidth()));
             }
         }
     }

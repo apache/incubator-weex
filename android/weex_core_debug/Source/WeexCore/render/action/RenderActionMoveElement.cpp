@@ -12,6 +12,9 @@ namespace WeexCore {
 
   void RenderActionMoveElement::ExecuteAction() {
     RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
+    if (page == nullptr)
+      return;
+
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callMoveElement(mPageId, mRef,
                                                         mParentRef, mIndex);

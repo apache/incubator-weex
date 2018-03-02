@@ -40,5 +40,7 @@ namespace WeexCore {
 
   const int HORIZONTAL_VALUE = 0;
   const int VERTICAL_VALUE = 1;
+
+  constexpr float kDefaultViewPortWidth = 750.0f;
 }
 #endif //WEEXV8_CONSTANTSVALUE_H

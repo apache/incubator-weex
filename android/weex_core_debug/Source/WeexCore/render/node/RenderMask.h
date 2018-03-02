@@ -15,8 +15,8 @@ namespace WeexCore {
       int width = WXCoreEnvironment::getInstance()->DeviceWidth();
 
       style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
-      style->insert(std::pair<std::string, std::string>(WIDTH, std::to_string(getWebPxByWidth(width, GetRenderPage()->ViewPortWidth()))));
-      style->insert(std::pair<std::string, std::string>(HEIGHT, std::to_string(getWebPxByWidth(height, GetRenderPage()->ViewPortWidth()))));
+      style->insert(std::pair<std::string, std::string>(WIDTH, std::to_string(getWebPxByWidth(width, GetViewPortWidth()))));
+      style->insert(std::pair<std::string, std::string>(HEIGHT, std::to_string(getWebPxByWidth(height, GetViewPortWidth()))));
       style->insert(std::pair<std::string, std::string>(TOP, "0"));
       return style;
     }

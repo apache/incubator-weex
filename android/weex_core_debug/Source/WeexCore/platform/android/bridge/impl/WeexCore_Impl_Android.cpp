@@ -48,10 +48,13 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  if (render == nullptr)
+    return;
+
   render->setStyleWidthLevel(CSS_STYLE);
   render->setStyleWidth(value);
 }
@@ -66,10 +69,13 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  if (render == nullptr)
+    return;
+
   render->setStyleHeightLevel(CSS_STYLE);
   render->setStyleHeight(value);
 }
@@ -83,10 +89,13 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  if (render == nullptr)
+    return;
+
   if (edge == 0) {
     render->setMargin(kMarginTop, value);
   } else if (edge == 1) {
@@ -109,10 +118,13 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  if (render == nullptr)
+    return;
+
   if (edge == 0) {
     render->setPadding(kPaddingTop, value);
   } else if (edge == 1) {
@@ -136,10 +148,13 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  if (render == nullptr)
+    return;
+
   if (edge == 0) {
     render->setStylePosition(kPositionEdgeTop, value);
   } else if (edge == 1) {
@@ -157,9 +172,9 @@ static void CalculateLayout(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "CalculateLayout=" + jString2Str(env, instanceId);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
-
   if (page == nullptr)
     return;
+
   page->CalculateLayout();
 }
 

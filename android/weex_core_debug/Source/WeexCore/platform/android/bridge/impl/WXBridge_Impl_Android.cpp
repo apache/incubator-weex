@@ -294,6 +294,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -370,6 +373,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -492,6 +498,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -557,6 +566,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)
@@ -605,6 +617,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallLayoutByWeexCoreMethodId == NULL)
@@ -634,6 +649,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallCreateFinishByWeexCoreMethodId == NULL)
@@ -674,6 +692,9 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    if (page == nullptr)
+      return -1;
+
     long long startTime = getCurrentTime();
 
     if (jMapConstructorMethodId == NULL)

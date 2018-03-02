@@ -10,6 +10,9 @@ namespace WeexCore {
 
   void RenderActionLayout::ExecuteAction() {
     RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
+    if (page == nullptr)
+      return;
+
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callLayout(mPageId, mRef,
                                                    mTop, mBottom,

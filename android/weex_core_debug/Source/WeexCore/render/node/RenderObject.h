@@ -13,6 +13,7 @@
 #include <base/ViewUtils.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/platform/android/base/LogUtils.h>
+#include <WeexCore/css/ConstantsValue.h>
 
 namespace WeexCore {
 
@@ -116,32 +117,32 @@ namespace WeexCore {
         setFlexWrap(GetWXCoreFlexWrap(value));
         return kTypeLayout;
       } else if (key == MIN_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinWidth(realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinWidth(realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinWidth(realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinWidth(realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == HEIGHT) {
         setStyleHeightLevel(CSS_STYLE);
-        setStyleHeight(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        setStyleHeight(getFloatByViewport(value, GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == WIDTH) {
         setStyleWidthLevel(CSS_STYLE);
-        setStyleWidth(getFloatByViewport(value, GetRenderPage()->ViewPortWidth()));
+        setStyleWidth(getFloatByViewport(value, GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
@@ -149,92 +150,92 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == LEFT) {
         setStylePosition(kPositionEdgeLeft, getFloatByViewport(value,
-                                                             GetRenderPage()->ViewPortWidth()));
+                                                               GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == TOP) {
         setStylePosition(kPositionEdgeTop, getFloatByViewport(value,
-                                                            GetRenderPage()->ViewPortWidth()));
+                                                              GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == RIGHT) {
         setStylePosition(kPositionEdgeRight, getFloatByViewport(value,
-                                                              GetRenderPage()->ViewPortWidth()));
+                                                                GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == BOTTOM) {
         setStylePosition(kPositionEdgeBottom, getFloatByViewport(value,
-                                                               GetRenderPage()->ViewPortWidth()));
+                                                                 GetViewPortWidth()));
         return kTypeLayout;
       } else if (key == MARGIN) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMargin(kMarginALL, realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeMargin;
       } else if (key == MARGIN_LEFT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMargin(kMarginLeft, realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeMargin;
       } else if (key == MARGIN_TOP) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMargin(kMarginTop, realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeMargin;
       } else if (key == MARGIN_RIGHT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMargin(kMarginRight, realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeMargin;
       } else if (key == MARGIN_BOTTOM) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMargin(kMarginBottom, realValue);
         mMargins->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeMargin;
       } else if (key == BORDER_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setBorderWidth(kBorderWidthALL, realValue);
         mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeBorder;
       } else if (key == BORDER_TOP_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setBorderWidth(kBorderWidthTop, realValue);
         mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeBorder;
       } else if (key == BORDER_RIGHT_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setBorderWidth(kBorderWidthRight, realValue);
         mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeBorder;
       } else if (key == BORDER_BOTTOM_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setBorderWidth(kBorderWidthBottom, realValue);
         mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeBorder;
       } else if (key == BORDER_LEFT_WIDTH) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setBorderWidth(kBorderWidthLeft, realValue);
         mBorders->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeBorder;
       } else if (key == PADDING) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingALL, realValue);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypePadding;
       } else if (key == PADDING_LEFT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingLeft, realValue);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypePadding;
       } else if (key == PADDING_TOP) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingTop, realValue);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypePadding;
       } else if (key == PADDING_RIGHT) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingRight, realValue);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypePadding;
       } else if (key == PADDING_BOTTOM) {
-        float realValue = getFloatByViewport(value, GetRenderPage()->ViewPortWidth());
+        float realValue = getFloatByViewport(value, GetViewPortWidth());
         setPadding(kPaddingBottom, realValue);
         mPaddings->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypePadding;
@@ -333,6 +334,17 @@ namespace WeexCore {
       return RenderManager::GetInstance()->GetPage(PageId());
     }
 
+    inline float GetViewPortWidth() {
+      if (mViewPortWidth >= 0)
+        return mViewPortWidth;
+
+      RenderPage *page = GetRenderPage();
+      if (page == nullptr)
+        return kDefaultViewPortWidth;
+
+      return page->ViewPortWidth();
+    }
+
     inline void SetParentRender(RenderObject *render) {
       mParentRender = render;
     }
@@ -423,6 +435,7 @@ namespace WeexCore {
     jobject mComponent_Impl_Android;
     jobject mMeasureFunc_Impl_Android;
     void *mComponent_Impl_iOS;
+    float mViewPortWidth = -1;
 
   public:
     PaddingsMap *mPaddings;

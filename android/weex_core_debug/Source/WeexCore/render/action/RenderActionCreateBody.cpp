@@ -16,6 +16,9 @@ namespace WeexCore {
 
   void RenderActionCreateBody::ExecuteAction() {
     RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
+    if (page == nullptr)
+      return;
+
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callCreateBody(mPageId, mComponentType, mRef,
                                                        mStyles, mAttributes,

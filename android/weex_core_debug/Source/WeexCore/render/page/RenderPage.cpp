@@ -14,6 +14,7 @@
 #include <base/ViewUtils.h>
 #include <WeexCore/render/action/RenderActionAddEvent.h>
 #include <WeexCore/render/action/RenderActionRemoveEvent.h>
+#include <WeexCore/css/ConstantsValue.h>
 #include "RenderPage.h"
 #include "WeexCore/render/manager/RenderManager.h"
 #include "WeexCore/render/node/RenderObject.h"
@@ -31,7 +32,7 @@ namespace WeexCore {
 
     mPageId = pageId;
     mWXCorePerformance = new RenderPerformance();
-    mViewPortWidth = 750.0f;
+    mViewPortWidth = kDefaultViewPortWidth;
     renderPageSize.first = WXCoreEnvironment::getInstance()->DeviceWidth();
     renderPageSize.second = NAN;
   }

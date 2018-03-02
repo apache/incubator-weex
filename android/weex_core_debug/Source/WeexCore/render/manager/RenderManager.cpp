@@ -181,6 +181,7 @@ namespace WeexCore {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return;
+
     page->GetRootRenderObject()->PrintRenderMsg();
     page->GetRootRenderObject()->PrintLayoutMsg();
   }
