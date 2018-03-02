@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionAddEvent::RenderActionAddEvent(std::string pageId, std::string ref, std::string event) {
+  RenderActionAddEvent::RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mEvent = event;

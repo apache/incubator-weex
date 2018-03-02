@@ -11,7 +11,7 @@ namespace WeexCore {
       mRef = ref;
     }
 
-    inline const std::string &Ref() {
+    inline const std::string &Ref() const {
       return mRef;
     }
 
@@ -27,7 +27,7 @@ namespace WeexCore {
       mType = type;
     }
 
-    inline std::string Type() {
+    inline std::string Type() const {
       return mType;
     }
 

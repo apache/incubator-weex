@@ -2,8 +2,8 @@
 
 namespace WeexCore {
 
-  RenderActionAddElement::RenderActionAddElement(std::string pageId, RenderObject *render,
-                                                 RenderObject *parent, int index) {
+  RenderActionAddElement::RenderActionAddElement(const std::string &pageId, const RenderObject *render,
+                                                 const RenderObject *parent, int index) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();

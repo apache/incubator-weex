@@ -353,27 +353,27 @@ namespace WeexCore {
       return mParentRender;
     }
 
-    inline StylesMap *Styles() {
+    inline StylesMap *Styles() const {
       return mStyles;
     }
 
-    inline AttributesMap *Attributes() {
+    inline AttributesMap * Attributes() const {
       return mAttributes;
     }
 
-    inline EventsSet *Events() {
+    inline EventsSet *Events() const {
       return mEvents;
     }
 
-    inline PaddingsMap *Paddings() {
+    inline PaddingsMap *Paddings() const {
       return mPaddings;
     }
 
-    inline MarginsMap *Margins() {
+    inline MarginsMap *Margins() const {
       return mMargins;
     }
 
-    inline BordersMap *Borders() {
+    inline BordersMap *Borders() const {
       return mBorders;
     }
 

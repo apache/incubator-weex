@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionLayout::RenderActionLayout(std::string pageId, RenderObject *render) {
+  RenderActionLayout::RenderActionLayout(const std::string &pageId, const RenderObject *render) {
     this->mPageId = pageId;
     this->mRef = render->Ref();
     GetLayoutInfo(render);
@@ -22,7 +22,7 @@ namespace WeexCore {
     page->LayoutActionJniTime(getCurrentTime() - startTime);
   }
 
-  void RenderActionLayout::GetLayoutInfo(WXCoreLayoutNode *node) {
+  void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
     mTop = node->getLayoutPositionTop();
     mBottom = node->getLayoutPositionBottom();
     mRight = node->getLayoutPositionRight();

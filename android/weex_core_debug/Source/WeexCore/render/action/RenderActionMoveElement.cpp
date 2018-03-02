@@ -2,8 +2,8 @@
 
 namespace WeexCore {
 
-  RenderActionMoveElement::RenderActionMoveElement(std::string pageId, std::string ref,
-                                                   std::string parentRef, int index) {
+  RenderActionMoveElement::RenderActionMoveElement(const std::string &pageId, const std::string &ref,
+                                                   const std::string &parentRef, int index) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mParentRef = parentRef;

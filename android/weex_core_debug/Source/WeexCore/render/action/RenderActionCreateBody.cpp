@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionCreateBody::RenderActionCreateBody(std::string pageId, RenderObject *render) {
+  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId, const RenderObject *render) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
