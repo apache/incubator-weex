@@ -62,11 +62,12 @@ public class WXPerformance {
      * range : [min,max)
      */
     JSLibSize(0D, Double.MAX_VALUE),
-    JSLibInitTime(0D, 3000D),
-    SDKInitTime(0D, 3000D),
-    SDKInitInvokeTime(0D, 3000D),
-    SDKInitExecuteTime(0D, 3000D),
-    JSTemplateSize(0D, 4000D),
+    //normal 300ms.. first install apk 30s ?
+    JSLibInitTime(0D, 50000D),
+    SDKInitTime(0D, 5000D),
+    SDKInitInvokeTime(0D, 5000D),
+    SDKInitExecuteTime(0D, 5000D),
+    JSTemplateSize(0D, 5000D),
     pureNetworkTime(0D, 15000D),
     networkTime(0D, 15000D),
     fsCreateInstanceTime(0D, 3000D),
