@@ -133,4 +133,7 @@ public interface IWXBridge extends IWXObject {
   void calculateLayout(String instanceId, String ref);
 
   void registerCoreEnv(String key, String value);
+
+  void setViewPortWidth(String instanceId, float value);
+
 }

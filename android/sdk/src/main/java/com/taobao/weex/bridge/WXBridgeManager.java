@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -1984,6 +1985,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void setStyleHeight(String instanceId, String ref, float value) {
     mWXBridge.setStyleHeight(instanceId, ref, value);
+  }
+
+  public void setViewPortWidth(String instanceId, float value) {
+    mWXBridge.setViewPortWidth(instanceId, value);
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {

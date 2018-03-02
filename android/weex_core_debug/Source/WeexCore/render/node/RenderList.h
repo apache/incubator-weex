@@ -55,7 +55,6 @@ namespace WeexCore {
         std::map<std::string, std::string> *attrs = new std::map<std::string, std::string>();
         if (Attributes() != nullptr) {
             mColumnCount = getColumnCount();
-            LOGE("listen mColumnCount 1 = %d", mColumnCount);
             mColumnWidth = getColumnWidth();
             mColumnGap = getColumnGap();
 
@@ -66,11 +65,9 @@ namespace WeexCore {
                 mColumnCount = COLUMN_COUNT_NORMAL;
                 mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
                 mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
-                LOGE("listen mColumnCount 2 = %d", mColumnCount);
             } else if (AUTO_VALUE == mColumnWidth && AUTO_VALUE != mColumnCount) {
                 mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
                 mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
-                LOGE("listen mColumnCount 3 = %d", mColumnCount);
             } else if (AUTO_VALUE != mColumnWidth && AUTO_VALUE == mColumnCount) {
                 mColumnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = mColumnCount > 0 ? mColumnCount :1;
@@ -78,19 +75,15 @@ namespace WeexCore {
                     mColumnCount = COLUMN_COUNT_NORMAL;
                 mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
 
-                LOGE("listen mColumnCount 4 = %d", mColumnCount);
             } else if(AUTO_VALUE != mColumnWidth && AUTO_VALUE != mColumnCount){
                 int columnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
                 if (mColumnCount <= 0)
                     mColumnCount = COLUMN_COUNT_NORMAL;
                 mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
-
-                LOGE("listen mColumnCount 5 = %d", mColumnCount);
             }
 
             mIsPreCalculateCellWidth = true;
-            LOGE("listen 6 mColumnCount=%d mColumnWidth=%f mColumnGap=%f", mColumnCount, mColumnWidth, mColumnGap);
             attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, std::to_string(mColumnCount)));
             attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, std::to_string(mColumnWidth)));
             attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, std::to_string(mColumnGap)));

@@ -63,6 +63,8 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
+  private native void nativeSetViewPortWidth(String instanceId, float value);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -496,5 +498,10 @@ public class WXBridge implements IWXBridge {
   @Override
   public void registerCoreEnv(String key, String value) {
     nativeRegisterCoreEnv(key, value);
+  }
+
+  @Override
+  public void setViewPortWidth(String instanceId, float value) {
+    nativeSetViewPortWidth(instanceId, value);
   }
 }

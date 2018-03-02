@@ -186,6 +186,17 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
   WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, key), jString2Str(env, value));
 }
 
+static void nativeSetViewPortWidth(JNIEnv *env, jobject jcaller,
+                            jstring instanceId,
+                            jfloat value) {
+  LOGE("nativeSetViewPortWidth，key: %s, value: %f", jString2Str(env, instanceId).c_str(), value);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  if (page == nullptr)
+    return;
+
+  page->SetViewPortWidth(value);
+}
+
 
 static jint InitFramework(JNIEnv *env,
                           jobject object,
