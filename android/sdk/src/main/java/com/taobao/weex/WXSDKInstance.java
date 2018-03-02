@@ -1791,7 +1791,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         Object zCacheInfo = response.extendParams.get("zCacheInfo");
         mWXPerformance.zCacheInfo = zCacheInfo instanceof String?(String)zCacheInfo:"";
 
-        if("network".equals(requestType) && mUserTrackAdapter!=null){
+        if(isNet(mWXPerformance.requestType) && mUserTrackAdapter!=null){
           WXPerformance performance=new WXPerformance();
           if(!TextUtils.isEmpty(mBundleUrl)){
             try {
@@ -1849,6 +1849,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 				response.errorMsg);
       }
     }
+  }
+
+  private boolean isNet(String requestType){
+
+    return "network".equals(requestType) || "2g".equals(requestType) || "3g".equals(requestType)
+           || "4g".equals(requestType) || "wifi".equals(requestType) || "other".equals(requestType)
+           || "unknown".equals(requestType);
   }
 
   /**
