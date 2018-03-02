@@ -285,25 +285,19 @@ namespace WeexCore {
           float childWidth = child->mCssStyle->mStyleWidth;
           float childHeight = child->mCssStyle->mStyleHeight;
           if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
-            if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
-              childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
-                  child->mCssStyle->mMargin.getMargin(kMarginLeft) -
-                  child->mCssStyle->mMargin.getMargin(kMarginRight);
-            }
             stretch = isSingleFlexLine(parentHeight) && (mCssStyle->mAlignItems == kAlignItemsStretch);
           }
-          else if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
-              && (mCssStyle->mAlignItems == kAlignItemsStretch)) {
+
+          if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
             if (isMainAxisHorizontal(this)) {
               if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)
-                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto) {
+                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto && mCssStyle->mAlignItems == kAlignItemsStretch) {
                 childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
                     child->mCssStyle->mMargin.getMargin(kMarginTop) -
                     child->mCssStyle->mMargin.getMargin(kMarginBottom);
               }
             } else {
-              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)
-                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto) {
+              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
                 childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
                     child->mCssStyle->mMargin.getMargin(kMarginLeft) -
                     child->mCssStyle->mMargin.getMargin(kMarginRight);
