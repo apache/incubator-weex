@@ -254,7 +254,7 @@ namespace WeexCore {
       mMinHeight = NAN;
     }
 
-    float sumPaddingBorderOfEdge(const WXCoreEdge edge){
+    inline float sumPaddingBorderOfEdge(const WXCoreEdge edge){
       switch (edge) {
         case kTop:
           return mPadding.getPadding(kPaddingTop)

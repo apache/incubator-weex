@@ -4,20 +4,20 @@
 #include <string>
 
 namespace WeexCore {
-  const std::string kRenderCell = "cell";
-  const std::string kRenderIndicator = "indicator";
-  const std::string kRenderInput = "input";
-  const std::string kRenderList = "list";
-  const std::string kHList = "hlist";
-  const std::string kRenderMask = "mask";
-  const std::string kRenderScroller = "scroller";
-  const std::string kRenderSwitch = "switch";
-  const std::string kRenderText = "text";
-  const std::string kRenderTextArea = "textarea";
-  const std::string kRenderHeader = "header";
-  const std::string kRenderFooter = "footer";
-  const std::string kRenderWaterfall = "waterfall";
-  const std::string kRenderAppBar = "appbar";
+  constexpr char kRenderCell[] = "cell";
+  constexpr char kRenderIndicator[] = "indicator";
+  constexpr char kRenderInput[] = "input";
+  constexpr char kRenderList[] = "list";
+  constexpr char kHList[] = "hlist";
+  constexpr char kRenderMask[] = "mask";
+  constexpr char kRenderScroller[] = "scroller";
+  constexpr char kRenderSwitch[] = "switch";
+  constexpr char kRenderText[] = "text";
+  constexpr char kRenderTextArea[] = "textarea";
+  constexpr char kRenderHeader[] = "header";
+  constexpr char kRenderFooter[] = "footer";
+  constexpr char kRenderWaterfall[] = "waterfall";
+  constexpr char kRenderAppBar[] = "appbar";
 }
 
 #endif //WEEX_PROJECT_RENDERTYPE_H
