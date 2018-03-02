@@ -6,58 +6,58 @@
 
 namespace WeexCore {
 
-  const std::string FLEX = "flex";
-  const std::string HORIZONTAL = "horizontal";
-  const std::string ALIGN_ITEMS = "alignItems";
-  const std::string ALIGN_SELF = "alignSelf";
-  const std::string FLEX_DIRECTION = "flexDirection";
-  const std::string JUSTIFY_CONTENT = "justifyContent";
-  const std::string FLEX_WRAP = "flexWrap";
+  constexpr char FLEX[] = "flex";
+  constexpr char HORIZONTAL[] = "horizontal";
+  constexpr char ALIGN_ITEMS[] = "alignItems";
+  constexpr char ALIGN_SELF[] = "alignSelf";
+  constexpr char FLEX_DIRECTION[] = "flexDirection";
+  constexpr char JUSTIFY_CONTENT[] = "justifyContent";
+  constexpr char FLEX_WRAP[] = "flexWrap";
 
-  const std::string MIN_WIDTH = "minWidth";
-  const std::string MIN_HEIGHT = "minHeight";
-  const std::string MAX_WIDTH = "maxWidth";
-  const std::string MAX_HEIGHT = "maxHeight";
+  constexpr char MIN_WIDTH[] = "minWidth";
+  constexpr char MIN_HEIGHT[] = "minHeight";
+  constexpr char MAX_WIDTH[] = "maxWidth";
+  constexpr char MAX_HEIGHT[] = "maxHeight";
 
-  const std::string DEFAULT_HEIGHT = "defaultHeight";
-  const std::string HEIGHT = "height";
+  constexpr char DEFAULT_HEIGHT[] = "defaultHeight";
+  constexpr char HEIGHT[] = "height";
 
-  const std::string DEFAULT_WIDTH = "defaultWidth";
-  const std::string WIDTH = "width";
-  const std::string SCROLL_DIRECTION = "scrollDirection";
+  constexpr char DEFAULT_WIDTH[] = "defaultWidth";
+  constexpr char WIDTH[] = "width";
+  constexpr char SCROLL_DIRECTION[] = "scrollDirection";
 
-  const std::string POSITION = "position";
+  constexpr char POSITION[] = "position";
 
-  const std::string LEFT = "left";
-  const std::string TOP = "top";
-  const std::string RIGHT = "right";
-  const std::string BOTTOM = "bottom";
+  constexpr char LEFT[] = "left";
+  constexpr char TOP[] = "top";
+  constexpr char RIGHT[] = "right";
+  constexpr char BOTTOM[] = "bottom";
 
-  const std::string MARGIN = "margin";
-  const std::string MARGIN_LEFT = "marginLeft";
-  const std::string MARGIN_TOP = "marginTop";
-  const std::string MARGIN_RIGHT = "marginRight";
-  const std::string MARGIN_BOTTOM = "marginBottom";
+  constexpr char MARGIN[] = "margin";
+  constexpr char MARGIN_LEFT[] = "marginLeft";
+  constexpr char MARGIN_TOP[] = "marginTop";
+  constexpr char MARGIN_RIGHT[] = "marginRight";
+  constexpr char MARGIN_BOTTOM[] = "marginBottom";
 
-  const std::string BORDER_WIDTH = "borderWidth";
-  const std::string BORDER_TOP_WIDTH = "borderTopWidth";
-  const std::string BORDER_RIGHT_WIDTH = "borderRightWidth";
-  const std::string BORDER_BOTTOM_WIDTH = "borderBottomWidth";
-  const std::string BORDER_LEFT_WIDTH = "borderLeftWidth";
+  constexpr char BORDER_WIDTH[] = "borderWidth";
+  constexpr char BORDER_TOP_WIDTH[] = "borderTopWidth";
+  constexpr char BORDER_RIGHT_WIDTH[] = "borderRightWidth";
+  constexpr char BORDER_BOTTOM_WIDTH[] = "borderBottomWidth";
+  constexpr char BORDER_LEFT_WIDTH[] = "borderLeftWidth";
 
-  const std::string PADDING = "padding";
-  const std::string PADDING_LEFT = "paddingLeft";
-  const std::string PADDING_TOP = "paddingTop";
-  const std::string PADDING_RIGHT = "paddingRight";
-  const std::string PADDING_BOTTOM = "paddingBottom";
+  constexpr char PADDING[] = "padding";
+  constexpr char PADDING_LEFT[] = "paddingLeft";
+  constexpr char PADDING_TOP[] = "paddingTop";
+  constexpr char PADDING_RIGHT[] = "paddingRight";
+  constexpr char PADDING_BOTTOM[] = "paddingBottom";
 
-  const std::string FONT_STYLE = "fontStyle";
-  const std::string COLUMN_WIDTH= "columnWidth";
-  const std::string COLUMN_COUNT= "columnCount";
-  const std::string COLUMN_GAP= "columnGap";
+  constexpr char FONT_STYLE[] = "fontStyle";
+  constexpr char COLUMN_WIDTH[] = "columnWidth";
+  constexpr char COLUMN_COUNT[] = "columnCount";
+  constexpr char COLUMN_GAP[] = "columnGap";
 
-  const std::string COLOR = "color";
-  const std::string BACKGROUND_COLOR = "backgroundColor";
+  constexpr char COLOR[] = "color";
+  constexpr char BACKGROUND_COLOR[] = "backgroundColor";
 }
 
 #endif //WEEXV8_CONSTANTSNAME_H

@@ -9,6 +9,8 @@
 
 namespace WeexCore {
 
+  constexpr float kLayoutFirstScreenOverflowRadio = 1.2f;
+
   class RenderAction;
 
   class RenderObject;
@@ -150,7 +152,6 @@ namespace WeexCore {
     void OnRenderPageClose();
 
   private:
-    const float kLayoutFirstScreenOverflowRadio = 1.2;
     bool mAlreadyCreateFinish = false;
     float mViewPortWidth;
     RenderObject *render_root = nullptr;

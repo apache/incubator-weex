@@ -7,39 +7,38 @@
 namespace WeexCore {
 
   // flex-direction
-  const std::string ROW = "row";
-  const std::string ROW_REVERSE = "row-reverse";
-  const std::string COLUMN = "column";
-  const std::string COLUMN_REVERSE = "column-reverse";
+  constexpr char ROW[] = "row";
+  constexpr char ROW_REVERSE[] = "row-reverse";
+  constexpr char COLUMN[] = "column";
+  constexpr char COLUMN_REVERSE[] = "column-reverse";
 
   // flex-wrap
-  const std::string NOWRAP = "nowrap";
-  const std::string WRAP = "wrap";
-  const std::string WRAP_REVERSE = "wrap-reverse";
+  constexpr char NOWRAP[] = "nowrap";
+  constexpr char WRAP[] = "wrap";
+  constexpr char WRAP_REVERSE[] = "wrap-reverse";
 
   // align
-  const std::string FLEX_START = "flex-start";
-  const std::string FLEX_END = "flex-end";
-  const std::string CENTER = "center";
-  const std::string SPACE_BETWEEN = "space-between";
-  const std::string SPACE_AROUND = "space-around";
-  const std::string BASELINE = "baseline";
-  const std::string STRETCH = "stretch";
-  const std::string AUTO = "auto";
+  constexpr char FLEX_START[] = "flex-start";
+  constexpr char FLEX_END[] = "flex-end";
+  constexpr char CENTER[] = "center";
+  constexpr char SPACE_BETWEEN[] = "space-between";
+  constexpr char SPACE_AROUND[] = "space-around";
+  constexpr char STRETCH[] = "stretch";
+  constexpr char AUTO[] = "auto";
 
   // position
-  const std::string RELATIVE = "relative";
-  const std::string ABSOLUTE = "absolute";
-  const std::string FIXED = "fixed";
-  const std::string STICKY = "sticky";
+  constexpr char RELATIVE[] = "relative";
+  constexpr char ABSOLUTE[] = "absolute";
+  constexpr char FIXED[] = "fixed";
+  constexpr char STICKY[] = "sticky";
 
-  const std::string NORMAL = "normal";
-  const int COLUMN_COUNT_NORMAL = 1;
-  const float AUTO_VALUE = -1;
-  const float COLUMN_GAP_NORMAL = 32;
+  constexpr char NORMAL[] = "normal";
+  constexpr int COLUMN_COUNT_NORMAL = 1;
+  constexpr float AUTO_VALUE = -1;
+  constexpr float COLUMN_GAP_NORMAL = 32;
 
-  const int HORIZONTAL_VALUE = 0;
-  const int VERTICAL_VALUE = 1;
+  constexpr int HORIZONTAL_VALUE = 0;
+  constexpr int VERTICAL_VALUE = 1;
 
   constexpr float kDefaultViewPortWidth = 750.0f;
 }
