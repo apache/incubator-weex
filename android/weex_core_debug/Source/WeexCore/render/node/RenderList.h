@@ -132,7 +132,7 @@ namespace WeexCore {
         }
     }
 
-    void UpdateAttr(const std::string &key, const std::string &value) {
+    void UpdateAttr(std::string key, std::string value) {
       RenderObject::UpdateAttr(key, value);
 
       if(!GetAttr(COLUMN_COUNT).empty() || !GetAttr(COLUMN_GAP).empty() || !GetAttr(COLUMN_WIDTH).empty()){

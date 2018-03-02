@@ -37,7 +37,7 @@ namespace WeexCore {
 
   public:
 
-    StyleType ApplyStyle(std::string key, std::string value) {
+    StyleType ApplyStyle(const std::string &key, const std::string &value) {
 
       if (key == PADDING) {
         float paddingLeft =

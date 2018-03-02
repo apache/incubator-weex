@@ -31,9 +31,9 @@ namespace WeexCore {
 
     void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
 
-    void SendRemoveElementAction(std::string ref);
+    void SendRemoveElementAction(const std::string &ref);
 
-    void SendMoveElementAction(std::string ref, std::string parentRef, int index);
+    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
 
     void SendLayoutAction(RenderObject *render);
 
@@ -61,24 +61,24 @@ namespace WeexCore {
     bool CreateRootRender(RenderObject *root);
 
     bool
-    AddRenderObject(std::string parentRef, int insertPosiotn, RenderObject *child);
+    AddRenderObject(const std::string &parentRef, int insertPosiotn, RenderObject *child);
 
-    bool RemoveRenderObject(std::string ref);
+    bool RemoveRenderObject(const std::string &ref);
 
-    bool MoveRenderObject(std::string ref, std::string parentRef, int index);
+    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int index);
 
     bool
-    UpdateStyle(std::string ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
 
-    bool UpdateAttr(std::string ref,
+    bool UpdateAttr(const std::string &ref,
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
 
-    bool AddEvent(std::string ref, std::string event);
+    bool AddEvent(const std::string &ref, const std::string &event);
 
-    bool RemoveEvent(std::string ref, std::string event);
+    bool RemoveEvent(const std::string &ref, const std::string &event);
 
     bool CreateFinish();
 

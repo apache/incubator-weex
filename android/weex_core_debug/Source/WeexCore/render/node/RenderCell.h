@@ -5,7 +5,7 @@
 
 namespace WeexCore {
   class RenderCell : public RenderObject {
-  public:
+
   };
 }
 

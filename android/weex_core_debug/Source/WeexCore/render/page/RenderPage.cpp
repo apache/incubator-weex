@@ -138,7 +138,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::AddRenderObject(std::string parentRef, int insertPosition,
+  bool RenderPage::AddRenderObject(const std::string &parentRef, int insertPosition,
                                    RenderObject *child) {
     long long startTime = getCurrentTime();
     RenderObject *parent = GetRenderObject(parentRef);
@@ -158,7 +158,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::RemoveRenderObject(std::string ref) {
+  bool RenderPage::RemoveRenderObject(const std::string &ref) {
     long long startTime = getCurrentTime();
     RenderObject *child = GetRenderObject(ref);
     if (child == nullptr)
@@ -180,7 +180,7 @@ namespace WeexCore {
   }
 
   bool
-  RenderPage::MoveRenderObject(std::string ref, std::string parentRef, int index) {
+  RenderPage::MoveRenderObject(const std::string &ref, const std::string &parentRef, int index) {
     long long startTime = getCurrentTime();
 
     RenderObject *child = GetRenderObject(ref);
@@ -211,7 +211,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::UpdateStyle(std::string ref,
+  bool RenderPage::UpdateStyle(const std::string &ref,
                                std::vector<std::pair<std::string, std::string> *> *styles) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
@@ -334,7 +334,7 @@ namespace WeexCore {
     return flag;
   }
 
-  bool RenderPage::UpdateAttr(std::string ref,
+  bool RenderPage::UpdateAttr(const std::string &ref,
                               std::vector<std::pair<std::string, std::string> *> *attrs) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
@@ -382,7 +382,7 @@ namespace WeexCore {
       CalculateLayout();
   }
 
-  bool RenderPage::AddEvent(std::string ref, std::string event) {
+  bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -396,7 +396,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::RemoveEvent(std::string ref, std::string event) {
+  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -481,12 +481,12 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::SendRemoveElementAction(std::string ref) {
+  void RenderPage::SendRemoveElementAction(const std::string &ref) {
     RenderAction *action = new RenderActionRemoveElement(PageId(), ref);
     PostRenderAction(action);
   }
 
-  void RenderPage::SendMoveElementAction(std::string ref, std::string parentRef,
+  void RenderPage::SendMoveElementAction(const std::string &ref, const std::string &parentRef,
                                          int index) {
     RenderAction *action = new RenderActionMoveElement(PageId(), ref, parentRef, index);
     PostRenderAction(action);

@@ -19,7 +19,7 @@ namespace WeexCore {
       this->mPageId = pageId;
     }
 
-    inline const std::string &PageId() {
+    inline const std::string &PageId() const {
       return mPageId;
     }
 
@@ -27,7 +27,7 @@ namespace WeexCore {
       mType = type;
     }
 
-    inline std::string Type() const {
+    inline const std::string &Type() const {
       return mType;
     }
 

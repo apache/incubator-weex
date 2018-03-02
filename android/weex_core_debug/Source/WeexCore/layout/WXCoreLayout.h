@@ -644,7 +644,7 @@ namespace WeexCore {
       return mCssStyle->mPadding.getPadding(kPaddingBottom);
     }
 
-    void setPadding(const WXCorePaddingEdge &edge, const float padding) {
+    void setPadding(const WXCorePaddingEdge edge, const float padding) {
       if (mCssStyle->mPadding.setPadding(edge, padding)) {
         markDirty();
       }
@@ -669,7 +669,7 @@ namespace WeexCore {
       return mCssStyle->mBorderWidth.getBorderWidth(kBorderWidthBottom);
     }
 
-    void setBorderWidth(const WXCoreBorderWidthEdge &edge, const float borderWidth) {
+    void setBorderWidth(const WXCoreBorderWidthEdge edge, const float borderWidth) {
       if (mCssStyle->mBorderWidth.setBorderWidth(edge, borderWidth)) {
         markDirty();
       }
@@ -708,7 +708,7 @@ namespace WeexCore {
       return mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
     }
 
-    void setStylePosition(const WXCorePositionEdge &edge, const float positionRight) {
+    void setStylePosition(const WXCorePositionEdge edge, const float positionRight) {
       if (mCssStyle->mStylePosition.setPosition(edge, positionRight))
         markDirty();
     }

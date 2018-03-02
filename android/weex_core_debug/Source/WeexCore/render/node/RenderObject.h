@@ -97,7 +97,7 @@ namespace WeexCore {
 
     void onLayoutAfter(float width, float height);
 
-    virtual StyleType ApplyStyle(std::string key, std::string value) {
+    virtual StyleType ApplyStyle(const std::string &key, const std::string &value) {
       if (key == ALIGN_ITEMS) {
         setAlignItems(GetWXCoreAlignItem(value));
         return kTypeLayout;
@@ -261,11 +261,11 @@ namespace WeexCore {
       return mMeasureFunc_Impl_Android;
     }
 
-    inline RenderObject *GetChild(Index &index) {
+    inline RenderObject *GetChild(const Index &index) {
       return static_cast<RenderObject*>(getChildAt(index));
     }
 
-    inline Index IndexOf(RenderObject *render) {
+    inline Index IndexOf(const RenderObject *render) {
       if (render == nullptr) {
         return -1;
       } else {
@@ -326,7 +326,7 @@ namespace WeexCore {
       mEvents->insert(event);
     }
 
-    inline void RemoveEvent(std::string event) {
+    inline void RemoveEvent(const std::string &event) {
       mEvents->erase(event);
     }
 
@@ -401,7 +401,7 @@ namespace WeexCore {
       return mEvents->end();
     }
 
-    inline const std::string GetStyle(std::string key) {
+    inline const std::string GetStyle(const std::string &key) {
       if (mStyles == nullptr)
         return "";
 
@@ -413,7 +413,7 @@ namespace WeexCore {
       }
     }
 
-    inline const std::string GetAttr(std::string key) {
+    inline const std::string GetAttr(const std::string &key) {
       if (mAttributes == nullptr)
         return "";
 
