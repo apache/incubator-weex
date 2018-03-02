@@ -21,8 +21,8 @@ package com.taobao.weex.utils;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Base64;
 
-import com.alibaba.fastjson.util.Base64;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.URIAdapter;
@@ -101,7 +101,7 @@ public class FontDO {
               if (!TextUtils.isEmpty(base64Data)) {
                 String md5 = WXFileUtils.md5(base64Data);
                 String filePath = WXEnvironment.getApplication().getCacheDir() + "/font-family/" + md5;
-                WXFileUtils.saveFile(filePath, Base64.decodeFast(base64Data), WXEnvironment.getApplication());
+                WXFileUtils.saveFile(filePath, Base64.decode(base64Data, Base64.DEFAULT), WXEnvironment.getApplication());
                 mUrl = filePath;
                 mType = TYPE_BASE64;
                 WXLogUtils.d("TypefaceUtil", "Parse base64 font cost " + (System.currentTimeMillis() - start) + " ms");
