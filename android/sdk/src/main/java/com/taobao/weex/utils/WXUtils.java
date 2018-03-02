@@ -235,10 +235,14 @@ public class WXUtils {
       return df;
     }
 
+    String temp = value.toString().trim();
+    if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+      return (int)WXUtils.parseFloat(temp);
+    }
+
     try {
       return (Integer) value;
     } catch (ClassCastException cce) {
-      String temp = value.toString().trim();
 
       if (temp.endsWith("wx")) {
         if (WXEnvironment.isApkDebugable()) {
