@@ -85,6 +85,10 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring key,
     jstring value);
 
+static void nativeSetViewPortWidth(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jfloat value);
+
 // Step 2: method stubs.
 
 // Step 3: RegisterNatives.
@@ -177,6 +181,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(RegisterCoreEnv) },
+    { "nativeSetViewPortWidth",
+"("
+"Ljava/lang/String;"
+"F"
+")"
+"V", reinterpret_cast<void*>(nativeSetViewPortWidth) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {
