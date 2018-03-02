@@ -44,17 +44,17 @@ namespace WeexCore {
 
     bool IsIOS();
 
-    bool SetDeviceWidth(std::string width);
+    bool SetDeviceWidth(const std::string &width);
 
-    bool SetDeviceHeight(std::string height);
+    bool SetDeviceHeight(const std::string &height);
 
-    float DeviceWidth();
+    const float &DeviceWidth();
 
-    float DeviceHeight();
+    const float &DeviceHeight();
 
-    std::string GetOption(std::string key);
+    const std::string &GetOption(const std::string &key);
 
-    std::string AddOption(std::string key, std::string value);
+    void AddOption(std::string key, std::string value);
 
     static WXCoreEnvironment *getInstance() {
       if (!m_pInstance) {

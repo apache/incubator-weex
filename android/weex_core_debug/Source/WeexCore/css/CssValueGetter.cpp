@@ -5,7 +5,7 @@
 
 namespace WeexCore {
 
-  WXCoreFlexDirection GetWXCoreFlexDirection(const std::string &value) {
+  const WXCoreFlexDirection &GetWXCoreFlexDirection(const std::string &value) {
     if (value == COLUMN) {
       return WeexCore::kFlexDirectionColumn;
     } else if (value == ROW) {
@@ -18,7 +18,7 @@ namespace WeexCore {
     return WeexCore::kFlexDirectionColumn;
   }
 
-  WXCoreJustifyContent GetWXCoreJustifyContent(const std::string &value) {
+  const WXCoreJustifyContent &GetWXCoreJustifyContent(const std::string &value) {
     if (value == FLEX_START) {
       return WeexCore::kJustifyFlexStart;
     } else if (value == FLEX_END) {
@@ -33,7 +33,7 @@ namespace WeexCore {
     return WeexCore::kJustifyFlexStart;
   }
 
-  WXCoreAlignItems GetWXCoreAlignItem(const std::string &value) {
+  const WXCoreAlignItems &GetWXCoreAlignItem(const std::string &value) {
     if (value == STRETCH) {
       return WeexCore::kAlignItemsStretch;
     } else if (value == FLEX_START) {
@@ -46,7 +46,7 @@ namespace WeexCore {
     return WeexCore::kAlignItemsStretch;
   }
 
-  WXCoreFlexWrap GetWXCoreFlexWrap(const std::string &value) {
+  const WXCoreFlexWrap &GetWXCoreFlexWrap(const std::string &value) {
     if (value == NOWRAP) {
       return WeexCore::kNoWrap;
     } else if (value == WRAP) {
@@ -57,7 +57,7 @@ namespace WeexCore {
     return WeexCore::kNoWrap;
   }
 
-  WXCoreAlignSelf GetWXCoreAlignSelf(const std::string &value) {
+  const WXCoreAlignSelf &GetWXCoreAlignSelf(const std::string &value) {
     if (value == AUTO) {
       return WeexCore::kAlignSelfAuto;
     } else if (value == STRETCH) {
@@ -72,7 +72,7 @@ namespace WeexCore {
     return WeexCore::kAlignSelfAuto;
   }
 
-  WXCorePositionType GetWXCorePositionType(const std::string &value) {
+  const WXCorePositionType &GetWXCorePositionType(const std::string &value) {
     auto ret = kRelative;
     if (value == RELATIVE) {
       ret = kRelative;

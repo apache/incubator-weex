@@ -25,29 +25,29 @@ namespace WeexCore {
     return mPlatformName == OS_iOS;
   }
 
-  bool WXCoreEnvironment::SetDeviceWidth(std::string width) {
+  bool WXCoreEnvironment::SetDeviceWidth(const std::string &width) {
     if (width.empty())
       return false;
     mDeviceWidth = atof(width.c_str());
     return true;
   }
 
-  bool WXCoreEnvironment::SetDeviceHeight(std::string height) {
+  bool WXCoreEnvironment::SetDeviceHeight(const std::string &height) {
     if (height.empty())
       return false;
     mDeviceHeight = atof(height.c_str());
     return true;
   }
 
-  float WXCoreEnvironment::DeviceWidth() {
+  const float &WXCoreEnvironment::DeviceWidth() {
     return mDeviceWidth;
   }
 
-  float WXCoreEnvironment::DeviceHeight() {
+  const float &WXCoreEnvironment::DeviceHeight() {
     return mDeviceHeight;
   }
 
-  std::string WXCoreEnvironment::GetOption(std::string key) {
+  const std::string &WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
     if (iter != mOptions.end()) {
       return iter->second;
@@ -56,7 +56,7 @@ namespace WeexCore {
     }
   }
 
-  std::string WXCoreEnvironment::AddOption(std::string key, std::string value) {
+  void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
   }
 }

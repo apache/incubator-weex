@@ -319,7 +319,7 @@ namespace WeexCore {
       }
     }
 
-    float firstLineCrossSize() const {
+    float &firstLineCrossSize() const {
       float sum = sumPaddingBorderAlongAxis(this, !isMainAxisHorizontal(this));
       if (!mFlexLines.empty()) {
         sum += mFlexLines[0]->mCrossSize;
@@ -327,7 +327,7 @@ namespace WeexCore {
       return sum;
     }
 
-    float getSumOfCrossSize() const {
+    float &getSumOfCrossSize() const {
       float sum = sumPaddingBorderAlongAxis(this, !isMainAxisHorizontal(this));
       for (WXCoreFlexLine *flexLine: mFlexLines) {
         sum += flexLine->mCrossSize;
@@ -345,7 +345,7 @@ namespace WeexCore {
                                         : widthMeasureMode == kExactly;
     }
 
-    float sumPaddingBorderAlongAxis(const WXCoreLayoutNode* const node, bool horizontal) const {
+    float &sumPaddingBorderAlongAxis(const WXCoreLayoutNode* const node, bool horizontal) const {
       float paddingBorderAlongAxis;
       if (horizontal) {
         paddingBorderAlongAxis =
@@ -363,11 +363,11 @@ namespace WeexCore {
       return paddingBorderAlongAxis;
     }
 
-    bool isWrapRequired(const float mainSize, const float currentLength, const float childLength) const {
+    bool isWrapRequired(const float &mainSize, const float &currentLength, const float &childLength) const {
       return !isSingleFlexLine(mainSize) && mainSize < currentLength + childLength;
     }
 
-    bool isSingleFlexLine(const float mainSize) const {
+    bool isSingleFlexLine(const float &mainSize) const {
       return mCssStyle->mFlexWrap == kNoWrap || isnan(mainSize);
     }
 
@@ -620,7 +620,7 @@ namespace WeexCore {
       return mCssStyle->mMargin.getMargin(kMarginRight);
     }
 
-    void setMargin(const WXCoreMarginEdge edge, const float margin) {
+    void setMargin(const WXCoreMarginEdge &edge, const float margin) {
       if (mCssStyle->mMargin.setMargin(edge, margin)) {
         markDirty();
       }
@@ -644,7 +644,7 @@ namespace WeexCore {
       return mCssStyle->mPadding.getPadding(kPaddingBottom);
     }
 
-    void setPadding(const WXCorePaddingEdge edge, const float padding) {
+    void setPadding(const WXCorePaddingEdge &edge, const float padding) {
       if (mCssStyle->mPadding.setPadding(edge, padding)) {
         markDirty();
       }
@@ -669,7 +669,7 @@ namespace WeexCore {
       return mCssStyle->mBorderWidth.getBorderWidth(kBorderWidthBottom);
     }
 
-    void setBorderWidth(const WXCoreBorderWidthEdge edge, const float borderWidth) {
+    void setBorderWidth(const WXCoreBorderWidthEdge &edge, const float borderWidth) {
       if (mCssStyle->mBorderWidth.setBorderWidth(edge, borderWidth)) {
         markDirty();
       }
@@ -708,7 +708,7 @@ namespace WeexCore {
       return mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
     }
 
-    void setStylePosition(const WXCorePositionEdge edge, const float positionRight) {
+    void setStylePosition(const WXCorePositionEdge &edge, const float positionRight) {
       if (mCssStyle->mStylePosition.setPosition(edge, positionRight))
         markDirty();
     }
