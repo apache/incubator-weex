@@ -1695,9 +1695,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders) {
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
@@ -1713,10 +1711,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               .append(", componentType:").append(componentType).append(", ref:").append(ref)
               .append(", styles:").append(styles)
               .append(", attributes:").append(attributes)
-              .append(", events:").append(events)
-              .append(", paddings:").append(paddings)
-              .append(", margins:").append(margins)
-              .append(", borders:").append(borders);
+              .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -1728,7 +1723,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final BasicGraphicAction action = new GraphicActionCreateBody(pageId, ref, componentType,
-                styles, attributes, events, paddings, margins, borders);
+                styles, attributes, events);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -1743,9 +1738,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders) {
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callAddElement: call CreateBody tasks is null");
@@ -1762,10 +1755,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               .append(", parentRef:").append(parentRef)
               .append(", styles:").append(styles)
               .append(", attributes:").append(attributes)
-              .append(", events:").append(events)
-              .append(", paddings:").append(paddings)
-              .append(", margins:").append(margins)
-              .append(", borders:").append(borders);
+              .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
@@ -1777,7 +1767,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final BasicGraphicAction action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
-                styles, attributes, events, paddings, margins, borders);
+                styles, attributes, events);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {

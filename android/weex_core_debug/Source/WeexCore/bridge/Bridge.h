@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <WeexCore/layout/WXCoreStyle.h>
 
 namespace WeexCore {
 
@@ -45,9 +46,9 @@ namespace WeexCore {
                    std::map<std::string, std::string> *styles,
                    std::map<std::string, std::string> *attributes,
                    std::set<std::string> *events,
-                   std::map<std::string, std::string> *paddings,
-                   std::map<std::string, std::string> *margins,
-                   std::map<std::string, std::string> *borders) = 0;
+                   WXCorePadding paddings,
+                   WXCoreMargin margins,
+                   WXCoreBorderWidth borders) = 0;
 
     virtual int
     callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
@@ -56,9 +57,9 @@ namespace WeexCore {
                    std::map<std::string, std::string> *styles,
                    std::map<std::string, std::string> *attributes,
                    std::set<std::string> *events,
-                   std::map<std::string, std::string> *paddings,
-                   std::map<std::string, std::string> *margins,
-                   std::map<std::string, std::string> *borders) = 0;
+                   WXCorePadding paddings,
+                   WXCoreMargin margins,
+                   WXCoreBorderWidth borders) = 0;
 
     virtual int callLayout(std::string &pageId, std::string &ref,
                            int top, int bottom, int left, int right,
