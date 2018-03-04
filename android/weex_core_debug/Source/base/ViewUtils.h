@@ -5,11 +5,42 @@
 #include <cmath>
 
 namespace WeexCore {
+
   const std::string WX("wx");
   const std::string PX("px");
   const std::string UNDEFINE("undefined");
   const std::string SCALE("scale");
   const std::string AUTO_UNIT("auto");
+  const std::string NONE("none");
+
+  inline std::string &Trim(std::string &s) {
+    if (s.empty()) {
+      return s;
+    }
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+  }
+
+  inline bool AllisNum(std::string str) {
+    bool point = false;
+    for (int i = 0; i < str.size(); i++) {
+      int tmp = (int) str[i];
+      if (tmp == 46) {
+        if (!point) {
+          point = true;
+          continue;
+        } else {
+          return false;
+        }
+      } else if (tmp >= 48 && tmp <= 57) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
 
   inline float getFloat(const float &src, const float &viewport) {
     if (isnan(src))
@@ -25,6 +56,7 @@ namespace WeexCore {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
+        || NONE == src
         || src.empty()) {
       return ret;
     }
@@ -47,16 +79,20 @@ namespace WeexCore {
     return density * f * viewport / WXCoreEnvironment::getInstance()->DeviceWidth();
   }
 
-  inline static float getFloatByViewport(const std::string &src, const float &viewport) {
+  inline static float getFloatByViewport(std::string src, const float &viewport) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
+        || NONE == src
         || src.empty()) {
-    } else if (endWidth(src, WX)) {
+      return ret;
+    }
+    Trim(src);
+    if (endWidth(src, WX)) {
       ret = getFloat(transferWx(src, viewport), viewport);
     } else if (endWidth(src, PX)) {
       ret = getFloat(src.substr(0, src.size() - PX.size()), viewport);
-    } else {
+    } else if (AllisNum(src)) {
       ret = getFloat(src, viewport);
     }
     return ret;
