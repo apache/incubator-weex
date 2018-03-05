@@ -205,7 +205,8 @@ WX_EXPORT_METHOD(@selector(goForward))
     [_jsContext evaluateScript:code];
 }
 
-- (void)postMessage:(NSDictionary *)data {
+- (void)postMessage:(NSDictionary *)data
+{
     NSDictionary *eventDict = @{ @"data" : data };
     NSString *json = [WXUtility JSONString:eventDict];
     NSString *code = [NSString stringWithFormat:@"(function (){document.dispatchEvent(new MessageEvent('message', %@));}())",json];
