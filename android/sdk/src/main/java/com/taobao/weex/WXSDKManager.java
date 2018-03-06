@@ -79,7 +79,7 @@ public class WXSDKManager {
   private IWXHttpAdapter mIWXHttpAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
   private IWXAccessibilityRoleAdapter mRoleAdapter;
-  private IWXAnalyzer mWXAnalyzer;
+  private List<IWXAnalyzer> mWXAnalyzerList;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -351,12 +351,14 @@ public class WXSDKManager {
     return mIWXSoLoaderAdapter;
   }
 
-  public IWXAnalyzer getWXAnalyzer(){
-    return mWXAnalyzer;
+  public List<IWXAnalyzer> getWXAnalyzer(){
+    return mWXAnalyzerList;
   }
 
   public void setWXAnalyzer(IWXAnalyzer analyzer){
-    this.mWXAnalyzer = analyzer;
+    if (!mWXAnalyzerList.contains(analyzer)) {
+      mWXAnalyzerList.add(analyzer);
+    }
   }
 
   void setInitConfig(InitConfig config){
@@ -369,7 +371,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
-    this.mWXAnalyzer = config.getWxAnalyzer();
+    this.mWXAnalyzerList = config.getWxAnalyzer();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

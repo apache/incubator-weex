@@ -25,6 +25,7 @@ import com.taobao.weex.common.WXPerformance;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,8 +43,8 @@ public class WXAnalyzerDataTransfer {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
-    if (null == transfer) {
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    if (null == transferList || transferList.size() == 0) {
       return;
     }
 
@@ -73,15 +74,17 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
+    }
   }
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
-    if (null == transfer) {
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    if (null == transferList || transferList.size() == 0) {
       return;
     }
 
@@ -102,15 +105,17 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
+    }
   }
 
   public static void transferFps(long fps) {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    IWXAnalyzer transfer = WXSDKManager.getInstance().getWXAnalyzer();
-    if (null == transfer) {
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    if (null == transferList || transferList.size() == 0) {
       return;
     }
     String data = "";
@@ -119,7 +124,9 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
+    }
   }
 
 //  @Override
