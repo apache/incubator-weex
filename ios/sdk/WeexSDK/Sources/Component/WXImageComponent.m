@@ -30,6 +30,8 @@
 #import "WXSDKEngine.h"
 #import "WXUtility.h"
 #import "WXAssert.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
 #import <pthread/pthread.h>
 
 @interface WXImageView : UIImageView
@@ -64,6 +66,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 @property (nonatomic, strong) id<WXImageOperationProtocol> placeholderOperation;
 @property (nonatomic) BOOL imageLoadEvent;
 @property (nonatomic) BOOL imageDownloadFinish;
+@property (nonatomic) BOOL downloadImageWithURL;
 
 @end
 
@@ -100,6 +103,14 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         if (attributes[@"quality"]) {
             _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        }
+        id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        _downloadImageWithURL = YES;
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            _downloadImageWithURL = [configCenter configForKey:@"iOS_weex_ext_config.downloadImageWithURL" defaultValue:@(YES) isDefault:NULL];
+        }
+        if (attributes[@"compositing"]) {
+            _downloadImageWithURL = [WXConvert BOOL:attributes[@"compositing"]];
         }
         
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
@@ -352,27 +363,55 @@ WX_EXPORT_METHOD(@selector(save:))
 - (void)updateImage
 {
     __weak typeof(self) weakSelf = self;
-    dispatch_async(WXImageUpdateQueue, ^{
-         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf cancelImage];
-       
-        void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
-            weakSelf.imageDownloadFinish = YES;
-            WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
-        };
-        
-        [strongSelf updatePlaceHolderWithFailedBlock:downloadFailed];
-        [strongSelf updateContentImageWithFailedBlock:downloadFailed];
-        
-        if (!strongSelf.imageSrc && !strongSelf.placeholdSrc) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-               
-                strongSelf.layer.contents = nil;
-                strongSelf.imageDownloadFinish = YES;
-                [strongSelf readyToRender];
-            });
+    if (_downloadImageWithURL && [[self imageLoader] respondsToSelector:@selector(setImageViewWithURL:url:placeholderImage:options:progress:completed:)]) {
+        NSString *newURL = nil;
+        if (self.placeholdSrc) {
+            newURL = [self.placeholdSrc copy];
+            WX_REWRITE_URL([self placeholdSrc], WXResourceTypeImage, self.weexInstance)
+            [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:nil progress:nil completed:nil];
         }
-    });
+        newURL = [[self imageSrc] copy];
+        WX_REWRITE_URL([self imageSrc], WXResourceTypeImage, self.weexInstance)
+        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
+        [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            // progress when loading image
+        } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
+            __strong typeof(weakSelf) strongSelf =  weakSelf;
+            if (strongSelf.imageLoadEvent) {
+                NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                sizeDict[@"naturalWidth"] = @0;
+                sizeDict[@"naturalHeight"] = @0;
+                if (!error) {
+                    sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                    sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                } else {
+                    [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
+                }
+                [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+            }
+        }];
+    } else {
+        dispatch_async(WXImageUpdateQueue, ^{
+             __strong typeof(weakSelf) strongSelf = weakSelf;
+            [strongSelf cancelImage];
+
+            void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
+                weakSelf.imageDownloadFinish = YES;
+                WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
+            };
+
+            [strongSelf updatePlaceHolderWithFailedBlock:downloadFailed];
+            [strongSelf updateContentImageWithFailedBlock:downloadFailed];
+
+            if (!strongSelf.imageSrc && !strongSelf.placeholdSrc) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    strongSelf.layer.contents = nil;
+                    strongSelf.imageDownloadFinish = YES;
+                    [strongSelf readyToRender];
+                });
+            }
+        });
+    }
 }
 
 - (void)updatePlaceHolderWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock

@@ -60,4 +60,22 @@
     }];
 }
 
+- (void)setImageViewWithURL:(UIImageView *)imageView url:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(NSDictionary *)options progress:(void (^)(NSInteger, NSInteger))progressBlock completed:(void (^)(UIImage *, NSError *, WXImageLoaderCacheType, NSURL *))completedBlock
+{
+    SDWebImageOptions sdWebimageOption = SDWebImageRetryFailed;
+    if (options && options[@"sdWebimageOption"]) {
+        [options[@"sdWebimageOption"] intValue];
+    }
+    
+    [imageView sd_setImageWithURL:url placeholderImage:placeholder options:sdWebimageOption progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        if (progressBlock) {
+            progressBlock(receivedSize, expectedSize);
+        }
+    } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        if (completedBlock) {
+            completedBlock(image, error, (WXImageLoaderCacheType)cacheType, imageURL);
+        }
+    }];
+}
+
 @end
