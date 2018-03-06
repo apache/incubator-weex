@@ -17,9 +17,9 @@ namespace WeexCore {
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
-    WXCorePadding mPaddings;
-    WXCoreMargin mMargins;
-    WXCoreBorderWidth mBorders;
+    PaddingsMap *mPaddings;
+    MarginsMap *mMargins;
+    BordersMap *mBorders;
     std::string mPageId;
     std::string mComponentType;
     std::string mParentRef;

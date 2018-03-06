@@ -39,7 +39,10 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
                                  int index,
                                  Map<String, String> style,
                                  Map<String, String> attributes,
-                                 Set<String> events) {
+                                 Set<String> events,
+                                 HashMap<String, String> paddings,
+                                 HashMap<String, String> margins,
+                                 HashMap<String, String> borders) {
     super(pageId, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;
@@ -47,6 +50,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.mStyle = style;
     this.mAttributes = attributes;
     this.mEvents = events;
+    this.mPaddings = paddings;
+    this.mMargins = margins;
+    this.mBorders = borders;
 
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
     if (instance == null || instance.getContext() == null) {

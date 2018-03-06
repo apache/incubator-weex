@@ -186,21 +186,21 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
 
     }
 
-  @Override
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float arr1, float arr2, float arr3, float arr4, float arr5, float arr6, float arr7, float arr8, float arr9, float arr10, float arr11, float arr12) {
-    if (!mInit || mJsManager == null)
-      return IWXBridge.INSTANCE_RENDERING_ERROR ;
-    mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events);
-    return IWXBridge.INSTANCE_RENDERING;
-  }
+    @Override
+    public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events, paddings, margins, borders);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
 
-  @Override
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float arr1, float arr2, float arr3, float arr4, float arr5, float arr6, float arr7, float arr8, float arr9, float arr10, float arr11, float arr12) {
-    if (!mInit || mJsManager == null)
-      return IWXBridge.INSTANCE_RENDERING_ERROR ;
-    mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef, styles, attributes, events);
-    return IWXBridge.INSTANCE_RENDERING;
-  }
+    @Override
+    public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+      if (!mInit || mJsManager == null)
+        return IWXBridge.INSTANCE_RENDERING_ERROR ;
+      mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef, styles, attributes, events, paddings, margins, borders);
+      return IWXBridge.INSTANCE_RENDERING;
+    }
 
   @Override
   public int callRemoveElement(String instanceId, String ref) {

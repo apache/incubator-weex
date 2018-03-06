@@ -626,10 +626,6 @@ namespace WeexCore {
       }
     }
 
-    inline WXCoreMargin GetMargin() const {
-      return mCssStyle->mMargin;
-    }
-
     /** ================================ padding =================================== **/
 
     inline float getPaddingLeft() const {
@@ -652,10 +648,6 @@ namespace WeexCore {
       if (mCssStyle->mPadding.setPadding(edge, padding)) {
         markDirty();
       }
-    }
-
-    inline WXCorePadding GetPadding() const {
-      return mCssStyle->mPadding;
     }
 
 
@@ -681,10 +673,6 @@ namespace WeexCore {
       if (mCssStyle->mBorderWidth.setBorderWidth(edge, borderWidth)) {
         markDirty();
       }
-    }
-
-    inline WXCoreBorderWidth GetBorderWidth() const {
-      return mCssStyle->mBorderWidth;
     }
 
 

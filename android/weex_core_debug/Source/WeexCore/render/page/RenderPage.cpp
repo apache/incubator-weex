@@ -81,14 +81,14 @@ namespace WeexCore {
         switch (render_root->getFlexDirection()) {
           case kFlexDirectionColumn:
           case kFlexDirectionColumnReverse:
-            if (render_root->getLargestMainSize() * radio > deviceHeight / 3) {
+            if (render_root->getLargestMainSize() * radio > deviceHeight / 2) {
               TraverseTree(render_root);
             }
             break;
           case kFlexDirectionRow:
           case kFlexDirectionRowReverse:
           default:
-            if (render_root->getLargestMainSize() * radio > deviceWidth / 3) {
+            if (render_root->getLargestMainSize() * radio > deviceWidth / 2) {
               TraverseTree(render_root);
             }
             break;

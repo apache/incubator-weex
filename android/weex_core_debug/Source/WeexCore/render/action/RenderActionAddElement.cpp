@@ -7,9 +7,9 @@ namespace WeexCore {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
-    this->mPaddings = render->GetPadding();
-    this->mMargins = render->GetMargin();
-    this->mBorders = render->GetBorderWidth();
+    this->mPaddings = render->Paddings();
+    this->mMargins = render->Margins();
+    this->mBorders = render->Borders();
     this->mPageId = pageId;
     this->mComponentType = render->Type();
     this->mRef = render->Ref();

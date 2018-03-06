@@ -309,15 +309,14 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float marginTop, float marginBottom, float marginLeft, float marginRight,
-                                      float paddingTop, float paddingBottom, float paddingLeft, float paddingRight,
-                                      float borderTop, float borderBottom, float borderLeft, float borderRight) {
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     WXLogUtils.logOfFirstScreen("start callCreateBodyByWeexCore");
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref,
-              styles, attributes, events);
+              styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -331,14 +330,13 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float marginTop, float marginBottom, float marginLeft, float marginRight,
-                                      float paddingTop, float paddingBottom, float paddingLeft, float paddingRight,
-                                      float borderTop, float borderBottom, float borderLeft, float borderRight) {
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
-              styles, attributes, events);
+              styles, attributes, events, paddings, margins, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {

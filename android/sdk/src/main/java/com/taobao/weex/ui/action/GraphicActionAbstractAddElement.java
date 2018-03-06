@@ -36,6 +36,9 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   protected Map<String, String> mStyle;
   protected Map<String, String> mAttributes;
   protected Set<String> mEvents;
+  protected HashMap<String, String> mPaddings;
+  protected HashMap<String, String> mMargins;
+  protected HashMap<String, String> mBorders;
 
   public GraphicActionAbstractAddElement(String pageId, String ref) {
     super(pageId, ref);
@@ -46,9 +49,9 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
       basicComponentData.addStyle(mStyle);
       basicComponentData.addAttr(mAttributes);
       basicComponentData.addEvent(mEvents);
-//      basicComponentData.addShorthand(mPaddings);
-//      basicComponentData.addShorthand(mMargins);
-//      basicComponentData.addShorthand(mBorders);
+      basicComponentData.addShorthand(mPaddings);
+      basicComponentData.addShorthand(mMargins);
+      basicComponentData.addShorthand(mBorders);
     }
 
     WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
@@ -79,5 +82,17 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
 
   public Set<String> getEvents() {
     return mEvents;
+  }
+
+  public HashMap<String, String> getPaddings() {
+    return mPaddings;
+  }
+
+  public HashMap<String, String> getMargins() {
+    return mMargins;
+  }
+
+  public HashMap<String, String> getBorders() {
+    return mBorders;
   }
 }

@@ -13,6 +13,9 @@ namespace WeexCore {
   RenderObject::RenderObject() {
     mStyles = new StylesMap();
     mAttributes = new AttributesMap();
+    mPaddings = new PaddingsMap();
+    mMargins = new MarginsMap();
+    mBorders = new BordersMap();
     mEvents = new EventsSet();
     mComponent_Impl_Android = nullptr;
     mMeasureFunc_Impl_Android = nullptr;
