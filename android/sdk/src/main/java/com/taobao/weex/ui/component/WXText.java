@@ -80,6 +80,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component(lazyload = false)
 public class WXText extends WXComponent<WXTextView> implements FlatComponent<TextWidget> {
 
+  private static final Canvas DUMMY_CANVAS = new Canvas();
   private TextWidget mTextWidget;
 
   /**
@@ -147,7 +148,6 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
         }
       }
 
-      private final Canvas DUMMY_CANVAS = new Canvas();
       private static final String ELLIPSIS = "\u2026";
       private boolean mIsColorSet = false;
       private boolean hasBeenMeasured = false;

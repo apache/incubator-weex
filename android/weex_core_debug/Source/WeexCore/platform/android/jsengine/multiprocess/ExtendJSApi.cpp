@@ -336,7 +336,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
   jbyteArray jTaskString = getArgumentAsJByteArray(env, arguments, 1);
   jstring jCallback = getArgumentAsJString(env, arguments, 2);
 
-  std::string pageId = jString2Str(env, jInstanceId);
+  std::string pageId = jString2StrFast(env, jInstanceId);
   std::string task = jByteArray2Str(env, jTaskString);
 
 #if JSAPI_LOG

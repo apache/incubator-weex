@@ -47,11 +47,11 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "SetStyleWidth=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -68,11 +68,11 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "SetStyleHeight=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -88,11 +88,11 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "SetMargin=" + std::to_string(value);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -117,11 +117,11 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "SetPadding=" + std::to_string(value);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -147,11 +147,11 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 //    std::string mMessage = "SetPosition=" + std::to_string(value);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -171,7 +171,7 @@ static void CalculateLayout(JNIEnv *env, jobject jcaller,
                             jstring ref) {
 //    std::string mMessage = "CalculateLayout=" + jString2Str(env, instanceId);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
@@ -189,8 +189,8 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
 static void nativeSetViewPortWidth(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jfloat value) {
-  LOGE("nativeSetViewPortWidth，key: %s, value: %f", jString2Str(env, instanceId).c_str(), value);
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  LOGE("nativeSetViewPortWidth，key: %s, value: %f", jString2StrFast(env, instanceId).c_str(), value);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
@@ -222,7 +222,7 @@ static void TakeHeapSnapshot(JNIEnv *env,
 static void OnVsync(JNIEnv *env,
                     jobject object,
                     jstring jinstanceId) {
-  RenderManager::GetInstance()->Batch(jString2Str(env, jinstanceId));
+  RenderManager::GetInstance()->Batch(jString2StrFast(env, jinstanceId));
 }
 
 /**

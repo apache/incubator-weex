@@ -21,11 +21,11 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
   if (component == nullptr)
     return;
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -34,14 +34,14 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller,
                             jstring instanceId) {
-  RenderManager::GetInstance()->ClosePage(jString2Str(env, instanceId));
+  RenderManager::GetInstance()->ClosePage(jString2StrFast(env, instanceId));
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
                                                 jstring instanceId,
                                                 jfloat defaultWidth,
                                                 jfloat defaultHeight) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
@@ -50,7 +50,7 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
 
 static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
                                        jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return 0;
 
@@ -59,7 +59,7 @@ static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
 
 static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
                                   jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return 0;
 

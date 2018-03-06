@@ -44,6 +44,11 @@ static std::string jString2Str(JNIEnv *env, jstring jstr) {
   return stemp;
 }
 
+static std::string jString2StrFast(JNIEnv *env, jstring jstr){
+  const char *nativeString = env->GetStringUTFChars(jstr, JNI_FALSE);
+  return std::string(nativeString);
+}
+
 static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   char *rtn = NULL;
   jsize alen = env->GetArrayLength(barr);

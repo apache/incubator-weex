@@ -22,11 +22,11 @@ static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller,
   if (contentBoxMeasurement == nullptr)
     return;
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2Str(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2Str(env, ref));
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
