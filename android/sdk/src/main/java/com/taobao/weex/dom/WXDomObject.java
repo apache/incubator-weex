@@ -828,6 +828,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     if(updates == null){
       return  false;
     }
+    /**
     Set<Map.Entry<String,Object>> entries = updates.entrySet();
     Iterator<Map.Entry<String,Object>> it = entries.iterator();
     while (it.hasNext()){
@@ -844,7 +845,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
         it.remove();
         continue;
       }
-    }
+    }*/
     return updates.size() > 0;
   }
 
