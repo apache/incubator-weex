@@ -107,6 +107,7 @@ public class WXSDKManager {
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
     mWXWorkThreadManager = new WXWorkThreadManager();
+    mWXAnalyzerList = new ArrayList<>();
   }
 
   /**
@@ -371,7 +372,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
-    this.mWXAnalyzerList = config.getWxAnalyzer();
+    this.mWXAnalyzerList.addAll(config.getWxAnalyzer());
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

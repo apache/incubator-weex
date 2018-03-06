@@ -18,7 +18,6 @@ package com.taobao.weex.performance;
 
 
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.view.Choreographer;
 
@@ -26,6 +25,8 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXPerformance;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -90,7 +91,21 @@ public class FpsCollector {
       for (Map.Entry<String, IFPSCallBack> entry : mListenerMap.entrySet()) {
         entry.getValue().fps(mFrameCount);
       }
-      WXAnalyzerDataTransfer.transferFps(mFrameCount);
+      // WXAnalyzerDataTransfer.transferFps(mFrameCount);
+
+      List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+      if (null == transferList || transferList.size() == 0) {
+        return;
+      }
+
+      for (IWXAnalyzer transfer : transferList) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("group", "WXAnalyzer");
+        params.put("module", "WXPerformance");
+        params.put("type", "fps");
+        params.put("fps", mFrameCount);
+        transfer.transfer(params);
+      }
 
       mTimeBegin = 0;
       mFrameCount = 0;

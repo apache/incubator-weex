@@ -17,6 +17,8 @@
 package com.taobao.weex.performance;
 
 
+import java.util.HashMap;
+
 /**
  * @author zhongcang
  * @date 2018/2/28
@@ -24,12 +26,5 @@ package com.taobao.weex.performance;
 
 public interface IWXAnalyzer {
 
-  /**
-   *
-   * @param group   dataGroup
-   * @param module  dataModule in group
-   * @param type    dataType
-   * @param data   data (json)
-   */
-  void transfer(String group, String module, String type, String data);
+  void transfer(HashMap<String, Object> params);
 }

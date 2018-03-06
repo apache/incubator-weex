@@ -74,9 +74,9 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    for (IWXAnalyzer transfer : transferList) {
-      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
-    }
+//    for (IWXAnalyzer transfer : transferList) {
+//      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
+//    }
   }
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
@@ -105,9 +105,9 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    for (IWXAnalyzer transfer : transferList) {
-      transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
-    }
+//    for (IWXAnalyzer transfer : transferList) {
+//      transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
+//    }
   }
 
   public static void transferFps(long fps) {
@@ -124,9 +124,9 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    for (IWXAnalyzer transfer : transferList) {
-      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
-    }
+//    for (IWXAnalyzer transfer : transferList) {
+//      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
+//    }
   }
 
 //  @Override
