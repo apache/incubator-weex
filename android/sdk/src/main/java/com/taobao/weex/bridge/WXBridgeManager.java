@@ -157,6 +157,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * Whether JS Framework(main.js) has been initialized.
    */
   private volatile static boolean mInit = false;
+  private static Map<String, String> mWeexCoreEnvOptions = new HashMap<>();
+
   /**
    * package
    **/
@@ -207,6 +209,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void setJSFrameworkInit(boolean init) {
     mInit = init;
+    if (init == true) {
+      onJsFrameWorkInitSuccees();
+    }
   }
 
   private void initWXBridge(boolean remoteDebug) {
@@ -2022,6 +2027,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void registerCoreEnv(String key, String value) {
-    mWXBridge.registerCoreEnv(key, value);
+    if (isJSFrameworkInit())
+      mWXBridge.registerCoreEnv(key, value);
+    else
+      mWeexCoreEnvOptions.put(key, value);
+  }
+
+  private void onJsFrameWorkInitSuccees() {
+    for (Map.Entry<String, String> entry : mWeexCoreEnvOptions.entrySet()) {
+      mWXBridge.registerCoreEnv(entry.getKey(), entry.getValue());
+    }
+    mWeexCoreEnvOptions.clear();
   }
 }
