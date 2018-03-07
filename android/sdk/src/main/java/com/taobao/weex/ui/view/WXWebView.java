@@ -21,11 +21,19 @@ package com.taobao.weex.ui.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.JsPromptResult;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -36,7 +44,12 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.lang.ref.WeakReference;
 
 public class WXWebView implements IWebView {
 
@@ -44,10 +57,16 @@ public class WXWebView implements IWebView {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private boolean mShowLoading = true;
+    private Handler mMessageHandler;
+    private static final int POST_MESSAGE = 1;
+    private static final String BRIDGE_NAME = "__WEEX_WEB_VIEW_BRIDGE";
+    private static final int SDK_VERSION = Build.VERSION.SDK_INT;
+    // downgraded by CVE-2012-6636(https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2012-6636)
+    private static final boolean DOWNGRADE_JS_INTERFACE = SDK_VERSION < 17;
 
     private OnErrorListener mOnErrorListener;
     private OnPageListener mOnPageListener;
-
+    private OnMessageListener mOnMessageListener;
 
     public WXWebView(Context context) {
         mContext = context;
@@ -75,6 +94,9 @@ public class WXWebView implements IWebView {
         mProgressBar.setLayoutParams(pLayoutParams);
         pLayoutParams.gravity = Gravity.CENTER;
         root.addView(mProgressBar);
+
+        mMessageHandler = new MessageHandler(this);
+
         return root;
     }
 
@@ -92,6 +114,12 @@ public class WXWebView implements IWebView {
         if(getWebView() == null)
             return;
         getWebView().loadUrl(url);
+    }
+
+    @Override
+    public void loadDataWithBaseURL(String source, String baseUrl) {
+        if (mWebView == null) return;
+        mWebView.loadDataWithBaseURL(baseUrl, source, "text/html", "utf-8", null);
     }
 
     @Override
@@ -115,6 +143,30 @@ public class WXWebView implements IWebView {
         getWebView().goForward();
     }
 
+    @Override
+    public void postMessage(Object msg) {
+        if(getWebView() == null)
+            return;
+
+        try {
+            JSONObject jsonMsg = new JSONObject();
+            jsonMsg.put("data", msg);
+            evaluateJS("javascript:(function () {" +
+                "var event;" +
+                "var data = " + jsonMsg.toString() + ";" +
+                "try {" +
+                "event = new MessageEvent('message', data);" +
+                "} catch (e) {" +
+                "event = document.createEvent('MessageEvent');" +
+                "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
+                "}" +
+                "document.dispatchEvent(event);" +
+                "})();");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /*@Override
     public void setVisibility(int visibility) {
         if (mRootView != null) {
@@ -135,6 +187,11 @@ public class WXWebView implements IWebView {
     @Override
     public void setOnPageListener(OnPageListener listener) {
         mOnPageListener = listener;
+    }
+
+    @Override
+    public void setOnMessageListener(OnMessageListener listener) {
+        mOnMessageListener = listener;
     }
 
     private void showProgressBar(boolean shown) {
@@ -185,6 +242,13 @@ public class WXWebView implements IWebView {
                 if (mOnPageListener != null) {
                     mOnPageListener.onPageFinish(url, view.canGoBack(), view.canGoForward());
                 }
+                if (mOnMessageListener != null) {
+                    evaluateJS("javascript:(window.postMessage = function(data) {"
+                        + (DOWNGRADE_JS_INTERFACE
+                        ? "prompt('" + BRIDGE_NAME + "://postMessage?data=' + JSON.stringify(data))"
+                        : BRIDGE_NAME + ".postMessage(JSON.stringify(data));")
+                        + "})");
+                }
             }
 
             @Override
@@ -211,7 +275,6 @@ public class WXWebView implements IWebView {
                     mOnErrorListener.onError("error", "ssl error");
                 }
             }
-
         });
         wv.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -230,7 +293,78 @@ public class WXWebView implements IWebView {
                 }
             }
 
+            @Override
+            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+                Uri uri = Uri.parse(message);
+                String scheme = uri.getScheme();
+                if (TextUtils.equals(scheme, BRIDGE_NAME)) {
+                    if (TextUtils.equals(uri.getAuthority(), "postMessage")) {
+                        String data = uri.getQueryParameter("data");
+                        onMessage(data);
+                        result.confirm("success");
+                    } else {
+                        result.confirm("fail");
+                    }
+                    return true;
+                }
+                return super.onJsPrompt(view, url, message, defaultValue, result);
+            }
         });
+        if (!DOWNGRADE_JS_INTERFACE) {
+            wv.addJavascriptInterface(new Object() {
+                @JavascriptInterface
+                public void postMessage(String data) {
+                    onMessage(data);
+                }
+            }, BRIDGE_NAME);
+        }
     }
 
+    private void onMessage(String data) {
+        if (data != null && mOnMessageListener != null) {
+            try {
+                Message message = new Message();
+                message.what = POST_MESSAGE;
+                message.obj = JSON.parse(data);
+                mMessageHandler.sendMessage(message);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    private void evaluateJS(String jsStr) {
+        if (SDK_VERSION < 19) {
+            mWebView.loadUrl(jsStr);
+        } else {
+            mWebView.evaluateJavascript(jsStr, new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                }
+            });
+        }
+    }
+
+    private static class MessageHandler extends Handler {
+        private final WeakReference<WXWebView> mWv;
+
+        private MessageHandler(WXWebView wv) {
+            mWv = new WeakReference<>(wv);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case POST_MESSAGE:
+                    if (mWv.get() != null && mWv.get().mOnMessageListener != null) {
+                        mWv.get().mOnMessageListener.onMessage(msg.obj);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

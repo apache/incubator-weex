@@ -29,7 +29,8 @@ public class WXWebViewModule extends WXModule{
     private enum Action {
         reload,
         goBack,
-        goForward
+        goForward,
+        postMessage
     }
 
     @JSMethod(uiThread = true)
@@ -47,15 +48,23 @@ public class WXWebViewModule extends WXModule{
         action(Action.reload, ref);
     }
 
-    private void action(Action action, String ref) {
+    @JSMethod(uiThread = true)
+    public void postMessage(String ref, Object msg) {
+        action(Action.postMessage, ref, msg);
+    }
 
+    private void action(Action action, String ref, Object data) {
         WXComponent webComponent =
-                WXSDKManager.getInstance()
-                        .getWXRenderManager()
-                        .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
+            WXSDKManager.getInstance()
+                .getWXRenderManager()
+                .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
         if(webComponent instanceof WXWeb) {
-            ((WXWeb) webComponent).setAction(action.name());
+            ((WXWeb) webComponent).setAction(action.name(), data);
         }
+    }
+
+    private void action(Action action, String ref) {
+        action(action, ref, null);
     }
 
 }
