@@ -6,9 +6,9 @@ namespace WeexCore {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
-    this->mPaddings = render->Paddings();
-    this->mMargins = render->Margins();
-    this->mBorders = render->Borders();
+    this->mMargins = render->GetMargins();
+    this->mPaddings = render->GetPaddings();
+    this->mBorders = render->GetBorders();
     this->mPageId = pageId;
     this->mComponentType = render->Type();
     this->mRef = render->Ref();
@@ -23,7 +23,7 @@ namespace WeexCore {
     Bridge_Impl_Android::getInstance()->callCreateBody(mPageId, mComponentType, mRef,
                                                        mStyles, mAttributes,
                                                        mEvents,
-                                                       mPaddings, mMargins, mBorders);
+                                                       mMargins, mPaddings, mBorders);
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddElementActionJNITime(getCurrentTime() - startTime);
   }

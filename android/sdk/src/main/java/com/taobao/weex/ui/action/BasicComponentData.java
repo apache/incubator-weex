@@ -89,8 +89,33 @@ public class BasicComponentData<T extends View> {
     mEvents.addAll(events);
   }
 
+  public final void addShorthand(float[] shorthand, CSSShorthand.TYPE type) {
+    if (shorthand.length == 4) {
+      switch (type) {
+        case MARGIN:
+          addMargin(CSSShorthand.EDGE.TOP, shorthand[0]);
+          addMargin(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
+          addMargin(CSSShorthand.EDGE.LEFT, shorthand[2]);
+          addMargin(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          break;
+        case PADDING:
+          addPadding(CSSShorthand.EDGE.TOP, shorthand[0]);
+          addPadding(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
+          addPadding(CSSShorthand.EDGE.LEFT, shorthand[2]);
+          addPadding(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          break;
+        case BORDER:
+          addBorder(CSSShorthand.EDGE.TOP, shorthand[0]);
+          addBorder(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
+          addBorder(CSSShorthand.EDGE.LEFT, shorthand[2]);
+          addBorder(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          break;
+      }
+    }
+  }
+
   public final void addShorthand(Map<String, String> shorthand) {
-    if (!shorthand.isEmpty()) {
+    if (shorthand != null && !shorthand.isEmpty()) {
       for (Map.Entry<String, String> item : shorthand.entrySet()) {
         String key = item.getKey();
         switch (key) {

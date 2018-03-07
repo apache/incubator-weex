@@ -4,6 +4,7 @@
 #include <base/TimeUtils.h>
 #include <WeexCore/platform/android/base/string/StringUtils.h>
 #include "WXBridge_Impl_Android.h"
+#include <WeexCore/layout/WXCoreStyle.h>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -43,6 +44,16 @@ namespace WeexCore {
   }
 
   Bridge_Impl_Android::~Bridge_Impl_Android() {
+  }
+
+  bool static FloatArrayAllZero(float *array, uint32_t length) {
+    bool flag = true;
+    for (uint32_t i = 0; i < length; ++i) {
+      if (array[i] != 0)
+        flag = false;
+        return flag;
+    }
+    return flag;
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
@@ -288,9 +299,9 @@ namespace WeexCore {
                                           std::map<std::string, std::string> *styles,
                                           std::map<std::string, std::string> *attributes,
                                           std::set<std::string> *events,
-                                          std::map<std::string, std::string> *paddings,
-                                          std::map<std::string, std::string> *margins,
-                                          std::map<std::string, std::string> *borders) {
+                                          const WXCoreMargin &margins,
+                                          const WXCorePadding &paddings,
+                                          const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -313,25 +324,44 @@ namespace WeexCore {
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
-    jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jBorders = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
     cpyCMap2JMap(styles, jStyles, env);
     cpyCMap2JMap(attributes, jAttributes, env);
     cpyCSet2JSet(events, jEvents, env);
-    cpyCMap2JMap(paddings, jPaddings, env);
-    cpyCMap2JMap(margins, jMargins, env);
-    cpyCMap2JMap(borders, jBorders, env);
 
     page->CreateJMapJNITime(getCurrentTime() - startTime);
+
+    float c_margins[4];
+    float c_paddings[4];
+    float c_borders[4];
+    jfloatArray jMargins = env->NewFloatArray(4);
+    jfloatArray jPaddings = env->NewFloatArray(4);
+    jfloatArray jBorders = env->NewFloatArray(4);
+
+    c_margins[0] = margins.getMargin(kMarginTop);
+    c_margins[1] = margins.getMargin(kMarginBottom);
+    c_margins[2] = margins.getMargin(kMarginLeft);
+    c_margins[3] = margins.getMargin(kMarginRight);
+    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
+
+    c_paddings[0] = paddings.getPadding(kPaddingTop);
+    c_paddings[1] = paddings.getPadding(kPaddingBottom);
+    c_paddings[2] = paddings.getPadding(kPaddingLeft);
+    c_paddings[3] = paddings.getPadding(kPaddingRight);
+    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
+
+    c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
+    c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
+    c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
+    c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
+    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
 
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallCreateBodyByWeexCoreMethodId == NULL)
       jCallCreateBodyByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                            "callCreateBodyByWeexCore",
-                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
@@ -341,7 +371,7 @@ namespace WeexCore {
     flag = env->CallIntMethod(jThis, jCallCreateBodyByWeexCoreMethodId, jPageId, jComponentType,
                               jRef, jStyles, jAttributes,
                               jEvents,
-                              jPaddings, jMargins, jBorders);
+                              jMargins, jPaddings, jBorders);
 
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
@@ -355,8 +385,8 @@ namespace WeexCore {
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
-    env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jMargins);
+    env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jBorders);
     return flag;
   }
@@ -367,9 +397,9 @@ namespace WeexCore {
                                           std::map<std::string, std::string> *styles,
                                           std::map<std::string, std::string> *attributes,
                                           std::set<std::string> *events,
-                                          std::map<std::string, std::string> *paddings,
-                                          std::map<std::string, std::string> *margins,
-                                          std::map<std::string, std::string> *borders) {
+                                          const WXCoreMargin &margins,
+                                          const WXCorePadding &paddings,
+                                          const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -392,25 +422,44 @@ namespace WeexCore {
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
-    jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jBorders = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
     cpyCMap2JMap(styles, jStyles, env);
     cpyCMap2JMap(attributes, jAttributes, env);
     cpyCSet2JSet(events, jEvents, env);
-    cpyCMap2JMap(paddings, jPaddings, env);
-    cpyCMap2JMap(margins, jMargins, env);
-    cpyCMap2JMap(borders, jBorders, env);
 
     page->CreateJMapJNITime(getCurrentTime() - startTime);
+
+    float c_margins[4];
+    float c_paddings[4];
+    float c_borders[4];
+    jfloatArray jMargins = env->NewFloatArray(4);
+    jfloatArray jPaddings = env->NewFloatArray(4);
+    jfloatArray jBorders = env->NewFloatArray(4);
+
+    c_margins[0] = margins.getMargin(kMarginTop);
+    c_margins[1] = margins.getMargin(kMarginBottom);
+    c_margins[2] = margins.getMargin(kMarginLeft);
+    c_margins[3] = margins.getMargin(kMarginRight);
+    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
+
+    c_paddings[0] = paddings.getPadding(kPaddingTop);
+    c_paddings[1] = paddings.getPadding(kPaddingBottom);
+    c_paddings[2] = paddings.getPadding(kPaddingLeft);
+    c_paddings[3] = paddings.getPadding(kPaddingRight);
+    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
+
+    c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
+    c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
+    c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
+    c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
+    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
 
     long long startTimeCallBridge = getCurrentTime();
 
     if (jCallAddElementByWeexCoreMethodId == NULL)
       jCallAddElementByWeexCoreMethodId = env->GetMethodID(jBridgeClazz,
                                                            "callAddElementByWeexCore",
-                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashMap;)I");
+                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
 
     jstring jPageId = env->NewStringUTF(pageId.c_str());
     jstring jComponentType = env->NewStringUTF(componentType.c_str());
@@ -420,7 +469,7 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementByWeexCoreMethodId, jPageId, jComponentType,
                               jRef, index, jParentRef,
-                              jStyles, jAttributes, jEvents, jPaddings, jMargins, jBorders);
+                              jStyles, jAttributes, jEvents, jMargins, jPaddings, jBorders);
 
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
@@ -435,8 +484,8 @@ namespace WeexCore {
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
-    env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jMargins);
+    env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jBorders);
     return flag;
   }

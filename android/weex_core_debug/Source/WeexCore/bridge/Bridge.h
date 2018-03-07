@@ -9,6 +9,12 @@
 
 namespace WeexCore {
 
+  class WXCoreMargin;
+
+  class WXCorePadding;
+
+  class WXCoreBorderWidth;
+
   class Bridge {
   public:
     virtual void setJSVersion(jstring &jversion) = 0;
@@ -45,9 +51,9 @@ namespace WeexCore {
                    std::map<std::string, std::string> *styles,
                    std::map<std::string, std::string> *attributes,
                    std::set<std::string> *events,
-                   std::map<std::string, std::string> *paddings,
-                   std::map<std::string, std::string> *margins,
-                   std::map<std::string, std::string> *borders) = 0;
+                   const WXCoreMargin &margins,
+                   const WXCorePadding &paddings,
+                   const WXCoreBorderWidth &borders) = 0;
 
     virtual int
     callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
@@ -56,9 +62,9 @@ namespace WeexCore {
                    std::map<std::string, std::string> *styles,
                    std::map<std::string, std::string> *attributes,
                    std::set<std::string> *events,
-                   std::map<std::string, std::string> *paddings,
-                   std::map<std::string, std::string> *margins,
-                   std::map<std::string, std::string> *borders) = 0;
+                   const WXCoreMargin &margins,
+                   const WXCorePadding &paddings,
+                   const WXCoreBorderWidth &borders) = 0;
 
     virtual int callLayout(std::string &pageId, std::string &ref,
                            int top, int bottom, int left, int right,

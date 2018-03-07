@@ -45,7 +45,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCoreMargin::getMargin(const WXCoreMarginEdge &edge) {
+  float WXCoreMargin::getMargin(const WXCoreMarginEdge &edge)const {
     float margin = 0;
     switch (edge) {
       case kMarginLeft:
@@ -109,7 +109,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCorePadding::getPadding(const WXCorePaddingEdge &edge) {
+  float WXCorePadding::getPadding(const WXCorePaddingEdge &edge)const {
     float padding = 0;
     switch (edge) {
       case kPaddingLeft:
@@ -173,7 +173,7 @@ namespace WeexCore {
     return dirty;
   }
 
-  float WXCoreBorderWidth::getBorderWidth(const WXCoreBorderWidthEdge &edge) {
+  float WXCoreBorderWidth::getBorderWidth(const WXCoreBorderWidthEdge &edge)const {
     float borderWidth = 0;
     switch (edge) {
       case kBorderWidthLeft:

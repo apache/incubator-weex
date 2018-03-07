@@ -42,16 +42,16 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
                                  Map<String, String> style,
                                  Map<String, String> attributes,
                                  Set<String> events,
-                                 HashMap<String, String> paddings,
-                                 HashMap<String, String> margins,
-                                 HashMap<String, String> borders) {
+                                 float[] margins,
+                                 float[] paddings,
+                                 float[] borders) {
     super(pageId, ref);
     this.mComponentType = componentType;
     this.mStyle = style;
     this.mAttributes = attributes;
     this.mEvents = events;
-    this.mPaddings = paddings;
     this.mMargins = margins;
+    this.mPaddings = paddings;
     this.mBorders = borders;
 
     instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());

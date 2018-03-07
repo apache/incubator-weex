@@ -34,7 +34,7 @@ namespace WeexCore {
 
     bool setMargin(const WXCoreMarginEdge &edge, float margin);
 
-    float getMargin(const WXCoreMarginEdge &edge);
+    float getMargin(const WXCoreMarginEdge &edge)const;
   };
 
 
@@ -63,7 +63,7 @@ namespace WeexCore {
 
     bool setPadding(const WXCorePaddingEdge &edge, float padding);
 
-    float getPadding(const WXCorePaddingEdge &edge);
+    float getPadding(const WXCorePaddingEdge &edge)const;
   };
 
 
@@ -92,7 +92,7 @@ namespace WeexCore {
 
     bool setBorderWidth(const WXCoreBorderWidthEdge &edge, float borderWidth);
 
-    float getBorderWidth(const WXCoreBorderWidthEdge &edge);
+    float getBorderWidth(const WXCoreBorderWidthEdge &edge)const;
   };
 
 

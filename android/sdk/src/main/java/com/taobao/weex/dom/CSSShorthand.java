@@ -29,6 +29,10 @@ public class CSSShorthand implements Cloneable {
     TOP, RIGHT, BOTTOM, LEFT, ALL;
   }
 
+  public static enum TYPE {
+    MARGIN, PADDING, BORDER;
+  }
+
   private final float[] values = new float[EDGE.values().length];
 
   public CSSShorthand() {

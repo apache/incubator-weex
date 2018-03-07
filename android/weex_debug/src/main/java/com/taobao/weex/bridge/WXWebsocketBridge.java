@@ -187,18 +187,18 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+    public int callCreateBodyByWeexCore(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
-        mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events, paddings, margins, borders);
+        mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events, margins, paddings, borders);
         return IWXBridge.INSTANCE_RENDERING;
     }
 
     @Override
-    public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+    public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
       if (!mInit || mJsManager == null)
         return IWXBridge.INSTANCE_RENDERING_ERROR ;
-      mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef, styles, attributes, events, paddings, margins, borders);
+      mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
       return IWXBridge.INSTANCE_RENDERING;
     }
 

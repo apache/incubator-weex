@@ -91,13 +91,11 @@ public interface IWXBridge extends IWXObject {
 
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders);
+                                      float[] margins, float[] paddings, float[] borders);
 
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders);
+                                      float[] margins, float[] paddings, float[] borders);
 
   int callRemoveElement(String instanceId, String ref);
 

@@ -309,14 +309,13 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders) {
+                                      float[] margins, float[] paddings, float[] borders) {
     WXLogUtils.logOfFirstScreen("start callCreateBodyByWeexCore");
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callCreateBodyByWeexCore(pageId, componentType, ref,
-              styles, attributes, events, paddings, margins, borders);
+              styles, attributes, events, margins, paddings, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -330,8 +329,7 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      HashMap<String, String> paddings, HashMap<String, String> margins,
-                                      HashMap<String, String> borders) {
+                                      float[] margins, float[] paddings, float[] borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {

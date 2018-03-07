@@ -40,9 +40,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
                                  Map<String, String> style,
                                  Map<String, String> attributes,
                                  Set<String> events,
-                                 HashMap<String, String> paddings,
-                                 HashMap<String, String> margins,
-                                 HashMap<String, String> borders) {
+                                 float[] margins,
+                                 float[] paddings,
+                                 float[] borders) {
     super(pageId, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;

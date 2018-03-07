@@ -73,9 +73,9 @@ namespace WeexCore {
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
-                       std::map<std::string, std::string> *paddings,
-                       std::map<std::string, std::string> *margins,
-                       std::map<std::string, std::string> *borders);
+                       const WXCoreMargin &margins,
+                       const WXCorePadding &paddings,
+                       const WXCoreBorderWidth &borders);
 
     int callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
                        int &index,
@@ -83,9 +83,9 @@ namespace WeexCore {
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
-                       std::map<std::string, std::string> *paddings,
-                       std::map<std::string, std::string> *margins,
-                       std::map<std::string, std::string> *borders);
+                       const WXCoreMargin &margins,
+                       const WXCorePadding &paddings,
+                       const WXCoreBorderWidth &borders);
 
     int callRemoveElement(std::string &pageId, std::string &ref);
 
