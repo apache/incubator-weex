@@ -26,5 +26,6 @@ import java.util.HashMap;
 
 public interface IWXAnalyzer {
 
-  void transfer(HashMap<String, Object> params);
+  void transfer(String group, String module, String type, String data);
+  void transfer2(HashMap<String, Object> params);
 }

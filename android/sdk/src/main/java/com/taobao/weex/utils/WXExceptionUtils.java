@@ -30,6 +30,7 @@ import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +108,7 @@ public class WXExceptionUtils {
 	  adapter.onJSException(exceptionCommit);
 	}
 
+	WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
     List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
     if (null == transferList || transferList.size() == 0) {
       return;
@@ -119,9 +121,8 @@ public class WXExceptionUtils {
       params.put("type", exceptionCommit.getErrCode().getErrorType().toString());
       params.put("instance", WXSDKManager.getInstance().getSDKInstance(instanceId));
       params.put("errorCode", exceptionCommit.getErrCode());
-      transfer.transfer(params);
+      transfer.transfer2(params);
     }
 
-      // WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
   }
 }

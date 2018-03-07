@@ -29,6 +29,7 @@ import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.performance.IWXAnalyzer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class InitConfig {
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
-  private List<IWXAnalyzer> mWxAnalyzerList;
+  private List<IWXAnalyzer> mWxAnalyzerList = new ArrayList<>();
   private String framework;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -103,7 +104,7 @@ public class InitConfig {
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
-    List<IWXAnalyzer> mWxAnalyzerList;
+    List<IWXAnalyzer> mWxAnalyzerList = new ArrayList<>();
     public Builder(){
 
     }

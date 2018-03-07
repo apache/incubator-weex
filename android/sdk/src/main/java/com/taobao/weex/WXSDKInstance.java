@@ -68,6 +68,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -891,6 +892,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
+
+      WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
       List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
       if (null == transferList || transferList.size() == 0) {
         return;
@@ -903,10 +906,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         params.put("type", "instance");
         params.put("instance", this);
         params.put("performance", mWXPerformance);
-        transfer.transfer(params);
+        transfer.transfer2(params);
       }
 
-      // WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
 
       isCommit=true;
     }

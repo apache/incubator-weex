@@ -22,6 +22,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONObject;
 
@@ -74,9 +75,10 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-//    for (IWXAnalyzer transfer : transferList) {
-//      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
-//    }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_PERFORMANCE + ",instance," + data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
+    }
   }
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
@@ -105,9 +107,10 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-//    for (IWXAnalyzer transfer : transferList) {
-//      transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
-//    }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_ERROR + ","+errorCode.getErrorType().toString()+"," + data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
+    }
   }
 
   public static void transferFps(long fps) {
@@ -124,13 +127,14 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-//    for (IWXAnalyzer transfer : transferList) {
-//      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
-//    }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_PERFORMANCE + ",fps," + data);
+    for (IWXAnalyzer transfer : transferList) {
+      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
+    }
   }
 
 //  @Override
-//  public void transfer(String tag, String module, String type, String data) {
+//  public void transfer2(String tag, String module, String type, String data) {
 //    WXLogUtils.d(tag, module + ":" + type + ":" + data);
 //  }
 }

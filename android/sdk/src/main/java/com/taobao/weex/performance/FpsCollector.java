@@ -91,7 +91,7 @@ public class FpsCollector {
       for (Map.Entry<String, IFPSCallBack> entry : mListenerMap.entrySet()) {
         entry.getValue().fps(mFrameCount);
       }
-      // WXAnalyzerDataTransfer.transferFps(mFrameCount);
+      WXAnalyzerDataTransfer.transferFps(mFrameCount);
 
       List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
       if (null == transferList || transferList.size() == 0) {
@@ -104,7 +104,7 @@ public class FpsCollector {
         params.put("module", "WXPerformance");
         params.put("type", "fps");
         params.put("fps", mFrameCount);
-        transfer.transfer(params);
+        transfer.transfer2(params);
       }
 
       mTimeBegin = 0;
