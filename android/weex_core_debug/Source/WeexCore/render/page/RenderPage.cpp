@@ -21,7 +21,6 @@
 
 namespace WeexCore {
 
-  static bool useVSync = false;
   static bool splitScreenRendering = true;
 
   RenderPage::RenderPage(std::string pageId) {
@@ -152,9 +151,7 @@ namespace WeexCore {
     BuildRenderTreeTime(getCurrentTime() - startTime);
     SendAddElementAction(child, parent, insertPosition);
 
-    if (!useVSync) {
-      CalculateLayout();
-    }
+    Batch();
     return true;
   }
 
@@ -269,8 +266,7 @@ namespace WeexCore {
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
     SendUpdateStyleAction(render, style, margin, padding, border);
-    if (!useVSync)
-      CalculateLayout();
+    Batch();
 
     if (style != nullptr) {
       for (int i = 0; i < style->size(); ++i) {
@@ -378,8 +374,7 @@ namespace WeexCore {
       render_root->setStyleHeight(defaultHeight);
     }
 
-    if (!useVSync)
-      CalculateLayout();
+    Batch();
   }
 
   bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
@@ -415,7 +410,11 @@ namespace WeexCore {
       return false;
     }
     mAlreadyCreateFinish = true;
-    TraverseTree(render_root);
+    if(isDirty()){
+      CalculateLayout();
+      needLayout.store(false);
+      updateDirty(false);
+    }
     SendCreateFinishAction();
     return true;
   }
@@ -585,8 +584,10 @@ namespace WeexCore {
   }
 
   void RenderPage::Batch() {
-    if (useVSync) {
+    if ((useVSync && needLayout.load()) || !useVSync) {
       CalculateLayout();
+      needLayout.store(false);
+      updateDirty(false);
     }
   }
 

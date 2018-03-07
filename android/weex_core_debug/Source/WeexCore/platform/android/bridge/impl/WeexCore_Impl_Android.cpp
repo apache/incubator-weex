@@ -219,12 +219,6 @@ static void TakeHeapSnapshot(JNIEnv *env,
                              jstring name) {
 }
 
-static void OnVsync(JNIEnv *env,
-                    jobject object,
-                    jstring jinstanceId) {
-  RenderManager::GetInstance()->Batch(jString2StrFast(env, jinstanceId));
-}
-
 /**
  * Called to execute JavaScript such as . createInstance(),destroyInstance ext.
  *

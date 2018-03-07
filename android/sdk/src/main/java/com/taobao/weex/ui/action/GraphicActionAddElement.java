@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.support.annotation.WorkerThread;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXTransition;
@@ -33,6 +36,8 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   private WXVContainer parent;
   private WXComponent child;
+  private GraphicPosition layoutPosition;
+  private GraphicSize layoutSize;
 
   public GraphicActionAddElement(String pageId, String ref,
                                  String componentType, String parentRef,
@@ -71,6 +76,18 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
   }
 
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
+  public void setSize(GraphicSize graphicSize){
+    this.layoutSize = graphicSize;
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
+  public void setPosition(GraphicPosition position){
+    this.layoutPosition = position;
+  }
+
   @Override
   public void executeAction() {
     try {
@@ -78,6 +95,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       parent.createChildViewAt(mIndex);
 
       long start = System.currentTimeMillis();
+      child.updateDemission(layoutSize, layoutPosition);
       child.applyLayoutAndEvent(child);
       WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);
 

@@ -52,6 +52,8 @@ namespace WeexCore {
     void PostRenderAction(RenderAction *action);
 
   public:
+    static constexpr bool useVSync = true;
+    std::atomic_bool needLayout{false};
     RenderPage(std::string pageId);
 
     ~RenderPage();
@@ -139,6 +141,14 @@ namespace WeexCore {
       this->mViewPortWidth = viewPortWidth;
     }
 
+    bool isDirty(){
+      return dirty;
+    }
+
+    void updateDirty(bool dirty){
+      this->dirty = dirty;
+    }
+
     // ****** Life Cycle ****** //
 
     void OnRenderPageInit();
@@ -159,6 +169,7 @@ namespace WeexCore {
     std::pair<float,float> renderPageSize;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
+    bool dirty = true;
   };
 }
 

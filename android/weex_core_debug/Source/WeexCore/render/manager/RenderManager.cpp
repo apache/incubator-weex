@@ -19,6 +19,7 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *root = Json2RenderObject(c_data, pageId);
+    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);
     return page->CreateRootRender(root);
@@ -45,6 +46,7 @@ namespace WeexCore {
     if (child == nullptr)
       return false;
 
+    page->updateDirty(true);
     return page->AddRenderObject(parentRef, index, child);
   }
 
@@ -59,6 +61,7 @@ namespace WeexCore {
          ref.c_str());
 #endif
 
+    page->updateDirty(true);
     return page->RemoveRenderObject(ref);
   }
 
@@ -74,6 +77,7 @@ namespace WeexCore {
          pageId.c_str(), ref.c_str(), parentRef.c_str(), index);
 #endif
 
+    page->updateDirty(true);
     return page->MoveRenderObject(ref, parentRef, index);
   }
 
@@ -91,6 +95,7 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     std::vector<std::pair<std::string, std::string> *> *attrs = Json2Pairs(c_data);
+    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);
     return page->UpdateAttr(ref, attrs);
@@ -110,6 +115,7 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     std::vector<std::pair<std::string, std::string> *> *styles = Json2Pairs(c_data);
+    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);
     return page->UpdateStyle(ref, styles);
@@ -126,6 +132,7 @@ namespace WeexCore {
          pageId.c_str(), ref.c_str(), event.c_str());
 #endif
 
+    page->updateDirty(true);
     return page->AddEvent(ref, event);
   }
 
@@ -140,6 +147,7 @@ namespace WeexCore {
          pageId.c_str(), ref.c_str(), event.c_str());
 #endif
 
+    page->updateDirty(true);
     return page->RemoveEvent(ref, event);
   }
 
@@ -152,6 +160,7 @@ namespace WeexCore {
     LOGD("[RenderManager] CreateFinish >>>> pageId: %s", pageId.c_str());
 #endif
 
+    page->updateDirty(true);
     return page->CreateFinish();
   }
 

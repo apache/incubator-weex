@@ -44,7 +44,7 @@ static std::string jString2Str(JNIEnv *env, jstring jstr) {
   return stemp;
 }
 
-static std::string jString2StrFast(JNIEnv *env, jstring jstr){
+static inline std::string jString2StrFast(JNIEnv *env, jstring jstr){
   const char *nativeString = env->GetStringUTFChars(jstr, JNI_FALSE);
   return std::string(nativeString);
 }
