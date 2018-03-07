@@ -49,6 +49,7 @@ public class WXAnalyzerDataTransfer {
       return;
     }
 
+
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (null == instance) {
       return;
