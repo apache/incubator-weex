@@ -102,9 +102,29 @@ WX_EXPORT_METHOD(@selector(goForward))
             [weakSelf fireEvent:@"notify" params:[data toDictionary]];
         }
     };
-    
-    _jsContext[@"postMessage"] = ^(JSValue *data){
-        [weakSelf fireEvent:@"message" params:[data toDictionary]];
+
+    //Weex catch postMessage event from web
+    _jsContext[@"postMessage"] = ^() {
+
+        NSArray *args = [JSContext currentArguments];
+
+        if (args && args.count < 2) {
+            return;
+        }
+
+        NSDictionary *data = [args[0] toDictionary];
+        NSString *origin = [args[1] toString];
+
+        if (data == nil) {
+            return;
+        }
+
+        NSDictionary *initDic = @{ @"type" : @"message",
+                                   @"data" : data,
+                                   @"origin" : origin
+        };
+
+        [weakSelf fireEvent:@"message" params:initDic];
     };
 
     if (_url) {
@@ -205,11 +225,27 @@ WX_EXPORT_METHOD(@selector(goForward))
     [_jsContext evaluateScript:code];
 }
 
-- (void)postMessage:(NSDictionary *)data
-{
-    NSDictionary *eventDict = @{ @"data" : data };
-    NSString *json = [WXUtility JSONString:eventDict];
-    NSString *code = [NSString stringWithFormat:@"(function (){document.dispatchEvent(new MessageEvent('message', %@));}())",json];
+// Weex postMessage to web
+- (void)postMessage:(NSDictionary *)data {
+    WXSDKInstance *instance = [WXSDKEngine topInstance];
+
+    NSMutableString *bundleUrlOrigin = @"";
+
+    if (instance.pageName) {
+        NSString *bundleUrl = [instance.scriptURL absoluteString];
+        NSURL *url = [NSURL URLWithString:bundleUrl];
+        bundleUrlOrigin = [NSString stringWithFormat:@"%@://%@%@", url.scheme, url.host, url.port ? [NSString stringWithFormat:@":%@", url.port] : @""];
+    }
+
+    NSDictionary *initDic = @{
+        @"type" : @"message",
+        @"data" : data,
+        @"origin" : bundleUrlOrigin
+    };
+
+    NSString *json = [WXUtility JSONString:initDic];
+
+    NSString *code = [NSString stringWithFormat:@"(function (){document.dispatchEvent(new MessageEvent('message', %@));}())", json];
     [_jsContext evaluateScript:code];
 }
 
