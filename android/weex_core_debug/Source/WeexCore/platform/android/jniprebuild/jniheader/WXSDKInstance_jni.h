@@ -24,9 +24,6 @@ jclass g_WXSDKInstance_clazz = NULL;
 
 }  // namespace
 
-static void NotifyLayout(JNIEnv* env, jobject jcaller,
-    jstring instanceId);
-
 static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jobject component,
@@ -51,11 +48,6 @@ static jint PrintRenderFinishTime(JNIEnv* env, jobject jcaller,
 // Step 3: RegisterNatives.
 
 static const JNINativeMethod kMethodsWXSDKInstance[] = {
-    { "nativeNotifyLayout",
-"("
-"Ljava/lang/String;"
-")"
-"V", reinterpret_cast<void*>(NotifyLayout) },
     { "nativeBindComponentToWXCore",
 "("
 "Ljava/lang/String;"

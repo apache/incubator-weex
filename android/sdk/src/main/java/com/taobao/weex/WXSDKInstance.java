@@ -29,8 +29,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
-import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -61,7 +59,6 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.tracing.WXTracing;
-import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -157,25 +154,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
-  private HashMap<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
-
-  @WorkerThread
-  @RestrictTo(Scope.LIBRARY)
-  public void addInActiveAddElementAction(String ref, GraphicActionAddElement action){
-    inactiveAddElementAction.put(ref, action);
-  }
-
-  @WorkerThread
-  @RestrictTo(Scope.LIBRARY)
-  public void removeInActiveAddElmentAction(String ref){
-    inactiveAddElementAction.remove(ref);
-  }
-
-  @WorkerThread
-  @RestrictTo(Scope.LIBRARY)
-  public GraphicActionAddElement getInActiveAddElementAction(String ref){
-    return inactiveAddElementAction.get(ref);
-  }
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -1777,10 +1755,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   @Override
   public void OnVSync() {
     // add vSync code for refresh
-    nativeNotifyLayout(getInstanceId());
-  }
 
-  public native void nativeNotifyLayout(String instanceId);
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        WXBridgeManager.getInstance().onVsync(getInstanceId());
+      }
+    });
+  }
 
   public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 

@@ -65,17 +65,3 @@ static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
 
   return page->PrintRenderSuccessLog();
 }
-
-static void NotifyLayout(JNIEnv* env, jobject jcaller,
-                         jstring instanceId){
-  std::string pageId = jString2StrFast(env, instanceId);
-  RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-  if(page != nullptr) {
-#if RENDER_LOG
-    LOGD("[JNI] NotifyLayout >>>> pageId: %s", pageId.c_str());
-#endif
-    if(!page->needLayout.load()) {
-      page->needLayout.store(true);
-    }
-  }
-}

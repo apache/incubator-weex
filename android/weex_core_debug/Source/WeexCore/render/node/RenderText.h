@@ -12,7 +12,7 @@ namespace WeexCore {
       markDirty();
       RenderPage* page = GetRenderPage();
       if (page != nullptr)
-        GetRenderPage()->Batch();
+        GetRenderPage()->CalculateLayout();
     }
 
     inline StyleType UpdateStyle(std::string key, std::string value) {

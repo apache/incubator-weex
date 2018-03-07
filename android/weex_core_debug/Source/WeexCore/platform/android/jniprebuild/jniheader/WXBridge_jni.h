@@ -40,6 +40,9 @@ static jint ExecJS(JNIEnv* env, jobject jcaller,
     jstring function,
     jobjectArray args);
 
+static void OnVsync(JNIEnv* env, jobject jcaller,
+    jstring instanceId);
+
 static jint ExecJSService(JNIEnv* env, jobject jcaller,
     jstring javascript);
 
@@ -113,6 +116,11 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "[Lcom/taobao/weex/bridge/WXJSObject;"
 ")"
 "I", reinterpret_cast<void*>(ExecJS) },
+    { "nativeOnVsync",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(OnVsync) },
     { "nativeExecJSService",
 "("
 "Ljava/lang/String;"

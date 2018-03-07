@@ -232,8 +232,8 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s", pageId,
-       ref);
+  LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s", pageId.c_str(),
+       ref.c_str());
 #endif
 
   RenderManager::GetInstance()->RemoveRenderObject(pageId, ref);
@@ -257,7 +257,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s, parentRef: %s, index: %d",
-       pageId, ref, parentRef, index);
+       pageId.c_str(), ref.c_str(), parentRef.c_str(), index);
 #endif
 
   RenderManager::GetInstance()->MoveRenderObject(pageId, ref, parentRef, index);
@@ -279,8 +279,8 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallUpdateStyle >>>> pageId: %s, ref: %s, data: %s", pageId,
-       ref, data);
+  LOGD("[ExtendJSApi] functionCallUpdateStyle >>>> pageId: %s, ref: %s, data: %s", pageId.c_str(),
+       ref.c_str(), data.c_str());
 #endif
 
   RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
@@ -301,8 +301,8 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallUpdateAttrs >>>> pageId: %s, ref: %s, data: %s", pageId,
-       ref, data);
+  LOGD("[ExtendJSApi] functionCallUpdateAttrs >>>> pageId: %s, ref: %s, data: %s", pageId.c_str(),
+       ref.c_str(), data.c_str());
 #endif
 
   RenderManager::GetInstance()->UpdateAttr(pageId, ref, data);
@@ -321,7 +321,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId);
+  LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId.c_str());
 #endif
 
   RenderManager::GetInstance()->CreateFinish(pageId);
@@ -365,8 +365,8 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
+  LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId.c_str(),
+       ref.c_str(), event.c_str());
 #endif
 
   RenderManager::GetInstance()->AddEvent(pageId, ref, event);
@@ -387,8 +387,8 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
+  LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId.c_str(),
+       ref.c_str(), event.c_str());
 #endif
 
   RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
