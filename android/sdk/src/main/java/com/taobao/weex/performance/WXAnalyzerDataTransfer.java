@@ -22,6 +22,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONObject;
 
@@ -49,6 +50,7 @@ public class WXAnalyzerDataTransfer {
       return;
     }
 
+
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (null == instance) {
       return;
@@ -75,6 +77,7 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_PERFORMANCE + ",instance," + data);
     for (IWXAnalyzer transfer : transferList) {
       transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
     }
@@ -106,6 +109,7 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_ERROR + ","+errorCode.getErrorType().toString()+"," + data);
     for (IWXAnalyzer transfer : transferList) {
       transfer.transfer(GROUP, MODULE_ERROR, errorCode.getErrorType().toString(), data);
     }
@@ -125,13 +129,14 @@ public class WXAnalyzerDataTransfer {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    WXLogUtils.e(GROUP, "transfer: " + MODULE_PERFORMANCE + ",fps," + data);
     for (IWXAnalyzer transfer : transferList) {
       transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
     }
   }
 
 //  @Override
-//  public void transfer(String tag, String module, String type, String data) {
+//  public void transfer2(String tag, String module, String type, String data) {
 //    WXLogUtils.d(tag, module + ":" + type + ":" + data);
 //  }
 }

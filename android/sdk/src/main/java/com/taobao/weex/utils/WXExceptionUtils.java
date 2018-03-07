@@ -26,12 +26,14 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
-import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,6 +108,22 @@ public class WXExceptionUtils {
 	if (adapter != null) {
 	  adapter.onJSException(exceptionCommit);
 	}
-        WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
+
+	WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    if (null == transferList || transferList.size() == 0) {
+      return;
+    }
+
+    for (IWXAnalyzer transfer : transferList) {
+      HashMap<String, Object> params = new HashMap<>();
+      params.put("group", "WXAnalyzer");
+      params.put("module", "WXError");
+      params.put("type", exceptionCommit.getErrCode().getErrorType().toString());
+      params.put("instance", WXSDKManager.getInstance().getSDKInstance(instanceId));
+      params.put("errorCode", exceptionCommit.getErrCode());
+      transfer.transfer2(params);
+    }
+
   }
 }

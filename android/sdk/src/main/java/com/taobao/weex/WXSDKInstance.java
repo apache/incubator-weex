@@ -43,7 +43,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
@@ -68,6 +68,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -892,7 +893,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
+
       WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
+      List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+      if (null == transferList || transferList.size() == 0) {
+        return;
+      }
+
+      for (IWXAnalyzer transfer : transferList) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("group", "WXAnalyzer");
+        params.put("module", "WXPerformance");
+        params.put("type", "instance");
+        params.put("instance", this);
+        params.put("performance", mWXPerformance);
+        transfer.transfer2(params);
+      }
+
+
       isCommit=true;
     }
     // module listen Activity onActivityPause
@@ -1782,7 +1800,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         mWXPerformance.syncTaskTime=syncTaskTime instanceof Long ?(long)syncTaskTime:0;
 
         Object requestType=response.extendParams.get("requestType");
-        mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
+        mWXPerformance.requestType=requestType instanceof String?(String)requestType:"none";
 
         Object cacheType = response.extendParams.get(Dimension.cacheType.toString());
         if(cacheType instanceof String){

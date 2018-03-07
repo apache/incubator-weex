@@ -92,7 +92,6 @@ public class FpsCollector {
       }
       WXAnalyzerDataTransfer.transferFps(mFrameCount);
 
-
       mTimeBegin = 0;
       mFrameCount = 0;
     }
