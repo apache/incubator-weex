@@ -110,20 +110,6 @@ public class WXExceptionUtils {
 	}
 
 	WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
-    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
-    if (null == transferList || transferList.size() == 0) {
-      return;
-    }
-
-    for (IWXAnalyzer transfer : transferList) {
-      HashMap<String, Object> params = new HashMap<>();
-      params.put("group", "WXAnalyzer");
-      params.put("module", "WXError");
-      params.put("type", exceptionCommit.getErrCode().getErrorType().toString());
-      params.put("instance", WXSDKManager.getInstance().getSDKInstance(instanceId));
-      params.put("errorCode", exceptionCommit.getErrCode());
-      transfer.transfer2(params);
-    }
 
   }
 }

@@ -888,29 +888,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
-	  mWXPerformance.wxDims = mwxDims;
-	  mWXPerformance.measureTimes = measureTimes;
+      mWXPerformance.wxDims = mwxDims;
+      mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
-
       WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
-      List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
-      if (null == transferList || transferList.size() == 0) {
-        return;
-      }
-
-      for (IWXAnalyzer transfer : transferList) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("group", "WXAnalyzer");
-        params.put("module", "WXPerformance");
-        params.put("type", "instance");
-        params.put("instance", this);
-        params.put("performance", mWXPerformance);
-        transfer.transfer2(params);
-      }
-
-
       isCommit=true;
     }
     // module listen Activity onActivityPause
