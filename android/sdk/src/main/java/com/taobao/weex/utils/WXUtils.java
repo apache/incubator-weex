@@ -186,7 +186,8 @@ public class WXUtils {
         result*=-1;
       return result;
     }
-    throw new NumberFormatException("NullNumber");
+    return 0;
+    // throw new NumberFormatException("NullNumber");
   }
 
   /**
@@ -258,7 +259,11 @@ public class WXUtils {
       }else if (temp.endsWith("px")) {
         try {
           temp = temp.substring(0, temp.indexOf("px"));
-          return Integer.parseInt(temp);
+          if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+            return (int) WXUtils.parseFloat(temp);
+          } else {
+            return Integer.parseInt(temp);
+          }
         } catch (NumberFormatException nfe) {
           WXLogUtils.e("Argument format error! value is " + value, nfe);
         } catch (Exception e) {
@@ -266,7 +271,11 @@ public class WXUtils {
         }
       }else {
         try {
-          return Integer.parseInt(temp);
+          if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+            return (int) WXUtils.parseFloat(temp);
+          } else {
+            return Integer.parseInt(temp);
+          }
         } catch (NumberFormatException nfe) {
           WXLogUtils.e("Argument format error! value is " + value, nfe);
         } catch (Exception e) {
