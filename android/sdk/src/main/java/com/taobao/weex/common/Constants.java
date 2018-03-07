@@ -108,6 +108,7 @@ public class Constants {
     String FILTER = "filter";
     String QUALITY = "quality";
     String SRC = "src";
+    String SOURCE = "source";
     String PLACE_HOLDER = "placeHolder";
     String RESIZE_MODE = "resizeMode";
     String AUTO_RECYCLE = "autoBitmapRecycle";
@@ -326,11 +327,8 @@ public class Constants {
       String DESTORY = "destroy";
     }
 
-
     String STOP_PROPAGATION = "stopPropagation";
-
-
-
+    String ONMESSAGE = "message";
   }
 
   public interface PSEUDO {

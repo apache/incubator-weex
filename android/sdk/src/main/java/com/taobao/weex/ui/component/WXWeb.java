@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
@@ -42,6 +43,7 @@ public class WXWeb extends WXComponent {
     public static final String GO_BACK = "goBack";
     public static final String GO_FORWARD = "goForward";
     public static final String RELOAD = "reload";
+    public static final String POST_MESSAGE = "postMessage";
     protected IWebView mWebView;
 
     @Deprecated
@@ -96,6 +98,14 @@ public class WXWeb extends WXComponent {
                 }
             }
         });
+        mWebView.setOnMessageListener(new IWebView.OnMessageListener() {
+            @Override
+            public void onMessage(Object msg) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("data", msg);
+                fireEvent(Constants.Event.ONMESSAGE, params);
+            }
+        });
         return mWebView.getView();
     }
 
@@ -118,6 +128,11 @@ public class WXWeb extends WXComponent {
                 if (src != null)
                     setUrl(src);
                 return true;
+            case Constants.Name.SOURCE:
+                String source = WXUtils.getString(param,null);
+                if (source != null)
+                    setSource(source);
+                return true;
         }
         return super.setProperty(key,param);
     }
@@ -137,7 +152,14 @@ public class WXWeb extends WXComponent {
         }
     }
 
-    public void setAction(String action) {
+    @WXComponentProp(name = Constants.Name.SOURCE)
+    public void setSource(String source) {
+        if (!TextUtils.isEmpty(source) && getHostView() != null) {
+            loadDataWithBaseURL(source);
+        }
+    }
+
+    public void setAction(String action, Object data) {
         if (!TextUtils.isEmpty(action)) {
             if (action.equals(GO_BACK)) {
                 goBack();
@@ -145,6 +167,8 @@ public class WXWeb extends WXComponent {
                 goForward();
             } else if (action.equals(RELOAD)) {
                 reload();
+            } else if (action.equals(POST_MESSAGE)) {
+                postMessage(data);
             }
         }
     }
@@ -162,6 +186,18 @@ public class WXWeb extends WXComponent {
         getWebView().loadUrl(url);
     }
 
+    private void loadDataWithBaseURL(String source) {
+        String baseUrl = null;
+        try {
+            String bundleUrl = WXSDKManager.getInstance().getSDKInstance(getInstanceId()).getBundleUrl();
+            Uri uri = Uri.parse(bundleUrl);
+            baseUrl = uri.getScheme() + "://" + uri.getAuthority();
+        } catch (Exception e) {
+            // do noting
+        }
+        getWebView().loadDataWithBaseURL(source, baseUrl);
+    }
+
     private void reload() {
         getWebView().reload();
     }
@@ -172,6 +208,10 @@ public class WXWeb extends WXComponent {
 
     private void goBack() {
         getWebView().goBack();
+    }
+
+    private void postMessage(Object msg) {
+        getWebView().postMessage(msg);
     }
 
     private IWebView getWebView() {
