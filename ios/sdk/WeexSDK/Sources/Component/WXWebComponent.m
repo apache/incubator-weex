@@ -229,7 +229,7 @@ WX_EXPORT_METHOD(@selector(goForward))
 - (void)postMessage:(NSDictionary *)data {
     WXSDKInstance *instance = [WXSDKEngine topInstance];
 
-    NSMutableString *bundleUrlOrigin = @"";
+    NSString *bundleUrlOrigin = @"";
 
     if (instance.pageName) {
         NSString *bundleUrl = [instance.scriptURL absoluteString];
@@ -245,7 +245,7 @@ WX_EXPORT_METHOD(@selector(goForward))
 
     NSString *json = [WXUtility JSONString:initDic];
 
-    NSString *code = [NSString stringWithFormat:@"(function (){document.dispatchEvent(new MessageEvent('message', %@));}())", json];
+    NSString *code = [NSString stringWithFormat:@"(function (){window.dispatchEvent(new MessageEvent('message', %@));}())", json];
     [_jsContext evaluateScript:code];
 }
 
