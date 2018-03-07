@@ -1979,6 +1979,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     animations.clear();
   }
 
+
   private WXAnimationBean createAnimationBean(String ref,Map<String, Object> style){
     if (style != null) {
       try {
