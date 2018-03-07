@@ -39,6 +39,7 @@ public class WXAnalyzerDataTransfer {
   private static final String MODULE_PERFORMANCE = "WXPerformance";
   private static final String MODULE_ERROR = "WXError";
 
+
   public static void transferPerformance(WXPerformance performance, String instanceId) {
     if (!WXEnvironment.isApkDebugable()) {
       return;

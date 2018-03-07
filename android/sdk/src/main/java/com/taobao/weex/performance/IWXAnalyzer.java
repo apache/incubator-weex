@@ -32,4 +32,5 @@ public interface IWXAnalyzer {
    * @param data   data (json)
    */
   void transfer(String group, String module, String type, String data);
+
 }

@@ -45,6 +45,7 @@ public class WXExceptionUtils {
    */
   public static String degradeUrl = "BundleUrlDefaultDegradeUrl";
 
+
   /**
    * commitCriticalExceptionRT eg:JsRuntime Exception or JsFramework Init Exception
    * @param instanceId

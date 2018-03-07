@@ -836,6 +836,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *  begin hook Activity life cycle callback
    ********************************************************/
 
+
   @Override
   public void onActivityCreate() {
 
