@@ -51,6 +51,9 @@
 
 @property (nonatomic, strong) NSString *source;
 
+// save source during this initialization
+@property (nonatomic, strong) NSString *inInitsource;
+
 @property (nonatomic, assign) BOOL startLoadEvent;
 
 @property (nonatomic, assign) BOOL finishLoadEvent;
@@ -63,6 +66,7 @@
 
 @implementation WXWebComponent
 
+WX_EXPORT_METHOD(@selector(postMessage:))
 WX_EXPORT_METHOD(@selector(goBack))
 WX_EXPORT_METHOD(@selector(reload))
 WX_EXPORT_METHOD(@selector(goForward))
@@ -73,7 +77,7 @@ WX_EXPORT_METHOD(@selector(goForward))
         self.url = attributes[@"src"];
         
         if(attributes[@"source"]){
-            self.source = attributes[@"source"];
+            self.inInitsource = attributes[@"source"];
         }
         
     }
@@ -127,10 +131,9 @@ WX_EXPORT_METHOD(@selector(goForward))
         [weakSelf fireEvent:@"message" params:initDic];
     };
 
+    self.source = _inInitsource;
     if (_url) {
         [self loadURL:_url];
-    }else if(_source){
-        [_webview loadHTMLString:_source baseURL:nil];
     }
 }
 
@@ -139,11 +142,10 @@ WX_EXPORT_METHOD(@selector(goForward))
     if (attributes[@"src"]) {
         self.url = attributes[@"src"];
     }
-    
-    if(attributes[@"source"]){
-        self.source=attributes[@"source"];
+
+    if (attributes[@"source"]) {
+        self.source = attributes[@"source"];
     }
-    
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -178,7 +180,7 @@ WX_EXPORT_METHOD(@selector(goForward))
 - (void) setSource:(NSString *)source
 {
     NSString *newSource=[source copy];
-    if(!newSource){
+    if(!newSource || _url){
         return;
     }
     if(![newSource isEqualToString:_source]){
