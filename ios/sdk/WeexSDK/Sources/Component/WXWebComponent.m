@@ -145,7 +145,7 @@ WX_EXPORT_METHOD(@selector(goForward))
 
     if (attributes[@"source"]) {
         self.inInitsource = attributes[@"source"];
-        self.source = attributes[@"source"];
+        self.source = self.inInitsource;
     }
 }
 
