@@ -45,5 +45,7 @@ public class GraphicActionLayout extends BasicGraphicAction {
 
     component.setLayout(component);
     component.setPadding(component.getPadding(), component.getBorder());
+
+    WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionLayoutCount();
   }
 }

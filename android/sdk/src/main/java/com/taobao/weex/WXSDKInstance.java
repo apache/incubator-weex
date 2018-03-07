@@ -1000,6 +1000,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
+    WXLogUtils.renderPerformanceLog("   firstCallAddElementByWeexCoreSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementByWeexCoreSumTime);
+    WXLogUtils.renderPerformanceLog("   firstCallLayoutByWeexCoreSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutByWeexCoreSumTime);
     WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
