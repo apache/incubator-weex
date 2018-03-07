@@ -372,6 +372,9 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
+      WXLogUtils.e("listen", "config=" + config);
+      WXLogUtils.e("listen", "config.getWxAnalyzer()=" + config.getWxAnalyzer() + ",");
+      WXLogUtils.e("listen", "mWXAnalyzerList=" + mWXAnalyzerList);
     this.mWXAnalyzerList.addAll(config.getWxAnalyzer());
   }
 
