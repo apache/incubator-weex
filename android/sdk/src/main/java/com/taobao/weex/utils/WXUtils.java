@@ -238,14 +238,16 @@ public class WXUtils {
 
     String temp = value.toString().trim();
     if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
-      return Integer.valueOf((int) WXUtils.parseFloat(temp));
+      return (int)WXUtils.parseFloat(temp);
     }
-    else {
-      String suffix = temp.substring(temp.length()-2, temp.length());
-      if (TextUtils.equals("wx",suffix)) {
+
+    try {
+      return (Integer) value;
+    } catch (ClassCastException cce) {
+
+      if (temp.endsWith("wx")) {
         if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils
-              .w("the value of " + value + " use wx unit, which will be not supported soon after.");
+          WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
         }
         try {
           return (int) transferWx(temp, 750);
@@ -254,9 +256,9 @@ public class WXUtils {
         } catch (Exception e) {
           WXLogUtils.e("Argument error! value is " + value, e);
         }
-      } else if (TextUtils.equals("px",suffix)) {
+      }else if (temp.endsWith("px")) {
         try {
-          temp = temp.substring(0, temp.length()-2);
+          temp = temp.substring(0, temp.indexOf("px"));
           if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
             return (int) WXUtils.parseFloat(temp);
           } else {
@@ -267,7 +269,7 @@ public class WXUtils {
         } catch (Exception e) {
           WXLogUtils.e("Argument error! value is " + value, e);
         }
-      } else {
+      }else {
         try {
           if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
             return (int) WXUtils.parseFloat(temp);
@@ -281,6 +283,7 @@ public class WXUtils {
         }
       }
     }
+
     return df;
   }
 
