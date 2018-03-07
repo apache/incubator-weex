@@ -64,24 +64,24 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.WXTransition;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
-import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
-import com.taobao.weex.dom.CSSShorthand;
-import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.flat.WidgetContainer;
@@ -107,10 +107,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * abstract component
@@ -162,7 +162,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
-  private Set <Pair<String, Map<String, Object>>> animations;
+  private ConcurrentLinkedQueue<Pair<String, Map<String, Object>>> animations;
 
 
   @Deprecated
@@ -186,7 +186,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mParent = parent;
     mType = type;
     mGestureType = new HashSet<>();
-    animations = new LinkedHashSet<>();
+    animations = new ConcurrentLinkedQueue<>();
     ++mComponentNum;
 
     if (instance != null)
