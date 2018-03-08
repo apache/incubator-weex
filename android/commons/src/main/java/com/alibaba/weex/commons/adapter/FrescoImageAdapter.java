@@ -36,6 +36,8 @@ import com.facebook.datasource.DataSubscriber;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeView;
 import com.facebook.imagepipeline.common.ImageDecodeOptions;
@@ -126,6 +128,32 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
                             FLog.e(getClass(), throwable, "Error loading %s", id);
                         }
                     };
+
+
+                    //匹配底层ScaleType和Fresco框架显示模式
+                    ScalingUtils.ScaleType actualImageScaleType;
+                    switch (view.getScaleType()){
+                        case FIT_CENTER:
+                            actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER;break;
+                        case FIT_XY:
+                            actualImageScaleType = ScalingUtils.ScaleType.FIT_XY;break;
+                        case CENTER:
+                            actualImageScaleType = ScalingUtils.ScaleType.CENTER;break;
+                        case CENTER_CROP:
+                            actualImageScaleType = ScalingUtils.ScaleType.CENTER_CROP;break;
+                        case CENTER_INSIDE:
+                            actualImageScaleType = ScalingUtils.ScaleType.CENTER_INSIDE;break;
+                        case FIT_END:
+                            actualImageScaleType = ScalingUtils.ScaleType.FIT_END;break;
+                        case FIT_START:
+                            actualImageScaleType = ScalingUtils.ScaleType.FIT_START;break;
+                        default: actualImageScaleType = ScalingUtils.ScaleType.CENTER_CROP;
+                    }
+                    //Fresco改变图片显示模式
+                    ((DraweeView)view).setHierarchy(new GenericDraweeHierarchyBuilder(view.getResources())
+                            .setActualImageScaleType(actualImageScaleType)
+                            .build());
+
                     DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setAutoPlayAnimations(true)
                         .setControllerListener(controllerListener)
