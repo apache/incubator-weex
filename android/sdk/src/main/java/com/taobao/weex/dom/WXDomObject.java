@@ -36,7 +36,6 @@ import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
@@ -646,6 +645,9 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
             break;
           case Constants.Name.PADDING_BOTTOM:
             setPadding(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingBottom(vp), vp));
+            break;
+          case Name.DIRECTION:
+            setDirection(stylesMap.getDirection());
             break;
         }
       }
