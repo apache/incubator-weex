@@ -49,6 +49,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
 import com.taobao.weex.dom.WXDomManager;
+import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -79,6 +80,7 @@ public class WXSDKManager {
   private IWXHttpAdapter mIWXHttpAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
   private IWXAccessibilityRoleAdapter mRoleAdapter;
+  private List<IWXAnalyzer> mWXAnalyzerList;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -107,6 +109,7 @@ public class WXSDKManager {
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
     mWXWorkThreadManager = new WXWorkThreadManager();
+    mWXAnalyzerList = new ArrayList<>();
   }
 
   /**
@@ -358,6 +361,16 @@ public class WXSDKManager {
     return mIWXSoLoaderAdapter;
   }
 
+  public List<IWXAnalyzer> getWXAnalyzer(){
+    return mWXAnalyzerList;
+  }
+
+  public void setWXAnalyzer(IWXAnalyzer analyzer){
+    if (!mWXAnalyzerList.contains(analyzer)) {
+      mWXAnalyzerList.add(analyzer);
+    }
+  }
+
   void setInitConfig(InitConfig config){
     this.mIWXHttpAdapter = config.getHttpAdapter();
     this.mIWXImgLoaderAdapter = config.getImgAdapter();
@@ -369,6 +382,7 @@ public class WXSDKManager {
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
     this.mClassLoaderAdapter = config.getClassLoaderAdapter();
+    this.mWXAnalyzerList.addAll(config.getWxAnalyzer());
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){
