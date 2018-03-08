@@ -28,8 +28,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,8 +49,8 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.ActionReloadPage;
-import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.GraphicActionAddEvent;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionCreateFinish;
@@ -75,7 +73,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1150,12 +1147,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  public void onVsync(String instanceId) {
-    if (mWXBridge != null) {
-      mWXBridge.onVsync(instanceId);
-    }
-  }
-
   @Override
   public boolean handleMessage(Message msg) {
     if (msg == null) {
@@ -1773,9 +1764,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
-        final BasicGraphicAction action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
-                styles, attributes, events, margins, paddings, borders);
-        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+        final GraphicActionAddElement action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
+            styles, attributes, events, margins, paddings, borders);
+        WXSDKManager.getInstance().getSDKInstance(pageId).addInActiveAddElementAction(ref, action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
@@ -1934,7 +1925,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
         final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);
-        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+        GraphicActionAddElement addAction = WXSDKManager.getInstance().getSDKInstance(pageId).getInActiveAddElementAction(ref);
+        if(addAction!=null) {
+          addAction.setSize(size);
+          addAction.setPosition(position);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), addAction);
+          WXSDKManager.getInstance().getSDKInstance(pageId).removeInActiveAddElmentAction(ref);
+        }
+        else {
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callLayout exception: ", e);

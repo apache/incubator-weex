@@ -81,7 +81,6 @@ public class RenderContainer extends FrameLayout {
     super.onDetachedFromWindow();
     if (mFrameRateControl != null) {
       mFrameRateControl.stop();
-      mFrameRateControl = null;
     }
   }
   @Override

@@ -43,8 +43,6 @@ public class WXBridge implements IWXBridge {
 
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
 
-  private native void nativeOnVsync(String instanceId);
-
   private native int nativeExecJSService(String javascript);
 
   private native void nativeTakeHeapSnapshot(String filename);
@@ -85,11 +83,6 @@ public class WXBridge implements IWXBridge {
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
     return nativeExecJS(instanceId, namespace, function, args);
-  }
-
-  @Override
-  public void onVsync(String instanceId) {
-    nativeOnVsync(instanceId);
   }
 
   @Override
