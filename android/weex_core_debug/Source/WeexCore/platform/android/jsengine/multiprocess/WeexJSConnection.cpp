@@ -108,10 +108,15 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     _exit(1);
   } else {
     printLogOnFile("fork success on main process and start m_impl->futexPageQueue->spinWaitPeer()");
-
     close(fd);
     m_impl->child = child;
-    m_impl->futexPageQueue->spinWaitPeer();
+    try {
+      m_impl->futexPageQueue->spinWaitPeer();
+    } catch (IPCException &e) {
+      LOGE("WeexJSConnection catch: %s", e.msg());
+      // TODO throw exception
+      return nullptr;
+    }
   }
   return m_impl->serverSender.get();
 }
@@ -357,7 +362,14 @@ static void closeAllButThis(int exceptfd) {
   }
   int dirFd = dirfd(dir);
   struct dirent *cur;
+  struct timespec start;
+  clock_gettime(CLOCK_MONOTONIC, &start);
   while ((cur = readdir(dir))) {
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    if ((now.tv_sec - start.tv_sec) > 6) {
+      break;
+    }
     if (!strcmp(cur->d_name, ".")
         || !strcmp(cur->d_name, "..")) {
       continue;

@@ -43,27 +43,37 @@ jint WeexProxy::doInitFramework(JNIEnv *env,
     sHandler = std::move(createIPCHandler());
     sConnection.reset(new WeexJSConnection());
     sSender = sConnection->start(sHandler.get(), reinit);
-    // initHandler(sHandler.get());
+    if (sSender == nullptr) {
+      LOGE("JSFreamwork init start sender is null");
+      if (!reinit) {
+        reinit = true;
+        goto startInitFrameWork;
+      } else {
+        return false;
+      }
+    } else {
+      // initHandler(sHandler.get());
+      ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
+      Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
+      pExtensionJSApi->initFunction(sHandler.get());
 
-    ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
-    Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
-    pExtensionJSApi->initFunction(sHandler.get());
-
-    // using base::debug::TraceEvent;
-    // TraceEvent::StartATrace(env);
-    std::unique_ptr <IPCSerializer> serializer(createIPCSerializer());
-    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
-    initFromParam(env, script, params, serializer.get());
-    std::unique_ptr <IPCBuffer> buffer = serializer->finish();
-    std::unique_ptr <IPCResult> result = sSender->send(buffer.get());
-    if (result->getType() != IPCType::INT32) {
-      LOGE("initFramework Unexpected result type");
-      reportException("", "initFramework",
-                      "error, initFramework Unexpected result type");
-      return false;
+      // using base::debug::TraceEvent;
+      // TraceEvent::StartATrace(env);
+      std::unique_ptr <IPCSerializer> serializer(createIPCSerializer());
+      serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
+      initFromParam(env, script, params, serializer.get());
+      std::unique_ptr <IPCBuffer> buffer = serializer->finish();
+      std::unique_ptr <IPCResult> result = sSender->send(buffer.get());
+      if (result->getType() != IPCType::INT32) {
+        LOGE("initFramework Unexpected result type");
+        reportException("", "initFramework",
+                        "error, initFramework Unexpected result type");
+        return false;
+      }
+      return result->get<jint>();
     }
-    return result->get<jint>();
   } catch (IPCException &e) {
+    LOGE("WeexProxy catch：%s", e.msg());
     if (!reinit) {
       reinit = true;
       goto startInitFrameWork;
