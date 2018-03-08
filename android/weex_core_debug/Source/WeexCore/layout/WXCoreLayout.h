@@ -9,8 +9,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <WeexCore/css/ConstantsName.h>
-#include <WeexCore/platform/android/base/LogUtils.h>
 
 namespace WeexCore {
 
