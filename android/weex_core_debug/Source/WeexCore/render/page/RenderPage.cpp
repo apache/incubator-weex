@@ -21,7 +21,7 @@
 
 namespace WeexCore {
 
-  static bool splitScreenRendering = true;
+  static bool splitScreenRendering = false;
 
   RenderPage::RenderPage(std::string pageId) {
 
