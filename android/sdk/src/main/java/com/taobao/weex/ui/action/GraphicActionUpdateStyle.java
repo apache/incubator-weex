@@ -21,6 +21,7 @@ package com.taobao.weex.ui.action;
 import android.support.v4.util.ArrayMap;
 
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXTransition;
@@ -95,6 +96,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
       animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
       animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
       component.addAnimationForElement(animationMap);
+      WXBridgeManager.getInstance().calculateLayout(component.getInstanceId(), component.getRef(), true);
     }
 
     if (null != paddings) {

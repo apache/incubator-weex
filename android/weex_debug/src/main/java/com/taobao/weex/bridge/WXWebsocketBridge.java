@@ -333,8 +333,8 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public void calculateLayout(String instanceId, String ref) {
-        mJsManager.calculateLayout(instanceId, ref);
+    public void calculateLayout(String instanceId, String ref, boolean dirty) {
+        mJsManager.calculateLayout(instanceId, ref, dirty);
     }
 
     @Override

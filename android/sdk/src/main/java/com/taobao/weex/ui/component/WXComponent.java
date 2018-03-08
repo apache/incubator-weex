@@ -759,7 +759,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
             || component.getLayoutSize() == null) {
       return;
     }
-
+    parseAnimation();
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
@@ -808,7 +808,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     realHeight = measureOutput.height;
 
     setComponentLayoutParams(realWidth, realHeight, realLeft, realTop, realRight, realBottom, rawOffset);
-    parseAnimation();
   }
 
   private void setComponentLayoutParams(int realWidth, int realHeight, int realLeft, int realTop,
@@ -1824,7 +1823,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     } else {
       WXBridgeManager.getInstance().setStyleWidth(getInstanceId(), getRef(), getLayoutWidth());
       WXBridgeManager.getInstance().setStyleHeight(getInstanceId(), getRef(), getLayoutHeight());
-      WXBridgeManager.getInstance().calculateLayout(getInstanceId(), getRef());
+      WXBridgeManager.getInstance().calculateLayout(getInstanceId(), getRef(), false);
     }
   }
 

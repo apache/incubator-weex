@@ -168,13 +168,21 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 
 static void CalculateLayout(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
-                            jstring ref) {
+                            jstring ref,
+                            jboolean dirty) {
 //    std::string mMessage = "CalculateLayout=" + jString2Str(env, instanceId);
 //    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
+  if (dirty) {
+
+    RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+    if (render == nullptr)
+      return;
+    render->markDirty();
+  }
   page->CalculateLayout();
 }
 
