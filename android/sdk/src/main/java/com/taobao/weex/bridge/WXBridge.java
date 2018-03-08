@@ -334,7 +334,7 @@ public class WXBridge implements IWXBridge {
 
     try {
       errorCode = WXBridgeManager.getInstance().callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
-              styles, attributes, events, paddings, margins, borders);
+              styles, attributes, events, margins, paddings, borders);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
