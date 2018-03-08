@@ -28,6 +28,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.IWebView;
@@ -56,8 +57,20 @@ public class WXWeb extends WXComponent {
         createWebView();
     }
 
-    protected void  createWebView(){
-        mWebView = new WXWebView(getContext());
+    protected void createWebView(){
+        String origin = null;
+        try {
+            String bundleUrl = WXSDKManager.getInstance().getSDKInstance(getInstanceId()).getBundleUrl();
+            Uri uri = Uri.parse(bundleUrl);
+            String scheme = uri.getScheme();
+            String authority = uri.getAuthority();
+            if (!TextUtils.isEmpty(scheme) && !TextUtils.isEmpty(authority)) {
+                origin = scheme + "://" + authority;
+            }
+        } catch (Exception e) {
+            // do noting
+        }
+        mWebView = new WXWebView(getContext(), origin);
     }
 
     @Override
@@ -100,9 +113,7 @@ public class WXWeb extends WXComponent {
         });
         mWebView.setOnMessageListener(new IWebView.OnMessageListener() {
             @Override
-            public void onMessage(Object msg) {
-                Map<String, Object> params = new HashMap<>();
-                params.put("data", msg);
+            public void onMessage(Map<String, Object> params) {
                 fireEvent(Constants.Event.ONMESSAGE, params);
             }
         });
@@ -187,30 +198,26 @@ public class WXWeb extends WXComponent {
     }
 
     private void loadDataWithBaseURL(String source) {
-        String baseUrl = null;
-        try {
-            String bundleUrl = WXSDKManager.getInstance().getSDKInstance(getInstanceId()).getBundleUrl();
-            Uri uri = Uri.parse(bundleUrl);
-            baseUrl = uri.getScheme() + "://" + uri.getAuthority();
-        } catch (Exception e) {
-            // do noting
-        }
-        getWebView().loadDataWithBaseURL(source, baseUrl);
+        getWebView().loadDataWithBaseURL(source);
     }
 
-    private void reload() {
+    @JSMethod
+    public void reload() {
         getWebView().reload();
     }
 
-    private void goForward() {
+    @JSMethod
+    public void goForward() {
         getWebView().goForward();
     }
 
-    private void goBack() {
+    @JSMethod
+    public void goBack() {
         getWebView().goBack();
     }
 
-    private void postMessage(Object msg) {
+    @JSMethod
+    public void postMessage(Object msg) {
         getWebView().postMessage(msg);
     }
 
