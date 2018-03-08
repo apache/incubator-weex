@@ -2074,11 +2074,11 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
           String reinitInfo = "";
           if (reInitCount > 1) {
             reinitInfo = "reinit Framework:";
-            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_REINIT_SUCCESS.getErrorCode(),
+            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_REINIT_SUCCESS,
                     "initFramework", reinitInfo + "success", null);
           } else {
-            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_SUCCESS.getErrorCode(),
-                    "initFramework", reinitInfo + "success", null);
+//            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_SUCCESS,
+//                    "initFramework", reinitInfo + "success", null);
           }
 
         } else {

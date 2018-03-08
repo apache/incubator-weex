@@ -174,6 +174,7 @@ public class InitConfig {
 
     public Builder setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
       this.classLoaderAdapter = classLoaderAdapter;
+      return this;
     }
     
     public Builder setWXMonitorDataTransfer(IWXAnalyzer analyzer){
