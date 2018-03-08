@@ -89,13 +89,6 @@
         }
         
         [self addSubview:_playerViewController.view];
-        
-        _posterImageView = [[UIImageView alloc] init];
-        _posterImageView.userInteractionEnabled = YES;
-        [_posterImageView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(posterTapHandler)]];
-        _posterImageView.hidden = YES;
-        [self addSubview:_posterImageView];
-        [self bringSubviewToFront:_posterImageView];
     }
     return self;
 }
@@ -158,7 +151,6 @@
     videoFrame.origin.x = 0;
     videoFrame.origin.y = 0;
     [_playerViewController.view setFrame:videoFrame];
-    [_posterImageView setFrame:videoFrame];
 }
 
 - (void)setURL:(NSURL *)URL
@@ -259,6 +251,18 @@
     if (self.posterClickHandle) {
         self.posterClickHandle();
     }
+}
+
+- (UIImageView *)posterImageView {
+    if (!_posterImageView) {
+        _posterImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        _posterImageView.userInteractionEnabled = YES;
+        [_posterImageView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(posterTapHandler)]];
+        _posterImageView.hidden = YES;
+        [self addSubview:_posterImageView];
+        [self bringSubviewToFront:_posterImageView];
+    }
+    return _posterImageView;
 }
 
 - (id<WXImgLoaderProtocol>)imageLoader
