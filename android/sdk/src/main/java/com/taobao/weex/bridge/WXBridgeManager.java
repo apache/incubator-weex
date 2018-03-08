@@ -2085,7 +2085,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
           if (reInitCount > 1) {
             WXLogUtils.e("[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail");
             String err = "[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail reinit FrameWork";
-			WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
+			WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK,
 					"initFramework", "reInitCount = " + reInitCount + err, null);
           } else {
             WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
@@ -2098,7 +2098,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
         if (reInitCount > 1) {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
           String err = "[WXBridgeManager] invokeInitFramework reinit FrameWork exception!#" + e.toString();
-		  WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
+		  WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_REINIT_FRAMEWORK,
 				  "initFramework", "reInitCount ==" + reInitCount + err, null);
         } else {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
