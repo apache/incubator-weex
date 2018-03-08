@@ -20,11 +20,13 @@ package com.taobao.weex.ui.view;
 
 import android.view.View;
 
+import java.util.Map;
+
 public interface IWebView {
     public View getView();
     public void destroy();
     public void loadUrl(String url);
-    public void loadDataWithBaseURL(String source, String baseUrl);
+    public void loadDataWithBaseURL(String source);
     public void reload();
     public void goBack();
     public void goForward();
@@ -45,6 +47,6 @@ public interface IWebView {
     }
 
     public interface OnMessageListener {
-        public void onMessage(Object msg);
+        public void onMessage(Map<String, Object> params);
     }
 }
