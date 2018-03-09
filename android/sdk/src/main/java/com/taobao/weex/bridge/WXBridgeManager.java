@@ -2000,8 +2000,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mWXBridge.setPosition(instanceId, ref, edge, value);
   }
 
-  public void calculateLayout(String instanceId, String ref) {
-    mWXBridge.calculateLayout(instanceId, ref);
+  public void calculateLayout(String instanceId, String ref, boolean dirty) {
+    mWXBridge.calculateLayout(instanceId, ref, dirty);
   }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {

@@ -76,7 +76,8 @@ static void SetPosition(JNIEnv* env, jobject jcaller,
 
 static void CalculateLayout(JNIEnv* env, jobject jcaller,
     jstring instanceId,
-    jstring ref);
+    jstring ref,
+    jboolean dirty);
 
 static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring key,
@@ -165,6 +166,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "("
 "Ljava/lang/String;"
 "Ljava/lang/String;"
+"Z"
 ")"
 "V", reinterpret_cast<void*>(CalculateLayout) },
     { "nativeRegisterCoreEnv",

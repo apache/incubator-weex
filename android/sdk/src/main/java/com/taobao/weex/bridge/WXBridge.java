@@ -57,7 +57,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeSetPosition(String instanceId, String ref, int edge, float value);
 
-  private native void nativeCalculateLayout(String instanceId, String ref);
+  private native void nativeCalculateLayout(String instanceId, String ref, boolean dirty);
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
@@ -477,8 +477,8 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public void calculateLayout(String instanceId, String ref) {
-    nativeCalculateLayout(instanceId, ref);
+  public void calculateLayout(String instanceId, String ref, boolean dirty) {
+    nativeCalculateLayout(instanceId, ref, dirty);
   }
 
   @Override

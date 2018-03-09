@@ -592,7 +592,7 @@ public class WXTransition {
                 WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
                     @Override
                     public void run() {
-                        WXBridgeManager.getInstance().calculateLayout(mWXComponent.getInstanceId(), mWXComponent.getRef());
+                        WXBridgeManager.getInstance().calculateLayout(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
                     }
                 });
             }
