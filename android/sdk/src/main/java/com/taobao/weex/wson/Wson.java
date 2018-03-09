@@ -24,6 +24,7 @@ import android.support.v4.util.LruCache;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.reflect.Array;
@@ -499,7 +500,7 @@ public class Wson {
                     if(object.getClass().isEnum()){
                         writeObject(JSON.toJSONString(object));
                     }else{
-                        writeMap(toMap(object));
+                        writeAdapterObject(object);
                     }
                     refs.remove(refs.size()-1);
                 }
@@ -600,6 +601,19 @@ public class Wson {
             position++;
         }
 
+        private final void writeAdapterObject(Object object){
+            if(specialClass.get(object.getClass().getName()) != null){
+                writeObject(JSON.toJSON(object));
+                return;
+            }
+            try{
+                writeMap(toMap(object));
+            }catch (Exception e){
+                specialClass.put(object.getClass().getName(), true);
+                writeObject(JSON.toJSON(object));
+            }
+        }
+
         private  final Map  toMap(Object object){
             Map map = new JSONObject();
             try {
@@ -637,7 +651,11 @@ public class Wson {
                     map.put(fieldName, value);
                 }
             }catch (Exception e){
-                throw  new RuntimeException(e);
+                if(e instanceof  RuntimeException){
+                    throw  (RuntimeException)e;
+                }else{
+                    throw  new RuntimeException(e);
+                }
             }
             return  map;
         }
@@ -749,6 +767,7 @@ public class Wson {
     private static final String METHOD_PREFIX_IS = "is";
     private static LruCache<String, List<Method>> methodsCache = new LruCache<>(128);
     private static LruCache<String, List<Field>> fieldsCache = new LruCache<>(128);
+    private static LruCache<String, Boolean> specialClass = new LruCache<>(16);
 
 
     private static final List<Method> getBeanMethod(String key, Class targetClass){
@@ -766,6 +785,9 @@ public class Wson {
                 String methodName = method.getName();
                 if(methodName.startsWith(METHOD_PREFIX_GET)
                         || methodName.startsWith(METHOD_PREFIX_IS)) {
+                    if(method.getAnnotation(JSONField.class) != null){
+                        throw new UnsupportedOperationException("getBeanMethod JSONField Annotation Not Handled, Use toJSON");
+                    }
                     methods.add(method);
                 }
             }
@@ -784,6 +806,9 @@ public class Wson {
             for(Field field : fields){
                 if((field.getModifiers() & Modifier.STATIC) != 0){
                     continue;
+                }
+                if(field.getAnnotation(JSONField.class) != null){
+                    throw new UnsupportedOperationException("getBeanMethod JSONField Annotation Not Handled, Use toJSON");
                 }
                 fieldList.add(field);
             }
