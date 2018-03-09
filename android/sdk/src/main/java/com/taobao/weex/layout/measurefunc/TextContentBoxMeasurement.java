@@ -244,7 +244,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    * @param text the give raw text.
    * @return an Spanned contains text and spans
    */
-  private
+  protected
   @NonNull
   Spanned createSpanned(String text) {
     if (!TextUtils.isEmpty(text)) {
@@ -255,7 +255,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     return new SpannableString("");
   }
 
-  private void updateSpannable(Spannable spannable, int spanFlag) {
+  protected void updateSpannable(Spannable spannable, int spanFlag) {
     List<SetSpanOperation> ops = createSetSpanOperation(spannable.length(), spanFlag);
     if (mFontSize == UNSET) {
       ops.add(new SetSpanOperation(0, spannable.length(),
