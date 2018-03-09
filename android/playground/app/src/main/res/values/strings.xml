@@ -40,4 +40,12 @@ under the License.
         "WXMainActivity"
     </string>
     <string name="title_activity_dynamic">DynamicActivity</string>
+    <string name="update_found_new_version">New version is available</string>
+    <string name="update_downloading">Downloading updates</string>
+    <string name="update_progress">Progress: </string>
+    <string name="update_now">Update Now</string>
+    <string name="update_remind_later">Remind Later</string>
+    <string name="update_version">Version: </string>
+    <string name="update_date">Date: </string>
+    <string name="update_desc">Updates: </string>
 </resources>
