@@ -383,7 +383,12 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
       pageXY = getEventLocInPageCoordinate(motionEvent, pointerIndex, pos);
       screenXY = getEventLocInScreenCoordinate(motionEvent, pointerIndex, pos);
     }
-    return createJSONObject(screenXY, pageXY, (float) motionEvent.getPointerId(pointerIndex));
+    JSONObject map = createJSONObject(screenXY, pageXY, (float) motionEvent.getPointerId(pointerIndex));
+    float force = motionEvent.getPressure();
+    if(force > 0 && force < 1) {
+      map.put("force", motionEvent.getPressure());
+    }
+    return map;
   }
 
   /**
