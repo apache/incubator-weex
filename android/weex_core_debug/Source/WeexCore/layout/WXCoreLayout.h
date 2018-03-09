@@ -317,7 +317,7 @@ namespace WeexCore {
       }
     }
 
-    inline float &firstLineCrossSize() const {
+    inline float firstLineCrossSize() const {
       float sum = sumPaddingBorderAlongAxis(this, !isMainAxisHorizontal(this));
       if (!mFlexLines.empty()) {
         sum += mFlexLines[0]->mCrossSize;
@@ -325,7 +325,7 @@ namespace WeexCore {
       return sum;
     }
 
-    inline float &getSumOfCrossSize() const {
+    inline float getSumOfCrossSize() const {
       float sum = sumPaddingBorderAlongAxis(this, !isMainAxisHorizontal(this));
       for (WXCoreFlexLine *flexLine: mFlexLines) {
         sum += flexLine->mCrossSize;
@@ -343,7 +343,7 @@ namespace WeexCore {
                                         : widthMeasureMode == kExactly;
     }
 
-    inline float &sumPaddingBorderAlongAxis(const WXCoreLayoutNode* const node, bool horizontal) const {
+    inline float sumPaddingBorderAlongAxis(const WXCoreLayoutNode* const node, bool horizontal) const {
       float paddingBorderAlongAxis;
       if (horizontal) {
         paddingBorderAlongAxis =
