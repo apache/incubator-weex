@@ -19,10 +19,22 @@
 package com.taobao.weex.layout;
 
 import com.taobao.weex.base.CalledByNative;
+import com.taobao.weex.ui.component.WXComponent;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 
 public abstract class ContentBoxMeasurement implements Serializable {
+
+  protected WeakReference<WXComponent> mComponent;
+
+  public ContentBoxMeasurement() {
+
+  }
+
+  public ContentBoxMeasurement(WXComponent component) {
+    this.mComponent = new WeakReference<>(component);
+  }
 
   /** uiThread = false **/
   @CalledByNative
