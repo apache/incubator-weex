@@ -38,6 +38,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by sospartan on 9/7/16.
  */
@@ -53,7 +56,7 @@ public class WXWebViewTest {
   @Before
   public void setUp() throws Exception {
     Activity activity = Robolectric.setupActivity(TestActivity.class);
-    view = new WXWebView(activity);
+    view = new WXWebView(activity, null);
     webView = (WebView)((ViewGroup)view.getView()).getChildAt(0);//first child
     shadow = Shadows.shadowOf(webView);
   }
@@ -89,6 +92,13 @@ public class WXWebViewTest {
   }
 
   @Test
+  public void testLoadDataWithBaseURL() throws Exception {
+    String source = "<p><span>hello weex</span></p>";
+    view.loadDataWithBaseURL(source);
+  }
+
+
+  @Test
   public void testReload() throws Exception {
     view.reload();
     testLoadUrl();
@@ -106,5 +116,13 @@ public class WXWebViewTest {
   public void testGoForward() throws Exception {
     testGoBack();
     view.goForward();
+  }
+
+  @Test
+  public void testPostMessage() throws Exception {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("test1", 1);
+    msg.put("test2", "2");
+    view.postMessage(msg);
   }
 }
