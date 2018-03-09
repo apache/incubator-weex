@@ -231,6 +231,38 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return position.toString().equals(Constants.Value.FIXED);
   }
 
+  public float getLeft() {
+    float temp = WXUtils.getFloat(get(Constants.Name.LEFT));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
+  }
+
+  public float getRight() {
+    float temp = WXUtils.getFloat(get(Constants.Name.RIGHT));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
+  }
+
+  public float getTop() {
+    float temp = WXUtils.getFloat(get(Constants.Name.TOP));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
+  }
+
+  public float getBottom() {
+    float temp = WXUtils.getFloat(get(Constants.Name.BOTTOM));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
+  }
+
   /*
    * others
    **/
