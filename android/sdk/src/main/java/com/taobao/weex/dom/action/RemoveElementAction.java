@@ -51,7 +51,7 @@ final class RemoveElementAction implements DOMAction, RenderAction {
       if (instance != null) {
 //        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT,
 				"removeElement",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorMsg() + "domObject is null",null);
       }
@@ -62,7 +62,7 @@ final class RemoveElementAction implements DOMAction, RenderAction {
       if (instance != null) {
 //        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT,
 				"removeElement",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT.getErrorMsg() + "parent is null",null);
       }
@@ -85,6 +85,10 @@ final class RemoveElementAction implements DOMAction, RenderAction {
     clearRegistryForComponent(context, component);
     parent.remove(component, true);
     context.unregisterComponent(mRef);
+    WXSDKInstance instance = context.getInstance();
+    if (null != instance){
+      instance.onElementChange();
+    }
   }
 
   private void clearRegistryForComponent(RenderActionContext context, WXComponent component) {

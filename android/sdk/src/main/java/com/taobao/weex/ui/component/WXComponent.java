@@ -66,6 +66,7 @@ import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
@@ -533,6 +534,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
     if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
       return;
+    }
+
+    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+      mInstance.getWXPerformance().cellExceedNum++;
     }
 
     mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutY());
