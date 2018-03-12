@@ -3,6 +3,7 @@
 
 #include <../WeexCore/env/CoreEnvironment.h>
 #include <cmath>
+#include <cstdlib>
 
 namespace WeexCore {
 
@@ -47,12 +48,12 @@ namespace WeexCore {
       return NAN;
 
     float realPx = (src * WXCoreEnvironment::getInstance()->DeviceWidth() /
-        viewport);
-    float result = realPx > 0.005 && realPx < 1 ? 1 : (float) rint(realPx);
+                    viewport);
+    float result = realPx > 0.005 && realPx < 1 ? 1 : rint(realPx);
     return result;
   }
 
-  inline float getFloat(const std::string &src, const float &viewport){
+  inline float getFloat(const std::string &src, const float &viewport) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
@@ -60,13 +61,13 @@ namespace WeexCore {
         || src.empty()) {
       return ret;
     }
-    ret = getFloat(std::stof(src), viewport);
+    ret = getFloat(atof((char *) src.c_str()), viewport);
     return ret;
   }
 
   inline bool endWidth(const std::string &src, const std::string &suffix) {
     return src.size() > suffix.size() &&
-        src.compare(src.size() - suffix.size(), suffix.size(), suffix) == 0;
+           src.compare(src.size() - suffix.size(), suffix.size(), suffix) == 0;
   }
 
   inline float transferWx(const std::string &stringWithWXPostfix, const float &viewport) {
@@ -74,8 +75,8 @@ namespace WeexCore {
     if (endWidth(stringWithWXPostfix, WX)) {
       temp = stringWithWXPostfix.substr(0, stringWithWXPostfix.size() - WX.size());
     }
-    float f = std::stof(temp);
-    float density = std::stof(WXCoreEnvironment::getInstance()->GetOption(SCALE));
+    float f = atof((char *) temp.c_str());
+    float density = atof((char *) WXCoreEnvironment::getInstance()->GetOption(SCALE).c_str());
     return density * f * viewport / WXCoreEnvironment::getInstance()->DeviceWidth();
   }
 
@@ -103,7 +104,7 @@ namespace WeexCore {
       return NAN;
 
     float realPx = (pxValue * customViewport / WXCoreEnvironment::getInstance()->DeviceWidth());
-    float result = realPx > 0.005 && realPx < 1 ? 1 : (float) rint(realPx);
+    float result = realPx > 0.005 && realPx < 1 ? 1 : rint(realPx);
     return result;
   }
 }
