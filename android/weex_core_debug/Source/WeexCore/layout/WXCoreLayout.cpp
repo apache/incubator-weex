@@ -602,7 +602,7 @@ namespace WeexCore {
       float spaceBetweenItem = 0.f;
       switch (mCssStyle->mJustifyContent) {
         case kJustifyFlexEnd:
-          childLeft = width - flexLine->mMainSize + getPaddingRight() + getBorderWidthRight();
+          childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
           childRight = width - getPaddingLeft() - getBorderWidthLeft();
           break;
         case kJustifyCenter:
@@ -784,7 +784,7 @@ namespace WeexCore {
 
       switch (mCssStyle->mJustifyContent) {
         case kJustifyFlexEnd:
-          childTop = height - flexLine->mMainSize + getPaddingBottom() + getBorderWidthBottom();
+          childTop = height - flexLine->mMainSize - getPaddingBottom() - getBorderWidthBottom();
           childBottom = height - getPaddingTop() - getBorderWidthTop();
           break;
         case kJustifyCenter:
