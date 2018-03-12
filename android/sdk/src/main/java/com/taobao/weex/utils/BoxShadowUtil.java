@@ -142,8 +142,8 @@ public class BoxShadowUtil {
 
   private static void drawShadow(Canvas canvas, BoxShadowOptions options) {
     RectF shadowRect = new RectF(
-        0f, 0f,
-        options.viewWidth + 2f * options.spread, options.viewHeight + 2f * options.spread
+            0f, 0f,
+            options.viewWidth + 2f * options.spread, options.viewHeight + 2f * options.spread
     );
 
     if (options.topLeft != null) {
@@ -248,7 +248,7 @@ public class BoxShadowUtil {
       int paddingX = (maxWidth - w) / 2;
       int paddingY = (maxHeight - h) / 2;
       OverflowBitmapDrawable shadowDrawable = new OverflowBitmapDrawable(target.getResources(),
-          output, new Point(paddingX, paddingY), new Rect(0, 0, w, h), radii);
+              output, new Point(paddingX, paddingY), new Rect(0, 0, w, h), radii);
 
       target.getOverlay().add(shadowDrawable);
       //Relayout to ensure the shadows are fully drawn
@@ -281,9 +281,9 @@ public class BoxShadowUtil {
       for (int i = 0; i < options.size(); i++) {
         BoxShadowOptions option = options.get(i);
         Drawable shadow = new InsetShadowDrawable(target.getWidth(), target.getHeight(),
-            option.hShadow, option.vShadow,
-            option.blur, option.spread,
-            option.color, radii);
+                option.hShadow, option.vShadow,
+                option.blur, option.spread,
+                option.color, radii);
         drawables[i] = shadow;
       }
 
@@ -306,7 +306,7 @@ public class BoxShadowUtil {
     String processedStyle = boxShadowStyle;
     while (matcher.find()) {
       String color = matcher.group();
-      processedStyle = processedStyle.replace(color, "#" + Integer.toHexString(WXResourceUtils.getColor(color, Color.BLACK)));
+      processedStyle = processedStyle.replace(color, "#" + String.format("%8s", Integer.toHexString(WXResourceUtils.getColor(color, Color.BLACK))).replaceAll("\\s", "0"));
     }
 
     String[] styles = processedStyle.split(",");

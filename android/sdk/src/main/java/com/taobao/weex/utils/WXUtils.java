@@ -520,6 +520,7 @@ public class WXUtils {
   }
 
 
+  
   /**
    * get number
    * */

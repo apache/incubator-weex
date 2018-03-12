@@ -28,10 +28,13 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.ui.config.ConfigModuleFactory;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.Serializable;
@@ -165,6 +168,13 @@ public class WXModuleManager {
         return null;
       }
     } catch (Exception e) {
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
+              "callModuleMethod",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
+                      + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
+                      + WXLogUtils.getStackTrace(e),
+              null);
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
@@ -206,7 +216,12 @@ public class WXModuleManager {
       wxModule = moduleMap.get(moduleStr);
       if (wxModule == null) {
         try {
-          wxModule = factory.buildInstance();
+          if(factory instanceof ConfigModuleFactory){
+            WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+            wxModule = ((ConfigModuleFactory) factory).buildInstance(instance);
+          }else{
+            wxModule = factory.buildInstance();
+          }
           wxModule.setModuleName(moduleStr);
         } catch (Exception e) {
           WXLogUtils.e(moduleStr + " module build instace failed.", e);
@@ -390,6 +405,10 @@ public class WXModuleManager {
     if(instance != null) {
       sDomModuleMap.put(instance.getInstanceId(), new WXDomModule(instance));
     }
+  }
+
+  public static void destoryDomModule(String instanceID){
+    sDomModuleMap.remove(instanceID);
   }
 
   public static WXDomModule getDomModule(String instanceId){

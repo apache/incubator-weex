@@ -84,8 +84,7 @@ public class FunctionParser<K, V> {
       lexer.moveOn();
       return value;
     }
-//    throw new WXInterpretationException(token + " Token doesn't match 11 " + lexer.source);
-    return "";
+    throw new WXInterpretationException(token + "Token doesn't match" + lexer.source);
   }
 
   private enum Token {

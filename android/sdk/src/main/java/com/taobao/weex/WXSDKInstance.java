@@ -20,6 +20,7 @@ package com.taobao.weex;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -66,6 +67,7 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.Trace;
@@ -81,6 +83,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -90,6 +93,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * It can be a pure weex view, or mixed with native view
  */
 public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
+
+  private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
 
   //Performance
   public boolean mEnd = false;
@@ -158,6 +163,18 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
   private HashMap<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
+
+  public PriorityQueue<WXEmbed> hiddenEmbeds;
+
+  private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit
+
+  public int getMaxHiddenEmbedsNum() {
+    return maxHiddenEmbedsNum;
+  }
+
+  public void setMaxHiddenEmbedsNum(int maxHiddenEmbedsNum) {
+    this.maxHiddenEmbedsNum = maxHiddenEmbedsNum;
+  }
 
   @WorkerThread
   @RestrictTo(Scope.LIBRARY)
@@ -264,6 +281,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   /**
    * For unittest only.
    */
+  @RestrictTo(Scope.TESTS)
   WXSDKInstance(Context context,String id) {
     mInstanceId = id;
     init(context);
@@ -422,6 +440,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
       WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
+
+      if (getUIContext() != null) {
+        new AlertDialog.Builder(getUIContext())
+                .setTitle("Error: Missing pageName")
+                .setMessage("We highly recommend you to set pageName. Call" +
+                        "\nWXSDKInstance#render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag)\n" +
+                        "to fix it.")
+                .show();
+      }
+
       return;
     }
     renderInternal(pageName,template,options,jsonInitData,flag);
@@ -480,8 +508,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
 
-//    Debug.startMethodTracing("renderTrace");
-//    WXLogUtils.e(WXLogUtils.WEEX_TAG, "startTrace");
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
 
@@ -777,6 +803,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    *  begin hook Activity life cycle callback
    ********************************************************/
 
+  @Override
   public void onActivityCreate() {
 
     // module listen Activity onActivityCreate
@@ -792,7 +819,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
 
-
+  @Override
   public void onActivityStart() {
 
     // module listen Activity onActivityCreate
@@ -825,6 +852,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
+      mWXPerformance.wxDims = mwxDims;
+      mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
@@ -1129,8 +1158,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void firstScreenCreateInstanceTime(long time) {
     if(mCreateInstance) {
       mWXPerformance.firstScreenJSFAndWeexCoreExecuteTime = time -mRenderStartTime;
-//      Debug.stopMethodTracing();
-//      WXLogUtils.e(WXLogUtils.WEEX_TAG, "stopMethodTracing");
       mCreateInstance =false;
     }
   }
@@ -1267,7 +1294,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
-      WXSDKManager.getInstance().destroyInstance(mInstanceId);
+      if(mRendered) {
+        WXSDKManager.getInstance().destroyInstance(mInstanceId);
+      }
       WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
@@ -1375,21 +1404,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXScrollListeners=new ArrayList<>();
     }
     mWXScrollListeners.add(wxScrollListener);
-  }
-
-  private void updateRootComponentStyle(JSONObject style) {
-    // TODO
-//    Message message = Message.obtain();
-//    WXDomTask task = new WXDomTask();
-//    task.instanceId = getInstanceId();
-//    if (task.args == null) {
-//      task.args = new ArrayList<>();
-//    }
-//    task.args.add(WXComponent.ROOT);
-//    task.args.add(style);
-//    message.obj = task;
-//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 
   public void setSize(int width, int height) {
@@ -1744,19 +1758,55 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public String getTemplateInfo() {
     String template = getTemplate();
     if(template == null){
-      return " template md5 null";
+      return " template md5 null " + JSONObject.toJSONString(responseHeaders);
     }
     if(TextUtils.isEmpty(template)){
-      return " template md5  length 0";
+      return " template md5  length 0 " + JSONObject.toJSONString(responseHeaders);
     }
     try {
       byte[] bts = template.getBytes("UTF-8");
-      return " template md5 " + WXFileUtils.md5(bts) + " length " +   bts.length
-              + "response header " + JSONObject.toJSONString(responseHeaders);
+      String sourceMD5 = WXFileUtils.md5(bts);
+      String sourceBase64MD5 = WXFileUtils.base64Md5(bts);
+      ArrayList<String> sourceMD5List = new ArrayList<>();
+      ArrayList<String> sourceBase64MD5List = new ArrayList<>();
+      sourceMD5List.add(sourceMD5);
+      sourceBase64MD5List.add(sourceBase64MD5);
+      responseHeaders.put("templateSourceMD5", sourceMD5List);
+      responseHeaders.put(SOURCE_TEMPLATE_BASE64_MD5, sourceBase64MD5List);
+      return " template md5 " + sourceMD5 + " length " +   bts.length
+              + " base64 md5 " + sourceBase64MD5
+              + " response header " + JSONObject.toJSONString(responseHeaders);
     } catch (UnsupportedEncodingException e) {
       return "template md5 getBytes error";
     }
 
+  }
+
+  /**
+   * check template header md5 match with header  content-md5
+   * */
+  public boolean isContentMd5Match(){
+    if(responseHeaders == null){
+      return true;
+    }
+    List<String> contentMD5s = responseHeaders.get("Content-Md5");
+    if(contentMD5s == null){
+      contentMD5s  = responseHeaders.get("content-md5");
+    }
+    if(contentMD5s == null || contentMD5s.size() <= 0){
+      return true;
+    }
+    String md5 = contentMD5s.get(0);
+
+    List<String> sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    if(sourceBase64Md5 == null){
+      getTemplateInfo();
+      sourceBase64Md5 = responseHeaders.get(SOURCE_TEMPLATE_BASE64_MD5);
+    }
+    if(sourceBase64Md5 == null || sourceBase64Md5.size() == 0){
+      return  true;
+    }
+    return  md5.equals(sourceBase64Md5.get(0));
   }
 
   public String getTemplate() {

@@ -51,12 +51,12 @@ public class SimpleComponentHolder implements IFComponentHolder{
   private Map<String, Invoker> mMethodInvokers;
   private ComponentCreator mCreator;
 
-  static class ClazzComponentCreator implements ComponentCreator{
+  public static class ClazzComponentCreator implements ComponentCreator{
 
     private Constructor<? extends WXComponent> mConstructor;
     private final Class<? extends WXComponent> mCompClz;
 
-    ClazzComponentCreator(Class<? extends WXComponent> c){
+    public ClazzComponentCreator(Class<? extends WXComponent> c){
       mCompClz = c;
     }
 
@@ -135,7 +135,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
     mMethodInvokers = methodPair.second;
   }
 
-  static Pair<Map<String,Invoker>,Map<String,Invoker>> getMethods(Class clz){
+  public static Pair<Map<String,Invoker>,Map<String,Invoker>> getMethods(Class clz){
     Map<String, Invoker> methods = new HashMap<>();
     Map<String, Invoker> mInvokers = new HashMap<>();
 

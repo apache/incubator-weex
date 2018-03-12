@@ -78,6 +78,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
@@ -315,6 +316,7 @@ public class WXSDKEngine implements Serializable {
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
+    AutoScanConfigRegister.doScanConfig();
     batchHelper.flush();
   }
 
@@ -393,23 +395,14 @@ public class WXSDKEngine implements Serializable {
 
 
   public static <T extends WXModule> boolean registerModuleWithFactory(String moduleName, IExternalModuleGetter factory, boolean global) throws WXException {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("registerModule=" + moduleName);
-    }
     return registerModule(moduleName, factory.getExternalModuleClass(moduleName,WXEnvironment.getApplication()),global);
   }
 
-  private static <T extends WXModule> boolean registerModule(String moduleName, ModuleFactory factory, boolean global) throws WXException {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXModuleManager.registerModule=" + moduleName);
-    }
+  public static <T extends WXModule> boolean registerModule(String moduleName, ModuleFactory factory, boolean global) throws WXException {
     return WXModuleManager.registerModule(moduleName, factory,global);
   }
 
   public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("registerModule=" + moduleName + ",moduleClass=" + moduleClass.getClass().getName());
-    }
     return registerModule(moduleName, moduleClass,false);
   }
 

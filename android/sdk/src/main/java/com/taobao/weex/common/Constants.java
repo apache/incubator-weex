@@ -322,6 +322,7 @@ public class Constants {
     String HTTPS = "https";
     String HTTP = "http";
     String LOCAL = "local";
+    String DATA = "data";
   }
 
   public interface CodeCache {

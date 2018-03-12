@@ -176,6 +176,13 @@ public class WXPerformance {
   public String connectionType;
   public String requestType;
 
+  /**
+   *for network tracker
+   */
+
+  public String wxDims[] = new String [5];
+  public long measureTimes[] = new long [5];
+
 
   public int mCallCreateBodySumTime = 0;
   public int mCallAddElementByWeexCoreSumTime = 0;

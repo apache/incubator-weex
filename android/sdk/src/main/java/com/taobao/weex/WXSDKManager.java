@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.ICrashInfoReporter;
@@ -84,6 +85,7 @@ public class WXSDKManager {
   private IWXStorageAdapter mIWXStorageAdapter;
   private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
+  private ClassLoaderAdapter mClassLoaderAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
   private ITracingAdapter mTracingAdapter;
   private WXValidateProcessor mWXValidateProcessor;
@@ -334,6 +336,13 @@ public class WXSDKManager {
     return mURIAdapter;
   }
 
+  public ClassLoaderAdapter getClassLoaderAdapter() {
+    if(mClassLoaderAdapter == null){
+      mClassLoaderAdapter = new ClassLoaderAdapter();
+    }
+    return mClassLoaderAdapter;
+  }
+
   public IWXSoLoaderAdapter getIWXSoLoaderAdapter() {
     return mIWXSoLoaderAdapter;
   }
@@ -348,6 +357,7 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
+    this.mClassLoaderAdapter = config.getClassLoaderAdapter();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){
