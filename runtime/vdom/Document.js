@@ -162,7 +162,7 @@ export default class Document {
       return
     }
     event = event || {}
-    event.type = type
+    event.type = event.type || type
     event.target = el
     event.currentTarget = el
     event.timestamp = Date.now()
