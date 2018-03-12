@@ -30,8 +30,10 @@ typedef NS_ENUM(NSInteger, WXPlaybackState) {
 @interface WXVideoView : UIView
 
 @property (nonatomic, copy) void (^playbackStateChanged)(WXPlaybackState state);
+@property (nonatomic, copy) void (^posterClickHandle)(void);
 
 - (void) setURL:(NSURL*)URL;
+- (void) setPosterURL:(NSURL *)posterURL;
 
 - (void) play;
 - (void) pause;
