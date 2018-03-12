@@ -392,18 +392,22 @@ public class BoxShadowUtil {
       setBounds(-paddingX, -paddingY, viewRect.width() + paddingX, viewRect.height() + paddingY);
     }
 
-    @Override
     public void draw(Canvas canvas) {
-      Rect newRect = canvas.getClipBounds();
+      Rect bounds = canvas.getClipBounds();
+      Rect newRect = new Rect(bounds);
       // Make the Canvas Rect bigger according to the padding.
       newRect.inset(-paddingX * 2, -paddingY * 2);
       canvas.clipRect(newRect, Region.Op.REPLACE);
 
       Path contentPath = new Path();
-      RectF rectF = new RectF(0f, 0f, viewRect.width(), viewRect.height());
+      // the content area map must be aligned with bounds
+      RectF rectF = new RectF(bounds);
       contentPath.addRoundRect(rectF, radii, Path.Direction.CCW);
       // can not antialias
       canvas.clipPath(contentPath, Region.Op.DIFFERENCE);
+
+      // translate the canvas to a suitable position and then draw the bitmap, otherwise draw from the origin(0, 0)
+      canvas.translate(bounds.left, bounds.top);
 
       super.draw(canvas);
     }
@@ -517,11 +521,15 @@ public class BoxShadowUtil {
 
     @Override
     public void draw(Canvas canvas) {
+      Rect bounds = canvas.getClipBounds();
       Path border = new Path();
-      RectF rectF = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
+      RectF rectF = new RectF(bounds);
       border.addRoundRect(rectF, radii, Path.Direction.CCW);
       canvas.clipPath(border);
       //TODO: we need clip border-width too
+
+      // translate the canvas to the right place and then draw the inner shadow
+      canvas.translate(bounds.left, bounds.top);
 
       for (int i = 0; i < 4; i++) {
         Shader shader = shades[i];
