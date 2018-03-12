@@ -57,7 +57,7 @@ class RemoveEventAction implements DOMAction, RenderAction {
     if (domObject == null) {
       if (instance != null) {
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_EVENT.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_EVENT,
 				"updateAttr",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_REMOVE_EVENT.getErrorMsg() + "domObject is null",null);
       }

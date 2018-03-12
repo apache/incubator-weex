@@ -28,6 +28,10 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+import com.taobao.weex.performance.IWXAnalyzer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -42,6 +46,7 @@ public class InitConfig {
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
+  private List<IWXAnalyzer> mWxAnalyzerList = new ArrayList<>();
   private String framework;
   private ClassLoaderAdapter classLoaderAdapter;
 
@@ -94,6 +99,8 @@ public class InitConfig {
     return mJSExceptionAdapter;
   }
 
+  public List<IWXAnalyzer> getWxAnalyzer(){return mWxAnalyzerList;}
+
   private InitConfig() {
   }
 
@@ -110,6 +117,7 @@ public class InitConfig {
     IWebSocketAdapterFactory webSocketAdapterFactory;
     ClassLoaderAdapter classLoaderAdapter;
 
+    List<IWXAnalyzer> mWxAnalyzerList = new ArrayList<>();
     public Builder(){
 
     }
@@ -168,6 +176,13 @@ public class InitConfig {
       this.classLoaderAdapter = classLoaderAdapter;
       return this;
     }
+    
+    public Builder setWXMonitorDataTransfer(IWXAnalyzer analyzer){
+      if (!mWxAnalyzerList.contains(analyzer)) {
+        mWxAnalyzerList.add(analyzer);
+      }
+      return this;
+    }
 
     public InitConfig build(){
       InitConfig config =  new InitConfig();
@@ -182,6 +197,7 @@ public class InitConfig {
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       config.mJSExceptionAdapter= this.mJSExceptionAdapter;
       config.classLoaderAdapter = this.classLoaderAdapter;
+      config.mWxAnalyzerList = this.mWxAnalyzerList;
       return config;
     }
   }
