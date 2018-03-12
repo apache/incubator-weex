@@ -45,6 +45,11 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
   if (page == nullptr)
     return;
 
+#if RENDER_LOG
+  LOGD("[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %s, defaultWidth: %f, defaultHeight: %f",
+       page->PageId().c_str(), defaultWidth,defaultHeight);
+#endif
+
   page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight);
 }
 
@@ -66,18 +71,42 @@ static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
   return page->PrintRenderSuccessLog();
 }
 
-static void NotifyLayout(JNIEnv* env, jobject jcaller,
-                         jstring instanceId){
+//Notice that this method is invoked from main thread.
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
+                         jstring instanceId) {
   std::string pageId = jString2StrFast(env, instanceId);
   RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-  if(page != nullptr) {
+  if (page != nullptr) {
 
 #if RENDER_LOG
-    LOGD("[JNI] NotifyLayout >>>> pageId: %s", pageId.c_str());
+    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", pageId.c_str(),
+         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
 #endif
 
-    if(!page->needLayout.load()) {
+    if (!page->needLayout.load()) {
       page->needLayout.store(true);
     }
+
+    bool ret = !page->hasForeLayoutAction.load() && page->isDirty();
+    if (ret) {
+      page->hasForeLayoutAction.store(true);
+    }
+    return ret ? JNI_TRUE : JNI_FALSE;
+  }
+}
+
+//Notice that this method is invoked from JS thread.
+static void ForceLayout(JNIEnv *env, jobject jcaller,
+                        jstring instanceId) {
+  std::string pageId = jString2StrFast(env, instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+  if (page != nullptr) {
+
+#if RENDER_LOG
+    LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", pageId.c_str(), page->hasForeLayoutAction.load()?"true":"false");
+#endif
+
+    page->LayoutImmediately();
+    page->hasForeLayoutAction.store(false);
   }
 }

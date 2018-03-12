@@ -1777,10 +1777,20 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   @Override
   public void OnVSync() {
     // add vSync code for refresh
-    nativeNotifyLayout(getInstanceId());
+    boolean forceLayout = nativeNotifyLayout(getInstanceId());
+    if(forceLayout) {
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          nativeForceLayout(getInstanceId());
+        }
+      });
+    }
   }
 
-  public native void nativeNotifyLayout(String instanceId);
+  private native boolean nativeNotifyLayout(String instanceId);
+
+  private native void nativeForceLayout(String instanceId);
 
   public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 

@@ -54,6 +54,7 @@ namespace WeexCore {
   public:
     static constexpr bool useVSync = true;
     std::atomic_bool needLayout{false};
+    std::atomic_bool hasForeLayoutAction{false};
     RenderPage(std::string pageId);
 
     ~RenderPage();
@@ -110,6 +111,8 @@ namespace WeexCore {
 
     int PrintRenderSuccessLog();
 
+    void LayoutImmediately();
+
     inline RenderObject *GetRenderObject(const std::string &ref) {
         std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
         if (iter != mRenderObjectRegisterMap.end()) {
@@ -142,11 +145,11 @@ namespace WeexCore {
     }
 
     bool isDirty(){
-      return dirty;
+      return dirty.load();
     }
 
     void updateDirty(bool dirty){
-      this->dirty = dirty;
+      this->dirty.store(dirty);
     }
 
     // ****** Life Cycle ****** //
@@ -169,7 +172,7 @@ namespace WeexCore {
     std::pair<float,float> renderPageSize;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
-    bool dirty = true;
+    std::atomic_bool dirty{true};
   };
 }
 
