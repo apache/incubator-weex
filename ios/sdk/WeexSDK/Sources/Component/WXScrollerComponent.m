@@ -28,6 +28,7 @@
 #import "WXRefreshComponent.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXThreadSafeMutableArray.h"
 
 @interface WXScrollerComponnetView:UIScrollView
 @end
@@ -50,7 +51,7 @@
 @interface WXScrollerComponent()
 
 @property (nonatomic, strong) NSMutableArray *  stickyArray;
-@property (nonatomic, strong) NSMutableArray *  listenerArray;
+@property (nonatomic, strong) WXThreadSafeMutableArray * listenerArray;
 @property (nonatomic, weak) WXRefreshComponent *refreshComponent;
 @property (nonatomic, weak) WXLoadingComponent *loadingComponent;
 
@@ -118,7 +119,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (self) {
         
         _stickyArray = [NSMutableArray array];
-        _listenerArray = [NSMutableArray array];
+        _listenerArray = [WXThreadSafeMutableArray array];
         _scrollEvent = NO;
         _scrollStartEvent = NO;
         _scrollEndEvent = NO;
@@ -382,7 +383,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)addScrollToListener:(WXComponent *)target
 {
     BOOL has = NO;
-    for (WXScrollToTarget *targetData in self.listenerArray) {
+    WXThreadSafeMutableArray *listenerArray = [self.listenerArray copy];
+    for (WXScrollToTarget *targetData in listenerArray) {
         if (targetData.target == target) {
             has = YES;
             break;
@@ -400,7 +402,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     if (_shouldRemoveScrollerListener) {
         WXScrollToTarget *targetData = nil;
-        for (WXScrollToTarget *targetDataTemp in self.listenerArray) {
+        WXThreadSafeMutableArray *listenerArray = [self.listenerArray copy];
+        for (WXScrollToTarget *targetDataTemp in listenerArray) {
             if (targetDataTemp.target == target) {
                 targetData = targetDataTemp;
                 break;
