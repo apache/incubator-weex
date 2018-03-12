@@ -57,6 +57,7 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
 
   render->setStyleWidthLevel(CSS_STYLE);
   render->setStyleWidth(value);
+  page->updateDirty(true);
 }
 
 void static
@@ -78,6 +79,7 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
 
   render->setStyleHeightLevel(CSS_STYLE);
   render->setStyleHeight(value);
+  page->updateDirty(true);
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
@@ -107,6 +109,7 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
   } else if (edge == 4) {
     render->setMargin(kMarginALL, value);
   }
+  page->updateDirty(true);
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
@@ -136,6 +139,7 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
   } else if (edge == 4) {
     render->setPadding(kPaddingALL, value);
   }
+  page->updateDirty(true);
 }
 
 
@@ -164,6 +168,7 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
   } else if (edge == 3) {
     render->setStylePosition(kPositionEdgeLeft, value);
   }
+  page->updateDirty(true);
 }
 
 static void CalculateLayout(JNIEnv *env, jobject jcaller,

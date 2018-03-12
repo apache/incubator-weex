@@ -24,7 +24,10 @@ jclass g_WXSDKInstance_clazz = NULL;
 
 }  // namespace
 
-static void NotifyLayout(JNIEnv* env, jobject jcaller,
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
+    jstring instanceId);
+
+static void ForceLayout(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
 static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
@@ -55,7 +58,12 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "("
 "Ljava/lang/String;"
 ")"
-"V", reinterpret_cast<void*>(NotifyLayout) },
+"Z", reinterpret_cast<void*>(NotifyLayout) },
+    { "nativeForceLayout",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(ForceLayout) },
     { "nativeBindComponentToWXCore",
 "("
 "Ljava/lang/String;"

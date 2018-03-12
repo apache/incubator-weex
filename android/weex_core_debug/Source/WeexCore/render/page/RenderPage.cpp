@@ -367,11 +367,13 @@ namespace WeexCore {
     if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
       render_root->setStyleWidthLevel(INSTANCE_STYLE);
       render_root->setStyleWidth(defaultWidth);
+      updateDirty(true);
     }
 
     if (render_root->getStyleHeightLevel() >= INSTANCE_STYLE) {
       render_root->setStyleHeightLevel(INSTANCE_STYLE);
       render_root->setStyleHeight(defaultHeight);
+      updateDirty(true);
     }
 
     Batch();
@@ -410,13 +412,17 @@ namespace WeexCore {
       return false;
     }
     mAlreadyCreateFinish = true;
-    if(isDirty()){
+    Batch();
+    SendCreateFinishAction();
+    return true;
+  }
+
+  void RenderPage::LayoutImmediately() {
+    if(isDirty() && useVSync){
       CalculateLayout();
       needLayout.store(false);
       updateDirty(false);
     }
-    SendCreateFinishAction();
-    return true;
   }
 
   void RenderPage::PostRenderAction(RenderAction *action) {
