@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.weex.commons.AbstractWeexActivity;
+import com.alibaba.weex.update.CheckForUpdateUtil;
 import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
@@ -103,6 +104,8 @@ public class IndexActivity extends AbstractWeexActivity {
     };
 
     LocalBroadcastManager.getInstance(this).registerReceiver(mReloadReceiver, new IntentFilter(WXSDKEngine.JS_FRAMEWORK_RELOAD));
+
+    CheckForUpdateUtil.checkForUpdate(this);
   }
 
   @Override
