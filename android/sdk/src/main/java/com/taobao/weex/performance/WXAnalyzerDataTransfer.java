@@ -44,7 +44,7 @@ public class WXAnalyzerDataTransfer {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
     if (null == transferList || transferList.size() == 0) {
       return;
     }
@@ -85,7 +85,7 @@ public class WXAnalyzerDataTransfer {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
     if (null == transferList || transferList.size() == 0) {
       return;
     }
@@ -116,7 +116,7 @@ public class WXAnalyzerDataTransfer {
     if (!WXEnvironment.isApkDebugable()) {
       return;
     }
-    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzer();
+    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
     if (null == transferList || transferList.size() == 0) {
       return;
     }

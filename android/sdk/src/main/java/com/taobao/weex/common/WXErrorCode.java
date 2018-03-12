@@ -146,9 +146,9 @@ public enum WXErrorCode {
   WX_ERR_JSDOWNLOAD_END("-2299", "js bundle download end",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   // for js framework
-  WX_JS_FRAMEWORK_INIT_SUCCESS("-1000", "js framework success"),
+  WX_JS_FRAMEWORK_INIT_SUCCESS("-1000", "js framework success",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
-  WX_JS_FRAMEWORK_REINIT_SUCCESS("-1001", "js framework reinit success"),
+  WX_JS_FRAMEWORK_REINIT_SUCCESS("-1001", "js framework reinit success",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
   /**
    * JS Framework run error
    */

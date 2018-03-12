@@ -46,8 +46,6 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.performance.IWXAnalyzer;
-import com.taobao.weex.utils.WXLogUtils;
 
 public class WXApplication extends Application {
 
@@ -77,12 +75,6 @@ public class WXApplication extends Application {
                                .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
                                .setJSExceptionAdapter(new JSExceptionAdapter())
                                .setHttpAdapter(new InterceptWXHttpAdapter())
-                                   .setWXMonitorDataTransfer(new IWXAnalyzer() {
-                                     @Override
-                                     public void transfer(String group, String module, String type, String data) {
-                                       WXLogUtils.e(group + "," + module + "," + type + "," + data);
-                                     }
-                                   })
                                .build()
                           );
 

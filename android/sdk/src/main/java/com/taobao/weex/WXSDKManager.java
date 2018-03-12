@@ -361,14 +361,18 @@ public class WXSDKManager {
     return mIWXSoLoaderAdapter;
   }
 
-  public List<IWXAnalyzer> getWXAnalyzer(){
+  public List<IWXAnalyzer> getWXAnalyzerList(){
     return mWXAnalyzerList;
   }
 
-  public void setWXAnalyzer(IWXAnalyzer analyzer){
+  public void addWXAnalyzer(IWXAnalyzer analyzer){
     if (!mWXAnalyzerList.contains(analyzer)) {
       mWXAnalyzerList.add(analyzer);
     }
+  }
+
+  public void rmWXAnalyzer(IWXAnalyzer analyzer){
+    mWXAnalyzerList.remove(analyzer);
   }
 
   void setInitConfig(InitConfig config){
@@ -381,7 +385,6 @@ public class WXSDKManager {
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
-    this.mWXAnalyzerList.addAll(config.getWxAnalyzer());
     this.mClassLoaderAdapter = config.getClassLoaderAdapter();
   }
 
