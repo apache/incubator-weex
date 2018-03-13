@@ -178,7 +178,7 @@ public class WXUtils {
           }
         }
         else{
-          throw new NumberFormatException("Illegal separator");
+          // throw new NumberFormatException("Illegal separator");
         }
       }
 
