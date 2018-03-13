@@ -361,8 +361,16 @@ namespace WeexCore {
       return paddingBorderAlongAxis;
     }
 
-    inline bool isWrapRequired(const float &mainSize, const float &currentLength, const float &childLength) const {
-      return !isSingleFlexLine(mainSize) && mainSize < currentLength + childLength;
+    inline bool isWrapRequired(const WXCoreLayoutNode *parent, const float &width, const float &height,
+                               const float &currentLength, const float &childLength) const {
+      float maxMainSize;
+      if(isMainAxisHorizontal(this)){
+        maxMainSize = width - sumPaddingBorderAlongAxis(this, true);
+      }
+      else{
+        maxMainSize = height - sumPaddingBorderAlongAxis(this, false);
+      }
+      return !isSingleFlexLine(maxMainSize) && maxMainSize < currentLength + childLength;
     }
 
     inline bool isSingleFlexLine(const float &mainSize) const {
@@ -433,18 +441,22 @@ namespace WeexCore {
                                                                        float childSizeAlongMainAxis, const Index childIndex){
       bool needsReexpand = false;
       if (isMainAxisHorizontal(this)) {
-        if (childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
+        if (!isnan(child->mCssStyle->mMaxWidth) &&
+            childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxWidth;
-        } else if (childSizeAlongMainAxis < child->mCssStyle->mMinWidth) {
+        } else if (!isnan(child->mCssStyle->mMinWidth) &&
+            childSizeAlongMainAxis < child->mCssStyle->mMinWidth) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMinWidth;
         }
       } else {
-        if (childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
+        if (!isnan(child->mCssStyle->mMaxHeight) &&
+            childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMaxHeight;
-        } else if (childSizeAlongMainAxis < child->mCssStyle->mMinHeight) {
+        } else if (!isnan(child->mCssStyle->mMinHeight) &&
+            childSizeAlongMainAxis < child->mCssStyle->mMinHeight) {
           needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
           childSizeAlongMainAxis = child->mCssStyle->mMinHeight;
         }

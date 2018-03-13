@@ -232,8 +232,8 @@ namespace WeexCore {
                        mPositionType(kWXCorePositionTypeDefault),
                        mStyleWidth(NAN), mStyleHeight(NAN),
                        mStyleHeightLevel(FALLBACK_STYLE), mStyleWidthLevel(FALLBACK_STYLE),
-                       mMaxWidth(MAXFLOAT), mMaxHeight(MAXFLOAT),
-                       mMinWidth(0), mMinHeight(0) {
+                       mMaxWidth(NAN), mMaxHeight(NAN),
+                       mMinWidth(NAN), mMinHeight(NAN) {
 
     }
 
@@ -248,8 +248,8 @@ namespace WeexCore {
       mStyleHeight = NAN;
       mStyleWidthLevel = FALLBACK_STYLE;
       mStyleHeightLevel = FALLBACK_STYLE;
-      mMaxWidth = MAXFLOAT;
-      mMaxHeight = MAXFLOAT;
+      mMaxWidth = NAN;
+      mMaxHeight = NAN;
       mMinWidth = NAN;
       mMinHeight = NAN;
     }
