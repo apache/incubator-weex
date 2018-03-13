@@ -594,7 +594,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 	}else {
 	  requestUrl = pageName;
 	}
-
+    wxRequest.instanceId = getInstanceId();
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
