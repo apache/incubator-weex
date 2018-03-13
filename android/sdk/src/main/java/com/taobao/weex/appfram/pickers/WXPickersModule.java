@@ -32,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Checkable;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -77,7 +78,6 @@ public class WXPickersModule extends WXModule {
     private static final String KEY_SELECTION_COLOR = "selectionColor";
 
     private int selected;
-    private View selectedView;
 
     @JSMethod
     public void pick(Map<String, Object> options, JSCallback callback) {
@@ -182,7 +182,7 @@ public class WXPickersModule extends WXModule {
 
     }
 
-    private void performSinglePick(List<String> items, final Map<String, Object> options, final JSCallback callback) {
+    private void performSinglePick(final List<String> items, final Map<String, Object> options, final JSCallback callback) {
         selected = getOption(options, KEY_INDEX, 0);
         final int textColor = getColor(options, KEY_TEXT_COLOR, Color.TRANSPARENT);
 
@@ -196,8 +196,9 @@ public class WXPickersModule extends WXModule {
                             @Override
                             public View getView(int position, View convertView, @Nullable ViewGroup parent) {
                                 View itemView =  super.getView(position, convertView, parent);
-                                if (position == selected) {
-                                    selectedView = itemView;
+
+                                if (itemView != null && itemView instanceof CheckedTextView) {
+                                    ((CheckedTextView) itemView).setChecked(position == selected);
                                 }
 
                                 if (itemView instanceof TextView && textColor != Color.TRANSPARENT) {
@@ -260,15 +261,6 @@ public class WXPickersModule extends WXModule {
                 previousView = view;
             }
         });
-
-        listView.post(WXThread.secure(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedView != null) {
-                    listView.performItemClick(selectedView, selected, selectedView.getId());
-                }
-            }
-        }));
 
         dialog.getWindow().getDecorView().post(WXThread.secure(new Runnable() {
             @Override
