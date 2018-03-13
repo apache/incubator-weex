@@ -118,6 +118,20 @@ under the License.
                 android:stateNotNeeded="true"/>
         <activity android:name="com.alibaba.weex.BenchmarkActivity"
                   android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".update.UpdateService"
+            android:exported="false" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.alibaba.weex.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
 
 </manifest>
