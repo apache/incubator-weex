@@ -1763,7 +1763,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 		  }
 
           if (mUserTrackAdapter != null) {
-            mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
+            mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, getUserTrackParams());
           }
         }
       }
