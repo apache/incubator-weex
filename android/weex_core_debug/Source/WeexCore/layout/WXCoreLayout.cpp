@@ -289,7 +289,11 @@ namespace WeexCore {
           float childWidth = child->mCssStyle->mStyleWidth;
           float childHeight = child->mCssStyle->mStyleHeight;
           if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
-            stretch = isSingleFlexLine(parentHeight) && (mCssStyle->mAlignItems == kAlignItemsStretch);
+            stretch = widthMeasureMode == kExactly &&
+                isSingleFlexLine(parentHeight) &&
+                ((child->mCssStyle->mAlignSelf == kAlignSelfStretch) ||
+                    (mCssStyle->mAlignItems == kAlignItemsStretch
+                        && child->mCssStyle->mAlignSelf == kAlignSelfAuto));
           }
 
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
@@ -612,7 +616,7 @@ namespace WeexCore {
         case kJustifySpaceAround:
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (width - flexLine->mMainSize) / visibleCount;
+            spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
           }
           childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
           childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
@@ -794,7 +798,7 @@ namespace WeexCore {
         case kJustifySpaceAround:
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (height - flexLine->mMainSize) / visibleCount;
+            spaceBetweenItem = (height - flexLine->mMainSize- sumPaddingBorderAlongAxis(this,false) ) / visibleCount;
           }
           childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
           childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
