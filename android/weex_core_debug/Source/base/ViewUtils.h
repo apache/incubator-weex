@@ -23,26 +23,6 @@ namespace WeexCore {
     return s;
   }
 
-  inline bool AllisNum(std::string str) {
-    bool point = false;
-    for (int i = 0; i < str.size(); i++) {
-      int tmp = (int) str[i];
-      if (tmp == 46) {
-        if (!point) {
-          point = true;
-          continue;
-        } else {
-          return false;
-        }
-      } else if (tmp >= 48 && tmp <= 57) {
-        continue;
-      } else {
-        return false;
-      }
-    }
-    return true;
-  }
-
   inline float getFloat(const float &src, const float &viewport) {
     if (isnan(src))
       return NAN;
@@ -61,7 +41,12 @@ namespace WeexCore {
         || src.empty()) {
       return ret;
     }
-    ret = getFloat(atof((char *) src.c_str()), viewport);
+    char *end;
+    float original_value = strtof(src.c_str(), &end);
+    if(*end != '\0'){
+      original_value = NAN;
+    }
+    ret = getFloat(original_value, viewport);
     return ret;
   }
 
@@ -93,7 +78,7 @@ namespace WeexCore {
       ret = getFloat(transferWx(src, viewport), viewport);
     } else if (endWidth(src, PX)) {
       ret = getFloat(src.substr(0, src.size() - PX.size()), viewport);
-    } else if (AllisNum(src)) {
+    } else {
       ret = getFloat(src, viewport);
     }
     return ret;
