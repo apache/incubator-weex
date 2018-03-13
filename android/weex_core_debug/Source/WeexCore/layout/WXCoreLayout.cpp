@@ -255,7 +255,8 @@ namespace WeexCore {
         }
         measureChild(child, width, height, needMeasure, hypotheticalMeasurment);
         checkSizeConstraints(child, hypotheticalMeasurment);
-        if (isWrapRequired(isMainAxisHorizontal(this) ? width : height, flexLine->mMainSize,
+
+        if (isWrapRequired(this, width, height, flexLine->mMainSize,
                            calcItemSizeAlongAxis(child, isMainAxisHorizontal(this)))) {
           if (flexLine->mItemCount > 0) {
             mFlexLines.push_back(flexLine);

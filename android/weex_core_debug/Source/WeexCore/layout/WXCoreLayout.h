@@ -361,8 +361,16 @@ namespace WeexCore {
       return paddingBorderAlongAxis;
     }
 
-    inline bool isWrapRequired(const float &mainSize, const float &currentLength, const float &childLength) const {
-      return !isSingleFlexLine(mainSize) && mainSize < currentLength + childLength;
+    inline bool isWrapRequired(const WXCoreLayoutNode *parent, const float &width, const float &height,
+                               const float &currentLength, const float &childLength) const {
+      float maxMainSize;
+      if(isMainAxisHorizontal(this)){
+        maxMainSize = width - sumPaddingBorderAlongAxis(this, true);
+      }
+      else{
+        maxMainSize = height - sumPaddingBorderAlongAxis(this, false);
+      }
+      return !isSingleFlexLine(maxMainSize) && maxMainSize < currentLength + childLength;
     }
 
     inline bool isSingleFlexLine(const float &mainSize) const {
