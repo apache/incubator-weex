@@ -326,24 +326,24 @@ namespace WeexCore {
       nodeWidth = node->mLayoutResult->mLayoutSize.width;
       nodeHeight = node->mLayoutResult->mLayoutSize.height;
 
-      if (node->widthMeasureMode != kUnspecified) {
-        if (nodeWidth < node->mCssStyle->mMinWidth) {
-          widthRemeasure = true;
-          nodeWidth = node->mCssStyle->mMinWidth;
-        } else if (nodeWidth > node->mCssStyle->mMaxWidth) {
-          widthRemeasure = true;
-          nodeWidth = node->mCssStyle->mMaxWidth;
-        }
+      if (!isnan(node->mCssStyle->mMinWidth) &&
+          nodeWidth < node->mCssStyle->mMinWidth) {
+        widthRemeasure = true;
+        nodeWidth = node->mCssStyle->mMinWidth;
+      } else if (!isnan(nodeWidth > node->mCssStyle->mMaxWidth)
+          && nodeWidth > node->mCssStyle->mMaxWidth) {
+        widthRemeasure = true;
+        nodeWidth = node->mCssStyle->mMaxWidth;
       }
 
-      if (node->heightMeasureMode != kUnspecified) {
-        if (nodeHeight < node->mCssStyle->mMinHeight) {
-          heightRemeasure = true;
-          nodeHeight = node->mCssStyle->mMinHeight;
-        } else if (nodeHeight > node->mCssStyle->mMaxHeight) {
-          heightRemeasure = true;
-          nodeHeight = node->mCssStyle->mMaxHeight;
-        }
+      if (!isnan(nodeHeight < node->mCssStyle->mMinHeight) &&
+          nodeHeight < node->mCssStyle->mMinHeight) {
+        heightRemeasure = true;
+        nodeHeight = node->mCssStyle->mMinHeight;
+      } else if (!isnan(nodeHeight > node->mCssStyle->mMaxHeight) &&
+          nodeHeight > node->mCssStyle->mMaxHeight) {
+        heightRemeasure = true;
+        nodeHeight = node->mCssStyle->mMaxHeight;
       }
 
       node->setWidthMeasureMode(widthRemeasure ? kExactly : node->widthMeasureMode);
