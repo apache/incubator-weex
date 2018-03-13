@@ -54,7 +54,8 @@ public:
                                        jstring jfunction,
                                        jobjectArray jargs);
 
-
+    static void updateGlobalConfig(JNIEnv* env, jobject jcaller,
+                                 jstring config);
 };
 }
 #endif //_WEEX_PROXY_H_

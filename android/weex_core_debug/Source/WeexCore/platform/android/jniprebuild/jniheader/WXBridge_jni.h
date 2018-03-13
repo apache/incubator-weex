@@ -93,6 +93,9 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
     jstring _function,
     jobjectArray args);
 
+static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
+    jstring config);
+
 // Step 2: method stubs.
 
 // Step 3: RegisterNatives.
@@ -195,6 +198,11 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "[Lcom/taobao/weex/bridge/WXJSObject;"
 ")"
 "[B", reinterpret_cast<void*>(ExecJSWithResult) },
+    { "nativeUpdateGlobalConfig",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(UpdateGlobalConfig) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

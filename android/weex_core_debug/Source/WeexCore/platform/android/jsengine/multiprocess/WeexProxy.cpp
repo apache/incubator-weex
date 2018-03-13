@@ -538,4 +538,24 @@ jbyteArray WeexProxy::execJSWithResult(JNIEnv* env, jobject jthis,
   return NULL;
 }
 
+void WeexProxy::updateGlobalConfig(JNIEnv *env, jobject jcaller, jstring config) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return;
+  }
+  if (config == NULL) {
+    LOGE("native_execJS function is NULL");
+    return;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::UPDATEGLOBALCONFIG));
+    addString(env, serializer.get(), config);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+  }
+}
+
 }  // namespace WeexCore

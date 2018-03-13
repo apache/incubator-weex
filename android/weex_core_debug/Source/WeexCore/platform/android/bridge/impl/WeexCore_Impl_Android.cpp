@@ -262,6 +262,11 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
   return WeexProxy::execJSWithResult(env, jcaller, instanceId, _namespace, _function, args);
 }
 
+static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
+                               jstring config) {
+  WeexProxy::updateGlobalConfig(env, jcaller, config);
+}
+
 
 namespace WeexCore {
   bool RegisterJNIUtils(JNIEnv *env) {

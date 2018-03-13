@@ -65,6 +65,12 @@ public class WXBridge implements IWXBridge {
 
   public native byte[] nativeExecJSWithResult(String instanceId, String _namespace, String _function, WXJSObject[] args);
 
+  /**
+   * update global config,
+   * @param config params
+   * */
+  public native void nativeUpdateGlobalConfig(String config);
+
   public static final boolean MULTIPROCESS = true;
 
 

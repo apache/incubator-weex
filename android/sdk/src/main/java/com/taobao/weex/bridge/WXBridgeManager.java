@@ -1826,6 +1826,38 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
+  /**
+   * update js server global config, current support turn wson off
+   * by pass wson_off
+   * */
+  public static void  updateGlobalConfig(String config) {
+    if(TextUtils.isEmpty(config)){
+      config = "none";
+    }
+    if(!TextUtils.equals(config, globalConfig)){
+      globalConfig = config;
+      WXEnvironment.getCustomOptions().put(GLOBAL_CONFIG_KEY, globalConfig);
+      Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+          if(mBridgeManager != null){
+            if(mBridgeManager.isJSFrameworkInit()){
+              if(mBridgeManager.mWXBridge instanceof WXBridge) {
+                final WXBridge bridge = (WXBridge) mBridgeManager.mWXBridge;
+                bridge.nativeUpdateGlobalConfig(globalConfig);
+              }
+            }
+          }
+        }
+      };
+      if(mBridgeManager != null && mBridgeManager.isJSFrameworkInit()){
+        mBridgeManager.post(runnable);
+      }else{
+        runnable.run();
+      }
+    }
+  }
+
   public
   @Nullable
   Looper getJSLooper() {
