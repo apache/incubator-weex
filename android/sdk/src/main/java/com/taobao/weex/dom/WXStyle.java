@@ -27,13 +27,12 @@ import android.text.TextUtils;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.binding.ELUtils;
-import com.taobao.weex.dom.binding.WXStatement;
 import com.taobao.weex.dom.flex.CSSAlign;
+import com.taobao.weex.dom.flex.CSSDirection;
 import com.taobao.weex.dom.flex.CSSFlexDirection;
 import com.taobao.weex.dom.flex.CSSJustify;
 import com.taobao.weex.dom.flex.CSSPositionType;
 import com.taobao.weex.dom.flex.CSSWrap;
-import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
@@ -43,9 +42,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
-import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
 
 /**
  * Store value of component style
@@ -812,5 +808,18 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public ArrayMap<String, Object> getBindingStyle() {
     return mBindingStyle;
+  }
+
+  public CSSDirection getDirection() {
+    String d = (String) get("direction");
+    if (d != null) {
+      switch (d) {
+        case "rtl":
+          return CSSDirection.RTL;
+        case "ltr":
+          return CSSDirection.LTR;
+      }
+    }
+    return CSSDirection.INHERIT;
   }
 }
