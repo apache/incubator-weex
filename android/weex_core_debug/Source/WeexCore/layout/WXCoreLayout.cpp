@@ -291,7 +291,9 @@ namespace WeexCore {
           if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
             stretch = widthMeasureMode == kExactly &&
                 isSingleFlexLine(parentHeight) &&
-                (mCssStyle->mAlignItems == kAlignItemsStretch);
+                ((child->mCssStyle->mAlignSelf == kAlignSelfStretch) ||
+                    (mCssStyle->mAlignItems == kAlignItemsStretch
+                        && child->mCssStyle->mAlignSelf == kAlignSelfAuto));
           }
 
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
