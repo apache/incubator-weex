@@ -26,6 +26,7 @@ import android.text.Layout;
 import android.text.TextUtils;
 
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.binding.ELUtils;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
@@ -49,9 +50,18 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private Map<String,Map<String,Object>> mPesudoStyleMap = new ArrayMap<>();// clz_group:{styleMap}
   private Map<String,Object> mPesudoResetStyleMap = new ArrayMap<>();
 
+  /**
+   * dynamic binding attrs, can be null, only weex use
+   * */
+  private ArrayMap<String, Object>  mBindingStyle;
 
   public WXStyle(){
     mStyles = new ArrayMap<>();
+  }
+
+  public WXStyle(Map<String, Object> mStyles, boolean byPesudo) {
+    this();
+    this.putAll(filterBindingStyles(mStyles), byPesudo);
   }
 
   @Nullable
@@ -431,5 +441,42 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
     style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
     return style;
+  }
+
+  /**
+   * filter dynamic state ment
+   * */
+  private Map<String, Object> filterBindingStyles(Map styles) {
+    if(styles == null || styles.size() == 0){
+      return styles;
+    }
+    Set<Map.Entry<String,Object>> entries = styles.entrySet();
+    Iterator<Entry<String,Object>> it =  entries.iterator();
+    while (it.hasNext()){
+      Map.Entry<String,Object> entry = it.next();
+      if(filterBindingStyle(entry.getKey(), entry.getValue())){
+        it.remove();
+      }
+    }
+    return styles;
+  }
+
+  /**
+   * filter dynamic attrs and statements
+   * */
+  private boolean filterBindingStyle(String key, Object value) {
+    if(ELUtils.isBinding(value)){
+      if(mBindingStyle == null){
+        mBindingStyle = new ArrayMap<String, Object>();
+      }
+      value = ELUtils.bindingBlock(value);
+      mBindingStyle.put(key, value);
+      return  true;
+    }
+    return  false;
+  }
+
+  public ArrayMap<String, Object> getBindingStyle() {
+    return mBindingStyle;
   }
 }

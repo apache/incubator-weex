@@ -385,6 +385,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     int spinnerDy = (int) calculateDistanceY(target, dy);
 
+    mRefreshing = false;
+
     if (!isConfirm) {
       if (spinnerDy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;

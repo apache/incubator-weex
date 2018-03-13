@@ -47,6 +47,14 @@ public:
     reportException(const char *instanceID, const char *func, const char *exception_string);
 
     static void reportServerCrash(jstring jinstanceid);
+
+    static jbyteArray execJSWithResult(JNIEnv* env, jobject jthis,
+                                       jstring jinstanceid,
+                                       jstring jnamespace,
+                                       jstring jfunction,
+                                       jobjectArray jargs);
+
+
 };
 }
 #endif //_WEEX_PROXY_H_

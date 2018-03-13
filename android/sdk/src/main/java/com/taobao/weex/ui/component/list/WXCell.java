@@ -51,12 +51,15 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
-    private boolean mLazy = true;
 
     /** used in list sticky detect **/
     private int mScrollPosition = -1;
     private boolean mFlatUIEnabled = false;
 
+
+    private Object  renderData;
+
+    private boolean isSourceUsed = false;
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -65,6 +68,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
         super(instance, parent, basicComponentData);
+        lazy(true);
         if(Build.VERSION.SDK_INT< Build.VERSION_CODES.LOLLIPOP) {
             try {
                 //TODO a WTF is necessary if anyone try to change the flat flag during update attrs.
@@ -80,11 +84,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     @Override
     public boolean isLazy() {
-        return mLazy;
-    }
-
-    public void lazy(boolean lazy) {
-        mLazy = lazy;
+        return super.isLazy() && !isFixed();
     }
 
     @Override
@@ -203,6 +203,22 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             return 0;
         }
         float  offset = WXUtils.getFloat(getAttrs().get(STICKY_OFFSET));
-        return (int)(WXViewUtils.getRealPxByWidth(offset,getViewPortWidth()));
+        return (int)(WXViewUtils.getRealPxByWidth(offset, getViewPortWidth()));
+    }
+
+    public Object getRenderData() {
+        return renderData;
+    }
+
+    public void setRenderData(Object renderData) {
+        this.renderData = renderData;
+    }
+
+    public boolean isSourceUsed() {
+        return isSourceUsed;
+    }
+
+    public void setSourceUsed(boolean sourceUsed) {
+        isSourceUsed = sourceUsed;
     }
 }

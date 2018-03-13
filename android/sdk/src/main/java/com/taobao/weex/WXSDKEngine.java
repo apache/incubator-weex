@@ -78,6 +78,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
@@ -284,8 +285,10 @@ public class WXSDKEngine implements Serializable {
       String simpleList = "simplelist";
       registerComponent(SimpleListComponent.class,false,simpleList);
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
+      registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
+      registerComponent(WXBasicComponentType.CELL_SLOT, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
       registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);

@@ -459,4 +459,83 @@ void WeexProxy::setCacheDir(JNIEnv *env) {
   s_cacheDir = getCacheDir(env);
 }
 
+jbyteArray WeexProxy::execJSWithResult(JNIEnv* env, jobject jthis,
+                                         jstring jinstanceid,
+                                         jstring jnamespace,
+                                         jstring jfunction,
+                                         jobjectArray jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return NULL;
+  }
+  if (jfunction == NULL || jinstanceid == NULL) {
+    LOGE("native_execJS function is NULL");
+    return NULL;
+  }
+
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSWITHRESULT));
+    addString(env, serializer.get(), jinstanceid);
+    if (jnamespace)
+      addString(env, serializer.get(), jnamespace);
+    else {
+      uint16_t tmp = 0;
+      serializer->add(&tmp, 0);
+    }
+    addString(env, serializer.get(), jfunction);
+
+    for (int i = 0; i < length; i++) {
+      jobject jArg = env->GetObjectArrayElement(jargs, i);
+
+      jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+      jint jTypeInt = env->GetIntField(jArg, jTypeId);
+
+      jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+      jobject jDataObj = env->GetObjectField(jArg, jDataId);
+      if (jTypeInt == 1) {
+        if (jDoubleValueMethodId == NULL) {
+          jclass jDoubleClazz = env->FindClass("java/lang/Double");
+          jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+          env->DeleteLocalRef(jDoubleClazz);
+        }
+        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+        serializer->add(jDoubleObj);
+
+      } else if (jTypeInt == 2) {
+        jstring jDataStr = (jstring)jDataObj;
+        addString(env, serializer.get(), jDataStr);
+      } else if (jTypeInt == 3) {
+        jstring jDataStr = (jstring)jDataObj;
+        addJSONString(env, serializer.get(), jDataStr);
+      } else {
+        serializer->addJSUndefined();
+      }
+      env->DeleteLocalRef(jDataObj);
+      env->DeleteLocalRef(jArg);
+    }
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    if (result->getType() != IPCType::BYTEARRAY) {
+      return NULL;
+    }
+    if(result->getByteArrayLength() == 0){
+      return NULL;
+    }
+    jbyteArray array = env->NewByteArray(result->getByteArrayLength());
+    env->SetByteArrayRegion(array, 0, result->getByteArrayLength(), reinterpret_cast<const jbyte*>(result->getByteArrayContent()));
+    return array;
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return NULL;
+  }
+  return NULL;
+}
+
 }  // namespace WeexCore

@@ -465,6 +465,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mParent != null && mParent.isLazy();
   }
 
+  /**
+   * find certain class type parent
+   * */
+  public  Object findTypeParent(WXComponent component, Class type){
+    if(component.getClass() == type){
+      return component;
+    }
+    if(component.getParent() != null) {
+      findTypeParent(component.getParent(), type);
+    }
+    return  null;
+  }
+
   protected final void addFocusChangeListener(OnFocusChangeListener l) {
     View view;
     if (l != null && (view = getRealView()) != null) {
@@ -1948,6 +1961,62 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return false;
   }
 
+  public boolean isWaste() {
+    return waste;
+  }
+
+  /**
+   * mark node waste,
+   * if node is waster should hidden, and dom tree should allow not show
+   * */
+  public void setWaste(boolean waste) {
+    if(this.waste != waste){
+      this.waste = waste;
+      if(waste){
+        //update dom not show, and put style to hidden
+        getStyles().put(Constants.Name.VISIBILITY, Constants.Value.HIDDEN);
+        //if component not init, mark lazy init when use, reduce view count
+        if(getHostView() == null){
+          if(!mLazy){
+            lazy(true);
+          }
+        }else{
+          getHostView().setVisibility(View.GONE);
+        }
+      }else{
+        getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
+        if(getHostView() == null){
+          if(mLazy) { // when parent is lazy just mark node lazy false
+            if(mParent != null && mParent.isLazy()){
+              lazy(false);
+            }else{
+              ComponentUtils.initLazyComponent(this, mParent);
+            }
+          }
+        }else{
+          getHostView().setVisibility(View.VISIBLE);
+        }
+      }
+    }
+  }
+
+
+  /** component key id in native,
+   *  differ with ref, ref + position
+   *  */
+  public  String getViewTreeKey(){
+    if(mViewTreeKey == null){
+      if(getParent() == null){
+        mViewTreeKey = getRef();
+      }else{
+        mViewTreeKey = getRef() + "_" + getParent().indexOf(this);
+      }
+    }
+    return mViewTreeKey;
+  }
+
+  private String mViewTreeKey;
+
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
   public WXTransition getTransition() {
@@ -1998,5 +2067,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
     }
     return null;
+  }
+
+  /**
+   * node is lazy
+   * */
+  private boolean mLazy = false;
+
+  /***/
+  public void lazy(boolean lazy) {
+    mLazy = lazy;
   }
 }

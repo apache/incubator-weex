@@ -63,6 +63,8 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeSetViewPortWidth(String instanceId, float value);
 
+  public native byte[] nativeExecJSWithResult(String instanceId, String _namespace, String _function, WXJSObject[] args);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -83,6 +85,11 @@ public class WXBridge implements IWXBridge {
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
     return nativeExecJS(instanceId, namespace, function, args);
+  }
+
+  @Override
+  public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return nativeExecJSWithResult(instanceId, namespace, function, args);
   }
 
   @Override

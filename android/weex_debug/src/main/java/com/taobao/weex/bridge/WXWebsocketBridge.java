@@ -81,8 +81,14 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
         return 0;
     }
 
+  @Override
+  public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
+      // TODO
+      return new byte[0];
+  }
 
-    @Override
+
+  @Override
     public int execJSService(String javascript) {
         return 0;
     }

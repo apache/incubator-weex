@@ -199,10 +199,9 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
   WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, key), jString2Str(env, value));
 }
 
-static void nativeSetViewPortWidth(JNIEnv *env, jobject jcaller,
+static void SetViewPortWidth(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jfloat value) {
-  LOGE("nativeSetViewPortWidth，key: %s, value: %f", jString2StrFast(env, instanceId).c_str(), value);
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
@@ -248,6 +247,19 @@ static jint ExecJS(JNIEnv *env,
   }
 
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
+}
+
+static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
+                                   jstring instanceId,
+                                   jstring _namespace,
+                                   jstring _function,
+                                   jobjectArray args) {
+  if (_function == NULL || instanceId == NULL) {
+    LOGE("native_execJS function is NULL");
+    return NULL;
+  }
+
+  return WeexProxy::execJSWithResult(env, jcaller, instanceId, _namespace, _function, args);
 }
 
 

@@ -52,6 +52,10 @@ public abstract class WXBasicComponent<T extends View> {
     this.mComponentType = basicComponentData.mComponentType;
   }
 
+  public BasicComponentData getBasicComponentData() {
+    return mBasicComponentData;
+  }
+
   protected void copyData(WXComponent component) {
     mComponentType = component.getComponentType();
     mRef = component.getRef();
@@ -59,26 +63,17 @@ public abstract class WXBasicComponent<T extends View> {
 
   public final @NonNull
   WXStyle getStyles() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getStyles();
-    }
-    return null;
+    return mBasicComponentData.getStyles();
   }
 
   public final @NonNull
   WXAttr getAttrs() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getAttrs();
-    }
-    return null;
+    return mBasicComponentData.getAttrs();
   }
 
   public final @NonNull
   WXEvent getEvents() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getEvents();
-    }
-    return null;
+    return mBasicComponentData.getEvents();
   }
 
   /**
@@ -86,10 +81,7 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public final @NonNull
   CSSShorthand getMargin() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getMargin();
-    }
-    return null;
+    return mBasicComponentData.getMargin();
   }
 
   /**
@@ -97,10 +89,7 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public final @NonNull
   CSSShorthand getPadding() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getPadding();
-    }
-    return null;
+    return mBasicComponentData.getPadding();
   }
 
   /**
@@ -108,55 +97,40 @@ public abstract class WXBasicComponent<T extends View> {
    */
   public @NonNull
   CSSShorthand getBorder() {
-    if (mBasicComponentData != null) {
-      return mBasicComponentData.getBorder();
-    }
-    return null;
+    return mBasicComponentData.getBorder();
   }
 
   public final void setMargins(@NonNull CSSShorthand margins) {
-    if (mBasicComponentData != null) {
-      mBasicComponentData.setMargins(margins);
-    }
+    mBasicComponentData.setMargins(margins);
   }
 
   public final void setPaddings(@NonNull CSSShorthand paddings) {
-    if (mBasicComponentData != null) {
-      mBasicComponentData.setPaddings(paddings);
-    }
+    mBasicComponentData.setPaddings(paddings);
   }
 
   public final void setBorders(@NonNull CSSShorthand borders) {
-    if (mBasicComponentData != null) {
-      mBasicComponentData.setBorders(borders);
-    }
+    mBasicComponentData.setBorders(borders);
   }
 
   public final void addAttr(Map<String, Object> attrs) {
     if (attrs == null || attrs.isEmpty()) {
       return;
     }
-    if (mBasicComponentData != null) {
-      mBasicComponentData.addAttr(attrs);
-    }
+    mBasicComponentData.addAttr(attrs);
   }
 
   public final void addStyle(Map<String, Object> styles) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
-    if (mBasicComponentData != null) {
-      mBasicComponentData.addStyle(styles);
-    }
+    mBasicComponentData.addStyle(styles);
   }
 
   public final void addStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
-    if (mBasicComponentData != null) {
-      mBasicComponentData.addStyle(styles, byPesudo);
-    }
+    mBasicComponentData.addStyle(styles, byPesudo);
   }
 
   public final void addEvent(Set<String> events) {
@@ -164,9 +138,7 @@ public abstract class WXBasicComponent<T extends View> {
       return;
     }
 
-    if (mBasicComponentData != null) {
-      mBasicComponentData.addEvent(events);
-    }
+    mBasicComponentData.addEvent(events);
   }
 
   public final void addShorthand(Map<String, String> shorthand) {
@@ -239,93 +211,6 @@ public abstract class WXBasicComponent<T extends View> {
     return mLayoutSize == null ? 0 : mLayoutSize.getHeight();
   }
 
-
-
-//  public float getPaddingTop() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_TOP));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-//    }
-//    return temp;
-//  }
-//
-//  public float getPaddingLeft() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_LEFT));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-//    }
-//    return temp;
-//  }
-//
-//  public float getPaddingRight() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_RIGHT));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-//    }
-//    return temp;
-//  }
-//
-//  public float getPaddingBottom() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_BOTTOM));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-//    }
-//    return temp;
-//  }
-//
-//  public float getMarginTop() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_TOP));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-//    }
-//    return temp;
-//  }
-//
-//  public float getMarginLeft() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_LEFT));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-//    }
-//    return temp;
-//  }
-//
-//  public float getMarginRight() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_RIGHT));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-//    }
-//    return temp;
-//  }
-//
-//  public float getMarginBottom() {
-//    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_BOTTOM));
-//    if (WXUtils.isUndefined(temp)) {
-//      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-//    }
-//    return temp;
-//  }
-//
-//
-//  public float getBorderRightWidth() {
-//    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
-//  }
-//
-//  public float getBorderTopWidth() {
-//    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
-//  }
-//
-//  public float getBorderBottomWidth() {
-//    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH);
-//  }
-//
-//  public float getBorderLeftWidth() {
-//    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
-//  }
-
-//  public float getDefaultWidth() {
-//    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.DEFAULT_WIDTH));
-//  }
-
   public float getMinWidth() {
     return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_WIDTH));
   }
@@ -333,10 +218,6 @@ public abstract class WXBasicComponent<T extends View> {
   public float getMaxWidth() {
     return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MAX_WIDTH));
   }
-
-//  public float getDefaultHeight() {
-//    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.DEFAULT_HEIGHT));
-//  }
 
   public float getMinHeight() {
     return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_HEIGHT));

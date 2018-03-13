@@ -55,7 +55,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
       basicComponentData.addShorthand(mBorders, CSSShorthand.TYPE.BORDER);
     }
 
-    WXComponent component = WXComponentFactory.newInstanceByWeexCore(instance, parent, basicComponentData);
+    WXComponent component = WXComponentFactory.newInstance(instance, parent, basicComponentData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
     component.addAnimationForElement(mStyle);
     WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionAddElementCount();

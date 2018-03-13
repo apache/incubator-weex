@@ -47,7 +47,7 @@ public class WXComponentFactory {
     sComponentTypes.remove(instanceId);
   }
 
-  public static WXComponent newInstanceByWeexCore(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+  public static WXComponent newInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }

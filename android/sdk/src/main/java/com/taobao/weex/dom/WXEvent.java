@@ -22,6 +22,7 @@ import android.support.v4.util.ArrayMap;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.dom.binding.ELUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,19 +36,27 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
   private static final long serialVersionUID = -8186587029452440107L;
 
   /**
+   *  event data format
+   *  {
+   *  type: 'appear',
+   *  params: [
+   *  { '@binding': 'index' },
+   *   'static',
+   *   { '@binding': 'item.name' },
+   *  { '@binding': '$event' }
+   *  ]
+   *  }
+   * */
+  public static final String EVENT_KEY_TYPE = "type";
+  public static final String EVENT_KEY_ARGS = "params";
+
+
+  /**
    * dynamic binding event args, can be null, only weex use
    * */
   private ArrayMap mEventBindingArgs;
   private ArrayMap<String, List<Object>> mEventBindingArgsValues;
 
-
-  @Override
-  public WXEvent clone() {
-    WXEvent event = (WXEvent) super.clone();
-    event.mEventBindingArgs = mEventBindingArgs;
-    event.mEventBindingArgsValues = mEventBindingArgsValues;
-    return  event;
-  }
 
   @Override
   public void clear() {
@@ -71,6 +80,19 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     return super.remove(o);
   }
 
+  /**
+   * can by null
+   * */
+  public ArrayMap getEventBindingArgs() {
+    return mEventBindingArgs;
+  }
+
+
+  public ArrayMap<String, List<Object>> getEventBindingArgsValues() {
+    return mEventBindingArgsValues;
+  }
+
+
   public void addEvent(Object event) {
     if(event instanceof CharSequence){
       String eventName = event.toString();
@@ -82,7 +104,7 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
       String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
       Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
       if (eventName != null) {
-//        putEventBindingArgs(eventName, args);
+        putEventBindingArgs(eventName, args);
       }
     }
   }
@@ -101,18 +123,37 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     return  event.toString();
   }
 
-  /**
-   *  event data format
-   *  {
-   *  type: 'appear',
-   *  params: [
-   *  { '@binding': 'index' },
-   *   'static',
-   *   { '@binding': 'item.name' },
-   *  { '@binding': '$event' }
-   *  ]
-   *  }
-   * */
-  public static final String EVENT_KEY_TYPE = "type";
-  public static final String EVENT_KEY_ARGS = "params";
+  public void putEventBindingArgs(String event, Object args){
+    if(!contains(event)){
+      add(event);
+    }
+    if(args != null){
+      if(mEventBindingArgs == null){
+        mEventBindingArgs = new ArrayMap();
+      }
+      mEventBindingArgs.put(event, ELUtils.bindingBlock(args));
+    }
+  }
+
+  public void putEventBindingArgsValue(String event, List<Object> value){
+    if(mEventBindingArgsValues == null){
+      mEventBindingArgsValues = new ArrayMap();
+    }
+    if(value == null){
+      mEventBindingArgsValues.remove(event);
+    }else{
+      mEventBindingArgsValues.put(event, value);
+    }
+  }
+
+  @Override
+  public WXEvent clone() {
+    WXEvent event = new WXEvent();
+    event.addAll(this);
+    if(mEventBindingArgs != null) {
+      event.mEventBindingArgs = new ArrayMap(mEventBindingArgs);
+    }
+    event.mEventBindingArgsValues = null; //this should not be clone, it dynamic args
+    return  event;
+  }
 }

@@ -95,7 +95,7 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         mInnerView = setInnerView(context);
         if (mInnerView == null)
             return null;
-        swipeLayout.addView(mInnerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        swipeLayout.addTargetView(mInnerView);
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
     }
@@ -197,24 +197,24 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
             swipeLayout.setPullLoadEnable(enable);
     }
 
-  @Override
-  public void removeView(View view) {
-    if (view instanceof WXLoadingLayout) {
-      finishPullLoad();
-      setLoadmoreEnable(false);
-      if (swipeLayout != null) {
-        swipeLayout.removeView(swipeLayout.getFooterView());
-      }
-    } else if (view instanceof WXRefreshLayout) {
-      finishPullRefresh();
-      setRefreshEnable(false);
-      if (swipeLayout != null) {
-        swipeLayout.removeView(swipeLayout.getHeaderView());
-      }
-    } else {
-      super.removeView(view);
+    @Override
+    public void removeView(View view) {
+        if (view instanceof WXLoadingLayout) {
+            finishPullLoad();
+            setLoadmoreEnable(false);
+            if (swipeLayout != null) {
+                swipeLayout.removeView(swipeLayout.getFooterView());
+            }
+        } else if (view instanceof WXRefreshLayout) {
+            finishPullRefresh();
+            setRefreshEnable(false);
+            if (swipeLayout != null) {
+                swipeLayout.removeView(swipeLayout.getHeaderView());
+            }
+        } else {
+            super.removeView(view);
+        }
     }
-  }
 
     public WXSwipeLayout getSwipeLayout() {
         return swipeLayout;

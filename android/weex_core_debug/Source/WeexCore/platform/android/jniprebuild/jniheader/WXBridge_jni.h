@@ -83,9 +83,15 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring key,
     jstring value);
 
-static void nativeSetViewPortWidth(JNIEnv* env, jobject jcaller,
+static void SetViewPortWidth(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jfloat value);
+
+static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring _namespace,
+    jstring _function,
+    jobjectArray args);
 
 // Step 2: method stubs.
 
@@ -180,7 +186,15 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 "F"
 ")"
-"V", reinterpret_cast<void*>(nativeSetViewPortWidth) },
+"V", reinterpret_cast<void*>(SetViewPortWidth) },
+    { "nativeExecJSWithResult",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"[Lcom/taobao/weex/bridge/WXJSObject;"
+")"
+"[B", reinterpret_cast<void*>(ExecJSWithResult) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {
