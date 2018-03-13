@@ -119,15 +119,15 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMinWidth(realValue);
+        setMinHeight(realValue);
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMinWidth(realValue);
+        setMaxWidth(realValue);
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMinWidth(realValue);
+        setMaxHeight(realValue);
         return kTypeLayout;
       } else if (key == HEIGHT) {
         setStyleHeightLevel(CSS_STYLE);
