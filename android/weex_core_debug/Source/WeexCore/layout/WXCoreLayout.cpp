@@ -612,7 +612,7 @@ namespace WeexCore {
         case kJustifySpaceAround:
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (width - flexLine->mMainSize) / visibleCount;
+            spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
           }
           childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
           childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
@@ -794,7 +794,7 @@ namespace WeexCore {
         case kJustifySpaceAround:
           visibleCount = flexLine->mItemCount;
           if (visibleCount != 0) {
-            spaceBetweenItem = (height - flexLine->mMainSize) / visibleCount;
+            spaceBetweenItem = (height - flexLine->mMainSize- sumPaddingBorderAlongAxis(this,false) ) / visibleCount;
           }
           childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
           childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
