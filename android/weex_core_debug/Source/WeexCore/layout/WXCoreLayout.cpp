@@ -289,7 +289,9 @@ namespace WeexCore {
           float childWidth = child->mCssStyle->mStyleWidth;
           float childHeight = child->mCssStyle->mStyleHeight;
           if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
-            stretch = isSingleFlexLine(parentHeight) && (mCssStyle->mAlignItems == kAlignItemsStretch);
+            stretch = widthMeasureMode == kExactly &&
+                isSingleFlexLine(parentHeight) &&
+                (mCssStyle->mAlignItems == kAlignItemsStretch);
           }
 
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
