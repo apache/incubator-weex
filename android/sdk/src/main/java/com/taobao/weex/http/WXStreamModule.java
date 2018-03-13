@@ -266,6 +266,7 @@ public class WXStreamModule extends WXModule {
     wxRequest.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
     wxRequest.body = options.getBody();
     wxRequest.timeoutMs = options.getTimeout();
+    wxRequest.instanceId = mWXSDKInstance.getInstanceId();
 
     if(options.getHeaders()!=null)
     if (wxRequest.paramMap == null) {
