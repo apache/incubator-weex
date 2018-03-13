@@ -147,7 +147,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
     }
   }
 
-  // TODO getDefaultStyle
+  // TODO
 //  public static class IndicatorDomNode extends WXDomObject{
 //    public IndicatorDomNode(){
 //      super();

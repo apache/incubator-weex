@@ -323,6 +323,8 @@ public class Constants {
       String DESTORY = "destroy";
     }
 
+    String STOP_PROPAGATION = "stopPropagation";
+
   }
 
   public interface PSEUDO {

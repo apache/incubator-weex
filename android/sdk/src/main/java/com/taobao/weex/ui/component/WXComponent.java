@@ -59,6 +59,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
+import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
@@ -79,6 +80,7 @@ import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
+import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -111,6 +113,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * abstract component
@@ -123,40 +127,44 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final String TYPE = "type";
   public static final String ROOT = "_root";
 
-  public static final int TYPE_COMMON = 0;
-  public static final int TYPE_VIRTUAL = 1;
-
   private int mFixedProp = 0;
   public static int mComponentNum = 0;
+  /** package **/ T mHost;
 
-  T mHost;
   private volatile WXVContainer mParent;
-  private IFComponentHolder mHolder;
   private WXSDKInstance mInstance;
   private Context mContext;
+
   private int mAbsoluteY = 0;
   private int mAbsoluteX = 0;
+  private Set<String> mGestureType;
+
+  private BorderDrawable mBackgroundDrawable;
+  private Drawable mRippleBackground;
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
-  private Set<String> mGestureType;
-  private WXGesture mGesture;
-  private BorderDrawable mBackgroundDrawable;
-  private Drawable mRippleBackground;
+  protected WXGesture mGesture;
+  private IFComponentHolder mHolder;
+  private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
-  private boolean isUsing = false;
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
+
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
+
+  public static final int TYPE_COMMON = 0;
+  public static final int TYPE_VIRTUAL = 1;
+
   private boolean waste = false;
 
   private ContentBoxMeasurement contentBoxMeasurement;
@@ -442,27 +450,58 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     void onFocusChange(boolean hasFocus);
   }
 
-  public final void fireEvent(String type) {
-    fireEvent(type, null);
+  public final void fireEvent(String type){
+    fireEvent(type,null);
   }
 
-  public final void fireEvent(String type, Map<String, Object> params) {
-    fireEvent(type, params, null);
-  }
-
-  protected final void fireEvent(String type, Map<String, Object> params, Map<String, Object> domChanges) {
-    if (mInstance != null) {
-      mInstance.fireEvent(getRef(), type, params, domChanges);
+  public final void fireEvent(String type, Map<String, Object> params){
+    if(WXUtils.getBoolean(getAttrs().get("fireEventSyn"), false)){
+      fireEventWait(type, params);
+    }else{
+      fireEvent(type, params,null, null);
     }
   }
 
-  /**
-   * The view is created as needed
-   *
-   * @return true for lazy
-   */
-  public boolean isLazy() {
-    return mParent != null && mParent.isLazy();
+  public final EventResult fireEventWait(String type, Map<String, Object> params){
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+    EventResult callback = new EventResult(){
+      @Override
+      public void onCallback(Object result) {
+        super.onCallback(result);
+        waitLatch.countDown();
+      }
+    };
+    try{
+      fireEvent(type, params, null, callback);
+      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      return  callback;
+    }catch (Exception e){
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e("fireEventWait", e);
+      }
+      return  callback;
+    }
+  }
+
+  protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
+    fireEvent(type, params, domChanges, null);
+  }
+
+
+  private final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges, EventResult callback){
+    if(mInstance != null) {
+      List<Object> eventArgsValues = null;
+      if(getEvents() != null && getEvents().getEventBindingArgsValues() != null){
+        eventArgsValues = getEvents().getEventBindingArgsValues().get(type);
+      }
+      if(params != null){
+        String componentId = Statements.getComponentId(this);
+        if(componentId != null) {
+          params.put("componentId", componentId);
+        }
+      }
+      mInstance.fireEvent(getRef(), type, params,domChanges, eventArgsValues, callback);
+    }
   }
 
   /**
@@ -478,17 +517,28 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return  null;
   }
 
-  protected final void addFocusChangeListener(OnFocusChangeListener l) {
+  /**
+   * The view is created as needed
+   * @return true for lazy
+   */
+  public boolean isLazy() {
+    if(mLazy){
+      return true;
+    }
+    return mParent != null && mParent.isLazy();
+  }
+
+  protected final void addFocusChangeListener(OnFocusChangeListener l){
     View view;
-    if (l != null && (view = getRealView()) != null) {
-      if (mFocusChangeListeners == null) {
+    if(l != null && (view = getRealView()) != null) {
+      if( mFocusChangeListeners == null){
         mFocusChangeListeners = new ArrayList<>();
         view.setFocusable(true);
         view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
           @Override
           public void onFocusChange(View v, boolean hasFocus) {
-            for (OnFocusChangeListener listener : mFocusChangeListeners) {
-              if (listener != null) {
+            for (OnFocusChangeListener listener : mFocusChangeListeners){
+              if(listener != null){
                 listener.onFocusChange(hasFocus);
               }
             }
@@ -499,29 +549,28 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected final void addClickListener(OnClickListener l) {
+  protected final void addClickListener(OnClickListener l){
     View view;
-    if (l != null && (view = getRealView()) != null) {
-      if (mHostClickListeners == null) {
+    if(l != null && (view = getRealView()) != null) {
+      if(mHostClickListeners == null){
         mHostClickListeners = new ArrayList<>();
         view.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-            if (mGesture != null && mGesture.isTouchEventConsumedByAdvancedGesture()) {
+            if(mGesture != null && mGesture.isTouchEventConsumedByAdvancedGesture()){
               //event is already consumed by gesture
               return;
             }
-            for (OnClickListener listener : mHostClickListeners) {
-              if (listener != null) {
+            for (OnClickListener listener : mHostClickListeners){
+              if(listener != null) {
                 listener.onHostViewClick();
               }
             }
           }
         });
       }
-      if (!mHostClickListeners.contains(l)) {
-        mHostClickListeners.add(l);
-      }
+      mHostClickListeners.add(l);
+
     }
   }
 
@@ -863,7 +912,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
               UIImp.getFlatComponentAncestor(mParent) != null &&
               UIImp.getAndroidViewWidget(mParent) == null) {
         childOffset.set(rawoffset.x, rawoffset.y);
-      } else {
+      }
+      else{
         childOffset.set(left, top);
       }
 
@@ -886,7 +936,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
     widget.setLayout(width, height, left, right, top, bottom, childOffset);
 
-    if (widget instanceof AndroidViewWidget && ((AndroidViewWidget) widget).getView() != null) {
+    if (widget instanceof AndroidViewWidget && ((AndroidViewWidget) widget).getView()!=null) {
       //TODO generic method if ever possible
       setHostLayoutParams((T) ((AndroidViewWidget) widget).getView(),
               width, height, childOffset.x, right, childOffset.y, bottom);
@@ -911,7 +961,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
+  private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
     params.width = width;
@@ -919,6 +969,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     params.setMargins(left, top, right, bottom);
     host.setLayoutParams(params);
     mInstance.moveFixedView(host);
+
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + getStyles().getLeft() + " " + (int) getStyles().getTop());
+    }
   }
 
   protected void updateBoxShadow() {
@@ -1134,6 +1189,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           return true;
         }
       }
+    }
+    if(Constants.Event.STOP_PROPAGATION.equals(type)){
+      return  true;
     }
     return false;
   }
@@ -1687,7 +1745,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  protected boolean containsEvent(String event) {
+  public boolean containsEvent(String event) {
     return getEvents().contains(event) || mAppendEvents.contains(event);
   }
 
@@ -1906,7 +1964,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final int STATE_DOM_FINISH = 0;
   public static final int STATE_UI_FINISH = 1;
   public static final int STATE_ALL_FINISH = 2;
-
   @IntDef({STATE_DOM_FINISH, STATE_UI_FINISH, STATE_ALL_FINISH})
   @Retention(RetentionPolicy.SOURCE)
   @Target(ElementType.PARAMETER)

@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.RectF;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
@@ -109,40 +111,40 @@ public class WXImage extends WXComponent<ImageView> {
     return view;
   }
 
-    @Override
-    protected boolean setProperty(String key, Object param) {
-      switch (key) {
-        case Constants.Name.RESIZE_MODE:
-          String resize_mode = WXUtils.getString(param, null);
-          if (resize_mode != null)
-            setResizeMode(resize_mode);
-          return true;
-        case Constants.Name.RESIZE:
-          String resize = WXUtils.getString(param, null);
-          if (resize != null)
-            setResize(resize);
-          return true;
-        case Constants.Name.SRC:
-          String src = WXUtils.getString(param, null);
-          if (src != null)
-            setSrc(src);
-          return true;
-        case Constants.Name.IMAGE_QUALITY:
-          return true;
-        case Constants.Name.AUTO_RECYCLE:
-          mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
-          return true;
-        case Constants.Name.FILTER:
-          int blurRadius = 0;
-          if(param != null && param instanceof String) {
-            blurRadius = parseBlurRadius((String)param);
-          }
-          if(!TextUtils.isEmpty(this.mSrc)) {
-            setBlurRadius(this.mSrc,blurRadius);
-          }
-          return true;
-      }
-      return super.setProperty(key, param);
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key) {
+      case Constants.Name.RESIZE_MODE:
+        String resize_mode = WXUtils.getString(param, null);
+        if (resize_mode != null)
+          setResizeMode(resize_mode);
+        return true;
+      case Constants.Name.RESIZE:
+        String resize = WXUtils.getString(param, null);
+        if (resize != null)
+          setResize(resize);
+        return true;
+      case Constants.Name.SRC:
+        String src = WXUtils.getString(param, null);
+        if (src != null)
+          setSrc(src);
+        return true;
+      case Constants.Name.IMAGE_QUALITY:
+        return true;
+      case Constants.Name.AUTO_RECYCLE:
+        mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
+        return true;
+      case Constants.Name.FILTER:
+        int blurRadius = 0;
+        if(param != null && param instanceof String) {
+          blurRadius = parseBlurRadius((String)param);
+        }
+        if(!TextUtils.isEmpty(this.mSrc)) {
+          setBlurRadius(this.mSrc,blurRadius);
+        }
+        return true;
+    }
+    return super.setProperty(key, param);
   }
 
   @Override
@@ -367,6 +369,13 @@ public class WXImage extends WXComponent<ImageView> {
    */
   @JSMethod(uiThread = false)
   public void save(final JSCallback saveStatuCallback) {
+
+    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      if (getContext() instanceof Activity) {
+        ActivityCompat.requestPermissions((Activity) getContext(),
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
+      }
+    }
 
     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       if (saveStatuCallback != null) {

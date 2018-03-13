@@ -29,35 +29,38 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * Created by moxun on 2017/9/26.
- *
+ * <p>
  * Ref: https://tools.ietf.org/html/bcp47
  */
 
 public class WXLocaleModule extends WXModule {
 
-  @JSMethod
-  public void getLanguage(JSCallback callback) {
-    String languageTags = getLanguageTags();
-    WXLogUtils.d("[WXLocaleModule] getLanguage=" + languageTags);
-    callback.invoke(languageTags);
+  @JSMethod(uiThread = false)
+  public String getLanguage() {
+    return getLanguageTags();
   }
 
-  @JSMethod
+  @JSMethod(uiThread = false)
+  public void getLanguage(JSCallback callback) {
+    callback.invoke(getLanguageTags());
+  }
+
+  @JSMethod(uiThread = false)
+  public List<String> getLanguages() {
+    String[] tags = getLanguageTags().split(",");
+    return Arrays.asList(tags);
+  }
+
+  @JSMethod(uiThread = false)
   public void getLanguages(JSCallback callback) {
-    String languageTags = getLanguageTags();
-    if (TextUtils.isEmpty(languageTags)) {
-      callback.invoke("");
-      WXLogUtils.d("[WXLocaleModule] getLanguages is empty");
-    } else {
-      callback.invoke(languageTags.split(","));
-      WXLogUtils.d("[WXLocaleModule] getLanguages=" + languageTags);
-    }
+    callback.invoke(getLanguageTags().split(","));
   }
 
   private String getLanguageTags() {
@@ -88,12 +91,8 @@ public class WXLocaleModule extends WXModule {
     } else {
       StringBuilder sb = new StringBuilder();
       String language = locale.getLanguage();
-      String script = locale.getScript();
       String region = locale.getCountry();
       sb.append(language);
-      if (!TextUtils.isEmpty(script)) {
-        sb.append("-").append(script);
-      }
       if (!TextUtils.isEmpty(region)) {
         sb.append("-").append(region);
       }

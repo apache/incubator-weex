@@ -21,15 +21,19 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
@@ -42,6 +46,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
+  private  boolean requestDisallowInterceptTouchEvent = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -116,14 +121,18 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    * Get or generate new layout parameter for child view
    */
   public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child, View childView, int width, int height, int left, int right, int top, int bottom) {
-    ViewGroup.LayoutParams lp = childView.getLayoutParams();
-    if (lp == null) {
-      lp = new ViewGroup.LayoutParams(width, height);
-    } else {
+    ViewGroup.LayoutParams lp = null;
+    if (childView != null) {
+      lp = childView.getLayoutParams();
+    }
+
+    if(lp == null) {
+      lp = new ViewGroup.LayoutParams(width,height);
+    }else{
       lp.width = width;
       lp.height = height;
-      if (lp instanceof ViewGroup.MarginLayoutParams) {
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
+      if(lp instanceof ViewGroup.MarginLayoutParams){
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
       }
     }
     return lp;
@@ -233,11 +242,15 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   public WXComponent getChild(int index) {
+    if (mChildren == null || index < 0 || index >= mChildren.size()) {
+      //To avoid index out of bounds
+      return null;
+    }
     return mChildren.get(index);
   }
 
   public int getChildCount() {
-    return mChildren.size();
+    return childCount();
   }
 
   public void addChild(WXComponent child) {
@@ -451,6 +464,90 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       child.onRenderFinish(state);
     }
     super.onRenderFinish(state);
+  }
+
+  @JSMethod
+  public void releaseImageList(String viewTreeRecycle){
+    if(getHostView() == null
+            || !ViewCompat.isAttachedToWindow(getHostView())
+            || !(getHostView() instanceof  ViewGroup)){
+      return;
+    }
+    boolean isViewTree = WXUtils.getBoolean(viewTreeRecycle, false);
+    if(isViewTree){
+      doViewTreeRecycleImageView(getHostView(), true);
+    }else{
+      int count = getChildCount();
+      for(int i=0; i<count; i++){
+        WXComponent component =  getChild(i);
+        if(component instanceof  WXImage && ((WXImage) component).getHostView() instanceof WXImageView){
+          WXImageView imageView = (WXImageView) component.getHostView();
+          if(imageView != null && ViewCompat.isAttachedToWindow(imageView)){
+            imageView.autoReleaseImage();
+          }
+        }else if(component instanceof  WXVContainer){
+          ((WXVContainer) component).releaseImageList(viewTreeRecycle);
+        }
+      }
+    }
+  }
+
+  @JSMethod
+  public void recoverImageList(String viewTreeRecycle){
+    if(getHostView() == null
+            || !ViewCompat.isAttachedToWindow(getHostView())
+            || !(getHostView() instanceof  ViewGroup)){
+      return;
+    }
+    boolean isViewTree = WXUtils.getBoolean(viewTreeRecycle, false);
+    if(isViewTree){
+      doViewTreeRecycleImageView(getHostView(), false);
+    }else{
+      int count = getChildCount();
+      for(int i=0; i<count; i++){
+        WXComponent component =  getChild(i);
+        if(component instanceof  WXImage && ((WXImage) component).getHostView() instanceof WXImageView){
+          WXImageView imageView = (WXImageView) component.getHostView();
+          if(imageView != null && ViewCompat.isAttachedToWindow(imageView)){
+            imageView.autoRecoverImage();
+          }
+        }else if(component instanceof  WXVContainer){
+          ((WXVContainer) component).recoverImageList(viewTreeRecycle);
+        }
+      }
+    }
+  }
+
+  /**
+   * transverse view tree, and recycle wximageview in container
+   * */
+  private void doViewTreeRecycleImageView(ViewGroup viewGroup, boolean isRelease){
+    int count = viewGroup.getChildCount();
+    for(int i=0; i<count; i++){
+      View view = viewGroup.getChildAt(i);
+      if(view instanceof  WXImageView){
+        if(isRelease){
+          ((WXImageView) view).autoReleaseImage();
+        }else{
+          ((WXImageView) view).autoRecoverImage();
+        }
+      }else if(view instanceof  ViewGroup){
+        doViewTreeRecycleImageView((ViewGroup) view, isRelease);
+      }
+    }
+  }
+
+
+  public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
+    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
+      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
+      if(mGesture != null){
+        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+      }
+      if(getParent() != null){
+        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+      }
+    }
   }
 
   /********************************

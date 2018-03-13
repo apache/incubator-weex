@@ -44,6 +44,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
+import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -1448,15 +1449,29 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param data
    * @param domChanges
    */
+  public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs){
+    fireEvent(elementRef, type, data, domChanges, eventArgs, null);
+  }
+
+  public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs, EventResult callback) {
+    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs, callback);
+  }
+  /**
+   * Fire event callback on a element.
+   * @param elementRef
+   * @param type
+   * @param data
+   * @param domChanges
+   */
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges){
-    WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges);
+    fireEvent(elementRef, type, data, domChanges, null);
   }
 
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data){
     fireEvent(elementRef,type,data,null);
   }
 
-  public void fireEvent(String ref, String type) {
+  public void fireEvent(String ref, String type){
     fireEvent(ref,type,new HashMap<String, Object>());
   }
 
