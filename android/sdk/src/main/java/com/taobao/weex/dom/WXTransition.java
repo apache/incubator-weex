@@ -526,6 +526,7 @@ public class WXTransition {
             public void onAnimationUpdate(final ValueAnimator animation) {
                 PropertyValuesHolder holders[] = animation.getValues();
                 for(PropertyValuesHolder holder : holders){
+
                     final String property =  holder.getPropertyName();
 
                     WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
