@@ -73,7 +73,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       return;
     }
 
-    WXSDKManager.getInstance().getSDKInstance(getPageId()).nativeBindComponentToWXCore(getPageId(), child, getRef());
+    WXSDKManager.getInstance().getSDKInstance(getPageId()).bindComponentWithRenderObject(getPageId(), child, getRef());
   }
 
   @RestrictTo(Scope.LIBRARY)

@@ -2185,28 +2185,91 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mWXBridge.setStyleWidth(instanceId, ref, value);
   }
 
+  public void setStyleWidthPostToJSThread(final String instanceId, final String ref, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setStyleWidth(instanceId, ref, value);
+      }
+    });
+  }
+
   public void setStyleHeight(String instanceId, String ref, float value) {
     mWXBridge.setStyleHeight(instanceId, ref, value);
+  }
+
+  public void setStyleHeightPostToJSThread(final String instanceId, final String ref, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setStyleHeight(instanceId, ref, value);
+      }
+    });
   }
 
   public void setViewPortWidth(String instanceId, float value) {
     mWXBridge.setViewPortWidth(instanceId, value);
   }
 
+  public void setViewPortWidthPostToJSThread(final String instanceId, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setViewPortWidth(instanceId, value);
+      }
+    });
+  }
+
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setMargin(instanceId, ref, edge, value);
+  }
+
+  public void setMarginPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setMargin(instanceId, ref, edge, value);
+      }
+    });
   }
 
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setPadding(instanceId, ref, edge, value);
   }
 
+  public void setPaddingPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setPadding(instanceId, ref, edge, value);
+      }
+    });
+  }
+
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setPosition(instanceId, ref, edge, value);
   }
 
+  public void setPositionPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setPosition(instanceId, ref, edge, value);
+      }
+    });
+  }
+
   public void calculateLayout(String instanceId, String ref, boolean dirty) {
     mWXBridge.calculateLayout(instanceId, ref, dirty);
+  }
+
+  public void calculateLayoutPostToJSThread(final String instanceId, final String ref, final boolean dirty) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.calculateLayout(instanceId, ref, dirty);
+      }
+    });
   }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {

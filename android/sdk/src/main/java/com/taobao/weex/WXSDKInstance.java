@@ -27,10 +27,12 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -931,12 +933,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     destroy();
 
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeOnInstanceClose(getInstanceId());
-      }
-    });
+    onInstanceClosePostToJSThread(getInstanceId());
   }
 
   @Override
@@ -1419,12 +1416,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           mRenderContainer.setLayoutParams(layoutParams);
         }
         if (mRootComp != null) {
-          WXBridgeManager.getInstance().post(new Runnable() {
-            @Override
-            public void run() {
-              nativeSetDefaultHeightAndWidthIntoRootDom(getInstanceId(), realWidth, realHeight);
-            }
-          });
+          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight);
         }
       }
     }
@@ -1842,28 +1834,105 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   @Override
   public void OnVSync() {
     // add vSync code for refresh
-    boolean forceLayout = nativeNotifyLayout(getInstanceId());
+    boolean forceLayout = notifyLayout(getInstanceId());
     if(forceLayout) {
       WXBridgeManager.getInstance().post(new Runnable() {
         @Override
         public void run() {
-          nativeForceLayout(getInstanceId());
+          forceLayout(getInstanceId());
         }
       });
     }
   }
 
+  /**
+   * Native: Layout
+   * @param instanceId
+   * @return
+   */
+  @UiThread
+  private boolean notifyLayout(String instanceId) {
+    return nativeNotifyLayout(instanceId);
+  }
+
   private native boolean nativeNotifyLayout(String instanceId);
+
+  @UiThread
+  private void forceLayout(String instanceId) {
+    nativeForceLayout(instanceId);
+  }
 
   private native void nativeForceLayout(String instanceId);
 
-  public native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
 
-  public native void nativeOnInstanceClose(String instanceId);
+  /**
+   * native: BindComponentToWXCore
+   */
+  public void bindComponentWithRenderObject(final String instanceId, final WXComponent component, final String ref) {
+    nativeBindComponentToWXCore(instanceId, component, ref);
+  }
 
-  public native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
+  public void bindComponentWithRenderObjectPostToJSThread(final String instanceId, final WXComponent component, final String ref) {
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeBindComponentToWXCore(instanceId, component, ref);
+      }
+    });
+  }
 
+  private native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
+
+
+  /**
+   * native: OnInstanceClose
+   * @param instanceId
+   */
+  public void onInstanceClose(String instanceId) {
+    nativeOnInstanceClose(instanceId);
+  }
+
+  public void onInstanceClosePostToJSThread(String instanceId) {
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeOnInstanceClose(getInstanceId());
+      }
+    });
+  }
+
+  private native void nativeOnInstanceClose(String instanceId);
+
+
+  /**
+   * native: SetDefaultHeightAndWidthIntoRootDom
+   * @param instanceId
+   * @param defaultWidth
+   * @param defaultHeight
+   */
+  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight) {
+    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight);
+  }
+
+  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight) {
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight);
+      }
+    });
+  }
+
+  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
+
+
+  /**
+   * native: print render time
+   * @param instanceId
+   * @return
+   */
   public native int nativePrintFirstScreenRenderTime(String instanceId);
 
   public native int nativePrintRenderFinishTime(String instanceId);
+
 }

@@ -194,9 +194,9 @@ static void CalculateLayout(JNIEnv *env, jobject jcaller,
 static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
                             jstring key,
                             jstring value) {
-  LOGE("RegisterCoreEnv，key: %s, value: %s", jString2Str(env, key).c_str(),
-       jString2Str(env, value).c_str());
-  WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, key), jString2Str(env, value));
+  LOGE("RegisterCoreEnv，key: %s, value: %s", jString2StrFast(env, key).c_str(),
+       jString2StrFast(env, value).c_str());
+  WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
 static void SetViewPortWidth(JNIEnv *env, jobject jcaller,

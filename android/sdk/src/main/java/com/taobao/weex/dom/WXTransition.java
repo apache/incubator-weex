@@ -588,13 +588,7 @@ public class WXTransition {
                             break;
                     }
                 }
-
-                WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        WXBridgeManager.getInstance().calculateLayout(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
-                    }
-                });
+                WXBridgeManager.getInstance().calculateLayoutPostToJSThread(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
             }
         });
         layoutValueAnimator.addListener(new AnimatorListenerAdapter() {
