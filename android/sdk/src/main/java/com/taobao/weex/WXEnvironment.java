@@ -119,6 +119,9 @@ public class WXEnvironment {
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.put(WXConfig.logLevel,sLogLevel.getName());
     try {
+      if (isApkDebugable()) {
+        options.put(WXConfig.debugMode, "true");
+      }
       options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.

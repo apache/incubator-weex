@@ -60,6 +60,19 @@ android {
     def jsfmVersion = m[0][1]
     println jsfmVersion
 
+    copy {
+        from '../../pre-build'
+        into new File(projectDir,"assets")
+        include 'weex-main-jsfm.js'
+        rename('weex-main-jsfm.js','weex-main-jsfm.js')
+    }
+
+    copy {
+        from '../../pre-build'
+        into new File(projectDir,"assets")
+        include 'weex-rax-api.js'
+    }
+
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
         download{

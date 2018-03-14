@@ -64,7 +64,26 @@ class WXBridge implements IWXBridge {
    */
   public native int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
+ /**
+   * nativeCreateInstanceContext
+   * @param instanceId
+   * @param name
+   * @param function
+   * @param args
+   * @return
+   */
+  public native int createInstanceContext(String instanceId, String name, String function, WXJSObject[] args);
 
+
+  /**
+   * nativeDestoryInstance
+   * @param instanceId
+   * @param name
+   * @param function
+   * @param args
+   * @return
+   */
+  public native int destoryInstance(String instanceId, String name, String function, WXJSObject[] args);
 
   /**
    * Execute JavaScript function
@@ -85,6 +104,15 @@ class WXBridge implements IWXBridge {
    */
   public native int execJSService(String javascript);
 
+
+  /**
+   * execJSOnInstance
+   * @param instanceId id
+   * @param script js
+   * @param type tag: sync | async | global | instance
+   * @return value
+   */
+  public native String execJSOnInstance(String instanceId, String script, int type);
   /**
    * Take v8's heap snapshot
    * @param filename the name of the file to be written.
