@@ -425,11 +425,10 @@ namespace WeexCore {
       return ret;
     }
 
-    inline bool limitMainSizeForFlexGrow(WXCoreFlexLine* const flexLine, const Index childIndex,
+    inline void limitMainSizeForFlexGrow(WXCoreFlexLine* const flexLine, const Index childIndex,
                                   const float flexGrow) {
       mChildrenFrozen[childIndex] = true;
       flexLine->mTotalFlexGrow -= flexGrow;
-      return true;
     }
 
     inline void setMeasuredDimension(const float width, const float height) {
@@ -443,24 +442,25 @@ namespace WeexCore {
       if (isMainAxisHorizontal(this)) {
         if (!isnan(child->mCssStyle->mMaxWidth) &&
             childSizeAlongMainAxis > child->mCssStyle->mMaxWidth) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
+          needsReexpand = true;
           childSizeAlongMainAxis = child->mCssStyle->mMaxWidth;
         } else if (!isnan(child->mCssStyle->mMinWidth) &&
             childSizeAlongMainAxis < child->mCssStyle->mMinWidth) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
+          needsReexpand = true;
           childSizeAlongMainAxis = child->mCssStyle->mMinWidth;
         }
       } else {
         if (!isnan(child->mCssStyle->mMaxHeight) &&
             childSizeAlongMainAxis > child->mCssStyle->mMaxHeight) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
+          needsReexpand = true;
           childSizeAlongMainAxis = child->mCssStyle->mMaxHeight;
         } else if (!isnan(child->mCssStyle->mMinHeight) &&
             childSizeAlongMainAxis < child->mCssStyle->mMinHeight) {
-          needsReexpand = limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
+          needsReexpand = true;
           childSizeAlongMainAxis = child->mCssStyle->mMinHeight;
         }
       }
+      limitMainSizeForFlexGrow(flexLine, childIndex, child->mCssStyle->mFlexGrow);
       return std::make_pair(needsReexpand, childSizeAlongMainAxis);
     }
 

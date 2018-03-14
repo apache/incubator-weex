@@ -191,18 +191,20 @@ namespace WeexCore {
    * Determine the main size by expanding the individual flexGrow attribute.
    */
   void WXCoreLayoutNode::determineMainSize(const float width, const float height) {
-      float maxMainSize;
       bool horizontal = isMainAxisHorizontal(this);
-      if (horizontal) {
-        maxMainSize = widthMeasureMode == kUnspecified ? getLargestMainSize() : width;
-      } else {
-        maxMainSize = heightMeasureMode == kUnspecified ? getLargestMainSize() : height;
-      }
+      if((horizontal && widthMeasureMode == kExactly) || (!horizontal && heightMeasureMode == kExactly)) {
+        float maxMainSize;
+        if (horizontal) {
+          maxMainSize = widthMeasureMode == kUnspecified ? getLargestMainSize() : width;
+        } else {
+          maxMainSize = heightMeasureMode == kUnspecified ? getLargestMainSize() : height;
+        }
 
-      maxMainSize -= sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
-      Index childIndex = 0;
-      for (WXCoreFlexLine *flexLine : mFlexLines) {
-        childIndex = expandItemsInFlexLine(flexLine, maxMainSize, childIndex);
+        maxMainSize -= sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
+        Index childIndex = 0;
+        for (WXCoreFlexLine *flexLine : mFlexLines) {
+          childIndex = expandItemsInFlexLine(flexLine, maxMainSize, childIndex);
+        }
       }
     }
 
