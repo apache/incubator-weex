@@ -103,7 +103,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       @Override
       public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         if (CSSConstants.isUndefined(width)) {
-          width = getMaxWidth();
+          width = 0;
         }
         MeasureSize size = new MeasureSize();
         size.setHeight(getMeasureHeight());

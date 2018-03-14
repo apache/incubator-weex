@@ -210,20 +210,4 @@ public abstract class WXBasicComponent<T extends View> {
   public float getLayoutHeight() {
     return mLayoutSize == null ? 0 : mLayoutSize.getHeight();
   }
-
-  public float getMinWidth() {
-    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_WIDTH));
-  }
-
-  public float getMaxWidth() {
-    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MAX_WIDTH));
-  }
-
-  public float getMinHeight() {
-    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MIN_HEIGHT));
-  }
-
-  public float getMaxHeight() {
-    return WXUtils.getFloat(mBasicComponentData.getStyles().get(Constants.Name.MAX_HEIGHT));
-  }
 }

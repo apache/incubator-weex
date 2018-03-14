@@ -116,22 +116,18 @@ namespace WeexCore {
       } else if (key == MIN_WIDTH) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinWidth(realValue);
-        mStyles->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMinHeight(realValue);
-        mStyles->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMaxWidth(realValue);
-        mStyles->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
         float realValue = getFloatByViewport(value, GetViewPortWidth());
         setMaxHeight(realValue);
-        mStyles->insert(std::pair<std::string, std::string>(key, std::to_string(realValue)));
         return kTypeLayout;
       } else if (key == HEIGHT) {
         setStyleHeightLevel(CSS_STYLE);
