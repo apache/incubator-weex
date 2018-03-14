@@ -44,9 +44,6 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
               jstring ref,
               jfloat value) {
 
-//    std::string mMessage = "SetStyleWidth=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
@@ -66,9 +63,6 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
                jstring ref,
                jfloat value) {
 
-//    std::string mMessage = "SetStyleHeight=" + std::to_string(value) + " ref=" + jString2Str(env, ref);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
@@ -87,9 +81,6 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
                       jstring ref,
                       jint edge,
                       jfloat value) {
-//    std::string mMessage = "SetMargin=" + std::to_string(value);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
@@ -117,8 +108,6 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
                        jstring ref,
                        jint edge,
                        jfloat value) {
-//    std::string mMessage = "SetPadding=" + std::to_string(value);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
@@ -148,8 +137,6 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
                         jstring ref,
                         jint edge,
                         jfloat value) {
-//    std::string mMessage = "SetPosition=" + std::to_string(value);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
@@ -175,8 +162,6 @@ static void CalculateLayout(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jstring ref,
                             jboolean dirty) {
-//    std::string mMessage = "CalculateLayout=" + jString2Str(env, instanceId);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
