@@ -24,6 +24,7 @@ import android.util.Log;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
@@ -68,8 +69,17 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
-
-    return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
+    BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context, mLayoutType, mColumnCount, mColumnGap, orientation);
+    if (bounceRecyclerView.getSwipeLayout() != null) {
+      if (WXUtils.getBoolean(getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), false)) {
+        bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
+      }
+    }
+    // TODO
+    //    if(mRecyclerDom != null && mRecyclerDom.getSpanOffsets() != null){
+    //      bounceRecyclerView.getInnerView().addItemDecoration(new GapItemDecoration(this));
+    //    }
+    return bounceRecyclerView;
   }
 
   @Override
@@ -105,35 +115,62 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
     if (child instanceof WXRefresh) {
       getHostView().setOnRefreshListener((WXRefresh) child);
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setHeaderView(child);
         }
-      }, 100);
+      }), 100);
       return true;
     }
 
     if (child instanceof WXLoading) {
       getHostView().setOnLoadingListener((WXLoading) child);
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setFooterView(child);
         }
-      }, 100);
+      }), 100);
       return true;
     }
     return false;
   }
 
-  private void updateRecyclerAttr(){
+  private void updateRecyclerAttr() {
     mColumnCount = WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT));
     mColumnGap = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP));
     mColumnWidth = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH));
     mPaddingLeft = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_LEFT));
     mPaddingRight = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_RIGHT));
+    // TODO
+    //      mLeftGap = mRecyclerDom.getLeftGap();
+    //      mRightGap = mRecyclerDom.getRightGap();
+    //      mRecyclerDom.preCalculateCellWidth();
   }
+
+  // TODO
+//  @WXComponentProp(name = Constants.Name.LEFT_GAP)
+  //  public void setLeftGap(float leftGap)  {
+  //    if(mRecyclerDom != null && mRecyclerDom.getLeftGap() != mLeftGap){
+  //      markComponentUsable();
+  //      mRecyclerDom.preCalculateCellWidth();
+  //      updateRecyclerAttr();
+  //      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+  //      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  //    }
+  //  }
+  //
+  //  @WXComponentProp(name = Constants.Name.RIGHT_GAP)
+  //  public void setRightGap(float rightGap)  {
+  //    if(mRecyclerDom != null && mRecyclerDom.getRightGap() != mRightGap){
+  //      markComponentUsable();
+  //      mRecyclerDom.preCalculateCellWidth();
+  //      updateRecyclerAttr();
+  //      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+  //      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  //    }
+  //  }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnWidth)  {
