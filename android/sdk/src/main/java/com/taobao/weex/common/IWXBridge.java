@@ -61,7 +61,36 @@ public interface IWXBridge extends IWXObject {
   byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args);
 
 
+/**
+   * createInstance
+   * @param instanceId
+   * @param namespace
+   * @param function
+   * @param args
+   * @return
+   */
+  int createInstanceContext(String instanceId, String namespace, String function, WXJSObject[] args);
+
+  /**
+   * destoryInstance
+   * @param instanceId
+   * @param namespace
+   * @param function
+   * @param args
+   * @return
+   */
+  int destoryInstance(String instanceId, String namespace, String function, WXJSObject[] args);
   int execJSService(String javascript);
+  
+    /**
+   * execJSOnInstance
+   * @param instanceId
+   * @param script
+   * @param type
+   * @return
+   */
+
+  String execJSOnInstance(String instanceId, String script, int type);
 
   /**
    * take the heap snapshot and serialize the heap to a local file.
