@@ -56,7 +56,7 @@ public class WXModuleManager {
   /**
    * module class object dictionary
    */
-  private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
+  private static volatile Map<String, ModuleFactoryImpl> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
@@ -81,40 +81,45 @@ public class WXModuleManager {
       return false;
     }
 
-    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
+    if (TextUtils.equals(moduleName, WXDomModule.WXDOM)) {
       WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
 
+    try {
+      sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
+    } catch (Throwable e) {
+
+    }
+
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()
-        .post(new Runnable() {
-      @Override
-      public void run() {
-        if (sModuleFactoryMap.containsKey(moduleName)) {
-          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
-        }
+            .post(new Runnable() {
+              @Override
+              public void run() {
+                if (sModuleFactoryMap != null && sModuleFactoryMap.containsKey(moduleName)) {
+                  WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+                }
+                try {
+                  registerNativeModule(moduleName, factory);
+                } catch (WXException e) {
+                  WXLogUtils.e("registerNativeModule" + e);
+                }
 
-        if (global) {
-          try {
-            WXModule wxModule = factory.buildInstance();
-            wxModule.setModuleName(moduleName);
-            sGlobalModuleMap.put(moduleName, wxModule);
-          } catch (Exception e) {
-            WXLogUtils.e(moduleName + " class must have a default constructor without params. ", e);
-          }
-        }
+                if (global) {
+                  try {
+                    WXModule wxModule = factory.buildInstance();
+                    wxModule.setModuleName(moduleName);
+                    sGlobalModuleMap.put(moduleName, wxModule);
+                  } catch (Exception e) {
+                    WXLogUtils.e(moduleName + " class must have a default constructor without params. ", e);
+                  }
+                }
 
-        try {
-          registerNativeModule(moduleName, factory);
-        } catch (WXException e) {
-          WXLogUtils.e("", e);
-        }
-        registerJSModule(moduleName, factory);
-      }
-    });
+                registerJSModule(moduleName, factory);
+              }
+            });
     return true;
-
   }
 
   static boolean registerNativeModule(String moduleName, ModuleFactory factory) throws WXException {
@@ -123,12 +128,16 @@ public class WXModuleManager {
     }
 
     try {
-      sModuleFactoryMap.put(moduleName, factory);
+      if (!sModuleFactoryMap.containsKey(moduleName) ) {
+        sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
+      }
     }catch (ArrayStoreException e){
       e.printStackTrace();
       //ignore:
       //may throw this exception:
       //java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
+
+      WXLogUtils.e("[WXModuleManager] registerNativeModule Error moduleName:"  + moduleName + " Error:" + e.toString());
     }
     return true;
   }
@@ -141,7 +150,7 @@ public class WXModuleManager {
   }
 
   static Object callModuleMethod(final String instanceId, String moduleStr, String methodStr, JSONArray args) {
-    ModuleFactory factory = sModuleFactoryMap.get(moduleStr);
+    ModuleFactory factory = sModuleFactoryMap.get(moduleStr).mFactory;
     if(factory == null){
       WXLogUtils.e("[WXModuleManager] module factory not found.");
       return null;
@@ -170,14 +179,14 @@ public class WXModuleManager {
         return null;
       }
     } catch (Exception e) {
-	  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
-			  "callModuleMethod",
-			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
-			  + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
-			  + WXLogUtils.getStackTrace(e),
-			  null);
-	  WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
+              "callModuleMethod",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
+                      + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
+                      + WXLogUtils.getStackTrace(e),
+              null);
+      WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
@@ -419,8 +428,59 @@ public class WXModuleManager {
 
   public static void reload(){
     if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
-      for (Map.Entry<String, ModuleFactory> entry : sModuleFactoryMap.entrySet()) {
-        registerJSModule(entry.getKey(), entry.getValue());
+      for (Map.Entry<String, ModuleFactoryImpl> entry : sModuleFactoryMap.entrySet()) {
+        try {
+          registerJSModule(entry.getKey(), entry.getValue().mFactory);
+        } catch (Throwable e) {
+
+        }
+      }
+    }
+  }
+
+  /**
+   * registerWhenCreateInstance
+   */
+  public static void registerWhenCreateInstance(){
+    if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
+      for (Map.Entry<String, ModuleFactoryImpl> entry : sModuleFactoryMap.entrySet()) {
+        try {
+          if (!entry.getValue().hasRigster) {
+            registerJSModule(entry.getKey(), entry.getValue().mFactory);
+          }
+        } catch (Throwable e) {
+
+        }
+      }
+    }
+  }
+
+  /**
+   * resetAllModuleState
+   */
+  public static void resetAllModuleState() {
+    if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
+      for (Map.Entry<String, ModuleFactoryImpl> entry : sModuleFactoryMap.entrySet()) {
+        entry.getValue().hasRigster = false;
+      }
+    }
+  }
+
+  /**
+   * resetModuleState
+   * @param module
+   * @param state
+   */
+  public static void resetModuleState(String module, boolean state) {
+    if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
+      for (Map.Entry<String, ModuleFactoryImpl> entry : sModuleFactoryMap.entrySet()) {
+        try {
+          if (entry.getKey() != null && entry.getKey().equals(module)) {
+            entry.getValue().hasRigster = state;
+          }
+        } catch (Throwable e) {
+
+        }
       }
     }
   }

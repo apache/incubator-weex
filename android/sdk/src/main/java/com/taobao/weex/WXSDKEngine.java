@@ -388,14 +388,19 @@ public class WXSDKEngine {
 
   public static boolean registerComponent(IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
     boolean result =  true;
-    for(String name:names) {
-      Map<String, Object> componentInfo = new HashMap<>();
-      if (appendTree) {
-        componentInfo.put("append", "tree");
+    try {
+      for (String name : names) {
+        Map<String, Object> componentInfo = new HashMap<>();
+        if (appendTree) {
+          componentInfo.put("append", "tree");
+        }
+        result = result && WXComponentRegistry.registerComponent(name, holder, componentInfo);
       }
-      result  = result && WXComponentRegistry.registerComponent(name, holder, componentInfo);
+      return result;
+    } catch (Throwable e) {
+      e.printStackTrace();
+      return result;
     }
-    return result;
   }
 
   /**
