@@ -165,6 +165,7 @@ public class WXStreamModule extends WXModule {
         if(callback != null) {
           Map<String, Object> resp = new HashMap<>();
           if(response == null|| "-1".equals(response.statusCode)){
+            resp.put("ok",false);
             resp.put(STATUS,-1);
             resp.put(STATUS_TEXT,Status.ERR_CONNECT_FAILED);
           }else {
