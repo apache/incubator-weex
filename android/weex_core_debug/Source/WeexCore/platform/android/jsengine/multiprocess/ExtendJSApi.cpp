@@ -210,8 +210,27 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
     return createInt32Result(0);
 
 #if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallAddElement >>>> pageId: %s, parentRef: %s, domStr: %s, index: %d",
-       pageId, parentRef, domStr, index);
+
+  std::string log = "";
+  log.append("pageId: ").append(pageId).append(", parentRef: ").append(parentRef).append(", domStr: ").append(domStr);
+  int log_index = 0;
+  int maxLength = 1000;
+  std::string sub;
+  while (log_index < log.length()) {
+    if (log.length() <= log_index + maxLength) {
+      sub = log.substr(log_index);
+    } else {
+      sub = log.substr(log_index, maxLength);
+    }
+
+
+    if (log_index == 0)
+      LOGD("[ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
+    else
+      LOGD("      [ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
+
+    log_index += maxLength;
+  }
 #endif
 
   RenderManager::GetInstance()->AddRenderObject(pageId, parentRef, index, domStr);
