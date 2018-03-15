@@ -350,9 +350,11 @@ namespace WeexCore {
       if (hypotheticalMeasurment) {
         if (widthRemeasure) {
           node->setLayoutWidth(nodeWidth);
+          node->mLayoutResult->mLayoutSize.hypotheticalWidth = nodeWidth;
         }
         if (heightRemeasure) {
           node->setLayoutHeight(nodeHeight);
+          node->mLayoutResult->mLayoutSize.hypotheticalHeight = nodeHeight;
         }
       } else {
         if (widthRemeasure || heightRemeasure) {
