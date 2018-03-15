@@ -1348,6 +1348,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public View getRootView() {
+    if (mRootComp == null)
+      return null;
     return mRootComp.getRealView();
   }
 
