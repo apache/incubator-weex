@@ -43,6 +43,9 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
     }
 
     Stopwatch.tick();
+    if (!component.getEvents().contains(mEvent)) {
+      component.getEvents().addEvent(mEvent);
+    }
     component.addEvent(mEvent);
     Stopwatch.split("addEventToComponent");
 
