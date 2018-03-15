@@ -193,13 +193,8 @@ namespace WeexCore {
   void WXCoreLayoutNode::determineMainSize(const float width, const float height) {
       bool horizontal = isMainAxisHorizontal(this);
       if((horizontal && widthMeasureMode == kExactly) || (!horizontal && heightMeasureMode == kExactly)) {
-        float maxMainSize;
-        if (horizontal) {
-          maxMainSize = widthMeasureMode == kUnspecified ? getLargestMainSize() : width;
-        } else {
-          maxMainSize = heightMeasureMode == kUnspecified ? getLargestMainSize() : height;
-        }
-
+        //The measureMode along main axis is exactly
+        float maxMainSize = horizontal ? width: height;
         maxMainSize -= sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
         Index childIndex = 0;
         for (WXCoreFlexLine *flexLine : mFlexLines) {
