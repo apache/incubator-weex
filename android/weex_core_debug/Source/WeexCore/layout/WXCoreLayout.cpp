@@ -244,16 +244,15 @@ namespace WeexCore {
       Index childCount = getChildCount(kNonBFC);
       WXCoreFlexLine *flexLine = new WXCoreFlexLine();
 
-      // The index of the view in a same flex line.
       for (Index i = 0; i < childCount; i++) {
         WXCoreLayoutNode *child = getChildAt(kNonBFC, i);
         if (child->mCssStyle->mAlignSelf == kAlignSelfStretch) {
           flexLine->mIndicesAlignSelfStretch.push_back(i);
         }
-        measureChild(child, width, height, needMeasure, hypotheticalMeasurment);
+        measureChild(child, flexLine->mMainSize, width, height, needMeasure, hypotheticalMeasurment);
         checkSizeConstraints(child, hypotheticalMeasurment);
 
-        if (isWrapRequired(this, width, height, flexLine->mMainSize,
+        if (isWrapRequired(width, height, flexLine->mMainSize,
                            calcItemSizeAlongAxis(child, isMainAxisHorizontal(this)))) {
           if (flexLine->mItemCount > 0) {
             mFlexLines.push_back(flexLine);
@@ -279,41 +278,62 @@ namespace WeexCore {
       }
     }
 
-    void WXCoreLayoutNode::measureChild(WXCoreLayoutNode* const child, const float parentWidth, const float parentHeight,
-                                     const bool needMeasure, const bool hypotheticalMeasurment) {
+    void WXCoreLayoutNode::measureChild(WXCoreLayoutNode* const child, const float currentMainSize,
+                                        const float parentWidth, const float parentHeight,
+                                        const bool needMeasure, const bool hypotheticalMeasurment) {
       if (needMeasure && child->isDirty()) {
-        bool stretch = false;
         if (hypotheticalMeasurment) {
           float childWidth = child->mCssStyle->mStyleWidth;
           float childHeight = child->mCssStyle->mStyleHeight;
-          if(!isMainAxisHorizontal(this) && child->measureFunc != nullptr){
-            stretch = widthMeasureMode == kExactly &&
-                isSingleFlexLine(parentHeight) &&
-                ((child->mCssStyle->mAlignSelf == kAlignSelfStretch) ||
-                    (mCssStyle->mAlignItems == kAlignItemsStretch
-                        && child->mCssStyle->mAlignSelf == kAlignSelfAuto));
-          }
+          bool stretch = !isMainAxisHorizontal(this) &&
+              child->measureFunc != nullptr &&
+              widthMeasureMode == kExactly &&
+              isSingleFlexLine(parentHeight) &&
+              ((child->mCssStyle->mAlignSelf == kAlignSelfStretch) ||
+                  (mCssStyle->mAlignItems == kAlignItemsStretch
+                      && child->mCssStyle->mAlignSelf == kAlignSelfAuto));
 
-          if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
-            if (isMainAxisHorizontal(this)) {
-              if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)
-                  && child->mCssStyle->mAlignSelf == kAlignSelfAuto && mCssStyle->mAlignItems == kAlignItemsStretch) {
-                childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
-                    child->mCssStyle->mMargin.getMargin(kMarginTop) -
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
-              }
-            } else {
-              if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
-                childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
-                    child->mCssStyle->mMargin.getMargin(kMarginLeft) -
-                    child->mCssStyle->mMargin.getMargin(kMarginRight);
-              }
-            }
-          }
+          adjustChildSize(child, currentMainSize, parentWidth,
+                          parentHeight, childWidth, childHeight);
           child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
           child->measure(child->mLayoutResult->mLayoutSize.width,
                          child->mLayoutResult->mLayoutSize.height, hypotheticalMeasurment);
+        }
+      }
+    }
+
+    void WXCoreLayoutNode::adjustChildSize(const WXCoreLayoutNode *child,
+                                        const float currentMainSize,
+                                        const float parentWidth,
+                                        const float parentHeight,
+                                        float &childWidth,
+                                        float &childHeight) const {
+      if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
+        if (isMainAxisHorizontal(this)) {
+          if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)
+              && child->mCssStyle->mAlignSelf == kAlignSelfAuto
+              && mCssStyle->mAlignItems == kAlignItemsStretch) {
+            childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
+                child->mCssStyle->sumMarginOfDirection(false);
+          }
+
+          if (isnan(child->mCssStyle->mStyleWidth)) {
+            childWidth =
+                calcFreeSpaceAlongMainAxis(parentWidth, parentHeight, currentMainSize) -
+                    child->mCssStyle->sumMarginOfDirection(true);
+          }
+        } else {
+          if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
+            childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
+                child->mCssStyle->sumMarginOfDirection(true);
+          }
+
+          if (isnan(child->mCssStyle->mStyleHeight)) {
+            childHeight =
+                calcFreeSpaceAlongMainAxis(parentWidth, parentHeight, currentMainSize) -
+                    child->mCssStyle->sumMarginOfDirection(false);
+          }
         }
       }
     }

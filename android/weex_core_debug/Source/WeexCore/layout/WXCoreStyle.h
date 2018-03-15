@@ -270,6 +270,15 @@ namespace WeexCore {
               + mBorderWidth.getBorderWidth(kBorderWidthLeft);
       }
     }
+
+    float sumMarginOfDirection(bool horizontal){
+      if(horizontal){
+        return mMargin.getMargin(kMarginLeft) + mMargin.getMargin(kMarginRight);
+      }
+      else{
+        return mMargin.getMargin(kMarginTop) + mMargin.getMargin(kMarginBottom);
+      }
+    }
   };
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H

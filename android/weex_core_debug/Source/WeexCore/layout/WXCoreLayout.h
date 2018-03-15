@@ -361,16 +361,22 @@ namespace WeexCore {
       return paddingBorderAlongAxis;
     }
 
-    inline bool isWrapRequired(const WXCoreLayoutNode *parent, const float &width, const float &height,
+    inline bool isWrapRequired(const float &width, const float &height,
                                const float &currentLength, const float &childLength) const {
-      float maxMainSize;
+      float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
+      return !isSingleFlexLine(freeMainSize) && freeMainSize < childLength;
+    }
+
+    //If width/height is NAN, ret is NAN, which property we use on purpose.
+    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
+      float ret;
       if(isMainAxisHorizontal(this)){
-        maxMainSize = width - sumPaddingBorderAlongAxis(this, true);
+        ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
       }
       else{
-        maxMainSize = height - sumPaddingBorderAlongAxis(this, false);
+        ret = height - sumPaddingBorderAlongAxis(this, false) - currentLength;
       }
-      return !isSingleFlexLine(maxMainSize) && maxMainSize < currentLength + childLength;
+      return ret;
     }
 
     inline bool isSingleFlexLine(const float &mainSize) const {
@@ -483,9 +489,16 @@ namespace WeexCore {
 
     void updateCurrentFlexline(Index, WXCoreFlexLine *, Index, const WXCoreLayoutNode *, bool);
 
-    void measureChild(WXCoreLayoutNode *, float, float, bool, bool);
+    void measureChild(WXCoreLayoutNode* , float, float, float, bool, bool);
 
     void adjustChildSize(WXCoreLayoutNode *, float);
+
+    void adjustChildSize(const WXCoreLayoutNode *child,
+                         const float currentMainSize,
+                         const float parentWidth,
+                         const float parentHeight,
+                         float &childWidth,
+                         float &childHeight) const;
 
     void stretchViewCrossSize();
 
@@ -944,7 +957,6 @@ namespace WeexCore {
       }
       return largestSize + sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
     }
-
   };
 }
 #endif //WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
