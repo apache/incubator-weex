@@ -89,7 +89,7 @@ static WXRuleManager *_sharedInstance = nil;
                 return;
             }
             if (!fontFamily) {
-                fontFamily = [WXThreadSafeMutableDictionary dictionary];
+                fontFamily = [[WXThreadSafeMutableDictionary alloc] init];
             }
             NSURL *fontURL = [NSURL URLWithString:fontSrc];
             if (!fontURL) {
