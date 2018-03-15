@@ -328,17 +328,17 @@ namespace WeexCore {
           nodeWidth < node->mCssStyle->mMinWidth) {
         widthRemeasure = true;
         nodeWidth = node->mCssStyle->mMinWidth;
-      } else if (!isnan(nodeWidth > node->mCssStyle->mMaxWidth)
+      } else if (!isnan(node->mCssStyle->mMaxWidth)
           && nodeWidth > node->mCssStyle->mMaxWidth) {
         widthRemeasure = true;
         nodeWidth = node->mCssStyle->mMaxWidth;
       }
 
-      if (!isnan(nodeHeight < node->mCssStyle->mMinHeight) &&
+      if (!isnan(node->mCssStyle->mMinHeight) &&
           nodeHeight < node->mCssStyle->mMinHeight) {
         heightRemeasure = true;
         nodeHeight = node->mCssStyle->mMinHeight;
-      } else if (!isnan(nodeHeight > node->mCssStyle->mMaxHeight) &&
+      } else if (!isnan(node->mCssStyle->mMaxHeight) &&
           nodeHeight > node->mCssStyle->mMaxHeight) {
         heightRemeasure = true;
         nodeHeight = node->mCssStyle->mMaxHeight;
