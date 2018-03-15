@@ -595,7 +595,7 @@ public class WXTransition {
                         }
                     });
                 }
-                WXBridgeManager.getInstance().calculateLayoutPostToJSThread(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
+//                WXBridgeManager.getInstance().calculateLayoutPostToJSThread(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
             }
         });
         layoutValueAnimator.addListener(new AnimatorListenerAdapter() {

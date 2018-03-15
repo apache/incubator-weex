@@ -1894,7 +1894,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     } else {
       WXBridgeManager.getInstance().setStyleWidth(getInstanceId(), getRef(), getLayoutWidth());
       WXBridgeManager.getInstance().setStyleHeight(getInstanceId(), getRef(), getLayoutHeight());
-      WXBridgeManager.getInstance().calculateLayout(getInstanceId(), getRef(), false);
+//      WXBridgeManager.getInstance().calculateLayout(getInstanceId(), getRef(), false);
     }
   }
 
