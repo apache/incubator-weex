@@ -223,12 +223,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public void updateStyles(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
+      applyBorder(component);
     }
   }
 
   public void updateStyles(Map<String, Object> styles) {
     if (styles != null) {
       updateProperties(styles);
+      applyBorder(this);
     }
   }
 
@@ -586,7 +588,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       copyData(component);
       updateStyles(component);
       updateAttrs(component);
-      applyBorder(component);
       updateExtra(component.getExtra());
 
     }
