@@ -56,7 +56,7 @@ public abstract class WXBasicComponent<T extends View> {
     return mBasicComponentData;
   }
 
-  protected void copyData(WXComponent component) {
+  protected void bindComponent(WXComponent component) {
     mComponentType = component.getComponentType();
     mRef = component.getRef();
   }

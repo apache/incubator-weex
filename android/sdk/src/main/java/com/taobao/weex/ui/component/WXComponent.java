@@ -207,8 +207,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected final void copyData(WXComponent component) {
-    super.copyData(component);
+  protected final void bindComponent(WXComponent component) {
+    super.bindComponent(component);
     if (getInstance() != null)
       setViewPortWidth(getInstance().getInstanceViewPortWidth());
     mParent = component.getParent();
@@ -585,11 +585,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (component == null) {
         component = this;
       }
-      copyData(component);
+      bindComponent(component);
       updateStyles(component);
       updateAttrs(component);
       updateExtra(component.getExtra());
-
     }
   }
 
@@ -598,7 +597,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (component == null) {
         component = this;
       }
-      copyData(component);
+      bindComponent(component);
       setLayout(component);
       setPadding(component.getPadding(), component.getBorder());
       applyEvents();
