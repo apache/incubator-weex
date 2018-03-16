@@ -21,6 +21,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +83,14 @@ public class CheckForUpdateUtil {
                         String version = params.optString("version", "latest");
                         String updateDate = params.optString("updateDate", "");
                         final String updateUrl = params.optString("updateUrl", "");
+
+                        try {
+                          new URL(updateUrl);
+                        } catch (Throwable t) {
+                          WXLogUtils.e("Update", "Invalid update url");
+                          return;
+                        }
+
                         String updateDescription = params.optString("updateDescription", null);
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
