@@ -18,6 +18,12 @@
  */
 package com.taobao.weex.ui.component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -33,7 +39,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -52,17 +57,11 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.SingleFunctionParser;
-import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXViewUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Image component
@@ -86,6 +85,7 @@ public class WXImage extends WXComponent<ImageView> {
   };
 
   public static class Creator implements ComponentCreator {
+    @Override
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXImage(instance, parent, basicComponentData);
     }
@@ -115,19 +115,16 @@ public class WXImage extends WXComponent<ImageView> {
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.RESIZE_MODE:
-        String resize_mode = WXUtils.getString(param, null);
-        if (resize_mode != null)
-          setResizeMode(resize_mode);
+        String resizeMode = WXUtils.getString(param, null);
+        if (resizeMode != null) { setResizeMode(resizeMode); }
         return true;
       case Constants.Name.RESIZE:
         String resize = WXUtils.getString(param, null);
-        if (resize != null)
-          setResize(resize);
+        if (resize != null) { setResize(resize); }
         return true;
       case Constants.Name.SRC:
         String src = WXUtils.getString(param, null);
-        if (src != null)
-          setSrc(src);
+        if (src != null) { setSrc(src); }
         return true;
       case Constants.Name.IMAGE_QUALITY:
         return true;
@@ -136,15 +133,16 @@ public class WXImage extends WXComponent<ImageView> {
         return true;
       case Constants.Name.FILTER:
         int blurRadius = 0;
-        if(param != null && param instanceof String) {
+        if (param != null && param instanceof String) {
           blurRadius = parseBlurRadius((String)param);
         }
-        if(!TextUtils.isEmpty(this.mSrc)) {
-          setBlurRadius(this.mSrc,blurRadius);
+        if (!TextUtils.isEmpty(this.mSrc)) {
+          setBlurRadius(this.mSrc, blurRadius);
         }
         return true;
+      default:
+        return super.setProperty(key, param);
     }
-    return super.setProperty(key, param);
   }
 
   @Override
@@ -175,6 +173,8 @@ public class WXImage extends WXComponent<ImageView> {
         break;
       case "stretch":
         scaleType = ScaleType.FIT_XY;
+        break;
+      default:
         break;
     }
     return scaleType;
@@ -341,21 +341,33 @@ public class WXImage extends WXComponent<ImageView> {
   @Override
   protected void onFinishLayout() {
     super.onFinishLayout();
-    WXImageView imageView;
+    updateBorderRadius();
+  }
+
+  @Override
+  public void updateProperties(Map<String, Object> props) {
+    super.updateProperties(props);
+    updateBorderRadius();
+  }
+
+  /**
+   * 更新图片边缘属性(圆角之类的)
+   */
+  private void updateBorderRadius() {
     if (getHostView() instanceof WXImageView) {
-      imageView = (WXImageView) getHostView();
+      final WXImageView imageView = (WXImageView)getHostView();
       BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
       float[] borderRadius;
       if (borderDrawable != null) {
         RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(this), WXDomUtils.getContentHeight(this));
         borderRadius = borderDrawable.getBorderRadius(borderBox);
       } else {
-        borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
+        borderRadius = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
       }
       imageView.setBorderRadius(borderRadius);
 
       if (imageView.getDrawable() instanceof ImageDrawable) {
-        ImageDrawable imageDrawable = (ImageDrawable) imageView.getDrawable();
+        ImageDrawable imageDrawable = (ImageDrawable)imageView.getDrawable();
         float[] previousRadius = imageDrawable.getCornerRadii();
         if (!Arrays.equals(previousRadius, borderRadius)) {
           imageDrawable.setCornerRadii(borderRadius);
@@ -429,6 +441,7 @@ public class WXImage extends WXComponent<ImageView> {
     });
   }
 
+  @Override
   public void destroy() {
     if(getHostView() instanceof WXImageView){
       if (getInstance().getImgLoaderAdapter() != null) {
