@@ -350,9 +350,6 @@ public class WXImage extends WXComponent<ImageView> {
     updateBorderRadius();
   }
 
-  /**
-   * 更新图片边缘属性(圆角之类的)
-   */
   private void updateBorderRadius() {
     if (getHostView() instanceof WXImageView) {
       final WXImageView imageView = (WXImageView)getHostView();
