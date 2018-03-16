@@ -259,7 +259,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       });
     } else if (type.equals(Constants.Event.INPUT)) {
       addTextChangedListener(new TextWatcher() {
-        boolean  hasChangeForDefaultValue = false;
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -278,20 +277,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
           mBeforeText = s.toString();
 
-          if(!hasChangeForDefaultValue){
-            if (getDomObject() != null && getDomObject().getAttrs() != null) {
-              Object val = getDomObject().getAttrs().get(Constants.Name.VALUE);
-              String valString = WXUtils.getString(val, null);
-              if (mBeforeText != null && mBeforeText.equals(valString)) {
-                hasChangeForDefaultValue = true;
-                return;
-              }
-            }
-          }
+          fireEvent(Constants.Event.INPUT, s.toString());
 
-          if (!mIgnoreNextOnInputEvent) {
-            fireEvent(Constants.Event.INPUT, s.toString());
-          }
         }
 
         @Override
