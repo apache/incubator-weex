@@ -214,7 +214,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   std::string log = "";
   log.append("pageId: ").append(pageId).append(", parentRef: ").append(parentRef).append(", domStr: ").append(domStr);
   int log_index = 0;
-  int maxLength = 1000;
+  int maxLength = 800;
   std::string sub;
   while (log_index < log.length()) {
     if (log.length() <= log_index + maxLength) {
@@ -426,6 +426,12 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
   jbyteArray jArgString = getArgumentAsJByteArray(env, arguments, 3);
   jbyteArray jOptString = getArgumentAsJByteArray(env, arguments, 4);
 
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s",
+      jString2StrFast(env, jInstanceId).c_str(), jString2StrFast(env, jmodule).c_str(),
+      jString2StrFast(env, jmethod).c_str(), jByteArray2Str(env, jArgString).c_str());
+#endif
+
   // add for android support
   jobject result;
   result = Bridge_Impl_Android::getInstance()->callNativeModule(jInstanceId, jmodule, jmethod,
@@ -465,6 +471,12 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   jstring jmethod = getArgumentAsJString(env, arguments, 2);
   jbyteArray jArgString = getArgumentAsJByteArray(env, arguments, 3);
   jbyteArray jOptString = getArgumentAsJByteArray(env, arguments, 4);
+
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] handleCallNativeComponent >>>> pageId: %s, ref: %s, method: %s, arg: %s",
+       jString2StrFast(env, jInstanceId).c_str(), jString2StrFast(env, jcomponentRef).c_str(),
+       jString2StrFast(env, jmethod).c_str(), jByteArray2Str(env, jArgString).c_str());
+#endif
 
   Bridge_Impl_Android::getInstance()->callNativeComponent(jInstanceId, jcomponentRef, jmethod,
                                                           jArgString,
