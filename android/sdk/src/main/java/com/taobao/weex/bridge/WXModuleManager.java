@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Manager class for weex module. There are two types of modules in weex, one is instance-level module,
@@ -56,7 +57,7 @@ public class WXModuleManager {
   /**
    * module class object dictionary
    */
-  private static volatile Map<String, ModuleFactoryImpl> sModuleFactoryMap = new HashMap<>();
+  private static volatile ConcurrentMap<String, ModuleFactoryImpl> sModuleFactoryMap = new ConcurrentHashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
