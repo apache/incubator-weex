@@ -5,6 +5,7 @@
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/css/ConstantsValue.h>
 #include <WeexCore/platform/android/base/LogUtils.h>
+#include <math.h>
 #include "RenderObject.h"
 
 namespace WeexCore {
@@ -33,9 +34,9 @@ namespace WeexCore {
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
 
-      if (prop == HEIGHT && getStyleHeight() == 0.0 && GetStyle(FLEX).empty()) {
+      if (prop == HEIGHT && isnan(getStyleHeight()) && GetStyle(FLEX).empty()) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      } else if (prop == WIDTH && getStyleWidth() == 0.0 && GetStyle(FLEX).empty()) {
+      } else if (prop == WIDTH && isnan(getStyleWidth()) && GetStyle(FLEX).empty()) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 
