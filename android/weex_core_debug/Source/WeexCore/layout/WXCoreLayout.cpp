@@ -273,7 +273,7 @@ namespace WeexCore {
       flexLine->mMainSize += calcItemSizeAlongAxis(child, isMainAxisHorizontal(this), useHypotheticalSize);
       sumFlexGrow(child, flexLine, i);
       flexLine->mCrossSize =
-          std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this)));
+          std::max(flexLine->mCrossSize, calcItemSizeAlongAxis(child, !isMainAxisHorizontal(this), useHypotheticalSize));
       if (i == childCount - 1 && flexLine->mItemCount != 0) {
         mFlexLines.push_back(flexLine);
       }
