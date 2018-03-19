@@ -29,15 +29,16 @@ import android.view.Choreographer;
 import java.lang.ref.WeakReference;
 
 public class WeexFrameRateControl {
+    private static final long VSYNC_FRAME = 1000 / 16;
     private WeakReference<VSyncListener> mListener;
     private final Choreographer mChoreographer;
     private final Choreographer.FrameCallback mVSyncFrameCallback;
+    private final Runnable runnable;
 
     public interface VSyncListener {
         void OnVSync();
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public WeexFrameRateControl(VSyncListener listener) {
         mListener = new WeakReference<>(listener);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
@@ -51,27 +52,37 @@ public class WeexFrameRateControl {
                     }
                 }
             };
+            runnable = null;
         } else {
-            // only support on api 16
+            // For API 15 or lower
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
+                    if (mListener != null && mListener.get() != null) {
+                        mListener.get().OnVSync();
+                    }
+                }
+            };
             mChoreographer = null;
             mVSyncFrameCallback = null;
         }
-
-
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void start() {
         if (mChoreographer != null) {
             mChoreographer.postFrameCallback(mVSyncFrameCallback);
         }
-
+        else if(runnable!=null){
+            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
+        }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void stop() {
         if (mChoreographer != null) {
             mChoreographer.removeFrameCallback(mVSyncFrameCallback);
+        }else if(runnable!=null){
+            WXSDKManager.getInstance().getWXRenderManager().removeTask(runnable);
         }
     }
 }

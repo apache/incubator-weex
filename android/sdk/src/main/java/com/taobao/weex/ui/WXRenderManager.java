@@ -19,6 +19,8 @@
 package com.taobao.weex.ui;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
@@ -72,6 +74,16 @@ public class WXRenderManager {
 
   public void postOnUiThread(Runnable runnable, long delayMillis) {
     mWXRenderHandler.postDelayed(WXThread.secure(runnable), delayMillis);
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void postOnUiThread(Runnable runnable){
+    mWXRenderHandler.post(WXThread.secure(runnable));
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void removeTask(Runnable runnable){
+    mWXRenderHandler.removeCallbacks(runnable);
   }
 
   /**
