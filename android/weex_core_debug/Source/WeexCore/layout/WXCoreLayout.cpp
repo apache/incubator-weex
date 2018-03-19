@@ -16,6 +16,7 @@ namespace WeexCore {
         mChildrenFrozen[i] = false;
       }
       measure(std::get<1>(bfcDimension), std::get<2>(bfcDimension), true);
+      checkSizeConstraints(this, false);
     }
     layout(mCssStyle->mMargin.getMargin(kMarginLeft),
            mCssStyle->mMargin.getMargin(kMarginTop),
