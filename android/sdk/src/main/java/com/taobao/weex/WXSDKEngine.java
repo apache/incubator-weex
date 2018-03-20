@@ -21,8 +21,10 @@ package com.taobao.weex;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -162,9 +164,28 @@ public class WXSDKEngine implements Serializable {
         }
       }
       doInitInternal(application,config);
+      registerApplicationOptions(application);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
       mIsInit = true;
+    }
+  }
+
+  private static void registerApplicationOptions(final Application application) {
+
+    if (application == null) {
+      WXLogUtils.e(TAG, "RegisterApplicationOptions application is null");
+      return;
+    }
+
+    Resources resources = application.getResources();
+    registerCoreEnv("screen_width_pixels", String.valueOf(resources.getDisplayMetrics().widthPixels));
+    registerCoreEnv("screen_height_pixels", String.valueOf(resources.getDisplayMetrics().heightPixels));
+
+    int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      int statusBarHeight = resources.getDimensionPixelSize(resourceId);
+      registerCoreEnv("status_bar_height", String.valueOf(statusBarHeight));
     }
   }
 
