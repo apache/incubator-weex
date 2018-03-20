@@ -80,7 +80,7 @@ namespace WeexCore {
     bool UpdateStyle(const std::string &key, const std::string &value,
                       float fallback, std::function<void(float)> functor){
       bool ret = false;
-      if (value.size() == 0) {
+      if (value.empty()) {
         functor(fallback);
         ret = true;
       } else {
@@ -119,7 +119,15 @@ namespace WeexCore {
         setAlignSelf(GetWXCoreAlignSelf(value));
         return kTypeLayout;
       } else if (key == FLEX) {
-        setFlex(atof(value.c_str()));
+        if (value.empty()) {
+          setFlex(0);
+        } else {
+          char *end;
+          float ret = strtof(value.c_str(), &end);
+          if ( *end == '\0') {
+            setFlex(ret);
+          }
+        }
         return kTypeLayout;
       } else if (key == FLEX_DIRECTION) {
         setFlexDirection(GetWXCoreFlexDirection(value));
