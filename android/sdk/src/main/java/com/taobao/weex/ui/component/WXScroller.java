@@ -18,6 +18,13 @@
  */
 package com.taobao.weex.ui.component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
@@ -31,7 +38,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -55,15 +61,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-//import com.taobao.weex.ui.WXRecycleImageManager;
-
 /**
  * Component for scroller. It also support features like
  * "appear", "disappear" and "sticky"
@@ -75,7 +72,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
   private List<WXComponent> mRefreshs=new ArrayList<>();
-  private int mChildrenLayoutOffset = 0;//Use for offset children layout
+  /** Use for offset children layout */
+  private int mChildrenLayoutOffset = 0;
   private boolean mForceLoadmoreNextTime = false;
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
@@ -87,6 +85,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private ScrollStartEndHelper mScrollStartEndHelper;
 
   public static class Creator implements ComponentCreator {
+    @Override
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXScroller(instance, parent, basicComponentData);
     }
@@ -142,8 +141,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * @return ScrollView
    */
   public ViewGroup getInnerView() {
-    if(getHostView() == null)
+    if(getHostView() == null) {
       return null;
+    }
     if (getHostView() instanceof BounceScrollerView) {
       return ((BounceScrollerView) getHostView()).getInnerView();
     } else {
@@ -278,6 +278,16 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @Override
   protected int getChildrenLayoutTopOffset() {
+    if (mChildrenLayoutOffset == 0) {
+      // Child LayoutSize data set after call Layout. So init mChildrenLayoutOffset here
+      final int listSize = mRefreshs.size();
+      if (listSize > 0) {
+        for (int i = 0; i < listSize; i++) {
+          WXComponent child = mRefreshs.get(i);
+          mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
+        }
+      }
+    }
     return mChildrenLayoutOffset;
   }
 
@@ -286,14 +296,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void addChild(WXComponent child, int index) {
-    mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
     if (child instanceof WXBaseRefresh) {
-      if (!checkRefreshOrLoading(child)) {
+      if (checkRefreshOrLoading(child)) {
         mRefreshs.add(child);
       }
     }
-
-    super.addChild(child,index);
+    super.addChild(child, index);
   }
 
   /**
@@ -312,6 +320,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
       });
       handler.postDelayed(runnable,100);
+      result = true;
     }
 
     if (child instanceof WXLoading && getHostView() !=null) {
@@ -495,8 +504,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     switch (key) {
       case Constants.Name.SHOW_SCROLLBAR:
         Boolean result = WXUtils.getBoolean(param,null);
-        if (result != null)
+        if (result != null) {
           setShowScrollbar(result);
+        }
         return true;
       case Constants.Name.SCROLLABLE:
         boolean scrollable = WXUtils.getBoolean(param, true);
@@ -506,6 +516,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
         return true;
+        default:
+          break;
     }
     return super.setProperty(key, param);
   }
@@ -572,7 +584,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
     item.setWatchEvent(event,isWatch);
 
-    procAppear(0,0,0,0);//check current components appearance status.
+    //check current components appearance status.
+    procAppear(0,0,0,0);
   }
 
   /**
