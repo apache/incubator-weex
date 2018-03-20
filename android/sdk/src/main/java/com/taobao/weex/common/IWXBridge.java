@@ -85,18 +85,14 @@ public interface IWXBridge extends IWXObject {
 
   int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-  int callAddEvent(String instanceId, String ref, String event);
-
-  int callRemoveEvent(String instanceId, String ref, String event);
-
   void reportServerCrash(String instanceId, String crashFile);
 
 
-  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
+  public int callCreateBody(String pageId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       float[] margins, float[] paddings, float[] borders);
 
-  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
+  public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       float[] margins, float[] paddings, float[] borders);
 
@@ -104,20 +100,22 @@ public interface IWXBridge extends IWXObject {
 
   int callMoveElement(String instanceId, String ref, String parentref, int index);
 
-  public int callUpdateStyleByWeexCore(String instanceId, String ref,
+  int callAddEvent(String instanceId, String ref, String event);
+
+  int callRemoveEvent(String instanceId, String ref, String event);
+
+  public int callUpdateStyle(String instanceId, String ref,
                                        HashMap<String, Object> styles,
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders);
 
-  int callUpdateAttrsByWeexCore(String instanceId, String ref,
+  int callUpdateAttrs(String instanceId, String ref,
                                        HashMap<String, String> attrs);
 
-  int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
 
-  int callCreateFinishByWeexCore(String instanceId);
-
-  void callLogOfFirstScreen(String message);
+  int callCreateFinish(String instanceId);
 
   int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
 

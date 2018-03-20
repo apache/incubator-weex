@@ -91,7 +91,7 @@ public class BenchmarkTest {
     for (int i = 0; i < TIMES; i++) {
       WXPerformance performance = fetchPerformance();
       long currentTime = performance.screenRenderTime;
-      long layoutTime = performance.mCallLayoutByWeexCoreSumTime;
+      long layoutTime = performance.mCallLayoutSumTime;
       localTotalTime.add(currentTime);
       localLayoutTime.add(layoutTime);
       Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity not kill) " + currentTime + "ms");
@@ -109,7 +109,7 @@ public class BenchmarkTest {
   public void testFirstFirstScreenPerformance() {
     WXPerformance performance = fetchPerformance();
     long currentTime = performance.screenRenderTime;
-    long layoutTime = performance.mCallLayoutByWeexCoreSumTime;
+    long layoutTime = performance.mCallLayoutSumTime;
     firstScreenRenderTime.add(currentTime);
     firstScreenLayoutTime.add(layoutTime);
     Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity killed) " + currentTime + " ms");

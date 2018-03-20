@@ -185,9 +185,9 @@ public class WXPerformance {
 
 
   public int mCallCreateBodySumTime = 0;
-  public int mCallAddElementByWeexCoreSumTime = 0;
+  public int mCallAddElementSumTime = 0;
 
-  public int mCallLayoutByWeexCoreSumTime = 0;
+  public int mCallLayoutSumTime = 0;
   public int mCallLayoutUpdateDemissionSumTime = 0;
   public int mCallLayoutApplyLayoutAndEventSumTime = 0;
   public int mCallLayoutBindDataSumTime = 0;

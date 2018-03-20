@@ -118,8 +118,6 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
   jstring jTime = getArgumentAsJString(env, arguments, 2);
   const char *_time = env->GetStringUTFChars(jTime, NULL);
   long time_ = atoi(_time);
-//  LOGE("functionSetIntervalWeex instanceId:%s time_:%ld callbackID:%s", instanceID, time_,
-//       callbackID);
   int _timerId = (atoi(instanceID) << 16) | (atoi(callbackID));
   env->DeleteLocalRef(jInstanceId);
   env->DeleteLocalRef(jCallbackId);
@@ -133,7 +131,6 @@ std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments) {
   const char *instanceID = env->GetStringUTFChars(jInstanceId, NULL);
   jstring jCallbackId = getArgumentAsJString(env, arguments, 1);
   const char *callbackID = env->GetStringUTFChars(jCallbackId, NULL);
-//  LOGE("functionClearIntervalWeex instanceID:%s, callbackID:%s", instanceID, callbackID);
   long id = atoi(callbackID);
 
   env->DeleteLocalRef(jInstanceId);
@@ -175,8 +172,6 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
   return ret;
 }
 
-
-/******************* WeexCore *******************/
 
 std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
 
@@ -288,6 +283,50 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
   return createInt32Result(0);
 }
 
+std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *event = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || event == nullptr)
+    return createInt32Result(0);
+
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
+       ref, event);
+#endif
+
+  RenderManager::GetInstance()->AddEvent(pageId, ref, event);
+
+  delete[]pageId;
+  delete[]ref;
+  delete[]event;
+  return createInt32Result(0);
+}
+
+std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
+
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *event = getArumentAsCStr(arguments, 2);
+
+  if (pageId == nullptr || ref == nullptr || event == nullptr)
+    return createInt32Result(0);
+
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
+       ref, event);
+#endif
+
+  RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
+
+  delete[]pageId;
+  delete[]ref;
+  delete[]event;
+  return createInt32Result(0);
+}
+
 std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
 
   char *pageId = getArumentAsCStr(arguments, 0);
@@ -371,50 +410,6 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
     Bridge_Impl_Android::getInstance()->callNative(jInstanceId, jTaskString, jCallback);
   }
 
-  return createInt32Result(0);
-}
-
-std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
-
-  char *pageId = getArumentAsCStr(arguments, 0);
-  char *ref = getArumentAsCStr(arguments, 1);
-  char *event = getArumentAsCStr(arguments, 2);
-
-  if (pageId == nullptr || ref == nullptr || event == nullptr)
-    return createInt32Result(0);
-
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
-#endif
-
-  RenderManager::GetInstance()->AddEvent(pageId, ref, event);
-
-  delete[]pageId;
-  delete[]ref;
-  delete[]event;
-  return createInt32Result(0);
-}
-
-std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
-
-  char *pageId = getArumentAsCStr(arguments, 0);
-  char *ref = getArumentAsCStr(arguments, 1);
-  char *event = getArumentAsCStr(arguments, 2);
-
-  if (pageId == nullptr || ref == nullptr || event == nullptr)
-    return createInt32Result(0);
-
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
-#endif
-
-  RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
-
-  delete[]pageId;
-  delete[]ref;
-  delete[]event;
   return createInt32Result(0);
 }
 

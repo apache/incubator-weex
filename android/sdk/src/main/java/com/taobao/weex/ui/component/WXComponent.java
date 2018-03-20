@@ -861,7 +861,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     //calculate first screen time
     if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      WXLogUtils.logOfFirstScreen("firstScreenRenderFinished in component");
       mInstance.firstScreenRenderFinished();
     }
 

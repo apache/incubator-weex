@@ -1049,8 +1049,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
-    WXLogUtils.renderPerformanceLog("   firstCallAddElementByWeexCoreSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementByWeexCoreSumTime);
-    WXLogUtils.renderPerformanceLog("   firstCallLayoutByWeexCoreSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutByWeexCoreSumTime);
+    WXLogUtils.renderPerformanceLog("   firstCallAddElementSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementSumTime);
+    WXLogUtils.renderPerformanceLog("   firstCallLayoutSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutSumTime);
     WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
@@ -1168,12 +1168,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.mCallCreateBodySumTime += time;
     }
 
-  public void callAddElementByWeexCoreTime(long time) {
-      mWXPerformance.mCallAddElementByWeexCoreSumTime += time;
+  public void callAddElementTime(long time) {
+      mWXPerformance.mCallAddElementSumTime += time;
   }
 
-  public void callLayoutByWeexCoreTime(long time) {
-      mWXPerformance.mCallLayoutByWeexCoreSumTime += time;
+  public void callLayoutTime(long time) {
+      mWXPerformance.mCallLayoutSumTime += time;
   }
 
   public void callLayoutUpdateDemissionTime(long time) {
@@ -1249,8 +1249,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("   firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
       WXLogUtils.renderPerformanceLog("   firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
       WXLogUtils.renderPerformanceLog("   firstCallCreateBodySumTime（"+mWXPerformance.mActionCreateBodyCount+"）", mWXPerformance.mCallCreateBodySumTime);
-      WXLogUtils.renderPerformanceLog("   firstCallAddElementByWeexCoreSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementByWeexCoreSumTime);
-      WXLogUtils.renderPerformanceLog("   firstCallLayoutByWeexCoreSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutByWeexCoreSumTime);
+      WXLogUtils.renderPerformanceLog("   firstCallAddElementSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementSumTime);
+      WXLogUtils.renderPerformanceLog("   firstCallLayoutSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutSumTime);
       WXLogUtils.renderPerformanceLog("   firstScreenRenderSumTime", mWXPerformance.renderSumTime());
       WXLogUtils.renderPerformanceLog("       firstActionCreateBodySumTime", mWXPerformance.mActionCreateBodySumTime);
       WXLogUtils.renderPerformanceLog("       firstActionAddElementSumTime", mWXPerformance.mActionAddElementSumTime);

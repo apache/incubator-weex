@@ -317,28 +317,4 @@ public class WXLogUtils {
   public interface LogWatcher {
     void onLog(String level, String tag, String msg);
   }
-
-  public static void logOfFirstScreen(String message){
-
-//    if (WXSDKInstance.sIsFinish) {
-//      return;
-//    }
-//    String threadName = Thread.currentThread().getName();
-//
-//    if ("main".equals(threadName)) {
-//
-//    } else {
-//      threadName = "             " + threadName;
-//    }
-//
-//    if (WXEnvironment.isApkDebugable()) {
-//      Log.e(WEEX_TAG, "logOfFirstScreen=" + message);
-//    }
-//    String name = threadName + "-" + message;
-//    if (null != sFirstScreenLog.get(name)) {
-//      sFirstScreenLog.put(name + "-" + System.currentTimeMillis(), System.currentTimeMillis());
-//    } else {
-//      sFirstScreenLog.put(name, System.currentTimeMillis());
-//    }
-  }
 }
