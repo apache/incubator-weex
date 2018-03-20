@@ -31,6 +31,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -104,7 +105,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private int mContentHeight = 0;
 
   private WXStickyHelper stickyHelper;
-  private Handler handler=new Handler();
+  private Handler handler=new Handler(Looper.getMainLooper());
 
   private boolean isScrollable = true;
 
