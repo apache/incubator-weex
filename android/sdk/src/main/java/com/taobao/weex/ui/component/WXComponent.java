@@ -838,12 +838,23 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     int realWidth = (int) getLayoutSize().getWidth();
     int realHeight = (int) getLayoutSize().getHeight();
-    int realLeft = (int) (getLayoutPosition().getLeft() -
-            parentPadding.get(CSSShorthand.EDGE.LEFT) - parentBorder.get(CSSShorthand.EDGE.LEFT));
-    int realTop = (int) (getLayoutPosition().getTop() -
-            parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
+
+    int realLeft = 0;
+    int realTop = 0;
+
+    if (isFixed()) {
+      realLeft = (int) (getLayoutPosition().getLeft() - getInstance().getRenderContainerPaddingLeft());
+      realTop = (int) (getLayoutPosition().getTop() - getInstance().getRenderContainerPaddingTop()) + siblingOffset;
+    } else {
+      realLeft = (int) (getLayoutPosition().getLeft() -
+              parentPadding.get(CSSShorthand.EDGE.LEFT) - parentBorder.get(CSSShorthand.EDGE.LEFT));
+      realTop = (int) (getLayoutPosition().getTop() -
+              parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
+    }
+
     int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
     int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
+
     Point rawOffset = new Point(
             (int) getLayoutPosition().getLeft(),
             (int) getLayoutPosition().getTop());
