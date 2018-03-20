@@ -456,6 +456,11 @@ namespace WeexCore {
         myPair = new std::pair<std::string, std::string>(key, "false");
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();
+      } else if(r.PeekType() == kNullType) {
+          RAPIDJSON_ASSERT(r.PeekType() == kNullType);
+          myPair = new std::pair<std::string, std::string>(key, "");
+          pairs->insert(pairs->end(), myPair);
+          r.SkipValue();
       } else {
         r.SkipValue();
       }
