@@ -36,6 +36,16 @@
 @property (nonatomic, assign)   BOOL    checked;
 @property (nonatomic, assign)   BOOL    disabled;
 
+//Background color when the switch is turned on.
+@property (nonatomic, strong)  UIColor *onTintColor;
+
+
+//Color of the foreground switch grip.
+@property (nonatomic, strong)  UIColor *thumbTintColor;
+
+//Border color and background color on Android when the switch is turned off
+@property (nonatomic, strong)  UIColor *tintColor;
+
 @end
 
 @implementation WXSwitchComponent
@@ -45,6 +55,18 @@
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         _checked = attributes[@"checked"] ? [WXConvert BOOL:attributes[@"checked"]] : NO;
         _disabled = attributes[@"disabled"] ? [WXConvert BOOL:attributes[@"disabled"]] : NO;
+        
+        if(attributes[@"onTintColor"]){
+            _onTintColor = [WXConvert UIColor:attributes[@"onTintColor"]];
+        }
+
+        if(attributes[@"thumbTintColor"]){
+            _thumbTintColor = [WXConvert UIColor:attributes[@"thumbTintColor"]];
+        }
+
+        if(attributes[@"tintColor"]){
+            _tintColor = [WXConvert UIColor:attributes[@"tintColor"]];
+        }
         
         self.cssNode->style.dimensions[CSS_WIDTH] = 51;
         self.cssNode->style.dimensions[CSS_HEIGHT] = 31;
@@ -64,6 +86,18 @@
     [_switchView setOn:_checked animated:YES];
     [_switchView setEnabled:!_disabled];
     [_switchView addTarget:self action:@selector(checkChanged) forControlEvents:UIControlEventValueChanged];
+    
+    if(_onTintColor){
+        _switchView.onTintColor = _onTintColor;
+    }
+
+    if(_tintColor){
+        _switchView.tintColor = _tintColor;
+    }
+
+    if(_thumbTintColor){
+        _switchView.thumbTintColor = _thumbTintColor;
+    }
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -89,6 +123,21 @@
     else if (attributes[@"disabled"]) {
         _disabled = [WXConvert BOOL:attributes[@"disabled"]];
         [_switchView setEnabled:!_disabled];
+    }
+    
+    if(attributes[@"onTintColor"]){
+        _onTintColor = [WXConvert UIColor:attributes[@"onTintColor"]];
+        _switchView.onTintColor = _onTintColor;
+    }
+    
+    if(attributes[@"thumbTintColor"]){
+        _thumbTintColor = [WXConvert UIColor:attributes[@"thumbTintColor"]];
+        _switchView.thumbTintColor = _thumbTintColor;
+    }
+    
+    if(attributes[@"tintColor"]){
+        _tintColor = [WXConvert UIColor:attributes[@"tintColor"]];
+        _switchView.tintColor = _tintColor;
     }
 }
 
