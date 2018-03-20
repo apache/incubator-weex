@@ -228,7 +228,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         setJSFrameworkInit(false);
         WXModuleManager.resetAllModuleState();
         String jsf = "";
-        if (!isSandBoxContext) {
+        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
           jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -244,7 +244,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             setJSFrameworkInit(false);
             WXModuleManager.resetAllModuleState();
             String jsf = "";
-            if (!isSandBoxContext) {
+            if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
               jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
             } else {
               jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -1741,7 +1741,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         instance.setTemplate(template);
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
-        if (!isSandBoxContext) {
+        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
@@ -1765,7 +1765,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
-    if (!useSandBox || type == BundType.Others) {
+    if (!useSandBox || type == BundType.Others || WXEnvironment.sDebugServerConnectable) {
       return opt;
     }
     try {
@@ -2059,7 +2059,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
         // }
-        if (!isSandBoxContext) {
+        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
           framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
