@@ -38,36 +38,28 @@ namespace WeexCore {
   public:
 
     StyleType ApplyStyle(const std::string &key, const std::string &value) {
-
       if (key == PADDING) {
-        float paddingLeft =
-            getFloatByViewport(value, GetViewPortWidth()) + defaultNavWidth;
-        float paddingRight =
-            getFloatByViewport(value, GetViewPortWidth()) + defaultOverflowWidth;
-        float padding = getFloatByViewport(value, GetViewPortWidth());
-
-        setPadding(kPaddingLeft, paddingLeft);
-        setPadding(kPaddingRight, paddingRight);
-        setPadding(kPaddingTop, padding);
-        setPadding(kPaddingBottom, padding);
+        UpdateStyle(key,
+                    value,
+                    0,
+                    [=](float foo) {
+                      setPadding(kPaddingLeft, foo + defaultNavWidth),
+                          setPadding(kPaddingRight, foo + defaultOverflowWidth),
+                          setPadding(kPaddingTop, foo),
+                          setPadding(kPaddingBottom, foo);
+                    });
         return kTypePadding;
       } else if (key == PADDING_LEFT) {
-        float paddingLeft =
-            getFloatByViewport(value, GetViewPortWidth()) + defaultNavWidth;
-        setPadding(kPaddingLeft, paddingLeft);
+        UpdateStyle(key,
+                    value,
+                    0,
+                    [=](float foo) { setPadding(kPaddingLeft, foo + defaultNavWidth); });
         return kTypePadding;
       } else if (key == PADDING_RIGHT) {
-        float paddingRight =
-            getFloatByViewport(value, GetViewPortWidth()) + defaultOverflowWidth;
-        setPadding(kPaddingRight, paddingRight);
-        return kTypePadding;
-      } else if (key == PADDING_TOP) {
-        float padding = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingTop, padding);
-        return kTypePadding;
-      } else if (key == PADDING_BOTTOM) {
-        float padding = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingBottom, padding);
+        UpdateStyle(key,
+                    value,
+                    0,
+                    [=](float foo) { setPadding(kPaddingRight, foo + defaultOverflowWidth); });
         return kTypePadding;
       } else {
         return RenderObject::ApplyStyle(key, value);

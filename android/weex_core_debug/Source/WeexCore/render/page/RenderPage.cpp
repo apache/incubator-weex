@@ -236,28 +236,46 @@ namespace WeexCore {
                 style = new std::vector<std::pair<std::string, std::string> *>();
                   style->insert(style->end(), (*styles)[i]);
                   flag = true;
-                  break;
+              break;
             case kTypeMargin:
-              if (margin == nullptr)
+              if (margin == nullptr) {
                 margin = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
-                  margin->insert(margin->end(), (*styles)[i]);
-                  flag = true;
-                  break;
+              }
+              render->UpdateStyle((*styles)[i]->first,
+                                  (*styles)[i]->second,
+                                  0,
+                                  [=, &flag](float foo) {
+                                    (*styles)[i]->second = std::to_string(foo),
+                                        margin->insert(margin->end(), (*styles)[i]),
+                                    flag = true;
+                                  });
+              break;
             case kTypePadding:
-              if (padding == nullptr)
+              if (padding == nullptr) {
                 padding = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
-                  padding->insert(padding->end(), (*styles)[i]);
-                  flag = true;
-                  break;
+              }
+              render->UpdateStyle((*styles)[i]->first,
+                                  (*styles)[i]->second,
+                                  0,
+                                  [=, &flag](float foo) {
+                                    (*styles)[i]->second = std::to_string(foo),
+                                        padding->insert(padding->end(), (*styles)[i]),
+                                    flag = true;
+                                  });
+              break;
             case kTypeBorder:
-              if (border == nullptr)
+              if (border == nullptr) {
                 border = new std::vector<std::pair<std::string, std::string> *>();
-                  (*styles)[i]->second = std::to_string(getFloatByViewport((*styles)[i]->second, ViewPortWidth()));
-                  border->insert(border->end(), (*styles)[i]);
-                  flag = true;
-                  break;
+              }
+              render->UpdateStyle((*styles)[i]->first,
+                                  (*styles)[i]->second,
+                                  0,
+                                  [=, &flag](float foo) {
+                                    (*styles)[i]->second = std::to_string(foo),
+                                        border->insert(border->end(), (*styles)[i]),
+                                    flag = true;
+                                  });
+              break;
           }
         }
       }

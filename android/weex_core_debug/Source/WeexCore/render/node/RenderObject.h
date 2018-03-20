@@ -76,6 +76,23 @@ namespace WeexCore {
       return nullptr;
     }
 
+   protected:
+    bool UpdateStyle(const std::string &key, const std::string &value,
+                      float fallback, std::function<void(float)> functor){
+      bool ret = false;
+      if (key.size() == 0) {
+        functor(fallback);
+        ret = true;
+      } else {
+        float ret = getFloatByViewport(value, GetViewPortWidth());
+        if (!isnan(ret)) {
+          functor(ret);
+          ret = true;
+        }
+      }
+      return ret;
+    }
+
   public:
 
     RenderObject();
@@ -114,108 +131,87 @@ namespace WeexCore {
         setFlexWrap(GetWXCoreFlexWrap(value));
         return kTypeLayout;
       } else if (key == MIN_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMinWidth(realValue);
+        UpdateStyle(key, value, NAN, [&](float foo){setMinWidth(foo);});
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMinHeight(realValue);
+        UpdateStyle(key, value, NAN, [&](float foo){setMinHeight(foo);});
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMaxWidth(realValue);
+        UpdateStyle(key, value, NAN, [&](float foo){setMaxWidth(foo);});
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMaxHeight(realValue);
+        UpdateStyle(key, value, NAN, [&](float foo){setMaxHeight(foo);});
         return kTypeLayout;
       } else if (key == HEIGHT) {
-        setStyleHeightLevel(CSS_STYLE);
-        setStyleHeight(getFloatByViewport(value, GetViewPortWidth()));
+        if(UpdateStyle(key, value, NAN, [&](float foo){setStyleHeight(foo);})){
+          setStyleHeightLevel(CSS_STYLE);
+        }
         return kTypeLayout;
       } else if (key == WIDTH) {
-        setStyleWidthLevel(CSS_STYLE);
-        setStyleWidth(getFloatByViewport(value, GetViewPortWidth()));
+        if(UpdateStyle(key, value, NAN, [&](float foo){setStyleWidth(foo);})){
+          setStyleWidthLevel(CSS_STYLE);
+        }
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
         mStyles->insert(std::pair<std::string, std::string>(key, value));
         return kTypeLayout;
       } else if (key == LEFT) {
-        setStylePosition(kPositionEdgeLeft, getFloatByViewport(value,
-                                                               GetViewPortWidth()));
+        UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeLeft, foo);});
         return kTypeLayout;
       } else if (key == TOP) {
-        setStylePosition(kPositionEdgeTop, getFloatByViewport(value,
-                                                              GetViewPortWidth()));
+        UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeTop, foo);});
         return kTypeLayout;
       } else if (key == RIGHT) {
-        setStylePosition(kPositionEdgeRight, getFloatByViewport(value,
-                                                                GetViewPortWidth()));
+        UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeRight, foo);});
         return kTypeLayout;
       } else if (key == BOTTOM) {
-        setStylePosition(kPositionEdgeBottom, getFloatByViewport(value,
-                                                                 GetViewPortWidth()));
+        UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeBottom, foo);});
         return kTypeLayout;
       } else if (key == MARGIN) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMargin(kMarginALL, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setMargin(kMarginALL, foo);});
         return kTypeMargin;
       } else if (key == MARGIN_LEFT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMargin(kMarginLeft, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setMargin(kMarginLeft, foo);});
         return kTypeMargin;
       } else if (key == MARGIN_TOP) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMargin(kMarginTop, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setMargin(kMarginTop, foo);});
         return kTypeMargin;
       } else if (key == MARGIN_RIGHT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMargin(kMarginRight, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setMargin(kMarginRight, foo);});
         return kTypeMargin;
       } else if (key == MARGIN_BOTTOM) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setMargin(kMarginBottom, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setMargin(kMarginBottom, foo);});
         return kTypeMargin;
       } else if (key == BORDER_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setBorderWidth(kBorderWidthALL, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setBorderWidth(kBorderWidthALL, foo);});
         return kTypeBorder;
       } else if (key == BORDER_TOP_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setBorderWidth(kBorderWidthTop, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setBorderWidth(kBorderWidthTop, foo);});
         return kTypeBorder;
       } else if (key == BORDER_RIGHT_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setBorderWidth(kBorderWidthRight, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setBorderWidth(kBorderWidthRight, foo);});
         return kTypeBorder;
       } else if (key == BORDER_BOTTOM_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setBorderWidth(kBorderWidthBottom, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setBorderWidth(kBorderWidthBottom, foo);});
         return kTypeBorder;
       } else if (key == BORDER_LEFT_WIDTH) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setBorderWidth(kBorderWidthLeft, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setBorderWidth(kBorderWidthLeft, foo);});
         return kTypeBorder;
       } else if (key == PADDING) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingALL, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingALL, foo);});
         return kTypePadding;
       } else if (key == PADDING_LEFT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingLeft, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingLeft, foo);});
         return kTypePadding;
       } else if (key == PADDING_TOP) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingTop, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingTop, foo);});
         return kTypePadding;
       } else if (key == PADDING_RIGHT) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingRight, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingRight, foo);});
         return kTypePadding;
       } else if (key == PADDING_BOTTOM) {
-        float realValue = getFloatByViewport(value, GetViewPortWidth());
-        setPadding(kPaddingBottom, realValue);
+        UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingBottom, foo);});
         return kTypePadding;
       } else {
         mStyles->insert(std::pair<std::string, std::string>(key, value));
