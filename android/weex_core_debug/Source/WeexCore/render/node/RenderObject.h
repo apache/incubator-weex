@@ -80,7 +80,7 @@ namespace WeexCore {
     bool UpdateStyle(const std::string &key, const std::string &value,
                       float fallback, std::function<void(float)> functor){
       bool ret = false;
-      if (key.size() == 0) {
+      if (value.size() == 0) {
         functor(fallback);
         ret = true;
       } else {
