@@ -16,7 +16,7 @@ namespace WeexCore {
     }
 
     inline StyleType UpdateStyle(std::string key, std::string value) {
-      StyleType resultType = RenderObject::ApplyStyle(key, value);
+      StyleType resultType = RenderObject::ApplyStyle(key, value, true);
       markDirty();
       return resultType;
     }

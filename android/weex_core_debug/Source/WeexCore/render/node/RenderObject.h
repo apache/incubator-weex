@@ -111,7 +111,7 @@ namespace WeexCore {
 
     void onLayoutAfter(float width, float height);
 
-    virtual StyleType ApplyStyle(const std::string &key, const std::string &value) {
+    virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
       if (key == ALIGN_ITEMS) {
         setAlignItems(GetWXCoreAlignItem(value));
         return kTypeLayout;
@@ -139,24 +139,24 @@ namespace WeexCore {
         setFlexWrap(GetWXCoreFlexWrap(value));
         return kTypeLayout;
       } else if (key == MIN_WIDTH) {
-        UpdateStyle(key, value, NAN, [&](float foo){setMinWidth(foo);});
+        UpdateStyle(key, value, NAN, [=](float foo){setMinWidth(foo, updating);});
         return kTypeLayout;
       } else if (key == MIN_HEIGHT) {
-        UpdateStyle(key, value, NAN, [&](float foo){setMinHeight(foo);});
+        UpdateStyle(key, value, NAN, [=](float foo){setMinHeight(foo);});
         return kTypeLayout;
       } else if (key == MAX_WIDTH) {
-        UpdateStyle(key, value, NAN, [&](float foo){setMaxWidth(foo);});
+        UpdateStyle(key, value, NAN, [=](float foo){setMaxWidth(foo, updating);});
         return kTypeLayout;
       } else if (key == MAX_HEIGHT) {
-        UpdateStyle(key, value, NAN, [&](float foo){setMaxHeight(foo);});
+        UpdateStyle(key, value, NAN, [=](float foo){setMaxHeight(foo);});
         return kTypeLayout;
       } else if (key == HEIGHT) {
-        if(UpdateStyle(key, value, NAN, [&](float foo){setStyleHeight(foo);})){
+        if(UpdateStyle(key, value, NAN, [=](float foo){setStyleHeight(foo);})){
           setStyleHeightLevel(CSS_STYLE);
         }
         return kTypeLayout;
       } else if (key == WIDTH) {
-        if(UpdateStyle(key, value, NAN, [&](float foo){setStyleWidth(foo);})){
+        if(UpdateStyle(key, value, NAN, [=](float foo){setStyleWidth(foo, updating);})){
           setStyleWidthLevel(CSS_STYLE);
         }
         return kTypeLayout;
@@ -294,11 +294,11 @@ namespace WeexCore {
     }
 
     virtual StyleType UpdateStyle(std::string key, std::string value) {
-      return ApplyStyle(key, value);
+      return ApplyStyle(key, value, true);
     }
 
     inline StyleType AddStyle(std::string key, std::string value) {
-      return ApplyStyle(key, value);
+      return ApplyStyle(key, value, false);
     }
 
     inline void AddEvent(std::string event) {

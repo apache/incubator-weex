@@ -37,7 +37,7 @@ namespace WeexCore {
 
   public:
 
-    StyleType ApplyStyle(const std::string &key, const std::string &value) {
+    StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
       if (key == PADDING) {
         UpdateStyle(key,
                     value,
@@ -62,7 +62,7 @@ namespace WeexCore {
                     [=](float foo) { setPadding(kPaddingRight, foo + defaultOverflowWidth); });
         return kTypePadding;
       } else {
-        return RenderObject::ApplyStyle(key, value);
+        return RenderObject::ApplyStyle(key, value, updating);
       }
     }
   };

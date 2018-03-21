@@ -126,7 +126,7 @@ namespace WeexCore {
 
     if (isnan(render_root->getStyleWidth())) {
       render_root->setStyleWidthLevel(FALLBACK_STYLE);
-      render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth());
+      render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
     } else {
       render_root->setStyleWidthLevel(CSS_STYLE);
     }
@@ -384,7 +384,7 @@ namespace WeexCore {
     renderPageSize.second = defaultHeight;
     if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
       render_root->setStyleWidthLevel(INSTANCE_STYLE);
-      render_root->setStyleWidth(defaultWidth);
+      render_root->setStyleWidth(defaultWidth, true);
       updateDirty(true);
     }
 

@@ -769,10 +769,13 @@ namespace WeexCore {
       return mCssStyle->mStyleWidthLevel;
     }
 
-    inline void setStyleWidth(const float width) {
+    inline void setStyleWidth(const float width, const bool updating) {
       if (mCssStyle->mStyleWidth != width) {
         mCssStyle->mStyleWidth = width;
         markDirty();
+        if(updating) {
+          markChildrenDirty(true);
+        }
       }
     }
 
@@ -791,10 +794,13 @@ namespace WeexCore {
       return mCssStyle->mStyleHeight;
     }
 
-    inline void setMinWidth(const float minWidth) {
+    inline void setMinWidth(const float minWidth, const bool updating) {
       if (mCssStyle->mMinWidth != minWidth) {
         mCssStyle->mMinWidth = minWidth;
         markDirty();
+        if(updating) {
+          markChildrenDirty(true);
+        }
       }
     }
 
@@ -802,10 +808,13 @@ namespace WeexCore {
       return mCssStyle->mMinWidth;
     }
 
-    inline void setMaxWidth(const float maxWidth) {
+    inline void setMaxWidth(const float maxWidth, const bool updating) {
       if (mCssStyle->mMaxWidth != maxWidth) {
         mCssStyle->mMaxWidth = maxWidth;
         markDirty();
+        if(updating) {
+          markChildrenDirty(true);
+        }
       }
     }
 
@@ -944,6 +953,25 @@ namespace WeexCore {
           getParent()->markDirty();
         }
       }
+    }
+
+    bool markChildrenDirty(const bool updatedNode = false) {
+      bool ret = false;
+      if(getChildCount() == 0){
+        if(measureFunc!= nullptr){
+          ret = true;
+        }
+      }
+      else {
+        //isnan(mCssStyle->mStyleWidth) XOR updatedNode
+        if(isnan(mCssStyle->mStyleWidth) != updatedNode){
+          for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+            ret = ((*it)->markChildrenDirty() || ret) ;
+          }
+        }
+      }
+      dirty = ret || dirty;
+      return ret;
     }
 
     inline void setHasNewLayout(const bool hasNewLayout) {

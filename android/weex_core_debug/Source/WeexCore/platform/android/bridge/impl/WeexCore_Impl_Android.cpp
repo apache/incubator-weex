@@ -53,7 +53,7 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
     return;
 
   render->setStyleWidthLevel(CSS_STYLE);
-  render->setStyleWidth(value);
+  render->setStyleWidth(value, true);
   page->updateDirty(true);
 }
 
