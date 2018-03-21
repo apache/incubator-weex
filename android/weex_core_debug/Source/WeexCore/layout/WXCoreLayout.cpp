@@ -615,41 +615,10 @@ namespace WeexCore {
     // Used only for RTL layout
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
-    float childLeft, childRight, denominator;
-    Index visibleCount, visibleItem;
+    float childLeft, childRight;
     for (WXCoreFlexLine *flexLine: mFlexLines) {
       float spaceBetweenItem = 0.f;
-      switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexEnd:
-          childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
-          childRight = width - getPaddingLeft() - getBorderWidthLeft();
-          break;
-        case kJustifyCenter:
-          childLeft = (width - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kRight) + mCssStyle->sumPaddingBorderOfEdge(kLeft)) / 2;
-          childRight = childLeft + flexLine->mMainSize;
-          break;
-        case kJustifySpaceAround:
-          visibleCount = flexLine->mItemCount;
-          if (visibleCount != 0) {
-            spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
-          }
-          childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
-          childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
-          break;
-        case kJustifySpaceBetween:
-          childLeft = getPaddingLeft() + getBorderWidthLeft();
-          visibleItem = flexLine->mItemCount;
-          denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / denominator;
-          childRight = width - getPaddingRight() - getBorderWidthRight();
-          break;
-        case kJustifyFlexStart:
-        default:
-          childLeft = getPaddingLeft() + getBorderWidthLeft();
-          childRight = width - getPaddingRight() - getBorderWidthRight();
-          break;
-      }
-
+      layoutFlexlineHorizontal(width, flexLine, childLeft, childRight, spaceBetweenItem);
       spaceBetweenItem = std::max(spaceBetweenItem, 0.f);
 
       for (Index j = 0; j < flexLine->mItemCount; j++) {
@@ -796,42 +765,10 @@ namespace WeexCore {
 
     // Use float to reduce the round error that may happen in when justifyContent ==
     // SPACE_BETWEEN or SPACE_AROUND
-    float childTop, childBottom, denominator;
-    Index visibleCount,visibleItem;
+    float childTop, childBottom;
     for (WXCoreFlexLine *flexLine : mFlexLines) {
       float spaceBetweenItem = 0.f;
-
-      switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexEnd:
-          childTop = height - flexLine->mMainSize - getPaddingBottom() - getBorderWidthBottom();
-          childBottom = height - getPaddingTop() - getBorderWidthTop();
-          break;
-        case kJustifyCenter:
-          childTop = (height - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kBottom) + mCssStyle->sumPaddingBorderOfEdge(kTop)) / 2;
-          childBottom = childTop + flexLine->mMainSize;
-          break;
-        case kJustifySpaceAround:
-          visibleCount = flexLine->mItemCount;
-          if (visibleCount != 0) {
-            spaceBetweenItem = (height - flexLine->mMainSize- sumPaddingBorderAlongAxis(this,false) ) / visibleCount;
-          }
-          childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
-          break;
-        case kJustifySpaceBetween:
-          childTop = getPaddingTop() + getBorderWidthTop();
-          visibleItem = flexLine->mItemCount;
-          denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (height - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, false)) / denominator;
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
-          break;
-        case kJustifyFlexStart:
-        default:
-          childTop = getPaddingTop() + getBorderWidthTop();
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
-          break;
-      }
-
+      layoutFlexlineVertical(height, flexLine, childTop, childBottom, spaceBetweenItem);
       spaceBetweenItem = std::max(spaceBetweenItem, 0.f);
 
       for (Index j = 0; j < flexLine->mItemCount; j++) {
