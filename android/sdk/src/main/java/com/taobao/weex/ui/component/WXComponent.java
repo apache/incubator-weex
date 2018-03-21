@@ -18,6 +18,23 @@
  */
 package com.taobao.weex.ui.component;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import com.alibaba.fastjson.JSONArray;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -51,8 +68,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOverlay;
 import android.widget.FrameLayout;
-
-import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
@@ -100,21 +115,6 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * abstract component
@@ -1945,30 +1945,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * Trigger a updateStyles invoke to relayout current page
    */
   public void notifyNativeSizeChanged(int w, int h) {
-    // TODO
-//    if (!mNeedLayoutOnAnimation) {
-//      return;
-//    }
-//
-//    Message message = Message.obtain();
-//    WXDomTask task = new WXDomTask();
-//    task.instanceId = getInstanceId();
-//    if (task.args == null) {
-//      task.args = new ArrayList<>();
-//    }
-//
-//    JSONObject style = new JSONObject(2);
-//    float webW = WXViewUtils.getWebPxByWidth(w);
-//    float webH = WXViewUtils.getWebPxByWidth(h);
-//
-//    style.put("width", webW);
-//    style.put("height", webH);
-//
-//    task.args.add(getRef());
-//    task.args.add(style);
-//    message.obj = task;
-//    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-//    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+    if (!mNeedLayoutOnAnimation) {
+      return;
+    }
+
+    final WXBridgeManager manager = WXBridgeManager.getInstance();
+    manager.setStyleWidth(getInstanceId(), getRef(), w);
+    manager.setStyleHeight(getInstanceId(), getRef(), h);
   }
 
   public static final int STATE_DOM_FINISH = 0;

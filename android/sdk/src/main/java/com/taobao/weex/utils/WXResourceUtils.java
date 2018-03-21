@@ -398,7 +398,7 @@ public class WXResourceUtils {
       @NonNull Pair<Boolean, Integer> handle(String rawColor) {
         SingleFunctionParser<Integer> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGB_MAPPER);
         List<Integer> rgb = functionParser.parse(RGB);
-        if (rgb.size() == RGB_SIZE) {
+        if (null != rgb && rgb.size() == RGB_SIZE) {
           return new Pair<>(Boolean.TRUE, Color.rgb(rgb.get(0), rgb.get(1), rgb.get(2)));
         } else {
           return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
