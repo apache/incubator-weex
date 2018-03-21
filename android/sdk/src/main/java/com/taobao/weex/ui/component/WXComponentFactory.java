@@ -74,7 +74,7 @@ public class WXComponentFactory {
 
     try {
       return holder.createInstance(instance, parent, basicComponentData);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       WXLogUtils.e("WXComponentFactory Exception type:[" + basicComponentData.mComponentType + "] ", e);
     }
 
