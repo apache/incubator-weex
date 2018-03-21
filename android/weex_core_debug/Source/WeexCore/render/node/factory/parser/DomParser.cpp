@@ -355,6 +355,18 @@ namespace WeexCore {
               render->AddStyle(key2, "false");
             }
             r.SkipValue();
+          } else if (r.PeekType() == kObjectType) {
+            RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+            std::string temp = "{";
+            temp.append(r.Stringify());
+            int index = temp.find('}');
+            std::string value = temp.substr(0, index + 1);
+            if (0 == strcmp(key, "attr")) {
+              render->AddAttr(key2, value);
+            } else if (0 == strcmp(key, "style")) {
+              render->AddStyle(key2, value);
+            }
+            r.SkipValue();
           } else {
             r.SkipValue();
           }
