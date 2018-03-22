@@ -167,6 +167,13 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
 
 /**
+ * The callback triggered when the bundleJS request finished in the renderWithURL. If the callback returns YES, the render process will terminate.
+ * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
+ */
+@property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
+
+
+/**
  *  the frame of current instance.
  **/
 @property (nonatomic, assign) CGRect frame;

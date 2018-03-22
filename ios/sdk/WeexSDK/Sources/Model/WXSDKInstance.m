@@ -320,6 +320,12 @@ typedef enum : NSUInteger {
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
         
+        if (strongSelf.onRenderTerminateWhenJSDownloadedFinish) {
+            if (strongSelf.onRenderTerminateWhenJSDownloadedFinish(response, request, data, error)) {
+                return;
+            }
+        }
+        
         [strongSelf _renderWithMainBundleString:jsBundleString];
         [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
     };
