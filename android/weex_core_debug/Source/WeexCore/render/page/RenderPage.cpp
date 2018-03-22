@@ -232,12 +232,10 @@ namespace WeexCore {
         if ((*styles)[i] != nullptr) {
           switch (render->UpdateStyle((*styles)[i]->first, (*styles)[i]->second)) {
             case kTypeStyle:
-            case kTypeLayout:
-              if (style == nullptr) {
+              if (style == nullptr)
                 style = new std::vector<std::pair<std::string, std::string> *>();
-              }
-              style->insert(style->end(), (*styles)[i]);
-              flag = true;
+                  style->insert(style->end(), (*styles)[i]);
+                  flag = true;
               break;
             case kTypeMargin:
               if (margin == nullptr) {
