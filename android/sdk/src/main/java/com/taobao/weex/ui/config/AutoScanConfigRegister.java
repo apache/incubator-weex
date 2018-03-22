@@ -45,6 +45,17 @@ public class AutoScanConfigRegister {
      * auto scan config files and do auto config from files, none need center register
      * */
     public static void doScanConfig(){
+       Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                doScanConfigSync();
+            }
+        });
+       thread.setName("AutoScanConfigRegister");
+       thread.start();
+    }
+
+    private static void doScanConfigSync(){
         if(WXEnvironment.sApplication == null){
             return;
         }
