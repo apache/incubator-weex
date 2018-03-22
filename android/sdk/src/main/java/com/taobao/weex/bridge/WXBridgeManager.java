@@ -1877,7 +1877,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, args);
       task.clear();
       for(int i=0; i<tasks.length; i++){
-        args[i] = null;
+        tasks[i] = null;
       }
       args = null;
     } catch (Throwable e) {
