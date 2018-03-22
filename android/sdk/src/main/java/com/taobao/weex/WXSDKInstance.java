@@ -932,8 +932,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     destroy();
-
-    onInstanceClosePostToJSThread(getInstanceId());
   }
 
   @Override
@@ -1333,6 +1331,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(templateRef != null){
         templateRef = null;
       }
+
+      onInstanceClosePostToJSThread(getInstanceId());
     }
   }
 

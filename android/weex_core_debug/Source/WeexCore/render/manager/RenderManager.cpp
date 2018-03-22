@@ -184,6 +184,7 @@ namespace WeexCore {
 
     mPages.erase(pageId);
     delete page;
+    page = nullptr;
   }
 
   void RenderManager::PrintRenderAndLayoutTree(const std::string &pageId) {
