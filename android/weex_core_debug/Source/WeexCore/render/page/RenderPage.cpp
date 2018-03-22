@@ -484,6 +484,15 @@ namespace WeexCore {
 
     RenderAction *action = new RenderActionCreateBody(PageId(), render);
     PostRenderAction(action);
+
+    Index i = 0;
+    for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      if (child != nullptr) {
+        SendAddElementAction(child, render, i);
+      }
+      ++i;
+    }
   }
 
   void
