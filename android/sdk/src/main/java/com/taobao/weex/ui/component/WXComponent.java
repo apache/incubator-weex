@@ -553,10 +553,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   private void setComponentLayoutParams(int realWidth, int realHeight, int realLeft, int realTop,
       int realRight, int realBottom, Point rawOffset) {
+    if(getInstance() == null || getInstance().isDestroy()){
+      return;
+    }
+
     FlatGUIContext UIImp = getInstance().getFlatUIContext();
     WidgetContainer ancestor;
     Widget widget;
-    if ((ancestor = UIImp.getFlatComponentAncestor(this)) != null) {
+    if (UIImp != null && (ancestor = UIImp.getFlatComponentAncestor(this)) != null) {
       if (this instanceof FlatComponent && !((FlatComponent) this).promoteToView(true)) {
         widget = ((FlatComponent) this).getOrCreateFlatWidget();
       } else {
