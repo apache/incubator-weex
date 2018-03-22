@@ -68,7 +68,7 @@ class UpdateStyleAction extends TraceableAction implements DOMAction, RenderActi
     if (domObject == null) {
       if (instance != null) {
 		WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_STYLE.getErrorCode(),
+				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_STYLE,
 				"updateStyle",
 				WXErrorCode.WX_KEY_EXCEPTION_DOM_UPDATE_STYLE.getErrorMsg() + "domObject is null",null);
       }
