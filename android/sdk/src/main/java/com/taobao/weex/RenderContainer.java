@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 
@@ -33,6 +34,7 @@ import java.lang.ref.WeakReference;
 
 public class RenderContainer extends FrameLayout {
   private WeakReference<WXSDKInstance> mSDKInstance;
+  private boolean mPageHasEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
@@ -63,5 +65,15 @@ public class RenderContainer extends FrameLayout {
       //re-render instance
       instance.setSize(w, h);
     }
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    mPageHasEvent = true;
+    return super.dispatchTouchEvent(ev);
+  }
+
+  public boolean isPageHasEvent(){
+    return mPageHasEvent;
   }
 }

@@ -64,7 +64,7 @@ class ModuleInvocationAction implements DOMAction, RenderAction {
             helper.invoke(mWXModule,mInvoker,mArgs);
         } catch (Exception e) {
 		  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				  WXErrorCode.WX_KEY_EXCEPTION_DOM_MODULEINVO.getErrorCode(),
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_MODULEINVO,
 				  "updateAttr",
 				  WXErrorCode.WX_KEY_EXCEPTION_DOM_MODULEINVO.getErrorMsg() + "callModuleMethod >>> invoke module:"
 						  + mWXModule.getClass().getSimpleName() + " failed. " + WXLogUtils.getStackTrace(e),null);
