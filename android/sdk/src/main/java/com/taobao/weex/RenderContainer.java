@@ -26,36 +26,41 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 
+import com.taobao.weex.bridge.WXBridgeManager;
+
 import java.lang.ref.WeakReference;
 
 /**
  * Created by sospartan on 08/10/2016.
  */
 
-public class RenderContainer extends FrameLayout {
+public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
   private WeakReference<WXSDKInstance> mSDKInstance;
   private WeexFrameRateControl mFrameRateControl;
 
   public RenderContainer(Context context) {
     super(context);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public RenderContainer(Context context, AttributeSet attrs) {
     super(context, attrs);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public RenderContainer(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public RenderContainer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public void setSDKInstance(WXSDKInstance instance) {
     mSDKInstance = new WeakReference<>(instance);
-    mFrameRateControl = new WeexFrameRateControl(mSDKInstance.get());
   }
 
   @Override
@@ -94,6 +99,13 @@ public class RenderContainer extends FrameLayout {
       if (mFrameRateControl != null) {
         mFrameRateControl.start();
       }
+    }
+  }
+
+  @Override
+  public void OnVSync() {
+    if (mSDKInstance.get() != null) {
+      mSDKInstance.get().OnVSync();
     }
   }
 }

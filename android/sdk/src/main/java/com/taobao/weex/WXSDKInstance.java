@@ -95,7 +95,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChangeListener, WeexFrameRateControl.VSyncListener {
+public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChangeListener {
 
   private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
 
@@ -1847,9 +1847,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     void onCreateNestInstance(WXSDKInstance instance, NestedContainer container);
   }
 
-  @Override
   public void OnVSync() {
-    // add vSync code for refresh
     boolean forceLayout = notifyLayout(getInstanceId());
     if(forceLayout) {
       WXBridgeManager.getInstance().post(new Runnable() {
