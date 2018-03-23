@@ -337,17 +337,17 @@ namespace WeexCore {
       border = nullptr;
     }
 
-//    if (styles != nullptr) {
-//      for (int i = 0; i < styles->size(); ++i) {
-//        if ((*styles)[i] != nullptr) {
-//          delete (*styles)[i];
-//          (*styles)[i] = nullptr;
-//        }
-//      }
-//      styles->clear();
-//      delete styles;
-//      styles = nullptr;
-//    }
+    if (src != nullptr) {
+      for (int i = 0; i < src->size(); ++i) {
+        if ((*src)[i] != nullptr) {
+          delete (*src)[i];
+          (*src)[i] = nullptr;
+        }
+      }
+      src->clear();
+      delete src;
+      src = nullptr;
+    }
     return flag;
   }
 
