@@ -18,7 +18,7 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 
 ## Meet Weex
 
-* Install [Weex Playground App](https://weex.apache.org/playground.html) to see examples we already written.
+* Install [Weex Playground App](https://weex.apache.org/tools/playground.html) to see examples we already written.
 * If you want to write a demo, install [weex-toolkit](https://www.npmjs.com/package/weex-toolkit) in [Node.js](http://nodejs.org/) 4.0+ and
 * Run `weex init` to generate & start a simple project in an empty folder.
 * Follow the instructions in the project README.
