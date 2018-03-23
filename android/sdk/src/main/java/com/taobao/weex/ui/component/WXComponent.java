@@ -821,12 +821,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
             || component.getLayoutSize() == null) {
       return;
     }
-    parseAnimation();
+
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
     setMargins(component.getMargin());
     setBorders(component.getBorder());
+
+    parseAnimation();
 
     boolean nullParent = mParent == null;//parent is nullable
 
@@ -967,7 +969,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
     }
     if (lp != null) {
-      mHost.setLayoutParams(lp);
+      host.setLayoutParams(lp);
     }
   }
 
@@ -2090,7 +2092,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
         if (animationBean != null) {
           GraphicActionAnimation action = new GraphicActionAnimation(getInstanceId(), getRef(), animationBean);
-          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+          action.executeAction();
         }
       }
     }
