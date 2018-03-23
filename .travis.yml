@@ -40,7 +40,7 @@ cache:
   - $HOME/.gradle
 before_script:
   - "echo $JAVA_OPTS"
-  - "export JAVA_OPTS=-Xmx1024m"
+  - "export JAVA_OPTS=-Xmx2048m"
   - "echo $JAVA_OPTS"
   - |
     if [[ $TEST_SUITE = "android" ]]; then

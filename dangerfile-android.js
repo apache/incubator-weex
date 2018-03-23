@@ -93,7 +93,7 @@ if(hasAndroidFile){
   var runTestCmd='source ~/.bash_profile; '
     +'cd android; '
     +'./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true '
-    +'-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx1024m '
+    +'-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx2048m '
     +'-XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 '
   var runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
