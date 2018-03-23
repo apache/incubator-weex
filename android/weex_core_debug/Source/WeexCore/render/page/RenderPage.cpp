@@ -209,10 +209,10 @@ namespace WeexCore {
   }
 
   bool RenderPage::UpdateStyle(const std::string &ref,
-                               std::vector<std::pair<std::string, std::string> *> *styles) {
+                               std::vector<std::pair<std::string, std::string> *> *src) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
-    if (render == nullptr || styles == nullptr || styles->empty())
+    if (render == nullptr || src == nullptr || src->empty())
       return false;
 
     std::vector<std::pair<std::string, std::string> *> *style = nullptr;
@@ -222,31 +222,32 @@ namespace WeexCore {
 
     bool flag = false;
 
-    int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId, ref, styles);
+    int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId, ref, src);
 
     if (result == 1) {
       BuildRenderTreeTime(getCurrentTime() - startTime);
-      SendUpdateStyleAction(render, styles, margin, padding, border);
+      SendUpdateStyleAction(render, src, margin, padding, border);
     } else {
-      for (int i = 0; i < styles->size(); ++i) {
-        if ((*styles)[i] != nullptr) {
-          switch (render->UpdateStyle((*styles)[i]->first, (*styles)[i]->second)) {
+      for (int i = 0; i < src->size(); ++i) {
+        if ((*src)[i] != nullptr) {
+          switch (render->UpdateStyle((*src)[i]->first, (*src)[i]->second)) {
             case kTypeStyle:
-              if (style == nullptr)
+              if (style == nullptr) {
                 style = new std::vector<std::pair<std::string, std::string> *>();
-                  style->insert(style->end(), (*styles)[i]);
-                  flag = true;
+              }
+              style->insert(style->end(), (*src)[i]);
+              flag = true;
               break;
             case kTypeMargin:
               if (margin == nullptr) {
                 margin = new std::vector<std::pair<std::string, std::string> *>();
               }
-              render->UpdateStyle((*styles)[i]->first,
-                                  (*styles)[i]->second,
+              render->UpdateStyle((*src)[i]->first,
+                                  (*src)[i]->second,
                                   0,
                                   [=, &flag](float foo) {
-                                    (*styles)[i]->second = std::to_string(foo),
-                                        margin->insert(margin->end(), (*styles)[i]),
+                                    (*src)[i]->second = std::to_string(foo),
+                                        margin->insert(margin->end(), (*src)[i]),
                                     flag = true;
                                   });
               break;
@@ -254,12 +255,12 @@ namespace WeexCore {
               if (padding == nullptr) {
                 padding = new std::vector<std::pair<std::string, std::string> *>();
               }
-              render->UpdateStyle((*styles)[i]->first,
-                                  (*styles)[i]->second,
+              render->UpdateStyle((*src)[i]->first,
+                                  (*src)[i]->second,
                                   0,
                                   [=, &flag](float foo) {
-                                    (*styles)[i]->second = std::to_string(foo),
-                                        padding->insert(padding->end(), (*styles)[i]),
+                                    (*src)[i]->second = std::to_string(foo),
+                                        padding->insert(padding->end(), (*src)[i]),
                                     flag = true;
                                   });
               break;
@@ -267,12 +268,12 @@ namespace WeexCore {
               if (border == nullptr) {
                 border = new std::vector<std::pair<std::string, std::string> *>();
               }
-              render->UpdateStyle((*styles)[i]->first,
-                                  (*styles)[i]->second,
+              render->UpdateStyle((*src)[i]->first,
+                                  (*src)[i]->second,
                                   0,
                                   [=, &flag](float foo) {
-                                    (*styles)[i]->second = std::to_string(foo),
-                                        border->insert(border->end(), (*styles)[i]),
+                                    (*src)[i]->second = std::to_string(foo),
+                                        border->insert(border->end(), (*src)[i]),
                                     flag = true;
                                   });
               break;
@@ -283,7 +284,9 @@ namespace WeexCore {
 
     BuildRenderTreeTime(getCurrentTime() - startTime);
 
-    SendUpdateStyleAction(render, style, margin, padding, border);
+    if (style != nullptr || margin != nullptr || padding != nullptr || border != nullptr)
+      SendUpdateStyleAction(render, style, margin, padding, border);
+
     Batch();
 
     if (style != nullptr) {
