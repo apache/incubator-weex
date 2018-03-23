@@ -84,9 +84,9 @@ namespace WeexCore {
         functor(fallback);
         ret = true;
       } else {
-        float ret = getFloatByViewport(value, GetViewPortWidth());
-        if (!isnan(ret)) {
-          functor(ret);
+        float fvalue = getFloatByViewport(value, GetViewPortWidth());
+        if (!isnan(fvalue)) {
+          functor(fvalue);
           ret = true;
         }
       }
