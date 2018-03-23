@@ -163,7 +163,7 @@ namespace WeexCore {
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
         mStyles->insert(std::pair<std::string, std::string>(key, value));
-        return kTypeLayout;
+        return kTypeStyle;
       } else if (key == LEFT) {
         UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeLeft, foo);});
         return kTypeLayout;
