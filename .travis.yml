@@ -39,6 +39,9 @@ cache:
   - $HOME/.m2
   - $HOME/.gradle
 before_script:
+  - "echo $JAVA_OPTS"
+  - "export JAVA_OPTS=-Xmx1024m"
+  - "echo $JAVA_OPTS"
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
