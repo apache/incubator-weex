@@ -59,8 +59,7 @@ namespace WeexCore {
             mColumnWidth = getColumnWidth();
             mColumnGap = getColumnGap();
 
-            mAvailableWidth = getStyleWidth()- getPaddingLeft() - getPaddingRight();
-            // mAvailableWidth = getWebPxByWidth(mAvailableWidth, GetRenderPage()->ViewPortWidth());
+            mAvailableWidth = getStyleWidth()- getWebPxByWidth(getPaddingLeft(), GetRenderPage()->ViewPortWidth()) - getWebPxByWidth(getPaddingRight(), GetRenderPage()->ViewPortWidth());
 
             if (AUTO_VALUE == mColumnCount && AUTO_VALUE == mColumnWidth) {
                 mColumnCount = COLUMN_COUNT_NORMAL;
@@ -72,15 +71,17 @@ namespace WeexCore {
             } else if (AUTO_VALUE != mColumnWidth && AUTO_VALUE == mColumnCount) {
                 mColumnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = mColumnCount > 0 ? mColumnCount :1;
-                if (mColumnCount <= 0)
+                if (mColumnCount <= 0) {
                     mColumnCount = COLUMN_COUNT_NORMAL;
+                }
                 mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
 
             } else if(AUTO_VALUE != mColumnWidth && AUTO_VALUE != mColumnCount){
                 int columnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
-                if (mColumnCount <= 0)
+                if (mColumnCount <= 0) {
                     mColumnCount = COLUMN_COUNT_NORMAL;
+                }
                 mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             }
 
@@ -93,19 +94,19 @@ namespace WeexCore {
     }
 
     float getStyleWidth() {
-        float width =  getLayoutWidth();
-        if (isnan(width) || width <= 0){
-            if(getParent() != nullptr){
-                width = getParent()->getLayoutWidth();
-            }
-            if (isnan(width) || width <= 0){
-                width = RenderObject::getStyleWidth();
-            }
+      float width =  getLayoutWidth();
+      if (isnan(width) || width <= 0){
+        if(getParent() != nullptr){
+          width = getParent()->getLayoutWidth();
         }
         if (isnan(width) || width <= 0){
-            width = GetViewPortWidth();
+          width = getWebPxByWidth(RenderObject::getStyleWidth(), GetRenderPage()->ViewPortWidth());;
         }
-        return width;
+      }
+      if (isnan(width) || width <= 0){
+        width = GetViewPortWidth();
+      }
+      return width;
     }
 
     void AddRenderObject(int index, RenderObject *child) {
