@@ -221,14 +221,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
 
     RenderContainer renderContainer = new RenderContainer(this);
-    mContainer.addView(renderContainer);
-
     mInstance = new WXSDKInstance(this);
     mInstance.setRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
     mInstance.setNestedInstanceInterceptor(this);
     mInstance.setBundleUrl(url);
     mInstance.setTrackComponent(true);
+    mContainer.addView(renderContainer);
 
     WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
