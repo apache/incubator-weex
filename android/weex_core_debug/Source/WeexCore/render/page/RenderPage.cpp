@@ -337,17 +337,24 @@ namespace WeexCore {
       border = nullptr;
     }
 
+//    if (src != nullptr) {
+//      for (int i = 0; i < src->size(); ++i) {
+//        if ((*src)[i] != nullptr) {
+//          delete (*src)[i];
+//          (*src)[i] = nullptr;
+//        }
+//      }
+//      src->clear();
+//      delete src;
+//      src = nullptr;
+//    }
+    // TODO
     if (src != nullptr) {
-      for (int i = 0; i < src->size(); ++i) {
-        if ((*src)[i] != nullptr) {
-          delete (*src)[i];
-          (*src)[i] = nullptr;
-        }
-      }
-      src->clear();
+      src->shrink_to_fit();
       delete src;
       src = nullptr;
     }
+
     return flag;
   }
 
@@ -373,7 +380,9 @@ namespace WeexCore {
       }
     }
 
+    // TODO
     if (attrs != nullptr) {
+      attrs->shrink_to_fit();
       delete attrs;
       attrs = nullptr;
     }
