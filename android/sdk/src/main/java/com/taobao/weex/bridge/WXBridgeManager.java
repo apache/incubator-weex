@@ -36,6 +36,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IModuleInvokeGateway;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
@@ -62,7 +63,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-import com.taobao.weex.wson.Wson;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -81,8 +81,8 @@ import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 
 
 /**
@@ -279,6 +279,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
         }
         return validateInfo;
+      }
+    }
+
+    IModuleInvokeGateway gateway = WXSDKManager.getInstance().getModuleInvokeGateway();
+    if (gateway != null) {
+      boolean allowAccess = gateway.allowAccess(instanceId, moduleStr, methodStr);
+      if (!allowAccess) {
+        //permission denied
+        //TODO: Notification js that the call has been rejected
+        return null;
       }
     }
     return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);

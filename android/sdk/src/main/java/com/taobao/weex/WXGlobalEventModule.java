@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
@@ -26,6 +27,7 @@ import java.util.Map;
 /**
  * Created by lixinke on 16/8/25.
  */
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXGlobalEventModule extends WXModule {
 
 

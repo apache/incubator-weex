@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,21 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.annotation;
 
-import com.taobao.weex.annotation.AccessRestriction;
-import com.taobao.weex.annotation.JSMethod;
+import android.support.annotation.IntDef;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Report template error.
+ * Created by moxun on 2018/3/26.
  */
-@AccessRestriction(AccessRestriction.PUBLIC)
-public class WXInstanceWrap extends WXModule {
 
-  @JSMethod
-  public void error(String type, String code, String info) {
-    if (mWXSDKInstance != null) {
-      mWXSDKInstance.onRenderError(type + "|" + code, info);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface AccessRestriction {
+  int PUBLIC = 3;
+  int FRIENDLY = 2;
+  int PRIVATE = 1;
+
+  @Policy
+  int value() default PRIVATE;
+
+  @IntDef({PUBLIC, FRIENDLY, PRIVATE})
+  @Retention(RetentionPolicy.SOURCE)
+  @interface Policy {
   }
 }

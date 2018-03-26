@@ -26,6 +26,7 @@ import android.os.LocaleList;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
@@ -39,7 +40,7 @@ import java.util.Locale;
  * <p>
  * Ref: https://tools.ietf.org/html/bcp47
  */
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXLocaleModule extends WXModule {
 
   @JSMethod(uiThread = false)

@@ -28,14 +28,13 @@ import android.view.Gravity;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +44,7 @@ import java.util.Map;
  * for example(weex JS):
  * this.$call('modal','toast',{'message':'test toast','duration': 2.0});
  */
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
 
   public static final String OK = "OK";

@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.DOMAction;
@@ -32,9 +33,8 @@ import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.component.WXComponent;
 
-
 import static com.taobao.weex.dom.action.Actions.getAnimationAction;
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXAnimationModule extends WXModule {
 
   @JSMethod
