@@ -459,6 +459,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    if (WXEnvironment.isApkDebugable()){
+      WXLogUtils.e("WXSDKInstance", "render pageName :"+pageName);
+    }
+
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
       WXLogUtils.e("WXSDKInstance", "Please set your pageName or your js bundle url !!!!!!!");
 
