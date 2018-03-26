@@ -104,7 +104,7 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
 
   @Override
   public void OnVSync() {
-    if (mSDKInstance.get() != null) {
+    if (mSDKInstance != null && mSDKInstance.get() != null) {
       mSDKInstance.get().OnVSync();
     }
   }
