@@ -128,7 +128,7 @@ class AnimationAction implements DOMAction, RenderAction {
       }
     } catch (RuntimeException e) {
 	  WXExceptionUtils.commitCriticalExceptionRT(context.getInstance().getInstanceId(),
-			  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorCode(),
+			  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION,
 			  "animationAction",
 			  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorMsg() + WXLogUtils.getStackTrace(e),null);
       WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
@@ -174,7 +174,7 @@ class AnimationAction implements DOMAction, RenderAction {
           }
         } catch (RuntimeException e) {
 		  WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorCode(),
+				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION,
 				  "animationAction",
 				  WXErrorCode.WX_KEY_EXCEPTION_DOM_ANIMATION.getErrorMsg() + WXLogUtils.getStackTrace(e),null);
 		  WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));        }

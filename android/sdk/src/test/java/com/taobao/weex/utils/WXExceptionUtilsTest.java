@@ -20,6 +20,7 @@ package com.taobao.weex.utils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.common.WXErrorCode;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,7 +68,7 @@ public class WXExceptionUtilsTest {
 	Map testMap =  new HashMap<String, String>();
 	testMap.put("weexUrl","weexurltest");
 	testMap.put("bundleUrl","bundleUrltest");
-	Exp.commitCriticalExceptionRT("1","test","test","test",testMap);
-	Exp.commitCriticalExceptionRT("1","test","test","test",null);
+	Exp.commitCriticalExceptionRT("1", WXErrorCode.WX_ERR_TEST,"test","test",testMap);
+	Exp.commitCriticalExceptionRT("1",WXErrorCode.WX_ERR_TEST,"test","test",null);
   }
 }

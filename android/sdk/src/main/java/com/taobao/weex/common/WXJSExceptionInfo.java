@@ -36,7 +36,7 @@ public class WXJSExceptionInfo {
   /**
    * error code
    */
-  private String mErrCode;
+  private WXErrorCode mErrCode;
   /**
    * The function name of the exception
    */
@@ -61,8 +61,7 @@ public class WXJSExceptionInfo {
    */
   private String mJsFrameworkVersion = WXEnvironment.JS_LIB_SDK_VERSION;
 
-
-  public WXJSExceptionInfo(String instanceId, String bundleUrl, String errCode, String function, String exception, Map<String,String> extParams) {
+  public WXJSExceptionInfo(String instanceId, String bundleUrl, WXErrorCode errCode, String function, String exception, Map<String,String> extParams) {
     this.mInstanceId = instanceId;
     this.mBundleUrl = bundleUrl;
     this.mErrCode = errCode;
@@ -87,11 +86,11 @@ public class WXJSExceptionInfo {
     mBundleUrl = bundleUrl;
   }
 
-  public String getErrCode() {
+  public WXErrorCode getErrCode() {
     return mErrCode;
   }
 
-  public void setErrCode(String errCode) {
+  public void setErrCode(WXErrorCode errCode) {
     mErrCode = errCode;
   }
 
@@ -136,7 +135,7 @@ public class WXJSExceptionInfo {
         .append(" JSFrameworkVersion:").append(mJsFrameworkVersion)
         .append(" instanceId:").append(mInstanceId)
         .append(" bundleUrl:").append(mBundleUrl)
-        .append(" errCode:").append(mErrCode)
+        .append(" errCode:").append(mErrCode.getErrorCode())
         .append(" function:").append(mFunction)
         .append(" exception:").append(mException)
         .append(" extParams:").append(mExtParams);
