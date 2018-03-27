@@ -29,16 +29,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * All components must be registered within this class before used.
  */
 public class WXComponentRegistry {
 
-  private static Map<String, IFComponentHolder> sTypeComponentMap = new HashMap<>();
+  private static Map<String, IFComponentHolder> sTypeComponentMap = new ConcurrentHashMap<>();
   private static ArrayList<Map<String, Object>> sComponentInfos=new ArrayList<>();
 
-  public static boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
+  public static synchronized boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }

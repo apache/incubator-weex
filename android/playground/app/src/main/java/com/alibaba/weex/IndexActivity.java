@@ -42,9 +42,9 @@ import android.widget.Toast;
 import com.alibaba.weex.commons.AbstractWeexActivity;
 import com.alibaba.weex.update.CheckForUpdateUtil;
 import com.google.zxing.client.android.CaptureActivity;
-import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
@@ -169,7 +169,7 @@ public class IndexActivity extends AbstractWeexActivity {
     super.onException(wxsdkInstance,s,s1);
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.VISIBLE);
-    if (TextUtils.equals(s, WXRenderErrorCode.DegradPassivityCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getDegradErrorCode())) {
+    if (TextUtils.equals(s, WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode())) {
       mTipView.setText(R.string.index_tip);
     } else {
       mTipView.setText("network render error:" + s1);

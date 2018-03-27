@@ -107,7 +107,7 @@ WX_EXPORT_METHOD(@selector(save:))
         id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         _downloadImageWithURL = YES;
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-            _downloadImageWithURL = [configCenter configForKey:@"iOS_weex_ext_config.downloadImageWithURL" defaultValue:@(YES) isDefault:NULL];
+            _downloadImageWithURL = [[configCenter configForKey:@"iOS_weex_ext_config.downloadImageWithURL" defaultValue:@(YES) isDefault:NULL] boolValue];
         }
         if (attributes[@"compositing"]) {
             _downloadImageWithURL = [WXConvert BOOL:attributes[@"compositing"]];
@@ -377,6 +377,11 @@ WX_EXPORT_METHOD(@selector(save:))
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
             __strong typeof(weakSelf) strongSelf =  weakSelf;
+            weakSelf.imageDownloadFinish = YES;
+            if (error) {
+                // log error message for error
+                WXLogError(@"Error downloading image: %@, detail:%@", imageURL.absoluteString, [error localizedDescription]);
+            }
             if (strongSelf.imageLoadEvent) {
                 NSMutableDictionary *sizeDict = [NSMutableDictionary new];
                 sizeDict[@"naturalWidth"] = @0;

@@ -180,14 +180,14 @@ public class WXModuleManager {
         return null;
       }
     } catch (Exception e) {
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorCode(),
-              "callModuleMethod",
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
-                      + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
-                      + WXLogUtils.getStackTrace(e),
-              null);
-      WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
+	  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED,
+			  "callModuleMethod",
+			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
+			  + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
+			  + WXLogUtils.getStackTrace(e),
+			  null);
+	  WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {

@@ -150,5 +150,6 @@ final class AddElementAction extends AbstractAddElementAction {
       WXLogUtils.e("add component failed.", e);
 	  mErrMsg.append("add component failed.").append(WXLogUtils.getStackTrace(e));
     }
+    instance.onElementChange();
   }
 }
