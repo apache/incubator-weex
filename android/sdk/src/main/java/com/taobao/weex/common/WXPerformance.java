@@ -18,13 +18,9 @@
  */
 package com.taobao.weex.common;
 
-import android.os.Debug;
 import android.support.annotation.RestrictTo;
-import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.performance.FpsCollector;
-import com.taobao.weex.performance.MemUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
@@ -185,18 +181,9 @@ public class WXPerformance {
   public int fsCallEventTotalNum;
 
   public long avgFPS;
-  public long frameSum;
-  public long frameStartTime;
-  public long frameEndTime;
   public double fluency = 100D;
 
-  public long maxImproveMemory;
-
   public long backImproveMemory;
-
-  public long pushImproveMemory;
-
-  public long memTotalBeforeRender;
 
 
   /**
@@ -394,9 +381,6 @@ public class WXPerformance {
   }
 
   public static void init() {
-    if (WXPerformance.TRACE_DATA) {
-      FpsCollector.getInstance().init();
-    }
   }
 
   public Map<String, Double> getMeasureMap() {
@@ -557,64 +541,11 @@ public class WXPerformance {
     mErrMsgBuilder.append(msg);
   }
 
-  private FpsRecorder mFpsRecorder = new FpsRecorder();
-
   public void beforeInstanceRender(String instanceId) {
     renderTimeOrigin = System.currentTimeMillis();
-    if (WXPerformance.TRACE_DATA) {
-      if (TextUtils.isEmpty(instanceId)) {
-        return;
-      }
-      Debug.MemoryInfo mem = MemUtils.getMemoryInfo(WXEnvironment.getApplication());
-      if (null != mem) {
-        memTotalBeforeRender = mem.getTotalPss();
-      }
-      FpsCollector.getInstance().registerListener(instanceId, mFpsRecorder);
-    }
   }
-
-  //  public void onInstanceEndRender(String instanceId,boolean isFirstScreen){
-  //
-  //  }
-
 
   public void afterInstanceDestroy(String instanceId) {
-    if (WXPerformance.TRACE_DATA) {
-      if (TextUtils.isEmpty(instanceId)) {
-        return;
-      }
-      FpsCollector.getInstance().unRegister(instanceId);
-      Debug.MemoryInfo mem = MemUtils.getMemoryInfo(WXEnvironment.getApplication());
-      if (null != mem) {
-        backImproveMemory = mem.getTotalPss() - memTotalBeforeRender;
-      }
-      if (mFpsRecorder.totalFpsCount > 0) {
-        avgFPS = mFpsRecorder.totalFpsCount / mFpsRecorder.totalFpsCount;
-        fluency = (double) mFpsRecorder.fluncyFpsPointCount / (double) mFpsRecorder.totalFpsCount;
-      }
-    }
-  }
-
-  private class FpsRecorder implements FpsCollector.IFPSCallBack {
-
-    private final long FLUENCY_FPS_LIMIT = 35;
-
-    private long totalFpsFrame;
-    private long totalFpsCount;
-    private long fluncyFpsPointCount;
-    private final long LIMIT_LONG = Long.MAX_VALUE - 1000;
-
-    @Override
-    public void fps(int fps) {
-      if (totalFpsFrame >= LIMIT_LONG || totalFpsCount >= Long.MAX_VALUE) {
-        return;
-      }
-      totalFpsFrame += fps;
-      totalFpsCount++;
-      if (fps >= FLUENCY_FPS_LIMIT) {
-        fluncyFpsPointCount++;
-      }
-    }
   }
 
   public int renderSumTime() {
