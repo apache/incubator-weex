@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.alibaba.weex.extend.module;
-
-import android.widget.Toast;
+package com.taobao.weex.utils;
 
 import com.taobao.weex.annotation.AccessRestriction;
-import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.common.WXModule;
+import com.taobao.weex.bridge.WXModuleManager;
 
-@AccessRestriction(AccessRestriction.PUBLIC)
-public class MyModule extends WXModule {
+/**
+ * Created by moxun on 2018/3/27.
+ */
 
-  @JSMethod(uiThread = true)
-  public void printLog(String msg) {
-    Toast.makeText(mWXSDKInstance.getContext(),msg,Toast.LENGTH_SHORT).show();
+public class WXModuleUtil {
+  public static boolean isPublicAccess(String instanceId, String module, String method) {
+    try {
+      Class clazz = WXModuleManager.findModuleClass(instanceId, module);
+      if (clazz != null && clazz.isAnnotationPresent(AccessRestriction.class)) {
+        AccessRestriction restriction = (AccessRestriction) clazz.getAnnotation(AccessRestriction.class);
+        if (restriction != null) {
+          int policy = restriction.value();
+          if (policy == AccessRestriction.PUBLIC) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+      return false;
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    return false;
   }
 }

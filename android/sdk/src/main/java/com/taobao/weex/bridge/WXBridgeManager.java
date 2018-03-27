@@ -47,7 +47,6 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -288,8 +287,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (gateway != null) {
       boolean allowAccess = gateway.allowAccess(instanceId, moduleStr, methodStr);
       if (!allowAccess) {
-        //permission denied
         //TODO: Notification js that the call has been rejected
+        WXLogUtils.e("[WXBridgeManager] permission denied: " + moduleStr + "." + methodStr);
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (instance != null) {
+          Map<String, Object> event = new HashMap<>();
+          event.put("msg", "PERMISSION_DENIED");
+          event.put("module", moduleStr);
+          event.put("method", methodStr);
+          instance.fireGlobalEventCallback("invokeFailed", event);
+        }
         return null;
       }
     }

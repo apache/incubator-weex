@@ -26,6 +26,7 @@ import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
+import com.alibaba.weex.extend.adapter.DefaultModuleInvokeGateway;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
@@ -34,6 +35,7 @@ import com.alibaba.weex.extend.component.WXParallax;
 import com.alibaba.weex.extend.component.dom.WXMaskDomObject;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
+import com.alibaba.weex.extend.module.PrivateModule;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
@@ -79,6 +81,7 @@ public class WXApplication extends Application {
                           );
 
     WXSDKManager.getInstance().setAccessibilityRoleAdapter(new DefaultAccessibilityRoleAdapter());
+    WXSDKManager.getInstance().setModuleInvokeGateway(new DefaultModuleInvokeGateway());
 
     try {
       Fresco.initialize(this);
@@ -99,6 +102,7 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("titleBar", WXTitleBar.class);
 
       WXSDKEngine.registerModule("wsonTest", WXWsonTestModule.class);
+      WXSDKEngine.registerModule("privateModule", PrivateModule.class);
 
 
       /**

@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.weex.R;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -20,7 +21,7 @@ import com.taobao.weex.utils.WXResourceUtils;
 /**
  * Created by moxun on 12/01/2018.
  */
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXTitleBar extends WXModule {
   @JSMethod
   public void setTitle(String title) {

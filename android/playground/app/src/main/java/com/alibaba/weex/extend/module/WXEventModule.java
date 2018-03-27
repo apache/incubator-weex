@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.alibaba.weex.WXPageActivity;
 import com.google.zxing.client.android.CaptureActivity;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
@@ -37,7 +38,7 @@ import com.taobao.weex.common.WXModule;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXEventModule extends WXModule {
 
   private static final String WEEX_CATEGORY = "com.taobao.android.intent.category.WEEX";
