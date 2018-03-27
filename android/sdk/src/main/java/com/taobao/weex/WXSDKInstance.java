@@ -31,7 +31,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -546,7 +545,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
-    mBundleUrl = url;
+    setBundleUrl(url);
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
     }
