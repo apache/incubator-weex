@@ -504,12 +504,12 @@ public class WXTransition {
             }
             break;
             case Constants.Name.PADDING_LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.LEFT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  domObject.getPadding().get(Spacing.LEFT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.RIGHT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  domObject.getPadding().get(Spacing.RIGHT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
             }
             break;
