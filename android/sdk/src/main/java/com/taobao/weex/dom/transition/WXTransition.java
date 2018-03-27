@@ -502,12 +502,12 @@ public class WXTransition {
             }
             break;
             case Constants.Name.PADDING_LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getPadding().get(CSSShorthand.EDGE.LEFT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.LEFT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getPadding().get(CSSShorthand.EDGE.RIGHT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.RIGHT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
@@ -529,72 +529,7 @@ public class WXTransition {
                 for(PropertyValuesHolder holder : holders){
 
                     final String property =  holder.getPropertyName();
-
-                    WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (property){
-                                case Constants.Name.WIDTH:{
-                                    WXBridgeManager.getInstance().setStyleWidth(mWXComponent.getInstanceId(), mWXComponent.getRef(), (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.HEIGHT:{
-                                    WXBridgeManager.getInstance().setStyleHeight(mWXComponent.getInstanceId(), mWXComponent.getRef(), (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.MARGIN_TOP:{
-                                    WXBridgeManager.getInstance().setMargin(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.TOP, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.MARGIN_LEFT:{
-                                    WXBridgeManager.getInstance().setMargin(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.LEFT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.MARGIN_RIGHT:{
-                                    WXBridgeManager.getInstance().setMargin(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.RIGHT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.MARGIN_BOTTOM:{
-                                    WXBridgeManager.getInstance().setMargin(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.BOTTOM, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.LEFT:{
-                                    WXBridgeManager.getInstance().setPosition(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.LEFT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.RIGHT:{
-                                    WXBridgeManager.getInstance().setPosition(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.RIGHT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.BOTTOM:{
-                                    WXBridgeManager.getInstance().setPosition(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.BOTTOM, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.TOP:{
-                                    WXBridgeManager.getInstance().setPosition(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.TOP, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.PADDING_TOP:{
-                                    WXBridgeManager.getInstance().setPadding(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.TOP, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.PADDING_BOTTOM:{
-                                    WXBridgeManager.getInstance().setPadding(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.BOTTOM, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.PADDING_LEFT:{
-                                    WXBridgeManager.getInstance().setPadding(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.LEFT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                case Constants.Name.PADDING_RIGHT:{
-                                    WXBridgeManager.getInstance().setPadding(mWXComponent.getInstanceId(), mWXComponent.getRef(), CSSShorthand.EDGE.RIGHT, (Float) animation.getAnimatedValue(property));
-                                }
-                                break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
+                    asynchronouslyUpdateLayout(mWXComponent, property, (Float) animation.getAnimatedValue(property));
                 }
 //                WXBridgeManager.getInstance().calculateLayoutPostToJSThread(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
             }
@@ -623,6 +558,84 @@ public class WXTransition {
         layoutValueAnimator.setStartDelay((long) (delay));
         layoutValueAnimator.setDuration((long) (duration));
         layoutValueAnimator.start();
+    }
+
+    @SuppressWarnings("unused")
+    public static void asynchronouslyUpdateLayout(WXComponent component, final String propertyName, final float propertyValue) {
+        if(component == null) {
+            return;
+        }
+        final String ref = component.getRef();
+        final String instanceId = component.getInstanceId();
+        if(TextUtils.isEmpty(ref) || TextUtils.isEmpty(instanceId)) {
+            return;
+        }
+
+        WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
+            @Override
+            public void run() {
+                switch (propertyName){
+                    case Constants.Name.WIDTH:{
+                        WXBridgeManager.getInstance().setStyleWidth(instanceId, ref, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.HEIGHT:{
+                        WXBridgeManager.getInstance().setStyleHeight(instanceId, ref, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_TOP:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_LEFT:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_RIGHT:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.RIGHT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_BOTTOM:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.LEFT:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.RIGHT:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.RIGHT, (propertyValue));
+                    }
+                    break;
+                    case Constants.Name.BOTTOM:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.TOP:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_TOP:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_BOTTOM:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_LEFT:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_RIGHT:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.RIGHT, propertyValue);
+                    }
+                    break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     private synchronized void onTransitionAnimationEnd(){
