@@ -85,9 +85,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
