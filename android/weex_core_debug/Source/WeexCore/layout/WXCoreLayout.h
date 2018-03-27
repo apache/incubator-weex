@@ -356,7 +356,7 @@ namespace WeexCore {
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.
-    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
+    virtual float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
       float ret;
       if(isMainAxisHorizontal(this)){
         ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
