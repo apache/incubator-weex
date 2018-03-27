@@ -504,12 +504,12 @@ public class WXTransition {
             }
             break;
             case Constants.Name.PADDING_LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.LEFT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  domObject.getPadding().get(Spacing.LEFT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPadding().get(Spacing.RIGHT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  domObject.getPadding().get(Spacing.RIGHT),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
             }
             break;
@@ -530,66 +530,7 @@ public class WXTransition {
                 PropertyValuesHolder holders[] = animation.getValues();
                 for(PropertyValuesHolder holder : holders){
                     String property =  holder.getPropertyName();
-                    switch (property){
-                        case Constants.Name.WIDTH:{
-                            domObject.setStyleWidth((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.HEIGHT:{
-                            domObject.setStyleHeight((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.MARGIN_TOP:{
-                            domObject.setMargin(Spacing.TOP, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.MARGIN_LEFT:{
-                            domObject.setMargin(Spacing.LEFT, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.MARGIN_RIGHT:{
-                            domObject.setMargin(Spacing.RIGHT, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.MARGIN_BOTTOM:{
-                            domObject.setMargin(Spacing.BOTTOM, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.LEFT:{
-                            domObject.setPositionLeft((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.RIGHT:{
-                            domObject.setPositionRight((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.BOTTOM:{
-                            domObject.setPositionBottom((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.TOP:{
-                            domObject.setPositionTop((Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.PADDING_TOP:{
-                            domObject.setPadding(Spacing.TOP, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.PADDING_BOTTOM:{
-                            domObject.setPadding(Spacing.BOTTOM, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.PADDING_LEFT:{
-                            domObject.setPadding(Spacing.LEFT, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        case Constants.Name.PADDING_RIGHT:{
-                            domObject.setPadding(Spacing.RIGHT, (Float) animation.getAnimatedValue(property));
-                        }
-                        break;
-                        default:
-                            break;
-                    }
+                    updateShadowLayoutPropertyByName(domObject,property,(Float)animation.getAnimatedValue(property));
                 }
 
                 DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(domObject.getDomContext().getInstanceId());
@@ -630,6 +571,91 @@ public class WXTransition {
         layoutValueAnimator.setStartDelay((long) (delay));
         layoutValueAnimator.setDuration((long) (duration));
         layoutValueAnimator.start();
+    }
+
+    private static void updateShadowLayoutPropertyByName(WXDomObject domObject, String propertyName, float propertyValue) {
+        if(domObject == null || TextUtils.isEmpty(propertyName)) {
+            return;
+        }
+        switch (propertyName){
+            case Constants.Name.WIDTH:{
+                domObject.setStyleWidth(propertyValue);
+            }
+            break;
+            case Constants.Name.HEIGHT:{
+                domObject.setStyleHeight(propertyValue);
+            }
+            break;
+            case Constants.Name.MARGIN_TOP:{
+                domObject.setMargin(Spacing.TOP, propertyValue);
+            }
+            break;
+            case Constants.Name.MARGIN_LEFT:{
+                domObject.setMargin(Spacing.LEFT, propertyValue);
+            }
+            break;
+            case Constants.Name.MARGIN_RIGHT:{
+                domObject.setMargin(Spacing.RIGHT, propertyValue);
+            }
+            break;
+            case Constants.Name.MARGIN_BOTTOM:{
+                domObject.setMargin(Spacing.BOTTOM, propertyValue);
+            }
+            break;
+            case Constants.Name.LEFT:{
+                domObject.setPositionLeft(propertyValue);
+            }
+            break;
+            case Constants.Name.RIGHT:{
+                domObject.setPositionRight(propertyValue);
+            }
+            break;
+            case Constants.Name.BOTTOM:{
+                domObject.setPositionBottom(propertyValue);
+            }
+            break;
+            case Constants.Name.TOP:{
+                domObject.setPositionTop(propertyValue);
+            }
+            break;
+            case Constants.Name.PADDING_TOP:{
+                domObject.setPadding(Spacing.TOP, propertyValue);
+            }
+            break;
+            case Constants.Name.PADDING_BOTTOM:{
+                domObject.setPadding(Spacing.BOTTOM, propertyValue);
+            }
+            break;
+            case Constants.Name.PADDING_LEFT:{
+                domObject.setPadding(Spacing.LEFT, propertyValue);
+            }
+            break;
+            case Constants.Name.PADDING_RIGHT:{
+                domObject.setPadding(Spacing.RIGHT, propertyValue);
+            }
+            break;
+            default:
+                break;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static void asynchronouslyUpdateLayout(WXComponent component, String propertyName, float propertyValue) {
+        if(component == null || TextUtils.isEmpty(propertyName)) {
+            return;
+        }
+        String instanceId = component.getInstanceId();
+        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(instanceId);
+        if(domActionContext == null){
+            return;
+        }
+        WXDomObject domObject = domActionContext.getDomByRef(component.getRef());
+        if(domObject == null || TextUtils.isEmpty(instanceId)) {
+            return;
+        }
+        updateShadowLayoutPropertyByName(domObject, propertyName, propertyValue);
+        domActionContext.markDirty();
+        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_TRANSITION_BATCH, 0);
     }
 
     private synchronized void onTransitionAnimationEnd(){
