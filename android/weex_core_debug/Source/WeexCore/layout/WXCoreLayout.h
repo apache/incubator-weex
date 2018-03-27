@@ -120,7 +120,6 @@ namespace WeexCore {
 
   protected:
       WXCoreLayoutNode() :
-              mChildrenFrozen(nullptr),
               mParent(nullptr),
               dirty(true),
               widthDirty{false},
@@ -142,11 +141,7 @@ namespace WeexCore {
         mChildList.clear();
         BFCs.clear();
         NonBFCs.clear();
-
-        if (mChildrenFrozen != nullptr) {
-          delete mChildrenFrozen;
-          mChildrenFrozen = nullptr;
-        }
+        mChildrenFrozen.clear();
 
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
@@ -174,7 +169,7 @@ namespace WeexCore {
      * expand regardless of mFlexGrow. Items are indexed by the child's
      * reordered index.
      */
-    bool *mChildrenFrozen = nullptr;
+    std::vector<bool> mChildrenFrozen;
 
     std::vector<WXCoreFlexLine *> mFlexLines;
 
@@ -268,14 +263,7 @@ namespace WeexCore {
         }
         mFlexLines.clear();
 
-        if(mChildrenFrozen != nullptr) {
-          delete mChildrenFrozen;
-          mChildrenFrozen = nullptr;
-        }
-        mChildrenFrozen = new bool[getChildCount(kNonBFC)];
-        for(int i=0;i<getChildCount(kNonBFC);i++){
-          mChildrenFrozen[i] = false;
-        }
+        mChildrenFrozen.assign(getChildCount(kNonBFC), false);
       }
       widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
       heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
@@ -383,7 +371,7 @@ namespace WeexCore {
       return mCssStyle->mFlexWrap == kNoWrap || isnan(mainSize);
     }
 
-    inline void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i) const {
+    inline void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, Index i){
       if (child->mCssStyle->mFlexGrow > 0) {
         flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
         mChildrenFrozen[i] = false;
