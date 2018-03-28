@@ -126,7 +126,10 @@ namespace WeexCore {
 
     if (isnan(render_root->getStyleWidth())) {
       render_root->setStyleWidthLevel(FALLBACK_STYLE);
-      render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
+      if (GetRenderContainerWrapContent())
+        render_root->setStyleWidthToNAN();
+      else
+        render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
     } else {
       render_root->setStyleWidthLevel(CSS_STYLE);
     }
@@ -135,6 +138,13 @@ namespace WeexCore {
     BuildRenderTreeTime(getCurrentTime() - startTime);
     SendCreateBodyAction(root);
     return true;
+  }
+
+  void RenderPage::SetRootRenderObject(RenderObject *root) {
+    if (root != nullptr) {
+      render_root = root;
+      render_root->MarkRootRender();
+    }
   }
 
   bool RenderPage::AddRenderObject(const std::string &parentRef, int insertPosition,
@@ -391,12 +401,19 @@ namespace WeexCore {
   }
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
-                                                          const float defaultHeight) {
+                                                          const float defaultHeight,
+                                                          const bool isWidthWrapContent) {
     renderPageSize.first = defaultWidth;
     renderPageSize.second = defaultHeight;
     if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
       render_root->setStyleWidthLevel(INSTANCE_STYLE);
-      render_root->setStyleWidth(defaultWidth, true);
+      if (isWidthWrapContent) {
+        SetRenderContainerWrapContent(true);
+        render_root->setStyleWidthToNAN();
+        renderPageSize.first = NAN;
+      } else {
+        render_root->setStyleWidth(defaultWidth, true);
+      }
       updateDirty(true);
     }
 

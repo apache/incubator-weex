@@ -857,6 +857,14 @@ namespace WeexCore {
       }
     }
 
+    inline void setStyleWidthToNAN() {
+      if (!isnan(mCssStyle->mStyleWidth)) {
+        mCssStyle->mStyleWidth = NAN;
+        markDirty();
+        markChildrenDirty(true);
+      }
+    }
+
     inline float getStyleWidth() const {
       return mCssStyle->mStyleWidth;
     }

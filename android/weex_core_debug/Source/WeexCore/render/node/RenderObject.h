@@ -65,7 +65,8 @@ namespace WeexCore {
     }
 
     inline bool ViewInit() {
-      return !isnan(getStyleWidth()) && getStyleWidth() > 0;
+      return (!isnan(getStyleWidth()) && getStyleWidth() > 0) ||
+          (IsRootRender() && GetRenderPage() != nullptr && GetRenderPage()->GetRenderContainerWrapContent());
     }
 
     virtual std::map<std::string, std::string> *GetDefaultStyle() {
@@ -395,6 +396,14 @@ namespace WeexCore {
       }
     }
 
+    inline void MarkRootRender() {
+      mIsRootRender = true;
+    }
+
+    inline bool IsRootRender() {
+      return mIsRootRender;
+    }
+
   private:
     RenderObject *mParentRender;
     StylesMap *mStyles;
@@ -404,6 +413,7 @@ namespace WeexCore {
     jobject mMeasureFunc_Impl_Android;
     void *mComponent_Impl_iOS;
     float mViewPortWidth = -1;
+    bool mIsRootRender;
   };
 } //end WeexCore
 #endif //RenderObject_h

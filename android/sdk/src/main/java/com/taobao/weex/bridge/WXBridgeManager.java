@@ -2043,7 +2043,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                                        HashMap<String, String> borders) {
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref).append(", styles:").append(styles.toString());
+              .append(", ref:").append(ref).append(", styles:").append(styles.toString())
+              .append(", paddings:").append(paddings.toString())
+                      .append(", margins:").append(margins.toString())
+                              .append(", borders:").append(borders.toString());
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }

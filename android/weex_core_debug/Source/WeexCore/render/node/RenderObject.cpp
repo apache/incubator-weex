@@ -16,6 +16,7 @@ namespace WeexCore {
     mEvents = new EventsSet();
     mComponent_Impl_Android = nullptr;
     mMeasureFunc_Impl_Android = nullptr;
+    mIsRootRender = false;
   }
 
   RenderObject::~RenderObject() {

@@ -41,7 +41,12 @@ static void OnInstanceClose(JNIEnv* env, jobject jcaller,
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jfloat defaultWidth,
-    jfloat defaultHeight);
+    jfloat defaultHeight,
+    jboolean isWidthWrapContent);
+
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
+    jboolean wrap,
+    jstring instanceId);
 
 static jint PrintFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
     jstring instanceId);
@@ -81,8 +86,15 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "Ljava/lang/String;"
 "F"
 "F"
+"Z"
 ")"
 "V", reinterpret_cast<void*>(SetDefaultHeightAndWidthIntoRootDom) },
+    { "nativeSetRenderContainerWrapContent",
+"("
+"Z"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(SetRenderContainerWrapContent) },
     { "nativePrintFirstScreenRenderTime",
 "("
 "Ljava/lang/String;"

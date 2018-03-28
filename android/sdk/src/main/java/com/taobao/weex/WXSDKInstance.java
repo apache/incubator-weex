@@ -208,6 +208,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       a.addOnLayoutChangeListener(this);
     }
     mRenderContainer = a;
+    if (mRenderContainer != null && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT) {
+      setRenderContentWrapContentToCorePostToJSThread(true, getInstanceId());
+    } else {
+      setRenderContentWrapContentToCorePostToJSThread(false, getInstanceId());
+    }
   }
 
   private int mMaxDeepLayer;
@@ -461,7 +466,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
       if (getContext() != null) {
-        mRenderContainer = new RenderContainer(getContext());
+        setRenderContainer(new RenderContainer(getContext()));
         mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
         mRenderContainer.setSDKInstance(this);
@@ -1432,7 +1437,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           mRenderContainer.setLayoutParams(layoutParams);
         }
         if (mRootComp != null) {
-          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight);
+          boolean isWidthWrapContent = false;
+          if (mRenderContainer != null && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT)
+            isWidthWrapContent = true;
+          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight, isWidthWrapContent);
         }
       }
     }
@@ -1924,21 +1932,36 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param defaultWidth
    * @param defaultHeight
    */
-  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight) {
-    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight);
+  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent) {
+    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent);
   }
 
-  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight) {
+  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight);
+        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent);
       }
     });
   }
 
-  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight);
+  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent);
 
+
+  private void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
+    nativeSetRenderContainerWrapContent(wrap, instanceId);
+  }
+
+  private void setRenderContentWrapContentToCorePostToJSThread(final boolean wrap, final String instanceId) {
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeSetRenderContainerWrapContent(wrap, instanceId);
+      }
+    });
+  }
+
+  private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
   /**
    * native: print render time

@@ -77,7 +77,7 @@ namespace WeexCore {
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void
-    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight);
+    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent);
 
     bool AddEvent(const std::string &ref, const std::string &event);
 
@@ -122,11 +122,7 @@ namespace WeexCore {
         }
     }
 
-    inline void SetRootRenderObject(RenderObject *root) {
-      if (root != nullptr) {
-        render_root = root;
-      }
-    }
+    void SetRootRenderObject(RenderObject *root);
 
     inline RenderObject * GetRootRenderObject() const {
       return render_root;
@@ -144,12 +140,20 @@ namespace WeexCore {
       this->mViewPortWidth = viewPortWidth;
     }
 
-    bool isDirty(){
+    inline bool isDirty(){
       return dirty.load();
     }
 
-    void updateDirty(bool dirty){
+    inline void updateDirty(bool dirty){
       this->dirty.store(dirty);
+    }
+
+    inline void SetRenderContainerWrapContent(bool wrap) {
+      this->isRenderContainerWrapContent.store(wrap);
+    }
+
+    inline bool GetRenderContainerWrapContent() {
+      return isRenderContainerWrapContent.load();
     }
 
     // ****** Life Cycle ****** //
@@ -173,6 +177,7 @@ namespace WeexCore {
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
     std::atomic_bool dirty{true};
+    std::atomic_bool isRenderContainerWrapContent{false};
   };
 }
 

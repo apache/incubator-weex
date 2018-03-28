@@ -40,7 +40,8 @@ static void OnInstanceClose(JNIEnv *env, jobject jcaller,
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
                                                 jstring instanceId,
                                                 jfloat defaultWidth,
-                                                jfloat defaultHeight) {
+                                                jfloat defaultHeight,
+                                                jboolean isWidthWrapContent) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
@@ -50,7 +51,17 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
        page->PageId().c_str(), defaultWidth,defaultHeight);
 #endif
 
-  page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight);
+  page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent);
+}
+
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
+                                          jboolean wrap,
+                                          jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return;
+
+  page->SetRenderContainerWrapContent(wrap);
 }
 
 static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
