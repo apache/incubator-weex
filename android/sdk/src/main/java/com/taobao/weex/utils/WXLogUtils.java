@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 public class WXLogUtils {
 
@@ -41,12 +41,12 @@ public class WXLogUtils {
 
   private static StringBuilder builder = new StringBuilder(50);
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
-  private static JsLogWatcher jsLogWatcher;
+  private static List<JsLogWatcher> jsLogWatcherList;
   private static LogWatcher sLogWatcher;
-  public static LinkedHashMap<String, Long> sFirstScreenLog = new LinkedHashMap<>();
 
   static {
     clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
+    jsLogWatcherList = new ArrayList<>();
   }
 
   private static Class loadClass(String clazzName) {
@@ -127,17 +127,19 @@ public class WXLogUtils {
       log(tag, msg, LogLevel.DEBUG);
 
       if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
-        if ("jsLog".equals(tag) && jsLogWatcher != null) {
-          if (msg.endsWith("__DEBUG")) {
-            jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
-          } else if (msg.endsWith("__INFO")) {
-            jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__INFO", ""));
-          } else if (msg.endsWith("__WARN")) {
-            jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__WARN", ""));
-          } else if (msg.endsWith("__ERROR")) {
-            jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__ERROR", ""));
-          } else {
-            jsLogWatcher.onJsLog(Log.DEBUG, msg);
+        if ("jsLog".equals(tag) && jsLogWatcherList != null && jsLogWatcherList.size() > 0) {
+          for (JsLogWatcher jsLogWatcher : jsLogWatcherList) {
+            if (msg.endsWith("__DEBUG")) {
+              jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
+            } else if (msg.endsWith("__INFO")) {
+              jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__INFO", ""));
+            } else if (msg.endsWith("__WARN")) {
+              jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__WARN", ""));
+            } else if (msg.endsWith("__ERROR")) {
+              jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__ERROR", ""));
+            } else {
+              jsLogWatcher.onJsLog(Log.DEBUG, msg);
+            }
           }
         }
 
@@ -233,17 +235,6 @@ public class WXLogUtils {
     }
   }
 
-  public static String parseMap(Map<String, Object> map){
-    if (null != map && map.size() > 0) {
-      StringBuilder sb = new StringBuilder();
-      for (Map.Entry<String, Object> stringObjectEntry : map.entrySet()) {
-        sb.append(stringObjectEntry.getKey()).append("=").append(stringObjectEntry.getValue()).append(" ");
-      }
-      return sb.toString();
-    }
-    return "map is null";
-  }
-
   /**
    * 'p' for 'Performance', use {@link #WEEX_PERF_TAG}
    */
@@ -303,7 +294,9 @@ public class WXLogUtils {
   }
 
   public static void setJsLogWatcher(JsLogWatcher watcher) {
-    jsLogWatcher = watcher;
+    if (!jsLogWatcherList.contains(watcher)) {
+      jsLogWatcherList.add(watcher);
+    }
   }
 
   public static void setLogWatcher(LogWatcher watcher) {

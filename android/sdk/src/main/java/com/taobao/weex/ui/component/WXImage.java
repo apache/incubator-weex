@@ -37,6 +37,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import com.taobao.weex.WXEnvironment;
@@ -318,6 +319,7 @@ public class WXImage extends WXComponent<ImageView> {
             fireEvent(Constants.Event.ONLOAD, params);
           }
         }
+        monitorImgSize(imageView);
       }
     });
 
@@ -436,6 +438,26 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
     });
+  }
+
+  private void monitorImgSize(ImageView imageView){
+    if (null == imageView){
+      return;
+    }
+    WXSDKInstance instance = getInstance();
+    if (null == instance){
+      return;
+    }
+    ViewGroup.LayoutParams params =imageView.getLayoutParams();
+    Drawable img = imageView.getDrawable();
+    if (null == params || null ==img){
+      return;
+    }
+
+    if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
+            imageView.getMeasuredWidth()){
+      instance.getWXPerformance().wrongImgSizeCount++;
+    }
   }
 
   @Override

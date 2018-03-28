@@ -34,6 +34,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXHashMap;
@@ -68,6 +69,14 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void setTimeout(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float delay) {
     if(mWXSDKInstance != null) {
       postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, WXUtils.parseInt(mWXSDKInstance.getInstanceId()));
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (null != mWXSDKInstance){
+            mWXSDKInstance.getWXPerformance().timerInvokeCount++;
+          }
+        }
+      },0);
     }
   }
 
@@ -75,6 +84,14 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void setInterval(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float interval) {
     if(mWXSDKInstance != null) {
       postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, WXUtils.parseInt(mWXSDKInstance.getInstanceId()));
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (null != mWXSDKInstance){
+            mWXSDKInstance.getWXPerformance().timerInvokeCount++;
+          }
+        }
+      },0);
     }
   }
 

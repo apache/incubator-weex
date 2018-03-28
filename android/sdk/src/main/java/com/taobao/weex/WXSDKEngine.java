@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -167,6 +168,7 @@ public class WXSDKEngine implements Serializable {
       registerApplicationOptions(application);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
+      WXPerformance.init();
       mIsInit = true;
     }
   }
@@ -194,7 +196,7 @@ public class WXSDKEngine implements Serializable {
     if(application == null){
       WXLogUtils.e(TAG, " doInitInternal application is null");
       WXExceptionUtils.commitCriticalExceptionRT(null,
-              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
               "doInitInternal",
               WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "WXEnvironment sApplication is null",
               null);
@@ -216,7 +218,7 @@ public class WXSDKEngine implements Serializable {
         boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!isSoInitSuccess) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
-                  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorCode(),
+                  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
                   "doInitInternal",
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
                   null);

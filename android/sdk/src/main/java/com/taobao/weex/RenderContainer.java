@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -37,6 +38,7 @@ import java.lang.ref.WeakReference;
 public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
   private WeakReference<WXSDKInstance> mSDKInstance;
   private WeexFrameRateControl mFrameRateControl;
+  private boolean mPageHasEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
@@ -107,5 +109,15 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
     if (mSDKInstance != null && mSDKInstance.get() != null) {
       mSDKInstance.get().OnVSync();
     }
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    mPageHasEvent = true;
+    return super.dispatchTouchEvent(ev);
+  }
+
+  public boolean isPageHasEvent(){
+    return mPageHasEvent;
   }
 }
