@@ -473,8 +473,17 @@ namespace WeexCore {
           myPair = new std::pair<std::string, std::string>(key, "");
           pairs->insert(pairs->end(), myPair);
           r.SkipValue();
+      }else if (r.PeekType() == kObjectType) {
+          RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+          std::string temp = "{";
+          temp.append(r.Stringify());
+          int index = temp.find_last_of('}');
+          std::string value = temp.substr(0, index);
+          myPair = new std::pair<std::string, std::string>(key, value);
+          pairs->insert(pairs->end(), myPair);
+          r.SkipValue();
       } else {
-        r.SkipValue();
+          r.SkipValue();
       }
     }
     return pairs;
