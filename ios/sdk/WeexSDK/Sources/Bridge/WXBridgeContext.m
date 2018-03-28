@@ -46,6 +46,7 @@
 #import "WXMonitor.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXConfigCenterProtocol.h"
+#import "WXSDKInstance_performance.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -417,6 +418,9 @@ _Pragma("clang diagnostic pop") \
         WXLogInfo(@"instance already destroyed, task ignored");
         return -1;
     }
+    
+    NSTimeInterval startTime = CACurrentMediaTime()*1000;
+    
     for (NSDictionary *task in tasks) {
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
@@ -435,7 +439,11 @@ _Pragma("clang diagnostic pop") \
     }
     
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
-    
+    if (!instance.isJSCreateFinish) {
+        NSTimeInterval diff = CACurrentMediaTime()*1000-startTime;
+        instance.performance.fsCallNativeNum++;
+        instance.performance.fsCallNativeTime =  instance.performance.fsCallNativeTime + diff;
+    }
     return 1;
 }
 
@@ -856,11 +864,20 @@ _Pragma("clang diagnostic pop") \
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];
+        NSTimeInterval start = -1;
+        if (execInstance && !(execInstance.isJSCreateFinish)) {
+            start = CACurrentMediaTime()*1000;
+        }
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
             [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
             [self callJSMethod:@"callJS" args:@[execIns, tasks]];
         }
+        if (execInstance && !(execInstance.isJSCreateFinish)) {
+            NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
+            execInstance.performance.fsCallJsNum++;
+            execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
+         }
     }
     
     if (hasTask) {
