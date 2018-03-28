@@ -113,6 +113,7 @@ namespace WeexCore {
       return width;
     }
 
+
     void AddRenderObject(int index, RenderObject *child) {
       RenderObject::AddRenderObject(index, child);
 
