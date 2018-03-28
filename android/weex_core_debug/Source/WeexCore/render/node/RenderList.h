@@ -98,13 +98,13 @@ namespace WeexCore {
     }
 
     float getStyleWidth() {
-      float width =  getLayoutWidth();
+      float width = getWebPxByWidth(getLayoutWidth(), GetRenderPage()->ViewPortWidth());
       if (isnan(width) || width <= 0){
         if(getParent() != nullptr){
-          width = getParent()->getLayoutWidth();
+          width = getWebPxByWidth(getParent()->getLayoutWidth(), GetRenderPage()->ViewPortWidth());
         }
         if (isnan(width) || width <= 0){
-          width = getWebPxByWidth(RenderObject::getStyleWidth(), GetRenderPage()->ViewPortWidth());;
+            width = getWebPxByWidth(RenderObject::getStyleWidth(), GetRenderPage()->ViewPortWidth());
         }
       }
       if (isnan(width) || width <= 0){
