@@ -204,7 +204,9 @@ public class WXUtils {
     try {
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
-      e.printStackTrace();
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      }
     }
     return 0;
   }
@@ -221,7 +223,9 @@ public class WXUtils {
     try {
       return Float.parseFloat(value);
     } catch (NumberFormatException e) {
-      e.printStackTrace();
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      }
     }
     return 0;
   }
