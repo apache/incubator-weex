@@ -79,12 +79,16 @@ public class FunctionParser<K, V> {
   }
 
   private String match(Token token) {
-    if (token == lexer.getCurrentToken()) {
-      String value = lexer.getCurrentTokenValue();
-      lexer.moveOn();
-      return value;
+    try {
+      if (token == lexer.getCurrentToken()) {
+        String value = lexer.getCurrentTokenValue();
+        lexer.moveOn();
+        return value;
+      }
+    } catch (Exception e) {
+      WXLogUtils.e(token + "Token doesn't match" + lexer.source);
     }
-    throw new WXInterpretationException(token + "Token doesn't match" + lexer.source);
+    return "";
   }
 
   private enum Token {
