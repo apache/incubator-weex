@@ -120,7 +120,6 @@ namespace WeexCore {
 
   protected:
       WXCoreLayoutNode() :
-              mChildrenFrozen(nullptr),
               mParent(nullptr),
               dirty(true),
               widthDirty{false},
@@ -142,11 +141,7 @@ namespace WeexCore {
         mChildList.clear();
         BFCs.clear();
         NonBFCs.clear();
-
-        if (mChildrenFrozen != nullptr) {
-          delete mChildrenFrozen;
-          mChildrenFrozen = nullptr;
-        }
+        mChildrenFrozen.clear();
 
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
@@ -174,7 +169,7 @@ namespace WeexCore {
      * expand regardless of mFlexGrow. Items are indexed by the child's
      * reordered index.
      */
-    bool *mChildrenFrozen = nullptr;
+    std::vector<bool> mChildrenFrozen;
 
     std::vector<WXCoreFlexLine *> mFlexLines;
 
@@ -268,14 +263,7 @@ namespace WeexCore {
         }
         mFlexLines.clear();
 
-        if(mChildrenFrozen != nullptr) {
-          delete mChildrenFrozen;
-          mChildrenFrozen = nullptr;
-        }
-        mChildrenFrozen = new bool[getChildCount(kNonBFC)];
-        for(int i=0;i<getChildCount(kNonBFC);i++){
-          mChildrenFrozen[i] = false;
-        }
+        mChildrenFrozen.assign(getChildCount(kNonBFC), false);
       }
       widthMeasureMode = isnan(mCssStyle->mStyleWidth) ? kUnspecified : kExactly;
       heightMeasureMode = isnan(mCssStyle->mStyleHeight) ? kUnspecified : kExactly;
@@ -368,7 +356,7 @@ namespace WeexCore {
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.
-    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
+    virtual float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
       float ret;
       if(isMainAxisHorizontal(this)){
         ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
@@ -383,7 +371,7 @@ namespace WeexCore {
       return mCssStyle->mFlexWrap == kNoWrap || isnan(mainSize);
     }
 
-    inline void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, const Index i) const {
+    inline void sumFlexGrow(const WXCoreLayoutNode* const child, WXCoreFlexLine* const flexLine, Index i){
       if (child->mCssStyle->mFlexGrow > 0) {
         flexLine->mTotalFlexGrow += child->mCssStyle->mFlexGrow;
         mChildrenFrozen[i] = false;
@@ -470,81 +458,55 @@ namespace WeexCore {
       return std::make_pair(needsReexpand, childSizeAlongMainAxis);
     }
 
-    void layoutFlexlineHorizontal(const float width,
-                                  const WXCoreFlexLine *const flexLine,
-                                  float &childLeft,
-                                  float &childRight,
-                                  float &spaceBetweenItem) const {
-      Index visibleCount, visibleItem;
-      float denominator;
-      switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexEnd:
-          childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
-          childRight = width - getPaddingLeft() - getBorderWidthLeft();
-          break;
-        case kJustifyCenter:
-          childLeft = (width - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kRight) + mCssStyle->sumPaddingBorderOfEdge(kLeft)) / 2;
-          childRight = childLeft + flexLine->mMainSize;
-          break;
-        case kJustifySpaceAround:
-          visibleCount = flexLine->mItemCount;
-          if (visibleCount != 0) {
-            spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
-          }
-          childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
-          childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
-          break;
-        case kJustifySpaceBetween:
-          childLeft = getPaddingLeft() + getBorderWidthLeft();
-          visibleItem = flexLine->mItemCount;
-          denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / denominator;
-          childRight = width - getPaddingRight() - getBorderWidthRight();
-          break;
-        case kJustifyFlexStart:
-        default:
-          childLeft = getPaddingLeft() + getBorderWidthLeft();
-          childRight = width - getPaddingRight() - getBorderWidthRight();
-          break;
+    void updateLeftRightForAbsolute(float &left, float &right,
+                                    const WXCorePadding &parentPadding,
+                                    const WXCoreBorderWidth &parentBorder,
+                                    const WXCoreSize &parentSize) const {
+      if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft))) {
+        if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeRight))) {
+//          left += parentBorder.getBorderWidth(kBorderWidthLeft) + parentPadding.getPadding(kPaddingLeft);
+//          right += parentBorder.getBorderWidth(kBorderWidthLeft) + parentPadding.getPadding(kPaddingLeft);
+        } else {
+          right += parentSize.width -
+              (parentBorder.getBorderWidth(kBorderWidthRight) +
+                  mCssStyle->mStylePosition.getPosition(kPositionEdgeRight)
+                  + mLayoutResult->mLayoutSize.width);
+          left += parentSize.width -
+              (parentBorder.getBorderWidth(kBorderWidthRight) +
+                  mCssStyle->mStylePosition.getPosition(kPositionEdgeRight)
+                  + mLayoutResult->mLayoutSize.width);
+        }
+      } else {
+        left += parentBorder.getBorderWidth(kBorderWidthLeft) +
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft);
+        right += parentBorder.getBorderWidth(kBorderWidthLeft) +
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft);
       }
     }
 
-    void layoutFlexlineVertical(const float height,
-                                const WXCoreFlexLine *const flexLine,
-                                float &childTop,
-                                float &childBottom,
-                                float &spaceBetweenItem) const {
-      Index visibleCount,visibleItem;
-      float denominator;
-      switch (mCssStyle->mJustifyContent) {
-        case kJustifyFlexEnd:
-          childTop = height - flexLine->mMainSize - getPaddingBottom() - getBorderWidthBottom();
-          childBottom = height - getPaddingTop() - getBorderWidthTop();
-          break;
-        case kJustifyCenter:
-          childTop = (height - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kBottom) + mCssStyle->sumPaddingBorderOfEdge(kTop)) / 2;
-          childBottom = childTop + flexLine->mMainSize;
-          break;
-        case kJustifySpaceAround:
-          visibleCount = flexLine->mItemCount;
-          if (visibleCount != 0) {
-            spaceBetweenItem = (height - flexLine->mMainSize- sumPaddingBorderAlongAxis(this, false) ) / visibleCount;
-          }
-          childTop = getPaddingTop() + getBorderWidthTop() + spaceBetweenItem / 2;
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom() - spaceBetweenItem / 2;
-          break;
-        case kJustifySpaceBetween:
-          childTop = getPaddingTop() + getBorderWidthTop();
-          visibleItem = flexLine->mItemCount;
-          denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-          spaceBetweenItem = (height - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, false)) / denominator;
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
-          break;
-        case kJustifyFlexStart:
-        default:
-          childTop = getPaddingTop() + getBorderWidthTop();
-          childBottom = height - getPaddingBottom() - getBorderWidthBottom();
-          break;
+    void updateTopBottomForAbsolute(float &top, float &bottom,
+                                    const WXCorePadding &parentPadding,
+                                    const WXCoreBorderWidth &parentBorder,
+                                    const WXCoreSize &parentSize) const {
+      if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeTop))) {
+        if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom))) {
+//          top += parentBorder.getBorderWidth(kBorderWidthTop) + parentPadding.getPadding(kPaddingTop);
+//          bottom += parentBorder.getBorderWidth(kBorderWidthTop) + parentPadding.getPadding(kPaddingTop);
+        } else {
+          top += parentSize.height -
+              (parentBorder.getBorderWidth(kBorderWidthBottom) +
+                  mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom)
+                  + mLayoutResult->mLayoutSize.height);
+          bottom += parentSize.height -
+              (parentBorder.getBorderWidth(kBorderWidthBottom) +
+                  mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom)
+                  + mLayoutResult->mLayoutSize.height);
+        }
+      } else {
+        top += parentBorder.getBorderWidth(kBorderWidthTop) +
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeTop);
+        bottom += parentBorder.getBorderWidth(kBorderWidthTop) +
+            mCssStyle->mStylePosition.getPosition(kPositionEdgeTop);
       }
     }
 
@@ -596,28 +558,56 @@ namespace WeexCore {
 
     /** ================================ layout =================================== **/
 
-    void layout(float left, float top, float right, float bottom, const std::pair<float,float>* = nullptr);
+    void layout(float left, float top, float right, float bottom, bool, const std::pair<float,float>* = nullptr);
 
     void calcRelativeOffset(float &left, float &top, float &right, float &bottom) const ;
 
-    void calcAbsoluteOffset(float &left, float &top, float &right, float &bottom, const std::pair<float,float>* = nullptr) const ;
+    void calcAbsoluteOffset(float &left, float &top, float &right, float &bottom, const std::pair<float,float>* = nullptr);
 
-    void onLayout(float left, float top, float right, float bottom);
+    void positionAbsoluteFlexItem(float &left, float &top, float &right, float &bottom);
 
-    void layoutHorizontal(bool isRtl, float left, float top, float right, float bottom);
+    void onLayout(float left, float top, float right, float bottom, WXCoreLayoutNode* = nullptr, WXCoreFlexLine *const flexLine = nullptr);
+
+    void layoutHorizontal(bool isRtl, float left, float top, float right, float bottom,
+                          WXCoreLayoutNode*, WXCoreFlexLine *const flexLine);
+
+    void layoutFlexlineHorizontal(const float width,
+                                         const WXCoreFlexLine *const flexLine,
+                                         float &childLeft,
+                                         float &childRight,
+                                         float &spaceBetweenItem) const;
 
     void layoutSingleChildHorizontal(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine,
-                                     WXCoreFlexWrap flexWrap,
-                                     WXCoreAlignItems alignItems, float left, float top,
-                                     float right,
-                                     float bottom);
+                                     WXCoreFlexWrap flexWrap, WXCoreAlignItems alignItems,
+                                     float, float, float, float, bool);
 
-    void layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top,
-                        float right, float bottom);
+    void layoutSingleChildHorizontal(const bool isRtl,
+                                    const bool,
+                                    float childBottom, float childTop,
+                                    WXCoreFlexLine *const flexLine,
+                                    WXCoreLayoutNode *const child,
+                                    float&, float&);
 
-    void layoutSingleChildVertical(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine, bool isRtl,
-                                   WXCoreAlignItems alignItems, float left, float top, float right,
-                                   float bottom);
+    void layoutVertical(bool isRtl, bool fromBottomToTop, float left, float top, float right, float bottom,
+                        WXCoreLayoutNode*, WXCoreFlexLine *const flexLine);
+
+    void layoutFlexlineVertical(const float height,
+                                const WXCoreFlexLine *const flexLine,
+                                float &childTop,
+                                float &childBottom,
+                                float &spaceBetweenItem) const;
+    void layoutSingleChildVertical(WXCoreLayoutNode *node, WXCoreFlexLine *flexLine,
+                                   bool isRtl, WXCoreAlignItems alignItems,
+                                   float, float, float, float, bool);
+
+    void layoutSingleChildVertical(const bool isRtl, const bool fromBottomToTop,
+                                   const bool absoluteFlexItem,
+                                   const float childLeft, const float childRight,
+                                   WXCoreFlexLine *const flexLine,
+                                   WXCoreLayoutNode *const child,
+                                   float& ,float&);
+
+    void updateFlexLineForAbsoluteItem(WXCoreLayoutNode *const absoluteFlexItem, WXCoreFlexLine *const flexLine);
 
     void initFormatingContext(std::vector<WXCoreLayoutNode *> &BFCs);
 

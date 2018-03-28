@@ -158,7 +158,7 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
   page->updateDirty(true);
 }
 
-static void CalculateLayout(JNIEnv *env, jobject jcaller,
+static void MarkDirty(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jstring ref,
                             jboolean dirty) {
@@ -173,7 +173,6 @@ static void CalculateLayout(JNIEnv *env, jobject jcaller,
       return;
     render->markDirty();
   }
-  page->CalculateLayout();
 }
 
 static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,

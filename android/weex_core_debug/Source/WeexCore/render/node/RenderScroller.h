@@ -29,6 +29,11 @@ namespace WeexCore {
 
       return style;
     }
+
+    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
+      return NAN;
+    }
+
   };
 }
 #endif //WEEX_PROJECT_RENDERSCROLLER_H

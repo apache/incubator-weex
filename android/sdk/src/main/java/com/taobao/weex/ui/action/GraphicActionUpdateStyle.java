@@ -96,7 +96,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
       animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
       animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
       component.addAnimationForElement(animationMap);
-//      WXBridgeManager.getInstance().calculateLayout(component.getInstanceId(), component.getRef(), true);
+      WXBridgeManager.getInstance().markDirty(component.getInstanceId(), component.getRef(), true);
     }
 
     if (null != paddings) {

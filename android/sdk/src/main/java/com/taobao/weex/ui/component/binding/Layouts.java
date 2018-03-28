@@ -131,7 +131,7 @@ public class Layouts {
 //            }
 //        });
 //        if(instance != null && !instance.isDestroy()){
-//            domObject.calculateLayout(layoutContext);
+//            domObject.markDirty(layoutContext);
 //        }
 //        domObject.traverseUpdateTree( new WXDomObject.Consumer() {
 //            @Override

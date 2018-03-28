@@ -129,7 +129,7 @@ public interface IWXBridge extends IWXObject {
 
   void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
 
-  void calculateLayout(String instanceId, String ref, boolean dirty);
+  void markDirty(String instanceId, String ref, boolean dirty);
 
   void registerCoreEnv(String key, String value);
 

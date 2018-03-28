@@ -5,7 +5,7 @@
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/css/ConstantsValue.h>
 #include <WeexCore/platform/android/base/LogUtils.h>
-#include <math.h>
+#include <cmath>
 #include "RenderObject.h"
 
 namespace WeexCore {
@@ -43,6 +43,9 @@ namespace WeexCore {
       return style;
     }
 
+    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
+      return NAN;
+    }
 
     std::map<std::string, std::string> *GetDefaultAttr() {
       if (!mIsPreCalculateCellWidth) {
