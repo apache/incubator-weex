@@ -364,7 +364,7 @@
                 tracing.parentId = [self getParentId:task tracing:tracing];
             }
         }
-    
+        
     }
     if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
         NSMutableArray *tracings = task.tracings;

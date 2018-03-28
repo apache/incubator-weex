@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,40 +17,14 @@
  * under the License.
  */
 
-#import "WXRootView.h"
-#import "WXSDKInstance.h"
+#import <Foundation/Foundation.h>
+#import <WeexSDK/WeexSDK.h>
+#import "DebugAnalyzer.h"
 
-@interface WXRootView()
 
-@property (nonatomic, assign) BOOL mHasEvent;
-
-@end
-
-@implementation WXRootView
-
-- (void)setFrame:(CGRect)frame
+@implementation DebugAnalyzer
+- (void)transfer:(NSDictionary *) value
 {
-    BOOL shouldNotifyLayout = NO;
-    if (_instance.onLayoutChange && !CGRectEqualToRect(self.frame, frame)) {
-        shouldNotifyLayout = YES;
-    }
-    
-    [super setFrame:frame];
-    
-    if (shouldNotifyLayout && _instance.onLayoutChange) {
-        _instance.onLayoutChange(self);
-    }
+    NSLog(@"DebugAnalyzer value : %@",value);
 }
-
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
-{
-    _mHasEvent = TRUE;
-    return [super hitTest:point withEvent:event];
-}
-
-- (BOOL)isHasEvent
-{
-    return false;
-}
-
 @end
