@@ -208,7 +208,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       a.addOnLayoutChangeListener(this);
     }
     mRenderContainer = a;
-    if (mRenderContainer != null && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT) {
+    if (mRenderContainer != null && mRenderContainer.getLayoutParams() != null
+            && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT) {
       setRenderContentWrapContentToCorePostToJSThread(true, getInstanceId());
     } else {
       setRenderContentWrapContentToCorePostToJSThread(false, getInstanceId());
@@ -1438,7 +1439,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
         if (mRootComp != null) {
           boolean isWidthWrapContent = false;
-          if (mRenderContainer != null && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT)
+          if (mRenderContainer != null && mRenderContainer.getLayoutParams() != null
+                  && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT)
             isWidthWrapContent = true;
           setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight, isWidthWrapContent);
         }
