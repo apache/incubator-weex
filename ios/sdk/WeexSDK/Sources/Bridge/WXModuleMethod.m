@@ -113,12 +113,12 @@
 - (void)commitModuleInvoke
 {
     id<WXAppMonitorProtocol> appMonitorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
-	if ([appMonitorHandler respondsToSelector:@selector(commitMonitorWithPage:withPoint:withArgs:)]) {
+	if ([appMonitorHandler respondsToSelector:@selector(commitMonitorWithPage:monitorPoint:args:)]) {
 		NSDictionary * args = @{
 								@"url": self.instance.pageName ?: @"",
 								@"name": [NSString stringWithFormat:@"%@.%@", self.moduleName, self.methodName],
 								};
-		[appMonitorHandler commitMonitorWithPage:@"weex" withPoint:@"invokeModule" withArgs:args];
+		[appMonitorHandler commitMonitorWithPage:@"weex" monitorPoint:@"invokeModule" args:args];
 	} else if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
         NSString * arg = [NSString stringWithFormat:@"%@.%@", self.moduleName, self.methodName];
         [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"invokeModule" success:NO errorCode:@"101" errorMsg:self.instance.pageName arg:arg];

@@ -56,6 +56,6 @@
 
 @optional
 
-- (void)commitMonitorWithPage:(NSString *)pageName withPoint:(NSString *)monitorPoint withArgs:(NSDictionary *)args;
+- (void)commitMonitorWithPage:(NSString *)pageName monitorPoint:(NSString *)monitorPoint args:(NSDictionary *)args;
 
 @end
