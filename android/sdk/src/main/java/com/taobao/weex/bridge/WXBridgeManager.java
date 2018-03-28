@@ -2254,15 +2254,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     });
   }
 
-  public void calculateLayout(String instanceId, String ref, boolean dirty) {
-    mWXBridge.calculateLayout(instanceId, ref, dirty);
+  public void markDirty(String instanceId, String ref, boolean dirty) {
+    mWXBridge.markDirty(instanceId, ref, dirty);
   }
 
   public void calculateLayoutPostToJSThread(final String instanceId, final String ref, final boolean dirty) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.calculateLayout(instanceId, ref, dirty);
+        mWXBridge.markDirty(instanceId, ref, dirty);
       }
     });
   }

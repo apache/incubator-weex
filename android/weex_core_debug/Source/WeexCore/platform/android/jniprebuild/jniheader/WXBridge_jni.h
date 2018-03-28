@@ -74,7 +74,7 @@ static void SetPosition(JNIEnv* env, jobject jcaller,
     jint edge,
     jfloat value);
 
-static void CalculateLayout(JNIEnv* env, jobject jcaller,
+static void MarkDirty(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring ref,
     jboolean dirty);
@@ -171,13 +171,13 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetPosition) },
-    { "nativeCalculateLayout",
+    { "nativeMarkDirty",
 "("
 "Ljava/lang/String;"
 "Ljava/lang/String;"
 "Z"
 ")"
-"V", reinterpret_cast<void*>(CalculateLayout) },
+"V", reinterpret_cast<void*>(MarkDirty) },
     { "nativeRegisterCoreEnv",
 "("
 "Ljava/lang/String;"
