@@ -26,6 +26,8 @@
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
 #import "WXLayoutDefine.h"
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
 
 @implementation WXComponent (Layout)
 
@@ -134,6 +136,13 @@
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
     WXAssertComponentThread();
+    if (isChanged) {
+        CGFloat mainScreenWidth = [[UIScreen mainScreen] bounds].size.width;
+        CGFloat mainScreenHeight = [[UIScreen mainScreen] bounds].size.height;
+        if (mainScreenHeight/2 < _calculatedFrame.size.height && mainScreenWidth/2 < _calculatedFrame.size.width) {
+            [self weexInstance].performance.cellExceedNum++;
+        }
+    }
     
     if ([self isViewLoaded] && isChanged && [self isViewFrameSyncWithCalculated]) {
         

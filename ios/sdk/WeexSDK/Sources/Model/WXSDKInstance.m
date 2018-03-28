@@ -49,6 +49,7 @@
 #import "WXMonitor.h"
 #import "WXBridgeContext.h"
 #import "WXJSCoreBridge.h"
+#import "WXSDKInstance_performance.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -114,6 +115,8 @@ typedef enum : NSUInteger {
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
         _trackComponent = NO;
         _performanceCommit = NO;
+        
+        _performance = [[WXPerformance alloc] init];
         
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
@@ -229,6 +232,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -407,6 +411,8 @@ typedef enum : NSUInteger {
         
         [strongSelf _renderWithMainBundleString:jsBundleString];
         [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
+        [WXMonitor performanceFinishWithState:DebugAfterRequest instance:strongSelf];
+    
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
@@ -504,6 +510,7 @@ typedef enum : NSUInteger {
     }
     
     if (!_performanceCommit && state == WeexInstanceDisappear) {
+        [self updatePerDicBeforExit];
         WX_MONITOR_INSTANCE_PERF_COMMIT(self);
         _performanceCommit = YES;
     }

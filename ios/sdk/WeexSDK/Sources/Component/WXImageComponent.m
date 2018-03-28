@@ -33,6 +33,8 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 #import <pthread/pthread.h>
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
 
 @interface WXImageView : UIImageView
 
@@ -400,6 +402,14 @@ WX_EXPORT_METHOD(@selector(save:))
                     [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
                 }
                 [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+            }
+            //check view/img size
+            if (!error && image && weakSelf.view) {
+                double imageSize = image.size.width * image.scale * image.size.height * image.scale;
+                double viewSize = weakSelf.view.frame.size.height *  weakSelf.view.frame.size.width;
+                if (imageSize > viewSize) {
+                    self.weexInstance.performance.imgWrongSizeNum++;
+                }
             }
         }];
     } else {

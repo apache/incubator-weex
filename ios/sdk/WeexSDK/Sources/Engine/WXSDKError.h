@@ -69,3 +69,23 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_KEY_EXCEPTION_ABILITY_DOWN_ = -9603,
 };
 
+typedef NS_ENUM (int,WXSDKErrorType)
+{
+    JS_ERROR,
+    NATIVE_ERROR,
+    RENDER_ERROR,
+    DEGRAD_ERROR
+};
+
+typedef NS_ENUM (int,WXSDKErrorGroup){
+    JS,
+    NATIVE
+};
+
+@interface WXSDKErrCodeUtil :NSObject
+
++ (WXSDKErrorType) getErrorTypeByCode:(WXSDKErrCode) code;
++ (WXSDKErrorGroup) getErrorGroupByCode:(WXSDKErrCode) code;
+
+@end
+
