@@ -25,6 +25,10 @@ public class DefaultModuleInvokeGateway implements IModuleInvokeGateway {
       if ("assets".equals(uri.getScheme())) {
         return true;
       }
+
+      if ("dotwe.org".equals(uri.getHost())) {
+        return true;
+      }
     }
     return false;
   }

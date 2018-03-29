@@ -39,7 +39,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-@AccessRestriction(AccessRestriction.PUBLIC)
+@AccessRestriction
 public class WXClipboardModule extends WXModule implements IWXClipboard {
 
     private final String CLIP_KEY = "WEEX_CLIP_KEY_MAIN";

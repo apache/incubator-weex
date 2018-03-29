@@ -27,7 +27,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 
 import java.util.Map;
-@AccessRestriction(AccessRestriction.PUBLIC)
+@AccessRestriction
 public class WXStorageModule extends WXSDKEngine.DestroyableModule implements IWXStorage {
 
     IWXStorageAdapter mStorageAdapter;
