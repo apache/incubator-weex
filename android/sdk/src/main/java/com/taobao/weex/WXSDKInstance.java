@@ -1481,12 +1481,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           layoutParams.height = height;
           mRenderContainer.setLayoutParams(layoutParams);
         }
-        if (mRootComp != null) {
-          boolean isWidthWrapContent = false;
-          if (mRenderContainer != null && mRenderContainer.getLayoutParams() != null
-                  && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT)
-            isWidthWrapContent = true;
-          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight, isWidthWrapContent);
+
+        if (mRootComp != null && layoutParams != null) {
+          final boolean isWidthWrapContent = layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT;
+          final boolean isHeightWrapContent = layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT;
+          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
+              isHeightWrapContent);
         }
       }
     }
@@ -1995,21 +1995,20 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param defaultWidth
    * @param defaultHeight
    */
-  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent) {
-    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent);
+  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
+    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
   }
 
-  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent) {
+  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent);
+        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
       }
     });
   }
 
-  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent);
-
+  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
 
   private void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
     nativeSetRenderContainerWrapContent(wrap, instanceId);

@@ -66,7 +66,7 @@ namespace WeexCore {
 
     inline bool ViewInit() {
       return (!isnan(getStyleWidth()) && getStyleWidth() > 0) ||
-          (IsRootRender() && GetRenderPage() != nullptr && GetRenderPage()->GetRenderContainerWrapContent());
+          (IsRootRender() && GetRenderPage() != nullptr && GetRenderPage()->GetRenderContainerWidthWrapContent());
     }
 
     virtual std::map<std::string, std::string> *GetDefaultStyle() {

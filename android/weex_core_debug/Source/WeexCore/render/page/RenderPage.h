@@ -77,7 +77,7 @@ namespace WeexCore {
                     std::vector<std::pair<std::string, std::string> *> *attrs);
 
     void
-    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent);
+    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);
 
     bool AddEvent(const std::string &ref, const std::string &event);
 
@@ -148,12 +148,12 @@ namespace WeexCore {
       this->dirty.store(dirty);
     }
 
-    inline void SetRenderContainerWrapContent(bool wrap) {
-      this->isRenderContainerWrapContent.store(wrap);
+    inline void SetRenderContainerWidthWrapContent(bool wrap) {
+      this->isRenderContainerWidthWrapContent.store(wrap);
     }
 
-    inline bool GetRenderContainerWrapContent() {
-      return isRenderContainerWrapContent.load();
+    inline bool GetRenderContainerWidthWrapContent() {
+      return isRenderContainerWidthWrapContent.load();
     }
 
     // ****** Life Cycle ****** //
@@ -177,7 +177,8 @@ namespace WeexCore {
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
     std::atomic_bool dirty{true};
-    std::atomic_bool isRenderContainerWrapContent{false};
+    std::atomic_bool isRenderContainerWidthWrapContent{false};
+    std::atomic_bool isRenderContainerHeightWrapContent{false};
   };
 }
 

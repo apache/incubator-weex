@@ -126,7 +126,7 @@ namespace WeexCore {
 
     if (isnan(render_root->getStyleWidth())) {
       render_root->setStyleWidthLevel(FALLBACK_STYLE);
-      if (GetRenderContainerWrapContent())
+      if (GetRenderContainerWidthWrapContent())
         render_root->setStyleWidthToNAN();
       else
         render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
@@ -402,13 +402,13 @@ namespace WeexCore {
 
   void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
                                                           const float defaultHeight,
-                                                          const bool isWidthWrapContent) {
+                                                          const bool isWidthWrapContent, const bool isHeightWrapContent) {
     renderPageSize.first = defaultWidth;
     renderPageSize.second = defaultHeight;
     if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
       render_root->setStyleWidthLevel(INSTANCE_STYLE);
       if (isWidthWrapContent) {
-        SetRenderContainerWrapContent(true);
+        SetRenderContainerWidthWrapContent(true);
         render_root->setStyleWidthToNAN();
         renderPageSize.first = NAN;
       } else {
@@ -418,9 +418,11 @@ namespace WeexCore {
     }
 
     if (render_root->getStyleHeightLevel() >= INSTANCE_STYLE) {
-      render_root->setStyleHeightLevel(INSTANCE_STYLE);
-      render_root->setStyleHeight(defaultHeight);
-      updateDirty(true);
+      if(!isHeightWrapContent) {
+        render_root->setStyleHeightLevel(INSTANCE_STYLE);
+        render_root->setStyleHeight(defaultHeight);
+        updateDirty(true);
+      }
     }
 
     Batch();
