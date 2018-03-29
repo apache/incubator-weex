@@ -112,13 +112,6 @@
 
 @end
 
-
-
-
-
-
-
-
 @implementation WXComponent (Events)
 
 #pragma mark Public
@@ -150,7 +143,6 @@
     NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
     
     [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
-    
 }
 
 - (void)addEvent:(NSString *)addEventName

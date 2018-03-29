@@ -143,8 +143,6 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     }
 }
 
-
-
 #pragma mark JSBridge Management
 
 - (void)createInstance:(NSString *)instance
@@ -379,7 +377,6 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
     return [self callJSMethodWithResult:method];
-    
 }
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive
