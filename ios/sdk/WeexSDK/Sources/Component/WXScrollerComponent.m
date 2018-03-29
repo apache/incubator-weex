@@ -29,39 +29,14 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 
-@interface WXScrollerComponnetView:UIScrollView
+@interface WXScrollerComponentView:UIScrollView
 @end
 
-@implementation WXScrollerComponnetView
-@end
-
-@interface UIScrollView (Events)
-@end
-
-@implementation UIScrollView (Events)
+@implementation WXScrollerComponentView
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    NSString * panGestureRecog = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"UIScrollV", @"iewPanG", @"estur",@"eRecog",@"nize",@"r"];
-    if ([gestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
-        if(touch.wx_stopPropagation && [touch.wx_stopPropagation isEqualToNumber:@1])
-        {
-            return NO;
-        }
-        else
-        {
-            if (self.wx_component->_listenStopPropagation)
-            {
-                [self.wx_component gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
-            }
-        }
-    }
-    return YES;
+    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
 }
-@end
-
-
-@interface WXScrollerComponnetView(WXScrollerComponnetView_ContentInsetAdjustmentBehavior)
-@property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
 @end
 
 @interface WXScrollToTarget : NSObject
@@ -192,14 +167,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (UIView *)loadView
 {
-    return [[WXScrollerComponnetView alloc] init];
+    return [[WXScrollerComponentView alloc] init];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self setContentSize:_contentSize];
-    WXScrollerComponnetView* scrollView = (WXScrollerComponnetView *)self.view;
+    WXScrollerComponentView* scrollView = (WXScrollerComponentView *)self.view;
     scrollView.delegate = self;
     scrollView.exclusiveTouch = YES;
     scrollView.autoresizesSubviews = NO;
@@ -562,6 +537,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (WXScrollDirection)scrollDirection
 {
     return _scrollDirection;
+}
+
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
 }
 
 #pragma mark UIScrollViewDelegate

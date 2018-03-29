@@ -82,7 +82,7 @@
  **/
 - (void)executeJsMethod:(WXCallJSMethod *)method;
 
-- (JSValue *)excuteJsMethodWithResult:(WXCallJSMethod *)method;
+- (JSValue *)excuteJSMethodWithResult:(WXCallJSMethod *)method;
 
 /**
  *  Register Modules Method

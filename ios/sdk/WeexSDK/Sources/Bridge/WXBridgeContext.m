@@ -583,7 +583,7 @@ _Pragma("clang diagnostic pop") \
     }
 }
 
-- (JSValue *)excuteJsMethodWithResult:(WXCallJSMethod *)method
+- (JSValue *)excuteJSMethodWithResult:(WXCallJSMethod *)method
 {
     WXAssertBridgeThread();
     return  [self.jsBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];

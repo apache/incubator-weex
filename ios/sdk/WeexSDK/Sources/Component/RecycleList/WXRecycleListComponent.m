@@ -33,6 +33,17 @@
 #import "WXSDKManager.h"
 #import "WXComponent+DataBinding.h"
 
+@interface WXRecycleListComponentView:UICollectionView
+@end
+
+@implementation WXRecycleListComponentView
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
+
+@end
+
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
 @end

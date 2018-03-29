@@ -252,7 +252,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     __weak typeof(self) weakSelf = self;
     __block JSValue *value;
     WXPerformBlockSyncOnBridgeThread(^(){
-        value = [weakSelf.bridgeCtx excuteJsMethodWithResult:method];
+        value = [weakSelf.bridgeCtx excuteJSMethodWithResult:method];
     });
     return value;
 }

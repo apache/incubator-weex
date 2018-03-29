@@ -732,31 +732,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
 }
 
-- (void)gestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+- (BOOL)gestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    NSString *ref = _templateComponent ? _templateComponent.ref : self.ref;
-    CGPoint screenLocation = [touch locationInView:touch.window];
-    CGPoint pageLocation = [touch locationInView:self.weexInstance.rootView];
-    NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
-    NSString *touchState;
-    if (touch.phase == UITouchPhaseBegan) {
-        touchState = @"start";
-    }
-    else if (touch.phase == UITouchPhaseMoved){
-        touchState = @"move";
-    }
-    else{
-        touchState = @"end";
-    }
-    BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:@"stopPropagation" params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
-    touch.wx_stopPropagation = stopPropagation ? @1 : @0;
-}
-
-#pragma mark - UIGestureRecognizerDelegate
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-{
-    CGPoint screenLocation = [touch locationInView:touch.window];
-    NSLog(@"%@",NSStringFromCGPoint(screenLocation));
     if(touch.wx_stopPropagation && [touch.wx_stopPropagation isEqualToNumber:@1]){
         return NO;
     }
@@ -764,10 +741,31 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     {
         if (_listenStopPropagation)
         {
-            [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+            NSString *ref = _templateComponent ? _templateComponent.ref : self.ref;
+            CGPoint screenLocation = [touch locationInView:touch.window];
+            CGPoint pageLocation = [touch locationInView:self.weexInstance.rootView];
+            NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
+            NSString *touchState;
+            if (touch.phase == UITouchPhaseBegan) {
+                touchState = @"start";
+            }
+            else if (touch.phase == UITouchPhaseMoved){
+                touchState = @"move";
+            }
+            else{
+                touchState = @"end";
+            }
+            BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:@"stopPropagation" params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
+            touch.wx_stopPropagation = stopPropagation ? @1 : @0;
         }
     }
     return YES;
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
