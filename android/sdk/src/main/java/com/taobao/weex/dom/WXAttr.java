@@ -52,7 +52,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * static attrs
    * */
-  private @NonNull final ArrayMap<String, Object> attr;
+  private @NonNull final Map<String, Object> attr;
 
   /**
    * dynamic binding attrs, can be null, only weex use
@@ -71,6 +71,10 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
     attr.putAll(filterBindingStatement(standardMap));
+  }
+
+  public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
+    attr = standardMap;
   }
 
   public static String getPrefix(Map<String, Object> attr) {

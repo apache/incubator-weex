@@ -74,9 +74,11 @@ public class BasicComponentData<T extends View> {
       return;
     }
     if (mAttributes == null) {
-      mAttributes = new WXAttr();
+      mAttributes = new WXAttr(attrs, 0);
     }
-    mAttributes.putAll(attrs);
+    else {
+      mAttributes.putAll(attrs);
+    }
   }
 
   public final void addEvent(Set<String> events) {
