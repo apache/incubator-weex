@@ -59,7 +59,6 @@ import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.performance.FpsCollector;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
 import com.taobao.weex.ui.IExternalModuleGetter;
