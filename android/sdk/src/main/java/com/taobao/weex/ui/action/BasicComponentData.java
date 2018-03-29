@@ -93,22 +93,28 @@ public class BasicComponentData<T extends View> {
     if (shorthand.length == 4) {
       switch (type) {
         case MARGIN:
-          addMargin(CSSShorthand.EDGE.TOP, shorthand[0]);
-          addMargin(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
-          addMargin(CSSShorthand.EDGE.LEFT, shorthand[2]);
-          addMargin(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          if(mMargins == null){
+            mMargins = new CSSShorthand(shorthand);
+          }
+          else{
+            mPaddings.replace(shorthand);
+          }
           break;
         case PADDING:
-          addPadding(CSSShorthand.EDGE.TOP, shorthand[0]);
-          addPadding(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
-          addPadding(CSSShorthand.EDGE.LEFT, shorthand[2]);
-          addPadding(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          if(mPaddings == null){
+            mPaddings = new CSSShorthand(shorthand);
+          }
+          else{
+            mPaddings.replace(shorthand);
+          }
           break;
         case BORDER:
-          addBorder(CSSShorthand.EDGE.TOP, shorthand[0]);
-          addBorder(CSSShorthand.EDGE.BOTTOM, shorthand[1]);
-          addBorder(CSSShorthand.EDGE.LEFT, shorthand[2]);
-          addBorder(CSSShorthand.EDGE.RIGHT, shorthand[3]);
+          if(mBorders == null){
+            mBorders = new CSSShorthand(shorthand);
+          }
+          else{
+            mBorders.replace(shorthand);
+          }
           break;
       }
     }

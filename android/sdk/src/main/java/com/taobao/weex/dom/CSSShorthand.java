@@ -20,26 +20,30 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
-
 import java.util.Arrays;
 
 public class CSSShorthand implements Cloneable {
 
   public static enum EDGE {
-    TOP, RIGHT, BOTTOM, LEFT, ALL;
+    TOP, BOTTOM, LEFT, RIGHT, ALL;
   }
 
   public static enum TYPE {
     MARGIN, PADDING, BORDER;
   }
 
-  private final float[] values = new float[EDGE.values().length];
+  private float[] values;
+
+  public CSSShorthand(float []values){
+    replace(values);
+  }
 
   public CSSShorthand() {
     this(false);
   }
 
   CSSShorthand(boolean fillWithNaN) {
+    values = new float[EDGE.values().length];
     if (fillWithNaN) {
       Arrays.fill(values, Float.NaN);
     }
@@ -48,16 +52,25 @@ public class CSSShorthand implements Cloneable {
   @RestrictTo(RestrictTo.Scope.LIBRARY)
   public void set(@NonNull EDGE edge, float value) {
     if (edge == EDGE.ALL) {
-      for (EDGE side : EDGE.values()) {
-        values[side.ordinal()] = value;
-      }
+      Arrays.fill(values, value);
     } else {
       values[edge.ordinal()] = value;
     }
   }
 
+  /**
+   * {@link EDGE#ALL} is not supported, 0 will be returned.
+   * @throws IndexOutOfBoundsException
+   * @param edge
+   * @return
+   */
   public float get(@NonNull EDGE edge) {
-    return values[edge.ordinal()];
+    return edge == EDGE.ALL ? 0 : values[edge.ordinal()];
+  }
+
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
+  public final void replace(float []values){
+    this.values = values;
   }
 
   @Override
