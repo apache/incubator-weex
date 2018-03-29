@@ -18,7 +18,41 @@
  */
 
 #import "WXComponent.h"
+#import <objc/runtime.h>
+
+@interface UITouch (WXTouchGestureRecognizer)
+
+@property (nonatomic, strong) NSNumber *wx_identifier;
+@property (nonatomic, strong) NSNumber *wx_stopPropagation;
+
+@end
+
+@implementation UITouch (WXTouchGestureRecognizer)
+
+- (NSNumber *)wx_identifier
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setWx_identifier:(NSNumber *)wx_identifier
+{
+    objc_setAssociatedObject(self, @selector(wx_identifier), wx_identifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)wx_stopPropagation
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setWx_stopPropagation:(NSNumber *)wx_stopPropagation
+{
+    objc_setAssociatedObject(self, @selector(wx_stopPropagation), wx_stopPropagation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
 
 @interface WXComponent (Events) <UIGestureRecognizerDelegate>
-
+- (BOOL)gestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 @end
