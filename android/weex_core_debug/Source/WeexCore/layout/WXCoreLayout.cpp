@@ -160,7 +160,9 @@ namespace WeexCore {
       if(widthMeasureMode == kExactly && !isnan(width)){
         constrainsWidth -= sumPaddingBorderAlongAxis(this, true);
       }
-      WXCoreSize dimension = measureFunc(this, constrainsWidth, widthMeasureMode, height, heightMeasureMode);
+      WXCoreSize dimension = measureFunc(this, constrainsWidth,
+                                         (stretch && !isnan(width)) ? kExactly:widthMeasureMode,
+                                         height, heightMeasureMode);
       if (widthMeasureMode == kUnspecified) {
         float actualWidth = dimension.width + sumPaddingBorderAlongAxis(this, true);
         if (isnan(width)) {

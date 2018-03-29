@@ -135,10 +135,10 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
     float measureWidth = width, measureHeight = height;
     hasBeenMeasured = true;
-    float textWidth = getTextWidth(mTextPaint, width, false);
+    float textWidth = getTextWidth(mTextPaint, width, widthMeasureMode == MeasureMode.EXACTLY);
 
     if (textWidth > 0 && mText != null) {
-      layout = createLayout(textWidth, false, null);
+      layout = createLayout(textWidth,null);
       previousWidth = layout.getWidth();
       if (Float.isNaN(width)) {
         measureWidth = layout.getWidth();
@@ -320,18 +320,20 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       }
       return 0;
     }
-    float textWidth;
-    if (forceToDesired) {
-      textWidth = outerWidth;
-    } else {
-      float desiredWidth = Layout.getDesiredWidth(spanned, textPaint);
-      if (isUndefined(outerWidth) || desiredWidth < outerWidth) {
-        textWidth = desiredWidth;
-      } else {
+    else {
+      float textWidth;
+      if (forceToDesired) {
         textWidth = outerWidth;
+      } else {
+        float desiredWidth = Layout.getDesiredWidth(spanned, textPaint);
+        if (isUndefined(outerWidth) || desiredWidth < outerWidth) {
+          textWidth = desiredWidth;
+        } else {
+          textWidth = outerWidth;
+        }
       }
+      return textWidth;
     }
-    return textWidth;
   }
 
   /**
@@ -344,9 +346,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    */
   private
   @NonNull
-  Layout createLayout(float width, boolean forceWidth, @Nullable Layout previousLayout) {
-    float textWidth;
-    textWidth = getTextWidth(mTextPaint, width, forceWidth);
+  Layout createLayout(final float textWidth, @Nullable Layout previousLayout) {
     Layout layout;
     if (previousWidth != textWidth || previousLayout == null) {
       layout = new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
@@ -448,7 +448,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     if (contentWidth > 0) {
       spanned = createSpanned(mText);
       if (mText != null) {
-        layout = createLayout(contentWidth, true, layout);
+        layout = createLayout(contentWidth, layout);
         previousWidth = layout.getWidth();
       } else {
         previousWidth = 0;
