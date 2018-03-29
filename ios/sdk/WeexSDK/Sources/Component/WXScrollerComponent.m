@@ -35,6 +35,35 @@
 @implementation WXScrollerComponnetView
 @end
 
+@interface UIScrollView (Events)
+@end
+
+@implementation UIScrollView (Events)
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    NSString * panGestureRecog = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"UIScrollV", @"iewPanG", @"estur",@"eRecog",@"nize",@"r"];
+    if ([gestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
+        if(touch.wx_stopPropagation && [touch.wx_stopPropagation isEqualToNumber:@1])
+        {
+            return NO;
+        }
+        else
+        {
+            if (self.wx_component->_listenStopPropagation)
+            {
+                [self.wx_component gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+            }
+        }
+    }
+    return YES;
+}
+@end
+
+
+@interface WXScrollerComponnetView(WXScrollerComponnetView_ContentInsetAdjustmentBehavior)
+@property(nonatomic, assign)NSUInteger contentInsetAdjustmentBehavior;
+@end
+
 @interface WXScrollToTarget : NSObject
 
 @property (nonatomic, weak)   WXComponent *target;

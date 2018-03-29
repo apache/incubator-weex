@@ -18,7 +18,6 @@
  */
 
 #import "WXBridgeContext.h"
-#import "WXBridgeProtocol.h"
 #import "WXJSCoreBridge.h"
 #import "WXLog.h"
 #import "WXUtility.h"
@@ -584,6 +583,12 @@ _Pragma("clang diagnostic pop") \
     }
 }
 
+- (JSValue *)excuteJsMethodWithResult:(WXCallJSMethod *)method
+{
+    WXAssertBridgeThread();
+    return  [self.jsBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];
+}
+
 - (void)executeAllJsService
 {
     for(NSDictionary *service in _jsServiceQueue) {
@@ -692,7 +697,6 @@ _Pragma("clang diagnostic pop") \
             for(WXCallJSMethod *method in sendQueue){
                 [tasks addObject:[method callJSTask]];
             }
-            
             [sendQueue removeAllObjects];
             execIns = instance;
             break;
