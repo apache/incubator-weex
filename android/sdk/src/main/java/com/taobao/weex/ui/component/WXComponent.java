@@ -2005,7 +2005,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           uiEvent.submit();
         } else {
           if (WXEnvironment.isApkDebugable() && !isLazy()) {
-            WXLogUtils.w("onRenderFinish", "createView() not called");
+//            WXLogUtils.w("onRenderFinish", "createView() not called");
           }
         }
       }
