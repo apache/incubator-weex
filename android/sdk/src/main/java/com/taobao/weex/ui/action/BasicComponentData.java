@@ -97,7 +97,7 @@ public class BasicComponentData<T extends View> {
             mMargins = new CSSShorthand(shorthand);
           }
           else{
-            mPaddings.replace(shorthand);
+            mMargins.replace(shorthand);
           }
           break;
         case PADDING:
