@@ -22,6 +22,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.support.annotation.NonNull;
+import android.support.v4.util.LruCache;
 import android.util.Pair;
 import android.text.TextUtils;
 
@@ -37,6 +38,7 @@ import java.util.StringTokenizer;
 public class WXResourceUtils {
 
   private final static Map<String, Integer> colorMap = new HashMap<>();
+  private final static LruCache<String, Integer> colorCache = new LruCache<>(64);
   private final static int RGB_SIZE = 3;
   private final static int RGBA_SIZE = 4;
   private final static int HEX = 16;
@@ -238,21 +240,28 @@ public class WXResourceUtils {
     }
     color = color.trim(); //remove non visible codes
 
-    int resultColor = defaultColor;
-    Pair<Boolean, Integer> result;
-    ColorConvertHandler[] handlers = ColorConvertHandler.values();
-    for (ColorConvertHandler handler : handlers) {
-      try {
-        result = handler.handle(color);
-        if (result.first) {
-          resultColor = result.second;
-          break;
-        }
-      } catch (RuntimeException e) {
-        WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
-      }
+    Integer cache = colorCache.get(color);
+    if(cache!=null){
+      return cache;
     }
-    return resultColor;
+    else {
+      int resultColor = defaultColor;
+      Pair<Boolean, Integer> result;
+      ColorConvertHandler[] handlers = ColorConvertHandler.values();
+      for (ColorConvertHandler handler : handlers) {
+        try {
+          result = handler.handle(color);
+          if (result.first) {
+            resultColor = result.second;
+            colorCache.put(color, resultColor);
+            break;
+          }
+        } catch (RuntimeException e) {
+          WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
+        }
+      }
+      return resultColor;
+    }
   }
 
   /**
