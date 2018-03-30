@@ -57,10 +57,13 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
 
     WXComponent component = WXComponentFactory.newInstance(instance, parent, basicComponentData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
-    Map<String, Object> animationMap = new ArrayMap<>(2);
-    animationMap.put(Constants.Name.TRANSFORM, mStyle.get(Constants.Name.TRANSFORM));
-    animationMap.put(Constants.Name.TRANSFORM_ORIGIN, mStyle.get(Constants.Name.TRANSFORM_ORIGIN));
-    component.addAnimationForElement(animationMap);
+    if(mStyle.containsKey(Constants.Name.TRANSFORM)) {
+      Map<String, Object> animationMap = new ArrayMap<>(2);
+      animationMap.put(Constants.Name.TRANSFORM, mStyle.get(Constants.Name.TRANSFORM));
+      animationMap
+          .put(Constants.Name.TRANSFORM_ORIGIN, mStyle.get(Constants.Name.TRANSFORM_ORIGIN));
+      component.addAnimationForElement(animationMap);
+    }
     WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionAddElementCount();
     return component;
   }
