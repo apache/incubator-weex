@@ -168,6 +168,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private ComponentObserver mComponentObserver;
   private HashMap<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
 
+  /**
+   * set open SandBox
+   * @param flag
+   */
+  public void setUseSandBox(boolean flag) {
+    WXBridgeManager.getInstance().setSandBoxContext(flag);
+  }
+
   public PriorityQueue<WXEmbed> hiddenEmbeds;
 
   private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit

@@ -152,6 +152,21 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
+  public int createInstanceContext(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return 0;
+  }
+
+  @Override
+  public int destoryInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return 0;
+  }
+
+  @Override
+  public String execJSOnInstance(String instanceId, String script, int type) {
+    return null;
+  }
+
+  @Override
   public void reportJSException(String instanceId, String func, String exception) {
     if (mJsManager != null) {
       mJsManager.reportJSException(instanceId, func, exception);
