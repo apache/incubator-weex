@@ -256,51 +256,35 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   }
 
   protected void updateSpannable(Spannable spannable, int spanFlag) {
-    List<SetSpanOperation> ops = createSetSpanOperation(spannable.length(), spanFlag);
+    int end = spannable.length();
     if (mFontSize == UNSET) {
-      ops.add(new SetSpanOperation(0, spannable.length(),
-              new AbsoluteSizeSpan(WXText.sDEFAULT_SIZE), spanFlag));
+      setSpan(spannable, new AbsoluteSizeSpan(WXText.sDEFAULT_SIZE), 0, end, spanFlag);
     }
-    Collections.reverse(ops);
-    for (SetSpanOperation op : ops) {
-      op.execute(spannable);
+    else{
+      setSpan(spannable,  new AbsoluteSizeSpan(mFontSize), 0, end, spanFlag);
+    }
+
+    if (mLineHeight != UNSET) {
+      setSpan(spannable, new WXLineHeightSpan(mLineHeight), 0, end, spanFlag);
+    }
+
+    setSpan(spannable, new AlignmentSpan.Standard(mAlignment), 0, end, spanFlag);
+
+    if (mFontStyle != UNSET || mFontWeight != UNSET || mFontFamily != null) {
+      setSpan(spannable, new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily), 0, end, spanFlag);
+    }
+
+    if (mIsColorSet) {
+      setSpan(spannable, new ForegroundColorSpan(mColor), 0, end, spanFlag);
+    }
+
+    if (mTextDecoration == WXTextDecoration.UNDERLINE || mTextDecoration == WXTextDecoration.LINETHROUGH) {
+      setSpan(spannable, new TextDecorationSpan(mTextDecoration), 0, end, spanFlag);
     }
   }
 
-  /**
-   * Create a task list which contains {@link SetSpanOperation}. The task list will be executed
-   * in other method.
-   *
-   * @param end the end character of the text.
-   * @return a task list which contains {@link SetSpanOperation}.
-   */
-  private List<SetSpanOperation> createSetSpanOperation(int end, int spanFlag) {
-    List<SetSpanOperation> ops = new LinkedList<>();
-    int start = 0;
-    if (end >= start) {
-      if (mTextDecoration == WXTextDecoration.UNDERLINE || mTextDecoration == WXTextDecoration.LINETHROUGH) {
-        ops.add(new SetSpanOperation(start, end, new TextDecorationSpan(mTextDecoration), spanFlag));
-      }
-      if (mIsColorSet) {
-        ops.add(new SetSpanOperation(start, end,
-                new ForegroundColorSpan(mColor), spanFlag));
-      }
-      if (mFontSize != UNSET) {
-        ops.add(new SetSpanOperation(start, end, new AbsoluteSizeSpan(mFontSize), spanFlag));
-      }
-      if (mFontStyle != UNSET
-              || mFontWeight != UNSET
-              || mFontFamily != null) {
-        ops.add(new SetSpanOperation(start, end,
-                new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily),
-                spanFlag));
-      }
-      ops.add(new SetSpanOperation(start, end, new AlignmentSpan.Standard(mAlignment), spanFlag));
-      if (mLineHeight != UNSET) {
-        ops.add(new SetSpanOperation(start, end, new WXLineHeightSpan(mLineHeight), spanFlag));
-      }
-    }
-    return ops;
+  private void setSpan(Spannable spannable, Object what, int start, int end, int spanFlag){
+    spannable.setSpan(what, start, end, spanFlag);
   }
 
   /**
