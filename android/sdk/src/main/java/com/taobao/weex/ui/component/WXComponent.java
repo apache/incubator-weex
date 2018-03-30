@@ -209,10 +209,12 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
+  @Override
   protected final void bindComponent(WXComponent component) {
     super.bindComponent(component);
-    if (getInstance() != null)
+    if (getInstance() != null) {
       setViewPortWidth(getInstance().getInstanceViewPortWidth());
+    }
     mParent = component.getParent();
     mType = component.getType();
   }
@@ -292,53 +294,56 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    *
    * @param type
    */
-  public void addEvent(String type) {
-    if(mAppendEvents == null){
-      mAppendEvents = new ArraySet<>();
-    }
-
+  public void addEvent(final String type) {
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
-    mAppendEvents.add(type);
+    final View view = getRealView();
 
-    View view = getRealView();
-    if (type.equals(Constants.Event.CLICK) && view != null) {
+    if (type.equals(Constants.Event.CLICK)) {
+      if (view == null) {
+        // wait next time to add.
+        return;
+      }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
       addFocusChangeListener(new OnFocusChangeListener() {
+        @Override
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
-    } else if (view != null &&
-            needGestureDetector(type)) {
+    } else if (needGestureDetector(type)) {
+      if (null == view) {
+        // wait next time to add.
+        return;
+      }
       if (view instanceof WXGestureObservable) {
         if (mGesture == null) {
           mGesture = new WXGesture(this, mContext);
           boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
           mGesture.setPreventMoveEvent(isPreventMove);
         }
-        if(mGestureType == null){
-          mGestureType = new ArraySet<>();
-        }
         mGestureType.add(type);
-        ((WXGestureObservable) view).registerGestureListener(mGesture);
+        ((WXGestureObservable)view).registerGestureListener(mGesture);
       } else {
         WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
-                "WXGestureObservable, so no gesture is supported.");
+            "WXGestureObservable, so no gesture is supported.");
       }
     } else {
-      Scrollable scroller = getParentScroller();
-      if (type.equals(Constants.Event.APPEAR) && scroller != null) {
-        scroller.bindAppearEvent(this);
-      }
-      if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
-        scroller.bindDisappearEvent(this);
+      final Scrollable scroller = getParentScroller();
+      if (scroller != null) {
+        if (type.equals(Constants.Event.APPEAR)) {
+          scroller.bindAppearEvent(this);
+        } else if (type.equals(Constants.Event.DISAPPEAR)) {
+          scroller.bindDisappearEvent(this);
+        }
       }
     }
+    // Final add to mAppendEvents.
+    mAppendEvents.add(type);
   }
 
   protected void onCreate() {
