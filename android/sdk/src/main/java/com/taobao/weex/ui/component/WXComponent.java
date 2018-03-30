@@ -154,7 +154,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
-  private Set<String> mAppendEvents = new HashSet<>();
+  private Set<String> mAppendEvents;
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
   private boolean mIsDestroyed = false;
@@ -292,6 +292,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @param type
    */
   public void addEvent(String type) {
+    if(mAppendEvents == null){
+      mAppendEvents = new ArraySet<>();
+    }
 
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
@@ -1385,7 +1388,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       removeEventFromView(event);
     }
-    mAppendEvents.clear();//only clean append events, not dom's events.
+    if(mAppendEvents!=null) {
+      mAppendEvents.clear();//only clean append events, not dom's events.
+    }
     if(mGestureType != null){
       mGestureType.clear();
     }
@@ -1774,7 +1779,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public boolean containsEvent(String event) {
-    return getEvents().contains(event) || mAppendEvents.contains(event);
+    return getEvents().contains(event) || (mAppendEvents!=null && mAppendEvents.contains(event));
   }
 
   public void notifyAppearStateChange(String wxEventType, String direction) {

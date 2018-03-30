@@ -20,18 +20,14 @@ package com.taobao.weex.ui.component.basic;
 
 import android.support.annotation.NonNull;
 import android.view.View;
-
-import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
-import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXUtils;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -40,8 +36,8 @@ public abstract class WXBasicComponent<T extends View> {
   private Object mExtra;
   private String mComponentType;
   private String mRef;
-  private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
-  private GraphicSize mLayoutSize = new GraphicSize(0, 0);
+  private GraphicPosition mLayoutPosition;
+  private GraphicSize mLayoutSize;
   private BasicComponentData mBasicComponentData;
 
   private int mViewPortWidth = 750;
@@ -172,6 +168,9 @@ public abstract class WXBasicComponent<T extends View> {
   }
 
   protected GraphicPosition getLayoutPosition() {
+    if (mLayoutPosition == null) {
+      mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
+    }
     return mLayoutPosition;
   }
 
@@ -180,6 +179,9 @@ public abstract class WXBasicComponent<T extends View> {
   }
 
   protected GraphicSize getLayoutSize() {
+    if (mLayoutSize == null) {
+      mLayoutSize = new GraphicSize(0, 0);
+    }
     return mLayoutSize;
   }
 
@@ -188,19 +190,19 @@ public abstract class WXBasicComponent<T extends View> {
   }
 
   public float getCSSLayoutTop() {
-    return mLayoutPosition.getTop();
+    return mLayoutPosition == null ? 0 : mLayoutPosition.getTop();
   }
 
   public float getCSSLayoutBottom() {
-    return mLayoutPosition.getBottom();
+    return mLayoutPosition == null ? 0 : mLayoutPosition.getBottom();
   }
 
   public float getCSSLayoutLeft() {
-    return mLayoutPosition.getLeft();
+    return mLayoutPosition == null ? 0 : mLayoutPosition.getLeft();
   }
 
   public float getCSSLayoutRight() {
-    return mLayoutPosition.getRight();
+    return mLayoutPosition == null ? 0 : mLayoutPosition.getRight();
   }
 
   public float getLayoutWidth() {
