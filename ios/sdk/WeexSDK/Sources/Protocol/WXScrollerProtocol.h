@@ -72,5 +72,6 @@
 
 - (WXScrollDirection)scrollDirection;
 
+- (NSString*)refreshType;
 @end
 

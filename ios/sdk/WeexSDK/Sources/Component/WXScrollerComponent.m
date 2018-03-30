@@ -72,6 +72,10 @@
     BOOL _scrollable;
     NSString * _alwaysScrollableVertical;
     NSString * _alwaysScrollableHorizontal;
+    
+    // refreshForAppear: load more when refresh component begin appear(if scroll is dragging or decelerating, should delay)
+    // refreshForWholeVisible: load more until the whole refresh component visible
+    NSString *_refreshType;
 
     // vertical & horizontal
     WXScrollDirection _scrollDirection;
@@ -132,6 +136,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if (attributes[@"alwaysScrollableHorizontal"]) {
             _alwaysScrollableHorizontal = [WXConvert NSString:attributes[@"alwaysScrollableHorizontal"]];
         }
+        _refreshType = [WXConvert NSString:attributes[@"refreshType"]]?:@"refreshForWholeVisible";
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         _loadmoreretry = attributes[@"loadmoreretry"] ? [WXConvert NSUInteger:attributes[@"loadmoreretry"]] : 0;
@@ -263,6 +268,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _alwaysScrollableVertical = [WXConvert NSString:attributes[@"alwaysScrollableVertical"]];
         ((UIScrollView*)self.view).alwaysBounceVertical = [WXConvert BOOL:_alwaysScrollableVertical];
     }
+    
+    if (attributes[@"refreshType"]) {
+        _refreshType = [WXConvert NSString:attributes[@"refreshType"]];
+    }
+    
     if (attributes[@"offsetAccuracy"]) {
         _offsetAccuracy = [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
@@ -535,9 +545,18 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     return _scrollDirection;
 }
 
+- (NSString*)refreshType
+{
+    return _refreshType;
+}
+
 #pragma mark UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    if ([_refreshType isEqualToString:@"refreshForAppear"] && _refreshComponent) {
+        [_refreshComponent setIndicatorHidden:NO];
+    }
+    
     if (_scrollStartEvent) {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
@@ -642,14 +661,34 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     }
 }
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
+{
+    if ([_refreshType isEqualToString:@"refreshForAppear"]) {
+        if(targetContentOffset == nil)
+            return;
+        CGPoint offset = *targetContentOffset;
+        if(velocity.y <= 0) {
+            // drop down
+            if( offset.y <= _refreshComponent.calculatedFrame.size.height ) {
+                [self loadMoreIfNeed];
+            }
+        } else if (velocity.y > 0) {
+            // drop up
+        }
+    }
+}
+
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     [_loadingComponent.view setHidden:NO];
     [_refreshComponent.view setHidden:NO];
     
     //refresh
-    if (_refreshComponent && scrollView.contentOffset.y < 0 && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
-        [_refreshComponent refresh];
+    if ([_refreshType isEqualToString:@"refreshForWholeVisible"]) {
+        if (_refreshComponent && scrollView.contentOffset.y < 0 && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
+            [_refreshComponent refresh];
+        }
     }
     
     //loading
@@ -661,6 +700,16 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _isScrolling = NO;
         [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:nil afterDelay:0.1];
     }
+}
+
+- (void)loadMoreIfNeed
+{
+    WXScrollerComponnetView* scrollView = (WXScrollerComponnetView *)self.view;
+    if (scrollView.isDragging || scrollView.isTracking || scrollView.isDecelerating) {
+        [self performSelector:@selector(loadMoreIfNeed) withObject:nil afterDelay:0.1];
+        return;
+    }
+    [_refreshComponent refresh];
 }
 
 - (void)handleAppear
