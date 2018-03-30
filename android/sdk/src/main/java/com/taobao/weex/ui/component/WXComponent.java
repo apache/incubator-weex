@@ -295,11 +295,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @param type
    */
   public void addEvent(final String type) {
+    if (mAppendEvents == null) {
+      mAppendEvents = new ArraySet<>();
+    }
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
     final View view = getRealView();
-
     if (type.equals(Constants.Event.CLICK)) {
       if (view == null) {
         // wait next time to add.
@@ -326,6 +328,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
           mGesture.setPreventMoveEvent(isPreventMove);
         }
+        if (mGestureType == null) {
+          mGestureType = new ArraySet<>();
+        }
         mGestureType.add(type);
         ((WXGestureObservable)view).registerGestureListener(mGesture);
       } else {
@@ -334,12 +339,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
     } else {
       final Scrollable scroller = getParentScroller();
-      if (scroller != null) {
-        if (type.equals(Constants.Event.APPEAR)) {
-          scroller.bindAppearEvent(this);
-        } else if (type.equals(Constants.Event.DISAPPEAR)) {
-          scroller.bindDisappearEvent(this);
-        }
+      if (scroller == null) {
+        // wait next time to add.
+        return;
+      }
+      if (type.equals(Constants.Event.APPEAR)) {
+        scroller.bindAppearEvent(this);
+      } else if (type.equals(Constants.Event.DISAPPEAR)) {
+        scroller.bindDisappearEvent(this);
       }
     }
     // Final add to mAppendEvents.
