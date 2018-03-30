@@ -98,7 +98,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (UIView *)loadView
 {
     WXRecycleListLayout *layout = [self recycleListLayout];
-    return [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+    return [[WXRecycleListComponentView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
 }
 
 - (void)viewDidLoad
