@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.support.v4.util.ArraySet;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -138,6 +139,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private int mAbsoluteY = 0;
   private int mAbsoluteX = 0;
+  @Nullable
   private Set<String> mGestureType;
 
   private BorderDrawable mBackgroundDrawable;
@@ -171,8 +173,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
+  @Nullable
   private ConcurrentLinkedQueue<Pair<String, Map<String, Object>>> animations;
-
 
   @Deprecated
   public WXComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -194,8 +196,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
-    mGestureType = new HashSet<>();
-    animations = new ConcurrentLinkedQueue<>();
     ++mComponentNum;
 
     if (instance != null)
@@ -316,6 +316,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           mGesture = new WXGesture(this, mContext);
           boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
           mGesture.setPreventMoveEvent(isPreventMove);
+        }
+        if(mGestureType == null){
+          mGestureType = new ArraySet<>();
         }
         mGestureType.add(type);
         ((WXGestureObservable) view).registerGestureListener(mGesture);
@@ -1383,7 +1386,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       removeEventFromView(event);
     }
     mAppendEvents.clear();//only clean append events, not dom's events.
-    mGestureType.clear();
+    if(mGestureType != null){
+      mGestureType.clear();
+    }
     mGesture = null;
     if (getRealView() != null &&
             getRealView() instanceof WXGestureObservable) {
@@ -1717,7 +1722,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     mIsDestroyed = true;
-    animations.clear();
+    if(animations!=null) {
+      animations.clear();
+    }
   }
 
   public boolean isDestoryed() {
@@ -2089,7 +2096,12 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public void addAnimationForElement(Map<String, Object> animMap) {
-    animations.add(new Pair<>(getRef(),animMap));
+    if(animMap!=null && !animMap.isEmpty()){
+      if(animations == null){
+        animations = new ConcurrentLinkedQueue<>();
+      }
+      animations.add(new Pair<>(getRef(),animMap));
+    }
   }
 
   private void parseAnimation() {
