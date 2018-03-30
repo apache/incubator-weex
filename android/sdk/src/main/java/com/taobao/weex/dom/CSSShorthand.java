@@ -20,12 +20,20 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import com.taobao.weex.dom.CSSShorthand.CSSProperty;
 import java.util.Arrays;
 
-public class CSSShorthand implements Cloneable {
+public class CSSShorthand<T extends Enum & CSSProperty> implements Cloneable {
 
-  public static enum EDGE {
+  interface CSSProperty{}
+
+  public static enum EDGE implements CSSProperty{
     TOP, BOTTOM, LEFT, RIGHT, ALL;
+  }
+
+  public static enum CORNER implements CSSProperty{
+    BORDER_TOP_LEFT, BORDER_TOP_RIGHT,
+    BORDER_BOTTOM_RIGHT, BORDER_BOTTOM_LEFT, ALL;
   }
 
   public static enum TYPE {
@@ -43,15 +51,15 @@ public class CSSShorthand implements Cloneable {
   }
 
   CSSShorthand(boolean fillWithNaN) {
-    values = new float[EDGE.values().length];
+    values = new float[Math.max(EDGE.values().length,CORNER.values().length)];
     if (fillWithNaN) {
       Arrays.fill(values, Float.NaN);
     }
   }
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
-  public void set(@NonNull EDGE edge, float value) {
-    if (edge == EDGE.ALL) {
+  public void set(@NonNull T edge, float value) {
+    if (edge == EDGE.ALL || edge == CORNER.ALL) {
       Arrays.fill(values, value);
     } else {
       values[edge.ordinal()] = value;
@@ -64,8 +72,8 @@ public class CSSShorthand implements Cloneable {
    * @param edge
    * @return
    */
-  public float get(@NonNull EDGE edge) {
-    return edge == EDGE.ALL ? 0 : values[edge.ordinal()];
+  public float get(@NonNull T edge) {
+    return (edge == EDGE.ALL || edge == CORNER.ALL) ? 0 : values[edge.ordinal()];
   }
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
