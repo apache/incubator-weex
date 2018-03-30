@@ -50,6 +50,7 @@ import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.MeasureOutput;
+import com.taobao.weex.dom.text.FontBroadcastReceiver;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.StaticLayoutProxy;
@@ -571,6 +572,14 @@ public class WXTextDomObject extends WXDomObject {
     super.destroy();
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    if(!isDestroy()){
+      destroy();
+    }
+    super.finalize();
+  }
+
   private void registerTypefaceObserverIfNeed(String desiredFontFamily) {
     if(TextUtils.isEmpty(desiredFontFamily)){
       return;
@@ -583,34 +592,7 @@ public class WXTextDomObject extends WXDomObject {
     if (mTypefaceObserver != null) {
       return;
     }
-
-    mTypefaceObserver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-        String fontFamily = intent.getStringExtra("fontFamily");
-        if (!mFontFamily.equals(fontFamily)) {
-          return;
-        }
-        if(isDestroy() || getDomContext() == null){
-          return;
-        }
-
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(getDomContext().getInstanceId());
-        if(domActionContext == null){
-          return;
-        }
-        WXDomObject domObject = domActionContext.getDomByRef(getRef());
-        if(domObject == null){
-          return;
-        }
-        domObject.markDirty();
-        domActionContext.markDirty();
-        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_START_BATCH, 2);
-        if(WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
-        }
-      }
-    };
+    mTypefaceObserver = new FontBroadcastReceiver(this, mFontFamily);
     if(WXEnvironment.isApkDebugable()) {
          WXLogUtils.d("WXText", "Font family register " + desiredFontFamily + " is available" + getRef());
     }
