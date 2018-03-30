@@ -157,7 +157,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private List<OnFocusChangeListener> mFocusChangeListeners;
   private Set<String> mAppendEvents;
   private WXAnimationModule.AnimationHolder mAnimationHolder;
-  private PesudoStatus mPesudoStatus = new PesudoStatus();
+  private PesudoStatus mPesudoStatus;
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
@@ -1909,6 +1909,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     if (pesudoStyles == null || pesudoStyles.size() == 0) {
       return;
+    }
+    if(mPesudoStatus == null){
+      mPesudoStatus = new PesudoStatus();
     }
     Map<String, Object> resultStyles = mPesudoStatus.updateStatusAndGetUpdateStyles(
             clzName,
