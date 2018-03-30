@@ -2,6 +2,7 @@
 #define IPCSERIALIZER_H
 #include <memory>
 #include <stdint.h>
+#include "IPCByteArray.h"
 
 class IPCBuffer;
 class IPCSerializer {
@@ -15,6 +16,7 @@ public:
     virtual void add(const uint16_t* data, size_t len) = 0;
     virtual void addJSON(const uint16_t* data, size_t len) = 0;
     virtual void add(const char* data, size_t len) = 0;
+    virtual void add(const IPCByteArray* bytes) = 0;
     virtual void addJSUndefined() = 0;
     virtual void addVoid() = 0;
     virtual std::unique_ptr<IPCBuffer> finish() = 0;

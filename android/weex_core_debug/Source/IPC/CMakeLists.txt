@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 2.8.12)
 
-
-set(IPCSource
+add_library(IPC
+STATIC
 ./Serializing/IPCSerializer.cpp
 ./IPCResult.cpp
 ./IPCSender.cpp
@@ -12,12 +12,10 @@ set(IPCSource
 ./IPCFutexPageQueue.cpp
 ./IPCFutexPageQueue.cpp
 ./ashmem.c
-./IPCCheck.cpp
-)
+./IPCCheck.cpp)
 
-add_library(IPC
-STATIC
-${IPCSource})
+#target_link_libraries(IPC
+#JavaScriptCore)
 
 target_include_directories(IPC
 PUBLIC

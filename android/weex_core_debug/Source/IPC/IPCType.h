@@ -15,6 +15,7 @@ enum class IPCType {
     JSONSTRING,
     STRING,
     BYTEARRAY, /* terminated with zero. */
+    CHARARRAY,
     VOID,
     JSUNDEFINED,
     END,

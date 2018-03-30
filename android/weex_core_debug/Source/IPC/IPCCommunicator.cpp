@@ -230,7 +230,10 @@ std::unique_ptr<IPCBuffer> IPCCommunicator::generateResultBuffer(IPCResult* resu
         serializer->add(result->get<double>());
         break;
     case IPCType::BYTEARRAY:
-        // FIXME: Not implementd.
+        serializer->add(result->getByteArrayContent(), result->getByteArrayLength());
+        break;
+	case IPCType::CHARARRAY:
+        serializer->add(static_cast<const char*>(result->getData()), result->getStringLength());
         break;
     case IPCType::JSONSTRING:
         serializer->addJSON(result->getStringContent(), result->getStringLength());

@@ -12,11 +12,11 @@
 #include <unistd.h>
 
 IPCFutexPageQueue::IPCFutexPageQueue(void* sharedMemory, size_t s, size_t id)
-        : m_currentWrite(id)
-        , m_currentRead(id ^ 1)
-        , m_pageSize(s / m_pagesCount)
-        , m_sharedMemory(sharedMemory)
-        , m_tid(gettid())
+    : m_currentWrite(id)
+    , m_currentRead(id ^ 1)
+    , m_pageSize(s / m_pagesCount)
+    , m_sharedMemory(sharedMemory)
+    , m_tid(gettid())
 {
     IPC_DCHECK(s == ipc_size);
     IPC_LOGD("id: %zu", id);
@@ -59,7 +59,7 @@ void IPCFutexPageQueue::unlock(size_t id)
 
     uint32_t l = m_tid;
     if (__atomic_compare_exchange_n(pageStart, &l, 0,
-                                    false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+            false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
         return;
     }
     if ((l & FUTEX_WAITERS) != 0) {
@@ -106,7 +106,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
         }
     }
     if (__atomic_compare_exchange_n(pageStart, &expected, l,
-                                    false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+            false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
         return;
     }
     errno = 0;
@@ -174,7 +174,7 @@ void IPCFutexPageQueue::setFinishedTag()
     uint32_t* pageStart = static_cast<uint32_t*>(getPage(m_currentRead));
     uint32_t expected = 0;
     if (__atomic_compare_exchange_n(pageStart + 1, &expected, m_finishTag,
-                                    false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+            false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
         IPC_LOGD("setFinishedTag:waking writer");
         __futex(pageStart + 1, FUTEX_WAKE, 1, nullptr);
         return;

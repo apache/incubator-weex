@@ -56,6 +56,21 @@ public:
 
     static void updateGlobalConfig(JNIEnv* env, jobject jcaller,
                                  jstring config);
+    static jint createInstanceContext(JNIEnv* env, jobject jcaller, jstring instanceId,
+                                             jstring name,
+                                             jstring function,
+                                             jobjectArray args);
+
+    static jint destoryInstance(JNIEnv* env, jobject jcaller,
+                                jstring instanceId,
+                                jstring name,
+                                jstring function,
+                                jobjectArray args);
+
+    static jstring execJSOnInstance(JNIEnv* env, jobject jcaller,
+                                    jstring instanceId,
+                                    jstring script,
+                                    jint type);
 };
 }
 #endif //_WEEX_PROXY_H_

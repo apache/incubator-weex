@@ -20,6 +20,7 @@ public:
     void add(const uint16_t* data, size_t len) override;
     void addJSON(const uint16_t* data, size_t len) override;
     void add(const char* data, size_t len) override;
+    void add(const IPCByteArray* bytes) override;
     void addJSUndefined() override;
     void addVoid() override;
     std::unique_ptr<IPCBuffer> finish() override;
@@ -109,6 +110,11 @@ void IPCSerializerImpl::add(const char* data, size_t len)
     s->content[byteLength] = '\0';
     m_types.emplace_back(static_cast<uint32_t>(IPCType::BYTEARRAY));
     m_datas.emplace_back(std::move(buffer));
+}
+
+void IPCSerializerImpl::add(const IPCByteArray* bytes) {
+    m_types.emplace_back(static_cast<uint32_t>(IPCType::BYTEARRAY));
+    // m_datas.emplace_back(std::move((std::unique_ptr<char[]>)bytes));
 }
 
 void IPCSerializerImpl::addJSUndefined()

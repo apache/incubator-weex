@@ -56,6 +56,8 @@ static std::unique_ptr<IPCResult> handleClearInterval(IPCArguments *arguments);
 
 static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *arguments);
 
+static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments *arguments);
+
 
 static void reportException(const char *instanceID, const char *func, const char *exception_string);
 
@@ -66,6 +68,12 @@ namespace WeexCore {
   const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args);
 
   extern "C" void Inject_GCanvasFunc(FunType fp);
+
+  typedef const char* (*FunTypeT3d)(int, const char*);
+
+  const char* weexCallT3dFunc(FunTypeT3d fp, int x, const char* args);
+
+  extern "C" void Inject_T3dFunc(FunTypeT3d fp);
 
   class ExtendJSApi {
   public:

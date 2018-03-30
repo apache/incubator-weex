@@ -5,6 +5,8 @@ using namespace WeexCore;
 
 static WeexCore::FunType gCanvasFunc = nullptr;
 
+static WeexCore::FunTypeT3d t3dFunc = nullptr;
+
 /**
 * This class aim to extend JS Api
 **/
@@ -47,6 +49,7 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL), handleClearInterval);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK),
                            handleCallGCanvasLinkNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK), handleT3DLinkNative);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
@@ -172,6 +175,35 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
   return ret;
 }
 
+static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments* arguments)
+{
+  JNIEnv* env = getJNIEnv();
+
+  // jstring jType = getArgumentAsJString(env, arguments, 1);
+  int type = getArgumentAsInt32(env, arguments, 0);
+  // need tansfer jtype to type
+
+  jstring val = getArgumentAsJString(env, arguments, 1);
+  const char* args = env->GetStringUTFChars(val, NULL);
+
+  // LOGE("handleT3DLinkNative type:%d, args:%s", type, args);
+
+  const char* retVal = NULL;
+  if (t3dFunc) {
+    retVal = WeexCore::weexCallT3dFunc(t3dFunc, type, args);
+  }
+  // LOGE("handleT3DLinkNative retVal:%s", retVal);
+  std::unique_ptr<IPCResult> ret = createVoidResult();
+  if (retVal) {
+    jstring jDataStr = env->NewStringUTF(retVal);
+    ret = std::move(createStringResult(env, jDataStr));
+    env->DeleteLocalRef(jDataStr);
+    retVal = NULL;
+  }
+  // env->DeleteLocalRef(jType);
+  env->DeleteLocalRef(val);
+  return ret;
+}
 
 std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
 
@@ -514,5 +546,14 @@ namespace WeexCore {
   const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args) {
     return fp(conextId, x, args);
   }
+
+  extern "C" void Inject_T3dFunc(FunTypeT3d fp) {
+    t3dFunc = fp;
+    LOGE("weexjsc Inject_T3dFunc t3d Func");
+  }
+
+const char* weexCallT3dFunc(FunTypeT3d fp, int x, const char* args) {
+  return fp(x, args);
+}
 
 }

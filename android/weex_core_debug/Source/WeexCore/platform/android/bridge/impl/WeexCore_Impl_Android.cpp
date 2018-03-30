@@ -252,6 +252,29 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
 }
 
 
+static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
+                                  jstring instanceId,
+                                  jstring name,
+                                  jstring function,
+                                  jobjectArray args) {
+  return WeexProxy::createInstanceContext(env, jcaller, instanceId, name, function, args);
+}
+
+static jint DestoryInstance(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring name,
+                            jstring function,
+                            jobjectArray args) {
+  return WeexProxy::destoryInstance(env, jcaller, instanceId, name, function, args);
+}
+
+static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
+                                jstring instanceId,
+                                jstring script,
+                                jint type) {
+  return WeexProxy::execJSOnInstance(env, jcaller, instanceId, script, type);
+}
+
 namespace WeexCore {
   bool RegisterJNIUtils(JNIEnv *env) {
     return RegisterNativesImpl(env);

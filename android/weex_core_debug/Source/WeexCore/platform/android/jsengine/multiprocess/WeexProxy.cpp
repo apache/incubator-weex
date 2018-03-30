@@ -558,4 +558,147 @@ void WeexProxy::updateGlobalConfig(JNIEnv *env, jobject jcaller, jstring config)
   }
 }
 
+static jstring getJsonData(JNIEnv *env, jobjectArray jargs, int index) {
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  jstring ret = NULL;
+  if (length < (index + 1)) {
+    return ret;
+  }
+  jobject jArg = env->GetObjectArrayElement(jargs, index);
+
+  jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+  jint jTypeInt = env->GetIntField(jArg, jTypeId);
+  jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+  jobject jDataObj = env->GetObjectField(jArg, jDataId);
+  if (jTypeInt == 3) {
+    ret = (jstring) jDataObj;
+  }
+  // env->DeleteLocalRef(jDataObj);
+  env->DeleteLocalRef(jArg);
+  return ret;
+}
+
+jint
+WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid, jstring name,
+                                 jstring jfunction, jobjectArray jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return false;
+  }
+  if (jfunction == NULL || jinstanceid == NULL) {
+    LOGE("native_createInstanceContext function is NULL");
+    return false;
+  }
+
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  if (length < 4) {
+    LOGE("native_createInstanceContext jargs format error");
+    return false;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CREATEINSTANCE));
+    addString(env, serializer.get(), jinstanceid);
+    addString(env, serializer.get(), jfunction);
+
+    // get temp data, such as js bundle
+    jobject jArg = env->GetObjectArrayElement(jargs,1);
+    jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+    jobject jDataObj = env->GetObjectField(jArg, jDataId);
+    jstring jscript = (jstring) jDataObj;
+    addString(env, serializer.get(), jscript);
+    jstring opts = getJsonData(env, jargs, 2);
+    addJSONString(env, serializer.get(), opts);
+    // init jsonData
+    jstring initData = getJsonData(env, jargs, 3);
+    addJSONString(env, serializer.get(), initData);
+
+    // get extend api data, such as rax-api
+    jArg = env->GetObjectArrayElement(jargs, 4);
+    jDataObj = env->GetObjectField(jArg, jDataId);
+    jstring japi = (jstring) jDataObj;
+    addString(env, serializer.get(), japi);
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    env->DeleteLocalRef(jArg);
+    env->DeleteLocalRef(jDataObj);
+    env->DeleteLocalRef(opts);
+    if (result->getType() != IPCType::INT32) {
+      LOGE("createInstanceContext Unexpected result type");
+      return false;
+    }
+    return result->get<jint>();
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
+jint WeexProxy::destoryInstance(JNIEnv *env, jobject jcaller, jstring jinstanceid, jstring jnamespace,
+                                jstring jfunction, jobjectArray jargs) {
+  int ret = execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
+  if (jfunction == NULL || jinstanceid == NULL) {
+    LOGE("native_destoryInstance function is NULL");
+    return false;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::DESTORYINSTANCE));
+    addString(env, serializer.get(), jinstanceid);
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    if (result->getType() != IPCType::INT32) {
+      LOGE("destoryInstance Unexpected result type");
+      return false;
+    }
+    return result->get<jint>();
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
+jstring
+WeexProxy::execJSOnInstance(JNIEnv *env, jobject jcaller, jstring instanceId, jstring script,
+                            jint type) {
+  if (instanceId == NULL || script == NULL) {
+    return env->NewStringUTF("");
+  }
+  try {
+    // base::debug::TraceScope traceScope("weex", "native_execJSOnInstance");
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSONINSTANCE));
+
+    addString(env, serializer.get(), instanceId);
+    addString(env, serializer.get(), script);
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    if (result->getType() != IPCType::BYTEARRAY) {
+      // LOGE("native_execJSOnInstance return type error");
+      return env->NewStringUTF("");
+    }
+    return env->NewStringUTF(result->getByteArrayContent());
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(instanceId);
+    return env->NewStringUTF("");
+  }
+}
+
 }  // namespace WeexCore
