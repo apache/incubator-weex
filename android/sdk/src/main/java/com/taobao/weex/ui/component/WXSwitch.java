@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
@@ -38,6 +37,10 @@ import java.util.Map;
 public class WXSwitch extends WXComponent<WXSwitchView> {
 
   private CompoundButton.OnCheckedChangeListener mListener;
+  private String mTrackTintColorNormal;
+  private String mTrackTintColorActivated;
+  private String mThumbTintColorNormal;
+  private String mThumbTintColorActivated;
 
   @Deprecated
   public WXSwitch(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -94,6 +97,22 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
           setChecked(result);
         }
         return true;
+      case Constants.Name.THUMB_TINT_COLOR:
+        mThumbTintColorNormal = WXUtils.getString(param, null);
+        setThumbColor();
+        return true;
+      case Constants.Name.ON_THUMB_TINT_COLOR:
+        mThumbTintColorActivated = WXUtils.getString(param, null);
+        setThumbColor();
+        return true;
+      case Constants.Name.TINT_COLOR:
+        mTrackTintColorNormal = WXUtils.getString(param, null);
+        setTrackColor();
+        return true;
+      case Constants.Name.ON_TINT_COLOR:
+        mTrackTintColorActivated = WXUtils.getString(param, null);
+        setTrackColor();
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -103,5 +122,13 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
     getHostView().setOnCheckedChangeListener(null);
     getHostView().setChecked(checked);
     getHostView().setOnCheckedChangeListener(mListener);
+  }
+
+  private void setThumbColor() {
+    getHostView().setThumbColor(mThumbTintColorNormal, mThumbTintColorActivated);
+  }
+
+  private void setTrackColor() {
+    getHostView().setTrackColor(mTrackTintColorNormal, mTrackTintColorActivated);
   }
 }
