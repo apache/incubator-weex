@@ -45,7 +45,7 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
   public final static String ROOT = "root";
   private final static String TAG = "WEEX";
   private final static String URL =
-      "http://h5.waptest.taobao.com/app/weextc031/build/TC_Monitor_List_WithAppendTree.js";
+      "http://h5.m.taobao.com/js/src/weexlist.js";
   private WXSDKInstance mInstance;
   private LinearLayout root;
   private long startTime;

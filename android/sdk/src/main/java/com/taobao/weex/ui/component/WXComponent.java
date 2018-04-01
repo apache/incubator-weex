@@ -154,9 +154,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
-  private Set<String> mAppendEvents = new HashSet<>();
+  private Set<String> mAppendEvents;
   private WXAnimationModule.AnimationHolder mAnimationHolder;
-  private PesudoStatus mPesudoStatus = new PesudoStatus();
+  private PesudoStatus mPesudoStatus;
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
@@ -208,10 +208,12 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
+  @Override
   protected final void bindComponent(WXComponent component) {
     super.bindComponent(component);
-    if (getInstance() != null)
+    if (getInstance() != null) {
       setViewPortWidth(getInstance().getInstanceViewPortWidth());
+    }
     mParent = component.getParent();
     mType = component.getType();
   }
@@ -291,50 +293,63 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    *
    * @param type
    */
-  public void addEvent(String type) {
-
+  public void addEvent(final String type) {
+    if (mAppendEvents == null) {
+      mAppendEvents = new ArraySet<>();
+    }
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
-    mAppendEvents.add(type);
-
-    View view = getRealView();
-    if (type.equals(Constants.Event.CLICK) && view != null) {
+    final View view = getRealView();
+    if (type.equals(Constants.Event.CLICK)) {
+      if (view == null) {
+        // wait next time to add.
+        return;
+      }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
       addFocusChangeListener(new OnFocusChangeListener() {
+        @Override
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
-    } else if (view != null &&
-            needGestureDetector(type)) {
+    } else if (needGestureDetector(type)) {
+      if (null == view) {
+        // wait next time to add.
+        return;
+      }
       if (view instanceof WXGestureObservable) {
         if (mGesture == null) {
           mGesture = new WXGesture(this, mContext);
           boolean isPreventMove = WXUtils.getBoolean(getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT), false);
           mGesture.setPreventMoveEvent(isPreventMove);
         }
-        if(mGestureType == null){
+        if (mGestureType == null) {
           mGestureType = new ArraySet<>();
         }
         mGestureType.add(type);
-        ((WXGestureObservable) view).registerGestureListener(mGesture);
+        ((WXGestureObservable)view).registerGestureListener(mGesture);
       } else {
         WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
-                "WXGestureObservable, so no gesture is supported.");
+            "WXGestureObservable, so no gesture is supported.");
       }
     } else {
-      Scrollable scroller = getParentScroller();
-      if (type.equals(Constants.Event.APPEAR) && scroller != null) {
-        scroller.bindAppearEvent(this);
+      final Scrollable scroller = getParentScroller();
+      if (scroller == null) {
+        // wait next time to add.
+        return;
       }
-      if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
+      if (type.equals(Constants.Event.APPEAR)) {
+        scroller.bindAppearEvent(this);
+      } else if (type.equals(Constants.Event.DISAPPEAR)) {
         scroller.bindDisappearEvent(this);
       }
     }
+    // Final add to mAppendEvents.
+    mAppendEvents.add(type);
   }
 
   protected void onCreate() {
@@ -1385,7 +1400,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       removeEventFromView(event);
     }
-    mAppendEvents.clear();//only clean append events, not dom's events.
+    if(mAppendEvents!=null) {
+      mAppendEvents.clear();//only clean append events, not dom's events.
+    }
     if(mGestureType != null){
       mGestureType.clear();
     }
@@ -1774,7 +1791,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public boolean containsEvent(String event) {
-    return getEvents().contains(event) || mAppendEvents.contains(event);
+    return getEvents().contains(event) || (mAppendEvents!=null && mAppendEvents.contains(event));
   }
 
   public void notifyAppearStateChange(String wxEventType, String direction) {
@@ -1890,6 +1907,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     if (pesudoStyles == null || pesudoStyles.size() == 0) {
       return;
+    }
+    if(mPesudoStatus == null){
+      mPesudoStatus = new PesudoStatus();
     }
     Map<String, Object> resultStyles = mPesudoStatus.updateStatusAndGetUpdateStyles(
             clzName,

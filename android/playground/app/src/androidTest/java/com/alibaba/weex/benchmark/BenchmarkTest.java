@@ -171,13 +171,10 @@ public class BenchmarkTest {
       String[] columns;
       long timeStart, timeEnd, duration;
       String result = mUiDevice.executeShellCommand(DUMP_COMMAND);
-      //histogramGfxInfo(result);
       result = result.substring(result.indexOf(DUMP_START), result.lastIndexOf(DUMP_END));
       result = result.substring(DUMP_START.length());
       BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
       List<Long> list = createList(bufferedReader);
-      //Collections.sort(list);
-      //Log.d(TAG, list.toString());
       container.addAll(list);
       BoxPlot boxPlot = new BoxPlot(list);
       boxPlot.draw();

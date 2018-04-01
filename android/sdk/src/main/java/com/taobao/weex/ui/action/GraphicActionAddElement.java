@@ -36,8 +36,8 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   private WXVContainer parent;
   private WXComponent child;
-  private GraphicPosition layoutPosition = new GraphicPosition(0,0,0,0);
-  private GraphicSize layoutSize = new GraphicSize(0,0);
+  private GraphicPosition layoutPosition;
+  private GraphicSize layoutSize;
 
   public GraphicActionAddElement(String pageId, String ref,
                                  String componentType, String parentRef,
@@ -95,7 +95,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       parent.createChildViewAt(mIndex);
 
       long start = System.currentTimeMillis();
-      child.updateDemission(layoutSize, layoutPosition);
+      if(layoutPosition !=null && layoutSize != null) {
+        child.updateDemission(layoutSize, layoutPosition);
+      }
       child.applyLayoutAndEvent(child);
       WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);
 

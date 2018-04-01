@@ -23,8 +23,8 @@ import com.taobao.weex.ui.component.WXComponent;
 
 public class GraphicActionLayout extends BasicGraphicAction {
 
-  private GraphicPosition mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
-  private GraphicSize mLayoutSize = new GraphicSize(0, 0);
+  private final GraphicPosition mLayoutPosition;
+  private final GraphicSize mLayoutSize;
 
   public GraphicActionLayout(String pageId, String ref, GraphicPosition layoutPosition, GraphicSize layoutSize) {
     super(pageId, ref);

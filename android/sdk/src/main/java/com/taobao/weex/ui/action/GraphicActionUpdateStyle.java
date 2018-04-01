@@ -58,10 +58,13 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
     if (null != mStyle) {
       component.addStyle(mStyle, mIsCausedByPesudo);
-      Map<String, Object> animationMap = new ArrayMap<>(2);
-      animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
-      animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
-      component.addAnimationForElement(animationMap);
+      if(style.containsKey(Constants.Name.TRANSFORM)) {
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+        animationMap
+            .put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+        component.addAnimationForElement(animationMap);
+      }
     }
 
     if (null != paddings) {
