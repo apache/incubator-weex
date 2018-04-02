@@ -78,7 +78,7 @@ namespace WeexCore {
     }
 
    protected:
-    bool UpdateStyle(const std::string &key, const std::string &value,
+    bool UpdateStyle(const std::string key, const std::string value,
                       float fallback, std::function<void(float)> functor){
       bool ret = false;
       if (value.empty()) {

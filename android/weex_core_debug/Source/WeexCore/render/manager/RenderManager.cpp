@@ -94,7 +94,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    std::vector<std::pair<std::string, std::string> *> *attrs = Json2Pairs(c_data);
+    std::vector<std::pair<std::string, std::string>> *attrs = Json2Pairs(c_data);
     page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);
@@ -114,7 +114,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
-    std::vector<std::pair<std::string, std::string> *> *styles = Json2Pairs(c_data);
+    std::vector<std::pair<std::string, std::string>> *styles = Json2Pairs(c_data);
     page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
     page->BuildRenderTreeTime(getCurrentTime() - startTime);

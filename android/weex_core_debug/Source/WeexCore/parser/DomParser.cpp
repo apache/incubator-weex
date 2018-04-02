@@ -419,14 +419,13 @@ namespace WeexCore {
     return ParseJsonObject(r, nullptr, 0, pageId);
   }
 
-  std::vector<std::pair<std::string, std::string> *> *Json2Pairs(char *data) {
-    std::vector<std::pair<std::string, std::string> *> *pairs = nullptr;
+  std::vector<std::pair<std::string, std::string>> *Json2Pairs(char *data) {
+    std::vector<std::pair<std::string, std::string>> *pairs = nullptr;
     JsonParser r(data);
     RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
     r.EnterObject();
-    pairs = new std::vector<std::pair<std::string, std::string> *>();
+    pairs = new std::vector<std::pair<std::string, std::string>>();
     while (const char *key = r.NextObjectKey()) {
-      std::pair<std::string, std::string> *myPair = nullptr;
       if (r.PeekType() == kNumberType) {
         RAPIDJSON_ASSERT(r.PeekType() == kNumberType);
         char *temp = new char[65];
@@ -434,7 +433,7 @@ namespace WeexCore {
         temp[len] = '\0';
         char value[len + 1];
         strcpy(value, temp);
-        myPair = new std::pair<std::string, std::string>(key, value);
+        std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
         if (temp != nullptr) {
           delete[]temp;
@@ -443,7 +442,7 @@ namespace WeexCore {
       } else if (r.PeekType() == kStringType) {
         RAPIDJSON_ASSERT(r.PeekType() == kStringType);
         const char *value = r.GetString();
-        myPair = new std::pair<std::string, std::string>(key, value);
+        std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
         if (value != nullptr) {
           delete value;
@@ -455,35 +454,35 @@ namespace WeexCore {
         temp.append(r.Stringify());
         int index = temp.find(']');
         std::string value = temp.substr(0, index + 1);
-        myPair = new std::pair<std::string, std::string>(key, value);
+        std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();
       } else if (r.PeekType() == kTrueType) {
         RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
-        myPair = new std::pair<std::string, std::string>(key, "true");
+        std::pair<std::string, std::string> myPair(key, "true");
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();
       } else if (r.PeekType() == kFalseType) {
         RAPIDJSON_ASSERT(r.PeekType() == kFalseType);
-        myPair = new std::pair<std::string, std::string>(key, "false");
+        std::pair<std::string, std::string> myPair(key, "false");
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();
-      } else if(r.PeekType() == kNullType) {
-          RAPIDJSON_ASSERT(r.PeekType() == kNullType);
-          myPair = new std::pair<std::string, std::string>(key, "");
-          pairs->insert(pairs->end(), myPair);
-          r.SkipValue();
-      }else if (r.PeekType() == kObjectType) {
-          RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
-          std::string temp = "{";
-          temp.append(r.Stringify());
-          int index = temp.find_last_of('}');
-          std::string value = temp.substr(0, index);
-          myPair = new std::pair<std::string, std::string>(key, value);
-          pairs->insert(pairs->end(), myPair);
-          r.SkipValue();
+      } else if (r.PeekType() == kNullType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kNullType);
+        std::pair<std::string, std::string> myPair(key, "");
+        pairs->insert(pairs->end(), myPair);
+        r.SkipValue();
+      } else if (r.PeekType() == kObjectType) {
+        RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+        std::string temp = "{";
+        temp.append(r.Stringify());
+        int index = temp.find_last_of('}');
+        std::string value = temp.substr(0, index);
+        std::pair<std::string, std::string> myPair(key, value);
+        pairs->insert(pairs->end(), myPair);
+        r.SkipValue();
       } else {
-          r.SkipValue();
+        r.SkipValue();
       }
     }
     return pairs;

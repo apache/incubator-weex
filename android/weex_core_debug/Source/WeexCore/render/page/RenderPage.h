@@ -39,13 +39,13 @@ namespace WeexCore {
 
     void
     SendUpdateStyleAction(RenderObject *render,
-                          std::vector<std::pair<std::string, std::string> *> *style,
-                          std::vector<std::pair<std::string, std::string> *> *margin,
-                          std::vector<std::pair<std::string, std::string> *> *padding,
-                          std::vector<std::pair<std::string, std::string> *> *border);
+                          std::vector<std::pair<std::string, std::string>> *style,
+                          std::vector<std::pair<std::string, std::string>> *margin,
+                          std::vector<std::pair<std::string, std::string>> *padding,
+                          std::vector<std::pair<std::string, std::string>> *border);
 
     void SendUpdateAttrAction(RenderObject *render,
-                              std::vector<std::pair<std::string, std::string> *> *attrs);
+                              std::vector<std::pair<std::string, std::string>> *attrs);
 
     void SendCreateFinishAction();
 
@@ -71,10 +71,10 @@ namespace WeexCore {
     bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int index);
 
     bool
-    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string> *> *styles);
+    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *styles);
 
     bool UpdateAttr(const std::string &ref,
-                    std::vector<std::pair<std::string, std::string> *> *attrs);
+                    std::vector<std::pair<std::string, std::string>> *attrs);
 
     void
     SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);

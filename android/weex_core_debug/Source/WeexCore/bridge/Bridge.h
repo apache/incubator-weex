@@ -71,13 +71,13 @@ namespace WeexCore {
                            int height, int width) = 0;
 
     virtual int callUpdateStyle(std::string &pageId, std::string &ref,
-                                std::vector<std::pair<std::string, std::string> *> *style,
-                                std::vector<std::pair<std::string, std::string> *> *margin,
-                                std::vector<std::pair<std::string, std::string> *> *padding,
-                                std::vector<std::pair<std::string, std::string> *> *border) = 0;
+                                std::vector<std::pair<std::string, std::string>> *style,
+                                std::vector<std::pair<std::string, std::string>> *margin,
+                                std::vector<std::pair<std::string, std::string>> *padding,
+                                std::vector<std::pair<std::string, std::string>> *border) = 0;
 
     virtual int callUpdateAttr(std::string &pageId, std::string &ref,
-                               std::vector<std::pair<std::string, std::string> *> *attrs) = 0;
+                               std::vector<std::pair<std::string, std::string>> *attrs) = 0;
 
     virtual int callCreateFinish(std::string &pageId) = 0;
 
@@ -85,8 +85,6 @@ namespace WeexCore {
 
     virtual int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
                                 int index) = 0;
-
-    //virtual void callLogOfFirstScreen(std::string &message) = 0;
   };
 } //end WeexCore
 #endif //Bridge_h

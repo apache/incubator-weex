@@ -3,7 +3,7 @@
 namespace WeexCore {
 
   RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string> *> *mAttrs) {
+                                                 std::vector<std::pair<std::string, std::string>> *mAttrs) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mAttrs = mAttrs;

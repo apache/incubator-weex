@@ -123,7 +123,7 @@ namespace WeexCore {
  */
   RenderObject *Json2RenderObject(char *data, const std::string &pageId);
 
-  std::vector<std::pair<std::string, std::string> *> *Json2Pairs(char *data);
+  std::vector<std::pair<std::string, std::string>> *Json2Pairs(char *data);
 }
 
 #endif //WEEX_JSON_TOOLS

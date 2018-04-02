@@ -72,14 +72,14 @@ namespace WeexCore {
   }
 
   void static
-  cpyCVector2JMap(std::vector<std::pair<std::string, std::string> *> *cVector, jobject &jMap,
+  cpyCVector2JMap(std::vector<std::pair<std::string, std::string>> *cVector, jobject &jMap,
                   JNIEnv *env) {
     jstring jKey;
     jstring jValue;
 
     for (int i = 0; i < cVector->size(); ++i) {
-      jKey = env->NewStringUTF((*cVector)[i]->first.c_str());
-      jValue = env->NewStringUTF((*cVector)[i]->second.c_str());
+      jKey = env->NewStringUTF((*cVector)[i].first.c_str());
+      jValue = env->NewStringUTF((*cVector)[i].second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
       env->DeleteLocalRef(jKey);
       env->DeleteLocalRef(jValue);
@@ -537,10 +537,10 @@ namespace WeexCore {
 
   int
   Bridge_Impl_Android::callUpdateStyle(std::string &pageId, std::string &ref,
-                                       std::vector<std::pair<std::string, std::string> *> *style,
-                                       std::vector<std::pair<std::string, std::string> *> *margin,
-                                       std::vector<std::pair<std::string, std::string> *> *padding,
-                                       std::vector<std::pair<std::string, std::string> *> *border) {
+                                       std::vector<std::pair<std::string, std::string>> *style,
+                                       std::vector<std::pair<std::string, std::string>> *margin,
+                                       std::vector<std::pair<std::string, std::string>> *padding,
+                                       std::vector<std::pair<std::string, std::string>> *border) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -608,7 +608,7 @@ namespace WeexCore {
   }
 
   int Bridge_Impl_Android::callUpdateAttr(std::string &pageId, std::string &ref,
-                                          std::vector<std::pair<std::string, std::string> *> *attrs) {
+                                          std::vector<std::pair<std::string, std::string>> *attrs) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -734,7 +734,7 @@ namespace WeexCore {
 
   int
   Bridge_Impl_Android::callHasTransitionPros(std::string &pageId, const std::string &ref,
-                                       std::vector<std::pair<std::string, std::string> *> *style) {
+                                       std::vector<std::pair<std::string, std::string>> *style) {
     JNIEnv *env = getJNIEnv();
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);

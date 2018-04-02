@@ -219,16 +219,16 @@ namespace WeexCore {
   }
 
   bool RenderPage::UpdateStyle(const std::string &ref,
-                               std::vector<std::pair<std::string, std::string> *> *src) {
+                               std::vector<std::pair<std::string, std::string>> *src) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || src == nullptr || src->empty())
       return false;
 
-    std::vector<std::pair<std::string, std::string> *> *style = nullptr;
-    std::vector<std::pair<std::string, std::string> *> *margin = nullptr;
-    std::vector<std::pair<std::string, std::string> *> *padding = nullptr;
-    std::vector<std::pair<std::string, std::string> *> *border = nullptr;
+    std::vector<std::pair<std::string, std::string>> *style = nullptr;
+    std::vector<std::pair<std::string, std::string>> *margin = nullptr;
+    std::vector<std::pair<std::string, std::string>> *padding = nullptr;
+    std::vector<std::pair<std::string, std::string>> *border = nullptr;
 
     bool flag = false;
 
@@ -238,56 +238,54 @@ namespace WeexCore {
       BuildRenderTreeTime(getCurrentTime() - startTime);
       SendUpdateStyleAction(render, src, margin, padding, border);
     } else {
-      for (int i = 0; i < src->size(); ++i) {
-        if ((*src)[i] != nullptr) {
-          switch (render->UpdateStyle((*src)[i]->first, (*src)[i]->second)) {
-            case kTypeStyle:
-              if (style == nullptr) {
-                style = new std::vector<std::pair<std::string, std::string> *>();
-              }
-              style->insert(style->end(), (*src)[i]);
-              flag = true;
-              break;
-            case kTypeMargin:
-              if (margin == nullptr) {
-                margin = new std::vector<std::pair<std::string, std::string> *>();
-              }
-              render->UpdateStyle((*src)[i]->first,
-                                  (*src)[i]->second,
-                                  0,
-                                  [=, &flag](float foo) {
-                                    (*src)[i]->second = std::to_string(foo),
-                                        margin->insert(margin->end(), (*src)[i]),
-                                    flag = true;
-                                  });
-              break;
-            case kTypePadding:
-              if (padding == nullptr) {
-                padding = new std::vector<std::pair<std::string, std::string> *>();
-              }
-              render->UpdateStyle((*src)[i]->first,
-                                  (*src)[i]->second,
-                                  0,
-                                  [=, &flag](float foo) {
-                                    (*src)[i]->second = std::to_string(foo),
-                                        padding->insert(padding->end(), (*src)[i]),
-                                    flag = true;
-                                  });
-              break;
-            case kTypeBorder:
-              if (border == nullptr) {
-                border = new std::vector<std::pair<std::string, std::string> *>();
-              }
-              render->UpdateStyle((*src)[i]->first,
-                                  (*src)[i]->second,
-                                  0,
-                                  [=, &flag](float foo) {
-                                    (*src)[i]->second = std::to_string(foo),
-                                        border->insert(border->end(), (*src)[i]),
-                                    flag = true;
-                                  });
-              break;
-          }
+      for (auto iter = src->begin(); iter != src->end(); iter++) {
+        switch (render->UpdateStyle((*iter).first, (*iter).second)) {
+          case kTypeStyle:
+            if (style == nullptr) {
+              style = new std::vector<std::pair<std::string, std::string>>();
+            }
+            style->insert(style->end(), (*iter));
+            flag = true;
+            break;
+          case kTypeMargin:
+            if (margin == nullptr) {
+              margin = new std::vector<std::pair<std::string, std::string>>();
+            }
+            render->UpdateStyle((*iter).first,
+                                (*iter).second,
+                                0,
+                                [=, &flag](float foo) {
+                                  (*iter).second = std::to_string(foo),
+                                      margin->insert(margin->end(), (*iter)),
+                                  flag = true;
+                                });
+            break;
+          case kTypePadding:
+            if (padding == nullptr) {
+              padding = new std::vector<std::pair<std::string, std::string>>();
+            }
+            render->UpdateStyle((*iter).first,
+                                (*iter).second,
+                                0,
+                                [=, &flag](float foo) {
+                                  (*iter).second = std::to_string(foo),
+                                      padding->insert(padding->end(), (*iter)),
+                                  flag = true;
+                                });
+            break;
+          case kTypeBorder:
+            if (border == nullptr) {
+              border = new std::vector<std::pair<std::string, std::string>>();
+            }
+            render->UpdateStyle((*iter).first,
+                                (*iter).second,
+                                0,
+                                [=, &flag](float foo) {
+                                  (*iter).second = std::to_string(foo),
+                                      border->insert(border->end(), (*iter)),
+                                  flag = true;
+                                });
+            break;
         }
       }
     }
@@ -299,12 +297,14 @@ namespace WeexCore {
 
     Batch();
 
+    if (src != nullptr) {
+      src->clear();
+      src->shrink_to_fit();
+      delete src;
+      src = nullptr;
+    }
+
     if (style != nullptr) {
-      for (auto iter = style->cbegin(); iter != style->cend(); iter++) {
-        if ((*iter) != nullptr) {
-          delete (*iter);
-        }
-      }
       style->clear();
       style->shrink_to_fit();
       delete style;
@@ -312,11 +312,6 @@ namespace WeexCore {
     }
 
     if (margin != nullptr) {
-      for (auto iter = margin->cbegin(); iter != margin->cend(); iter++) {
-        if ((*iter) != nullptr) {
-          delete (*iter);
-        }
-      }
       margin->clear();
       margin->shrink_to_fit();
       delete margin;
@@ -324,11 +319,6 @@ namespace WeexCore {
     }
 
     if (padding != nullptr) {
-      for (auto iter = padding->cbegin(); iter != padding->cend(); iter++) {
-        if ((*iter) != nullptr) {
-          delete (*iter);
-        }
-      }
       padding->clear();
       padding->shrink_to_fit();
       delete padding;
@@ -336,34 +326,17 @@ namespace WeexCore {
     }
 
     if (border != nullptr) {
-      for (auto iter = border->cbegin(); iter != border->cend(); iter++) {
-        if ((*iter) != nullptr) {
-          delete (*iter);
-        }
-      }
       border->clear();
       border->shrink_to_fit();
       delete border;
       border = nullptr;
     }
 
-//    if (src != nullptr) {
-//      for (auto iter = src->cbegin(); iter != src->cend(); iter++) {
-//        if ((*iter) != nullptr) {
-//          delete (*iter);
-//        }
-//      }
-//      src->clear();
-//      src->shrink_to_fit();
-//      delete src;
-//      src = nullptr;
-//    }
-
     return flag;
   }
 
   bool RenderPage::UpdateAttr(const std::string &ref,
-                              std::vector<std::pair<std::string, std::string> *> *attrs) {
+                              std::vector<std::pair<std::string, std::string>> *attrs) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || attrs == nullptr || attrs->empty())
@@ -371,18 +344,11 @@ namespace WeexCore {
 
     SendUpdateAttrAction(render, attrs);
 
-    for (int i = 0; i < attrs->size(); ++i) {
-      if ((*attrs)[i] == nullptr)
-        return false;
-      render->UpdateAttr((*attrs)[i]->first, (*attrs)[i]->second);
+    for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+      render->UpdateAttr((*iter).first, (*iter).second);
     }
 
     if (attrs != nullptr) {
-      for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
-        if ((*iter) != nullptr) {
-          delete (*iter);
-        }
-      }
       attrs->clear();
       attrs->shrink_to_fit();
       delete attrs;
@@ -556,17 +522,17 @@ namespace WeexCore {
   }
 
   void RenderPage::SendUpdateStyleAction(RenderObject *render,
-                                         std::vector<std::pair<std::string, std::string> *> *style,
-                                         std::vector<std::pair<std::string, std::string> *> *margin,
-                                         std::vector<std::pair<std::string, std::string> *> *padding,
-                                         std::vector<std::pair<std::string, std::string> *> *border) {
+                                         std::vector<std::pair<std::string, std::string>> *style,
+                                         std::vector<std::pair<std::string, std::string>> *margin,
+                                         std::vector<std::pair<std::string, std::string>> *padding,
+                                         std::vector<std::pair<std::string, std::string>> *border) {
     RenderAction *action = new RenderActionUpdateStyle(PageId(), render->Ref(),
                                                        style, margin, padding, border);
     PostRenderAction(action);
   }
 
   void RenderPage::SendUpdateAttrAction(RenderObject *render,
-                                        std::vector<std::pair<std::string, std::string> *> *attrs) {
+                                        std::vector<std::pair<std::string, std::string>> *attrs) {
     RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(),
                                                       attrs);
     PostRenderAction(action);
