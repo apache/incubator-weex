@@ -51,23 +51,10 @@
 {
     // this behavior will hide the action like copy, cut, paste, selectAll and so on.
     // fixed textfield issue
+    // fixed menu item show by system default(like: if word not be selected ,menu item not show "cut")
     BOOL allowCopyPaste = [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
     if (allowCopyPaste) {
-        if (action == @selector(cut:)) {
-            return YES;
-        }
-        if (action == @selector(copy:)) {
-            return YES;
-        }
-        if (action == @selector(paste:)) {
-            return YES;
-        }
-        if (action == @selector(select:)) {
-            return YES;
-        }
-        if (action == @selector(selectAll:)) {
-            return YES;
-        }
+        return [super canPerformAction:action withSender:sender];
     }
     return NO;
 }
