@@ -1,4 +1,4 @@
-#include <WeexCore/render/node/factory/parser/DomParser.h>
+#include <WeexCore/parser/DomParser.h>
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>

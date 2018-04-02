@@ -63,15 +63,15 @@ add_library(weexjsc SHARED
     ./WeexCore/render/action/RenderActionUpdateAttr.cpp
     ./WeexCore/render/action/RenderActionUpdateStyle.cpp
 
-    ./WeexCore/render/node/factory/parser/DomParser.cpp
+    ./WeexCore/parser/DomParser.cpp
 
     ./WeexCore/layout/WXCoreLayout.cpp
     ./WeexCore/layout/WXCoreStyle.cpp
 
     ./WeexCore/css/CssValueGetter.cpp
 
-    ./WeexCore/env/CoreEnvironment.cpp
-    ./WeexCore/env/RenderPerformance.cpp
+    ./WeexCore/config/CoreEnvironment.cpp
+    ./WeexCore/moniter/RenderPerformance.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)

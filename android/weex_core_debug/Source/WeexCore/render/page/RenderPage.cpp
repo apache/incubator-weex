@@ -1,4 +1,4 @@
-#include <WeexCore/render/node/factory/parser/DomParser.h>
+#include <WeexCore/parser/DomParser.h>
 #include <WeexCore/render/action/RenderActionAddElement.h>
 #include <WeexCore/render/action/RenderActionRemoveElement.h>
 #include <WeexCore/render/action/RenderActionMoveElement.h>
@@ -9,8 +9,8 @@
 #include <WeexCore/render/action/RenderActionCreateFinish.h>
 #include <WeexCore/layout/WXCoreLayout.h>
 #include <WeexCore/platform/android/base/string/StringUtils.h>
-#include <WeexCore/env/RenderPerformance.h>
-#include <WeexCore/env/CoreEnvironment.h>
+#include <WeexCore/moniter/RenderPerformance.h>
+#include <WeexCore/config/CoreEnvironment.h>
 #include <base/ViewUtils.h>
 #include <WeexCore/render/action/RenderActionAddEvent.h>
 #include <WeexCore/render/action/RenderActionRemoveEvent.h>
@@ -348,22 +348,16 @@ namespace WeexCore {
     }
 
 //    if (src != nullptr) {
-//      for (int i = 0; i < src->size(); ++i) {
-//        if ((*src)[i] != nullptr) {
-//          delete (*src)[i];
-//          (*src)[i] = nullptr;
+//      for (auto iter = src->cbegin(); iter != src->cend(); iter++) {
+//        if ((*iter) != nullptr) {
+//          delete (*iter);
 //        }
 //      }
 //      src->clear();
+//      src->shrink_to_fit();
 //      delete src;
 //      src = nullptr;
 //    }
-    // TODO
-    if (src != nullptr) {
-      src->shrink_to_fit();
-      delete src;
-      src = nullptr;
-    }
 
     return flag;
   }

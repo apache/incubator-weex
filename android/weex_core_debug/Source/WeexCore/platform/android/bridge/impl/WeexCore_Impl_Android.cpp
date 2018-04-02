@@ -6,7 +6,7 @@
 #include <WeexCore/render/manager/RenderManager.h>
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
-#include <WeexCore/env/CoreEnvironment.h>
+#include <WeexCore/config/CoreEnvironment.h>
 
 using namespace WeexCore;
 
