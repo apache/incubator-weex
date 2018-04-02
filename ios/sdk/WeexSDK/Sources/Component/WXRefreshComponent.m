@@ -148,21 +148,48 @@
     if (scrollerProtocol == nil || !_initFinished)
         return;
     
-    CGPoint offset = [scrollerProtocol contentOffset];
-    if (_displayState) {
-        offset.y = -self.calculatedFrame.size.height;
-        [_indicator start];
+    if ([scrollerProtocol respondsToSelector:@selector(refreshType)] &&
+        [[scrollerProtocol refreshType] isEqualToString:@"refreshForAppear"]) {
+        UIEdgeInsets inset = [scrollerProtocol contentInset];
+        inset.top = self.calculatedFrame.size.height;
+        if (_displayState) {
+            if ([_indicator.view isHidden]) {
+                [_indicator.view setHidden:NO];
+            }
+            [_indicator start];
+        } else {
+            [_indicator stop];
+        }
+        [scrollerProtocol setContentInset:inset];
     } else {
-        offset.y = 0;
-        [_indicator stop];
+        CGPoint offset = [scrollerProtocol contentOffset];
+        if (_displayState) {
+            offset.y = -self.calculatedFrame.size.height;
+            if ([_indicator.view isHidden]) {
+                [_indicator.view setHidden:NO];
+            }
+            [_indicator start];
+        } else {
+            offset.y = 0;
+            [_indicator stop];
+        }
+        [scrollerProtocol setContentOffset:offset animated:YES];
     }
-    [scrollerProtocol setContentOffset:offset animated:YES];
   
 }
 
 - (BOOL)displayState
 {
     return _displayState;
+}
+
+- (void)setIndicatorHidden:(BOOL)hidden {
+    [_indicator.view setHidden:hidden];
+    if (!hidden) {
+        [_indicator start];
+    } else {
+        [_indicator stop];
+    }
 }
 
 @end

@@ -117,6 +117,7 @@ import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 public class WXBridgeManager implements Callback, BactchExecutor {
 
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
+  public static final String METHOD_CREATE_INSTANCE_CONTEXT = "createInstanceContext";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -1175,6 +1176,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
 
   public String syncExecJsOnInstanceWithResult(final String instanceId, final String js, final int type) {
+    try {
+      if (isJSThread()) {
+        return invokeExecJSOnInstance(instanceId, js, type);
+      }
+    } catch (Throwable e) {
+      WXLogUtils.e("[WXBridgeManager] syncExecJsOnInstanceWithResult on jsThread Exception");
+      return "";
+    }
     final CountDownLatch waitLatch = new CountDownLatch(1);
     EventResult callback = new EventResult(){
       @Override
@@ -1746,7 +1755,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         }
         if (type == BundType.Vue || type == BundType.Rax) {
-          invokeCreateInstanceContext(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
+          invokeCreateInstanceContext(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE_CONTEXT, args, false);
           return;
         } else {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
@@ -2420,7 +2429,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
     WXSDKInstance instance = null;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
 	  exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
-      if (METHOD_CREATE_INSTANCE.equals(function) || !instance.isContentMd5Match()) {
+      if (METHOD_CREATE_INSTANCE_CONTEXT.equals(function) || METHOD_CREATE_INSTANCE.equals(function) || !instance.isContentMd5Match()) {
         try {
           if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
             // JSONObject domObject = JSON.parseObject(tasks);

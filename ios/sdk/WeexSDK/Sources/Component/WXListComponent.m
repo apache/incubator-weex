@@ -124,6 +124,8 @@
     // Only accessed on main thread
     NSMutableArray<WXSectionComponent *> *_completedSections;
     NSUInteger _previousLoadMoreRowNumber;
+    // insert & reload & batch
+    NSString *_updataType;
     
     BOOL _isUpdating;
     NSMutableArray<void(^)(void)> *_updates;
@@ -136,6 +138,7 @@
         _sections = [NSMutableArray array];
         _completedSections = [NSMutableArray array];
         _reloadInterval = attributes[@"reloadInterval"] ? [WXConvert CGFloat:attributes[@"reloadInterval"]]/1000 : 0;
+        _updataType = [WXConvert NSString:attributes[@"updataType"]]?:@"insert";
         [self fixFlicker];
     }
     
@@ -186,6 +189,9 @@
     
     if (attributes[@"reloadInterval"]) {
         _reloadInterval = [WXConvert CGFloat:attributes[@"reloadInterval"]] / 1000;
+    }
+    if (attributes[@"updataType"]) {
+        _updataType = [WXConvert NSString:attributes[@"updataType"]];
     }
 }
 
@@ -904,9 +910,13 @@
 - (void)_insertTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
 {
     [self _performUpdates:^{
-        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+        if ([_updataType  isEqual: @"reload"]) {
+            [_tableView reloadData];
+        } else {
+            [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+        }
     } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
-        if ([indexPath compare:top] <= 0) {
+        if (([indexPath compare:top] <= 0) || [_updataType  isEqual: @"reload"]) {
             return [self tableView:_tableView heightForRowAtIndexPath:indexPath];
         } else {
             return 0.0;

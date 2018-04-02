@@ -207,8 +207,10 @@ public class Constants {
     String INCLUDE_FONT_PADDING = "includeFontPadding";
     String ENABLE_COPY = "enableCopy";
 
-
-
+    String THUMB_TINT_COLOR = "thumbTintColor";
+    String ON_THUMB_TINT_COLOR = "onThumbTintColor";
+    String TINT_COLOR = "tintColor";
+    String ON_TINT_COLOR = "onTintColor";
 
     interface  Recycler{
       String LIST_DATA = "listData";
