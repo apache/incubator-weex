@@ -300,49 +300,49 @@ namespace WeexCore {
     Batch();
 
     if (style != nullptr) {
-      for (int i = 0; i < style->size(); ++i) {
-        if ((*style)[i] != nullptr) {
-          delete (*style)[i];
-          (*style)[i] = nullptr;
+      for (auto iter = style->cbegin(); iter != style->cend(); iter++) {
+        if ((*iter) != nullptr) {
+          delete (*iter);
         }
       }
       style->clear();
+      style->shrink_to_fit();
       delete style;
       style = nullptr;
     }
 
     if (margin != nullptr) {
-      for (int i = 0; i < margin->size(); ++i) {
-        if ((*margin)[i] != nullptr) {
-          delete (*margin)[i];
-          (*margin)[i] = nullptr;
+      for (auto iter = margin->cbegin(); iter != margin->cend(); iter++) {
+        if ((*iter) != nullptr) {
+          delete (*iter);
         }
       }
       margin->clear();
+      margin->shrink_to_fit();
       delete margin;
       margin = nullptr;
     }
 
     if (padding != nullptr) {
-      for (int i = 0; i < padding->size(); ++i) {
-        if ((*padding)[i] != nullptr) {
-          delete (*padding)[i];
-          (*padding)[i] = nullptr;
+      for (auto iter = padding->cbegin(); iter != padding->cend(); iter++) {
+        if ((*iter) != nullptr) {
+          delete (*iter);
         }
       }
       padding->clear();
+      padding->shrink_to_fit();
       delete padding;
       padding = nullptr;
     }
 
     if (border != nullptr) {
-      for (int i = 0; i < border->size(); ++i) {
-        if ((*border)[i] != nullptr) {
-          delete (*border)[i];
-          (*border)[i] = nullptr;
+      for (auto iter = border->cbegin(); iter != border->cend(); iter++) {
+        if ((*iter) != nullptr) {
+          delete (*iter);
         }
       }
       border->clear();
+      border->shrink_to_fit();
       delete border;
       border = nullptr;
     }
@@ -377,15 +377,13 @@ namespace WeexCore {
       render->UpdateAttr((*attrs)[i]->first, (*attrs)[i]->second);
     }
 
-    for (int i = 0; i < attrs->size(); ++i) {
-      if ((*attrs)[i] != nullptr) {
-        delete (*attrs)[i];
-        (*attrs)[i] = nullptr;
-      }
-    }
-
-    // TODO
     if (attrs != nullptr) {
+      for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+        if ((*iter) != nullptr) {
+          delete (*iter);
+        }
+      }
+      attrs->clear();
       attrs->shrink_to_fit();
       delete attrs;
       attrs = nullptr;

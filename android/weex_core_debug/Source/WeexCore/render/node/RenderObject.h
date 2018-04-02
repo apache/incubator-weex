@@ -232,10 +232,6 @@ namespace WeexCore {
 
     void ApplyDefaultAttr();
 
-    void PrintRenderMsg();
-
-    void PrintLayoutMsg();
-
     inline jobject GetComponentImplAndroid() {
       return mComponent_Impl_Android;
     }

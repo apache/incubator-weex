@@ -63,11 +63,8 @@ namespace WeexCore {
     if (style == nullptr)
       return;
 
-    StylesIterator style_it = style->begin();
-    StylesIterator style_end = style->end();
-
-    for (; style_it != style_end; ++style_it)
-      AddStyle(style_it->first, style_it->second);
+    for (auto iter = style->cbegin(); iter != style->cend(); iter++)
+      AddStyle(iter->first, iter->second);
 
     if (style != nullptr) {
       delete style;
@@ -81,11 +78,8 @@ namespace WeexCore {
     if (attrs == nullptr)
       return;
 
-    AttributesIterator attr_it = attrs->begin();
-    AttributesIterator attr_end = attrs->end();
-
-    for (; attr_it != attr_end; ++attr_it) {
-        UpdateAttr(attr_it->first, attr_it->second);
+    for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+        UpdateAttr(iter->first, iter->second);
     }
 
     if (attrs != nullptr) {
@@ -164,79 +158,5 @@ namespace WeexCore {
       return;
     JNIEnv *env = getJNIEnv();
     LayoutAfterImplAndroid(env, this->GetMeasureFuncImplAndroid(), width, height);
-  }
-
-  void RenderObject::PrintRenderMsg() {
-    std::string result("ref: ");
-    result.append(Ref());
-    result.append("\n");
-
-    result.append("type: ");
-    result.append(Type());
-    result.append("\n");
-
-
-    result.append("attr:\n");
-
-    AttributesIterator attr_it = AttrItBegin();
-    AttributesIterator attr_end = AttrItEnd();
-    for (; attr_it != attr_end; ++attr_it) {
-      result.append("   ");
-      result.append(attr_it->first);
-      result.append(":");
-      result.append(attr_it->second);
-      result.append("\n");
-    }
-
-
-    result.append("style:\n");
-
-    StylesIterator style_it = StyleItBegin();
-    StylesIterator style_end = StyleItEnd();
-    for (; style_it != style_end; ++style_it) {
-      result.append("   ");
-      result.append(style_it->first);
-      result.append(":");
-      result.append(style_it->second);
-      result.append("\n");
-    }
-
-
-    if (mEvents != nullptr) {
-      result.append("event:\n");
-
-      EventsIterator event_it = EventItBegin();
-      EventsIterator event_end = EventItEnd();
-
-      for (; event_it != event_end; ++event_it) {
-        result.append("   ");
-        result.append(*event_it);
-        result.append("\n");
-      }
-    }
-
-//    LOGE("[RenderObject::Render tree] \n %s", result.c_str());
-
-//    for (CHILD_LIST_IT it = getChildListItBegin();
-//         it != getChildListItEnd(); it++) {
-//      if (nullptr != *it) {
-//        (*it)->printRenderMsg();
-//      }
-//    }
-  }
-
-  void RenderObject::PrintLayoutMsg() {
-//    LOGE("yoga ref: %s\n", mRef.c_str());
-//    LOGE("yoga type: %s\n", mType.c_str());
-//    YGNodePrint(mYGNode, YGPrintOptionsLayout);
-//    YGNodePrint(mYGNode, YGPrintOptionsStyle);
-//    LOGE("\n\n");
-
-//    for (CHILD_LIST_IT it = getChildListItBegin();
-//         it != getChildListItEnd(); it++) {
-//      if (nullptr != *it) {
-//        (*it)->printYGNodeMsg();
-//      }
-//    }
   }
 } //end WeexCore

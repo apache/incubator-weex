@@ -187,15 +187,6 @@ namespace WeexCore {
     page = nullptr;
   }
 
-  void RenderManager::PrintRenderAndLayoutTree(const std::string &pageId) {
-    RenderPage *page = this->GetPage(pageId);
-    if (page == nullptr)
-      return;
-
-    page->GetRootRenderObject()->PrintRenderMsg();
-    page->GetRootRenderObject()->PrintLayoutMsg();
-  }
-
   void RenderManager::Batch(const std::string &pageId) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
