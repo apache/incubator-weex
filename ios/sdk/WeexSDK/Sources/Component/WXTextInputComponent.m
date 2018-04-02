@@ -50,7 +50,26 @@
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {
     // this behavior will hide the action like copy, cut, paste, selectAll and so on.
-    return [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
+    // fixed textfield issue
+    BOOL allowCopyPaste = [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
+    if (allowCopyPaste) {
+        if (action == @selector(cut:)) {
+            return YES;
+        }
+        if (action == @selector(copy:)) {
+            return YES;
+        }
+        if (action == @selector(paste:)) {
+            return YES;
+        }
+        if (action == @selector(select:)) {
+            return YES;
+        }
+        if (action == @selector(selectAll:)) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds
