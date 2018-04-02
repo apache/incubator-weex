@@ -20,12 +20,21 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import com.taobao.weex.dom.CSSShorthand.CSSProperty;
 import java.util.Arrays;
 
-public class CSSShorthand implements Cloneable {
+public class CSSShorthand<T extends Enum<? extends CSSProperty>> implements Cloneable {
 
-  public static enum EDGE {
+  interface CSSProperty{
+  }
+
+  public static enum EDGE implements CSSProperty{
     TOP, BOTTOM, LEFT, RIGHT, ALL;
+  }
+
+  public static enum CORNER implements CSSProperty{
+    BORDER_TOP_LEFT, BORDER_TOP_RIGHT,
+    BORDER_BOTTOM_RIGHT, BORDER_BOTTOM_LEFT, ALL;
   }
 
   public static enum TYPE {
@@ -43,19 +52,20 @@ public class CSSShorthand implements Cloneable {
   }
 
   CSSShorthand(boolean fillWithNaN) {
-    values = new float[EDGE.values().length];
+    values = new float[Math.max(EDGE.values().length,CORNER.values().length)];
     if (fillWithNaN) {
       Arrays.fill(values, Float.NaN);
     }
   }
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
-  public void set(@NonNull EDGE edge, float value) {
-    if (edge == EDGE.ALL) {
-      Arrays.fill(values, value);
-    } else {
-      values[edge.ordinal()] = value;
-    }
+  public void set(@NonNull EDGE edge, float value){
+    setInternal(edge, value);
+  }
+
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
+  public void set(@NonNull CORNER edge, float value) {
+    setInternal(edge, value);
   }
 
   /**
@@ -64,8 +74,18 @@ public class CSSShorthand implements Cloneable {
    * @param edge
    * @return
    */
-  public float get(@NonNull EDGE edge) {
-    return edge == EDGE.ALL ? 0 : values[edge.ordinal()];
+  public float get(@NonNull EDGE edge){
+    return getInternal(edge);
+  }
+
+  /**
+   * {@link CORNER#ALL} is not supported, 0 will be returned.
+   * @throws IndexOutOfBoundsException
+   * @param edge
+   * @return
+   */
+  public float get(@NonNull CORNER edge) {
+    return getInternal(edge);
   }
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -76,5 +96,17 @@ public class CSSShorthand implements Cloneable {
   @Override
   public CSSShorthand clone() throws CloneNotSupportedException {
     return (CSSShorthand) super.clone();
+  }
+
+  private void setInternal(@NonNull Enum<? extends CSSProperty> edge, float value){
+    if (edge == EDGE.ALL || edge == CORNER.ALL) {
+      Arrays.fill(values, value);
+    } else {
+      values[edge.ordinal()] = value;
+    }
+  }
+
+  private float getInternal(@NonNull Enum<? extends CSSProperty> edge){
+    return (edge == EDGE.ALL || edge == CORNER.ALL) ? 0 : values[edge.ordinal()];
   }
 }

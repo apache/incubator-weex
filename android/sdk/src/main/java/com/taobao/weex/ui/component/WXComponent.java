@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component;
 
 import android.support.v4.util.ArraySet;
+import com.taobao.weex.dom.CSSShorthand.CORNER;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -1542,19 +1543,20 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (borderRadius >= 0) {
       switch (key) {
         case Constants.Name.BORDER_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_RADIUS_ALL, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(
+              CORNER.ALL, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(CORNER.BORDER_TOP_LEFT, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(CORNER.BORDER_TOP_RIGHT, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(CORNER.BORDER_BOTTOM_RIGHT, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(CORNER.BORDER_BOTTOM_LEFT, WXViewUtils.getRealSubPxByWidth(borderRadius, mInstance.getInstanceViewPortWidth()));
           break;
       }
     }
