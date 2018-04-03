@@ -798,29 +798,6 @@ _Pragma("clang diagnostic pop") \
     }
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(JSContext*)context completion:(void (^)(JSValue * value))complection
-{
-    NSMutableArray *newArg = nil;
-    if (self.frameworkLoadFinished) {
-        newArg = [args mutableCopy];
-        if ([newArg containsObject:complection]) {
-            [newArg removeObject:complection];
-        }
-        WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        JSValue *value = [[context globalObject] invokeMethod:method withArguments:args];
-        if (complection) {
-            complection(value);
-        }
-    } else {
-        newArg = [args mutableCopy];
-        if (complection) {
-            [newArg addObject:complection];
-        }
-        [_methodQueue addObject:@{@"method":method, @"args":[newArg copy]}];
-    }
-}
-
-
 - (void)resetEnvironment
 {
     [_jsBridge resetEnvironment];
