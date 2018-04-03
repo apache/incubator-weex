@@ -28,6 +28,7 @@
 #import "WXRefreshComponent.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXComponent+Events.h"
 
 @interface WXScrollerComponentView:UIScrollView
 @end
