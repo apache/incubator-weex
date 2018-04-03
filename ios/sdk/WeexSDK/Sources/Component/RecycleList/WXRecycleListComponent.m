@@ -39,7 +39,7 @@
 @implementation WXRecycleListComponentView
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    if ([(id <WXScrollerProtocol>) self.wx_component respondsToSelector:@selector(gestureShouldStopPropagation:shouldReceiveTouch:)]) {
+    if ([(id <WXScrollerProtocol>) self.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
         return [(id <WXScrollerProtocol>) self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
     }
     else{
