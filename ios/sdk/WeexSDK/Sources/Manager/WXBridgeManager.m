@@ -28,6 +28,7 @@
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
+#import "WXBridgeContext.h"
 
 @interface WXBridgeManager ()
 
