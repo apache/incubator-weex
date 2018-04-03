@@ -712,7 +712,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)loadMoreIfNeed
 {
-    WXScrollerComponnetView* scrollView = (WXScrollerComponnetView *)self.view;
+    WXScrollerComponentView* scrollView = (WXScrollerComponentView *)self.view;
     if (scrollView.isDragging || scrollView.isTracking || scrollView.isDecelerating) {
         [self performSelector:@selector(loadMoreIfNeed) withObject:nil afterDelay:0.1];
         return;
