@@ -19,7 +19,7 @@
 
 #import "WXScrollerProtocol.h"
 #import "WXComponent.h"
-
+#import "WXComponent+Events.h"
 @interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
 
 @property (nonatomic, copy) void (^onScroll)(UIScrollView *);

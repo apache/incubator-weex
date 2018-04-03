@@ -42,6 +42,11 @@
     return NO;
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];

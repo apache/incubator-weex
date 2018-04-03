@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import <JavaScriptCore/JavaScriptCore.h>
+#import "WXBridgeContext.h"
 
 @class WXBridgeMethod;
 @class WXSDKInstance;
@@ -141,6 +142,8 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param handlerArguments : arguments passed to event handler
  **/
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments;
+
+- (JSValue *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges;
 
 /**
  * componentHook

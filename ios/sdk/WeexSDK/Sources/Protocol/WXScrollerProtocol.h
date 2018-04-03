@@ -72,6 +72,8 @@
 
 - (WXScrollDirection)scrollDirection;
 
+@optional
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 - (NSString*)refreshType;
 @end
 

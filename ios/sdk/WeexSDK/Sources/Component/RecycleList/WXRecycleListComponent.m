@@ -33,6 +33,17 @@
 #import "WXSDKManager.h"
 #import "WXComponent+DataBinding.h"
 
+@interface WXRecycleListComponentView:UICollectionView
+@end
+
+@implementation WXRecycleListComponentView
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
+
+@end
+
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
 @end
@@ -87,7 +98,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (UIView *)loadView
 {
     WXRecycleListLayout *layout = [self recycleListLayout];
-    return [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+    return [[WXRecycleListComponentView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
 }
 
 - (void)viewDidLoad

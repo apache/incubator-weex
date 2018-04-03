@@ -29,10 +29,14 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 
-@interface WXScrollerComponnetView:UIScrollView
+@interface WXScrollerComponentView:UIScrollView
 @end
 
-@implementation WXScrollerComponnetView
+@implementation WXScrollerComponentView
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
 @end
 
 @interface WXScrollToTarget : NSObject
@@ -168,14 +172,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (UIView *)loadView
 {
-    return [[WXScrollerComponnetView alloc] init];
+    return [[WXScrollerComponentView alloc] init];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self setContentSize:_contentSize];
-    WXScrollerComponnetView* scrollView = (WXScrollerComponnetView *)self.view;
+    WXScrollerComponentView* scrollView = (WXScrollerComponentView *)self.view;
     scrollView.delegate = self;
     scrollView.exclusiveTouch = YES;
     scrollView.autoresizesSubviews = NO;
@@ -543,6 +547,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (WXScrollDirection)scrollDirection
 {
     return _scrollDirection;
+}
+
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
 }
 
 - (NSString*)refreshType
