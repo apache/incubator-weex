@@ -19,12 +19,11 @@
 package com.taobao.weex.ui.action;
 
 import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXLogUtils;
 
-public abstract class BasicGraphicAction implements IExecutable {
+public abstract class BasicGraphicAction implements IExecutable, Runnable {
 
   private String mPageId;
   private String mRef;
@@ -59,5 +58,20 @@ public abstract class BasicGraphicAction implements IExecutable {
         return;
     }
     WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mPageId, this);
+  }
+
+  @Override
+  public void run() {
+    try {
+      executeAction();
+    } catch (Throwable e) {
+      //catch everything may throw from exection.
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("BasicGraphicAction",
+            "SafeRunnable run throw expection:" + e.getMessage());
+        throw e;
+      }
+      WXLogUtils.w("BasicGraphicAction", e);
+    }
   }
 }

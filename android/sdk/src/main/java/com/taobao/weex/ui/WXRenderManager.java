@@ -28,6 +28,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
@@ -103,40 +104,12 @@ public class WXRenderManager {
     mWXRenderHandler.removeCallbacksAndMessages(null);
   }
 
-  public void postGraphicAction(final String instanceId, final IExecutable action) {
-
+  public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
     final RenderContextImpl renderContext = mRenderContext.get(instanceId);
     if (renderContext == null) {
       return;
     }
-
-    Runnable renderTask = WXThread.secure(new Runnable() {
-      @Override
-      public void run() {
-        long start = System.currentTimeMillis();
-        action.executeAction();
-        long time = System.currentTimeMillis() - start;
-        // WXLogUtils.e("" + Thread.currentThread() + "," + Thread.currentThread().getPriority());
-//        if ("com.taobao.weex.ui.action.GraphicActionAddElement".equals(action.getClass().getName())) {
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementCount();
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionAddElementTime(time);
-//
-//        } else if ("com.taobao.weex.ui.action.GraphicActionLayout".equals(action.getClass().getName())) {
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutCount();
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionLayoutTime(time);
-//
-//        } else if ("com.taobao.weex.ui.action.GraphicActionCreateBody".equals(action.getClass().getName())) {
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyCount();
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionCreateBodyTime(time);
-//
-//        } else {
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherCount();
-//          WXSDKManager.getInstance().getSDKInstance(instanceId).callActionOtherTime(time);
-//        }
-      }
-    });
-
-    mWXRenderHandler.post(renderTask);
+    mWXRenderHandler.post(action);
   }
 
   public void registerInstance(WXSDKInstance instance) {
