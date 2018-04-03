@@ -151,13 +151,14 @@
     if ([scrollerProtocol respondsToSelector:@selector(refreshType)] &&
         [[scrollerProtocol refreshType] isEqualToString:@"refreshForAppear"]) {
         UIEdgeInsets inset = [scrollerProtocol contentInset];
-        inset.top = self.calculatedFrame.size.height;
         if (_displayState) {
+            inset.top = self.calculatedFrame.size.height;
             if ([_indicator.view isHidden]) {
                 [_indicator.view setHidden:NO];
             }
             [_indicator start];
         } else {
+            inset.top = 0;
             [_indicator stop];
         }
         [scrollerProtocol setContentInset:inset];
@@ -185,10 +186,21 @@
 
 - (void)setIndicatorHidden:(BOOL)hidden {
     [_indicator.view setHidden:hidden];
-    if (!hidden) {
-        [_indicator start];
-    } else {
-        [_indicator stop];
+    
+    id<WXScrollerProtocol> scrollerProtocol = self.ancestorScroller;
+    if (scrollerProtocol == nil || !_initFinished)
+        return;
+    if ([scrollerProtocol respondsToSelector:@selector(refreshType)] &&
+        [[scrollerProtocol refreshType] isEqualToString:@"refreshForAppear"]) {
+        UIEdgeInsets inset = [scrollerProtocol contentInset];
+        if (!hidden) {
+            inset.top = self.calculatedFrame.size.height;
+            [_indicator start];
+        } else {
+            inset.top = 0;
+            [_indicator stop];
+        }
+        [scrollerProtocol setContentInset:inset];
     }
 }
 
