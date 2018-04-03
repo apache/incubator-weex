@@ -113,7 +113,7 @@ typedef enum : NSUInteger {
         
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-            _syncDestroyComponentManager = [configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL];
+            _syncDestroyComponentManager = [[configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL] boolValue];
         }
        
         [self addObservers];

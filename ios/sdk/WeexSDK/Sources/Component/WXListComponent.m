@@ -400,7 +400,7 @@
     
     [self.weexInstance.componentManager _addUITask:^{
         if (isDeleteSection) {
-            WXLogDebug(@"delete section:%zd", headerIndex);
+            WXLogDebug(@"delete section:%lu", (unsigned long)headerIndex);
             [_completedSections removeObjectAtIndex:headerIndex];
         }
         
@@ -409,7 +409,7 @@
         }
         
         if (completedReloadSection) {
-            WXLogDebug(@"Reload section:%zd", reloadIndex);
+            WXLogDebug(@"Reload section:%lu", (unsigned long)reloadIndex);
             _completedSections[reloadIndex] = completedReloadSection;
         }
         

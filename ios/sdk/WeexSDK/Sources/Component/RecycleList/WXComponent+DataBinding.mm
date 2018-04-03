@@ -102,7 +102,7 @@ static JSContext *jsContext;
         if (self.attributes[@"@isComponentRoot"]) {
             if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath]) {
                 static NSUInteger __componentId = 0;
-                self->_virtualComponentId = [NSString stringWithFormat:@"%@@%ld", listRef, __componentId % (2048*1024)];
+                self->_virtualComponentId = [NSString stringWithFormat:@"%@%lu", listRef, (unsigned long)__componentId % (2048*1024)];
                 __componentId++;
                 dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
                 [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {

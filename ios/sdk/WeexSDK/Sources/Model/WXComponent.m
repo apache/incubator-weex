@@ -156,7 +156,7 @@
         copyId = __copy % (1024*1024);
         __copy++;
     }
-    NSString *copyRef = [NSString stringWithFormat:@"%zdcopy_of%@", copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
+    NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", (long)copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
     WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
     if (_isTemplate) {
         component->_templateComponent = self;

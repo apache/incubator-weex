@@ -387,7 +387,7 @@ typedef enum : NSUInteger {
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    WXLogDebug(@"section number:%zi", [self.dataController numberOfSections]);
+    WXLogDebug(@"section number:%li", (long)[self.dataController numberOfSections]);
     return [self.dataController numberOfSections];
 }
 

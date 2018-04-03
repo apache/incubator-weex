@@ -428,7 +428,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
     });
 #ifdef DEBUG
     double duration = -[startTime timeIntervalSinceNow] * 1000;
-    WXLogDebug(@"cell:%zi update data time:%f", indexPath.item, duration);
+    WXLogDebug(@"cell:%li update data time:%f", (long)indexPath.item, duration);
 #endif
     
     NSValue *cachedSize = _sizeCache[indexPath];

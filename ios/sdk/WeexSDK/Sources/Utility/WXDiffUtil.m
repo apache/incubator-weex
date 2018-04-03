@@ -63,7 +63,7 @@ typedef enum : NSUInteger {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; %zi inserts; %zi deletes; %zi updates", NSStringFromClass([self class]), self, _inserts.count, _deletes.count, _updates.count];
+    return [NSString stringWithFormat:@"<%@: %p; %lu inserts; %lu deletes; %lu updates", NSStringFromClass([self class]), self, (unsigned long)_inserts.count, (unsigned long)_deletes.count, (unsigned long)_updates.count];
 }
 
 
@@ -186,9 +186,9 @@ typedef enum : NSUInteger {
             int value = matrix[i][j];
             NSString *result;
             if (value < 10) {
-                result = [NSString stringWithFormat:@"0%zi", value];
+                result = [NSString stringWithFormat:@"0%i", value];
             } else {
-                result = [NSString stringWithFormat:@"%zi", value];
+                result = [NSString stringWithFormat:@"%i", value];
             }
             [array addObject:result];
         }
