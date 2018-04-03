@@ -47,9 +47,6 @@ namespace WeexCore {
     IRenderObject *render = factory->CreateRender();
     render->SetRef(ref);
     render->SetType(type);
-    render->ApplyDefaultStyle();
-    render->ApplyDefaultAttr();
-
     delete factory;
     return render;
   }
