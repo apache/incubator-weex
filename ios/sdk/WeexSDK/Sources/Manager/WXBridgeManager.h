@@ -19,7 +19,6 @@
 
 #import <Foundation/Foundation.h>
 #import <JavaScriptCore/JavaScriptCore.h>
-#import "WXBridgeContext.h"
 
 @class WXBridgeMethod;
 @class WXSDKInstance;
