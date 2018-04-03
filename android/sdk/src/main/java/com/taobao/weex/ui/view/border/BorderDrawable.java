@@ -71,10 +71,10 @@ public class BorderDrawable extends Drawable {
   public static final int BORDER_RADIUS_ALL = 5;
   static final int DEFAULT_BORDER_COLOR = Color.BLACK;
   static final float DEFAULT_BORDER_WIDTH = 0;
-  private static final float DEFAULT_BORDER_RADIUS = 0;
   private static final BorderStyle DEFAULT_BORDER_STYLE = BorderStyle.SOLID;
   private static final String TAG = "Border";
   private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private static BorderStyle[] sBorderStyle = BorderStyle.values();
 
   private
   @Nullable
@@ -450,7 +450,7 @@ public class BorderDrawable extends Drawable {
   private void preparePaint(CSSShorthand.EDGE edge) {
     float borderWidth = mBorderWidth.get(edge);
     int color = WXViewUtils.multiplyColorAlpha(getBorderColor(edge), mAlpha);
-    BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(edge)];
+    BorderStyle borderStyle = sBorderStyle[getBorderStyle(edge)];
     Shader shader = borderStyle.getLineShader(borderWidth, color, edge);
     mPaint.setShader(shader);
     mPaint.setColor(color);
