@@ -38,7 +38,6 @@ import java.util.StringTokenizer;
 public class WXResourceUtils {
 
   private final static Map<String, Integer> colorMap = new HashMap<>();
-  private final static LruCache<String, Integer> colorCache = new LruCache<>(64);
   private final static int RGB_SIZE = 3;
   private final static int RGBA_SIZE = 4;
   private final static int HEX = 16;
@@ -240,7 +239,7 @@ public class WXResourceUtils {
     }
     color = color.trim(); //remove non visible codes
 
-    Integer cache = colorCache.get(color);
+    Integer cache = WXUtils.sCache.get(color);
     if(cache!=null){
       return cache;
     }
@@ -253,7 +252,7 @@ public class WXResourceUtils {
           result = handler.handle(color);
           if (result.first) {
             resultColor = result.second;
-            colorCache.put(color, resultColor);
+            WXUtils.sCache.put(color, resultColor);
             break;
           }
         } catch (RuntimeException e) {

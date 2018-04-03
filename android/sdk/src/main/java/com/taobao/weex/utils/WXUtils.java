@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
@@ -30,6 +31,7 @@ import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
 
+  final static LruCache<String, Integer> sCache = new LruCache<>(64);
   public static final char PERCENT = '%';
   private static final int HUNDRED =100;
   /**
@@ -241,55 +243,66 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
-    if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
-      return Integer.valueOf((int) WXUtils.parseFloat(temp));
+    String key = temp;
+    Integer cache = sCache.get(key);
+    if(cache !=null){
+      return cache;
     }
     else {
-      String suffix = "";
-      if(temp.length() >= 2) {
-        suffix = temp.substring(temp.length() - 2, temp.length());
-      }
-
-      if (TextUtils.equals("wx",suffix)) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils
-              .w("the value of " + value + " use wx unit, which will be not supported soon after.");
-        }
-        try {
-          return (int) transferWx(temp, 750);
-        } catch (NumberFormatException e) {
-          WXLogUtils.e("Argument format error! value is " + value, e);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
-        }
-      } else if (TextUtils.equals("px",suffix)) {
-        try {
-          temp = temp.substring(0, temp.length()-2);
-          if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
-            return (int) WXUtils.parseFloat(temp);
-          } else {
-            return Integer.parseInt(temp);
-          }
-        } catch (NumberFormatException nfe) {
-          WXLogUtils.e("Argument format error! value is " + value, nfe);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
-        }
+      Integer ret = df;
+      if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+        ret = Integer.valueOf((int) WXUtils.parseFloat(temp));
       } else {
-        try {
-          if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
-            return (int) WXUtils.parseFloat(temp);
-          } else {
-            return Integer.parseInt(temp);
+        String suffix = "";
+        if (temp.length() >= 2) {
+          suffix = temp.substring(temp.length() - 2, temp.length());
+        }
+
+        if (TextUtils.equals("wx", suffix)) {
+          if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils
+                .w("the value of " + value
+                    + " use wx unit, which will be not supported soon after.");
           }
-        } catch (NumberFormatException nfe) {
-          WXLogUtils.e("Argument format error! value is " + value, nfe);
-        } catch (Exception e) {
-          WXLogUtils.e("Argument error! value is " + value, e);
+          try {
+            ret = (int) transferWx(temp, 750);
+          } catch (NumberFormatException e) {
+            WXLogUtils.e("Argument format error! value is " + value, e);
+          } catch (Exception e) {
+            WXLogUtils.e("Argument error! value is " + value, e);
+          }
+        } else if (TextUtils.equals("px", suffix)) {
+          try {
+            temp = temp.substring(0, temp.length() - 2);
+            if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+              ret =  (int) WXUtils.parseFloat(temp);
+            } else {
+              ret =  Integer.parseInt(temp);
+            }
+          } catch (NumberFormatException nfe) {
+            WXLogUtils.e("Argument format error! value is " + value, nfe);
+          } catch (Exception e) {
+            WXLogUtils.e("Argument error! value is " + value, e);
+          }
+        } else {
+          try {
+            if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
+              ret =  (int) WXUtils.parseFloat(temp);
+            } else {
+              ret =  Integer.parseInt(temp);
+            }
+          } catch (NumberFormatException nfe) {
+            WXLogUtils.e("Argument format error! value is " + value, nfe);
+          } catch (Exception e) {
+            WXLogUtils.e("Argument error! value is " + value, e);
+          }
         }
       }
+      if(!ret.equals(df)){
+        sCache.put(key, ret);
+      }
+      return ret;
     }
-    return df;
   }
 
   /**
