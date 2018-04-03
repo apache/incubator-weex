@@ -399,11 +399,6 @@ namespace WeexCore {
       }
     }
 
-    if (render != nullptr) {
-      render->ApplyDefaultStyle();
-      render->ApplyDefaultAttr();
-    }
-
     return render;
   }
 

@@ -31,6 +31,10 @@ namespace WeexCore {
       return mType;
     }
 
+    virtual void ApplyDefaultStyle() = 0;
+
+    virtual void ApplyDefaultAttr() = 0;
+
   private:
     std::string mPageId = "";
     std::string mRef = "";
