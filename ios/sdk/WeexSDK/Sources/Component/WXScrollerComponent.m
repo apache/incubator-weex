@@ -35,7 +35,12 @@
 @implementation WXScrollerComponentView
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    return [self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+    if ([(id <WXScrollerProtocol>) self.wx_component respondsToSelector:@selector(gestureShouldStopPropagation:shouldReceiveTouch:)]) {
+        return [(id <WXScrollerProtocol>) self.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+    }
+    else{
+        return YES;
+    }
 }
 @end
 
