@@ -54,5 +54,4 @@
 
 @interface WXComponent (Events) <UIGestureRecognizerDelegate>
 - (BOOL)gestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
-- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 @end
