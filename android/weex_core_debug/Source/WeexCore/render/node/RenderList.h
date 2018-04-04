@@ -6,6 +6,7 @@
 #include <WeexCore/css/ConstantsValue.h>
 #include <WeexCore/platform/android/base/LogUtils.h>
 #include <cmath>
+#include <base/ViewUtils.h>
 #include "RenderObject.h"
 
 namespace WeexCore {
@@ -166,8 +167,8 @@ namespace WeexCore {
         return AUTO_VALUE;
       }
 
-      float columnCountValue = atof(columnCount.c_str());
-      return columnCountValue > 0 ? columnCountValue : AUTO_VALUE;
+      float columnCountValue = getFloat(columnCount);
+      return (columnCountValue > 0 && !isnan(columnCountValue)) ? columnCountValue : AUTO_VALUE;
     }
 
     float getColumnGap() {
@@ -177,8 +178,8 @@ namespace WeexCore {
         return COLUMN_GAP_NORMAL;
       }
 
-      float columnGapValue = atof(columnGap.c_str());
-      return columnGapValue > 0 ? columnGapValue : AUTO_VALUE;
+      float columnGapValue = getFloat(columnGap);
+      return (columnGapValue > 0 && !isnan(columnGapValue)) ? columnGapValue : AUTO_VALUE;
     }
 
     float getColumnWidth() {
@@ -188,8 +189,8 @@ namespace WeexCore {
         return AUTO_VALUE;
       }
 
-      float columnWidthValue = atof(columnWidth.c_str());
-      return columnWidthValue > 0 ? columnWidthValue : 0;
+      float columnWidthValue = getFloat(columnWidth);
+      return (columnWidthValue > 0 && !isnan(columnWidthValue)) ? columnWidthValue : 0;
     }
 
     int getOrientation(){

@@ -123,9 +123,8 @@ namespace WeexCore {
         if (value.empty()) {
           setFlex(0);
         } else {
-          char *end;
-          float ret = strtof(value.c_str(), &end);
-          if ( *end == '\0') {
+          float ret = getFloat(value);
+          if (!isnan(ret)) {
             setFlex(ret);
           }
         }

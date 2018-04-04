@@ -1,6 +1,7 @@
 #include "CoreEnvironment.h"
 #include "base/CoreConstants.h"
 #include <stdlib.h>
+#include <base/ViewUtils.h>
 
 namespace WeexCore {
 
@@ -26,16 +27,16 @@ namespace WeexCore {
   }
 
   bool WXCoreEnvironment::SetDeviceWidth(const std::string &width) {
-    if (width.empty())
+    if (width.empty() || isnan(getFloat(width)))
       return false;
-    mDeviceWidth = atof(width.c_str());
+    mDeviceWidth = getFloat(width);
     return true;
   }
 
   bool WXCoreEnvironment::SetDeviceHeight(const std::string &height) {
-    if (height.empty())
+    if (height.empty() || isnan(getFloat(height)))
       return false;
-    mDeviceHeight = atof(height.c_str());
+    mDeviceHeight = getFloat(height);
     return true;
   }
 

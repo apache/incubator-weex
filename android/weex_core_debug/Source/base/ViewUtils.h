@@ -23,6 +23,24 @@ namespace WeexCore {
     return s;
   }
 
+  inline float getFloat(const std::string &src) {
+    char *end;
+    float ret = strtof(src.c_str(), &end);
+    if(*end != '\0'){
+      ret = NAN;
+    }
+    return ret;
+  }
+
+  inline float getFloat(const char* src) {
+    char *end;
+    float ret = strtof(src, &end);
+    if(*end != '\0'){
+      ret = NAN;
+    }
+    return ret;
+  }
+
   inline float getFloat(const float &src, const float &viewport) {
     if (isnan(src))
       return NAN;
@@ -41,11 +59,7 @@ namespace WeexCore {
         || src.empty()) {
       return ret;
     }
-    char *end;
-    float original_value = strtof(src.c_str(), &end);
-    if(*end != '\0'){
-      original_value = NAN;
-    }
+    float original_value = getFloat(src);
     ret = getFloat(original_value, viewport);
     return ret;
   }
@@ -60,8 +74,8 @@ namespace WeexCore {
     if (endWidth(stringWithWXPostfix, WX)) {
       temp = stringWithWXPostfix.substr(0, stringWithWXPostfix.size() - WX.size());
     }
-    float f = atof((char *) temp.c_str());
-    float density = atof((char *) WXCoreEnvironment::getInstance()->GetOption(SCALE).c_str());
+    float f = getFloat(temp);
+    float density = getFloat(WXCoreEnvironment::getInstance()->GetOption(SCALE));
     return density * f * viewport / WXCoreEnvironment::getInstance()->DeviceWidth();
   }
 
