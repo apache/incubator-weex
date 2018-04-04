@@ -136,6 +136,9 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  */
 - (JSValue *)executeJavascript:(NSString *)script withSourceURL:(NSURL*)sourceURL;
 
+
+@property (nonatomic, strong) NSString* weexInstanceId;
+
 /**
  set JavaScriptContext
  */

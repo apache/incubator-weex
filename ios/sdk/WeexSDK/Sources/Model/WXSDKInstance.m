@@ -141,6 +141,10 @@ typedef enum : NSUInteger {
     
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
     
+    if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
+        [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
+    }
+    
     if(!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
@@ -459,10 +463,10 @@ typedef enum : NSUInteger {
     }
 
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-    if (_instanceJavaScriptContext) {
+    if (_instanceJavaScriptContext && !_debugJS) {
         JSGarbageCollect(_instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef);
-        _instanceJavaScriptContext = nil;
     }
+    _instanceJavaScriptContext = nil;
     
     if (_componentManager) {
         [_componentManager invalidate];

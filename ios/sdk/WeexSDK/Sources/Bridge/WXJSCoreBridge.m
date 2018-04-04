@@ -42,6 +42,9 @@
 #import <mach/mach.h>
 
 @interface WXJSCoreBridge ()
+{
+    NSString * _weexInstanceId;
+}
 
 @property (nonatomic, strong)  JSContext *jsContext;
 @property (nonatomic, strong)  NSMutableArray *timers;
@@ -113,6 +116,16 @@
 - (JSContext *)javaScriptContext
 {
     return _jsContext;
+}
+
+- (NSString *)weexInstanceId
+{
+    return _weexInstanceId;
+}
+
+- (void)setWeexInstanceId:(NSString *)weexInstanceId
+{
+    _weexInstanceId = weexInstanceId;
 }
 
 #pragma mark - WXBridgeProtocol
