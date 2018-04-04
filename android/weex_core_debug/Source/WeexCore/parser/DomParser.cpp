@@ -285,10 +285,6 @@ namespace WeexCore {
         const char *temp_type = r.GetString();
         render = (RenderObject *) RenderCreator::GetInstance()->CreateRender(temp_type, ref);
         render->SetPageId(pageId);
-        if (render != nullptr) {
-          render->ApplyDefaultStyle();
-          render->ApplyDefaultAttr();
-        }
         if (parent != nullptr)
           parent->AddRenderObject(index, render);
         if (temp_type != nullptr) {
@@ -401,6 +397,11 @@ namespace WeexCore {
       } else {
         r.SkipValue();
       }
+    }
+
+    if (render != nullptr) {
+      render->ApplyDefaultStyle();
+      render->ApplyDefaultAttr();
     }
 
     return render;

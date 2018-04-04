@@ -21,9 +21,9 @@ namespace WeexCore {
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
 
-      if (prop == HEIGHT && isnan(getStyleHeight()) && GetStyle(FLEX).empty()) {
+      if (prop == HEIGHT && isnan(getStyleHeight()) && isnan(getFlex())) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      } else if (prop == WIDTH && isnan(getStyleWidth()) && GetStyle(FLEX).empty()) {
+      } else if (prop == WIDTH && isnan(getStyleWidth()) && isnan(getFlex())) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 

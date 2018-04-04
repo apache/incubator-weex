@@ -368,18 +368,6 @@ namespace WeexCore {
       return mEvents->end();
     }
 
-    inline const std::string GetStyle(const std::string &key) {
-      if (mStyles == nullptr)
-        return "";
-
-      std::map<std::string, std::string>::iterator iter = mStyles->find(key);
-      if (iter != mStyles->end()) {
-        return iter->second;
-      } else {
-        return "";
-      }
-    }
-
     inline const std::string GetAttr(const std::string &key) {
       if (mAttributes == nullptr)
         return "";
