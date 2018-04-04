@@ -14,7 +14,6 @@ namespace WeexCore {
     mStyles = new StylesMap();
     mAttributes = new AttributesMap();
     mEvents = new EventsSet();
-    mComponent_Impl_Android = nullptr;
     mMeasureFunc_Impl_Android = nullptr;
     mIsRootRender = false;
   }
@@ -36,11 +35,6 @@ namespace WeexCore {
     if (mEvents != nullptr) {
       delete mEvents;
       mEvents = nullptr;
-    }
-
-    if (mComponent_Impl_Android != nullptr) {
-      env->DeleteGlobalRef(mComponent_Impl_Android);
-      mComponent_Impl_Android = nullptr;
     }
 
     if (mMeasureFunc_Impl_Android != nullptr) {
@@ -89,10 +83,7 @@ namespace WeexCore {
   }
 
   bool RenderObject::BindComponentImplAndroid(jobject component_impl_android) {
-    if (component_impl_android == nullptr)
-      return false;
-    this->mComponent_Impl_Android = getJNIEnv()->NewGlobalRef(component_impl_android);
-    return true;
+
   }
 
   bool RenderObject::BindComponentImplIOS(void *component_impl_ios) {

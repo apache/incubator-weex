@@ -1957,26 +1957,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private native void nativeForceLayout(int instanceId);
 
-
-  /**
-   * native: BindComponentToWXCore
-   */
-  public void bindComponentWithRenderObject(final String instanceId, final WXComponent component, final String ref) {
-    nativeBindComponentToWXCore(Integer.parseInt(instanceId), component, ref);
-  }
-
-  public void bindComponentWithRenderObjectPostToJSThread(final String instanceId, final WXComponent component, final String ref) {
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeBindComponentToWXCore(Integer.parseInt(instanceId), component, ref);
-      }
-    });
-  }
-
-  private native void nativeBindComponentToWXCore(int instanceId, WXComponent component, String ref);
-
-
   /**
    * native: OnInstanceClose
    * @param instanceId

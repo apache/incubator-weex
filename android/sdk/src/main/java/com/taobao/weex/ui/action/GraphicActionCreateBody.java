@@ -66,7 +66,6 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     }
     component.setTransition(WXTransition.fromMap(component.getStyles(), component));
 
-    instance.bindComponentWithRenderObject(getPageId(), component, getRef());
   }
 
   @Override
