@@ -299,6 +299,14 @@ namespace WeexCore {
                           parentHeight, childWidth, childHeight);
           child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
+          if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
+              && !isMainAxisHorizontal(this) && child->widthMeasureMode == kUnspecified){
+            child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
+                                      -child->mCssStyle->sumMarginOfDirection(true));
+            if(child->heightMeasureMode == kUnspecified && child->widthDirty) {
+              child->mLayoutResult->mLayoutSize.height = NAN;
+            }
+          }
           child->measure(child->mLayoutResult->mLayoutSize.width,
                          child->mLayoutResult->mLayoutSize.height, hypotheticalMeasurment);
         }
