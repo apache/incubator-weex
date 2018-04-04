@@ -231,10 +231,6 @@ namespace WeexCore {
 
     void ApplyDefaultAttr();
 
-    inline jobject GetComponentImplAndroid() {
-      return mComponent_Impl_Android;
-    }
-
     inline jobject GetMeasureFuncImplAndroid() {
       return mMeasureFunc_Impl_Android;
     }
@@ -392,7 +388,6 @@ namespace WeexCore {
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
-    jobject mComponent_Impl_Android;
     jobject mMeasureFunc_Impl_Android;
     void *mComponent_Impl_iOS;
     float mViewPortWidth = -1;

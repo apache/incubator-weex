@@ -30,11 +30,6 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
 static void ForceLayout(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
-static void BindComponentToWXCore(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jobject component,
-    jstring ref);
-
 static void OnInstanceClose(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
@@ -70,13 +65,6 @@ static const JNINativeMethod kMethodsWXSDKInstance[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(ForceLayout) },
-    { "nativeBindComponentToWXCore",
-"("
-"Ljava/lang/String;"
-"Lcom/taobao/weex/ui/component/WXComponent;"
-"Ljava/lang/String;"
-")"
-"V", reinterpret_cast<void*>(BindComponentToWXCore) },
     { "nativeOnInstanceClose",
 "("
 "Ljava/lang/String;"
