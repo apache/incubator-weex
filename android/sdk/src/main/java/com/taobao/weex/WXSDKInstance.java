@@ -1082,7 +1082,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    nativePrintRenderFinishTime(getInstanceId());
+    nativePrintRenderFinishTime(Integer.parseInt(getInstanceId()));
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1315,7 +1315,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      nativePrintFirstScreenRenderTime(getInstanceId());
+      nativePrintFirstScreenRenderTime(Integer.parseInt(getInstanceId()));
   }
 
   public void createInstanceFinished(long time) {
@@ -1945,36 +1945,36 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    */
   @UiThread
   private boolean notifyLayout(String instanceId) {
-    return nativeNotifyLayout(instanceId);
+    return nativeNotifyLayout(Integer.parseInt(instanceId));
   }
 
-  private native boolean nativeNotifyLayout(String instanceId);
+  private native boolean nativeNotifyLayout(int instanceId);
 
   @UiThread
   private void forceLayout(String instanceId) {
-    nativeForceLayout(instanceId);
+    nativeForceLayout(Integer.parseInt(instanceId));
   }
 
-  private native void nativeForceLayout(String instanceId);
+  private native void nativeForceLayout(int instanceId);
 
 
   /**
    * native: BindComponentToWXCore
    */
   public void bindComponentWithRenderObject(final String instanceId, final WXComponent component, final String ref) {
-    nativeBindComponentToWXCore(instanceId, component, ref);
+    nativeBindComponentToWXCore(Integer.parseInt(instanceId), component, ref);
   }
 
   public void bindComponentWithRenderObjectPostToJSThread(final String instanceId, final WXComponent component, final String ref) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeBindComponentToWXCore(instanceId, component, ref);
+        nativeBindComponentToWXCore(Integer.parseInt(instanceId), component, ref);
       }
     });
   }
 
-  private native void nativeBindComponentToWXCore(String instanceId, WXComponent component, String ref);
+  private native void nativeBindComponentToWXCore(int instanceId, WXComponent component, String ref);
 
 
   /**
@@ -1982,19 +1982,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param instanceId
    */
   public void onInstanceClose(String instanceId) {
-    nativeOnInstanceClose(instanceId);
+    nativeOnInstanceClose(Integer.parseInt(instanceId));
   }
 
-  public void onInstanceClosePostToJSThread(String instanceId) {
+  public void onInstanceClosePostToJSThread(final String instanceId) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeOnInstanceClose(getInstanceId());
+        nativeOnInstanceClose(Integer.parseInt(instanceId));
       }
     });
   }
 
-  private native void nativeOnInstanceClose(String instanceId);
+  private native void nativeOnInstanceClose(int instanceId);
 
 
   /**
@@ -2004,42 +2004,42 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param defaultHeight
    */
   public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
-    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+    nativeSetDefaultHeightAndWidthIntoRootDom(Integer.parseInt(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
   }
 
   public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+        nativeSetDefaultHeightAndWidthIntoRootDom(Integer.parseInt(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
       }
     });
   }
 
-  private native void nativeSetDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
+  private native void nativeSetDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
 
   private void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
-    nativeSetRenderContainerWrapContent(wrap, instanceId);
+    nativeSetRenderContainerWrapContent(wrap, Integer.parseInt(instanceId));
   }
 
   private void setRenderContentWrapContentToCorePostToJSThread(final boolean wrap, final String instanceId) {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeSetRenderContainerWrapContent(wrap, instanceId);
+        nativeSetRenderContainerWrapContent(wrap, Integer.parseInt(instanceId));
       }
     });
   }
 
-  private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
+  private native void nativeSetRenderContainerWrapContent(boolean wrap, int instanceId);
 
   /**
    * native: print render time
    * @param instanceId
    * @return
    */
-  public native int nativePrintFirstScreenRenderTime(String instanceId);
+  public native int nativePrintFirstScreenRenderTime(int instanceId);
 
-  public native int nativePrintRenderFinishTime(String instanceId);
+  public native int nativePrintRenderFinishTime(int instanceId);
 
 }

@@ -15,11 +15,11 @@ namespace WeexCore {
       return mRef;
     }
 
-    inline void SetPageId(std::string pageId) {
+    inline void SetPageId(int pageId) {
       this->mPageId = pageId;
     }
 
-    inline const std::string &PageId() const {
+    inline const int &PageId() const {
       return mPageId;
     }
 
@@ -32,7 +32,7 @@ namespace WeexCore {
     }
 
   private:
-    std::string mPageId = "";
+    int mPageId = -1;
     std::string mRef = "";
     std::string mType = "";
   };

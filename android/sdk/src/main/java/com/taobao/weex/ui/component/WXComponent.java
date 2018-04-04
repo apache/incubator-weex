@@ -221,7 +221,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    nativeBindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
+    nativeBindMeasurementToWXCore(Integer.parseInt(getInstanceId()), getRef(), contentBoxMeasurement);
   }
 
   public void updateStyles(WXComponent component) {
@@ -2107,7 +2107,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private String mViewTreeKey;
 
-  private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+  private native void nativeBindMeasurementToWXCore(int instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
   public WXTransition getTransition() {
     return mTransition;

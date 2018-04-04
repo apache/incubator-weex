@@ -15,13 +15,13 @@ namespace WeexCore {
 }
 
 static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
-                                  jstring instanceId,
+                                  jint instanceId,
                                   jobject component,
                                   jstring ref) {
   if (component == nullptr)
     return;
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -33,17 +33,17 @@ static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
 }
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller,
-                            jstring instanceId) {
-  RenderManager::GetInstance()->ClosePage(jString2StrFast(env, instanceId));
+                            jint instanceId) {
+  RenderManager::GetInstance()->ClosePage(instanceId);
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
-                                                jstring instanceId,
+                                                jint instanceId,
                                                 jfloat defaultWidth,
                                                 jfloat defaultHeight,
                                                 jboolean isWidthWrapContent,
                                                 jboolean isHeightWrapContent) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -57,8 +57,8 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
 
 static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
                                           jboolean wrap,
-                                          jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+                                          jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -66,8 +66,8 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
 }
 
 static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
-                                       jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+                                       jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return 0;
 
@@ -75,8 +75,8 @@ static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
 }
 
 static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
-                                  jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+                                  jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return 0;
 
@@ -85,9 +85,8 @@ static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
 
 //Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
-                         jstring instanceId) {
-  std::string pageId = jString2StrFast(env, instanceId);
-  RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+                             jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page != nullptr) {
 
 #if RENDER_LOG
@@ -109,9 +108,8 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
 
 //Notice that this method is invoked from JS thread.
 static void ForceLayout(JNIEnv *env, jobject jcaller,
-                        jstring instanceId) {
-  std::string pageId = jString2StrFast(env, instanceId);
-  RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+                        jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page != nullptr) {
 
 #if RENDER_LOG

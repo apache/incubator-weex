@@ -167,7 +167,7 @@ namespace WeexCore {
         return AUTO_VALUE;
       }
 
-      float columnCountValue = getFloat(columnCount);
+      float columnCountValue = getFloat(columnCount.c_str());
       return (columnCountValue > 0 && !isnan(columnCountValue)) ? columnCountValue : AUTO_VALUE;
     }
 
@@ -178,7 +178,7 @@ namespace WeexCore {
         return COLUMN_GAP_NORMAL;
       }
 
-      float columnGapValue = getFloat(columnGap);
+      float columnGapValue = getFloat(columnGap.c_str());
       return (columnGapValue > 0 && !isnan(columnGapValue)) ? columnGapValue : AUTO_VALUE;
     }
 
@@ -189,7 +189,7 @@ namespace WeexCore {
         return AUTO_VALUE;
       }
 
-      float columnWidthValue = getFloat(columnWidth);
+      float columnWidthValue = getFloat(columnWidth.c_str());
       return (columnWidthValue > 0 && !isnan(columnWidthValue)) ? columnWidthValue : 0;
     }
 

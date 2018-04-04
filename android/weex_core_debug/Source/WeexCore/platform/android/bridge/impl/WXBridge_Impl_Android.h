@@ -63,13 +63,13 @@ namespace WeexCore {
     int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
                           jstring &callback);
 
-    int callAddEvent(std::string &instanceId,
+    int callAddEvent(int &pageId,
                      std::string &ref, std::string &event);
 
-    int callRemoveEvent(std::string &instanceId,
+    int callRemoveEvent(int &pageId,
                         std::string &ref, std::string &event);
 
-    int callCreateBody(std::string &pageId, std::string &componentType, std::string &ref,
+    int callCreateBody(int &pageId, std::string &componentType, std::string &ref,
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
@@ -77,7 +77,7 @@ namespace WeexCore {
                        const WXCorePadding &paddings,
                        const WXCoreBorderWidth &borders);
 
-    int callAddElement(std::string &pageId, std::string &componentType, std::string &ref,
+    int callAddElement(int &pageId, std::string &componentType, std::string &ref,
                        int &index,
                        std::string &parentRef,
                        std::map<std::string, std::string> *styles,
@@ -87,31 +87,27 @@ namespace WeexCore {
                        const WXCorePadding &paddings,
                        const WXCoreBorderWidth &borders);
 
-    int callRemoveElement(std::string &pageId, std::string &ref);
+    int callRemoveElement(int &pageId, std::string &ref);
 
-    int callMoveElement(std::string &pageId, std::string &ref, std::string &parentRef,
+    int callMoveElement(int &pageId, std::string &ref, std::string &parentRef,
                         int index);
 
-    int callLayout(std::string &pageId, std::string &ref,
+    int callLayout(int &pageId, std::string &ref,
                    int top, int bottom, int left, int right,
                    int height, int width);
 
-    int callUpdateStyle(std::string &pageId, std::string &ref,
+    int callUpdateStyle(int &pageId, std::string &ref,
                         std::vector<std::pair<std::string, std::string>> *style,
                         std::vector<std::pair<std::string, std::string>> *margin,
                         std::vector<std::pair<std::string, std::string>> *padding,
                         std::vector<std::pair<std::string, std::string>> *border);
 
-    int callUpdateAttr(std::string &pageId, std::string &ref,
+    int callUpdateAttr(int &pageId, std::string &ref,
                        std::vector<std::pair<std::string, std::string>> *attrs);
 
-    int callCreateFinish(std::string &pageId);
+    int callCreateFinish(int &pageId);
 
-    void callLogOfFirstScreen(std::string &message);
-
-
-
-    int callHasTransitionPros(std::string &pageId, const std::string &ref,
+    int callHasTransitionPros(int &pageId, const std::string &ref,
                       std::vector<std::pair<std::string, std::string>> *style);
 
 

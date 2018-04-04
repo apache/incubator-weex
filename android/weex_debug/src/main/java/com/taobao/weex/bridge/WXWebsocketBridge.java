@@ -189,84 +189,84 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callCreateBody(String pageId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+  public int callCreateBody(int instanceId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callCreateBody(pageId, componentType, ref, styles, attributes, events, margins, paddings, borders);
+    mJsManager.callCreateBody(String.valueOf(instanceId), componentType, ref, styles, attributes, events, margins, paddings, borders);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+  public int callAddElement(int instanceId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callAddElement(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
+    mJsManager.callAddElement(String.valueOf(instanceId), componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callRemoveElement(String instanceId, String ref) {
+  public int callRemoveElement(int instanceId, String ref) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callRemoveElement(instanceId, ref);
+    mJsManager.callRemoveElement(String.valueOf(instanceId), ref);
 
 
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callMoveElement(String instanceId, String ref, String parentref, int index) {
+  public int callMoveElement(int instanceId, String ref, String parentref, int index) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callMoveElement(instanceId, ref, parentref, index);
+    mJsManager.callMoveElement(String.valueOf(instanceId), ref, parentref, index);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callAddEvent(String instanceId, String ref, String event) {
+  public int callAddEvent(int instanceId, String ref, String event) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callAddEvent(instanceId, ref, event);
+    mJsManager.callAddEvent(String.valueOf(instanceId), ref, event);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callRemoveEvent(String instanceId, String ref, String event) {
+  public int callRemoveEvent(int instanceId, String ref, String event) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callRemoveEvent(instanceId, ref, event);
+    mJsManager.callRemoveEvent(String.valueOf(instanceId), ref, event);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callUpdateStyle(String instanceId, String ref, HashMap<String, Object> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+  public int callUpdateStyle(int instanceId, String ref, HashMap<String, Object> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callUpdateStyle(instanceId, ref, styles, paddings, margins, borders);
+    mJsManager.callUpdateStyle(String.valueOf(instanceId), ref, styles, paddings, margins, borders);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callUpdateAttrs(String instanceId, String ref, HashMap<String, String> attrs) {
+  public int callUpdateAttrs(int instanceId, String ref, HashMap<String, String> attrs) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callUpdateAttrs(instanceId, ref, attrs);
+    mJsManager.callUpdateAttrs(String.valueOf(instanceId), ref, attrs);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callLayout(int instanceId, String ref, int top, int bottom, int left, int right, int height, int width) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callLayout(pageId, ref, top, bottom, left, right, height, width);
+    mJsManager.callLayout(String.valueOf(instanceId), ref, top, bottom, left, right, height, width);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
   @Override
-  public int callCreateFinish(String instanceId) {
+  public int callCreateFinish(int instanceId) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callCreateFinish(instanceId);
+    mJsManager.callCreateFinish(String.valueOf(instanceId));
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -319,8 +319,9 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
     Toast.makeText(WXEnvironment.sApplication, "socket connect failure!", Toast.LENGTH_SHORT).show();
   }
 
-  public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
-    return mJsManager.callHasTransitionPros(instanceId, ref, styles);
+  @Override
+  public int callHasTransitionPros(int instanceId, String ref, HashMap<String, String> styles) {
+    return mJsManager.callHasTransitionPros(String.valueOf(instanceId), ref, styles);
   }
 
   @Override

@@ -8,12 +8,12 @@ namespace WeexCore {
   class RenderActionCreateFinish : public RenderAction {
 
   public:
-    RenderActionCreateFinish(const std::string &pageId);
+    RenderActionCreateFinish(const int &pageId);
 
     void ExecuteAction();
 
   public:
-    std::string mPageId;
+    int mPageId;
   };
 }
 

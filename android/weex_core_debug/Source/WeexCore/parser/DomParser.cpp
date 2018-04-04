@@ -262,7 +262,7 @@ namespace WeexCore {
   }
 
   RenderObject *
-  ParseJsonObject(JsonParser &r, RenderObject *parent, int index, const std::string &pageId) {
+  ParseJsonObject(JsonParser &r, RenderObject *parent, int index, const int &pageId) {
 
     RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
     r.EnterObject();
@@ -413,7 +413,7 @@ namespace WeexCore {
  * @param page : {@link RenderPage}
  * @return {@link RenderObject*}
  */
-  RenderObject *Json2RenderObject(char *data, const std::string &pageId) {
+  RenderObject *Json2RenderObject(char *data, const int &pageId) {
 
     JsonParser r(data);
     return ParseJsonObject(r, nullptr, 0, pageId);

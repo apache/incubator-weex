@@ -59,7 +59,7 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
 static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments *arguments);
 
 
-static void reportException(const char *instanceID, const char *func, const char *exception_string);
+static void reportException(const int instanceID, const char *func, const char *exception_string);
 
 namespace WeexCore {
 

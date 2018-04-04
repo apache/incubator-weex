@@ -16,13 +16,13 @@ namespace WeexCore {
 }
 
 static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller,
-                                    jstring instanceId,
+                                    jint instanceId,
                                     jstring ref,
                                     jobject contentBoxMeasurement) {
   if (contentBoxMeasurement == nullptr)
     return;
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 

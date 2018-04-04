@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
+  RenderActionRemoveEvent::RenderActionRemoveEvent(const int &pageId, const std::string &ref, const std::string &event) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mEvent = event;

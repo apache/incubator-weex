@@ -29,33 +29,33 @@ namespace WeexCore {
 
   public:
 
-    void Batch(const std::string &pageId);
+    void Batch(const int &pageId);
 
     // create root node
-    bool CreatePage(std::string pageId, const std::string &data);
+    bool CreatePage(int pageId, const std::string &data);
 
-    bool AddRenderObject(const std::string &pageId, const std::string &parentRef, int index,
+    bool AddRenderObject(const int &pageId, const std::string &parentRef, int index,
                          const std::string &data);
 
-    bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
+    bool RemoveRenderObject(const int &pageId, const std::string &ref);
 
     bool
-    MoveRenderObject(const std::string &pageId, const std::string &ref,
+    MoveRenderObject(const int &pageId, const std::string &ref,
                      const std::string &parentRef, int index);
 
-    bool UpdateAttr(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateAttr(const int &pageId, const std::string &ref, const std::string &data);
 
-    bool UpdateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateStyle(const int &pageId, const std::string &ref, const std::string &data);
 
-    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const int &pageId, const std::string &ref, const std::string &event);
 
-    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool RemoveEvent(const int &pageId, const std::string &ref, const std::string &event);
 
-    bool CreateFinish(const std::string &pageId);
+    bool CreateFinish(const int &pageId);
 
-    RenderPage *GetPage(const std::string &id);
+    RenderPage *GetPage(const int &id);
 
-    bool ClosePage(const std::string &pageId);
+    bool ClosePage(const int &pageId);
 
     static RenderManager *GetInstance() {
       if (!m_pInstance) {
@@ -66,7 +66,7 @@ namespace WeexCore {
 
   private:
     static RenderManager *m_pInstance;
-    std::map<std::string, RenderPage *> mPages;
+    std::map<int, RenderPage *> mPages;
   };
 }
 

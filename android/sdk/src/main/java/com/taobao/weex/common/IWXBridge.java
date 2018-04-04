@@ -117,36 +117,36 @@ public interface IWXBridge extends IWXObject {
   void reportServerCrash(String instanceId, String crashFile);
 
 
-  public int callCreateBody(String pageId, String componentType, String ref,
+  public int callCreateBody(int instanceId, String componentType, String ref,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       float[] margins, float[] paddings, float[] borders);
 
-  public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef,
+  public int callAddElement(int instanceId, String componentType, String ref, int index, String parentRef,
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       float[] margins, float[] paddings, float[] borders);
 
-  int callRemoveElement(String instanceId, String ref);
+  int callRemoveElement(int instanceId, String ref);
 
-  int callMoveElement(String instanceId, String ref, String parentref, int index);
+  int callMoveElement(int instanceId, String ref, String parentref, int index);
 
-  int callAddEvent(String instanceId, String ref, String event);
+  int callAddEvent(int instanceId, String ref, String event);
 
-  int callRemoveEvent(String instanceId, String ref, String event);
+  int callRemoveEvent(int instanceId, String ref, String event);
 
-  public int callUpdateStyle(String instanceId, String ref,
+  public int callUpdateStyle(int instanceId, String ref,
                                        HashMap<String, Object> styles,
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders);
 
-  int callUpdateAttrs(String instanceId, String ref,
+  int callUpdateAttrs(int instanceId, String ref,
                                        HashMap<String, String> attrs);
 
-  int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayout(int instanceId, String ref, int top, int bottom, int left, int right, int height, int width);
 
-  int callCreateFinish(String instanceId);
+  int callCreateFinish(int instanceId);
 
-  int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
+  int callHasTransitionPros(int instanceId, String ref, HashMap<String, String> styles);
 
   void setStyleWidth(String instanceId, String ref, float value);
 

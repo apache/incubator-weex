@@ -55,7 +55,7 @@ namespace WeexCore {
     static constexpr bool useVSync = true;
     std::atomic_bool needLayout{false};
     std::atomic_bool hasForeLayoutAction{false};
-    RenderPage(std::string pageId);
+    RenderPage(int pageId);
 
     ~RenderPage();
 
@@ -128,7 +128,7 @@ namespace WeexCore {
       return render_root;
     }
 
-    inline std::string PageId() {
+    inline int PageId() {
       return mPageId;
     }
 
@@ -172,7 +172,7 @@ namespace WeexCore {
     bool mAlreadyCreateFinish = false;
     float mViewPortWidth;
     RenderObject *render_root = nullptr;
-    std::string mPageId;
+    int mPageId;
     std::pair<float,float> renderPageSize;
     std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;

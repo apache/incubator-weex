@@ -27,16 +27,16 @@ namespace WeexCore {
   }
 
   bool WXCoreEnvironment::SetDeviceWidth(const std::string &width) {
-    if (width.empty() || isnan(getFloat(width)))
+    if (width.empty() || isnan(getFloat(width.c_str())))
       return false;
-    mDeviceWidth = getFloat(width);
+    mDeviceWidth = getFloat(width.c_str());
     return true;
   }
 
   bool WXCoreEnvironment::SetDeviceHeight(const std::string &height) {
-    if (height.empty() || isnan(getFloat(height)))
+    if (height.empty() || isnan(getFloat(height.c_str())))
       return false;
-    mDeviceHeight = getFloat(height);
+    mDeviceHeight = getFloat(height.c_str());
     return true;
   }
 

@@ -8,7 +8,7 @@ namespace WeexCore {
   class RenderActionLayout : public RenderAction {
 
   public:
-    RenderActionLayout(const std::string &pageId, const RenderObject *render);
+    RenderActionLayout(const int &pageId, const RenderObject *render);
 
     void ExecuteAction();
 
@@ -16,7 +16,7 @@ namespace WeexCore {
 
   public:
     EventsSet *mEvents;
-    std::string mPageId;
+    int mPageId;
     std::string mRef;
     float mWidth;
     float mHeight;

@@ -1,4 +1,5 @@
 #include <WeexCore/platform/android/base/string/StringUtils.h>
+#include <base/ViewUtils.h>
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;
@@ -217,7 +218,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   LOGD("[ExtendJSApi] functionCallCreateBody >>>> pageId: %s, domStr: %s", pageId, domStr);
 #endif
 
-  RenderManager::GetInstance()->CreatePage(pageId, domStr) ? 0 : -1;
+  RenderManager::GetInstance()->CreatePage(getInteger(pageId), domStr) ? 0 : -1;
 
   delete[]pageId;
   delete[]domStr;
@@ -260,7 +261,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   }
 #endif
 
-  RenderManager::GetInstance()->AddRenderObject(pageId, parentRef, index, domStr);
+  RenderManager::GetInstance()->AddRenderObject(getInteger(pageId), parentRef, index, domStr);
 
   delete[]pageId;
   delete[]parentRef;
@@ -282,7 +283,7 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
        ref);
 #endif
 
-  RenderManager::GetInstance()->RemoveRenderObject(pageId, ref);
+  RenderManager::GetInstance()->RemoveRenderObject(getInteger(pageId), ref);
 
   delete[]pageId;
   delete[]ref;
@@ -306,7 +307,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
        pageId, ref, parentRef, index);
 #endif
 
-  RenderManager::GetInstance()->MoveRenderObject(pageId, ref, parentRef, index);
+  RenderManager::GetInstance()->MoveRenderObject(getInteger(pageId), ref, parentRef, index);
 
   delete[]pageId;
   delete[]ref;
@@ -329,7 +330,7 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
        ref, event);
 #endif
 
-  RenderManager::GetInstance()->AddEvent(pageId, ref, event);
+  RenderManager::GetInstance()->AddEvent(getInteger(pageId), ref, event);
 
   delete[]pageId;
   delete[]ref;
@@ -351,7 +352,7 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
        ref, event);
 #endif
 
-  RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
+  RenderManager::GetInstance()->RemoveEvent(getInteger(pageId), ref, event);
 
   delete[]pageId;
   delete[]ref;
@@ -373,7 +374,7 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
        ref, data);
 #endif
 
-  RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
+  RenderManager::GetInstance()->UpdateStyle(getInteger(pageId), ref, data);
 
   delete[] pageId;
   delete[] ref;
@@ -395,7 +396,7 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
        ref, data);
 #endif
 
-  RenderManager::GetInstance()->UpdateAttr(pageId, ref, data);
+  RenderManager::GetInstance()->UpdateAttr(getInteger(pageId), ref, data);
 
   delete[] pageId;
   delete[] ref;
@@ -414,7 +415,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId);
 #endif
 
-  RenderManager::GetInstance()->CreateFinish(pageId);
+  RenderManager::GetInstance()->CreateFinish(getInteger(pageId));
 
   delete[]pageId;
   return createInt32Result(0);
@@ -434,7 +435,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 #endif
 
   if (task == "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") {
-    RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
+    RenderManager::GetInstance()->CreateFinish(getInteger(pageId.c_str())) ? 0 : -1;
     env->DeleteLocalRef(jInstanceId);
     env->DeleteLocalRef(jTaskString);
     env->DeleteLocalRef(jCallback);

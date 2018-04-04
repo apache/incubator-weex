@@ -136,8 +136,6 @@ bool WeexProxy::execJS(JNIEnv *env,
     }
     addString(env, serializer.get(), jfunction);
 
-//    mMessage = "end ExecJS before for：" + jString2Str(env, jfunction);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     for (int i = 0; i < length; i++) {
       jobject jArg = env->GetObjectArrayElement(jargs, i);
 
@@ -171,26 +169,15 @@ bool WeexProxy::execJS(JNIEnv *env,
       env->DeleteLocalRef(jArg);
     }
 
-//    mMessage = "end ExecJS after for：" + jString2Str(env, jfunction);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
     std::unique_ptr <IPCBuffer> buffer = serializer->finish();
 
-//    mMessage = "end ExecJS start send：" + jString2Str(env, jfunction);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
-
     std::unique_ptr <IPCResult> result = sSender->send(buffer.get());
-
-//    mMessage = "end ExecJS after send：" + jString2Str(env, jfunction);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
 
     if (result->getType() != IPCType::INT32) {
       LOGE("execJS Unexpected result type");
       return false;
     }
 
-//    mMessage = "end ExecJS：" + jString2Str(env, jfunction);
-//    Bridge_Impl_Android::getInstance()->callLogOfFirstScreen(mMessage);
     return result->get<jint>();
   } catch (IPCException &e) {
     LOGE("%s", e.msg());

@@ -40,11 +40,11 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
 
 void static
 SetStyleWidth(JNIEnv *env, jobject jcaller,
-              jstring instanceId,
+              jint instanceId,
               jstring ref,
               jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -59,11 +59,11 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
 
 void static
 SetStyleHeight(JNIEnv *env, jobject jcaller,
-               jstring instanceId,
+               jint instanceId,
                jstring ref,
                jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -77,11 +77,11 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
-                      jstring instanceId,
+                      jint instanceId,
                       jstring ref,
                       jint edge,
                       jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -104,12 +104,12 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
-                       jstring instanceId,
+                       jint instanceId,
                        jstring ref,
                        jint edge,
                        jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -133,12 +133,12 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
 
 
 static void SetPosition(JNIEnv *env, jobject jcaller,
-                        jstring instanceId,
+                        jint instanceId,
                         jstring ref,
                         jint edge,
                         jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -159,10 +159,10 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 }
 
 static void MarkDirty(JNIEnv *env, jobject jcaller,
-                            jstring instanceId,
+                      jint instanceId,
                             jstring ref,
                             jboolean dirty) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
@@ -184,9 +184,9 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
 }
 
 static void SetViewPortWidth(JNIEnv *env, jobject jcaller,
-                            jstring instanceId,
+                             jint instanceId,
                             jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 

@@ -8,14 +8,14 @@ namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-  bool RenderManager::CreatePage(std::string pageId, const std::string &data) {
+  bool RenderManager::CreatePage(int pageId, const std::string &data) {
 
 #if RENDER_LOG
     LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s", pageId.c_str(), data.c_str());
 #endif
 
     RenderPage *page = new RenderPage(pageId);
-    mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
+    mPages.insert(std::pair<int, RenderPage *>(pageId, page));
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *root = Json2RenderObject(c_data, pageId);
@@ -25,7 +25,7 @@ namespace WeexCore {
     return page->CreateRootRender(root);
   }
 
-  bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
+  bool RenderManager::AddRenderObject(const int &pageId, const std::string &parentRef,
                                       int index,
                                       const std::string &data) {
 
@@ -50,7 +50,7 @@ namespace WeexCore {
     return page->AddRenderObject(parentRef, index, child);
   }
 
-  bool RenderManager::RemoveRenderObject(const std::string &pageId, const std::string &ref) {
+  bool RenderManager::RemoveRenderObject(const int &pageId, const std::string &ref) {
 
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -65,7 +65,7 @@ namespace WeexCore {
     return page->RemoveRenderObject(ref);
   }
 
-  bool RenderManager::MoveRenderObject(const std::string &pageId, const std::string &ref,
+  bool RenderManager::MoveRenderObject(const int &pageId, const std::string &ref,
                                        const std::string &parentRef,
                                        int index) {
     RenderPage *page = this->GetPage(pageId);
@@ -81,7 +81,7 @@ namespace WeexCore {
     return page->MoveRenderObject(ref, parentRef, index);
   }
 
-  bool RenderManager::UpdateAttr(const std::string &pageId, const std::string &ref,
+  bool RenderManager::UpdateAttr(const int &pageId, const std::string &ref,
                                  const std::string &data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -101,7 +101,7 @@ namespace WeexCore {
     return page->UpdateAttr(ref, attrs);
   }
 
-  bool RenderManager::UpdateStyle(const std::string &pageId, const std::string &ref,
+  bool RenderManager::UpdateStyle(const int &pageId, const std::string &ref,
                                   const std::string &data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -121,7 +121,7 @@ namespace WeexCore {
     return page->UpdateStyle(ref, styles);
   }
 
-  bool RenderManager::AddEvent(const std::string &pageId, const std::string &ref,
+  bool RenderManager::AddEvent(const int &pageId, const std::string &ref,
                                const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -136,7 +136,7 @@ namespace WeexCore {
     return page->AddEvent(ref, event);
   }
 
-  bool RenderManager::RemoveEvent(const std::string &pageId, const std::string &ref,
+  bool RenderManager::RemoveEvent(const int &pageId, const std::string &ref,
                                   const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -151,7 +151,7 @@ namespace WeexCore {
     return page->RemoveEvent(ref, event);
   }
 
-  bool RenderManager::CreateFinish(const std::string &pageId) {
+  bool RenderManager::CreateFinish(const int &pageId) {
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
       return false;
@@ -164,8 +164,8 @@ namespace WeexCore {
     return page->CreateFinish();
   }
 
-  RenderPage *RenderManager::GetPage(const std::string &id) {
-    std::map<std::string, RenderPage *>::iterator iter = mPages.find(id);
+  RenderPage *RenderManager::GetPage(const int &id) {
+    std::map<int, RenderPage *>::iterator iter = mPages.find(id);
     if (iter != mPages.end()) {
       return iter->second;
     } else {
@@ -173,7 +173,7 @@ namespace WeexCore {
     }
   }
 
-  bool RenderManager::ClosePage(const std::string &pageId) {
+  bool RenderManager::ClosePage(const int &pageId) {
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
       return false;
@@ -187,7 +187,7 @@ namespace WeexCore {
     page = nullptr;
   }
 
-  void RenderManager::Batch(const std::string &pageId) {
+  void RenderManager::Batch(const int &pageId) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return;

@@ -8,14 +8,14 @@ namespace WeexCore {
   class RenderActionMoveElement : public RenderAction {
 
   public:
-    RenderActionMoveElement(const std::string &pageId, const std::string &ref,
+    RenderActionMoveElement(const int &pageId, const std::string &ref,
                             const std::string &parentRef,
                             int index);
 
     void ExecuteAction();
 
   public:
-    std::string mPageId;
+    int mPageId;
     std::string mRef;
     std::string mParentRef;
     int mIndex;

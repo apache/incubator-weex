@@ -23,7 +23,7 @@ namespace WeexCore {
 
   static bool splitScreenRendering = false;
 
-  RenderPage::RenderPage(std::string pageId) {
+  RenderPage::RenderPage(int pageId) {
 
 #if RENDER_LOG
     LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
