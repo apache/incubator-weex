@@ -185,6 +185,7 @@ public class Statements {
                             if(map == null){
                                 key = index;
                                 value = item;
+                                index++;
                             }else{
                                 key = item;
                                 value = map.get(item);
