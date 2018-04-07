@@ -564,12 +564,14 @@ _Pragma("clang diagnostic pop") \
         // Fallback on earlier versions
         return bundleType;
     }
+    // trim like whiteSpace and newline charset
+    jsBundleString = [jsBundleString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
     // use the top 100 characters match the bundleType
     if (jsBundleString.length > 100) {
         jsBundleString = [jsBundleString substringWithRange:NSMakeRange(0, 100)];
     }
     
-    jsBundleString = [jsBundleString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (!jsBundleString ) {
         return bundleType;
     }
