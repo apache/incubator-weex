@@ -35,14 +35,38 @@
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
-@interface UIGestureRecognizer (WXGesture)
-
+@interface UITouch (WXTouchGestureRecognizer)
 @property (nonatomic, strong) NSNumber *wx_identifier;
+@property (nonatomic, strong) NSNumber *wx_stopPropagation;
+@end
 
+@implementation UITouch (WXTouchGestureRecognizer)
+- (NSNumber *)wx_identifier
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setWx_identifier:(NSNumber *)wx_identifier
+{
+    objc_setAssociatedObject(self, @selector(wx_identifier), wx_identifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)wx_stopPropagation
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setWx_stopPropagation:(NSNumber *)wx_stopPropagation
+{
+    objc_setAssociatedObject(self, @selector(wx_stopPropagation), wx_stopPropagation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+@end
+
+@interface UIGestureRecognizer (WXGesture)
+@property (nonatomic, strong) NSNumber *wx_identifier;
 @end
 
 @implementation UIGestureRecognizer (WXGesture)
-
 - (NSNumber *)wx_identifier
 {
     NSNumber *identifier = objc_getAssociatedObject(self, _cmd);
@@ -59,7 +83,6 @@
 {
     objc_setAssociatedObject(self, @selector(wx_identifier), wx_identifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-
 @end
 
 @interface WXTouchGestureRecognizer : UIGestureRecognizer
