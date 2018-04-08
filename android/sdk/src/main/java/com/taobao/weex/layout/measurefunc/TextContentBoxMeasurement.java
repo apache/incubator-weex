@@ -111,7 +111,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   private TextUtils.TruncateAt textOverflow;
   private Layout.Alignment mAlignment;
   private WXTextDecoration mTextDecoration = WXTextDecoration.NONE;
-  private TextPaint mTextPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+  private TextPaint mTextPaint;
   private @Nullable
   Spanned spanned;
   private @Nullable
@@ -123,6 +123,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    **/
   @Override
   public void layoutBefore() {
+    mTextPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
     hasBeenMeasured = false;
     updateStyleAndText();
     spanned = createSpanned(mText);
@@ -467,7 +468,6 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     if (layout != null) {
       atomicReference.set(layout);
       layout = null;
-      mTextPaint = new TextPaint(mTextPaint);
     }
     hasBeenMeasured = false;
   }
