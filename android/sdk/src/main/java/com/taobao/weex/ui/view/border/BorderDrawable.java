@@ -102,10 +102,10 @@ public class BorderDrawable extends Drawable {
   private Shader mShader = null;
   private int mAlpha = 255;
 
-  private final TopLeftCorner mTopLeft = new TopLeftCorner();
-  private final TopRightCorner mTopRight = new TopRightCorner();
-  private final BottomRightCorner mBottomRight = new BottomRightCorner();
-  private final BottomLeftCorner mBottomLeft = new BottomLeftCorner();
+  private final TopLeftCorner mTopLeftCorner = new TopLeftCorner();
+  private final TopRightCorner mTopRightCorner = new TopRightCorner();
+  private final BottomRightCorner mBottomRightCorner = new BottomRightCorner();
+  private final BottomLeftCorner mBottomLeftCorner = new BottomLeftCorner();
 
   private final BorderEdge mTopBorderEdge = new BorderEdge(CSSShorthand.EDGE.TOP);
   private final BorderEdge mRightBorderEdge = new BorderEdge(CSSShorthand.EDGE.RIGHT);
@@ -239,6 +239,29 @@ public class BorderDrawable extends Drawable {
             topRightRadius, topRightRadius,
             bottomRightRadius, bottomRightRadius,
             bottomLeftRadius, bottomLeftRadius};
+  }
+
+  public
+  @NonNull
+  float[] getBorderInnerRadius(RectF borderBox) {
+    prepareBorderRadius(borderBox);
+    if (mOverlappingBorderRadius == null) {
+      mOverlappingBorderRadius = new CSSShorthand<>();
+    }
+    float topLeftRadius = mOverlappingBorderRadius.get(BORDER_TOP_LEFT);
+    float topRightRadius = mOverlappingBorderRadius.get(BORDER_TOP_RIGHT);
+    float bottomRightRadius = mOverlappingBorderRadius.get(BORDER_BOTTOM_RIGHT);
+    float bottomLeftRadius = mOverlappingBorderRadius.get(BORDER_BOTTOM_LEFT);
+    if (null != mBorderWidth) {
+      topLeftRadius = Math.max(topLeftRadius - mBorderWidth.get(EDGE.TOP), 0);
+      topRightRadius = Math.max(topRightRadius - mBorderWidth.get(EDGE.TOP), 0);
+      bottomRightRadius = Math.max(bottomRightRadius - mBorderWidth.get(EDGE.BOTTOM), 0);
+      bottomLeftRadius = Math.max(bottomLeftRadius - mBorderWidth.get(EDGE.BOTTOM), 0);
+    }
+    return new float[] {topLeftRadius, topLeftRadius,
+        topRightRadius, topRightRadius,
+        bottomRightRadius, bottomRightRadius,
+        bottomLeftRadius, bottomLeftRadius};
   }
 
   public void setBorderColor(CSSShorthand.EDGE edge, int color) {
@@ -419,33 +442,33 @@ public class BorderDrawable extends Drawable {
     if (mOverlappingBorderRadius == null) {
       mOverlappingBorderRadius = new CSSShorthand<>();
     }
-    mTopLeft.set(
+    mTopLeftCorner.set(
         mOverlappingBorderRadius.get(BORDER_TOP_LEFT),
         mBorderWidth.get(EDGE.LEFT),
         mBorderWidth.get(EDGE.TOP),
         rectBounds);
-    mTopRight.set(
+    mTopRightCorner.set(
         mOverlappingBorderRadius.get(BORDER_TOP_RIGHT),
         mBorderWidth.get(EDGE.TOP),
         mBorderWidth.get(EDGE.RIGHT),
         rectBounds);
-    mBottomRight.set(
+    mBottomRightCorner.set(
         mOverlappingBorderRadius.get(BORDER_BOTTOM_RIGHT),
         mBorderWidth.get(EDGE.RIGHT),
         mBorderWidth.get(EDGE.BOTTOM),
         rectBounds);
-    mBottomLeft.set(
+    mBottomLeftCorner.set(
         mOverlappingBorderRadius.get(BORDER_BOTTOM_LEFT),
         mBorderWidth.get(EDGE.BOTTOM),
         mBorderWidth.get(EDGE.LEFT),
         rectBounds);
-    drawOneSide(canvas, mTopBorderEdge.set(mTopLeft, mTopRight,
+    drawOneSide(canvas, mTopBorderEdge.set(mTopLeftCorner, mTopRightCorner,
         mBorderWidth.get(EDGE.TOP)));
-    drawOneSide(canvas, mRightBorderEdge.set(mTopRight, mBottomRight,
+    drawOneSide(canvas, mRightBorderEdge.set(mTopRightCorner, mBottomRightCorner,
         mBorderWidth.get(EDGE.RIGHT)));
-    drawOneSide(canvas, mBottomBorderEdge.set(mBottomRight, mBottomLeft,
+    drawOneSide(canvas, mBottomBorderEdge.set(mBottomRightCorner, mBottomLeftCorner,
         mBorderWidth.get(EDGE.BOTTOM)));
-    drawOneSide(canvas, mLeftBorderEdge.set(mBottomLeft, mTopLeft,
+    drawOneSide(canvas, mLeftBorderEdge.set(mBottomLeftCorner, mTopLeftCorner,
         mBorderWidth.get(EDGE.LEFT)));
   }
 

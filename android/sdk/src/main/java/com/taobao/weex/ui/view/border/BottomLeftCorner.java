@@ -21,7 +21,6 @@ package com.taobao.weex.ui.view.border;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import com.taobao.weex.utils.WXLogUtils;
 
 class BottomLeftCorner extends BorderCorner {
 
@@ -32,7 +31,6 @@ class BottomLeftCorner extends BorderCorner {
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerExist() {
-    WXLogUtils.w("BottomLeftCorner", "++++++++++> getOvalIfInnerCornerExist() " + mOval);
     final float left = getPostBorderWidth() / 2;
     final float top = getBorderBox().height() - (2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
     final float right = 2 * getOuterCornerRadius() - getPostBorderWidth() / 2;
@@ -48,7 +46,6 @@ class BottomLeftCorner extends BorderCorner {
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerNotExist() {
-    WXLogUtils.w("BottomLeftCorner", "++++++++++> getOvalIfInnerCornerNotExist() " + mOval);
     final float left = getOuterCornerRadius() / 2;
     final float top = getBorderBox().height() - 1.5f * getOuterCornerRadius();
     final float right = 1.5f * getOuterCornerRadius();

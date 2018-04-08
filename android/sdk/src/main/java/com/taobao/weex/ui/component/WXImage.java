@@ -359,7 +359,7 @@ public class WXImage extends WXComponent<ImageView> {
       float[] borderRadius;
       if (borderDrawable != null) {
         RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(this), WXDomUtils.getContentHeight(this));
-        borderRadius = borderDrawable.getBorderRadius(borderBox);
+        borderRadius = borderDrawable.getBorderInnerRadius(borderBox);
       } else {
         borderRadius = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
       }
