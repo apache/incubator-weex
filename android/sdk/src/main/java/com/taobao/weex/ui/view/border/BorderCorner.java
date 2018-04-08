@@ -18,23 +18,32 @@
  */
 package com.taobao.weex.ui.view.border;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-
 import com.taobao.weex.base.FloatUtil;
 
 abstract class BorderCorner {
 
   final static float SWEEP_ANGLE = 45;
-  private final float mCornerRadius;
-  private final float mPreBorderWidth;
-  private final float mPostBorderWidth;
-  private final RectF mBorderBox;
-  protected final float mAngleBisector;
+  private float mCornerRadius;
+  private float mPreBorderWidth;
+  private float mPostBorderWidth;
+  private RectF mBorderBox;
+  protected float mAngleBisector;
 
-  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth,
-               @NonNull RectF borderBox, float angleBisector) {
+  protected RectF mOval;
+  protected PointF mRoundCornerStart;
+  protected PointF mRoundCornerEnd;
+  protected PointF mSharpCornerVertex;
+
+  BorderCorner() {
+  }
+
+  final void set(float cornerRadius, float preBorderWidth, float postBorderWidth,
+                  @NonNull RectF borderBox, float angleBisector) {
     mCornerRadius = cornerRadius;
     mPreBorderWidth = preBorderWidth;
     mPostBorderWidth = postBorderWidth;
@@ -134,4 +143,26 @@ abstract class BorderCorner {
   @NonNull
   abstract protected RectF getOvalIfInnerCornerNotExist();
 
+  public final void drawRoundedCorner(@NonNull Canvas canvas, @NonNull Paint paint, float startAngle,
+                                 @NonNull PointF startPoint, @NonNull PointF endPoint) {
+    if (this.hasOuterCorner()) {
+      RectF oval;
+      if (this.hasInnerCorner()) {
+        oval = this.getOvalIfInnerCornerExist();
+      } else {
+        paint.setStrokeWidth(this.getOuterCornerRadius());
+        oval = this.getOvalIfInnerCornerNotExist();
+      }
+      /*Due to the problem of hardware-acceleration, border-radius in some case will not
+       be rendered if Path.addArc used instead and the following condition met.
+       1. hardware-acceleration enabled
+       2. System version is Android 4.1
+       3. Screen width is 720px.
+       http://dotwe.org/weex/421b9ad09fde51c0b49bb56b37fcf955
+      */
+      canvas.drawArc(oval, startAngle, BorderCorner.SWEEP_ANGLE, false, paint);
+    } else {
+      canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, paint);
+    }
+  }
 }

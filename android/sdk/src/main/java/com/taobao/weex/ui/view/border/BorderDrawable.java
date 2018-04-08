@@ -18,11 +18,10 @@
  */
 package com.taobao.weex.ui.view.border;
 
-import static com.taobao.weex.dom.CSSShorthand.CORNER.ALL;
-import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_BOTTOM_LEFT;
-import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_BOTTOM_RIGHT;
-import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_TOP_LEFT;
-import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_TOP_RIGHT;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -39,7 +38,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.CSSShorthand.CORNER;
@@ -47,10 +45,11 @@ import com.taobao.weex.dom.CSSShorthand.EDGE;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import static com.taobao.weex.dom.CSSShorthand.CORNER.ALL;
+import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_BOTTOM_LEFT;
+import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_BOTTOM_RIGHT;
+import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_TOP_LEFT;
+import static com.taobao.weex.dom.CSSShorthand.CORNER.BORDER_TOP_RIGHT;
 
 /**
  * A subclass of
@@ -102,6 +101,16 @@ public class BorderDrawable extends Drawable {
    */
   private Shader mShader = null;
   private int mAlpha = 255;
+
+  private final TopLeftCorner mTopLeft = new TopLeftCorner();
+  private final TopRightCorner mTopRight = new TopRightCorner();
+  private final BottomRightCorner mBottomRight = new BottomRightCorner();
+  private final BottomLeftCorner mBottomLeft = new BottomLeftCorner();
+
+  private final BorderEdge mTopBorderEdge = new BorderEdge(CSSShorthand.EDGE.TOP);
+  private final BorderEdge mRightBorderEdge = new BorderEdge(CSSShorthand.EDGE.RIGHT);
+  private final BorderEdge mBottomBorderEdge = new BorderEdge(CSSShorthand.EDGE.BOTTOM);
+  private final BorderEdge mLeftBorderEdge = new BorderEdge(CSSShorthand.EDGE.LEFT);
 
   public BorderDrawable() {
   }
@@ -407,37 +416,37 @@ public class BorderDrawable extends Drawable {
 
   private void drawBorders(Canvas canvas) {
     RectF rectBounds = new RectF(getBounds());
-    if(mOverlappingBorderRadius == null){
+    if (mOverlappingBorderRadius == null) {
       mOverlappingBorderRadius = new CSSShorthand<>();
     }
-    BorderCorner topLeft = new TopLeftCorner(
-            mOverlappingBorderRadius.get(BORDER_TOP_LEFT),
-            mBorderWidth.get(EDGE.LEFT),
-            mBorderWidth.get(EDGE.TOP),
-            rectBounds);
-    BorderCorner topRight = new TopRightCorner(
-            mOverlappingBorderRadius.get(BORDER_TOP_RIGHT),
-            mBorderWidth.get(EDGE.TOP),
-            mBorderWidth.get(EDGE.RIGHT),
-            rectBounds);
-    BorderCorner bottomRight = new BottomRightCorner(
-            mOverlappingBorderRadius.get(BORDER_BOTTOM_RIGHT),
-            mBorderWidth.get(EDGE.RIGHT),
-            mBorderWidth.get(EDGE.BOTTOM),
-            rectBounds);
-    BorderCorner bottomLeft = new BottomLeftCorner(
-            mOverlappingBorderRadius.get(BORDER_BOTTOM_LEFT),
-            mBorderWidth.get(EDGE.BOTTOM),
-            mBorderWidth.get(EDGE.LEFT),
-            rectBounds);
-    drawOneSide(canvas, new BorderEdge(topLeft, topRight, CSSShorthand.EDGE.TOP,
-            mBorderWidth.get(EDGE.TOP)));
-    drawOneSide(canvas, new BorderEdge(topRight, bottomRight, CSSShorthand.EDGE.RIGHT,
-            mBorderWidth.get(EDGE.RIGHT)));
-    drawOneSide(canvas, new BorderEdge(bottomRight, bottomLeft, CSSShorthand.EDGE.BOTTOM,
-            mBorderWidth.get(EDGE.BOTTOM)));
-    drawOneSide(canvas, new BorderEdge(bottomLeft, topLeft, CSSShorthand.EDGE.LEFT,
-            mBorderWidth.get(EDGE.LEFT)));
+    mTopLeft.set(
+        mOverlappingBorderRadius.get(BORDER_TOP_LEFT),
+        mBorderWidth.get(EDGE.LEFT),
+        mBorderWidth.get(EDGE.TOP),
+        rectBounds);
+    mTopRight.set(
+        mOverlappingBorderRadius.get(BORDER_TOP_RIGHT),
+        mBorderWidth.get(EDGE.TOP),
+        mBorderWidth.get(EDGE.RIGHT),
+        rectBounds);
+    mBottomRight.set(
+        mOverlappingBorderRadius.get(BORDER_BOTTOM_RIGHT),
+        mBorderWidth.get(EDGE.RIGHT),
+        mBorderWidth.get(EDGE.BOTTOM),
+        rectBounds);
+    mBottomLeft.set(
+        mOverlappingBorderRadius.get(BORDER_BOTTOM_LEFT),
+        mBorderWidth.get(EDGE.BOTTOM),
+        mBorderWidth.get(EDGE.LEFT),
+        rectBounds);
+    drawOneSide(canvas, mTopBorderEdge.set(mTopLeft, mTopRight,
+        mBorderWidth.get(EDGE.TOP)));
+    drawOneSide(canvas, mRightBorderEdge.set(mTopRight, mBottomRight,
+        mBorderWidth.get(EDGE.RIGHT)));
+    drawOneSide(canvas, mBottomBorderEdge.set(mBottomRight, mBottomLeft,
+        mBorderWidth.get(EDGE.BOTTOM)));
+    drawOneSide(canvas, mLeftBorderEdge.set(mBottomLeft, mTopLeft,
+        mBorderWidth.get(EDGE.LEFT)));
   }
 
   private void drawOneSide(Canvas canvas, @NonNull BorderEdge borderEdge) {

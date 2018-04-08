@@ -24,62 +24,92 @@ import android.support.annotation.NonNull;
 
 class TopRightCorner extends BorderCorner {
 
-  TopRightCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
-    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 315);
+  void set(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
+    set(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 315);
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerExist() {
-    return new RectF(getBorderBox().width() - (2 * getOuterCornerRadius() - getPostBorderWidth() / 2),
-            getPreBorderWidth() / 2,
-            getBorderBox().width() - getPostBorderWidth() / 2,
-            2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
+    final float left = getBorderBox().width() - (2 * getOuterCornerRadius() - getPostBorderWidth() / 2);
+    final float top = getPreBorderWidth() / 2;
+    final float right = getBorderBox().width() - getPostBorderWidth() / 2;
+    final float bottom = 2 * getOuterCornerRadius() - getPreBorderWidth() / 2;
+    if (null == mOval) {
+      mOval = new RectF(left, top, right, bottom);
+    } else {
+      mOval.set(left, top, right, bottom);
+    }
+    return mOval;
   }
 
   @NonNull
   @Override
   protected RectF getOvalIfInnerCornerNotExist() {
-    return new RectF(getBorderBox().width() - 1.5f * getOuterCornerRadius(),
-            getOuterCornerRadius() / 2,
-            getBorderBox().width()-getOuterCornerRadius()/2,
-            getOuterCornerRadius() * 1.5f);
+    final float left = getBorderBox().width() - 1.5f * getOuterCornerRadius();
+    final float top = getOuterCornerRadius() / 2;
+    final float right = getBorderBox().width()-getOuterCornerRadius()/2;
+    final float bottom = getOuterCornerRadius() * 1.5f;
+    if (null == mOval) {
+      mOval = new RectF(left, top, right, bottom);
+    } else {
+      mOval.set(left, top, right, bottom);
+    }
+    return mOval;
   }
 
   @NonNull
   @Override
   protected PointF getRoundCornerStart() {
-    return new PointF(getBorderBox().width() - getOuterCornerRadius(),
-            getPreBorderWidth() / 2);
+    final float x = getBorderBox().width() - getOuterCornerRadius();
+    final float y = getPreBorderWidth() / 2;
+    if (null == mRoundCornerStart) {
+      mRoundCornerStart = new PointF(x, y);
+    } else {
+      mRoundCornerStart.set(x, y);
+    }
+    return mRoundCornerStart;
   }
 
   @NonNull
   @Override
   protected PointF getSharpCornerVertex() {
-    return new PointF(getBorderBox().width() - getPostBorderWidth() / 2,
-            getPreBorderWidth() / 2);
+    final float x = getBorderBox().width() - getPostBorderWidth() / 2;
+    final float y = getPreBorderWidth() / 2;
+    if (null == mSharpCornerVertex) {
+      mSharpCornerVertex = new PointF(x, y);
+    } else {
+      mSharpCornerVertex.set(x, y);
+    }
+    return mSharpCornerVertex;
   }
 
   @NonNull
   @Override
   protected PointF getSharpCornerStart() {
-    PointF pointF=getSharpCornerVertex();
-    pointF.y=0;
+    PointF pointF = getSharpCornerVertex();
+    pointF.y = 0;
     return pointF;
   }
 
   @NonNull
   @Override
   protected PointF getSharpCornerEnd() {
-    PointF pointF=getSharpCornerVertex();
-    pointF.x=getBorderBox().right;
+    PointF pointF = getSharpCornerVertex();
+    pointF.x = getBorderBox().right;
     return pointF;
   }
 
   @NonNull
   @Override
   protected PointF getRoundCornerEnd() {
-    return new PointF(getBorderBox().width() - getPostBorderWidth() / 2,
-            getOuterCornerRadius());
+    final float x = getBorderBox().width() - getPostBorderWidth() / 2;
+    final float y = getOuterCornerRadius();
+    if (null == mRoundCornerEnd) {
+      mRoundCornerEnd = new PointF(x, y);
+    } else {
+      mRoundCornerEnd.set(x, y);
+    }
+    return mRoundCornerEnd;
   }
 }
