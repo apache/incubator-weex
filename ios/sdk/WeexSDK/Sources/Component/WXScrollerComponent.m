@@ -82,6 +82,7 @@
     BOOL _scrollable;
     NSString * _alwaysScrollableVertical;
     NSString * _alwaysScrollableHorizontal;
+    BOOL _bounces;
     
     // refreshForAppear: load more when refresh component begin appear(if scroll is dragging or decelerating, should delay)
     // refreshForWholeVisible: load more until the whole refresh component visible
@@ -146,6 +147,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if (attributes[@"alwaysScrollableHorizontal"]) {
             _alwaysScrollableHorizontal = [WXConvert NSString:attributes[@"alwaysScrollableHorizontal"]];
         }
+        _bounces = attributes[@"bounce"]?[WXConvert BOOL:attributes[@"bounce"]]:YES;
         _refreshType = [WXConvert NSString:attributes[@"refreshType"]]?:@"refreshForWholeVisible";
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
@@ -194,6 +196,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.showsHorizontalScrollIndicator = _showScrollBar;
     scrollView.scrollEnabled = _scrollable;
     scrollView.pagingEnabled = _pagingEnabled;
+    scrollView.bounces = _bounces;
     if (_alwaysScrollableHorizontal) {
         scrollView.alwaysBounceHorizontal = [WXConvert BOOL:_alwaysScrollableHorizontal];
     }
@@ -256,6 +259,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     
     if (attributes[@"loadmoreoffset"]) {
         _loadMoreOffset = [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (attributes[@"bounce"]) {
+        _bounces = [WXConvert BOOL:attributes[@"bounce"]];
+        ((UIScrollView *)self.view).bounces = _bounces;
     }
     
     if (attributes[@"loadmoreretry"]) {
