@@ -58,20 +58,21 @@ class BorderEdge {
    * @param paint the paint which is used to draw.
    */
   void drawEdge(@NonNull Canvas canvas, @NonNull Paint paint) {
-    PointF lineStart = mPreCorner.getCornerEnd();
     paint.setStrokeWidth(mBorderWidth);
 
-    mPreCorner.drawRoundedCorner(canvas, paint,
-            mPreCorner.getAngleBisectorDegree(),
-            mPreCorner.getSharpCornerStart(), lineStart);
+    mPreCorner.drawRoundedCorner(canvas, paint, mPreCorner.getAngleBisectorDegree());
 
     paint.setStrokeWidth(mBorderWidth);
-    PointF lineEnd = mPostCorner.getCornerStart();
-    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
 
-    mPostCorner.drawRoundedCorner(canvas, paint,
-            mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-            lineEnd, mPostCorner.getSharpCornerEnd());
+    final float lineStartX = mPreCorner.getRoundCornerEndX();
+    final float lineStartY = mPreCorner.getRoundCornerEndY();
+
+    final float lineEndX = mPostCorner.getRoundCornerStartX();
+    final float lineEndY = mPostCorner.getRoundCornerStartY();
+
+    canvas.drawLine(lineStartX, lineStartY, lineEndX, lineEndY, paint);
+
+    mPostCorner.drawRoundedCorner(canvas, paint, mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE);
   }
 
   /**

@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.view.border;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
@@ -28,88 +27,38 @@ class TopLeftCorner extends BorderCorner {
     set(cornerRadius, preBorderWidth, postBorderWidth, borderBox, 225);
   }
 
-  @NonNull
   @Override
-  protected RectF getOvalIfInnerCornerExist() {
-    final float left = getPreBorderWidth() / 2;
-    final float top = getPostBorderWidth() / 2;
-    final float right = 2 * getOuterCornerRadius() - getPreBorderWidth() / 2;
-    final float bottom = 2 * getOuterCornerRadius() - getPostBorderWidth() / 2;
-    if (null == mOval) {
-      mOval = new RectF(left, top, right, bottom);
+  protected void prepareOval() {
+    if (hasInnerCorner()) {
+      setOvalLeft(getPreBorderWidth() / 2);
+      setOvalTop(getPostBorderWidth() / 2);
+      setOvalRight(2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
+      setOvalBottom(2 * getOuterCornerRadius() - getPostBorderWidth() / 2);
     } else {
-      mOval.set(left, top, right, bottom);
+      setOvalLeft(getOuterCornerRadius() / 2);
+      setOvalTop(getOuterCornerRadius() / 2);
+      setOvalRight(getOuterCornerRadius() * 1.5f);
+      setOvalBottom(getOuterCornerRadius() * 1.5f);
     }
-    return mOval;
   }
 
-  @NonNull
   @Override
-  protected RectF getOvalIfInnerCornerNotExist() {
-    final float left = getOuterCornerRadius() / 2;
-    final float top = getOuterCornerRadius() / 2;
-    final float right = getOuterCornerRadius() * 1.5f;
-    final float bottom = getOuterCornerRadius() * 1.5f;
-    if (null == mOval) {
-      mOval = new RectF(left, top, right, bottom);
+  protected void prepareRoundCorner() {
+    if (hasOuterCorner()) {
+      setRoundCornerStartX(getPreBorderWidth() / 2);
+      setRoundCornerStartY(getOuterCornerRadius());
+
+      setRoundCornerEndX(getOuterCornerRadius());
+      setRoundCornerEndY(getPostBorderWidth() / 2);
     } else {
-      mOval.set(left, top, right, bottom);
+      final float x = getPreBorderWidth() / 2;
+      final float y = getPostBorderWidth() / 2;
+
+      setRoundCornerStartX(x);
+      setRoundCornerStartY(y);
+
+      setRoundCornerEndX(x);
+      setRoundCornerEndY(y);
     }
-    return mOval;
-  }
-
-  @NonNull
-  @Override
-  protected PointF getRoundCornerStart() {
-    final float x = getPreBorderWidth() / 2;
-    final float y = getOuterCornerRadius();
-    if (null == mRoundCornerStart) {
-      mRoundCornerStart = new PointF(x, y);
-    } else {
-      mRoundCornerStart.set(x, y);
-    }
-    return mRoundCornerStart;
-  }
-
-  @NonNull
-  @Override
-  protected PointF getSharpCornerVertex() {
-    final float x = getPreBorderWidth() / 2;
-    final float y = getPostBorderWidth() / 2;
-    if (null == mSharpCornerVertex) {
-      mSharpCornerVertex = new PointF(x, y);
-    } else {
-      mSharpCornerVertex.set(x, y);
-    }
-    return mSharpCornerVertex;
-  }
-
-  @NonNull
-  @Override
-  protected PointF getSharpCornerStart() {
-    PointF pointF = getSharpCornerVertex();
-    pointF.x = 0;
-    return pointF;
-  }
-
-  @NonNull
-  @Override
-  protected PointF getSharpCornerEnd() {
-    PointF pointF = getSharpCornerVertex();
-    pointF.y = 0;
-    return pointF;
-  }
-
-  @NonNull
-  @Override
-  protected PointF getRoundCornerEnd() {
-    final float x = getOuterCornerRadius();
-    final float y = getPostBorderWidth() / 2;
-    if (null == mRoundCornerEnd) {
-      mRoundCornerEnd = new PointF(x, y);
-    } else {
-      mRoundCornerEnd.set(x, y);
-    }
-    return mRoundCornerEnd;
   }
 }
