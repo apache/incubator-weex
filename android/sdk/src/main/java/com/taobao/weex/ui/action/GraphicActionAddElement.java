@@ -65,7 +65,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     }
 
     parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef);
-    BasicComponentData basicComponentData = new BasicComponentData(getRef(), getComponentType(), getParentRef());
+    BasicComponentData basicComponentData = new BasicComponentData(ref, getComponentType(), getParentRef());
     child = createComponent(instance, parent, basicComponentData);
     child.setTransition(WXTransition.fromMap(child.getStyles(), child));
 

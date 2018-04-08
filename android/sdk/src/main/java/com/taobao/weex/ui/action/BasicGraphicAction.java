@@ -25,28 +25,20 @@ import com.taobao.weex.utils.WXLogUtils;
 
 public abstract class BasicGraphicAction implements IExecutable, Runnable {
 
-  private String mPageId;
-  private String mRef;
+  private final String mPageId;
+  private final String mRef;
 
   public BasicGraphicAction(String pageId, String ref) {
     this.mPageId = pageId;
     this.mRef = ref;
   }
 
-  public String getPageId() {
+  public final String getPageId() {
     return mPageId;
   }
 
-  public void setPageId(String pageId) {
-    this.mPageId = pageId;
-  }
-
-  public String getRef() {
+  public final String getRef() {
     return mRef;
-  }
-
-  public void setRef(String ref) {
-    this.mRef = ref;
   }
 
   public void executeActionOnRender() {
