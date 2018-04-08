@@ -48,8 +48,8 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
     return;
 
 #if RENDER_LOG
-  LOGD("[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %s, defaultWidth: %f, defaultHeight: %f",
-       page->PageId().c_str(), defaultWidth,defaultHeight);
+  LOGD("[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %d, defaultWidth: %f, defaultHeight: %f",
+       page->PageId(), defaultWidth,defaultHeight);
 #endif
 
   page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
@@ -90,7 +90,7 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
   if (page != nullptr) {
 
 #if RENDER_LOG
-    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", pageId.c_str(),
+    LOGD("[JNI] NotifyLayout >>>> pageId: %d, needForceLayout: %s, dirty: %s", instanceId,
          page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
 #endif
 
@@ -113,7 +113,7 @@ static void ForceLayout(JNIEnv *env, jobject jcaller,
   if (page != nullptr) {
 
 #if RENDER_LOG
-    LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", pageId.c_str(), page->hasForeLayoutAction.load()?"true":"false");
+    LOGD("[JNI] ForceLayout >>>> pageId: %d, needForceLayout: %s", instanceId, page->hasForeLayoutAction.load()?"true":"false");
 #endif
 
     page->LayoutImmediately();

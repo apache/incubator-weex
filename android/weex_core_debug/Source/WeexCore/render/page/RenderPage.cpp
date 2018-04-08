@@ -26,7 +26,7 @@ namespace WeexCore {
   RenderPage::RenderPage(int pageId) {
 
 #if RENDER_LOG
-    LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
+    LOGD("[RenderPage] new RenderPage >>>> pageId: %d", pageId);
 #endif
 
     mPageId = pageId;
@@ -39,7 +39,7 @@ namespace WeexCore {
   RenderPage::~RenderPage() {
 
 #if RENDER_LOG
-    LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
+    LOGD("[RenderPage] Delete RenderPage >>>> pageId: %d", mPageId);
 #endif
 
     mRenderObjectRegisterMap.clear();
@@ -60,7 +60,7 @@ namespace WeexCore {
       return;
 
 #if RENDER_LOG
-    LOGD("[RenderPage] CalculateLayout >>>> pageId: %s", mPageId.c_str());
+    LOGD("[RenderPage] CalculateLayout >>>> pageId: %d", mPageId);
 #endif
 
     long long startTime = getCurrentTime();
