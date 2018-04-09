@@ -166,7 +166,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
-  private HashMap<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
+  private Map<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
 
   /**
    * set open SandBox
