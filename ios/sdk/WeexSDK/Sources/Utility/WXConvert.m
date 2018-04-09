@@ -146,6 +146,20 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 #pragma mark CSS Layout
 
++ (css_direction_t)css_direction_t:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        if ([value isEqualToString:@"inherit"]) {
+            return CSS_DIRECTION_INHERIT;
+        } else if ([value isEqualToString:@"ltr"]) {
+            return CSS_DIRECTION_LTR;
+        } else if ([value isEqualToString:@"rtl"]) {
+            return CSS_DIRECTION_RTL;
+        }
+    }
+    return CSS_DIRECTION_LTR;
+}
+
 +(css_position_type_t)css_position_type_t:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
