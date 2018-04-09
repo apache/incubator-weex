@@ -20,7 +20,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.ComponentCreator;
@@ -29,8 +28,8 @@ import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.WXFrameLayout;
-
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 
 /**
  * div component
@@ -87,6 +86,9 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
 
   @Override
   protected void mountFlatGUI() {
+    if(widgets == null){
+      widgets = new LinkedList<>();
+    }
     if (promoteToView(true)) {
       if(getHostView()!=null) {
         getHostView().mountFlatGUI(widgets);

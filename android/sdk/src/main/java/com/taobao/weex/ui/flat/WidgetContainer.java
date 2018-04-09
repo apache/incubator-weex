@@ -37,7 +37,7 @@ import java.util.List;
 @RestrictTo(Scope.LIBRARY)
 public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<T> {
 
-  protected List<Widget> widgets = new LinkedList<>();
+  protected List<Widget> widgets;
 
   public WidgetContainer(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
@@ -84,6 +84,9 @@ public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<
   }
 
   private void addFlatChild(Widget widget, int index) {
+    if(widgets == null){
+      widgets = new LinkedList<>();
+    }
     if (index >= widgets.size()) {
       widgets.add(widget);
     } else {

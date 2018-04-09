@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.component.list;
 
+import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
+
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -25,7 +27,6 @@ import android.support.annotation.RestrictTo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -37,8 +38,7 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
-import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
+import java.util.LinkedList;
 
 /**
  * Root component for components in {@link WXListComponent}
@@ -182,6 +182,9 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     @Override
     protected void mountFlatGUI() {
         if(getHostView()!=null) {
+            if(widgets == null){
+                widgets = new LinkedList<>();
+            }
             getHostView().mountFlatGUI(widgets);
         }
     }

@@ -307,6 +307,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         // wait next time to add.
         return;
       }
+      if(mClickEventListener == null){
+        mClickEventListener = new OnClickListenerImp();
+      }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
       addFocusChangeListener(new OnFocusChangeListener() {
@@ -400,7 +403,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mParent != null && mParent.isFlatUIEnabled();
   }
 
-  private OnClickListener mClickEventListener = new OnClickListener() {
+  private class OnClickListenerImp implements OnClickListener{
     @Override
     public void onHostViewClick() {
       Map<String, Object> param = WXDataStructureUtil.newHashMapWithExpectedSize(1);
@@ -415,6 +418,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       fireEvent(Constants.Event.CLICK, param);
     }
   };
+  private OnClickListenerImp mClickEventListener;
 
   public String getInstanceId() {
     return mInstance.getInstanceId();
@@ -1379,6 +1383,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void removeEventFromView(String type) {
     if (type.equals(Constants.Event.CLICK) && getRealView() != null && mHostClickListeners != null) {
+      if(mClickEventListener == null){
+        mClickEventListener = new OnClickListenerImp();
+      }
       mHostClickListeners.remove(mClickEventListener);
       //click event only remove from listener array
     }
