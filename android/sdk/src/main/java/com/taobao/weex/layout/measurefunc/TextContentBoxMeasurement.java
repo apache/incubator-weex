@@ -171,7 +171,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   public void layoutAfter(float computedWidth, float computedHeight) {
     if (hasBeenMeasured) {
       if (layout != null &&
-              WXDomUtils.getContentWidth(mComponent.get().getPadding(), mComponent.get().getBorder(), computedWidth)
+              WXDomUtils.getContentWidth(mComponent.getPadding(), mComponent.getBorder(), computedWidth)
                       != previousWidth) {
         recalculateLayout(computedWidth);
       }
@@ -187,17 +187,17 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       }
     }
     swap();
-    mComponent.get().getInstance().runOnUiThread(new Runnable() {
+    mComponent.getInstance().runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        mComponent.get().updateExtra(atomicReference.get());
+        mComponent.updateExtra(atomicReference.get());
       }
     });
   }
 
   private void updateStyleAndText() {
-    updateStyleImp(mComponent.get().getStyles());
-    mText = WXAttr.getValue(mComponent.get().getAttrs());
+    updateStyleImp(mComponent.getStyles());
+    mText = WXAttr.getValue(mComponent.getAttrs());
   }
 
   /**
@@ -212,7 +212,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
         mNumberOfLines = lines > 0 ? lines : UNSET;
       }
       if (style.containsKey(Constants.Name.FONT_SIZE)) {
-        mFontSize = WXStyle.getFontSize(style, mComponent.get().getViewPortWidth());
+        mFontSize = WXStyle.getFontSize(style, mComponent.getViewPortWidth());
       }
       if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
         mFontWeight = WXStyle.getFontWeight(style);
@@ -232,7 +232,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       }
       mAlignment = WXStyle.getTextAlignment(style);
       textOverflow = WXStyle.getTextOverflow(style);
-      int lineHeight = WXStyle.getLineHeight(style, mComponent.get().getViewPortWidth());
+      int lineHeight = WXStyle.getLineHeight(style, mComponent.getViewPortWidth());
       if (lineHeight != UNSET) {
         mLineHeight = lineHeight;
       }
@@ -429,7 +429,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   }
 
   private void recalculateLayout(float computedWidth) {
-    float contentWidth = WXDomUtils.getContentWidth(mComponent.get().getPadding(), mComponent.get().getBorder(), computedWidth);
+    float contentWidth = WXDomUtils.getContentWidth(mComponent.getPadding(), mComponent.getBorder(), computedWidth);
     if (contentWidth > 0) {
       spanned = createSpanned(mText);
       if (mText != null) {

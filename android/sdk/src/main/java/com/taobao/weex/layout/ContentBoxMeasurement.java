@@ -18,22 +18,26 @@
  */
 package com.taobao.weex.layout;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.taobao.weex.base.CalledByNative;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.ui.component.WXComponent;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 
-public abstract class ContentBoxMeasurement implements Serializable {
+public abstract class ContentBoxMeasurement implements Serializable,Destroyable {
 
-  protected WeakReference<WXComponent> mComponent;
+  @Nullable
+  protected WXComponent mComponent;
 
   public ContentBoxMeasurement() {
-
+    mComponent = null;
   }
 
-  public ContentBoxMeasurement(WXComponent component) {
-    this.mComponent = new WeakReference<>(component);
+  public ContentBoxMeasurement(@NonNull WXComponent component) {
+    this.mComponent = component;
   }
 
   /** uiThread = false **/
@@ -47,4 +51,9 @@ public abstract class ContentBoxMeasurement implements Serializable {
   /** uiThread = false **/
   @CalledByNative
   public abstract void layoutAfter(float computedWidth, float computedHeight);
+
+  @Override
+  public void destroy() {
+    mComponent = null;
+  }
 }

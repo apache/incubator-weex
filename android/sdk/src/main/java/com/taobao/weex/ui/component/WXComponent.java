@@ -1749,6 +1749,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       getInstance().removeFixedView(view);
     }
 
+    if(contentBoxMeasurement!=null){
+      contentBoxMeasurement.destroy();
+      contentBoxMeasurement = null;
+    }
     mIsDestroyed = true;
     if(animations!=null) {
       animations.clear();
