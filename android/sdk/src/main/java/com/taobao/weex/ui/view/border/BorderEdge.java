@@ -37,18 +37,18 @@ class BorderEdge {
   @NonNull
   BorderCorner mPostCorner;
 
-  private final CSSShorthand.EDGE mEdge;
+  private CSSShorthand.EDGE mEdge;
   private float mBorderWidth;
 
-  BorderEdge(CSSShorthand.EDGE edge) {
-    mEdge = edge;
+  BorderEdge() {
   }
 
   BorderEdge set(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner,
-                 float borderWidth) {
+                 float borderWidth, CSSShorthand.EDGE edge) {
     mPreCorner = preCorner;
     mPostCorner = postCorner;
     mBorderWidth = borderWidth;
+    mEdge = edge;
     return this;
   }
 
@@ -81,5 +81,9 @@ class BorderEdge {
    */
   public CSSShorthand.EDGE getEdge() {
     return mEdge;
+  }
+
+  public float getBorderWidth() {
+    return mBorderWidth;
   }
 }

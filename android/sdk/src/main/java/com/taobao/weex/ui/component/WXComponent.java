@@ -1580,6 +1580,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         case Constants.Name.BORDER_LEFT_WIDTH:
           getOrCreateBorder().setBorderWidth(CSSShorthand.EDGE.LEFT, borderWidth);
           break;
+        default:
+          break;
       }
     }
   }

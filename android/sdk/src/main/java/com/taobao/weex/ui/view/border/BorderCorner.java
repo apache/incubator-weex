@@ -30,9 +30,9 @@ import com.taobao.weex.base.FloatUtil;
 abstract class BorderCorner {
 
   final static float SWEEP_ANGLE = 45;
-  private float mCornerRadius;
-  private float mPreBorderWidth;
-  private float mPostBorderWidth;
+  private float mCornerRadius = 0.0f;
+  private float mPreBorderWidth = 0.0f;
+  private float mPostBorderWidth = 0.0f;
   private RectF mBorderBox;
   protected float mAngleBisector;
 
@@ -56,24 +56,33 @@ abstract class BorderCorner {
   }
 
   final void set(float cornerRadius, float preBorderWidth, float postBorderWidth,
-                  @NonNull RectF borderBox, float angleBisector) {
-    mCornerRadius = cornerRadius;
-    mPreBorderWidth = preBorderWidth;
-    mPostBorderWidth = postBorderWidth;
-    mBorderBox = borderBox;
-    mAngleBisector = angleBisector;
+                 @NonNull RectF borderBox, float angleBisector) {
+    boolean dirty = !FloatUtil.floatsEqual(mCornerRadius, cornerRadius)
+        || !FloatUtil.floatsEqual(mPreBorderWidth, preBorderWidth)
+        || !FloatUtil.floatsEqual(mPostBorderWidth, postBorderWidth)
+        || !FloatUtil.floatsEqual(mAngleBisector, angleBisector)
+        || (null != mBorderBox && mBorderBox.equals(borderBox));
 
-    hasOuterCorner = getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
-    hasInnerCorner = (hasOuterCorner
-        && (getPreBorderWidth() >= 0)
-        && (getPostBorderWidth() >= 0)
-        && (getOuterCornerRadius() > getPreBorderWidth())
-        && (getOuterCornerRadius() > getPostBorderWidth()));
+    if (dirty) {
+      mCornerRadius = cornerRadius;
+      mPreBorderWidth = preBorderWidth;
+      mPostBorderWidth = postBorderWidth;
+      mBorderBox = borderBox;
+      mAngleBisector = angleBisector;
 
-    if (hasOuterCorner) {
-      prepareOval();
+      hasOuterCorner = mCornerRadius > 0 && !FloatUtil.floatsEqual(0, mCornerRadius);
+
+      hasInnerCorner = (hasOuterCorner
+          && (getPreBorderWidth() >= 0)
+          && (getPostBorderWidth() >= 0)
+          && (getOuterCornerRadius() > getPreBorderWidth())
+          && (getOuterCornerRadius() > getPostBorderWidth()));
+
+      if (hasOuterCorner) {
+        prepareOval();
+      }
+      prepareRoundCorner();
     }
-    prepareRoundCorner();
   }
 
   /** Build oval data */
