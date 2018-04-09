@@ -59,7 +59,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
       return;
     }
 
-    BasicComponentData basicComponentData = new BasicComponentData(getRef(), getComponentType(), null);
+    BasicComponentData basicComponentData = new BasicComponentData(getRef(), mComponentType, null);
     component = createComponent(instance, null, basicComponentData);
     if (component == null) {
       return;

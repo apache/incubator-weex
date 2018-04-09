@@ -2465,15 +2465,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
-        final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);
         GraphicActionAddElement addAction = WXSDKManager.getInstance().getSDKInstance(pageId).getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setSize(size);
           addAction.setPosition(position);
-          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), addAction);
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(pageId, addAction);
           WXSDKManager.getInstance().getSDKInstance(pageId).removeInActiveAddElmentAction(ref);
         }
         else {
+          final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
         }
       }
