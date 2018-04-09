@@ -7,6 +7,8 @@
 namespace WeexCore {
   class RenderScroller : public RenderObject {
 
+    bool mIsSetFlex = false;
+
     std::map<std::string, std::string> *GetDefaultStyle() {
       std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
 
@@ -21,16 +23,22 @@ namespace WeexCore {
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
 
-      if (prop == HEIGHT && isnan(getStyleHeight()) && isnan(getFlex())) {
+      if (prop == HEIGHT && isnan(getStyleHeight()) &&  !mIsSetFlex) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      } else if (prop == WIDTH && isnan(getStyleWidth()) && isnan(getFlex())) {
+      } else if (prop == WIDTH && isnan(getStyleWidth()) &&  !mIsSetFlex) {
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 
       return style;
     }
 
-    float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
+    inline void setFlex(const float flex) {
+       mIsSetFlex = true;
+       WXCoreLayoutNode::setFlex(flex);
+    }
+
+
+      float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
       return NAN;
     }
 

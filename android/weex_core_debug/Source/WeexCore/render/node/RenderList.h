@@ -18,6 +18,7 @@ namespace WeexCore {
     float mColumnWidth = AUTO_VALUE;
     float mAvailableWidth = 0;
     float mColumnGap = COLUMN_GAP_NORMAL;
+    bool mIsSetFlex = false;
 
     std::map<std::string, std::string> *GetDefaultStyle() {
       std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
@@ -35,13 +36,20 @@ namespace WeexCore {
 
       std::string prop = isVertical ? HEIGHT : WIDTH;
 
-      if (prop == HEIGHT && isnan(getStyleHeight()) && isnan(getFlex())) {
+      if (prop == HEIGHT && isnan(getStyleHeight()) && !mIsSetFlex) {
+        mIsSetFlex = true;
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      } else if (prop == WIDTH && isnan(getStyleWidth()) && isnan(getFlex())) {
+      } else if (prop == WIDTH && isnan(getStyleWidth()) && !mIsSetFlex) {
+        mIsSetFlex = true;
         style->insert(std::pair<std::string, std::string>(FLEX, "1"));
       }
 
       return style;
+    }
+
+    inline void setFlex(const float flex) {
+        mIsSetFlex = true;
+        WXCoreLayoutNode::setFlex(flex);
     }
 
     float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {

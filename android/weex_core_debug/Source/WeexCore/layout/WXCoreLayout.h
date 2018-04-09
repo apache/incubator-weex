@@ -976,7 +976,7 @@ namespace WeexCore {
       return mCssStyle->mAlignSelf;
     }
 
-    inline void setFlex(const float flex) {
+    virtual void setFlex(const float flex) {
       if (mCssStyle->mFlexGrow != flex) {
         mCssStyle->mFlexGrow = flex;
         markDirty();
