@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.support.v4.util.ArrayMap;
 import com.taobao.weex.common.WXPerformance.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -166,7 +167,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
-  private Map<String, GraphicActionAddElement> inactiveAddElementAction = new HashMap<>();
+  private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
   /**
    * set open SandBox
