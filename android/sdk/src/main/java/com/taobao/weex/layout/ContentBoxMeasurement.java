@@ -46,7 +46,7 @@ public abstract class ContentBoxMeasurement implements Serializable,Destroyable 
 
   /** uiThread = false **/
   @CalledByNative
-  public void measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+  public final void measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
     MeasureSize size = measureInternal(width, height, widthMeasureMode, heightMeasureMode);
     mMeasureWidth = size.getWidth();
     mMeasureHeight = size.getHeight();
