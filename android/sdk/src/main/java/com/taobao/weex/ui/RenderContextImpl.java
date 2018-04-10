@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui;
 
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
 import com.taobao.weex.WXSDKInstance;
@@ -42,7 +43,7 @@ class RenderContextImpl implements RenderContext {
 
   public RenderContextImpl(WXSDKInstance instance) {
     mWXSDKInstance = instance;
-    mRegistry = new HashMap<>();
+    mRegistry = new ArrayMap<>();
   }
 
   public void destroy() {
