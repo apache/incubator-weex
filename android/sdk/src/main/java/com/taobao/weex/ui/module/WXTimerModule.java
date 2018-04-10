@@ -70,14 +70,9 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void setTimeout(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float delay) {
     if(mWXSDKInstance != null) {
       postOrHoldMessage(MODULE_TIMEOUT, funcId, (int) delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            if (null != mWXSDKInstance){
-              mWXSDKInstance.getWXPerformance().timerInvokeCount++;
-            }
-          }
-      },0);
+      if (null != mWXSDKInstance.getWXPerformance()){
+        mWXSDKInstance.getWXPerformance().timerInvokeCount++;
+      }
     }
   }
 
@@ -85,14 +80,9 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void setInterval(@IntRange(from = 1) int funcId, @FloatRange(from = 0) float interval) {
     if(mWXSDKInstance != null) {
       postOrHoldMessage(MODULE_INTERVAL, funcId, (int) interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            if (null != mWXSDKInstance){
-              mWXSDKInstance.getWXPerformance().timerInvokeCount++;
-            }
-          }
-      },0);
+      if (null != mWXSDKInstance.getWXPerformance()){
+        mWXSDKInstance.getWXPerformance().timerInvokeCount++;
+      }
     }
   }
 
