@@ -32,9 +32,9 @@ public abstract class ContentBoxMeasurement implements Serializable,Destroyable 
   @Nullable
   protected WXComponent mComponent;
 
-  private float mMeasureWidth;
+  protected float mMeasureWidth;
 
-  private float mMeasureHeight;
+  protected float mMeasureHeight;
 
   public ContentBoxMeasurement() {
     mComponent = null;
@@ -47,13 +47,11 @@ public abstract class ContentBoxMeasurement implements Serializable,Destroyable 
   /** uiThread = false **/
   @CalledByNative
   public final void measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
-    MeasureSize size = measureInternal(width, height, widthMeasureMode, heightMeasureMode);
-    mMeasureWidth = size.getWidth();
-    mMeasureHeight = size.getHeight();
+    measureInternal(width, height, widthMeasureMode, heightMeasureMode);
   }
 
   /** uiThread = false **/
-  public abstract MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode);
+  public abstract void measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode);
 
   /** uiThread = false **/
   @CalledByNative

@@ -52,7 +52,7 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       /** uiThread = false **/
       @Override
-      public MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+      public void measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         try {
           WXSwitchView wxSwitchView = new WXSwitchView(instance.getContext());
           int widthSpec, heightSpec;
@@ -64,14 +64,13 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
           }
 
           wxSwitchView.measure(widthSpec, heightSpec);
-          MeasureSize ret = new MeasureSize();
-          ret.setWidth(wxSwitchView.getMeasuredWidth());
-          ret.setHeight(wxSwitchView.getMeasuredHeight());
-          return ret;
+          mMeasureWidth = wxSwitchView.getMeasuredWidth();
+          mMeasureHeight = wxSwitchView.getMeasuredHeight();
         } catch (RuntimeException e) {
           WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
-        return null;
+        mMeasureWidth = 0;
+        mMeasureHeight = 0;
       }
 
       /** uiThread = false **/

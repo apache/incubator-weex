@@ -133,7 +133,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    * uiThread = false
    **/
   @Override
-  public MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+  public void measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
     float measureWidth = width, measureHeight = height;
     hasBeenMeasured = true;
     float textWidth = getTextWidth(mTextPaint, width, widthMeasureMode == MeasureMode.EXACTLY);
@@ -158,10 +158,8 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
         measureHeight = 0;
       }
     }
-    MeasureSize ret = new MeasureSize();
-    ret.setWidth(measureWidth);
-    ret.setHeight(measureHeight);
-    return ret;
+    mMeasureWidth = measureWidth;
+    mMeasureHeight = measureHeight;
   }
 
   /**
