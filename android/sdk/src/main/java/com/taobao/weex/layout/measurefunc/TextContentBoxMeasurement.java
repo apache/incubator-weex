@@ -133,7 +133,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    * uiThread = false
    **/
   @Override
-  public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+  public MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
     float measureWidth = width, measureHeight = height;
     hasBeenMeasured = true;
     float textWidth = getTextWidth(mTextPaint, width, widthMeasureMode == MeasureMode.EXACTLY);

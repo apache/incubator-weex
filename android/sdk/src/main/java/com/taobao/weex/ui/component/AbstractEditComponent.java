@@ -101,7 +101,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       /** uiThread = false **/
       @Override
-      public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+      public MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         if (CSSConstants.isUndefined(width)) {
           width = 0;
         }

@@ -18,15 +18,12 @@
  */
 package com.taobao.weex.layout;
 
-import com.taobao.weex.base.CalledByNative;
-
 import java.io.Serializable;
 
 public class MeasureSize implements Serializable{
   private float width;
   private float height;
 
-  @CalledByNative
   public float getWidth() {
     return width;
   }
@@ -35,7 +32,6 @@ public class MeasureSize implements Serializable{
     this.width = width;
   }
 
-  @CalledByNative
   public float getHeight() {
     return height;
   }

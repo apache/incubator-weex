@@ -52,7 +52,7 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
     setContentBoxMeasurement(new ContentBoxMeasurement() {
       /** uiThread = false **/
       @Override
-      public MeasureSize measure(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+      public MeasureSize measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
         try {
           WXSwitchView wxSwitchView = new WXSwitchView(instance.getContext());
           int widthSpec, heightSpec;

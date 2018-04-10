@@ -8,13 +8,11 @@ namespace WeexCore {
     RegisterNativesImpl(env);
   }
 
-  base::android::ScopedLocalJavaRef<jobject>
-  cumsmeasure_Imple_Android(JNIEnv *env, jobject measureFunc_Impl_Android, float width,
+  void cumsmeasure_Imple_Android(JNIEnv *env, jobject measureFunc_Impl_Android, float width,
                             float height,
                             int widthMeasureMode, int heightMeasureMode) {
-    if (measureFunc_Impl_Android == nullptr)
-      return base::android::ScopedLocalJavaRef<jobject>(env, nullptr);
-    return Java_ContentBoxMeasurement_measure(env, measureFunc_Impl_Android, width, height,
+    if (measureFunc_Impl_Android != nullptr)
+      Java_ContentBoxMeasurement_measure(env, measureFunc_Impl_Android, width, height,
                                               widthMeasureMode, heightMeasureMode);
   }
 
@@ -23,10 +21,19 @@ namespace WeexCore {
       Java_ContentBoxMeasurement_layoutBefore(env, measureFunc_impl_android);
   }
 
-  void
-  LayoutAfterImplAndroid(JNIEnv *env, jobject measureFunc_impl_android, float width,
+  void LayoutAfterImplAndroid(JNIEnv *env, jobject measureFunc_impl_android, float width,
                          float height) {
     if (measureFunc_impl_android != nullptr)
       Java_ContentBoxMeasurement_layoutAfter(env, measureFunc_impl_android, width, height);
+  }
+
+  float GetLayoutWidth(JNIEnv *env, jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android != nullptr)
+      Java_ContentBoxMeasurement_getWidth(env, measureFunc_impl_android);
+  }
+
+  float GetLayoutHeight(JNIEnv *env, jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android != nullptr)
+      Java_ContentBoxMeasurement_getHeight(env, measureFunc_impl_android);
   }
 }

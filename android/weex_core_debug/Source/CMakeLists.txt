@@ -44,7 +44,6 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/WXSDKInstance_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/WXComponent_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.cpp
 
     ./WeexCore/render/manager/RenderManager.cpp
     ./WeexCore/render/page/RenderPage.cpp

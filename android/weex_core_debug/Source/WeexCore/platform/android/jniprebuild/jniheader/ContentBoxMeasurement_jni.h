@@ -28,14 +28,14 @@ jclass g_ContentBoxMeasurement_clazz = NULL;
 // Step 2: method stubs.
 
 static intptr_t g_ContentBoxMeasurement_measure = 0;
-static base::android::ScopedLocalJavaRef<jobject>
-    Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat width,
+static void Java_ContentBoxMeasurement_measure(JNIEnv* env, jobject obj, jfloat
+    width,
     jfloat height,
     int widthMeasureMode,
     int heightMeasureMode) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
-  //    ContentBoxMeasurement_clazz(env), NULL);
+  //    ContentBoxMeasurement_clazz(env));
   jmethodID method_id =
       base::android::GetMethod(
       env, ContentBoxMeasurement_clazz(env),
@@ -48,15 +48,14 @@ static base::android::ScopedLocalJavaRef<jobject>
 "I"
 "I"
 ")"
-"Lcom/taobao/weex/layout/MeasureSize;",
+"V",
       &g_ContentBoxMeasurement_measure);
 
-  jobject ret =
-      env->CallObjectMethod(obj,
+     env->CallVoidMethod(obj,
           method_id, width, height, int(widthMeasureMode),
               int(heightMeasureMode));
   base::android::CheckException(env);
-  return base::android::ScopedLocalJavaRef<jobject>(env, ret);
+
 }
 
 static intptr_t g_ContentBoxMeasurement_layoutBefore = 0;
@@ -105,6 +104,52 @@ static void Java_ContentBoxMeasurement_layoutAfter(JNIEnv* env, jobject obj,
           method_id, computedWidth, computedHeight);
   base::android::CheckException(env);
 
+}
+
+static intptr_t g_ContentBoxMeasurement_getWidth = 0;
+static jfloat Java_ContentBoxMeasurement_getWidth(JNIEnv* env, jobject obj) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    ContentBoxMeasurement_clazz(env), 0);
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, ContentBoxMeasurement_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "getWidth",
+
+"("
+")"
+"F",
+      &g_ContentBoxMeasurement_getWidth);
+
+  jfloat ret =
+      env->CallFloatMethod(obj,
+          method_id);
+  base::android::CheckException(env);
+  return ret;
+}
+
+static intptr_t g_ContentBoxMeasurement_getHeight = 0;
+static jfloat Java_ContentBoxMeasurement_getHeight(JNIEnv* env, jobject obj) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    ContentBoxMeasurement_clazz(env), 0);
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, ContentBoxMeasurement_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "getHeight",
+
+"("
+")"
+"F",
+      &g_ContentBoxMeasurement_getHeight);
+
+  jfloat ret =
+      env->CallFloatMethod(obj,
+          method_id);
+  base::android::CheckException(env);
+  return ret;
 }
 
 // Step 3: RegisterNatives.

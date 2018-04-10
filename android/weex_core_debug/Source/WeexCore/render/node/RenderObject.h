@@ -100,10 +100,6 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    bool BindComponentImplAndroid(jobject component_impl_android);
-
-    bool BindComponentImplIOS(void *component_impl_ios);
-
     bool BindMeasureFuncImplAndroid(jobject measureFunc_impl_android);
 
     bool BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
@@ -389,7 +385,6 @@ namespace WeexCore {
     AttributesMap *mAttributes;
     EventsSet *mEvents;
     jobject mMeasureFunc_Impl_Android;
-    void *mComponent_Impl_iOS;
     float mViewPortWidth = -1;
     bool mIsRootRender;
   };

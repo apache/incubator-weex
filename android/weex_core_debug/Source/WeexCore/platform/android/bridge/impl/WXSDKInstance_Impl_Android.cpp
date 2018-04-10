@@ -14,24 +14,6 @@ namespace WeexCore {
   }
 }
 
-static void BindComponentToWXCore(JNIEnv *env, jobject jcaller,
-                                  jint instanceId,
-                                  jobject component,
-                                  jstring ref) {
-  if (component == nullptr)
-    return;
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  render->BindComponentImplAndroid(component);
-}
-
 static void OnInstanceClose(JNIEnv *env, jobject jcaller,
                             jint instanceId) {
   RenderManager::GetInstance()->ClosePage(instanceId);

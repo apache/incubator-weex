@@ -1,6 +1,5 @@
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
-#include <WeexCore/platform/android/bridge/impl/MeasureSize_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
 #include <WeexCore/platform/android/base/jni/scoped_java_ref.h>
 #include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
@@ -82,17 +81,6 @@ namespace WeexCore {
     }
   }
 
-  bool RenderObject::BindComponentImplAndroid(jobject component_impl_android) {
-
-  }
-
-  bool RenderObject::BindComponentImplIOS(void *component_impl_ios) {
-    if (component_impl_ios == nullptr)
-      return false;
-    this->mComponent_Impl_iOS = component_impl_ios;
-    return true;
-  }
-
   WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
                               float height, MeasureMode heightMeasureMode) {
     JNIEnv *env = getJNIEnv();
@@ -100,7 +88,9 @@ namespace WeexCore {
     size.height = 0;
     size.width = 0;
 
-    if (node == nullptr || ((RenderObject *) node)->GetMeasureFuncImplAndroid() == nullptr)
+    jobject measureFunc = ((RenderObject *) node)->GetMeasureFuncImplAndroid();
+
+    if (node == nullptr || measureFunc == nullptr)
       return size;
 
     int widthMode = Unspecified(env);
@@ -109,15 +99,11 @@ namespace WeexCore {
       widthMode = Exactly(env);
     if (heightMeasureMode == kExactly)
       heightMode = Exactly(env);
-    base::android::ScopedLocalJavaRef<jobject> jsize = cumsmeasure_Imple_Android(env,
-                                                                                 ((RenderObject *) node)->GetMeasureFuncImplAndroid(),
-                                                                                 width, height,
-                                                                                 widthMode,
-                                                                                 heightMode);
-    if (jsize.Get() == nullptr)
-      return size;
-    size.height = GetMeasureHeight(env, jsize.Get());
-    size.width = GetMeasureWidth(env, jsize.Get());
+    cumsmeasure_Imple_Android(env, measureFunc,
+                              width, height,
+                              widthMode, heightMode);
+    size.width = GetLayoutWidth(env, measureFunc);
+    size.height = GetLayoutHeight(env, measureFunc);
 
     return size;
   }
