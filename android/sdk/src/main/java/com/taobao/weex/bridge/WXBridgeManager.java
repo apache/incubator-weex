@@ -58,6 +58,7 @@ import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -2509,7 +2510,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
 
      if (checkEmptyScreen(instance)){
         if (WXEnvironment.isApkDebugable()){
-          WXLogUtils.d("render error 4 js error !");
+          WXLogUtils.e("render error 4 js error !");
         }
        WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
                                                   function,
@@ -2528,8 +2529,12 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
     if (null == instance || instance.isDestroy()){
       return false;
     }
+    WXComponent rootComponent = instance.getRootComponent();
+    if (null == rootComponent) {
+      return true;
+    }
 
-    View rootView = instance.getRootView();
+    View rootView = rootComponent.getRealView();
     if (null == rootView){
       return true;
     }
