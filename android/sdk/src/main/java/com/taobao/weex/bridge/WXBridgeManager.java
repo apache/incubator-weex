@@ -1199,11 +1199,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       public void run() {
         long start = System.currentTimeMillis();
         invokeCreateInstance(instance, template, options, data);
-        final long totalTime = System.currentTimeMillis() - start;
+        final long endTime = System.currentTimeMillis();
+        final long totalTime = endTime- start;
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
 
-          @Override
-          public void run() {
+            @Override
+            public void run() {
+              instance.getWXPerformance().callCreateInstanceTime = endTime;
             instance.createInstanceFinished(totalTime);
           }
         }, 0);
