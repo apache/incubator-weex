@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSConstants;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.layout.MeasureMode;
 import com.taobao.weex.layout.MeasureSize;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
@@ -102,7 +103,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       /** uiThread = false **/
       @Override
       public void measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
-        if (CSSConstants.isUndefined(width)) {
+        if (CSSConstants.isUndefined(width) || widthMeasureMode == MeasureMode.UNSPECIFIED) {
           width = 0;
         }
         mMeasureWidth = width;
