@@ -92,11 +92,11 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
   if (edge == 0) {
     render->setMargin(kMarginTop, value);
   } else if (edge == 1) {
-    render->setMargin(kMarginRight, value);
-  } else if (edge == 2) {
     render->setMargin(kMarginBottom, value);
-  } else if (edge == 3) {
+  } else if (edge == 2) {
     render->setMargin(kMarginLeft, value);
+  } else if (edge == 3) {
+    render->setMargin(kMarginRight, value);
   } else if (edge == 4) {
     render->setMargin(kMarginALL, value);
   }
@@ -120,11 +120,11 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
   if (edge == 0) {
     render->setPadding(kPaddingTop, value);
   } else if (edge == 1) {
-    render->setPadding(kPaddingRight, value);
-  } else if (edge == 2) {
     render->setPadding(kPaddingBottom, value);
-  } else if (edge == 3) {
+  } else if (edge == 2) {
     render->setPadding(kPaddingLeft, value);
+  } else if (edge == 3) {
+    render->setPadding(kPaddingRight, value);
   } else if (edge == 4) {
     render->setPadding(kPaddingALL, value);
   }
@@ -149,11 +149,11 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
   if (edge == 0) {
     render->setStylePosition(kPositionEdgeTop, value);
   } else if (edge == 1) {
-    render->setStylePosition(kPositionEdgeRight, value);
-  } else if (edge == 2) {
     render->setStylePosition(kPositionEdgeBottom, value);
-  } else if (edge == 3) {
+  } else if (edge == 2) {
     render->setStylePosition(kPositionEdgeLeft, value);
+  } else if (edge == 3) {
+    render->setStylePosition(kPositionEdgeRight, value);
   }
   page->updateDirty(true);
 }
