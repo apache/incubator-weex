@@ -329,7 +329,10 @@ do {\
         [subcomponents _unloadViewWithReusing:isReusing];
     }
     
-    [_view removeFromSuperview];
+    if ([_view superview]) {
+        [_view removeFromSuperview];
+    }
+    
     if (self->_isTemplate && self.attributes[@"@templateId"]) {
         [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"detach" args:nil competion:nil];
     }
