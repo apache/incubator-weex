@@ -23,12 +23,11 @@ import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.dom.WXTransition;
+import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

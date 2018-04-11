@@ -24,7 +24,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
-import com.taobao.weex.dom.WXTransition;
+import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.Map;

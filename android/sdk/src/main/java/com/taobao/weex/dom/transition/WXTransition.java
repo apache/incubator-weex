@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.dom.transition;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -41,6 +41,7 @@ import com.taobao.weex.common.Constants;
 //import com.taobao.weex.dom.WXDomHandler;
 //import com.taobao.weex.dom.WXDomObject;
 //import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.animation.BackgroundColorProperty;
 import com.taobao.weex.ui.animation.TransformParser;
 import com.taobao.weex.ui.component.WXComponent;
