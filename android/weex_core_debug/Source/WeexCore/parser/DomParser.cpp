@@ -10,6 +10,21 @@ using namespace std;
 using namespace rapidjson;
 
 namespace WeexCore {
+
+  static inline int matchNum(std::string temp, std::string key, int startIndex, int endIndex) {
+    int num = 0;
+    while (startIndex < endIndex) {
+      int index = temp.find(key, startIndex);
+      if (index >= 0 && index < endIndex) {
+        num++;
+        startIndex = index + 1;
+      } else {
+        break;
+      }
+    }
+    return num;
+  }
+
   bool JsonParserHandler::Null() {
     st_ = kHasNull;
     v_.SetNull();
@@ -260,20 +275,6 @@ namespace WeexCore {
 
     return -1;
   }
-
-    int matchNum(std::string temp, std::string key, int startIndex, int endIndex) {
-        int num = 0;
-        while (startIndex < endIndex) {
-            int index = temp.find(key, startIndex);
-            if (index >= 0 && index < endIndex) {
-                num++;
-                startIndex = index + 1;
-            } else {
-                break;
-            }
-        }
-        return num;
-    }
 
   RenderObject *
   ParseJsonObject(JsonParser &r, RenderObject *parent, int index, const int &pageId) {
