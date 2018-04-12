@@ -49,7 +49,7 @@ static inline std::string jString2StrFast(JNIEnv *env, jstring jstr){
   return std::string(nativeString);
 }
 
-static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
+static inline std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   char *rtn = NULL;
   jsize alen = env->GetArrayLength(barr);
   jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
@@ -65,13 +65,15 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   return stemp;
 }
 
-static const char *GetUTFChars(JNIEnv *env, jstring str) {
-  const char *c_str = NULL;
-  if (env) {
-    c_str = env->GetStringUTFChars(str, NULL);
-  }
-  env->ReleaseStringUTFChars(str, c_str);
-  return c_str;
+static inline jbyteArray newJByteArray(JNIEnv *env, char* pat) {
+  jbyteArray jarray = nullptr;
+  if (pat == nullptr)
+    return jarray;
+  int byteSize = strlen(pat);
+  jbyte *jb =  (jbyte*) pat;
+  jarray = env->NewByteArray(byteSize);
+  env->SetByteArrayRegion(jarray, 0, byteSize, jb);
+  return jarray;
 }
 
 static char* getArumentAsCStr(IPCArguments *arguments, int argument) {
@@ -97,17 +99,6 @@ static jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int ar
   if (arguments->getType(argument) == IPCType::STRING) {
     const IPCString *s = arguments->getString(argument);
     ret = env->NewString(s->content, s->length);
-  }
-  return ret;
-}
-
-static char* getArgumentAsCStr(JNIEnv *env, IPCArguments *arguments, int argument) {
-  char* ret = nullptr;
-  if (arguments->getType(argument) == IPCType::STRING) {
-    const IPCString *s = arguments->getString(argument);
-    ret = (char *) malloc(s->length);
-    char *temp = (char *) &s->content;
-    strcpy(ret, temp);
   }
   return ret;
 }

@@ -22,13 +22,13 @@ namespace WeexCore {
     virtual void
     reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString) = 0;
 
-    virtual int callNative(jstring &instanceId, jbyteArray &taskString, jstring &callback) = 0;
+    virtual int callNative(char *pageId, char *task, char *callback) = 0;
 
-    virtual jobject callNativeModule(jstring &jInstanceId, jstring &jmodule, jstring &jmethod,
-                                     jbyteArray &jArgString, jbyteArray &jOptString) = 0;
+    virtual jobject callNativeModule(char *pageId, char *module, char *method,
+                                     char *argString, char *optString) = 0;
 
-    virtual void callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
-                                     jbyteArray &jArgString, jbyteArray &jOptString) = 0;
+    virtual void callNativeComponent(char *pageId, char *ref, char *method,
+                                     char *argString, char *optString) = 0;
 
     virtual void setTimeout(jstring &jCallbackID, jstring &jTime) = 0;
 

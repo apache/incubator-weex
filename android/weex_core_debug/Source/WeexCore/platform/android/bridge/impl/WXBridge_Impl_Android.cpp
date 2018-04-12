@@ -123,59 +123,102 @@ namespace WeexCore {
     env->DeleteLocalRef(jFunc);
   }
 
-  int Bridge_Impl_Android::callNative(jstring &instanceId, jbyteArray &taskString, jstring &callback) {
+  int Bridge_Impl_Android::callNative(char *pageId, char *task, char *callback) {
     JNIEnv *env = getJNIEnv();
-    if (jCallNativeMethodId == NULL) {
-      jCallNativeMethodId = env->GetMethodID(jBridgeClazz,
-                                             "callNative",
-                                             "(Ljava/lang/String;[BLjava/lang/String;)I");
+    jstring jPageId = env->NewStringUTF(pageId);
+    jbyteArray jTask = newJByteArray(env, task);
+    jstring jCallback = env->NewStringUTF(callback);
+
+    int flag = -1;
+
+    if (jPageId != nullptr && jTask != nullptr) {
+      if (jCallNativeMethodId == NULL) {
+        jCallNativeMethodId = env->GetMethodID(jBridgeClazz,
+                                               "callNative",
+                                               "(Ljava/lang/String;[BLjava/lang/String;)I");
+      }
+
+      flag = env->CallIntMethod(jThis, jCallNativeMethodId, jPageId, jTask, jCallback);
     }
 
-    int flag = env->CallIntMethod(jThis, jCallNativeMethodId, instanceId, taskString, callback);
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callNative");
     }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(taskString);
-    env->DeleteLocalRef(callback);
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jTask != nullptr)
+      env->DeleteLocalRef(jTask);
+    if (jCallback != nullptr)
+      env->DeleteLocalRef(jCallback);
     return flag;
   }
 
-  jobject Bridge_Impl_Android::callNativeModule(jstring &jInstanceId, jstring &jmodule, jstring &jmethod,
-                                          jbyteArray &jArgString, jbyteArray &jOptString) {
+  jobject Bridge_Impl_Android::callNativeModule(char *pageId, char *module, char *method,
+                                                char *argString, char *optString) {
     JNIEnv *env = getJNIEnv();
-    if (jCallNativeModuleMethodId == NULL) {
-      jCallNativeModuleMethodId = env->GetMethodID(jBridgeClazz,
-                                                   "callNativeModule",
-                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)Ljava/lang/Object;");
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jModule = env->NewStringUTF(module);
+    jstring jMethod = env->NewStringUTF(method);
+    jbyteArray jArgString = newJByteArray(env, argString);
+    jbyteArray jOptString = newJByteArray(env, optString);
+
+    jobject result = nullptr;
+
+    if (jPageId != nullptr && jModule != nullptr && jMethod != nullptr) {
+      if (jCallNativeModuleMethodId == NULL) {
+        jCallNativeModuleMethodId = env->GetMethodID(jBridgeClazz,
+                                                     "callNativeModule",
+                                                     "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)Ljava/lang/Object;");
+      }
+
+      result = env->CallObjectMethod(jThis, jCallNativeModuleMethodId, jPageId, jModule,
+                                             jMethod, jArgString, jOptString);
     }
 
-    jobject result = env->CallObjectMethod(jThis, jCallNativeModuleMethodId, jInstanceId, jmodule,
-                                           jmethod, jArgString, jOptString);
-    env->DeleteLocalRef(jInstanceId);
-    env->DeleteLocalRef(jmodule);
-    env->DeleteLocalRef(jmethod);
-    env->DeleteLocalRef(jArgString);
-    env->DeleteLocalRef(jOptString);
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jModule != nullptr)
+      env->DeleteLocalRef(jModule);
+    if (jMethod != nullptr)
+      env->DeleteLocalRef(jMethod);
+    if (jArgString != nullptr)
+      env->DeleteLocalRef(jArgString);
+    if (jOptString != nullptr)
+      env->DeleteLocalRef(jOptString);
     return result;
   }
 
   void
-  Bridge_Impl_Android::callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
-                                     jbyteArray &jArgString, jbyteArray &jOptString) {
+  Bridge_Impl_Android::callNativeComponent(char *pageId, char *ref, char *method,
+                                           char *argString, char *optString) {
     JNIEnv *env = getJNIEnv();
-    if (jCallNativeComponentMethodId == NULL) {
-      jCallNativeComponentMethodId = env->GetMethodID(jBridgeClazz,
-                                                      "callNativeComponent",
-                                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)V");
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jRef = env->NewStringUTF(ref);
+    jstring jMethod = env->NewStringUTF(method);
+    jbyteArray jArgString = newJByteArray(env, argString);
+    jbyteArray jOptString = newJByteArray(env, optString);
+
+    if (jPageId != nullptr && jRef != nullptr && jMethod != nullptr) {
+      if (jCallNativeComponentMethodId == NULL) {
+        jCallNativeComponentMethodId = env->GetMethodID(jBridgeClazz,
+                                                        "callNativeComponent",
+                                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)V");
+      }
+      env->CallVoidMethod(jThis, jCallNativeComponentMethodId, jPageId, jRef, jMethod,
+                          jArgString, jOptString);
     }
-    env->CallVoidMethod(jThis, jCallNativeComponentMethodId, jInstanceId, jcomponentRef, jmethod,
-                        jArgString, jOptString);
-    env->DeleteLocalRef(jInstanceId);
-    env->DeleteLocalRef(jcomponentRef);
-    env->DeleteLocalRef(jmethod);
-    env->DeleteLocalRef(jArgString);
-    env->DeleteLocalRef(jOptString);
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jRef != nullptr)
+      env->DeleteLocalRef(jRef);
+    if (jMethod != nullptr)
+      env->DeleteLocalRef(jMethod);
+    if (jArgString != nullptr)
+      env->DeleteLocalRef(jArgString);
+    if (jOptString != nullptr)
+      env->DeleteLocalRef(jOptString);
   }
 
   void Bridge_Impl_Android::setTimeout(jstring &jCallbackID, jstring &jTime) {

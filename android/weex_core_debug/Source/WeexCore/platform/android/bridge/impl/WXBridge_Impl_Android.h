@@ -45,13 +45,13 @@ namespace WeexCore {
 
     void reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString);
 
-    int callNative(jstring &instanceId, jbyteArray &taskString, jstring &callback);
+    int callNative(char *pageId, char *task, char *callback);
 
-    jobject callNativeModule(jstring &jInstanceId, jstring &jmodule, jstring &jmethod,
-                             jbyteArray &jArgString, jbyteArray &jOptString);
+    jobject callNativeModule(char *pageId, char *module, char *method,
+                             char *argString, char *optString);
 
-    void callNativeComponent(jstring &jInstanceId, jstring &jcomponentRef, jstring &jmethod,
-                             jbyteArray &jArgString, jbyteArray &jOptString);
+    void callNativeComponent(char *pageId, char *ref, char *method,
+                             char *argString, char *optString);
 
     void setTimeout(jstring &jCallbackID, jstring &jTime);
 
