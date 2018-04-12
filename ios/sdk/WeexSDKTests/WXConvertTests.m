@@ -36,6 +36,14 @@
     [super tearDown];
 }
 
+- (void)testDirection {
+    NSArray *testDirections = @[@"inherit", @"ltr", @"rtl"];
+    css_direction_t directions[3] = {CSS_DIRECTION_INHERIT, CSS_DIRECTION_LTR, CSS_DIRECTION_RTL};
+    for (int i = 0; i<testDirections.count; i++) {
+        XCTAssertTrue([WXConvert wx_css_direction_t:testDirections[i]] == directions[i]);
+    }
+}
+
 - (void)testBOOL {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
