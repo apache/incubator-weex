@@ -943,6 +943,8 @@ _Pragma("clang diagnostic pop") \
         [WXBridgeContext handleConsoleOutputWithArgument:args logLevel:(WXLogFlag)levelMap[levelStr]];
         
     };
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_JSCONTEXT_CREATE_NOTIFICATION object:context];
 }
 + (void)handleConsoleOutputWithArgument:(NSArray*)arguments logLevel:(WXLogFlag)logLevel
 {
