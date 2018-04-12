@@ -10,7 +10,7 @@ def common
     pod 'ATSDK-Weex', '0.0.1',:configurations => ['Debug']
     
     # WeexGcanvas is added by Weex Plugin, more info at https://market.dotwe.org/ext/list.htm
-    pod 'WeexGcanvas'
+    #pod 'WeexGcanvas'
 end
 
 target 'WeexDemo' do
