@@ -1838,8 +1838,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           if (temp.length() > 500) {
             temp = temp.substring(0, 500);
           }
-          String strTrim = temp.replaceAll("\n","");
-          strTrim.trim();
+          String strTrim = temp.replaceAll("\n","").trim();
           if (strTrim.startsWith("// { \"framework\": \"Vue\" }") ||
                   strTrim.startsWith("// { \"framework\": \"vue\" }") ||
                   strTrim.startsWith("// {\"framework\" : \"Vue\"}") ||
