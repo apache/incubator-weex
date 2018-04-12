@@ -22,6 +22,7 @@
 #import "WXComponentManager.h"
 #import "WXModuleMethod.h"
 #import "WXThreadSafeMutableDictionary.h"
+#import <JavaScriptCore/JavaScriptCore.h>
 
 @interface WXSDKInstance ()
 
@@ -31,6 +32,7 @@
 @property (nonatomic, strong) NSMutableDictionary *naviBarStyles;
 @property (nonatomic, strong) NSMutableDictionary *styleConfigs;
 @property (nonatomic, strong) NSMutableDictionary *attrConfigs;
+@property (nonatomic, strong) NSString *mainBundleString;
 
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 

@@ -72,11 +72,6 @@ static NSThread *WXBridgeThread;
     _bridgeCtx = nil;
 }
 
-- (void)dealloc
-{
-   
-}
-
 #pragma mark Thread Management
 
 - (void)_runLoopThread

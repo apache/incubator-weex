@@ -22,6 +22,7 @@
 #import "WXJSExceptionInfo.h"
 #import "WXResourceResponse.h"
 #import "WXResourceRequest.h"
+#import "WXBridgeProtocol.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -133,11 +134,22 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^refreshFinish)(UIView *);
 
 /**
+ * bundleType is the DSL type
+ */
+@property (nonatomic, strong) NSString * bundleType;
+
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured
  **/
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
+
+/**
+ *
+ *  @return instance runtime JavaScript.
+ **/
+- (id<WXBridgeProtocol>)instanceJavaScriptContext;
 
 /**
  *  The callback triggered when js occurs runtime error while executing.

@@ -21,6 +21,10 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXBridgeProtocol.h"
 
+#import "WXBridgeProtocol.h"
+
+#import "WXBridgeProtocol.h"
+
 @class WXCallJSMethod;
 @class WXSDKInstance;
 
@@ -127,6 +131,7 @@
  **/
 - (void)resetEnvironment;
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(JSContext*)context completion:(void (^)(JSValue * value))complection;
++ (void)mountContextEnvironment:(JSContext*)context;
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))complection;
 
 @end
