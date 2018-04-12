@@ -36,6 +36,7 @@
 #import "WXMonitor.h"
 #import "WXPolyfillSet.h"
 #import "WXAppMonitorProtocol.h"
+#import "JSContext+Weex.h"
 
 #import <dlfcn.h>
 
@@ -125,6 +126,7 @@
 
 - (void)setWeexInstanceId:(NSString *)weexInstanceId
 {
+    _jsContext.instanceId = weexInstanceId;
     _weexInstanceId = weexInstanceId;
 }
 
