@@ -254,7 +254,7 @@ namespace WeexCore {
       env->DeleteLocalRef(jTime);
   }
 
-  void Bridge_Impl_Android::callNativeLog(jbyteArray &str_msg) {
+  void Bridge_Impl_Android::callNativeLog(const char* str_array) {
     JNIEnv *env = getJNIEnv();
     if (jWXLogUtils != NULL) {
       if (jLogMethodId == NULL) {
@@ -263,12 +263,12 @@ namespace WeexCore {
       }
       if (jLogMethodId != NULL) {
         jstring str_tag = env->NewStringUTF("jsLog");
-        // str_msg = env->NewStringUTF(s);
+        jbyteArray str_msg = newJByteArray(env, str_array);
         env->CallStaticVoidMethod(jWXLogUtils, jLogMethodId, str_tag, str_msg);
         env->DeleteLocalRef(str_tag);
+        env->DeleteLocalRef(str_msg);
       }
     }
-    env->DeleteLocalRef(str_msg);
   }
 
   int Bridge_Impl_Android::callUpdateFinish(char *pageId, char *task, char *callback) {

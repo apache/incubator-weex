@@ -65,7 +65,7 @@ static inline std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   return stemp;
 }
 
-static inline jbyteArray newJByteArray(JNIEnv *env, char* pat) {
+static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
   jbyteArray jarray = nullptr;
   if (pat == nullptr)
     return jarray;

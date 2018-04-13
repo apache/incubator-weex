@@ -32,7 +32,7 @@ namespace WeexCore {
 
     virtual void setTimeout(char* callbackID, char* time) = 0;
 
-    virtual void callNativeLog(jbyteArray &str_msg) = 0;
+    virtual void callNativeLog(const char* str_array) = 0;
 
     virtual int callUpdateFinish(char *pageId, char *task, char *callback) = 0;
 

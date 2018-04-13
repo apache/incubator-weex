@@ -90,15 +90,13 @@ std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> handle(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jbyteArray str_array = getArgumentAsJByteArray(env, arguments, 0);
+  const char* str_array = getArumentAsCStr(arguments, 0);
   Bridge_Impl_Android::getInstance()->callNativeLog(str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
 std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  jbyteArray str_array = getArgumentAsJByteArray(env, arguments, 0);
+  const char* str_array = getArumentAsCStr(arguments, 0);
   Bridge_Impl_Android::getInstance()->callNativeLog(str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }

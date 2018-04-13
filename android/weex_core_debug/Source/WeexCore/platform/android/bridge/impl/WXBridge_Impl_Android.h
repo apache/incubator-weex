@@ -55,7 +55,7 @@ namespace WeexCore {
 
     void setTimeout(char* callbackID, char* time);
 
-    void callNativeLog(jbyteArray &str_msg);
+    void callNativeLog(const char* str_array);
 
     int callUpdateFinish(char *pageId, char *task, char *callback);
 
