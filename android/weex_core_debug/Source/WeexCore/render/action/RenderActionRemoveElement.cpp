@@ -13,7 +13,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId, mRef);
+    Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId, mRef.c_str());
     page->JniCallTime(getCurrentTime() - startTime);
   }
 }

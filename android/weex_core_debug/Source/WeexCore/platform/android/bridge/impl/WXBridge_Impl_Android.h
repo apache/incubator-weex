@@ -45,29 +45,27 @@ namespace WeexCore {
 
     void reportException(const char *pageId, const char *func, const char *exception_string);
 
-    int callNative(char *pageId, char *task, char *callback);
+    int callNative(const char *pageId, const char *task, const char *callback);
 
-    jobject callNativeModule(char *pageId, char *module, char *method,
-                             char *argString, char *optString);
+    jobject callNativeModule(const char *pageId, const char *module, const char *method,
+                             const char *argString, const char *optString);
 
-    void callNativeComponent(char *pageId, char *ref, char *method,
-                             char *argString, char *optString);
+    void callNativeComponent(const char *pageId, const char *ref, const char *method,
+                             const char *argString, const char *optString);
 
-    void setTimeout(char* callbackID, char* time);
+    void setTimeout(const char* callbackID, const char* time);
 
     void callNativeLog(const char* str_array);
 
-    int callUpdateFinish(char *pageId, char *task, char *callback);
+    int callUpdateFinish(const char *pageId, const char *task, const char *callback);
 
-    int callRefreshFinish(char *pageId, char *task, char *callback);
+    int callRefreshFinish(const char *pageId, const char *task, const char *callback);
 
-    int callAddEvent(int &pageId,
-                     std::string &ref, std::string &event);
+    int callAddEvent(int &pageId, const char *ref, const char *event);
 
-    int callRemoveEvent(int &pageId,
-                        std::string &ref, std::string &event);
+    int callRemoveEvent(int &pageId, const char *ref, const char *event);
 
-    int callCreateBody(int &pageId, std::string &componentType, std::string &ref,
+    int callCreateBody(int &pageId, const char *componentType, const char *ref,
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
@@ -75,9 +73,8 @@ namespace WeexCore {
                        const WXCorePadding &paddings,
                        const WXCoreBorderWidth &borders);
 
-    int callAddElement(int &pageId, std::string &componentType, std::string &ref,
-                       int &index,
-                       std::string &parentRef,
+    int callAddElement(int &pageId, const char *componentType,
+                       const char *ref, int &index, const char *parentRef,
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
@@ -85,30 +82,27 @@ namespace WeexCore {
                        const WXCorePadding &paddings,
                        const WXCoreBorderWidth &borders);
 
-    int callRemoveElement(int &pageId, std::string &ref);
+    int callRemoveElement(int &pageId, const char *ref);
 
-    int callMoveElement(int &pageId, std::string &ref, std::string &parentRef,
-                        int index);
+    int callMoveElement(int &pageId, const char *ref, const char *parentRef, int index);
 
-    int callLayout(int &pageId, std::string &ref,
+    int callLayout(int &pageId, const char *ref,
                    int top, int bottom, int left, int right,
                    int height, int width);
 
-    int callUpdateStyle(int &pageId, std::string &ref,
+    int callUpdateStyle(int &pageId, const char *ref,
                         std::vector<std::pair<std::string, std::string>> *style,
                         std::vector<std::pair<std::string, std::string>> *margin,
                         std::vector<std::pair<std::string, std::string>> *padding,
                         std::vector<std::pair<std::string, std::string>> *border);
 
-    int callUpdateAttr(int &pageId, std::string &ref,
+    int callUpdateAttr(int &pageId, const char *ref,
                        std::vector<std::pair<std::string, std::string>> *attrs);
 
     int callCreateFinish(int &pageId);
 
     int callHasTransitionPros(int &pageId, const std::string &ref,
-                      std::vector<std::pair<std::string, std::string>> *style);
-
-
+                              std::vector<std::pair<std::string, std::string>> *style);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

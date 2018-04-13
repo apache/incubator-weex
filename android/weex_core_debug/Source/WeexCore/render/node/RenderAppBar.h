@@ -14,11 +14,9 @@ namespace WeexCore {
     float defaultOverflowWidth;
 
     std::map<std::string, std::string> *GetDefaultStyle() {
-      defaultNavWidth = Str2Float(
-          WXCoreEnvironment::getInstance()->GetOption("defaultNavWidth"));
+      defaultNavWidth = getFloat(WXCoreEnvironment::getInstance()->GetOption("defaultNavWidth").c_str());
 
-      defaultOverflowWidth = Str2Float(
-          WXCoreEnvironment::getInstance()->GetOption("defaultOverflowWidth"));
+      defaultOverflowWidth = getFloat(WXCoreEnvironment::getInstance()->GetOption("defaultOverflowWidth").c_str());
 
       std::string appbar_color = WXCoreEnvironment::getInstance()->GetOption("appbar_color");
       std::string appbar_background_color = WXCoreEnvironment::getInstance()->GetOption(

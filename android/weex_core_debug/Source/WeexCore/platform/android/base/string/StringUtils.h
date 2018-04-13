@@ -14,13 +14,7 @@
 
 namespace WeexCore {
 
-static float Str2Float(const std::string &str) {
-  if (str.empty() || str == "")
-    return 0.0f;
-  return std::stof(str);
-}
-
-static std::string jString2Str(JNIEnv *env, jstring jstr) {
+static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   char *rtn = NULL;
   jclass clsstring = env->FindClass("java/lang/String");
   jstring strencode = env->NewStringUTF("GB2312");
@@ -44,25 +38,9 @@ static std::string jString2Str(JNIEnv *env, jstring jstr) {
   return stemp;
 }
 
-static inline std::string jString2StrFast(JNIEnv *env, jstring jstr){
+static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
   const char *nativeString = env->GetStringUTFChars(jstr, JNI_FALSE);
   return std::string(nativeString);
-}
-
-static inline std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
-  char *rtn = NULL;
-  jsize alen = env->GetArrayLength(barr);
-  jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
-  if (alen > 0) {
-    rtn = (char *) malloc(alen + 1);
-    memcpy(rtn, ba, alen);
-    rtn[alen] = 0;
-  }
-  env->ReleaseByteArrayElements(barr, ba, 0);
-
-  std::string stemp(rtn);
-  free(rtn);
-  return stemp;
 }
 
 static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
@@ -76,7 +54,14 @@ static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
   return jarray;
 }
 
-static char* getArumentAsCStr(IPCArguments *arguments, int argument) {
+static inline jstring newJString(JNIEnv* env, const char* pat) {
+  jstring jstr = nullptr;
+  if (pat == nullptr)
+    return jstr;
+  return env->NewStringUTF(pat);
+}
+
+static inline char* getArumentAsCStr(IPCArguments *arguments, int argument) {
     char* ret = nullptr;
 
     if (argument >= arguments->getCount())
@@ -94,7 +79,7 @@ static char* getArumentAsCStr(IPCArguments *arguments, int argument) {
     return ret;
 }
 
-static jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int argument) {
+static inline jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int argument) {
   jstring ret = nullptr;
   if (arguments->getType(argument) == IPCType::STRING) {
     const IPCString *s = arguments->getString(argument);
@@ -103,21 +88,7 @@ static jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int ar
   return ret;
 }
 
-static jbyteArray getArgumentAsJByteArray(JNIEnv *env, IPCArguments *arguments, size_t argument) {
-  jbyteArray ba = nullptr;
-  if (argument >= arguments->getCount())
-    return nullptr;
-  if (arguments->getType(argument) == IPCType::BYTEARRAY) {
-    const IPCByteArray *ipcBA = arguments->getByteArray(argument);
-    int strLen = ipcBA->length;
-    ba = env->NewByteArray(strLen);
-    env->SetByteArrayRegion(ba, 0, strLen,
-                            reinterpret_cast<const jbyte *>(ipcBA->content));
-  }
-  return ba;
-}
-
-static int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int argument) {
+static inline int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int argument) {
   int ret = 0;
   if (arguments->getType(argument) == IPCType::INT32) {
     const int32_t type = arguments->get<int32_t>(argument);
@@ -126,14 +97,14 @@ static int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int argument
   return ret;
 }
 
-static void addString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
+static inline void addString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
   ScopedJString scopedString(env, str);
   const uint16_t *chars = scopedString.getChars();
   size_t charsLength = scopedString.getCharsLength();
   serializer->add(chars, charsLength);
 }
 
-static void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
+static inline void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
   ScopedJString scopedString(env, str);
   const uint16_t *chars = scopedString.getChars();
   size_t charsLength = scopedString.getCharsLength();

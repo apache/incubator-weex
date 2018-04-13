@@ -15,18 +15,22 @@ ExtendJSApi::ExtendJSApi() {
 }
 
 void ExtendJSApi::initFunction(IPCHandler *handler) {
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION), handleSetJSVersion);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION),
+                           handleSetJSVersion);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION),
                            handleReportException);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE), handleCallNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE),
+                           handleCallNative);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVEMODULE),
                            handleCallNativeModule);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVECOMPONENT),
                            handleCallNativeComponent);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDELEMENT),
                            handleCallAddElement);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETTIMEOUT), handleSetTimeout);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::NATIVELOG), handleCallNativeLog);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETTIMEOUT),
+                           handleSetTimeout);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::NATIVELOG),
+                           handleCallNativeLog);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEBODY),
                            functionCallCreateBody);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEFINISH),
@@ -43,14 +47,18 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
                            functionCallRemoveElement);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLMOVEELEMENT),
                            functionCallMoveElement);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDEVENT), functionCallAddEvent);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLADDEVENT),
+                           functionCallAddEvent);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEEVENT),
                            functionCallRemoveEvent);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL), handleSetInterval);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL), handleClearInterval);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL),
+                           handleSetInterval);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL),
+                           handleClearInterval);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK),
                            handleCallGCanvasLinkNative);
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK), handleT3DLinkNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK),
+                           handleT3DLinkNative);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
@@ -195,26 +203,22 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 }
 
 static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *arguments) {
-//  base::debug::TraceScope traceScope("weex", "callGCanvasLinkNative");
   JNIEnv *env = getJNIEnv();
-  //instacneID args[0]
-  jstring jContextId = getArgumentAsJString(env, arguments, 0);
-  const char *conextId = env->GetStringUTFChars(jContextId, NULL);
-
-  // jstring jType = getArgumentAsJString(env, arguments, 1);
+  jstring jPageId = getArgumentAsJString(env, arguments, 0);
+  const char *pageId = env->GetStringUTFChars(jPageId, NULL);
   int type = getArgumentAsInt32(env, arguments, 1);
-  // need tansfer jtype to type
-
   jstring val = getArgumentAsJString(env, arguments, 2);
   const char *args = env->GetStringUTFChars(val, NULL);
 
-  // LOGE("handleCallGCanvasLinkNative conextId:%s, type:%d, args:%s", conextId, type, args);
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] handleCallGCanvasLinkNative >>>> pageId: %s, type: %d, args: %s", pageId, type, args);
+#endif
 
   const char *retVal = NULL;
   if (gCanvasFunc) {
-    retVal = callGCanvasFun(gCanvasFunc, conextId, type, args);
+    retVal = callGCanvasFun(gCanvasFunc, pageId, type, args);
   }
-  // LOGE("handleCallGCanvasLinkNative retVal:%s", retVal);
+
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
@@ -222,8 +226,7 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }
-  env->DeleteLocalRef(jContextId);
-  // env->DeleteLocalRef(jType);
+  env->DeleteLocalRef(jPageId);
   env->DeleteLocalRef(val);
   return ret;
 }
@@ -231,21 +234,21 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
 static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments* arguments)
 {
   JNIEnv* env = getJNIEnv();
-
-  // jstring jType = getArgumentAsJString(env, arguments, 1);
   int type = getArgumentAsInt32(env, arguments, 0);
-  // need tansfer jtype to type
-
   jstring val = getArgumentAsJString(env, arguments, 1);
   const char* args = env->GetStringUTFChars(val, NULL);
 
-  // LOGE("handleT3DLinkNative type:%d, args:%s", type, args);
+#if JSAPI_LOG
+  LOGD("[ExtendJSApi] handleT3DLinkNative >>>> type: %d, args: %s", type, args);
+#endif
 
   const char* retVal = NULL;
   if (t3dFunc) {
     retVal = WeexCore::weexCallT3dFunc(t3dFunc, type, args);
   }
-  // LOGE("handleT3DLinkNative retVal:%s", retVal);
+
+
+
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
@@ -253,7 +256,6 @@ static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments* arguments)
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }
-  // env->DeleteLocalRef(jType);
   env->DeleteLocalRef(val);
   return ret;
 }

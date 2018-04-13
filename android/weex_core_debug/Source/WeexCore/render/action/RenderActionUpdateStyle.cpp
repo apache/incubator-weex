@@ -21,7 +21,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId, mRef, mStyle, mMargin,
+    Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId, mRef.c_str(), mStyle, mMargin,
                                                         mPadding, mBorder);
     if (page != nullptr)
       page->JniCallTime(getCurrentTime() - startTime);

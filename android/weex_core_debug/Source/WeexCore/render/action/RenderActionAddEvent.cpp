@@ -15,7 +15,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
 
-    Bridge_Impl_Android::getInstance()->callAddEvent(mPageId, mRef, mEvent);
+    Bridge_Impl_Android::getInstance()->callAddEvent(mPageId, mRef.c_str(), mEvent.c_str());
 
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddEventActionJNITime(getCurrentTime() - startTime);
