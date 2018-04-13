@@ -173,7 +173,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 
   if (pageId != nullptr && task != nullptr) {
 #if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId.c_str(), task.c_str());
+    LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId, task);
 #endif
 
     if (strcmp(task, "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") == 0) {
@@ -273,9 +273,8 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
 
   if (pageId != nullptr && module != nullptr && method != nullptr) {
 #if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s",
-        jString2StrFast(env, jInstanceId).c_str(), jString2StrFast(env, jmodule).c_str(),
-        jString2StrFast(env, jmethod).c_str(), jByteArray2Str(env, jArgString).c_str());
+    LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s, opt: %s",
+         pageId, module, method, argString, optString);
 #endif
 
     // add for android support
@@ -343,9 +342,8 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   if (pageId != nullptr && ref != nullptr && method != nullptr) {
 
 #if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeComponent >>>> pageId: %s, ref: %s, method: %s, arg: %s",
-         jString2StrFast(env, jInstanceId).c_str(), jString2StrFast(env, jcomponentRef).c_str(),
-         jString2StrFast(env, jmethod).c_str(), jByteArray2Str(env, jArgString).c_str());
+    LOGD("[ExtendJSApi] handleCallNativeComponent >>>> pageId: %s, ref: %s, method: %s, arg: %s, opt: %s",
+         pageId, ref, method, argString, optString);
 #endif
 
     Bridge_Impl_Android::getInstance()->callNativeComponent(pageId, ref, method,
