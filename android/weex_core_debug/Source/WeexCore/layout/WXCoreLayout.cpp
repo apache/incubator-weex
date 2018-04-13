@@ -319,6 +319,15 @@ namespace WeexCore {
                                         const float parentHeight,
                                         float &childWidth,
                                         float &childHeight) const {
+      if(child->measureFunc == nullptr) {
+        if(!isnan(childWidth)){
+          childWidth = std::max(childWidth, child->sumPaddingBorderAlongAxis(child, true));
+        }
+        if(!isnan(childHeight)){
+          childHeight = std::max(childHeight, child->sumPaddingBorderAlongAxis(child, false));
+        }
+      }
+
       if (isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)) {
         if (isMainAxisHorizontal(this)) {
           if (!isnan(parentHeight) && isnan(child->mCssStyle->mStyleHeight)
