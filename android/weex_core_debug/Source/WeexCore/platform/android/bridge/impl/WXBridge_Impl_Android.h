@@ -41,7 +41,7 @@ namespace WeexCore {
       jThis = jRef;
     }
 
-    void setJSVersion(jstring &jversion);
+    void setJSVersion(const char* version);
 
     void reportException(const char *pageId, const char *func, const char *exception_string);
 

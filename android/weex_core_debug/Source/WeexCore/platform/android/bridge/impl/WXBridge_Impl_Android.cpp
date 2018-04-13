@@ -98,15 +98,19 @@ namespace WeexCore {
     }
   }
 
-  void Bridge_Impl_Android::setJSVersion(jstring &jversion) {
+  void Bridge_Impl_Android::setJSVersion(const char* version) {
     JNIEnv *env = getJNIEnv();
+    jstring jVersion = env->NewStringUTF(version);
+
     if (jSetJSFrmVersionMethodId == NULL) {
       jSetJSFrmVersionMethodId = env->GetMethodID(jBridgeClazz,
                                                   "setJSFrmVersion",
                                                   "(Ljava/lang/String;)V");
     }
-    env->CallVoidMethod(jThis, jSetJSFrmVersionMethodId, jversion);
-    env->DeleteLocalRef(jversion);
+    env->CallVoidMethod(jThis, jSetJSFrmVersionMethodId, jVersion);
+
+    if (jVersion != nullptr)
+      env->DeleteLocalRef(jVersion);
   }
 
   void Bridge_Impl_Android::reportException(const char *pageId, const char *func, const char *exception_string) {

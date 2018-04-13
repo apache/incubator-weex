@@ -17,7 +17,7 @@ namespace WeexCore {
 
   class Bridge {
   public:
-    virtual void setJSVersion(jstring &jversion) = 0;
+    virtual void setJSVersion(const char* version) = 0;
 
     virtual void
     reportException(const char *pageId, const char *func, const char *exception_string) = 0;

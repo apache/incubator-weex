@@ -54,11 +54,9 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
-  JNIEnv *env = getJNIEnv();
-  const IPCByteArray *ba = arguments->getByteArray(0);
-  LOGA("init JSFrm version %s", ba->content);
-  jstring jversion = env->NewStringUTF(ba->content);
-  Bridge_Impl_Android::getInstance()->setJSVersion(jversion);
+  const char* version = getArumentAsCStr(arguments, 0);
+  LOGA("init JSFrm version %s", version);
+  Bridge_Impl_Android::getInstance()->setJSVersion(version);
   return createVoidResult();
 }
 
