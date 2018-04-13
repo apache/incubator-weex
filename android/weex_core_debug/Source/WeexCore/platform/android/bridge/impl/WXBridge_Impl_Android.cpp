@@ -109,18 +109,25 @@ namespace WeexCore {
     env->DeleteLocalRef(jversion);
   }
 
-  void
-  Bridge_Impl_Android::reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString) {
+  void Bridge_Impl_Android::reportException(const char *pageId, const char *func, const char *exception_string) {
     JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jFunc = env->NewStringUTF(func);
+    jstring jExceptionString = env->NewStringUTF(exception_string);
+
     if (jReportExceptionMethodId == NULL) {
       jReportExceptionMethodId = env->GetMethodID(jBridgeClazz,
                                                   "reportJSException",
                                                   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     }
-    env->CallVoidMethod(jThis, jReportExceptionMethodId, jInstanceId, jFunc, jExceptionString);
-    env->DeleteLocalRef(jExceptionString);
-    env->DeleteLocalRef(jInstanceId);
-    env->DeleteLocalRef(jFunc);
+    env->CallVoidMethod(jThis, jReportExceptionMethodId, jPageId, jFunc, jExceptionString);
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jFunc != nullptr)
+      env->DeleteLocalRef(jFunc);
+    if (jExceptionString != nullptr)
+      env->DeleteLocalRef(jExceptionString);
   }
 
   int Bridge_Impl_Android::callNative(char *pageId, char *task, char *callback) {
@@ -221,16 +228,26 @@ namespace WeexCore {
       env->DeleteLocalRef(jOptString);
   }
 
-  void Bridge_Impl_Android::setTimeout(jstring &jCallbackID, jstring &jTime) {
+  void Bridge_Impl_Android::setTimeout(char* callbackID, char* time) {
     JNIEnv *env = getJNIEnv();
+    jstring jCallbackID = env->NewStringUTF(callbackID);
+    jstring jTime = env->NewStringUTF(time);
+
+    if (jCallbackID == nullptr || jTime == nullptr)
+      return;
+
     if (jSetTimeoutNativeMethodId == NULL) {
       jSetTimeoutNativeMethodId = env->GetMethodID(jBridgeClazz,
                                                    "setTimeoutNative",
                                                    "(Ljava/lang/String;Ljava/lang/String;)V");
     }
+
     env->CallVoidMethod(jThis, jSetTimeoutNativeMethodId, jCallbackID, jTime);
-    env->DeleteLocalRef(jCallbackID);
-    env->DeleteLocalRef(jTime);
+
+    if (jCallbackID != nullptr)
+      env->DeleteLocalRef(jCallbackID);
+    if (jTime != nullptr)
+      env->DeleteLocalRef(jTime);
   }
 
   void Bridge_Impl_Android::callNativeLog(jbyteArray &str_msg) {
@@ -250,42 +267,56 @@ namespace WeexCore {
     env->DeleteLocalRef(str_msg);
   }
 
-  int Bridge_Impl_Android::callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
-                                      jstring &callback) {
+  int Bridge_Impl_Android::callUpdateFinish(char *pageId, char *task, char *callback) {
     JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(pageId);
+    jbyteArray jTask = newJByteArray(env, task);
+    jstring jCallback = env->NewStringUTF(callback);
+
     if (jCallUpdateFinishMethodId == NULL) {
       jCallUpdateFinishMethodId = env->GetMethodID(jBridgeClazz,
                                                    "callUpdateFinish",
                                                    "(Ljava/lang/String;[BLjava/lang/String;)I");
     }
 
-    int flag = env->CallIntMethod(jThis, jCallUpdateFinishMethodId, instanceId, taskString,
-                                  callback);
+    int flag = env->CallIntMethod(jThis, jCallUpdateFinishMethodId, jPageId, jTask, jCallback);
+
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callUpdateFinish");
     }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(taskString);
-    env->DeleteLocalRef(callback);
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jTask != nullptr)
+      env->DeleteLocalRef(jTask);
+    if (jCallback != nullptr)
+      env->DeleteLocalRef(jCallback);
     return flag;
   }
 
-  int Bridge_Impl_Android::callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
-                                       jstring &callback) {
+  int Bridge_Impl_Android::callRefreshFinish(char *pageId, char *task, char *callback) {
     JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(pageId);
+    jbyteArray jTask = newJByteArray(env, task);
+    jstring jCallback = env->NewStringUTF(callback);
+
     if (jCallRefreshFinishMethodId == NULL) {
       jCallRefreshFinishMethodId = env->GetMethodID(jBridgeClazz,
                                                     "callRefreshFinish",
                                                     "(Ljava/lang/String;[BLjava/lang/String;)I");
     }
-    int flag = env->CallIntMethod(jThis, jCallRefreshFinishMethodId, instanceId, taskString,
-                                  callback);
+    int flag = env->CallIntMethod(jThis, jCallRefreshFinishMethodId, jPageId, jTask, jCallback);
+
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callNative");
     }
-    env->DeleteLocalRef(instanceId);
-    env->DeleteLocalRef(taskString);
-    env->DeleteLocalRef(callback);
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jTask != nullptr)
+      env->DeleteLocalRef(jTask);
+    if (jCallback != nullptr)
+      env->DeleteLocalRef(jCallback);
     return flag;
   }
 

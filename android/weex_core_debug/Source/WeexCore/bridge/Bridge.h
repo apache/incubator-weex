@@ -20,7 +20,7 @@ namespace WeexCore {
     virtual void setJSVersion(jstring &jversion) = 0;
 
     virtual void
-    reportException(jstring &jInstanceId, jstring &jFunc, jstring &jExceptionString) = 0;
+    reportException(const char *pageId, const char *func, const char *exception_string) = 0;
 
     virtual int callNative(char *pageId, char *task, char *callback) = 0;
 
@@ -30,15 +30,13 @@ namespace WeexCore {
     virtual void callNativeComponent(char *pageId, char *ref, char *method,
                                      char *argString, char *optString) = 0;
 
-    virtual void setTimeout(jstring &jCallbackID, jstring &jTime) = 0;
+    virtual void setTimeout(char* callbackID, char* time) = 0;
 
     virtual void callNativeLog(jbyteArray &str_msg) = 0;
 
-    virtual int callUpdateFinish(jstring &instanceId, jbyteArray &taskString,
-                                 jstring &callback) = 0;
+    virtual int callUpdateFinish(char *pageId, char *task, char *callback) = 0;
 
-    virtual int callRefreshFinish(jstring &instanceId, jbyteArray &taskString,
-                                  jstring &callback) = 0;
+    virtual int callRefreshFinish(char *pageId, char *task, char *callback) = 0;
 
     virtual int callAddEvent(int &pageId,
                              std::string &ref, std::string &event) = 0;
