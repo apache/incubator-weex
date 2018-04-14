@@ -39,6 +39,7 @@
 #import "WXResourceRequestHandler.h"
 #import "WXResourceRequest.h"
 #import "WXResourceLoader.h"
+#import "WXRecyclerComponent.h"
 #import "WXPrerenderManager.h"
 #import "WXNetworkProtocol.h"
 #import "WXNavigationProtocol.h"

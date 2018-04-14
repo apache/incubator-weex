@@ -125,7 +125,7 @@
 		744D61151E4AF23E00B624B3 /* WXDiffUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 744D61131E4AF23E00B624B3 /* WXDiffUtil.m */; };
 		745B2D681E5A8E1E0092D38A /* WXMultiColumnLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D5E1E5A8E1E0092D38A /* WXMultiColumnLayout.h */; };
 		745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D5F1E5A8E1E0092D38A /* WXMultiColumnLayout.m */; };
-		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
+		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		745B2D6B1E5A8E1E0092D38A /* WXRecyclerComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D611E5A8E1E0092D38A /* WXRecyclerComponent.m */; };
 		745B2D6C1E5A8E1E0092D38A /* WXRecyclerDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D621E5A8E1E0092D38A /* WXRecyclerDataController.h */; };
 		745B2D6D1E5A8E1E0092D38A /* WXRecyclerDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D631E5A8E1E0092D38A /* WXRecyclerDataController.m */; };
@@ -498,7 +498,7 @@
 		DCA445D81EFA599400D0CFA8 /* WXRootView.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B8BEFC1DC47B72004A6027 /* WXRootView.h */; };
 		DCA445D91EFA59A100D0CFA8 /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
 		DCA445DA1EFA59A600D0CFA8 /* WXMultiColumnLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D5E1E5A8E1E0092D38A /* WXMultiColumnLayout.h */; };
-		DCA445DB1EFA59AA00D0CFA8 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
+		DCA445DB1EFA59AA00D0CFA8 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445DC1EFA59AD00D0CFA8 /* WXRecyclerDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D621E5A8E1E0092D38A /* WXRecyclerDataController.h */; };
 		DCA445DD1EFA59B300D0CFA8 /* WXRecyclerUpdateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D641E5A8E1E0092D38A /* WXRecyclerUpdateController.h */; };
 		DCA445DE1EFA59B800D0CFA8 /* WXSectionDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D661E5A8E1E0092D38A /* WXSectionDataController.h */; };
@@ -1628,6 +1628,7 @@
 				2A837AB21CD9DE9200AEDF03 /* WXLoadingComponent.h in Headers */,
 				DCA446271EFA5DAF00D0CFA8 /* WeexSDK.h in Headers */,
 				841CD1051F974DFA0081196D /* WXExceptionUtils.h in Headers */,
+				745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */,
 				C42E8F9B1F39DF07001EBE9D /* WXTracingProtocol.h in Headers */,
 				7423899F1C32733800D748CA /* WXType.h in Headers */,
 				59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */,
@@ -1635,7 +1636,6 @@
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
 				C47B78CE1F2998EE001D3B0C /* WXExtendCallNativeManager.h in Headers */,
-				745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */,
 				749DC27B1D40827B009E1C91 /* WXMonitor.h in Headers */,
 				77E659DA1C07F594008B8775 /* WXDomModule.h in Headers */,
 				74EF31AD1DE58BE200667A07 /* WXURLRewriteDefaultImpl.h in Headers */,
@@ -1784,6 +1784,7 @@
 				DCA445F01EFA5A1D00D0CFA8 /* WXComponent_internal.h in Headers */,
 				74B81AE71F73C3E900D3A61D /* WXRecycleListTemplateManager.h in Headers */,
 				DCA445ED1EFA5A1200D0CFA8 /* WXTransform.h in Headers */,
+				DCA445DB1EFA59AA00D0CFA8 /* WXRecyclerComponent.h in Headers */,
 				DCA445CD1EFA592E00D0CFA8 /* WXComponent+Events.h in Headers */,
 				DCA445EC1EFA5A0E00D0CFA8 /* WXTextAreaComponent.h in Headers */,
 				DCA445D81EFA599400D0CFA8 /* WXRootView.h in Headers */,
@@ -1837,7 +1838,6 @@
 				DCA445E61EFA59E500D0CFA8 /* WXImageComponent.h in Headers */,
 				DCA4461B1EFA5AA200D0CFA8 /* WXDatePickerManager.h in Headers */,
 				DCA445D71EFA598D00D0CFA8 /* WXComponent+ViewManagement.h in Headers */,
-				DCA445DB1EFA59AA00D0CFA8 /* WXRecyclerComponent.h in Headers */,
 				DCA445D31EFA594A00D0CFA8 /* WXRoundedRect.h in Headers */,
 				DCA445EA1EFA5A0300D0CFA8 /* WXCellComponent.h in Headers */,
 				DCA446201EFA5AB800D0CFA8 /* WXComponent+Navigation.h in Headers */,
