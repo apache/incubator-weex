@@ -336,12 +336,6 @@ namespace WeexCore {
             childHeight = parentHeight - sumPaddingBorderAlongAxis(this, false) -
                 child->mCssStyle->sumMarginOfDirection(false);
           }
-
-          if (isnan(child->mCssStyle->mStyleWidth) && child->getChildCount(kNonBFC) > 0 ) {
-            childWidth =
-                calcFreeSpaceAlongMainAxis(parentWidth, parentHeight, currentMainSize) -
-                    child->mCssStyle->sumMarginOfDirection(true);
-          }
         } else {
           if (!isnan(parentWidth) && isnan(child->mCssStyle->mStyleWidth)) {
             childWidth = parentWidth - sumPaddingBorderAlongAxis(this, true) -
