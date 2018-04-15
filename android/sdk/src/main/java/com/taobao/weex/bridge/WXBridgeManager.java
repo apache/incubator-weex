@@ -2169,8 +2169,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callCreateBody(String pageId, String componentType, String ref,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders) {
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       // if (WXEnvironment.isApkDebugable()) {
@@ -2215,8 +2215,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders) {
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callAddElement: call CreateBody tasks is null");
@@ -2378,9 +2378,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callUpdateStyle(String instanceId, String ref, HashMap<String, Object> styles,
-                                       HashMap<String, String> paddings,
-                                       HashMap<String, String> margins,
-                                       HashMap<String, String> borders) {
+                             HashMap<String, String> paddings,
+                             HashMap<String, String> margins,
+                             HashMap<String, String> borders) {
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
               .append(", ref:").append(ref).append(", styles:").append(styles.toString())

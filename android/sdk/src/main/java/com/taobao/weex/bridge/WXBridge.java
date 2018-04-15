@@ -288,8 +288,8 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callCreateBody(int instanceId, String componentType, String ref,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders) {
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
@@ -306,8 +306,8 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callAddElement(int instanceId, String componentType, String ref, int index, String parentRef,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders) {
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
@@ -411,10 +411,10 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int callUpdateStyle(int instanceId, String ref,
-                                       HashMap<String, Object> styles,
-                                       HashMap<String, String> paddings,
-                                       HashMap<String, String> margins,
-                                       HashMap<String, String> borders) {
+                             HashMap<String, Object> styles,
+                             HashMap<String, String> paddings,
+                             HashMap<String, String> margins,
+                             HashMap<String, String> borders) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callUpdateStyle(String.valueOf(instanceId), ref, styles, paddings, margins, borders);
@@ -428,8 +428,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public int callUpdateAttrs(int instanceId, String ref,
-                                       HashMap<String, String> attrs) {
+  public int callUpdateAttrs(int instanceId, String ref, HashMap<String, String> attrs) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callUpdateAttrs(String.valueOf(instanceId), ref, attrs);

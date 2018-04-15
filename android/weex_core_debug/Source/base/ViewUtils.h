@@ -23,7 +23,7 @@ namespace WeexCore {
     return s;
   }
 
-  inline int getInteger(const char* src) {
+  inline int RefactorPageID(const char *src) {
     return atoi(src);
   }
 
