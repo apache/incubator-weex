@@ -101,7 +101,8 @@ public class WXRenderManager {
     if (statement != null) {
       statement.destroy();
     }
-    mWXRenderHandler.removeCallbacksAndMessages(null);
+    final Object token = instanceId == null ? null : instanceId.hashCode();
+    mWXRenderHandler.removeCallbacksAndMessages(token);
   }
 
   public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
@@ -109,7 +110,7 @@ public class WXRenderManager {
     if (renderContext == null) {
       return;
     }
-    mWXRenderHandler.post(action);
+    mWXRenderHandler.post(instanceId, action);
   }
 
   public void registerInstance(WXSDKInstance instance) {
