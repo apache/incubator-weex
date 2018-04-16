@@ -154,10 +154,12 @@ typedef enum : NSUInteger {
         JSGlobalContextRelease(sandboxGlobalContextRef);
         [WXBridgeContext mountContextEnvironment:instanceContext];
         [_instanceJavaScriptContext setJSContext:instanceContext];
-    }
-    
-    if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
-        [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
+        
+        if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
+            [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
+        }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_JSCONTEXT_CREATE_NOTIFICATION object:instanceContext];
     }
     
     return _instanceJavaScriptContext;
