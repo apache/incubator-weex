@@ -45,10 +45,12 @@ public final class NativeInvokeHelper {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
-          try {
-            invoker.invoke(target, params);
-          } catch (Exception e) {
-            throw new RuntimeException(target + "Invoker " + invoker.toString() ,e);
+          if (invoker != null) {
+            try {
+              invoker.invoke(target, params);
+            } catch (Exception e) {
+              throw new RuntimeException(target + "Invoker " + invoker.toString(), e);
+            }
           }
         }
       }, 0);
