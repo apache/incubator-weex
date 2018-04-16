@@ -22,8 +22,8 @@ namespace WeexCore {
     WXCoreBorderWidth mBorders;
     int mPageId;
     std::string mComponentType;
-    std::string mParentRef;
-    std::string mRef;
+    int mParentRef;
+    int mRef;
     int mIndex;
   };
 }

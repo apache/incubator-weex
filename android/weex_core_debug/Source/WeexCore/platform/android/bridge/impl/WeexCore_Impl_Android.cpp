@@ -38,17 +38,14 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-void static
-SetStyleWidth(JNIEnv *env, jobject jcaller,
-              jint instanceId,
-              jstring ref,
-              jfloat value) {
+void static SetStyleWidth(JNIEnv *env, jobject jcaller,
+                          jint instanceId, jint ref, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 
@@ -57,17 +54,14 @@ SetStyleWidth(JNIEnv *env, jobject jcaller,
   page->updateDirty(true);
 }
 
-void static
-SetStyleHeight(JNIEnv *env, jobject jcaller,
-               jint instanceId,
-               jstring ref,
-               jfloat value) {
+void static SetStyleHeight(JNIEnv *env, jobject jcaller,
+                           jint instanceId, jint ref, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 
@@ -77,15 +71,12 @@ SetStyleHeight(JNIEnv *env, jobject jcaller,
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
-                      jint instanceId,
-                      jstring ref,
-                      jint edge,
-                      jfloat value) {
+                      jint instanceId, jint ref, jint edge, jfloat value) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 
@@ -104,16 +95,13 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
-                       jint instanceId,
-                       jstring ref,
-                       jint edge,
-                       jfloat value) {
+                       jint instanceId, jint ref, jint edge, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 
@@ -133,16 +121,13 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
 
 
 static void SetPosition(JNIEnv *env, jobject jcaller,
-                        jint instanceId,
-                        jstring ref,
-                        jint edge,
-                        jfloat value) {
+                        jint instanceId, jint ref, jint edge, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 
@@ -159,33 +144,27 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 }
 
 static void MarkDirty(JNIEnv *env, jobject jcaller,
-                      jint instanceId,
-                            jstring ref,
-                            jboolean dirty) {
+                      jint instanceId, jint ref, jboolean dirty) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
 
   if (dirty) {
 
-    RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+    RenderObject *render = page->GetRenderObject(ref);
     if (render == nullptr)
       return;
     render->markDirty();
   }
 }
 
-static void RegisterCoreEnv(JNIEnv *env, jobject jcaller,
-                            jstring key,
-                            jstring value) {
+static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring value) {
   LOGE("RegisterCoreEnv，key: %s, value: %s", jString2StrFast(env, key).c_str(),
        jString2StrFast(env, value).c_str());
   WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
-static void SetViewPortWidth(JNIEnv *env, jobject jcaller,
-                             jint instanceId,
-                            jfloat value) {
+static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jint instanceId, jfloat value) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
@@ -194,37 +173,25 @@ static void SetViewPortWidth(JNIEnv *env, jobject jcaller,
 }
 
 
-static jint InitFramework(JNIEnv *env,
-                          jobject object,
-                          jstring script,
-                          jobject params) {
+static jint InitFramework(JNIEnv *env, jobject object, jstring script, jobject params) {
   jThis = env->NewGlobalRef(object);
   return WeexProxy::doInitFramework(env, jThis, script, params);
 }
 
-static jint ExecJSService(JNIEnv *env,
-                          jobject object,
-                          jstring script) {
+static jint ExecJSService(JNIEnv *env, jobject object, jstring script) {
   if (script == nullptr)
     return false;
   return WeexProxy::execJSService(env, object, script);
 }
 
-static void TakeHeapSnapshot(JNIEnv *env,
-                             jobject object,
-                             jstring name) {
+static void TakeHeapSnapshot(JNIEnv *env, jobject object, jstring name) {
 }
 
 /**
  * Called to execute JavaScript such as . createInstance(),destroyInstance ext.
  *
  */
-static jint ExecJS(JNIEnv *env,
-                   jobject jthis,
-                   jstring jinstanceid,
-                   jstring jnamespace,
-                   jstring jfunction,
-                   jobjectArray jargs) {
+static jint ExecJS(JNIEnv *env, jobject jthis, jstring jinstanceid, jstring jnamespace, jstring jfunction, jobjectArray jargs) {
   if (jfunction == NULL || jinstanceid == NULL) {
     LOGE("native_execJS function is NULL");
     return false;
@@ -233,11 +200,7 @@ static jint ExecJS(JNIEnv *env,
   return WeexProxy::execJS(env, jThis, jinstanceid, jnamespace, jfunction, jargs);
 }
 
-static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
-                                   jstring instanceId,
-                                   jstring _namespace,
-                                   jstring _function,
-                                   jobjectArray args) {
+static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller, jstring instanceId, jstring _namespace, jstring _function, jobjectArray args) {
   if (_function == NULL || instanceId == NULL) {
     LOGE("native_execJS function is NULL");
     return NULL;
@@ -246,32 +209,20 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
   return WeexProxy::execJSWithResult(env, jcaller, instanceId, _namespace, _function, args);
 }
 
-static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
-                               jstring config) {
+static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
   WeexProxy::updateGlobalConfig(env, jcaller, config);
 }
 
 
-static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
-                                  jstring instanceId,
-                                  jstring name,
-                                  jstring function,
-                                  jobjectArray args) {
+static jint CreateInstanceContext(JNIEnv* env, jobject jcaller, jstring instanceId, jstring name, jstring function, jobjectArray args) {
   return WeexProxy::createInstanceContext(env, jcaller, instanceId, name, function, args);
 }
 
-static jint DestoryInstance(JNIEnv* env, jobject jcaller,
-                            jstring instanceId,
-                            jstring name,
-                            jstring function,
-                            jobjectArray args) {
+static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId, jstring name, jstring function, jobjectArray args) {
   return WeexProxy::destoryInstance(env, jcaller, instanceId, name, function, args);
 }
 
-static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
-                                jstring instanceId,
-                                jstring script,
-                                jint type) {
+static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller, jstring instanceId, jstring script, jint type) {
   return WeexProxy::execJSOnInstance(env, jcaller, instanceId, script, type);
 }
 
@@ -332,6 +283,4 @@ namespace WeexCore {
     WeexProxy::reset();
     LOGD(" end JNI_OnUnload");
   }
-
-
 }

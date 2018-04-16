@@ -23,8 +23,8 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callAddElement(mPageId, mComponentType.c_str(), mRef.c_str(),
-                                                       mIndex, mParentRef.c_str(), mStyles, mAttributes,
+    Bridge_Impl_Android::getInstance()->callAddElement(mPageId, mComponentType.c_str(), mRef,
+                                                       mIndex, mParentRef, mStyles, mAttributes,
                                                        mEvents, mMargins, mPaddings, mBorders);
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddElementActionJNITime(getCurrentTime() - startTime);

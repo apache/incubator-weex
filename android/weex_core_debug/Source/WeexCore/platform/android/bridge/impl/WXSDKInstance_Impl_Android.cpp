@@ -14,17 +14,13 @@ namespace WeexCore {
   }
 }
 
-static void OnInstanceClose(JNIEnv *env, jobject jcaller,
-                            jint instanceId) {
+static void OnInstanceClose(JNIEnv *env, jobject jcaller, jint instanceId) {
   RenderManager::GetInstance()->ClosePage(instanceId);
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
-                                                jint instanceId,
-                                                jfloat defaultWidth,
-                                                jfloat defaultHeight,
-                                                jboolean isWidthWrapContent,
-                                                jboolean isHeightWrapContent) {
+                                                jint instanceId, jfloat defaultWidth, jfloat defaultHeight,
+                                                jboolean isWidthWrapContent, jboolean isHeightWrapContent) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
@@ -37,9 +33,7 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
   page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
 }
 
-static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
-                                          jboolean wrap,
-                                          jint instanceId) {
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean wrap, jint instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return;
@@ -47,8 +41,7 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
   page->SetRenderContainerWidthWrapContent(wrap);
 }
 
-static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
-                                       jint instanceId) {
+static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jint instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return 0;
@@ -56,8 +49,7 @@ static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller,
   return page->PrintFirstScreenLog();
 }
 
-static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
-                                  jint instanceId) {
+static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jint instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page == nullptr)
     return 0;
@@ -66,8 +58,7 @@ static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller,
 }
 
 //Notice that this method is invoked from main thread.
-static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
-                             jint instanceId) {
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jint instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page != nullptr) {
 
@@ -89,8 +80,7 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
 }
 
 //Notice that this method is invoked from JS thread.
-static void ForceLayout(JNIEnv *env, jobject jcaller,
-                        jint instanceId) {
+static void ForceLayout(JNIEnv *env, jobject jcaller, jint instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
   if (page != nullptr) {
 

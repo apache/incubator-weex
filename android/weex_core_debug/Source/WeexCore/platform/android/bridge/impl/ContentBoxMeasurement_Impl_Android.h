@@ -7,14 +7,13 @@
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env);
 
-  void cumsmeasure_Imple_Android(JNIEnv *env, jobject measureFunc_Impl_Android, float width,
-                            float height,
-                            int widthMeasureMode, int heightMeasureMode);
+  void cumsmeasure_Imple_Android(JNIEnv *env, jobject measureFunc_Impl_Android,
+                                 float width, float height,
+                                 int widthMeasureMode, int heightMeasureMode);
 
   void LayoutBeforeImplAndroid(JNIEnv *env, jobject measureFunc_impl_android);
 
-  void LayoutAfterImplAndroid(JNIEnv *env, jobject measureFunc_impl_android, float width,
-                         float height);
+  void LayoutAfterImplAndroid(JNIEnv *env, jobject measureFunc_impl_android, float width, float height);
 
   float GetLayoutWidth(JNIEnv *env, jobject measureFunc_impl_android);
 

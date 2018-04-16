@@ -25,9 +25,8 @@ namespace WeexCore {
     return page->CreateRootRender(root);
   }
 
-  bool RenderManager::AddRenderObject(const int &pageId, const std::string &parentRef,
-                                      int index,
-                                      const std::string &data) {
+  bool RenderManager::AddRenderObject(const int &pageId, const int &parentRef,
+                                      int index, const std::string &data) {
 
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
@@ -50,7 +49,7 @@ namespace WeexCore {
     return page->AddRenderObject(parentRef, index, child);
   }
 
-  bool RenderManager::RemoveRenderObject(const int &pageId, const std::string &ref) {
+  bool RenderManager::RemoveRenderObject(const int &pageId, const int &ref) {
 
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -65,9 +64,8 @@ namespace WeexCore {
     return page->RemoveRenderObject(ref);
   }
 
-  bool RenderManager::MoveRenderObject(const int &pageId, const std::string &ref,
-                                       const std::string &parentRef,
-                                       int index) {
+  bool RenderManager::MoveRenderObject(const int &pageId, const int &ref,
+                                       const int &parentRef, int index) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
@@ -81,7 +79,7 @@ namespace WeexCore {
     return page->MoveRenderObject(ref, parentRef, index);
   }
 
-  bool RenderManager::UpdateAttr(const int &pageId, const std::string &ref,
+  bool RenderManager::UpdateAttr(const int &pageId, const int &ref,
                                  const std::string &data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -101,7 +99,7 @@ namespace WeexCore {
     return page->UpdateAttr(ref, attrs);
   }
 
-  bool RenderManager::UpdateStyle(const int &pageId, const std::string &ref,
+  bool RenderManager::UpdateStyle(const int &pageId, const int &ref,
                                   const std::string &data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -121,7 +119,7 @@ namespace WeexCore {
     return page->UpdateStyle(ref, styles);
   }
 
-  bool RenderManager::AddEvent(const int &pageId, const std::string &ref,
+  bool RenderManager::AddEvent(const int &pageId, const int &ref,
                                const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
@@ -136,7 +134,7 @@ namespace WeexCore {
     return page->AddEvent(ref, event);
   }
 
-  bool RenderManager::RemoveEvent(const int &pageId, const std::string &ref,
+  bool RenderManager::RemoveEvent(const int &pageId, const int &ref,
                                   const std::string &event) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)

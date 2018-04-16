@@ -5,13 +5,17 @@
 #include <WeexCore/layout/WXCoreLayout.h>
 
 namespace WeexCore {
+
+  constexpr int kInvalidPageID = -2;
+  constexpr int kInvalidRef = -2;
+
   class IRenderObject : public WXCoreLayoutNode {
   public:
-    inline void SetRef(std::string ref) {
+    inline void SetRef(int ref) {
       mRef = ref;
     }
 
-    inline const std::string &Ref() const {
+    inline const int &Ref() const {
       return mRef;
     }
 
@@ -32,8 +36,8 @@ namespace WeexCore {
     }
 
   private:
-    int mPageId = -1;
-    std::string mRef = "";
+    int mPageId = kInvalidPageID;
+    int mRef = kInvalidRef;
     std::string mType = "";
   };
 }

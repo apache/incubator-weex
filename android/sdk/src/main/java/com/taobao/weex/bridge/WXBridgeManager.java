@@ -212,6 +212,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private Interceptor mInterceptor;
   private WXParams mInitParams;
 
+  private static int ref2Int(String ref) {
+    if (ref.equals("_root"))
+      return -1;
+    else
+      return Integer.parseInt(ref);
+  }
+
   private WXBridgeManager() {
     initWXBridge(WXEnvironment.sRemoteDebugMode);
     mJSThread = new WXThread("WeexJSBridgeThread", this);
@@ -2520,94 +2527,85 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void setStyleWidth(String instanceId, String ref, float value) {
-    mWXBridge.setStyleWidth(instanceId, ref, value);
+    mWXBridge.setStyleWidth(Integer.parseInt(instanceId), ref2Int(ref), value);
   }
 
   public void setStyleWidthPostToJSThread(final String instanceId, final String ref, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setStyleWidth(instanceId, ref, value);
+        mWXBridge.setStyleWidth(Integer.parseInt(instanceId), ref2Int(ref), value);
       }
     });
   }
 
   public void setStyleHeight(String instanceId, String ref, float value) {
-    mWXBridge.setStyleHeight(instanceId, ref, value);
+    mWXBridge.setStyleHeight(Integer.parseInt(instanceId), ref2Int(ref), value);
   }
 
   public void setStyleHeightPostToJSThread(final String instanceId, final String ref, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setStyleHeight(instanceId, ref, value);
+        mWXBridge.setStyleHeight(Integer.parseInt(instanceId), ref2Int(ref), value);
       }
     });
   }
 
   public void setViewPortWidth(String instanceId, float value) {
-    mWXBridge.setViewPortWidth(instanceId, value);
+    mWXBridge.setViewPortWidth(Integer.parseInt(instanceId), value);
   }
 
   public void setViewPortWidthPostToJSThread(final String instanceId, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setViewPortWidth(instanceId, value);
+        mWXBridge.setViewPortWidth(Integer.parseInt(instanceId), value);
       }
     });
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setMargin(instanceId, ref, edge, value);
+    mWXBridge.setMargin(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
   }
 
   public void setMarginPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setMargin(instanceId, ref, edge, value);
+        mWXBridge.setMargin(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
       }
     });
   }
 
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPadding(instanceId, ref, edge, value);
+    mWXBridge.setPadding(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
   }
 
   public void setPaddingPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setPadding(instanceId, ref, edge, value);
+        mWXBridge.setPadding(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
       }
     });
   }
 
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPosition(instanceId, ref, edge, value);
+    mWXBridge.setPosition(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
   }
 
   public void setPositionPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setPosition(instanceId, ref, edge, value);
+        mWXBridge.setPosition(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
       }
     });
   }
 
   public void markDirty(String instanceId, String ref, boolean dirty) {
-    mWXBridge.markDirty(instanceId, ref, dirty);
-  }
-
-  public void calculateLayoutPostToJSThread(final String instanceId, final String ref, final boolean dirty) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.markDirty(instanceId, ref, dirty);
-      }
-    });
+    mWXBridge.markDirty(Integer.parseInt(instanceId), ref2Int(ref), dirty);
   }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {

@@ -34,22 +34,22 @@ namespace WeexCore {
     // create root node
     bool CreatePage(int pageId, const std::string &data);
 
-    bool AddRenderObject(const int &pageId, const std::string &parentRef, int index,
+    bool AddRenderObject(const int &pageId, const int &parentRef, int index,
                          const std::string &data);
 
-    bool RemoveRenderObject(const int &pageId, const std::string &ref);
+    bool RemoveRenderObject(const int &pageId, const int &ref);
 
     bool
-    MoveRenderObject(const int &pageId, const std::string &ref,
-                     const std::string &parentRef, int index);
+    MoveRenderObject(const int &pageId, const int &ref,
+                     const int &parentRef, int index);
 
-    bool UpdateAttr(const int &pageId, const std::string &ref, const std::string &data);
+    bool UpdateAttr(const int &pageId, const int &ref, const std::string &data);
 
-    bool UpdateStyle(const int &pageId, const std::string &ref, const std::string &data);
+    bool UpdateStyle(const int &pageId, const int &ref, const std::string &data);
 
-    bool AddEvent(const int &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const int &pageId, const int &ref, const std::string &event);
 
-    bool RemoveEvent(const int &pageId, const std::string &ref, const std::string &event);
+    bool RemoveEvent(const int &pageId, const int &ref, const std::string &event);
 
     bool CreateFinish(const int &pageId);
 

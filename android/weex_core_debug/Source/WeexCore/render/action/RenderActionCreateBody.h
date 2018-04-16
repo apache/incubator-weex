@@ -20,7 +20,7 @@ namespace WeexCore {
     WXCoreBorderWidth mBorders;
     int mPageId;
     std::string mComponentType;
-    std::string mRef;
+    int mRef;
   };
 }
 

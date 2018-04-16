@@ -26,7 +26,7 @@ jclass g_WXComponent_clazz = NULL;
 
 static void BindMeasurementToWXCore(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jobject contentBoxMeasurement);
 
 // Step 2: method stubs.
@@ -37,7 +37,7 @@ static const JNINativeMethod kMethodsWXComponent[] = {
     { "nativeBindMeasurementToWXCore",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "Lcom/taobao/weex/layout/ContentBoxMeasurement;"
 ")"
 "V", reinterpret_cast<void*>(BindMeasurementToWXCore) },

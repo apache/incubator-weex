@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionAddEvent::RenderActionAddEvent(const int &pageId, const std::string &ref, const std::string &event) {
+  RenderActionAddEvent::RenderActionAddEvent(const int &pageId, const int &ref, const std::string &event) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mEvent = event;
@@ -15,7 +15,7 @@ namespace WeexCore {
 
     long long startTime = getCurrentTime();
 
-    Bridge_Impl_Android::getInstance()->callAddEvent(mPageId, mRef.c_str(), mEvent.c_str());
+    Bridge_Impl_Android::getInstance()->callAddEvent(mPageId, mRef, mEvent.c_str());
 
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddEventActionJNITime(getCurrentTime() - startTime);

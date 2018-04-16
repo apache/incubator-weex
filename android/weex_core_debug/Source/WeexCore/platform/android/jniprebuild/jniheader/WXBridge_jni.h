@@ -48,35 +48,35 @@ static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
 
 static void SetStyleWidth(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jfloat value);
 
 static void SetStyleHeight(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jfloat value);
 
 static void SetMargin(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jint edge,
     jfloat value);
 
 static void SetPadding(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jint edge,
     jfloat value);
 
 static void SetPosition(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jint edge,
     jfloat value);
 
 static void MarkDirty(JNIEnv* env, jobject jcaller,
     jint instanceId,
-    jstring ref,
+    jint ref,
     jboolean dirty);
 
 static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
@@ -153,21 +153,21 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     { "nativeSetStyleWidth",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetStyleWidth) },
     { "nativeSetStyleHeight",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetStyleHeight) },
     { "nativeSetMargin",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "I"
 "F"
 ")"
@@ -175,7 +175,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     { "nativeSetPadding",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "I"
 "F"
 ")"
@@ -183,7 +183,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     { "nativeSetPosition",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "I"
 "F"
 ")"
@@ -191,7 +191,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     { "nativeMarkDirty",
 "("
 "I"
-"Ljava/lang/String;"
+"I"
 "Z"
 ")"
 "V", reinterpret_cast<void*>(MarkDirty) },

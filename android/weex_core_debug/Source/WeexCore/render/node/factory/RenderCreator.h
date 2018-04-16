@@ -35,7 +35,7 @@ namespace WeexCore {
       return m_pInstance;
     }
 
-    IRenderObject *CreateRender(const std::string &type, const std::string &ref);
+    IRenderObject *CreateRender(const std::string &type, const int &ref);
 
   private:
     static RenderCreator *m_pInstance;

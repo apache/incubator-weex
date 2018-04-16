@@ -283,14 +283,14 @@ namespace WeexCore {
     r.EnterObject();
 
     RenderObject *render;
-    std::string ref;
+    int ref;
 
     while (const char *key = r.NextObjectKey()) {
 
       if (0 == strcmp(key, "ref")) {
         RAPIDJSON_ASSERT(r.PeekType() == kStringType);
         const char *temp_ref = r.GetString();
-        ref = temp_ref;
+        ref = RefactorRef(temp_ref);
         if (temp_ref != nullptr) {
           delete[]temp_ref;
           temp_ref = nullptr;

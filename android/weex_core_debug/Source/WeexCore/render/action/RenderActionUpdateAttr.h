@@ -8,14 +8,14 @@ namespace WeexCore {
   class RenderActionUpdateAttr : public RenderAction {
 
   public:
-    RenderActionUpdateAttr(const int &pageId, const std::string &ref,
+    RenderActionUpdateAttr(const int &pageId, const int &ref,
                            std::vector<std::pair<std::string, std::string>> *mAttrs);
 
     void ExecuteAction();
 
   public:
     int mPageId;
-    std::string mRef;
+    int mRef;
     std::vector<std::pair<std::string, std::string>> *mAttrs;
   };
 }

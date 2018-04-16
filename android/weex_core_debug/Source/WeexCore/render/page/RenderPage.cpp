@@ -147,8 +147,7 @@ namespace WeexCore {
     }
   }
 
-  bool RenderPage::AddRenderObject(const std::string &parentRef, int insertPosition,
-                                   RenderObject *child) {
+  bool RenderPage::AddRenderObject(const int &parentRef, int insertPosition, RenderObject *child) {
     long long startTime = getCurrentTime();
     RenderObject *parent = GetRenderObject(parentRef);
     if (parent == nullptr || child == nullptr) {
@@ -157,6 +156,7 @@ namespace WeexCore {
 
     // add child to Render Tree
     parent->AddRenderObject(insertPosition, child);
+
     PushRenderToRegisterMap(child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
     SendAddElementAction(child, parent, insertPosition);
@@ -165,7 +165,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::RemoveRenderObject(const std::string &ref) {
+  bool RenderPage::RemoveRenderObject(const int &ref) {
     long long startTime = getCurrentTime();
     RenderObject *child = GetRenderObject(ref);
     if (child == nullptr)
@@ -187,7 +187,7 @@ namespace WeexCore {
   }
 
   bool
-  RenderPage::MoveRenderObject(const std::string &ref, const std::string &parentRef, int index) {
+  RenderPage::MoveRenderObject(const int &ref, const int &parentRef, int index) {
     long long startTime = getCurrentTime();
 
     RenderObject *child = GetRenderObject(ref);
@@ -218,8 +218,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::UpdateStyle(const std::string &ref,
-                               std::vector<std::pair<std::string, std::string>> *src) {
+  bool RenderPage::UpdateStyle(const int &ref, std::vector<std::pair<std::string, std::string>> *src) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || src == nullptr || src->empty())
@@ -335,8 +334,7 @@ namespace WeexCore {
     return flag;
   }
 
-  bool RenderPage::UpdateAttr(const std::string &ref,
-                              std::vector<std::pair<std::string, std::string>> *attrs) {
+  bool RenderPage::UpdateAttr(const int &ref, std::vector<std::pair<std::string, std::string>> *attrs) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || attrs == nullptr || attrs->empty())
@@ -386,7 +384,7 @@ namespace WeexCore {
     Batch();
   }
 
-  bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
+  bool RenderPage::AddEvent(const int &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -400,7 +398,7 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
+  bool RenderPage::RemoveEvent(const int &ref, const std::string &event) {
     long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
@@ -442,8 +440,8 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    std::string ref = render->Ref();
-    mRenderObjectRegisterMap.insert(std::pair<std::string, RenderObject *>(ref, render));
+    int ref = render->Ref();
+    mRenderObjectRegisterMap.insert(std::pair<int, RenderObject *>(ref, render));
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
@@ -484,8 +482,7 @@ namespace WeexCore {
     }
   }
 
-  void
-  RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
+  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
     if (child == nullptr || parent == nullptr)
       return;
 
@@ -502,12 +499,12 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::SendRemoveElementAction(const std::string &ref) {
+  void RenderPage::SendRemoveElementAction(const int &ref) {
     RenderAction *action = new RenderActionRemoveElement(PageId(), ref);
     PostRenderAction(action);
   }
 
-  void RenderPage::SendMoveElementAction(const std::string &ref, const std::string &parentRef,
+  void RenderPage::SendMoveElementAction(const int &ref, const int &parentRef,
                                          int index) {
     RenderAction *action = new RenderActionMoveElement(PageId(), ref, parentRef, index);
     PostRenderAction(action);
@@ -526,15 +523,13 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string>> *margin,
                                          std::vector<std::pair<std::string, std::string>> *padding,
                                          std::vector<std::pair<std::string, std::string>> *border) {
-    RenderAction *action = new RenderActionUpdateStyle(PageId(), render->Ref(),
-                                                       style, margin, padding, border);
+    RenderAction *action = new RenderActionUpdateStyle(PageId(), render->Ref(), style, margin, padding, border);
     PostRenderAction(action);
   }
 
   void RenderPage::SendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string>> *attrs) {
-    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(),
-                                                      attrs);
+    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(), attrs);
     PostRenderAction(action);
   }
 

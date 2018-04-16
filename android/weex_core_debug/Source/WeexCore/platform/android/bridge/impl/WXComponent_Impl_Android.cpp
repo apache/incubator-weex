@@ -15,10 +15,7 @@ namespace WeexCore {
   }
 }
 
-static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller,
-                                    jint instanceId,
-                                    jstring ref,
-                                    jobject contentBoxMeasurement) {
+static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jint instanceId, jint ref, jobject contentBoxMeasurement) {
   if (contentBoxMeasurement == nullptr)
     return;
 
@@ -26,7 +23,7 @@ static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller,
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
+  RenderObject *render = page->GetRenderObject(ref);
   if (render == nullptr)
     return;
 

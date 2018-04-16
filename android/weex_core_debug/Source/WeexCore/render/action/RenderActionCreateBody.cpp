@@ -20,7 +20,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callCreateBody(mPageId, mComponentType.c_str(), mRef.c_str(),
+    Bridge_Impl_Android::getInstance()->callCreateBody(mPageId, mComponentType.c_str(), mRef,
                                                        mStyles, mAttributes, mEvents,
                                                        mMargins, mPaddings, mBorders);
     page->JniCallTime(getCurrentTime() - startTime);

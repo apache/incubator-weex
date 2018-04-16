@@ -31,9 +31,9 @@ namespace WeexCore {
 
     void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
 
-    void SendRemoveElementAction(const std::string &ref);
+    void SendRemoveElementAction(const int &ref);
 
-    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
+    void SendMoveElementAction(const int &ref, const int &parentRef, int index);
 
     void SendLayoutAction(RenderObject *render);
 
@@ -44,8 +44,7 @@ namespace WeexCore {
                           std::vector<std::pair<std::string, std::string>> *padding,
                           std::vector<std::pair<std::string, std::string>> *border);
 
-    void SendUpdateAttrAction(RenderObject *render,
-                              std::vector<std::pair<std::string, std::string>> *attrs);
+    void SendUpdateAttrAction(RenderObject *render, std::vector<std::pair<std::string, std::string>> *attrs);
 
     void SendCreateFinishAction();
 
@@ -63,25 +62,21 @@ namespace WeexCore {
 
     bool CreateRootRender(RenderObject *root);
 
-    bool
-    AddRenderObject(const std::string &parentRef, int insertPosiotn, RenderObject *child);
+    bool AddRenderObject(const int &parentRef, int insertPosiotn, RenderObject *child);
 
-    bool RemoveRenderObject(const std::string &ref);
+    bool RemoveRenderObject(const int &ref);
 
-    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int index);
+    bool MoveRenderObject(const int &ref, const int &parentRef, int index);
 
-    bool
-    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *styles);
+    bool UpdateStyle(const int &ref, std::vector<std::pair<std::string, std::string>> *styles);
 
-    bool UpdateAttr(const std::string &ref,
-                    std::vector<std::pair<std::string, std::string>> *attrs);
+    bool UpdateAttr(const int &ref, std::vector<std::pair<std::string, std::string>> *attrs);
 
-    void
-    SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);
+    void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);
 
-    bool AddEvent(const std::string &ref, const std::string &event);
+    bool AddEvent(const int &ref, const std::string &event);
 
-    bool RemoveEvent(const std::string &ref, const std::string &event);
+    bool RemoveEvent(const int &ref, const std::string &event);
 
     bool CreateFinish();
 
@@ -113,8 +108,8 @@ namespace WeexCore {
 
     void LayoutImmediately();
 
-    inline RenderObject *GetRenderObject(const std::string &ref) {
-        std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
+    inline RenderObject *GetRenderObject(const int &ref) {
+        std::map<int, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
         if (iter != mRenderObjectRegisterMap.end()) {
             return iter->second;
         } else {
@@ -174,7 +169,7 @@ namespace WeexCore {
     RenderObject *render_root = nullptr;
     int mPageId;
     std::pair<float,float> renderPageSize;
-    std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
+    std::map<int, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
     std::atomic_bool dirty{true};
     std::atomic_bool isRenderContainerWidthWrapContent{false};

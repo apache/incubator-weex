@@ -102,66 +102,66 @@ public interface IWXBridge extends IWXObject {
   /**
    * js call native
    */
-  int callNative(String instanceId, String tasks, String callback);
+  int callNative(int instanceId, String tasks, String callback);
 
-  void reportJSException(String instanceId, String func, String exception);
+  void reportJSException(int instanceId, String func, String exception);
 
-  Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
+  Object callNativeModule(int instanceId, String module, String method, byte[] arguments, byte[] options);
 
-  void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options);
+  void callNativeComponent(int instanceId, int ref, String method, byte[] arguments, byte[] options);
 
-  int callUpdateFinish(String instanceId, byte[] tasks, String callback);
+  int callUpdateFinish(int instanceId, byte[] tasks, String callback);
 
-  int callRefreshFinish(String instanceId, byte[] tasks, String callback);
+  int callRefreshFinish(int instanceId, byte[] tasks, String callback);
 
   void reportServerCrash(String instanceId, String crashFile);
 
 
-  public int callCreateBody(int instanceId, String componentType, String ref,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders);
+  public int callCreateBody(int instanceId, String componentType, int ref,
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders);
 
-  public int callAddElement(int instanceId, String componentType, String ref, int index, String parentRef,
-                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                      float[] margins, float[] paddings, float[] borders);
+  public int callAddElement(int instanceId, String componentType, int ref, int index, int parentRef,
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders);
 
-  int callRemoveElement(int instanceId, String ref);
+  int callRemoveElement(int instanceId, int ref);
 
-  int callMoveElement(int instanceId, String ref, String parentref, int index);
+  int callMoveElement(int instanceId, int ref, int parentref, int index);
 
-  int callAddEvent(int instanceId, String ref, String event);
+  int callAddEvent(int instanceId, int ref, String event);
 
-  int callRemoveEvent(int instanceId, String ref, String event);
+  int callRemoveEvent(int instanceId, int ref, String event);
 
-  public int callUpdateStyle(int instanceId, String ref,
-                                       HashMap<String, Object> styles,
-                                       HashMap<String, String> paddings,
-                                       HashMap<String, String> margins,
-                                       HashMap<String, String> borders);
+  public int callUpdateStyle(int instanceId, int ref,
+                             HashMap<String, Object> styles,
+                             HashMap<String, String> paddings,
+                             HashMap<String, String> margins,
+                             HashMap<String, String> borders);
 
-  int callUpdateAttrs(int instanceId, String ref,
-                                       HashMap<String, String> attrs);
+  int callUpdateAttrs(int instanceId, int ref,
+                      HashMap<String, String> attrs);
 
-  int callLayout(int instanceId, String ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayout(int instanceId, int ref, int top, int bottom, int left, int right, int height, int width);
 
   int callCreateFinish(int instanceId);
 
-  int callHasTransitionPros(int instanceId, String ref, HashMap<String, String> styles);
+  int callHasTransitionPros(int instanceId, int ref, HashMap<String, String> styles);
 
-  void setStyleWidth(String instanceId, String ref, float value);
+  void setStyleWidth(int instanceId, int ref, float value);
 
-  void setStyleHeight(String instanceId, String ref, float value);
+  void setStyleHeight(int instanceId, int ref, float value);
 
-  void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+  void setMargin(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
 
-  void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+  void setPadding(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
 
-  void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+  void setPosition(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
 
-  void markDirty(String instanceId, String ref, boolean dirty);
+  void markDirty(int instanceId, int ref, boolean dirty);
 
   void registerCoreEnv(String key, String value);
 
-  void setViewPortWidth(String instanceId, float value);
+  void setViewPortWidth(int instanceId, float value);
 
 }

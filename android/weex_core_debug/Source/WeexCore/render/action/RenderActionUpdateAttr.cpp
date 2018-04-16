@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionUpdateAttr::RenderActionUpdateAttr(const int &pageId, const std::string &ref,
+  RenderActionUpdateAttr::RenderActionUpdateAttr(const int &pageId, const int &ref,
                                                  std::vector<std::pair<std::string, std::string>> *mAttrs) {
     this->mPageId = pageId;
     this->mRef = ref;
@@ -15,7 +15,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callUpdateAttr(mPageId, mRef.c_str(), mAttrs);
+    Bridge_Impl_Android::getInstance()->callUpdateAttr(mPageId, mRef, mAttrs);
     if (page != nullptr)
       page->JniCallTime(getCurrentTime() - startTime);
   }
