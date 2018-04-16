@@ -242,6 +242,15 @@ typedef enum : NSUInteger {
             [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
         }
     }
+    if (!self.userInfo) {
+        self.userInfo = [NSMutableDictionary new];
+    }
+    if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
+        self.userInfo[@"jsMainBundleStringContentLength"] = @([mainBundleString length]);
+    }
+    if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
+        self.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:mainBundleString];
+    }
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
     WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
