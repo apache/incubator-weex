@@ -252,10 +252,10 @@ namespace WeexCore {
       return -1;
     }
 
-    virtual void AddRenderObject(int index, RenderObject *child) {
+    virtual int AddRenderObject(int index, RenderObject *child) {
 
       if (child == nullptr || index < -1) {
-        return;
+        return index;
       }
 
       Index count = getChildCount();
@@ -267,6 +267,8 @@ namespace WeexCore {
       }
 
       child->SetParentRender(this);
+
+      return index;
     }
 
     inline void RemoveRenderObject(RenderObject *child) {
