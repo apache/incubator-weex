@@ -154,9 +154,11 @@ namespace WeexCore {
     if (parent == nullptr || child == nullptr) {
       return false;
     }
-
     // add child to Render Tree
-    parent->AddRenderObject(insertPosition, child);
+    insertPosition = parent->AddRenderObject(insertPosition, child);
+    if (insertPosition < -1) {
+      return false;
+    }
     PushRenderToRegisterMap(child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
     SendAddElementAction(child, parent, insertPosition);

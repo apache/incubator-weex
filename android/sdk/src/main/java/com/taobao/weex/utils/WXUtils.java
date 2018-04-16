@@ -204,9 +204,11 @@ public class WXUtils {
 
   public static int parseInt(String value) {
     try {
-      return Integer.parseInt(value);
+      if (!TextUtils.isEmpty(value) && !value.contains(".")) {
+        return Integer.parseInt(value);
+      }
     } catch (NumberFormatException e) {
-      if(WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e(WXLogUtils.getStackTrace(e));
       }
     }
@@ -223,9 +225,15 @@ public class WXUtils {
 
   public static float parseFloat(String value) {
     try {
-      return Float.parseFloat(value);
+      if (!TextUtils.isEmpty(value) && !TextUtils.equals(value, "null")) {
+        return Float.parseFloat(value);
+      } else {
+        if (WXEnvironment.isApkDebugable()) {
+          WXLogUtils.e("WXUtils parseFloat illegal value is " + value);
+        }
+      }
     } catch (NumberFormatException e) {
-      if(WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e(WXLogUtils.getStackTrace(e));
       }
     }
@@ -282,10 +290,16 @@ public class WXUtils {
         }
       } else {
         try {
-          if (!TextUtils.isEmpty(temp) && temp.contains(".")) {
-            ret = (int)WXUtils.parseFloat(temp);
+          if (!TextUtils.isEmpty(temp)) {
+            if (temp.contains(".")) {
+              ret = (int)WXUtils.parseFloat(temp);
+            } else {
+              ret = Integer.parseInt(temp);
+            }
           } else {
-            ret = Integer.parseInt(temp);
+            if (WXEnvironment.isApkDebugable()) {
+              WXLogUtils.e("Argument value is null, df is" + df);
+            }
           }
         } catch (NumberFormatException nfe) {
           WXLogUtils.e("Argument format error! value is " + value, nfe);

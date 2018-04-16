@@ -123,8 +123,8 @@ namespace WeexCore {
     }
 
 
-    void AddRenderObject(int index, RenderObject *child) {
-      RenderObject::AddRenderObject(index, child);
+    int AddRenderObject(int index, RenderObject *child) {
+      index = RenderObject::AddRenderObject(index, child);
 
       if (!mIsPreCalculateCellWidth) {
         preCalculateCellWidth();
@@ -134,6 +134,7 @@ namespace WeexCore {
         //LOGE("listen child->ApplyStyle %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
         AddRenderObjectWidth(child, false);
       }
+      return index;
     }
 
     void AddRenderObjectWidth(RenderObject *child, const bool updating) {
