@@ -29,7 +29,7 @@ namespace WeexCore {
 
   inline int RefactorRef(const char *ref) {
     if (strcmp(ref, "_root") == 0)
-      return -1;
+      return -1000;
     return atoi(ref);
   }
 
