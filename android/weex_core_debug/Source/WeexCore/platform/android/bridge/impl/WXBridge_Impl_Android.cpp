@@ -175,26 +175,23 @@ namespace WeexCore {
     return result;
   }
 
-  void Bridge_Impl_Android::callNativeComponent(const int pageId, const char *ref,
+  void Bridge_Impl_Android::callNativeComponent(const int pageId, const int ref,
                                                 const char *method, const char *argString,
                                                 const char *optString) {
     JNIEnv *env = getJNIEnv();
-    jstring jRef = env->NewStringUTF(ref);
     jstring jMethod = env->NewStringUTF(method);
     jbyteArray jArgString = newJByteArray(env, argString);
     jbyteArray jOptString = newJByteArray(env, optString);
 
-    if (jRef != nullptr && jMethod != nullptr) {
+    if (jMethod != nullptr) {
       if (jCallNativeComponentMethodId == NULL) {
         jCallNativeComponentMethodId = env->GetMethodID(jBridgeClazz,
                                                         "callNativeComponent",
-                                                        "(ILjava/lang/String;Ljava/lang/String;[B[B)V");
+                                                        "(IILjava/lang/String;[B[B)V");
       }
-      env->CallVoidMethod(jThis, jCallNativeComponentMethodId, pageId, jRef, jMethod, jArgString, jOptString);
+      env->CallVoidMethod(jThis, jCallNativeComponentMethodId, pageId, ref, jMethod, jArgString, jOptString);
     }
 
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     if (jMethod != nullptr)
       env->DeleteLocalRef(jMethod);
     if (jArgString != nullptr)

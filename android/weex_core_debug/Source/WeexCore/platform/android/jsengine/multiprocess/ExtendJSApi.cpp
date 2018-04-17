@@ -344,7 +344,7 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
          pageId, ref, method, argString, optString);
 #endif
 
-    Bridge_Impl_Android::getInstance()->callNativeComponent(RefactorPageID(pageId), ref, method, argString, optString);
+    Bridge_Impl_Android::getInstance()->callNativeComponent(RefactorPageID(pageId), RefactorRef(ref), method, argString, optString);
   }
 
   if (pageId != nullptr) {

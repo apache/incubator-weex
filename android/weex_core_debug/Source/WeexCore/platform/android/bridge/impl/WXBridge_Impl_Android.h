@@ -50,7 +50,7 @@ namespace WeexCore {
     jobject callNativeModule(const int pageId, const char *module, const char *method,
                              const char *argString, const char *optString);
 
-    void callNativeComponent(const int pageId, const char *ref, const char *method,
+    void callNativeComponent(const int pageId, const int ref, const char *method,
                              const char *argString, const char *optString);
 
     void setTimeout(const char* callbackID, const char* time);

@@ -26,7 +26,7 @@ namespace WeexCore {
     virtual jobject callNativeModule(const int pageId, const char *module, const char *method,
                                      const char *argString, const char *optString) = 0;
 
-    virtual void callNativeComponent(const int pageId, const char *ref, const char *method,
+    virtual void callNativeComponent(const int pageId, const int ref, const char *method,
                                      const char *argString, const char *optString) = 0;
 
     virtual void setTimeout(const char* callbackID, const char* time) = 0;
