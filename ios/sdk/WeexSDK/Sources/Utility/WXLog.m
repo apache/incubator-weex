@@ -47,16 +47,16 @@
 // Insert the ESCAPE_SEQ into your string, followed by ";"
 
 #ifdef DEBUG
-static const WXLogLevel defaultLogLevel = WXLogLevelLog;
+static const WeexLogLevel defaultLogLevel = WeexLogLevelLog;
 #else
-static const WXLogLevel defaultLogLevel = WXLogLevelWarning;
+static const WeexLogLevel defaultLogLevel = WeexLogLevelWarning;
 #endif
 
 static id<WXLogProtocol> _externalLog;
 
 @implementation WXLog
 {
-    WXLogLevel _logLevel;
+    WeexLogLevel _logLevel;
 }
 
 + (instancetype)sharedInstance
@@ -71,7 +71,7 @@ static id<WXLogProtocol> _externalLog;
 }
 
 
-+ (void)setLogLevel:(WXLogLevel)level
++ (void)setLogLevel:(WeexLogLevel)level
 {
     if (((WXLog*)[self sharedInstance])->_logLevel != level) {
         ((WXLog*)[self sharedInstance])->_logLevel = level;
@@ -88,7 +88,7 @@ static id<WXLogProtocol> _externalLog;
 #pragma clang diagnostic pop
 }
 
-+ (WXLogLevel)logLevel
++ (WeexLogLevel)logLevel
 {
     return ((WXLog*)[self sharedInstance])->_logLevel;
 }
@@ -97,13 +97,13 @@ static id<WXLogProtocol> _externalLog;
 {
     NSDictionary *logLevelEnumToString =
     @{
-      @(WXLogLevelOff) : @"off",
-      @(WXLogLevelError) : @"error",
-      @(WXLogLevelWarning) : @"warn",
-      @(WXLogLevelInfo) : @"info",
-      @(WXLogLevelLog) : @"log",
-      @(WXLogLevelDebug) : @"debug",
-      @(WXLogLevelAll) : @"debug"
+      @(WeexLogLevelOff) : @"off",
+      @(WeexLogLevelError) : @"error",
+      @(WeexLogLevelWarning) : @"warn",
+      @(WeexLogLevelInfo) : @"info",
+      @(WeexLogLevelLog) : @"log",
+      @(WeexLogLevelDebug) : @"debug",
+      @(WeexLogLevelAll) : @"debug"
       };
     return [logLevelEnumToString objectForKey:@([self logLevel])];
 }
@@ -112,12 +112,12 @@ static id<WXLogProtocol> _externalLog;
 {
     NSDictionary *logLevelStringToEnum =
     @{
-      @"all" : @(WXLogLevelAll),
-      @"error" : @(WXLogLevelError),
-      @"warn" : @(WXLogLevelWarning),
-      @"info" : @(WXLogLevelInfo),
-      @"debug" : @(WXLogLevelDebug),
-      @"log" : @(WXLogLevelLog)
+      @"all" : @(WeexLogLevelAll),
+      @"error" : @(WeexLogLevelError),
+      @"warn" : @(WeexLogLevelWarning),
+      @"info" : @(WeexLogLevelInfo),
+      @"debug" : @(WeexLogLevelDebug),
+      @"log" : @(WeexLogLevelLog)
     };
     
     [self setLogLevel:[logLevelStringToEnum[levelString] unsignedIntegerValue]];

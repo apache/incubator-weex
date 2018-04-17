@@ -818,7 +818,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     layoutNode(_rootCSSNode, _rootCSSNode->style.dimensions[CSS_WIDTH], _rootCSSNode->style.dimensions[CSS_HEIGHT], CSS_DIRECTION_INHERIT);
     
     if ([_rootComponent needsLayout]) {
-        if ([WXLog logLevel] >= WXLogLevelDebug) {
+        if ([WXLog logLevel] >= WeexLogLevelDebug) {
             print_css_node(_rootCSSNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
         }
     }
