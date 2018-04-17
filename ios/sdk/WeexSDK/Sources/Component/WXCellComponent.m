@@ -46,6 +46,9 @@
         _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
+        if (attributes[@"zIndex"]) {
+            _zIndex = [WXConvert NSString:attributes[@"zIndex"]];
+        }
     }
     
     return self;

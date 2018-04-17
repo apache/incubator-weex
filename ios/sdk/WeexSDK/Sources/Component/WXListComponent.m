@@ -705,6 +705,10 @@
     
     WXCellComponent *cell = [self cellForIndexPath:indexPath];
     
+    if (cell.zIndex) {
+        cellView.layer.zPosition = [WXConvert CGFloat:cell.zIndex];
+    }
+    
     if (!cell) {
         return cellView;
     }
