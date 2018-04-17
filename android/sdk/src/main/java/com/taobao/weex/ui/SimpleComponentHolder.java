@@ -204,7 +204,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
   }
 
   @Override
-  public String[] getMethods() {
+  public synchronized String[] getMethods() {
     if(mMethodInvokers == null){
       generate();
     }

@@ -94,7 +94,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   }
 
   @Override
-  public String[] getMethods() {
+  public synchronized String[] getMethods() {
     if(mMethodInvokers == null && !generate()){
       //generate failed
       return new String[0];

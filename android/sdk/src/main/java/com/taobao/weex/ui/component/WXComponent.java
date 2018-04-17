@@ -926,7 +926,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   protected void updateBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
-      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      }
       return;
     }
 
@@ -994,7 +996,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   protected void clearBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
-      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.w("BoxShadow", "box-shadow disabled");
+      }
       return;
     }
 

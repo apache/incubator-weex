@@ -34,6 +34,7 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.config.ConfigModuleFactory;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -92,7 +93,7 @@ public class WXModuleManager {
     } catch (Throwable e) {
 
     }
-
+    AutoScanConfigRegister.preLoad(factory);
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()
             .post(new Runnable() {

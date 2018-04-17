@@ -2115,6 +2115,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
+          trackComponentAndModulesTime();
           String reinitInfo = "";
           if (reInitCount > 1) {
             reinitInfo = "reinit Framework:";
@@ -2153,6 +2154,17 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
       }
 
     }
+  }
+
+  private void trackComponentAndModulesTime() {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        WXEnvironment.sComponentsAndModulesReadyTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
+        WXLogUtils.renderPerformanceLog("ComponentModulesReadyTime", WXEnvironment.sComponentsAndModulesReadyTime);
+        WXLogUtils.d("ComponentModulesReadyTime " + WXEnvironment.sComponentsAndModulesReadyTime);
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -2293,12 +2305,18 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
         || components.size() == 0) {
       return;
     }
-    post(new Runnable() {
+    Runnable runnable = new Runnable() {
       @Override
       public void run() {
         invokeRegisterComponents(components, mRegisterComponentFailList);
       }
-    }, null);
+    };
+
+    if(isJSThread() && isJSFrameworkInit()){
+      runnable.run();
+    }else{
+      post(runnable, null);
+    }
   }
 
   public void execJSService(final String service) {
@@ -2359,9 +2377,9 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
             WXModuleManager.resetModuleState(module, true);
             WXLogUtils.e("[WXBridgeManager]invokeRegisterModules METHOD_REGISTER_MODULES success module:" + module);
           }
-
         }
       } catch (Throwable e) {
+        WXLogUtils.e("Weex [invokeRegisterModules]", e);
       }
     } catch (Throwable e) {
 	  WXExceptionUtils.commitCriticalExceptionRT(null,
