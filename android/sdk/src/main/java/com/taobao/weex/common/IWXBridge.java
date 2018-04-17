@@ -21,6 +21,7 @@ package com.taobao.weex.common;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,6 +148,22 @@ public interface IWXBridge extends IWXObject {
   int callCreateFinish(int instanceId);
 
   int callHasTransitionPros(int instanceId, int ref, HashMap<String, String> styles);
+
+  void bindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement);
+
+  void setRenderContainerWrapContent(boolean wrap, int instanceId);
+
+  int printFirstScreenRenderTime(int instanceId);
+
+  int printRenderFinishTime(int instanceId);
+
+  void setDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
+
+  void onInstanceClose(int instanceId);
+
+  void forceLayout(int instanceId);
+
+  boolean notifyLayout(int instanceId);
 
   void setStyleWidth(int instanceId, int ref, float value);
 

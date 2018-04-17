@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
@@ -51,6 +52,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
@@ -2526,82 +2528,77 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public void setStyleWidth(String instanceId, String ref, float value) {
-    mWXBridge.setStyleWidth(Integer.parseInt(instanceId), ref2Int(ref), value);
+  public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
+    mWXBridge.bindMeasurementToWXCore(Integer.parseInt(instanceId), ref2Int(ref), contentBoxMeasurement);
   }
 
-  public void setStyleWidthPostToJSThread(final String instanceId, final String ref, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setStyleWidth(Integer.parseInt(instanceId), ref2Int(ref), value);
-      }
-    });
+  /**
+   * Native: Layout
+   * @param instanceId
+   * @return
+   */
+  @UiThread
+  public boolean notifyLayout(String instanceId) {
+    return mWXBridge.notifyLayout(Integer.parseInt(instanceId));
+  }
+
+  @UiThread
+  public void forceLayout(String instanceId) {
+    mWXBridge.forceLayout(Integer.parseInt(instanceId));
+  }
+
+  /**
+   * native: OnInstanceClose
+   * @param instanceId
+   */
+  public void onInstanceClose(String instanceId) {
+    mWXBridge.onInstanceClose(Integer.parseInt(instanceId));
+  }
+
+  /**
+   * native: SetDefaultHeightAndWidthIntoRootDom
+   * @param instanceId
+   * @param defaultWidth
+   * @param defaultHeight
+   */
+  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
+    mWXBridge.setDefaultHeightAndWidthIntoRootDom(Integer.parseInt(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+  }
+
+  public void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
+    mWXBridge.setRenderContainerWrapContent(wrap, Integer.parseInt(instanceId));
+  }
+
+  public void setStyleWidth(String instanceId, String ref, float value) {
+    mWXBridge.setStyleWidth(Integer.parseInt(instanceId), ref2Int(ref), value);
   }
 
   public void setStyleHeight(String instanceId, String ref, float value) {
     mWXBridge.setStyleHeight(Integer.parseInt(instanceId), ref2Int(ref), value);
   }
 
-  public void setStyleHeightPostToJSThread(final String instanceId, final String ref, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setStyleHeight(Integer.parseInt(instanceId), ref2Int(ref), value);
-      }
-    });
+  public int printFirstScreenRenderTime(String instanceId) {
+    return mWXBridge.printFirstScreenRenderTime(Integer.parseInt(instanceId));
+  }
+
+  public int printRenderFinishTime(String instanceId) {
+    return mWXBridge.printRenderFinishTime(Integer.parseInt(instanceId));
   }
 
   public void setViewPortWidth(String instanceId, float value) {
     mWXBridge.setViewPortWidth(Integer.parseInt(instanceId), value);
   }
 
-  public void setViewPortWidthPostToJSThread(final String instanceId, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setViewPortWidth(Integer.parseInt(instanceId), value);
-      }
-    });
-  }
-
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setMargin(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
-  }
-
-  public void setMarginPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setMargin(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
-      }
-    });
   }
 
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setPadding(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
   }
 
-  public void setPaddingPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setPadding(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
-      }
-    });
-  }
-
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mWXBridge.setPosition(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
-  }
-
-  public void setPositionPostToJSThread(final String instanceId, final String ref, final CSSShorthand.EDGE edge, final float value) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        mWXBridge.setPosition(Integer.parseInt(instanceId), ref2Int(ref), edge, value);
-      }
-    });
   }
 
   public void markDirty(String instanceId, String ref, boolean dirty) {

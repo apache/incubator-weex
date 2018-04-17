@@ -220,7 +220,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    nativeBindMeasurementToWXCore(Integer.parseInt(getInstanceId()), Integer.parseInt(getRef()), contentBoxMeasurement);
+    WXBridgeManager.getInstance().bindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
   }
 
   public void updateStyles(WXComponent component) {
@@ -2118,8 +2118,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private String mViewTreeKey;
-
-  private native void nativeBindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement);
 
   public WXTransition getTransition() {
     return mTransition;

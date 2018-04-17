@@ -26,6 +26,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -55,6 +56,22 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeTakeHeapSnapshot(String filename);
 
+  private native void nativeBindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement);
+
+  private native void nativeSetRenderContainerWrapContent(boolean wrap, int instanceId);
+
+  public native int nativePrintFirstScreenRenderTime(int instanceId);
+
+  public native int nativePrintRenderFinishTime(int instanceId);
+
+  private native void nativeSetDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
+
+  private native void nativeOnInstanceClose(int instanceId);
+
+  private native void nativeForceLayout(int instanceId);
+
+  private native boolean nativeNotifyLayout(int instanceId);
+
   private native void nativeSetStyleWidth(int instanceId, int ref, float value);
 
   private native void nativeSetStyleHeight(int instanceId, int ref, float value);
@@ -70,6 +87,7 @@ public class WXBridge implements IWXBridge {
   private native void nativeRegisterCoreEnv(String key, String value);
 
   private native void nativeSetViewPortWidth(int instanceId, float value);
+
 
   /**
    * update global config,
@@ -482,6 +500,46 @@ public class WXBridge implements IWXBridge {
       }
     }
     return errorCode;
+  }
+
+  @Override
+  public void bindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement) {
+    nativeBindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
+  }
+
+  @Override
+  public void setRenderContainerWrapContent(boolean wrap, int instanceId) {
+    nativeSetRenderContainerWrapContent(wrap, instanceId);
+  }
+
+  @Override
+  public int printFirstScreenRenderTime(int instanceId) {
+    return nativePrintFirstScreenRenderTime(instanceId);
+  }
+
+  @Override
+  public int printRenderFinishTime(int instanceId) {
+    return nativePrintRenderFinishTime(instanceId);
+  }
+
+  @Override
+  public void setDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent) {
+    nativeSetDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+  }
+
+  @Override
+  public void onInstanceClose(int instanceId) {
+    nativeOnInstanceClose(instanceId);
+  }
+
+  @Override
+  public void forceLayout(int instanceId) {
+    nativeForceLayout(instanceId);
+  }
+
+  @Override
+  public boolean notifyLayout(int instanceId) {
+    return nativeNotifyLayout(instanceId);
   }
 
   @Override

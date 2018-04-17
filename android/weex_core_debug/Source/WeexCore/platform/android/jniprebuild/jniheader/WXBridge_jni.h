@@ -43,8 +43,62 @@ static jint ExecJS(JNIEnv* env, jobject jcaller,
 static jint ExecJSService(JNIEnv* env, jobject jcaller,
     jstring javascript);
 
+static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring _namespace,
+    jstring _function,
+    jobjectArray args);
+
+static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring name,
+    jstring function,
+    jobjectArray args);
+
+static jint DestoryInstance(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring name,
+    jstring function,
+    jobjectArray args);
+
+static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring script,
+    jint type);
+
 static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
+
+static void BindMeasurementToWXCore(JNIEnv* env, jobject jcaller,
+    jint instanceId,
+    jint ref,
+    jobject contentBoxMeasurement);
+
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
+    jboolean wrap,
+    jint instanceId);
+
+static jint PrintFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
+    jint instanceId);
+
+static jint PrintRenderFinishTime(JNIEnv* env, jobject jcaller,
+    jint instanceId);
+
+static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
+    jint instanceId,
+    jfloat defaultWidth,
+    jfloat defaultHeight,
+    jboolean isWidthWrapContent,
+    jboolean isHeightWrapContent);
+
+static void OnInstanceClose(JNIEnv* env, jobject jcaller,
+    jint instanceId);
+
+static void ForceLayout(JNIEnv* env, jobject jcaller,
+    jint instanceId);
+
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
+    jint instanceId);
 
 static void SetStyleWidth(JNIEnv* env, jobject jcaller,
     jint instanceId,
@@ -87,29 +141,6 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller,
     jint instanceId,
     jfloat value);
 
-static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jstring _namespace,
-    jstring _function,
-    jobjectArray args);
-
-static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jstring name,
-    jstring function,
-    jobjectArray args);
-
-static jint DestoryInstance(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jstring name,
-    jstring function,
-    jobjectArray args);
-
-static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
-    jstring instanceId,
-    jstring script,
-    jint type);
-
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
@@ -145,11 +176,89 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "I", reinterpret_cast<void*>(ExecJSService) },
+    { "nativeExecJSWithResult",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"[Lcom/taobao/weex/bridge/WXJSObject;"
+")"
+"[B", reinterpret_cast<void*>(ExecJSWithResult) },
+    { "nativeCreateInstanceContext",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"[Lcom/taobao/weex/bridge/WXJSObject;"
+")"
+"I", reinterpret_cast<void*>(CreateInstanceContext) },
+    { "nativeDestoryInstance",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"[Lcom/taobao/weex/bridge/WXJSObject;"
+")"
+"I", reinterpret_cast<void*>(DestoryInstance) },
+    { "nativeExecJSOnInstance",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"I"
+")"
+"Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
     { "nativeTakeHeapSnapshot",
 "("
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(TakeHeapSnapshot) },
+    { "nativeBindMeasurementToWXCore",
+"("
+"I"
+"I"
+"Lcom/taobao/weex/layout/ContentBoxMeasurement;"
+")"
+"V", reinterpret_cast<void*>(BindMeasurementToWXCore) },
+    { "nativeSetRenderContainerWrapContent",
+"("
+"Z"
+"I"
+")"
+"V", reinterpret_cast<void*>(SetRenderContainerWrapContent) },
+    { "nativePrintFirstScreenRenderTime",
+"("
+"I"
+")"
+"I", reinterpret_cast<void*>(PrintFirstScreenRenderTime) },
+    { "nativePrintRenderFinishTime",
+"("
+"I"
+")"
+"I", reinterpret_cast<void*>(PrintRenderFinishTime) },
+    { "nativeSetDefaultHeightAndWidthIntoRootDom",
+"("
+"I"
+"F"
+"F"
+"Z"
+"Z"
+")"
+"V", reinterpret_cast<void*>(SetDefaultHeightAndWidthIntoRootDom) },
+    { "nativeOnInstanceClose",
+"("
+"I"
+")"
+"V", reinterpret_cast<void*>(OnInstanceClose) },
+    { "nativeForceLayout",
+"("
+"I"
+")"
+"V", reinterpret_cast<void*>(ForceLayout) },
+    { "nativeNotifyLayout",
+"("
+"I"
+")"
+"Z", reinterpret_cast<void*>(NotifyLayout) },
     { "nativeSetStyleWidth",
 "("
 "I"
@@ -207,37 +316,6 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetViewPortWidth) },
-    { "nativeExecJSWithResult",
-"("
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"[Lcom/taobao/weex/bridge/WXJSObject;"
-")"
-"[B", reinterpret_cast<void*>(ExecJSWithResult) },
-    { "nativeCreateInstanceContext",
-"("
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"[Lcom/taobao/weex/bridge/WXJSObject;"
-")"
-"I", reinterpret_cast<void*>(CreateInstanceContext) },
-    { "nativeDestoryInstance",
-"("
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"[Lcom/taobao/weex/bridge/WXJSObject;"
-")"
-"I", reinterpret_cast<void*>(DestoryInstance) },
-    { "nativeExecJSOnInstance",
-"("
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"I"
-")"
-"Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
     { "nativeUpdateGlobalConfig",
 "("
 "Ljava/lang/String;"

@@ -30,6 +30,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.websocket.WXWebSocketManager;
 
@@ -322,6 +323,46 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   @Override
   public int callHasTransitionPros(int instanceId, int ref, HashMap<String, String> styles) {
     return mJsManager.callHasTransitionPros(String.valueOf(instanceId), String.valueOf(ref), styles);
+  }
+
+  @Override
+  public void bindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement) {
+
+  }
+
+  @Override
+  public void setRenderContainerWrapContent(boolean wrap, int instanceId) {
+
+  }
+
+  @Override
+  public int printFirstScreenRenderTime(int instanceId) {
+    return 0;
+  }
+
+  @Override
+  public int printRenderFinishTime(int instanceId) {
+    return 0;
+  }
+
+  @Override
+  public void setDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent) {
+
+  }
+
+  @Override
+  public void onInstanceClose(int instanceId) {
+
+  }
+
+  @Override
+  public void forceLayout(int instanceId) {
+
+  }
+
+  @Override
+  public boolean notifyLayout(int instanceId) {
+    return false;
   }
 
   @Override

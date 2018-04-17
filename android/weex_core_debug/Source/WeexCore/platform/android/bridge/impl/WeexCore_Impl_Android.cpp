@@ -38,7 +38,101 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-void static SetStyleWidth(JNIEnv *env, jobject jcaller,
+static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jint instanceId, jint ref, jobject contentBoxMeasurement) {
+  if (contentBoxMeasurement == nullptr)
+    return;
+
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page == nullptr)
+    return;
+
+  RenderObject *render = page->GetRenderObject(ref);
+  if (render == nullptr)
+    return;
+
+  render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
+}
+
+static void OnInstanceClose(JNIEnv *env, jobject jcaller, jint instanceId) {
+  RenderManager::GetInstance()->ClosePage(instanceId);
+}
+
+static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
+                                                jint instanceId, jfloat defaultWidth, jfloat defaultHeight,
+                                                jboolean isWidthWrapContent, jboolean isHeightWrapContent) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page == nullptr)
+    return;
+
+#if RENDER_LOG
+  LOGD("[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %d, defaultWidth: %f, defaultHeight: %f",
+       page->PageId(), defaultWidth,defaultHeight);
+#endif
+
+  page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+}
+
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean wrap, jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page == nullptr)
+    return;
+
+  page->SetRenderContainerWidthWrapContent(wrap);
+}
+
+static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page == nullptr)
+    return 0;
+
+  return page->PrintFirstScreenLog();
+}
+
+static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page == nullptr)
+    return 0;
+
+  return page->PrintRenderSuccessLog();
+}
+
+//Notice that this method is invoked from main thread.
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page != nullptr) {
+
+#if RENDER_LOG
+    LOGD("[JNI] NotifyLayout >>>> pageId: %d, needForceLayout: %s, dirty: %s", instanceId,
+         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
+#endif
+
+    if (!page->needLayout.load()) {
+      page->needLayout.store(true);
+    }
+
+    bool ret = !page->hasForeLayoutAction.load() && page->isDirty();
+    if (ret) {
+      page->hasForeLayoutAction.store(true);
+    }
+    return ret ? JNI_TRUE : JNI_FALSE;
+  }
+}
+
+//Notice that this method is invoked from JS thread.
+static void ForceLayout(JNIEnv *env, jobject jcaller, jint instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  if (page != nullptr) {
+
+#if RENDER_LOG
+    LOGD("[JNI] ForceLayout >>>> pageId: %d, needForceLayout: %s", instanceId, page->hasForeLayoutAction.load()?"true":"false");
+#endif
+
+    page->LayoutImmediately();
+    page->hasForeLayoutAction.store(false);
+  }
+}
+
+static void SetStyleWidth(JNIEnv *env, jobject jcaller,
                           jint instanceId, jint ref, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
@@ -54,7 +148,7 @@ void static SetStyleWidth(JNIEnv *env, jobject jcaller,
   page->updateDirty(true);
 }
 
-void static SetStyleHeight(JNIEnv *env, jobject jcaller,
+static void SetStyleHeight(JNIEnv *env, jobject jcaller,
                            jint instanceId, jint ref, jfloat value) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);

@@ -28,6 +28,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.support.v4.util.ArrayMap;
+
+import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.common.WXPerformance.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -217,12 +219,23 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       a.setSDKInstance(this);
       a.addOnLayoutChangeListener(this);
     }
+
     mRenderContainer = a;
     if (mRenderContainer != null && mRenderContainer.getLayoutParams() != null
             && mRenderContainer.getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT) {
-      setRenderContentWrapContentToCorePostToJSThread(true, getInstanceId());
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          WXBridgeManager.getInstance().setRenderContentWrapContentToCore(true, getInstanceId());
+        }
+      });
     } else {
-      setRenderContentWrapContentToCorePostToJSThread(false, getInstanceId());
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          WXBridgeManager.getInstance().setRenderContentWrapContentToCore(false, getInstanceId());
+        }
+      });
     }
   }
 
@@ -1083,7 +1096,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
 
-    nativePrintRenderFinishTime(Integer.parseInt(getInstanceId()));
+    WXBridgeManager.getInstance().printRenderFinishTime(getInstanceId());
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1316,7 +1329,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
       WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
 
-      nativePrintFirstScreenRenderTime(Integer.parseInt(getInstanceId()));
+    WXBridgeManager.getInstance().printFirstScreenRenderTime(getInstanceId());
   }
 
   public void createInstanceFinished(long time) {
@@ -1391,7 +1404,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       mWXPerformance.afterInstanceDestroy(mInstanceId);
 
-      onInstanceClosePostToJSThread(getInstanceId());
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          WXBridgeManager.getInstance().onInstanceClose(getInstanceId());
+        }
+      });
     }
   }
 
@@ -1494,8 +1512,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         if (mRootComp != null && layoutParams != null) {
           final boolean isWidthWrapContent = layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT;
           final boolean isHeightWrapContent = layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT;
-          setDefaultRootSizePostToJSThread(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
-              isHeightWrapContent);
+
+          WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+              WXBridgeManager.getInstance().setDefaultRootSize(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
+                      isHeightWrapContent);
+            }
+          });
         }
       }
     }
@@ -1928,99 +1952,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void OnVSync() {
-    boolean forceLayout = notifyLayout(getInstanceId());
+    boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
     if(forceLayout) {
       WXBridgeManager.getInstance().post(new Runnable() {
         @Override
         public void run() {
-          forceLayout(getInstanceId());
+          WXBridgeManager.getInstance().forceLayout(getInstanceId());
         }
       });
     }
   }
-
-  /**
-   * Native: Layout
-   * @param instanceId
-   * @return
-   */
-  @UiThread
-  private boolean notifyLayout(String instanceId) {
-    return nativeNotifyLayout(Integer.parseInt(instanceId));
-  }
-
-  private native boolean nativeNotifyLayout(int instanceId);
-
-  @UiThread
-  private void forceLayout(String instanceId) {
-    nativeForceLayout(Integer.parseInt(instanceId));
-  }
-
-  private native void nativeForceLayout(int instanceId);
-
-  /**
-   * native: OnInstanceClose
-   * @param instanceId
-   */
-  public void onInstanceClose(String instanceId) {
-    nativeOnInstanceClose(Integer.parseInt(instanceId));
-  }
-
-  public void onInstanceClosePostToJSThread(final String instanceId) {
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeOnInstanceClose(Integer.parseInt(instanceId));
-      }
-    });
-  }
-
-  private native void nativeOnInstanceClose(int instanceId);
-
-
-  /**
-   * native: SetDefaultHeightAndWidthIntoRootDom
-   * @param instanceId
-   * @param defaultWidth
-   * @param defaultHeight
-   */
-  public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
-    nativeSetDefaultHeightAndWidthIntoRootDom(Integer.parseInt(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
-  }
-
-  public void setDefaultRootSizePostToJSThread(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeSetDefaultHeightAndWidthIntoRootDom(Integer.parseInt(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
-      }
-    });
-  }
-
-  private native void nativeSetDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
-
-  private void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
-    nativeSetRenderContainerWrapContent(wrap, Integer.parseInt(instanceId));
-  }
-
-  private void setRenderContentWrapContentToCorePostToJSThread(final boolean wrap, final String instanceId) {
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeSetRenderContainerWrapContent(wrap, Integer.parseInt(instanceId));
-      }
-    });
-  }
-
-  private native void nativeSetRenderContainerWrapContent(boolean wrap, int instanceId);
-
-  /**
-   * native: print render time
-   * @param instanceId
-   * @return
-   */
-  public native int nativePrintFirstScreenRenderTime(int instanceId);
-
-  public native int nativePrintRenderFinishTime(int instanceId);
-
 }
