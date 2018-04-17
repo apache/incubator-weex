@@ -33,8 +33,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] AddRenderObject >>>> pageId: %d, parentRef: %s, index: %d, dom data: %s",
-         pageId, parentRef.c_str(), index, data.c_str());
+    LOGD("[RenderManager] AddRenderObject >>>> pageId: %d, parentRef: %d, index: %d, dom data: %s",
+         pageId, parentRef, index, data.c_str());
 #endif
 
     long long startTime = getCurrentTime();
@@ -56,8 +56,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] RemoveRenderObject >>>> pageId: %d, ref: %s", pageId,
-         ref.c_str());
+    LOGD("[RenderManager] RemoveRenderObject >>>> pageId: %d, ref: %d", pageId,
+         ref);
 #endif
 
     page->updateDirty(true);
@@ -71,8 +71,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] MoveRenderObject >>>> pageId: %d, ref: %s, parentRef: %s, index: %d",
-         pageId, ref.c_str(), parentRef.c_str(), index);
+    LOGD("[RenderManager] MoveRenderObject >>>> pageId: %d, ref: %d, parentRef: %d, index: %d",
+         pageId, ref, parentRef, index);
 #endif
 
     page->updateDirty(true);
@@ -86,8 +86,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] UpdateAttr >>>> pageId: %d, ref: %s, data: %s",
-         pageId, ref.c_str(), data.c_str());
+    LOGD("[RenderManager] UpdateAttr >>>> pageId: %d, ref: %d, data: %s",
+         pageId, ref, data.c_str());
 #endif
 
     long long startTime = getCurrentTime();
@@ -106,8 +106,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] UpdateStyle >>>> pageId: %d, ref: %s, data: %s",
-         pageId, ref.c_str(), data.c_str());
+    LOGD("[RenderManager] UpdateStyle >>>> pageId: %d, ref: %d, data: %s",
+         pageId, ref, data.c_str());
 #endif
 
     long long startTime = getCurrentTime();
@@ -126,8 +126,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] AddEvent >>>> pageId: %d, ref: %s, event: %s",
-         pageId, ref.c_str(), event.c_str());
+    LOGD("[RenderManager] AddEvent >>>> pageId: %d, ref: %d, event: %s",
+         pageId, ref, event.c_str());
 #endif
 
     page->updateDirty(true);
@@ -141,8 +141,8 @@ namespace WeexCore {
       return false;
 
 #if RENDER_LOG
-    LOGD("[RenderManager] RemoveEvent >>>> pageId: %d, ref: %s, event: %s",
-         pageId, ref.c_str(), event.c_str());
+    LOGD("[RenderManager] RemoveEvent >>>> pageId: %d, ref: %d, event: %s",
+         pageId, ref, event.c_str());
 #endif
 
     page->updateDirty(true);
