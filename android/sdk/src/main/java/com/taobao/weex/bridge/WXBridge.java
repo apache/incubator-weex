@@ -101,10 +101,10 @@ public class WXBridge implements IWXBridge {
   public static final boolean MULTIPROCESS = true;
 
 
-  private static SparseArray<String> mStringPool = new SparseArray<>();
+  private final static SparseArray<String> sStringPool = new SparseArray<>();
 
   private static String ref2String(int ref) {
-    String ret = mStringPool.get(ref);
+    String ret = sStringPool.get(ref);
     if (ret != null) {
       return ret;
     }
@@ -114,18 +114,19 @@ public class WXBridge implements IWXBridge {
     } else {
       ret = String.valueOf(ref);
     }
-    mStringPool.put(ref, ret);
+
+    sStringPool.put(ref, ret);
     return ret;
   }
 
   private static String instanceId2String(int instanceID) {
-    String ret = mStringPool.get(instanceID);
+    String ret = sStringPool.get(instanceID);
     if (ret != null) {
       return ret;
     }
 
     ret = String.valueOf(instanceID);
-    mStringPool.put(instanceID, ret);
+    sStringPool.put(instanceID, ret);
     return ret;
   }
 

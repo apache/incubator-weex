@@ -29,7 +29,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -214,15 +216,33 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private Interceptor mInterceptor;
   private WXParams mInitParams;
 
+  private final static LruCache<String, Integer> sIntegerCache = new LruCache<>(64);
+
   private static int ref2Int(String ref) {
+
+    Integer ret = sIntegerCache.get(ref);
+    if (ret != null) {
+      return ret;
+    }
+
     if (ref.equals("_root"))
-      return -1;
+      ret =  -1;
     else
-      return Integer.parseInt(ref);
+      ret = Integer.parseInt(ref);
+
+    sIntegerCache.put(ref, ret);
+    return ret;
   }
 
   private static int instanceID2Int(String instanceID) {
-    return Integer.parseInt(instanceID);
+    Integer ret = sIntegerCache.get(instanceID);
+    if (ret != null) {
+      return ret;
+    }
+
+    ret = Integer.parseInt(instanceID);
+    sIntegerCache.put(instanceID, ret);
+    return ret;
   }
 
   private WXBridgeManager() {
