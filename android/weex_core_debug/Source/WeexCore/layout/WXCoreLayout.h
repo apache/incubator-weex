@@ -464,8 +464,7 @@ namespace WeexCore {
                                     const WXCoreSize &parentSize) const {
       if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft))) {
         if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeRight))) {
-//          left += parentBorder.getBorderWidth(kBorderWidthLeft) + parentPadding.getPadding(kPaddingLeft);
-//          right += parentBorder.getBorderWidth(kBorderWidthLeft) + parentPadding.getPadding(kPaddingLeft);
+          ;
         } else {
           right += parentSize.width -
               (parentBorder.getBorderWidth(kBorderWidthRight) +
@@ -490,8 +489,7 @@ namespace WeexCore {
                                     const WXCoreSize &parentSize) const {
       if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeTop))) {
         if (isnan(mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom))) {
-//          top += parentBorder.getBorderWidth(kBorderWidthTop) + parentPadding.getPadding(kPaddingTop);
-//          bottom += parentBorder.getBorderWidth(kBorderWidthTop) + parentPadding.getPadding(kPaddingTop);
+          ;
         } else {
           top += parentSize.height -
               (parentBorder.getBorderWidth(kBorderWidthBottom) +

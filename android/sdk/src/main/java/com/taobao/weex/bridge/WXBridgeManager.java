@@ -216,33 +216,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private Interceptor mInterceptor;
   private WXParams mInitParams;
 
-  private final static LruCache<String, Integer> sIntegerCache = new LruCache<>(64);
-
   private static int ref2Int(String ref) {
-
-    Integer ret = sIntegerCache.get(ref);
-    if (ret != null) {
-      return ret;
-    }
-
-    if (ref.equals("_root"))
-      ret =  -1;
-    else
-      ret = Integer.parseInt(ref);
-
-    sIntegerCache.put(ref, ret);
-    return ret;
+    return Integer.parseInt(ref);
   }
 
   private static int instanceID2Int(String instanceID) {
-    Integer ret = sIntegerCache.get(instanceID);
-    if (ret != null) {
-      return ret;
-    }
-
-    ret = Integer.parseInt(instanceID);
-    sIntegerCache.put(instanceID, ret);
-    return ret;
+    return Integer.parseInt(instanceID);
   }
 
   private WXBridgeManager() {
