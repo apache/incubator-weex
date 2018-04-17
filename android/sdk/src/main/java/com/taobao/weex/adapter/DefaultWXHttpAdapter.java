@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPInputStream;
 
 
 public class DefaultWXHttpAdapter implements IWXHttpAdapter {
@@ -74,7 +75,13 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
 
           response.statusCode = String.valueOf(responseCode);
           if (responseCode >= 200 && responseCode<=299) {
-            InputStream rawStream = connection.getInputStream();
+            String encoding = connection.getContentEncoding();
+            InputStream rawStream;
+            if (encoding != null && encoding.contains("gzip")) {
+              rawStream = new GZIPInputStream(connection.getInputStream());
+            } else {
+              rawStream = connection.getInputStream();
+            }
             rawStream = reporter.interpretResponseStream(rawStream);
             response.originalData = readInputStreamAsBytes(rawStream, listener);
           } else {
@@ -117,6 +124,7 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
     HttpURLConnection connection = createConnection(url);
     connection.setConnectTimeout(request.timeoutMs);
     connection.setReadTimeout(request.timeoutMs);
+    connection.setRequestProperty("Accept-Encoding", "gzip");
     connection.setUseCaches(false);
     connection.setDoInput(true);
 
