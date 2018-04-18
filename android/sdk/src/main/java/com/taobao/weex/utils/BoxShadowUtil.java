@@ -65,12 +65,12 @@ import java.util.regex.Pattern;
 
 public class BoxShadowUtil {
   private static final String TAG = "BoxShadowUtil";
-  private static boolean sBoxShadowEnabled = true;
+  private static boolean sBoxShadowEnabled = false /*disable box-shadow temporary*/;
 
   private static Pattern sColorPattern;
 
   public static void setBoxShadowEnabled(boolean enabled) {
-    sBoxShadowEnabled = enabled;
+    //sBoxShadowEnabled = enabled;
     WXLogUtils.w(TAG, "Switch box-shadow status: " + enabled);
   }
 
@@ -142,8 +142,8 @@ public class BoxShadowUtil {
 
   private static void drawShadow(Canvas canvas, BoxShadowOptions options) {
     RectF shadowRect = new RectF(
-            0f, 0f,
-            options.viewWidth + 2f * options.spread, options.viewHeight + 2f * options.spread
+        0f, 0f,
+        options.viewWidth + 2f * options.spread, options.viewHeight + 2f * options.spread
     );
 
     if (options.topLeft != null) {
@@ -248,7 +248,7 @@ public class BoxShadowUtil {
       int paddingX = (maxWidth - w) / 2;
       int paddingY = (maxHeight - h) / 2;
       OverflowBitmapDrawable shadowDrawable = new OverflowBitmapDrawable(target.getResources(),
-              output, new Point(paddingX, paddingY), new Rect(0, 0, w, h), radii);
+          output, new Point(paddingX, paddingY), new Rect(0, 0, w, h), radii);
 
       target.getOverlay().add(shadowDrawable);
       //Relayout to ensure the shadows are fully drawn
@@ -281,9 +281,9 @@ public class BoxShadowUtil {
       for (int i = 0; i < options.size(); i++) {
         BoxShadowOptions option = options.get(i);
         Drawable shadow = new InsetShadowDrawable(target.getWidth(), target.getHeight(),
-                option.hShadow, option.vShadow,
-                option.blur, option.spread,
-                option.color, radii);
+            option.hShadow, option.vShadow,
+            option.blur, option.spread,
+            option.color, radii);
         drawables[i] = shadow;
       }
 
