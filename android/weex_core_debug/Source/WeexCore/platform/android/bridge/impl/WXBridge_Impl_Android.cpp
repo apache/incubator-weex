@@ -5,6 +5,7 @@
 #include <WeexCore/platform/android/base/string/StringUtils.h>
 #include "WXBridge_Impl_Android.h"
 #include <WeexCore/layout/WXCoreStyle.h>
+#include <map>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -50,10 +51,13 @@ namespace WeexCore {
     jstring jValue;
 
     for (; it != end; ++it) {
-      jKey = env->NewStringUTF(it->first.c_str());
+      jKey = getStyleKeyFromCache(it->first.c_str());
+      if (jKey == nullptr) {
+        jKey = putStyleKeyToCache(it->first.c_str());
+      }
+
       jValue = env->NewStringUTF(it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
-      env->DeleteLocalRef(jKey);
       env->DeleteLocalRef(jValue);
     }
   }
@@ -354,7 +358,11 @@ namespace WeexCore {
                                                  "callCreateBody",
                                                  "(ILjava/lang/String;ILjava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
 
-    jstring jComponentType = env->NewStringUTF(componentType);
+
+    jstring jComponentType = getComponentTypeFromCache(componentType);
+    if (jComponentType == nullptr) {
+      jComponentType = putComponentTypeToCache(componentType);
+    }
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallCreateBodyMethodId, pageId,
@@ -367,7 +375,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateBody");
     }
 
-    env->DeleteLocalRef(jComponentType);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
@@ -446,7 +453,10 @@ namespace WeexCore {
                                                            "callAddElement",
                                                            "(ILjava/lang/String;IIILjava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
 
-    jstring jComponentType = env->NewStringUTF(componentType);
+    jstring jComponentType = getComponentTypeFromCache(componentType);
+    if (jComponentType == nullptr) {
+      jComponentType = putComponentTypeToCache(componentType);
+    }
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementMethodId, pageId, jComponentType, ref, index,
@@ -458,7 +468,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddElement");
     }
 
-    env->DeleteLocalRef(jComponentType);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
