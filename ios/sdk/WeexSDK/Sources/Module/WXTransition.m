@@ -59,15 +59,6 @@
 @end
 
 @implementation WXTransition
-int BitCount2(unsigned int n)
-{
-    unsigned int c =0 ;
-    for (c =0; n; ++c)
-    {
-        n &= (n -1) ;
-    }
-    return c ;
-}
 
 - (instancetype)initWithStyles:(NSDictionary *)styles
 {
@@ -75,14 +66,14 @@ int BitCount2(unsigned int n)
         NSString *property = styles[kWXTransitionProperty];
         NSArray *properties = [property componentsSeparatedByString:@","];
         for (NSString *string in properties) {
-            _transitionOptions |= [self fromString:string];
+            _transitionOptions |= [self transitionOptionsFromString:string];
         }
     }
     return self;
 }
 
 #pragma mark - HandleStyle
-- (WXTransitionOptions)fromString:(NSString *)string
+- (WXTransitionOptions)transitionOptionsFromString:(NSString *)string
 {
     NSDictionary<NSString*,NSNumber*> *options = @{
                                                   @"width": @(WXTransitionOptionsWidth),
@@ -114,7 +105,7 @@ int BitCount2(unsigned int n)
     NSMutableDictionary *futileStyles = [NSMutableDictionary new];
     
     for (NSString *key in styles) {
-        if (self.transitionOptions & [self fromString:key]) {
+        if (self.transitionOptions & [self transitionOptionsFromString:key]) {
             [_filterStyles setObject:styles[key] forKey:key];
             if (![key isEqualToString:@"transform"]) {
                 if (!isRunning) {
@@ -525,5 +516,4 @@ int BitCount2(unsigned int n)
 {
     return [self sampleCurveY:([self solveCurveX:x epsilon:epsilon])];
 }
-
 @end
