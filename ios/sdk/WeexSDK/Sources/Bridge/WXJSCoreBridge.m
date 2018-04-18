@@ -434,10 +434,6 @@
     _jsContext[@"clearInterval"] = ^(JSValue *timerId) {
         [weakSelf clearTimer:[timerId toNumber]];
     };
-    
-    _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
-        [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
-    };
 }
 
 #pragma mark - Private
