@@ -305,11 +305,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 - (void)animationWithTransitionTarget:(WXComponent *)target handleProperty:(NSString *)property withDic:(NSDictionary *)args
 {
     NSDictionary *styles = args[@"styles"];
-    _transition.addStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
-    _transition.fromStyles =_transition.fromStyles ? :[NSMutableDictionary dictionaryWithDictionary:target.styles] ;
-    [_transition.fromStyles setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
-    [_transition.fromStyles setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
-    NSString *oldProperty = _transition.fromStyles[kWXTransitionProperty];
+    _transition.filterStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
+    _transition.oldFilterStyles =_transition.oldFilterStyles ? :[NSMutableDictionary dictionaryWithDictionary:target.styles] ;
+    [_transition.oldFilterStyles setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
+    [_transition.oldFilterStyles setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
+    NSString *oldProperty = _transition.oldFilterStyles[kWXTransitionProperty];
     NSString *newProperty;
     if (oldProperty) {
         if ([oldProperty containsString:property]) {
@@ -324,11 +324,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     {
         newProperty = property;
     }
-    [_transition.fromStyles setObject:newProperty forKey:kWXTransitionProperty];
-    [_transition.fromStyles setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
+    [_transition.oldFilterStyles setObject:newProperty forKey:kWXTransitionProperty];
+    [_transition.oldFilterStyles setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
     [target _modifyStyles:styles];
-    
 }
+
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
 {
     /**
@@ -361,7 +361,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction commit];
     if (_needLayout) {
         WXPerformBlockOnComponentThread(^{
-            [_transition _handleTransitionWithStyles:_transition.addStyles resetStyles:nil target:targetComponent];
+            [_transition _handleTransitionWithStyles:_transition.filterStyles resetStyles:nil target:targetComponent];
         });
     }
 }
