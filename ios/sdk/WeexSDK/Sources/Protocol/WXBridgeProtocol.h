@@ -65,6 +65,11 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 
 @optional
 /**
+ * Register timer.
+ */
+- (void)registerTimers;
+
+/**
  * Remove instance's timer.
  */
 -(void)removeTimers:(NSString *)instance;

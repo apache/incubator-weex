@@ -37,6 +37,8 @@
 #import "WXPolyfillSet.h"
 #import "WXAppMonitorProtocol.h"
 #import "JSContext+Weex.h"
+#import "NSTimer+Weex.h"
+#import "WXThreadSafeMutableDictionary.h"
 
 #import <dlfcn.h>
 
@@ -53,9 +55,21 @@
 @property (nonatomic)  long long intervalTimerId;
 @property (nonatomic, strong)  NSMutableDictionary *callbacks;
 
+@property (nonatomic, strong) WXThreadSafeMutableDictionary *timerDic;
+
 @end
 
 @implementation WXJSCoreBridge
+
+- (void)dealloc {
+    [_timerDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        NSTimer *timer = (NSTimer *)obj;
+        if (timer.isValid) {
+            [timer invalidate];
+        }
+    }];
+    [_timerDic removeAllObjects];
+}
 
 - (instancetype)init
 {
@@ -71,17 +85,11 @@
         _intervalTimerId = 0;
         _intervaltimers = [NSMutableDictionary new];
         _multiContext = NO;
+        _timerDic = [[WXThreadSafeMutableDictionary alloc] init];
 
         __weak typeof(self) weakSelf = self;
         
         [WXBridgeContext mountContextEnvironment:_jsContext];
-        
-        _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
-            // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
-            [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
-                [function callWithArguments:@[]];
-            } afterDelay:[timeout toDouble] / 1000];
-        };
         
         _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
             [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
@@ -105,6 +113,8 @@
         _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
             return [weakSelf extendCallNative:[value toDictionary]];
         };
+        
+        [self registerTimers];
     }
     return self;
 }
@@ -384,7 +394,6 @@
 //    JSGarbageCollect(_jsContext.JSGlobalContextRef);
 }
 
-#pragma mark - Public
 -(void)removeTimers:(NSString *)instance
 {
     // remove timers
@@ -402,6 +411,33 @@
     if(_intervaltimers && [_intervaltimers objectForKey:instance]){
         [_intervaltimers removeObjectForKey:instance];
     }
+}
+
+- (void)registerTimers {
+    __weak typeof(self) weakSelf = self;
+    _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
+        return [weakSelf scheduledTimerWithTimeInterval:[timeout toDouble]/1000.f block:^{
+            [function callWithArguments:@[]];
+        } repeats:NO];
+    };
+    
+    _jsContext[@"clearTimeout"] = ^(JSValue *timerId) {
+        [weakSelf clearTimer:[timerId toNumber]];
+    };
+    
+    _jsContext[@"setInterval"] = ^(JSValue *function, JSValue *intervalTime) {
+        return [weakSelf scheduledTimerWithTimeInterval:[intervalTime toDouble]/1000.f block:^{
+            [function callWithArguments:@[]];
+        } repeats:YES];
+    };
+    
+    _jsContext[@"clearInterval"] = ^(JSValue *timerId) {
+        [weakSelf clearTimer:[timerId toNumber]];
+    };
+    
+    _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
+        [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
+    };
 }
 
 #pragma mark - Private
@@ -424,19 +460,12 @@
     }
 }
 
-- (void)triggerTimeout:(void(^)(void))block
-{
-    block();
-}
-
 - (void)callBack:(NSDictionary *)dic
 {
     if([dic objectForKey:@"ret"] && [_timers containsObject:[dic objectForKey:@"ret"]]) {
         [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appId"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
     }
-
 }
-
 
 - (void)callBackInterval:(NSDictionary *)dic
 {
@@ -523,6 +552,28 @@
         return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
     }
     return @(-1);
+}
+
+- (NSNumber *)scheduledTimerWithTimeInterval:(NSTimeInterval)interval block:(void(^)(void))block repeats:(BOOL)repeats {
+    NSTimer *timer = [NSTimer wx_scheduledTimerWithTimeInterval:interval block:block repeats:repeats];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    _intervalTimerId = _intervalTimerId + 1; // timerId must auto-increment.
+    long long timerId = _intervalTimerId;
+    [self.timerDic setObject:timer forKey:@(timerId)];
+    
+    return @(timerId);
+}
+
+- (void)clearTimer:(NSNumber *)timerId {
+    NSTimer *timer = [self.timerDic objectForKey:timerId];
+    if (!timer) {
+        return;
+    }
+    
+    if (timer.isValid) {
+        [timer invalidate];
+        [self.timerDic removeObjectForKey:timerId];
+    }
 }
 
 @end

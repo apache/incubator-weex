@@ -159,6 +159,10 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_JSCONTEXT_CREATE_NOTIFICATION object:instanceContext];
     }
     
+    if ([_instanceJavaScriptContext respondsToSelector:@selector(registerTimers)]) {
+        [_instanceJavaScriptContext registerTimers];
+    }
+    
     return _instanceJavaScriptContext;
 }
 
