@@ -196,7 +196,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.showsHorizontalScrollIndicator = _showScrollBar;
     scrollView.scrollEnabled = _scrollable;
     scrollView.pagingEnabled = _pagingEnabled;
-    scrollView.bounces = _bounces;
+    
+    if (scrollView.bounces != _bounces) {
+        scrollView.bounces = _bounces;
+    }
+    
     if (_alwaysScrollableHorizontal) {
         scrollView.alwaysBounceHorizontal = [WXConvert BOOL:_alwaysScrollableHorizontal];
     }
