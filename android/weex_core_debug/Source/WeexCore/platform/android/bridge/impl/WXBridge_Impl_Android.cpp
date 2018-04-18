@@ -38,6 +38,8 @@ static jmethodID jCallCreateFinishMethodId;
 
 namespace WeexCore {
 
+std::map<std::string, jstring > StyleCache;
+
   Bridge_Impl_Android *Bridge_Impl_Android::m_instance = nullptr;
 
   Bridge_Impl_Android::Bridge_Impl_Android() {}
@@ -49,12 +51,14 @@ namespace WeexCore {
     std::map<std::string, std::string>::const_iterator end = cMap->end();
     jstring jKey;
     jstring jValue;
-
     for (; it != end; ++it) {
-      jKey = env->NewStringUTF(it->first.c_str());
+      if (StyleCache.find(it->first) == StyleCache.end()) {
+        jKey = env->NewStringUTF(it->first.c_str());
+        StyleCache[it->first] = static_cast<jstring>(env->NewGlobalRef(jKey));
+        env->DeleteLocalRef(jKey);
+      }
       jValue = env->NewStringUTF(it->second.c_str());
-      env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
-      env->DeleteLocalRef(jKey);
+      env->CallObjectMethod(jMap, jMapPutMethodId, StyleCache[it->first], jValue);
       env->DeleteLocalRef(jValue);
     }
   }
