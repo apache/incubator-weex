@@ -7,6 +7,7 @@
 #include <WeexCore/render/page/RenderPage.h>
 #include <WeexCore/render/node/RenderObject.h>
 #include <WeexCore/config/CoreEnvironment.h>
+#include <map>
 
 using namespace WeexCore;
 
@@ -16,8 +17,8 @@ jclass jWXLogUtils;
 jclass jMapClazz;
 jclass jSetClazz;
 jmethodID jDoubleValueMethodId;
-// static
 jobject jThis;
+std::map<std::string, jobject> componentTypeCache;
 
 static JavaVM *sVm = NULL;
 
@@ -318,6 +319,24 @@ static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId, js
 
 static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller, jstring instanceId, jstring script, jint type) {
   return WeexProxy::execJSOnInstance(env, jcaller, instanceId, script, type);
+}
+
+jstring getComponentTypeFromCache(const std::string type) {
+  std::map<std::string, jobject>::const_iterator iter = componentTypeCache.find(type);
+  if (iter != componentTypeCache.end()) {
+    return (jstring)(iter->second);
+  } else {
+    return nullptr;
+  }
+}
+
+jstring putComponentTypeToCache(const std::string type) {
+  JNIEnv *env = getJNIEnv();
+  jstring jType = env->NewStringUTF(type.c_str());
+  jobject jGlobalType = env->NewGlobalRef(jType);
+  componentTypeCache.insert(std::pair<std::string, jobject>(type, jGlobalType));
+  env->DeleteLocalRef(jType);
+  return (jstring) jGlobalType;
 }
 
 namespace WeexCore {
