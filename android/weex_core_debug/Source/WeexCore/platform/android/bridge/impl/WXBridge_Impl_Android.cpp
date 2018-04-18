@@ -51,10 +51,13 @@ namespace WeexCore {
     jstring jValue;
 
     for (; it != end; ++it) {
-      jKey = env->NewStringUTF(it->first.c_str());
+      jKey = getStyleKeyFromCache(it->first.c_str());
+      if (jKey == nullptr) {
+        jKey = putStyleKeyToCache(it->first.c_str());
+      }
+
       jValue = env->NewStringUTF(it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
-      env->DeleteLocalRef(jKey);
       env->DeleteLocalRef(jValue);
     }
   }

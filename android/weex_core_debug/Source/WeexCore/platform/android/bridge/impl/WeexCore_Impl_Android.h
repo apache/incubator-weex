@@ -21,6 +21,8 @@ extern jclass jSetClazz;
 extern JNIEnv *getJNIEnv();
 extern jstring getComponentTypeFromCache(const std::string type);
 extern jstring putComponentTypeToCache(const std::string type);
+extern jstring getStyleKeyFromCache(const std::string key);
+extern jstring putStyleKeyToCache(const std::string key);
 
 namespace WeexCore {
 

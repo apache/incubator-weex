@@ -19,6 +19,7 @@ jclass jSetClazz;
 jmethodID jDoubleValueMethodId;
 jobject jThis;
 std::map<std::string, jobject> componentTypeCache;
+std::map<std::string, jobject> styleKeyCache;
 
 static JavaVM *sVm = NULL;
 
@@ -28,6 +29,42 @@ JNIEnv *getJNIEnv() {
     return JNI_FALSE;
   }
   return env;
+}
+
+jstring getComponentTypeFromCache(const std::string type) {
+  std::map<std::string, jobject>::const_iterator iter = componentTypeCache.find(type);
+  if (iter != componentTypeCache.end()) {
+    return (jstring)(iter->second);
+  } else {
+    return nullptr;
+  }
+}
+
+jstring putComponentTypeToCache(const std::string type) {
+  JNIEnv *env = getJNIEnv();
+  jstring jType = env->NewStringUTF(type.c_str());
+  jobject jGlobalType = env->NewGlobalRef(jType);
+  componentTypeCache.insert(std::pair<std::string, jobject>(type, jGlobalType));
+  env->DeleteLocalRef(jType);
+  return (jstring) jGlobalType;
+}
+
+jstring getStyleKeyFromCache(const std::string key) {
+  std::map<std::string, jobject>::const_iterator iter = styleKeyCache.find(key);
+  if (iter != styleKeyCache.end()) {
+    return (jstring)(iter->second);
+  } else {
+    return nullptr;
+  }
+}
+
+jstring putStyleKeyToCache(const std::string key) {
+  JNIEnv *env = getJNIEnv();
+  jstring jKey = env->NewStringUTF(key.c_str());
+  jobject jGlobalKey = env->NewGlobalRef(jKey);
+  styleKeyCache.insert(std::pair<std::string, jobject>(key, jGlobalKey));
+  env->DeleteLocalRef(jKey);
+  return (jstring) jGlobalKey;
 }
 
 static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
@@ -321,24 +358,6 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller, jstring instanceId
   return WeexProxy::execJSOnInstance(env, jcaller, instanceId, script, type);
 }
 
-jstring getComponentTypeFromCache(const std::string type) {
-  std::map<std::string, jobject>::const_iterator iter = componentTypeCache.find(type);
-  if (iter != componentTypeCache.end()) {
-    return (jstring)(iter->second);
-  } else {
-    return nullptr;
-  }
-}
-
-jstring putComponentTypeToCache(const std::string type) {
-  JNIEnv *env = getJNIEnv();
-  jstring jType = env->NewStringUTF(type.c_str());
-  jobject jGlobalType = env->NewGlobalRef(jType);
-  componentTypeCache.insert(std::pair<std::string, jobject>(type, jGlobalType));
-  env->DeleteLocalRef(jType);
-  return (jstring) jGlobalType;
-}
-
 namespace WeexCore {
   bool RegisterJNIUtils(JNIEnv *env) {
     return RegisterNativesImpl(env);
@@ -394,12 +413,19 @@ namespace WeexCore {
 
     for (auto iter = componentTypeCache.begin(); iter != componentTypeCache.end(); iter++) {
       if (iter->second != nullptr) {
-        LOGE("DeleteGlobalRef componentTypeCache");
         env->DeleteGlobalRef(iter->second);
         iter->second = nullptr;
       }
     }
     componentTypeCache.clear();
+
+    for (auto iter = styleKeyCache.begin(); iter != styleKeyCache.end(); iter++) {
+      if (iter->second != nullptr) {
+        env->DeleteGlobalRef(iter->second);
+        iter->second = nullptr;
+      }
+    }
+    styleKeyCache.clear();
 
     if (jThis)
       env->DeleteGlobalRef(jThis);
