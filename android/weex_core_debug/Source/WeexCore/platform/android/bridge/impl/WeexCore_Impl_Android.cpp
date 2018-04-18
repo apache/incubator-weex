@@ -391,6 +391,16 @@ namespace WeexCore {
     env->DeleteGlobalRef(jWXJSObject);
     env->DeleteGlobalRef(jWXLogUtils);
     env->DeleteGlobalRef(jMapClazz);
+
+    for (auto iter = componentTypeCache.begin(); iter != componentTypeCache.end(); iter++) {
+      if (iter->second != nullptr) {
+        LOGE("DeleteGlobalRef componentTypeCache");
+        env->DeleteGlobalRef(iter->second);
+        iter->second = nullptr;
+      }
+    }
+    componentTypeCache.clear();
+
     if (jThis)
       env->DeleteGlobalRef(jThis);
     WeexProxy::reset();
