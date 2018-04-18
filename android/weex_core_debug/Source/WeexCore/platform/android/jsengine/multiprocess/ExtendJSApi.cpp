@@ -68,7 +68,7 @@ std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
   return createVoidResult();
 }
 
-void reportException(const int pageId, const char *func, const char *exception_string) {
+void reportException(const char* pageId, const char *func, const char *exception_string) {
   Bridge_Impl_Android::getInstance()->reportException(pageId, func, exception_string);
 }
 
@@ -93,7 +93,7 @@ std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
   }
 
   LOGE(" ReportException : %s", exceptionInfo);
-  reportException(RefactorPageID(pageId), func, exceptionInfo);
+  reportException(pageId, func, exceptionInfo);
   return createVoidResult();
 }
 
@@ -181,9 +181,9 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
 #endif
 
     if (strcmp(task, "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") == 0) {
-      RenderManager::GetInstance()->CreateFinish(RefactorPageID(pageId)) ? 0 : -1;
+      RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
     } else {
-      Bridge_Impl_Android::getInstance()->callNative(RefactorPageID(pageId), task, callback);
+      Bridge_Impl_Android::getInstance()->callNative(pageId, task, callback);
     }
   }
 
@@ -277,7 +277,7 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
 
     // add for android support
     jobject result;
-    result = Bridge_Impl_Android::getInstance()->callNativeModule(RefactorPageID(pageId), module, method,
+    result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
                                                                   argString, optString);
 
     if (result == nullptr)
@@ -344,7 +344,7 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
          pageId, ref, method, argString, optString);
 #endif
 
-    Bridge_Impl_Android::getInstance()->callNativeComponent(RefactorPageID(pageId), RefactorRef(ref), method, argString, optString);
+    Bridge_Impl_Android::getInstance()->callNativeComponent(pageId, ref, method, argString, optString);
   }
 
   if (pageId != nullptr) {
@@ -382,7 +382,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   LOGD("[ExtendJSApi] functionCallCreateBody >>>> pageId: %s, domStr: %s", pageId, domStr);
 #endif
 
-  RenderManager::GetInstance()->CreatePage(RefactorPageID(pageId), domStr) ? 0 : -1;
+  RenderManager::GetInstance()->CreatePage(pageId, domStr) ? 0 : -1;
 
   delete[]pageId;
   delete[]domStr;
@@ -425,7 +425,7 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   }
 #endif
 
-  RenderManager::GetInstance()->AddRenderObject(RefactorPageID(pageId), RefactorRef(parentRef), index, domStr);
+  RenderManager::GetInstance()->AddRenderObject(pageId, parentRef, index, domStr);
 
   delete[]pageId;
   delete[]parentRef;
@@ -447,7 +447,7 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
        ref);
 #endif
 
-  RenderManager::GetInstance()->RemoveRenderObject(RefactorPageID(pageId), RefactorRef(ref));
+  RenderManager::GetInstance()->RemoveRenderObject(pageId, ref);
 
   delete[]pageId;
   delete[]ref;
@@ -471,7 +471,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
        pageId, ref, parentRef, index);
 #endif
 
-  RenderManager::GetInstance()->MoveRenderObject(RefactorPageID(pageId), RefactorRef(ref), RefactorRef(parentRef), index);
+  RenderManager::GetInstance()->MoveRenderObject(pageId, ref, parentRef, index);
 
   delete[]pageId;
   delete[]ref;
@@ -494,7 +494,7 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
        ref, event);
 #endif
 
-  RenderManager::GetInstance()->AddEvent(RefactorPageID(pageId), RefactorRef(ref), event);
+  RenderManager::GetInstance()->AddEvent(pageId, ref, event);
 
   delete[]pageId;
   delete[]ref;
@@ -516,7 +516,7 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
        ref, event);
 #endif
 
-  RenderManager::GetInstance()->RemoveEvent(RefactorPageID(pageId), RefactorRef(ref), event);
+  RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
 
   delete[]pageId;
   delete[]ref;
@@ -538,7 +538,7 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
        ref, data);
 #endif
 
-  RenderManager::GetInstance()->UpdateStyle(RefactorPageID(pageId), RefactorRef(ref), data);
+  RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
 
   delete[] pageId;
   delete[] ref;
@@ -560,7 +560,7 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
        ref, data);
 #endif
 
-  RenderManager::GetInstance()->UpdateAttr(RefactorPageID(pageId), RefactorRef(ref), data);
+  RenderManager::GetInstance()->UpdateAttr(pageId, ref, data);
 
   delete[] pageId;
   delete[] ref;
@@ -579,7 +579,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId);
 #endif
 
-  RenderManager::GetInstance()->CreateFinish(RefactorPageID(pageId));
+  RenderManager::GetInstance()->CreateFinish(pageId);
 
   delete[]pageId;
   return createInt32Result(0);
@@ -595,7 +595,7 @@ std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
   if (pageId == nullptr || task == nullptr)
     return createInt32Result(flag);
 
-  flag = Bridge_Impl_Android::getInstance()->callUpdateFinish(RefactorPageID(pageId), task, callback);
+  flag = Bridge_Impl_Android::getInstance()->callUpdateFinish(pageId, task, callback);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -622,7 +622,7 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   if (pageId == nullptr || task == nullptr)
     return createInt32Result(flag);
 
-  flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(RefactorPageID(pageId), task, callback);
+  flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(pageId, task, callback);
 
   if (pageId != nullptr) {
     delete[]pageId;

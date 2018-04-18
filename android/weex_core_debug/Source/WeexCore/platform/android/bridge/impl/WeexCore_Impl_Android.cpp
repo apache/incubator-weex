@@ -76,29 +76,29 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jint instanceId, jint ref, jobject contentBoxMeasurement) {
+static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instanceId, jstring ref, jobject contentBoxMeasurement) {
   if (contentBoxMeasurement == nullptr)
     return;
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
   render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
 }
 
-static void OnInstanceClose(JNIEnv *env, jobject jcaller, jint instanceId) {
-  RenderManager::GetInstance()->ClosePage(instanceId);
+static void OnInstanceClose(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  RenderManager::GetInstance()->ClosePage(jString2StrFast(env, instanceId));
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
-                                                jint instanceId, jfloat defaultWidth, jfloat defaultHeight,
+                                                jstring instanceId, jfloat defaultWidth, jfloat defaultHeight,
                                                 jboolean isWidthWrapContent, jboolean isHeightWrapContent) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
@@ -110,24 +110,24 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
   page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
 }
 
-static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean wrap, jint instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean wrap, jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
   page->SetRenderContainerWidthWrapContent(wrap);
 }
 
-static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jint instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return 0;
 
   return page->PrintFirstScreenLog();
 }
 
-static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jint instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return 0;
 
@@ -135,8 +135,8 @@ static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jint instanceId)
 }
 
 //Notice that this method is invoked from main thread.
-static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jint instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
 #if RENDER_LOG
@@ -157,8 +157,8 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jint instanceId) {
 }
 
 //Notice that this method is invoked from JS thread.
-static void ForceLayout(JNIEnv *env, jobject jcaller, jint instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static void ForceLayout(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
 #if RENDER_LOG
@@ -171,13 +171,13 @@ static void ForceLayout(JNIEnv *env, jobject jcaller, jint instanceId) {
 }
 
 static void SetStyleWidth(JNIEnv *env, jobject jcaller,
-                          jint instanceId, jint ref, jfloat value) {
+                          jstring instanceId, jstring ref, jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -187,13 +187,13 @@ static void SetStyleWidth(JNIEnv *env, jobject jcaller,
 }
 
 static void SetStyleHeight(JNIEnv *env, jobject jcaller,
-                           jint instanceId, jint ref, jfloat value) {
+                           jstring instanceId, jstring ref, jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -203,12 +203,12 @@ static void SetStyleHeight(JNIEnv *env, jobject jcaller,
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
-                      jint instanceId, jint ref, jint edge, jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+                      jstring instanceId, jstring ref, jint edge, jfloat value) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -227,13 +227,13 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
-                       jint instanceId, jint ref, jint edge, jfloat value) {
+                       jstring instanceId, jstring ref, jint edge, jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -253,13 +253,13 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
 
 
 static void SetPosition(JNIEnv *env, jobject jcaller,
-                        jint instanceId, jint ref, jint edge, jfloat value) {
+                        jstring instanceId, jstring ref, jint edge, jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
-  RenderObject *render = page->GetRenderObject(ref);
+  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
   if (render == nullptr)
     return;
 
@@ -276,14 +276,14 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
 }
 
 static void MarkDirty(JNIEnv *env, jobject jcaller,
-                      jint instanceId, jint ref, jboolean dirty) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+                      jstring instanceId, jstring ref, jboolean dirty) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 
   if (dirty) {
 
-    RenderObject *render = page->GetRenderObject(ref);
+    RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
     if (render == nullptr)
       return;
     render->markDirty();
@@ -296,8 +296,8 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring v
   WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
-static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jint instanceId, jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instanceId);
+static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat value) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return;
 

@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionUpdateStyle::RenderActionUpdateStyle(const int &pageId, const int &ref,
+  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
                                                    std::vector<std::pair<std::string, std::string>> *style,
                                                    std::vector<std::pair<std::string, std::string>> *margin,
                                                    std::vector<std::pair<std::string, std::string>> *padding,
@@ -21,7 +21,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId, mRef, mStyle, mMargin,
+    Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
                                                         mPadding, mBorder);
     if (page != nullptr)
       page->JniCallTime(getCurrentTime() - startTime);

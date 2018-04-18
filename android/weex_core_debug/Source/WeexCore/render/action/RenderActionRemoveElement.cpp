@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionRemoveElement::RenderActionRemoveElement(const int &pageId, const int &ref) {
+  RenderActionRemoveElement::RenderActionRemoveElement(const std::string &pageId, const std::string &ref) {
     this->mPageId = pageId;
     this->mRef = ref;
   }
@@ -13,7 +13,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId, mRef);
+    Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId.c_str(), mRef.c_str());
     page->JniCallTime(getCurrentTime() - startTime);
   }
 }

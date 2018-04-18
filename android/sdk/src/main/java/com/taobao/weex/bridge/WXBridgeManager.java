@@ -216,14 +216,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private Interceptor mInterceptor;
   private WXParams mInitParams;
 
-  private static int ref2Int(String ref) {
-    return Integer.parseInt(ref);
-  }
-
-  private static int instanceID2Int(String instanceID) {
-    return Integer.parseInt(instanceID);
-  }
-
   private WXBridgeManager() {
     initWXBridge(WXEnvironment.sRemoteDebugMode);
     mJSThread = new WXThread("WeexJSBridgeThread", this);
@@ -2531,7 +2523,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
-    mWXBridge.bindMeasurementToWXCore(instanceID2Int(instanceId), ref2Int(ref), contentBoxMeasurement);
+    mWXBridge.bindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
   }
 
   /**
@@ -2541,12 +2533,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    */
   @UiThread
   public boolean notifyLayout(String instanceId) {
-    return mWXBridge.notifyLayout(instanceID2Int(instanceId));
+    return mWXBridge.notifyLayout(instanceId);
   }
 
   @UiThread
   public void forceLayout(String instanceId) {
-    mWXBridge.forceLayout(instanceID2Int(instanceId));
+    mWXBridge.forceLayout(instanceId);
   }
 
   /**
@@ -2554,7 +2546,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param instanceId
    */
   public void onInstanceClose(String instanceId) {
-    mWXBridge.onInstanceClose(instanceID2Int(instanceId));
+    mWXBridge.onInstanceClose(instanceId);
   }
 
   /**
@@ -2564,47 +2556,47 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param defaultHeight
    */
   public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
-    mWXBridge.setDefaultHeightAndWidthIntoRootDom(instanceID2Int(instanceId), defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+    mWXBridge.setDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
   }
 
   public void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
-    mWXBridge.setRenderContainerWrapContent(wrap, instanceID2Int(instanceId));
+    mWXBridge.setRenderContainerWrapContent(wrap, instanceId);
   }
 
   public void setStyleWidth(String instanceId, String ref, float value) {
-    mWXBridge.setStyleWidth(instanceID2Int(instanceId), ref2Int(ref), value);
+    mWXBridge.setStyleWidth(instanceId, ref, value);
   }
 
   public void setStyleHeight(String instanceId, String ref, float value) {
-    mWXBridge.setStyleHeight(instanceID2Int(instanceId), ref2Int(ref), value);
+    mWXBridge.setStyleHeight(instanceId, ref, value);
   }
 
   public int printFirstScreenRenderTime(String instanceId) {
-    return mWXBridge.printFirstScreenRenderTime(instanceID2Int(instanceId));
+    return mWXBridge.printFirstScreenRenderTime(instanceId);
   }
 
   public int printRenderFinishTime(String instanceId) {
-    return mWXBridge.printRenderFinishTime(instanceID2Int(instanceId));
+    return mWXBridge.printRenderFinishTime(instanceId);
   }
 
   public void setViewPortWidth(String instanceId, float value) {
-    mWXBridge.setViewPortWidth(instanceID2Int(instanceId), value);
+    mWXBridge.setViewPortWidth(instanceId, value);
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setMargin(instanceID2Int(instanceId), ref2Int(ref), edge, value);
+    mWXBridge.setMargin(instanceId, ref, edge, value);
   }
 
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPadding(instanceID2Int(instanceId), ref2Int(ref), edge, value);
+    mWXBridge.setPadding(instanceId, ref, edge, value);
   }
 
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPosition(instanceID2Int(instanceId), ref2Int(ref), edge, value);
+    mWXBridge.setPosition(instanceId, ref, edge, value);
   }
 
   public void markDirty(String instanceId, String ref, boolean dirty) {
-    mWXBridge.markDirty(instanceID2Int(instanceId), ref2Int(ref), dirty);
+    mWXBridge.markDirty(instanceId, ref, dirty);
   }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {

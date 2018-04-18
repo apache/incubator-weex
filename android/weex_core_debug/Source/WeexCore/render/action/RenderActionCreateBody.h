@@ -7,7 +7,7 @@ namespace WeexCore {
   class RenderActionCreateBody : public RenderAction {
 
   public:
-    RenderActionCreateBody(const int &pageId, const RenderObject *render);
+    RenderActionCreateBody(const std::string &pageId, const RenderObject *render);
 
     void ExecuteAction();
 
@@ -18,9 +18,9 @@ namespace WeexCore {
     WXCoreMargin mMargins;
     WXCorePadding mPaddings;
     WXCoreBorderWidth mBorders;
-    int mPageId;
+    std::string mPageId;
     std::string mComponentType;
-    int mRef;
+    std::string mRef;
   };
 }
 

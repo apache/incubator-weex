@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionCreateBody::RenderActionCreateBody(const int &pageId, const RenderObject *render) {
+  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId, const RenderObject *render) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
@@ -20,7 +20,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callCreateBody(mPageId, mComponentType.c_str(), mRef,
+    Bridge_Impl_Android::getInstance()->callCreateBody(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
                                                        mStyles, mAttributes, mEvents,
                                                        mMargins, mPaddings, mBorders);
     page->JniCallTime(getCurrentTime() - startTime);

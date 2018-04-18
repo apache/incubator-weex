@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionCreateFinish::RenderActionCreateFinish(const int &pageId) {
+  RenderActionCreateFinish::RenderActionCreateFinish(const std::string &pageId) {
     this->mPageId = pageId;
   }
 
@@ -12,7 +12,7 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId);
+    Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
 
     page->JniCallTime(getCurrentTime() - startTime);
   }

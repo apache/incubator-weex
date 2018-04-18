@@ -70,67 +70,67 @@ static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
 
 static void BindMeasurementToWXCore(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jobject contentBoxMeasurement);
 
 static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
     jboolean wrap,
-    jint instanceId);
+    jstring instanceId);
 
 static jint PrintFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
-    jint instanceId);
+    jstring instanceId);
 
 static jint PrintRenderFinishTime(JNIEnv* env, jobject jcaller,
-    jint instanceId);
+    jstring instanceId);
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
-    jint instanceId,
+    jstring instanceId,
     jfloat defaultWidth,
     jfloat defaultHeight,
     jboolean isWidthWrapContent,
     jboolean isHeightWrapContent);
 
 static void OnInstanceClose(JNIEnv* env, jobject jcaller,
-    jint instanceId);
+    jstring instanceId);
 
 static void ForceLayout(JNIEnv* env, jobject jcaller,
-    jint instanceId);
+    jstring instanceId);
 
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller,
-    jint instanceId);
+    jstring instanceId);
 
 static void SetStyleWidth(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jfloat value);
 
 static void SetStyleHeight(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jfloat value);
 
 static void SetMargin(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jint edge,
     jfloat value);
 
 static void SetPadding(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jint edge,
     jfloat value);
 
 static void SetPosition(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jint edge,
     jfloat value);
 
 static void MarkDirty(JNIEnv* env, jobject jcaller,
-    jint instanceId,
-    jint ref,
+    jstring instanceId,
+    jstring ref,
     jboolean dirty);
 
 static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
@@ -138,7 +138,7 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring value);
 
 static void SetViewPortWidth(JNIEnv* env, jobject jcaller,
-    jint instanceId,
+    jstring instanceId,
     jfloat value);
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
@@ -214,30 +214,30 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "V", reinterpret_cast<void*>(TakeHeapSnapshot) },
     { "nativeBindMeasurementToWXCore",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "Lcom/taobao/weex/layout/ContentBoxMeasurement;"
 ")"
 "V", reinterpret_cast<void*>(BindMeasurementToWXCore) },
     { "nativeSetRenderContainerWrapContent",
 "("
 "Z"
-"I"
+"Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(SetRenderContainerWrapContent) },
     { "nativePrintFirstScreenRenderTime",
 "("
-"I"
+"Ljava/lang/String;"
 ")"
 "I", reinterpret_cast<void*>(PrintFirstScreenRenderTime) },
     { "nativePrintRenderFinishTime",
 "("
-"I"
+"Ljava/lang/String;"
 ")"
 "I", reinterpret_cast<void*>(PrintRenderFinishTime) },
     { "nativeSetDefaultHeightAndWidthIntoRootDom",
 "("
-"I"
+"Ljava/lang/String;"
 "F"
 "F"
 "Z"
@@ -246,61 +246,61 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "V", reinterpret_cast<void*>(SetDefaultHeightAndWidthIntoRootDom) },
     { "nativeOnInstanceClose",
 "("
-"I"
+"Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(OnInstanceClose) },
     { "nativeForceLayout",
 "("
-"I"
+"Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(ForceLayout) },
     { "nativeNotifyLayout",
 "("
-"I"
+"Ljava/lang/String;"
 ")"
 "Z", reinterpret_cast<void*>(NotifyLayout) },
     { "nativeSetStyleWidth",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetStyleWidth) },
     { "nativeSetStyleHeight",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetStyleHeight) },
     { "nativeSetMargin",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "I"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetMargin) },
     { "nativeSetPadding",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "I"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetPadding) },
     { "nativeSetPosition",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "I"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetPosition) },
     { "nativeMarkDirty",
 "("
-"I"
-"I"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
 "Z"
 ")"
 "V", reinterpret_cast<void*>(MarkDirty) },
@@ -312,7 +312,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "V", reinterpret_cast<void*>(RegisterCoreEnv) },
     { "nativeSetViewPortWidth",
 "("
-"I"
+"Ljava/lang/String;"
 "F"
 ")"
 "V", reinterpret_cast<void*>(SetViewPortWidth) },

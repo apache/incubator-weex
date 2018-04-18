@@ -95,7 +95,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callNative(int instanceId, String tasks, String callback) {
+  public int callNative(String instanceId, String tasks, String callback) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callNative(String.valueOf(instanceId), tasks, callback);
@@ -103,7 +103,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callUpdateFinish(int instanceId, byte[] tasks, String callback) {
+  public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callUpdateFinish(String.valueOf(instanceId), callback);
@@ -111,7 +111,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callRefreshFinish(int instanceId, byte[] tasks, String callback) {
+  public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callRefreshFinish(String.valueOf(instanceId), callback);
@@ -168,19 +168,19 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public void reportJSException(int instanceId, String func, String exception) {
+  public void reportJSException(String instanceId, String func, String exception) {
     if (mJsManager != null) {
       mJsManager.reportJSException(String.valueOf(instanceId), func, exception);
     }
   }
 
   @Override
-  public String callNativeModule(int instanceId, String module, String method, byte[] arguments, byte[] options) {
+  public String callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     return null;
   }
 
   @Override
-  public void callNativeComponent(int instanceId, int ref, String method, byte[] arguments, byte[] options) {
+  public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] options) {
 
   }
 
@@ -190,7 +190,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callCreateBody(int instanceId, String componentType, int ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+  public int callCreateBody(String instanceId, String componentType, String ref, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callCreateBody(String.valueOf(instanceId), componentType, String.valueOf(ref), styles, attributes, events, margins, paddings, borders);
@@ -198,7 +198,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callAddElement(int instanceId, String componentType, int ref, int index, int parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+  public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callAddElement(String.valueOf(instanceId), componentType, String.valueOf(ref), index, String.valueOf(parentRef), styles, attributes, events, margins, paddings, borders);
@@ -206,7 +206,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callRemoveElement(int instanceId, int ref) {
+  public int callRemoveElement(String instanceId, String ref) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callRemoveElement(String.valueOf(instanceId), String.valueOf(ref));
@@ -216,7 +216,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callMoveElement(int instanceId, int ref, int parentref, int index) {
+  public int callMoveElement(String instanceId, String ref, String parentref, int index) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callMoveElement(String.valueOf(instanceId), String.valueOf(ref), String.valueOf(parentref), index);
@@ -224,7 +224,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callAddEvent(int instanceId, int ref, String event) {
+  public int callAddEvent(String instanceId, String ref, String event) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callAddEvent(String.valueOf(instanceId), String.valueOf(ref), event);
@@ -232,7 +232,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callRemoveEvent(int instanceId, int ref, String event) {
+  public int callRemoveEvent(String instanceId, String ref, String event) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callRemoveEvent(String.valueOf(instanceId), String.valueOf(ref), event);
@@ -240,7 +240,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callUpdateStyle(int instanceId, int ref, HashMap<String, Object> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
+  public int callUpdateStyle(String instanceId, String ref, HashMap<String, Object> styles, HashMap<String, String> paddings, HashMap<String, String> margins, HashMap<String, String> borders) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callUpdateStyle(String.valueOf(instanceId), String.valueOf(ref), styles, paddings, margins, borders);
@@ -248,7 +248,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callUpdateAttrs(int instanceId, int ref, HashMap<String, String> attrs) {
+  public int callUpdateAttrs(String instanceId, String ref, HashMap<String, String> attrs) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callUpdateAttrs(String.valueOf(instanceId), String.valueOf(ref), attrs);
@@ -256,7 +256,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callLayout(int instanceId, int ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callLayout(String.valueOf(instanceId), String.valueOf(ref), top, bottom, left, right, height, width);
@@ -264,7 +264,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callCreateFinish(int instanceId) {
+  public int callCreateFinish(String instanceId) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     mJsManager.callCreateFinish(String.valueOf(instanceId));
@@ -289,7 +289,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
       }
       if (name.toString().equals("callNative")) {
         JSONArray jsonArray = JSONObject.parseArray(value.toString());
-        callNative(Integer.parseInt(jsonArray.getString(0)), jsonArray.getString(1),
+        callNative(jsonArray.getString(0), jsonArray.getString(1),
                 jsonArray.getString(2));
       }
     } catch (Exception e) {
@@ -321,77 +321,77 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callHasTransitionPros(int instanceId, int ref, HashMap<String, String> styles) {
+  public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     return mJsManager.callHasTransitionPros(String.valueOf(instanceId), String.valueOf(ref), styles);
   }
 
   @Override
-  public void bindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement) {
+  public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
 
   }
 
   @Override
-  public void setRenderContainerWrapContent(boolean wrap, int instanceId) {
+  public void setRenderContainerWrapContent(boolean wrap, String instanceId) {
 
   }
 
   @Override
-  public int printFirstScreenRenderTime(int instanceId) {
+  public int printFirstScreenRenderTime(String instanceId) {
     return 0;
   }
 
   @Override
-  public int printRenderFinishTime(int instanceId) {
+  public int printRenderFinishTime(String instanceId) {
     return 0;
   }
 
   @Override
-  public void setDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent) {
+  public void setDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent) {
 
   }
 
   @Override
-  public void onInstanceClose(int instanceId) {
+  public void onInstanceClose(String instanceId) {
 
   }
 
   @Override
-  public void forceLayout(int instanceId) {
+  public void forceLayout(String instanceId) {
 
   }
 
   @Override
-  public boolean notifyLayout(int instanceId) {
+  public boolean notifyLayout(String instanceId) {
     return false;
   }
 
   @Override
-  public void setStyleWidth(int instanceId, int ref, float value) {
+  public void setStyleWidth(String instanceId, String ref, float value) {
     mJsManager.setStyleWidth(String.valueOf(instanceId), String.valueOf(ref), value);
   }
 
   @Override
-  public void setStyleHeight(int instanceId, int ref, float value) {
+  public void setStyleHeight(String instanceId, String ref, float value) {
     mJsManager.setStyleHeight(String.valueOf(instanceId), String.valueOf(ref), value);
   }
 
   @Override
-  public void setMargin(int instanceId, int ref, CSSShorthand.EDGE edge, float value) {
+  public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mJsManager.setMargin(String.valueOf(instanceId), String.valueOf(ref), edge, value);
   }
 
   @Override
-  public void setPadding(int instanceId, int ref, CSSShorthand.EDGE edge, float value) {
+  public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mJsManager.setPadding(String.valueOf(instanceId), String.valueOf(ref), edge, value);
   }
 
   @Override
-  public void setPosition(int instanceId, int ref, CSSShorthand.EDGE edge, float value) {
+  public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     mJsManager.setPosition(String.valueOf(instanceId), String.valueOf(ref), edge, value);
   }
 
   @Override
-  public void markDirty(int instanceId, int ref, boolean dirty) {
+  public void markDirty(String instanceId, String ref, boolean dirty) {
     mJsManager.markDirty(String.valueOf(instanceId), String.valueOf(ref), dirty);
   }
 
@@ -401,7 +401,7 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public void setViewPortWidth(int instanceId, float value) {
+  public void setViewPortWidth(String instanceId, float value) {
     mJsManager.setViewPortWidth(String.valueOf(instanceId), value);
   }
 }

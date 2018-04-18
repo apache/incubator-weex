@@ -9,7 +9,7 @@ namespace WeexCore {
 
   public:
 
-    RenderActionUpdateStyle(const int &pageId, const int &ref,
+    RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
                             std::vector<std::pair<std::string, std::string>> *padding,
@@ -18,8 +18,8 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    int mPageId;
-    int mRef;
+    std::string mPageId;
+    std::string mRef;
     std::vector<std::pair<std::string, std::string>> *mStyle;
     std::vector<std::pair<std::string, std::string>> *mMargin;
     std::vector<std::pair<std::string, std::string>> *mPadding;

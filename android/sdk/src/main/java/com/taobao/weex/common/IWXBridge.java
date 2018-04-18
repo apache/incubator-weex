@@ -103,82 +103,82 @@ public interface IWXBridge extends IWXObject {
   /**
    * js call native
    */
-  int callNative(int instanceId, String tasks, String callback);
+  int callNative(String instanceId, String tasks, String callback);
 
-  void reportJSException(int instanceId, String func, String exception);
+  void reportJSException(String instanceId, String func, String exception);
 
-  Object callNativeModule(int instanceId, String module, String method, byte[] arguments, byte[] options);
+  Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
 
-  void callNativeComponent(int instanceId, int ref, String method, byte[] arguments, byte[] options);
+  void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] options);
 
-  int callUpdateFinish(int instanceId, byte[] tasks, String callback);
+  int callUpdateFinish(String instanceId, byte[] tasks, String callback);
 
-  int callRefreshFinish(int instanceId, byte[] tasks, String callback);
+  int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
   void reportServerCrash(String instanceId, String crashFile);
 
 
-  public int callCreateBody(int instanceId, String componentType, int ref,
+  public int callCreateBody(String instanceId, String componentType, String ref,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders);
 
-  public int callAddElement(int instanceId, String componentType, int ref, int index, int parentRef,
+  public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders);
 
-  int callRemoveElement(int instanceId, int ref);
+  int callRemoveElement(String instanceId, String ref);
 
-  int callMoveElement(int instanceId, int ref, int parentref, int index);
+  int callMoveElement(String instanceId, String ref, String parentref, int index);
 
-  int callAddEvent(int instanceId, int ref, String event);
+  int callAddEvent(String instanceId, String ref, String event);
 
-  int callRemoveEvent(int instanceId, int ref, String event);
+  int callRemoveEvent(String instanceId, String ref, String event);
 
-  public int callUpdateStyle(int instanceId, int ref,
+  public int callUpdateStyle(String instanceId, String ref,
                              HashMap<String, Object> styles,
                              HashMap<String, String> paddings,
                              HashMap<String, String> margins,
                              HashMap<String, String> borders);
 
-  int callUpdateAttrs(int instanceId, int ref,
+  int callUpdateAttrs(String instanceId, String ref,
                       HashMap<String, String> attrs);
 
-  int callLayout(int instanceId, int ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width);
 
-  int callCreateFinish(int instanceId);
+  int callCreateFinish(String instanceId);
 
-  int callHasTransitionPros(int instanceId, int ref, HashMap<String, String> styles);
+  int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
 
-  void bindMeasurementToWXCore(int instanceId, int ref, ContentBoxMeasurement contentBoxMeasurement);
+  void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
 
-  void setRenderContainerWrapContent(boolean wrap, int instanceId);
+  void setRenderContainerWrapContent(boolean wrap, String instanceId);
 
-  int printFirstScreenRenderTime(int instanceId);
+  int printFirstScreenRenderTime(String instanceId);
 
-  int printRenderFinishTime(int instanceId);
+  int printRenderFinishTime(String instanceId);
 
-  void setDefaultHeightAndWidthIntoRootDom(int instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
+  void setDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
 
-  void onInstanceClose(int instanceId);
+  void onInstanceClose(String instanceId);
 
-  void forceLayout(int instanceId);
+  void forceLayout(String instanceId);
 
-  boolean notifyLayout(int instanceId);
+  boolean notifyLayout(String instanceId);
 
-  void setStyleWidth(int instanceId, int ref, float value);
+  void setStyleWidth(String instanceId, String ref, float value);
 
-  void setStyleHeight(int instanceId, int ref, float value);
+  void setStyleHeight(String instanceId, String ref, float value);
 
-  void setMargin(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
+  void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
 
-  void setPadding(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
+  void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
 
-  void setPosition(int instanceId, int ref, CSSShorthand.EDGE edge, float value);
+  void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
 
-  void markDirty(int instanceId, int ref, boolean dirty);
+  void markDirty(String instanceId, String ref, boolean dirty);
 
   void registerCoreEnv(String key, String value);
 
-  void setViewPortWidth(int instanceId, float value);
+  void setViewPortWidth(String instanceId, float value);
 
 }

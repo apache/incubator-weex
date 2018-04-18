@@ -8,7 +8,7 @@ namespace WeexCore {
   class RenderActionAddElement : public RenderAction {
 
   public:
-    RenderActionAddElement(const int &pageId, const RenderObject *render, const RenderObject *parent,
+    RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
                            int index);
 
     void ExecuteAction();
@@ -20,10 +20,10 @@ namespace WeexCore {
     WXCoreMargin mMargins;
     WXCorePadding mPaddings;
     WXCoreBorderWidth mBorders;
-    int mPageId;
+    std::string mPageId;
     std::string mComponentType;
-    int mParentRef;
-    int mRef;
+    std::string mParentRef;
+    std::string mRef;
     int mIndex;
   };
 }

@@ -8,13 +8,13 @@ namespace WeexCore {
   class RenderActionAddEvent : public RenderAction {
 
   public:
-    RenderActionAddEvent(const int &pageId, const int &ref, const std::string &event);
+    RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 
     void ExecuteAction();
 
   public:
-    int mPageId;
-    int mRef;
+    std::string mPageId;
+    std::string mRef;
     std::string mEvent;
   };
 }

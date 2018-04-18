@@ -2,7 +2,7 @@
 
 namespace WeexCore {
 
-  RenderActionAddElement::RenderActionAddElement(const int &pageId, const RenderObject *render,
+  RenderActionAddElement::RenderActionAddElement(const std::string &pageId, const RenderObject *render,
                                                  const RenderObject *parent, int index) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
@@ -23,8 +23,8 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callAddElement(mPageId, mComponentType.c_str(), mRef,
-                                                       mIndex, mParentRef, mStyles, mAttributes,
+    Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+                                                       mIndex, mParentRef.c_str(), mStyles, mAttributes,
                                                        mEvents, mMargins, mPaddings, mBorders);
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddElementActionJNITime(getCurrentTime() - startTime);

@@ -23,16 +23,6 @@ namespace WeexCore {
     return s;
   }
 
-  inline int RefactorPageID(const char *pageID) {
-    return atoi(pageID);
-  }
-
-  inline int RefactorRef(const char *ref) {
-    if (strcmp(ref, "_root") == 0)
-      return -1000;
-    return atoi(ref);
-  }
-
   inline float getFloat(const char* src) {
     char *end;
     float ret = strtof(src, &end);

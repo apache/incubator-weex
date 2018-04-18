@@ -31,9 +31,9 @@ namespace WeexCore {
 
     void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
 
-    void SendRemoveElementAction(const int &ref);
+    void SendRemoveElementAction(const std::string &ref);
 
-    void SendMoveElementAction(const int &ref, const int &parentRef, int index);
+    void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
 
     void SendLayoutAction(RenderObject *render);
 
@@ -54,7 +54,7 @@ namespace WeexCore {
     static constexpr bool useVSync = true;
     std::atomic_bool needLayout{false};
     std::atomic_bool hasForeLayoutAction{false};
-    RenderPage(int pageId);
+    RenderPage(std::string pageId);
 
     ~RenderPage();
 
@@ -62,21 +62,21 @@ namespace WeexCore {
 
     bool CreateRootRender(RenderObject *root);
 
-    bool AddRenderObject(const int &parentRef, int insertPosiotn, RenderObject *child);
+    bool AddRenderObject(const std::string &parentRef, int insertPosiotn, RenderObject *child);
 
-    bool RemoveRenderObject(const int &ref);
+    bool RemoveRenderObject(const std::string &ref);
 
-    bool MoveRenderObject(const int &ref, const int &parentRef, int index);
+    bool MoveRenderObject(const std::string &ref, const std::string &parentRef, int index);
 
-    bool UpdateStyle(const int &ref, std::vector<std::pair<std::string, std::string>> *styles);
+    bool UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *styles);
 
-    bool UpdateAttr(const int &ref, std::vector<std::pair<std::string, std::string>> *attrs);
+    bool UpdateAttr(const std::string &ref, std::vector<std::pair<std::string, std::string>> *attrs);
 
     void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);
 
-    bool AddEvent(const int &ref, const std::string &event);
+    bool AddEvent(const std::string &ref, const std::string &event);
 
-    bool RemoveEvent(const int &ref, const std::string &event);
+    bool RemoveEvent(const std::string &ref, const std::string &event);
 
     bool CreateFinish();
 
@@ -108,8 +108,8 @@ namespace WeexCore {
 
     void LayoutImmediately();
 
-    inline RenderObject *GetRenderObject(const int &ref) {
-        std::map<int, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
+    inline RenderObject *GetRenderObject(const std::string &ref) {
+        std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
         if (iter != mRenderObjectRegisterMap.end()) {
             return iter->second;
         } else {
@@ -123,7 +123,7 @@ namespace WeexCore {
       return render_root;
     }
 
-    inline int PageId() {
+    inline std::string PageId() {
       return mPageId;
     }
 
@@ -167,9 +167,9 @@ namespace WeexCore {
     bool mAlreadyCreateFinish = false;
     float mViewPortWidth;
     RenderObject *render_root = nullptr;
-    int mPageId;
+    std::string mPageId;
     std::pair<float,float> renderPageSize;
-    std::map<int, RenderObject *> mRenderObjectRegisterMap;
+    std::map<std::string, RenderObject *> mRenderObjectRegisterMap;
     RenderPerformance *mWXCorePerformance;
     std::atomic_bool dirty{true};
     std::atomic_bool isRenderContainerWidthWrapContent{false};
