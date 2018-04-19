@@ -80,6 +80,7 @@ jstring getPageIdFromCache(const std::string pageId) {
 jstring putPageIdToCache(const std::string pageId) {
   JNIEnv *env = getJNIEnv();
   jstring jPageId = env->NewStringUTF(pageId.c_str());
+  LOGE("+1");
   jobject jGlobalPageId = env->NewGlobalRef(jPageId);
   pageIdCache.insert(std::pair<std::string, jobject>(pageId, jGlobalPageId));
   env->DeleteLocalRef(jPageId);
