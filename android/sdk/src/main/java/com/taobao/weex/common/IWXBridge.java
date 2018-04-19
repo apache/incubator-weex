@@ -143,7 +143,7 @@ public interface IWXBridge extends IWXObject {
   int callUpdateAttrs(String instanceId, String ref,
                       HashMap<String, String> attrs);
 
-  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width);
+  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index);
 
   int callCreateFinish(String instanceId);
 

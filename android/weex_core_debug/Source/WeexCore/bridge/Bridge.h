@@ -60,7 +60,7 @@ namespace WeexCore {
 
     virtual int callLayout(const char* pageId, const char* ref,
                            int top, int bottom, int left, int right,
-                           int height, int width) = 0;
+                           int height, int width, int index) = 0;
 
     virtual int callUpdateStyle(const char* pageId, const char* ref,
                                 std::vector<std::pair<std::string, std::string>> *style,

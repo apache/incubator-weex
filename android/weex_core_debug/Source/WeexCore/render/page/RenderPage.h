@@ -21,7 +21,7 @@ namespace WeexCore {
 
   private:
 
-    void TraverseTree(RenderObject *render);
+    void TraverseTree(RenderObject *render, int index);
 
     void PushRenderToRegisterMap(RenderObject *render);
 
@@ -35,7 +35,7 @@ namespace WeexCore {
 
     void SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index);
 
-    void SendLayoutAction(RenderObject *render);
+    void SendLayoutAction(RenderObject *render, int index);
 
     void
     SendUpdateStyleAction(RenderObject *render,

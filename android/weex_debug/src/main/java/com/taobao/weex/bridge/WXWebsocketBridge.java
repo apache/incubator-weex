@@ -256,10 +256,10 @@ public class WXWebsocketBridge implements IWXBridge, WXWebSocketManager.JSDebugg
   }
 
   @Override
-  public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
     if (!mInit || mJsManager == null)
       return IWXBridge.INSTANCE_RENDERING_ERROR;
-    mJsManager.callLayout(String.valueOf(instanceId), String.valueOf(ref), top, bottom, left, right, height, width);
+    mJsManager.callLayout(String.valueOf(instanceId), String.valueOf(ref), top, bottom, left, right, height, width, index);
     return IWXBridge.INSTANCE_RENDERING;
   }
 

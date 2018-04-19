@@ -735,7 +735,7 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callLayout(const char* pageId, const char* ref,
                                       int top, int bottom, int left, int right,
-                                      int height, int width) {
+                                      int height, int width, int index) {
     JNIEnv *env = getJNIEnv();
     jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
@@ -749,11 +749,11 @@ namespace WeexCore {
     if (jCallLayoutMethodId == NULL)
       jCallLayoutMethodId = env->GetMethodID(jBridgeClazz,
                                                        "callLayout",
-                                                       "(Ljava/lang/String;Ljava/lang/String;IIIIII)I");
+                                                       "(Ljava/lang/String;Ljava/lang/String;IIIIIII)I");
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallLayoutMethodId, jPageId,
-                              jRef, top, bottom, left, right, height, width);
+                              jRef, top, bottom, left, right, height, width, index);
 
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 

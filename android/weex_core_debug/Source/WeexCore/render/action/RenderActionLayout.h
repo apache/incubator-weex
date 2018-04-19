@@ -8,7 +8,7 @@ namespace WeexCore {
   class RenderActionLayout : public RenderAction {
 
   public:
-    RenderActionLayout(const std::string &pageId, const RenderObject *render);
+    RenderActionLayout(const std::string &pageId, const RenderObject *render, const int index);
 
     void ExecuteAction();
 
@@ -24,6 +24,7 @@ namespace WeexCore {
     float mLeft;
     float mBottom;
     float mRight;
+    int index;
   };
 }
 

@@ -114,7 +114,6 @@ bool WeexProxy::execJS(JNIEnv *env,
                        jstring jnamespace,
                        jstring jfunction,
                        jobjectArray jargs) {
-  LOGW("[WeexProxy] execJS jinstanceid: s%, jfunction: s%",jinstanceid, jfunction);
   std::string mMessage = "";
   if (!sSender) {
     LOGE("have not connected to a js server");
