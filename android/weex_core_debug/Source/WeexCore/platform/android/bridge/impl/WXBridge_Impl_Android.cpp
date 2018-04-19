@@ -106,7 +106,11 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jstring jFunc = env->NewStringUTF(func);
     jstring jExceptionString = env->NewStringUTF(exception_string);
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jReportExceptionMethodId == NULL) {
       jReportExceptionMethodId = env->GetMethodID(jBridgeClazz,
@@ -115,8 +119,6 @@ namespace WeexCore {
     }
     env->CallVoidMethod(jThis, jReportExceptionMethodId, jPageId, jFunc, jExceptionString);
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jFunc != nullptr)
       env->DeleteLocalRef(jFunc);
     if (jExceptionString != nullptr)
@@ -127,7 +129,11 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     int flag = -1;
 
@@ -145,8 +151,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -161,7 +165,11 @@ namespace WeexCore {
     jstring jMethod = env->NewStringUTF(method);
     jbyteArray jArgString = newJByteArray(env, argString);
     jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     jobject result = nullptr;
 
@@ -175,8 +183,6 @@ namespace WeexCore {
       result = env->CallObjectMethod(jThis, jCallNativeModuleMethodId, jPageId, jModule, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jModule != nullptr)
       env->DeleteLocalRef(jModule);
     if (jMethod != nullptr)
@@ -195,8 +201,12 @@ namespace WeexCore {
     jstring jMethod = env->NewStringUTF(method);
     jbyteArray jArgString = newJByteArray(env, argString);
     jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jMethod != nullptr) {
       if (jCallNativeComponentMethodId == NULL) {
@@ -207,8 +217,6 @@ namespace WeexCore {
       env->CallVoidMethod(jThis, jCallNativeComponentMethodId, jPageId, jRef, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     if (jMethod != nullptr)
@@ -262,7 +270,11 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallUpdateFinishMethodId == NULL) {
       jCallUpdateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -276,8 +288,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -289,7 +299,11 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallRefreshFinishMethodId == NULL) {
       jCallRefreshFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -302,8 +316,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -319,8 +331,12 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -398,8 +414,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateBody");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
@@ -420,9 +434,13 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
     jstring jParentRef = env->NewStringUTF(parentRef);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -498,8 +516,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     if (jParentRef != nullptr)
@@ -515,8 +531,12 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callRemoveElement(const char* pageId, const char* ref) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallRemoveElementMethodId == NULL) {
       jCallRemoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -529,8 +549,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     return 0;
@@ -538,9 +556,13 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
     jstring jParentRef = env->NewStringUTF(parentRef);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallMoveElementMethodId == NULL) {
       jCallMoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -553,8 +575,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     if (jParentRef != nullptr)
@@ -564,8 +584,12 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callAddEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallAddEventMethodId == NULL) {
       jCallAddEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -579,8 +603,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddEvent");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jEventId);
@@ -589,8 +611,12 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callRemoveEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     if (jCallRemoveEventMethodId == NULL) {
       jCallRemoveEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -604,8 +630,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jEventId);
@@ -618,8 +642,12 @@ namespace WeexCore {
                                            std::vector<std::pair<std::string, std::string>> *padding,
                                            std::vector<std::pair<std::string, std::string>> *border) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -672,8 +700,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateStyle");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
@@ -685,8 +711,12 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callUpdateAttr(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *attrs) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -725,8 +755,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateStyle");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jAttrs);
@@ -737,8 +765,12 @@ namespace WeexCore {
                                       int top, int bottom, int left, int right,
                                       int height, int width, int index) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -761,8 +793,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callLayout");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     return flag;
@@ -770,7 +800,11 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callCreateFinish(const char* pageId) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -791,15 +825,17 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     return flag;
   }
 
   int Bridge_Impl_Android::callHasTransitionPros(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *style) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getPageIdFromCache(pageId);
+    if (jPageId == nullptr) {
+      jPageId = putPageIdToCache(pageId);
+    }
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -832,8 +868,6 @@ namespace WeexCore {
     flag = env->CallIntMethod(jThis, jCallHasTransitionProsMethodId, jPageId, jRef, jStyles);
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jRef != nullptr)
       env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);

@@ -20,6 +20,7 @@ jmethodID jDoubleValueMethodId;
 jobject jThis;
 std::map<std::string, jobject> componentTypeCache;
 std::map<std::string, jobject> styleKeyCache;
+std::map<std::string, jobject> pageIdCache;
 
 static JavaVM *sVm = NULL;
 
@@ -65,6 +66,24 @@ jstring putStyleKeyToCache(const std::string key) {
   styleKeyCache.insert(std::pair<std::string, jobject>(key, jGlobalKey));
   env->DeleteLocalRef(jKey);
   return (jstring) jGlobalKey;
+}
+
+jstring getPageIdFromCache(const std::string pageId) {
+  std::map<std::string, jobject>::const_iterator iter = pageIdCache.find(pageId);
+  if (iter != pageIdCache.end()) {
+    return (jstring)(iter->second);
+  } else {
+    return nullptr;
+  }
+}
+
+jstring putPageIdToCache(const std::string pageId) {
+  JNIEnv *env = getJNIEnv();
+  jstring jPageId = env->NewStringUTF(pageId.c_str());
+  jobject jGlobalPageId = env->NewGlobalRef(jPageId);
+  pageIdCache.insert(std::pair<std::string, jobject>(pageId, jGlobalPageId));
+  env->DeleteLocalRef(jPageId);
+  return (jstring) jGlobalPageId;
 }
 
 static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
