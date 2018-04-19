@@ -920,10 +920,15 @@ namespace WeexCore {
 
     /** ================================ flex-style =================================== **/
 
-    inline void setFlexDirection(const WXCoreFlexDirection flexDirection) {
+    inline void setFlexDirection(const WXCoreFlexDirection flexDirection, const bool updating) {
       if (mCssStyle->mFlexDirection != flexDirection) {
         mCssStyle->mFlexDirection = flexDirection;
         markDirty();
+        if (updating) {
+          for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+            (*it)->markDirty(false);
+          }
+        }
       }
     }
 
