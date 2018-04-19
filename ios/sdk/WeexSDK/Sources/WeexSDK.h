@@ -71,5 +71,6 @@
 #import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
 #import "Layout.h"
+#import "JSContext+Weex.h"
 
 #endif /* __OBJC__ */
