@@ -2,6 +2,7 @@
 #include <WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.h>
 #include <WeexCore/platform/android/base/jni/android_jni.h>
 #include <WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.h>
+#include <WeexCore/platform/android/bridge/impl/WXJsFunction_Impl_Android.h>
 #include <WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.h>
 
 jint JNI_OnLoad (JavaVM *vm, void *reserved)
@@ -16,6 +17,7 @@ jint JNI_OnLoad (JavaVM *vm, void *reserved)
     WeexCore::RegisterJNIUtils(env);
     WeexCore::RegisterJNIMeasureMode(env);
     WeexCore::RegisterJNIContentBoxMeasurement(env);
+    WeexCore::RegisterWXJsFunction(env);
     return WeexCore::OnLoad(vm, reserved);
 }
 

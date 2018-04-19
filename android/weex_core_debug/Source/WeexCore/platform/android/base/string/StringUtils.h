@@ -43,6 +43,24 @@ static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
   return std::string(nativeString);
 }
 
+static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
+  char *rtn = NULL;
+  jsize alen = env->GetArrayLength(barr);
+  jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
+  if (alen > 0) {
+    rtn = (char *) malloc(alen + 1);
+    memcpy(rtn, ba, alen);
+    rtn[alen] = 0;
+  } else {
+    return "";
+  }
+  env->ReleaseByteArrayElements(barr, ba, 0);
+
+  std::string stemp(rtn);
+  free(rtn);
+  return stemp;
+}
+
 static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
   jbyteArray jarray = nullptr;
   if (pat == nullptr)

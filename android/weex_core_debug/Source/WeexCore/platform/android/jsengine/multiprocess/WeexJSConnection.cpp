@@ -13,6 +13,7 @@
 #include <IPC/IPCException.h>
 #include <IPC/IPCSender.h>
 #include <WeexCore/platform/android/base/LogUtils.h>
+#include <unistd.h>
 
 extern const char *s_cacheDir;
 extern bool s_start_pie;

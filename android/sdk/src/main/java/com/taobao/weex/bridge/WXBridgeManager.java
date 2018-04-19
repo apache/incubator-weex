@@ -304,7 +304,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
                       WXEnvironment.getApplication(), WXBridgeManager.this);
               if (mWxDebugProxy != null) {
-                mWxDebugProxy.start();
+                mWxDebugProxy.start(new WXJsFunctions());
               }
             }
           }

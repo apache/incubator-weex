@@ -37,9 +37,7 @@ namespace WeexCore {
       return m_instance;
     }
 
-    void setGlobalRef(jobject &jRef) {
-      jThis = jRef;
-    }
+    void setGlobalRef(jobject &jRef);
 
     void setJSVersion(const char* version);
 

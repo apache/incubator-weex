@@ -42,7 +42,7 @@ add_library(weexjsc SHARED
     ./WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
     ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
-
+    ./WeexCore/platform/android/bridge/impl/WXJsFunction_Impl_Android.cpp
     ./WeexCore/render/manager/RenderManager.cpp
     ./WeexCore/render/page/RenderPage.cpp
     ./WeexCore/render/node/RenderObject.cpp
