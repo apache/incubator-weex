@@ -2278,7 +2278,7 @@ public void invokeDestoryInstance(String instanceId, String namespace, String fu
         post(new Runnable() {
           @Override
           public void run() {
-			invokeRegisterModules(modules, mRegisterComponentFailList);
+			invokeRegisterModules(modules, mRegisterModuleFailList);
           }
         }, null);
       }
