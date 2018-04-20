@@ -189,6 +189,8 @@ namespace WeexCore {
 
     WXCorelayoutResult *mLayoutResult = nullptr;
 
+    WXCorePosition *absoultePositon = nullptr;
+
     bool mHasNewLayout;
 
     bool dirty, widthDirty, heightDirty;
@@ -553,6 +555,8 @@ namespace WeexCore {
     determineCrossSize(float, float, bool);
 
     void setFrame(float, float, float, float);
+
+    void setFrame(WXCorePosition*,float, float, float, float);
 
     /** ================================ layout =================================== **/
 
