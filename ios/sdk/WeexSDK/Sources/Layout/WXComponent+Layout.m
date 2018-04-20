@@ -36,13 +36,20 @@
 - (void)setNeedsLayout
 {
     WXComponent *supercomponent = [self supercomponent];
-    if(supercomponent){
-        for (WXComponent *siblingComponent in [supercomponent subcomponents]) {
-            [siblingComponent _needRecalculateLayout];
-        }
+    if (self->_virtualComponentId || self->_templateComponent) {
+        // we will generate a virtualComponentId for recycleList virtual component or templateComponent for recycleList component template.
+        // as for recyclelist component, it depends on the input data, not the new layout, here will not try to clear slibling child layout.
+        _isLayoutDirty = YES;
         [supercomponent setNeedsLayout];
     } else {
-        [self _needRecalculateLayout];
+        if(supercomponent){
+            for (WXComponent *siblingComponent in [supercomponent subcomponents]) {
+                [siblingComponent _needRecalculateLayout];
+            }
+            [supercomponent setNeedsLayout];
+        } else {
+            [self _needRecalculateLayout];
+        }
     }
 }
 
