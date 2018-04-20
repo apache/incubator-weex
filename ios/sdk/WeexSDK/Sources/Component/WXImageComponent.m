@@ -166,11 +166,11 @@ WX_EXPORT_METHOD(@selector(save:))
     
     // iOS 11 needs a NSPhotoLibraryUsageDescription key for permission
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
-        if (!info[@"NSPhotoLibraryUsageDescription"]) {
+        if (!info[@"NSPhotoLibraryAddUsageDescription"]) {
             if (resultCallback) {
                 resultCallback(@{
                                  @"success" : @(false),
-                                 @"errorDesc": @"This maybe crash above iOS 10 because it attempted to access privacy-sensitive data without a usage description.  The app's Info.plist must contain an NSPhotoLibraryUsageDescription key with a string value explaining to the user how the app uses this data."
+                                 @"errorDesc": @"This maybe crash above iOS 11 because it attempted to save image without a usage description.  The app's Info.plist must contain an NSPhotoLibraryAddUsageDescription key with a string value explaining to the user how the app uses this data."
                                  }, NO);
             }
             return;
