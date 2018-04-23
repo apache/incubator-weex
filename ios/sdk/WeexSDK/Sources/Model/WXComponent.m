@@ -291,6 +291,7 @@
                 [self.supercomponent.view addSubview:self.view];
             });
         }
+        [self setNeedsLayout];
     }
 }
 
