@@ -95,7 +95,6 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
-        [self configFilter:styles];
         
         _imageQuality = WXImageQualityNone;
         if (styles[@"quality"]) {
@@ -113,6 +112,8 @@ WX_EXPORT_METHOD(@selector(save:))
             _downloadImageWithURL = [WXConvert BOOL:attributes[@"compositing"]];
         }
         
+        [self configFilter:styles needUpdate:NO];
+        
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;
@@ -128,7 +129,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
-- (void)configFilter:(NSDictionary *)styles
+- (void)configFilter:(NSDictionary *)styles needUpdate:(BOOL)needUpdate
 {
     if (styles[@"filter"]) {
         NSString *filter = styles[@"filter"];
@@ -145,7 +146,9 @@ WX_EXPORT_METHOD(@selector(save:))
             NSString *matchString = [filter substringWithRange:matchRange];
             if (matchString && matchString.length > 0) {
                 _blurRadius = [matchString doubleValue];
-                [self updateImage];
+                if (needUpdate) {
+                    [self updateImage];
+                }
             }
         }
     }
@@ -241,7 +244,7 @@ WX_EXPORT_METHOD(@selector(save:))
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         [self updateImage];
     }
-    [self configFilter:styles];
+    [self configFilter:styles needUpdate:YES];
 }
 
 - (void)dealloc
@@ -381,6 +384,10 @@ WX_EXPORT_METHOD(@selector(save:))
             if (error) {
                 // log error message for error
                 WXLogError(@"Error downloading image: %@, detail:%@", imageURL.absoluteString, [error localizedDescription]);
+            }
+            UIImageView *imageView = (UIImageView *)strongSelf.view;
+            if (imageView && imageView.image != image) {
+                imageView.image = image;
             }
             if (strongSelf.imageLoadEvent) {
                 NSMutableDictionary *sizeDict = [NSMutableDictionary new];
