@@ -46,7 +46,7 @@ public class WXJsFunctions implements IWXJsFunctions {
 
 
     @Override
-    public native void jsHandleCallAddElement(String instanceId, String ref, String dom, String index, String callback);
+    public native void jsHandleCallAddElement(String instanceId, String ref, String dom, String index);
 
 
     @Override

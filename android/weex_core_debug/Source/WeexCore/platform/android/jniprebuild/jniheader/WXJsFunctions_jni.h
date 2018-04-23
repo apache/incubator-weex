@@ -38,8 +38,7 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
 
 static void
 jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jstring dom,
-                       jstring index,
-                       jstring callback);
+                       jstring index);
 
 static void jsHandleSetTimeout(JNIEnv *env, jobject object, jstring callbackId, jstring time);
 
@@ -105,7 +104,7 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)V",
                 reinterpret_cast<void *>(jsHandleCallNativeComponent)},
         {"jsHandleCallAddElement",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
                 reinterpret_cast<void *>(jsHandleCallAddElement)},
         {"jsHandleSetTimeout",
                 "(Ljava/lang/String;Ljava/lang/String;)V",

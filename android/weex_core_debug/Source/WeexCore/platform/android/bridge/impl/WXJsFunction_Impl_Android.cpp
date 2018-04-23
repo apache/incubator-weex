@@ -131,14 +131,12 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
 
 void
 jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jstring dom,
-                       jstring index,
-                       jstring callback) {
+                       jstring index) {
 
     const char *instanceChar = env->GetStringUTFChars(instanceId, 0);
     const char *refChar = env->GetStringUTFChars(ref, 0);
     const char *domChar = env->GetStringUTFChars(dom, 0);
     const char *indexChar = env->GetStringUTFChars(index, 0);
-    const char *callbackChar = env->GetStringUTFChars(callback, 0);
 
     int indexI = atoi(indexChar);
     if (instanceChar == nullptr || refChar == nullptr || domChar == nullptr ||

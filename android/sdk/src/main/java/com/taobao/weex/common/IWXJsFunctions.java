@@ -38,8 +38,7 @@ public interface IWXJsFunctions {
     void jsHandleCallNativeComponent(String instanceId, String componentRef, String method,
                                      byte[] arguments, byte[] options);
 
-    void jsHandleCallAddElement(String instanceId, String ref, String dom, String index,
-                                String callback);
+    void jsHandleCallAddElement(String instanceId, String ref, String dom, String index);
 
     void jsHandleSetTimeout(String callbackId, String time);
 

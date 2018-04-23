@@ -90,7 +90,8 @@ dependencies {
     debugCompile project(path: ':commons', configuration: 'debug')
     releaseCompile project(path: ':commons', configuration: 'release')
 
-    // compile project(':weex_sdk')
+    debugCompile project(path: ':weex_sdk', configuration: 'debug')
+    releaseCompile project(path: ':weex_sdk', configuration: 'release')
     // debugCompile project(':weex_debug')
     // compile project(':commons')
 
@@ -117,5 +118,6 @@ dependencies {
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-    compile 'com.taobao.android:weex_inspector:0.11.0'
+    //compile 'com.taobao.android:weex_inspector:0.11.0'
+    compile project(":weex_inspector")
 }
