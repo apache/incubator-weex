@@ -189,6 +189,8 @@ namespace WeexCore {
 
     WXCorelayoutResult *mLayoutResult = nullptr;
 
+    WXCorePosition *absoultePositon = nullptr;
+
     bool mHasNewLayout;
 
     bool dirty, widthDirty, heightDirty;
@@ -553,6 +555,8 @@ namespace WeexCore {
     determineCrossSize(float, float, bool);
 
     void setFrame(float, float, float, float);
+
+    void setFrame(WXCorePosition*,float, float, float, float);
 
     /** ================================ layout =================================== **/
 
@@ -920,10 +924,15 @@ namespace WeexCore {
 
     /** ================================ flex-style =================================== **/
 
-    inline void setFlexDirection(const WXCoreFlexDirection flexDirection) {
+    inline void setFlexDirection(const WXCoreFlexDirection flexDirection, const bool updating) {
       if (mCssStyle->mFlexDirection != flexDirection) {
         mCssStyle->mFlexDirection = flexDirection;
         markDirty();
+        if (updating) {
+          for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+            (*it)->markDirty(false);
+          }
+        }
       }
     }
 

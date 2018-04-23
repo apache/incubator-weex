@@ -86,6 +86,12 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.layoutPosition = position;
   }
 
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
+  public void setIndex(int index){
+    mIndex = index;
+  }
+
   @Override
   public void executeAction() {
     try {

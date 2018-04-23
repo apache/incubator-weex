@@ -2276,9 +2276,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
         final BasicGraphicAction action = new GraphicActionRemoveElement(instanceId, ref);
-        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+        if(instance.getInActiveAddElementAction(ref)!=null){
+          instance.removeInActiveAddElmentAction(ref);
+        }
+        else {
+          WXSDKManager.getInstance().getWXRenderManager()
+              .postGraphicAction(action.getPageId(), action);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
@@ -2440,7 +2447,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
+  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callLayout: call callLayout arguments is null");
@@ -2474,6 +2481,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         if(addAction!=null) {
           addAction.setSize(size);
           addAction.setPosition(position);
+          if(!TextUtils.equals(ref, WXComponent.ROOT)) {
+            addAction.setIndex(index);
+          }
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(pageId, addAction);
           WXSDKManager.getInstance().getSDKInstance(pageId).removeInActiveAddElmentAction(ref);
         }

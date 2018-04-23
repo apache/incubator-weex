@@ -26,7 +26,7 @@ namespace WeexCore {
   RenderPage::RenderPage(std::string pageId) {
 
 #if RENDER_LOG
-    LOGD("[RenderPage] new RenderPage >>>> pageId: %d", pageId);
+    LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
 #endif
 
     mPageId = pageId;
@@ -39,7 +39,7 @@ namespace WeexCore {
   RenderPage::~RenderPage() {
 
 #if RENDER_LOG
-    LOGD("[RenderPage] Delete RenderPage >>>> pageId: %d", mPageId);
+    LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
 #endif
 
     mRenderObjectRegisterMap.clear();
@@ -60,7 +60,7 @@ namespace WeexCore {
       return;
 
 #if RENDER_LOG
-    LOGD("[RenderPage] CalculateLayout >>>> pageId: %d", mPageId);
+    LOGD("[RenderPage] CalculateLayout >>>> pageId: %s", mPageId.c_str());
 #endif
 
     long long startTime = getCurrentTime();
@@ -71,7 +71,7 @@ namespace WeexCore {
 
     if (splitScreenRendering) {
       if (mAlreadyCreateFinish) {
-        TraverseTree(render_root);
+        TraverseTree(render_root, 0);
       } else {
         float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
         float deviceWidth = WXCoreEnvironment::getInstance()->DeviceWidth();
@@ -81,37 +81,37 @@ namespace WeexCore {
           case kFlexDirectionColumn:
           case kFlexDirectionColumnReverse:
             if (render_root->getLargestMainSize() * radio > deviceHeight / 3) {
-              TraverseTree(render_root);
+              TraverseTree(render_root, 0);
             }
             break;
           case kFlexDirectionRow:
           case kFlexDirectionRowReverse:
           default:
             if (render_root->getLargestMainSize() * radio > deviceWidth / 3) {
-              TraverseTree(render_root);
+              TraverseTree(render_root, 0);
             }
             break;
         }
       }
     } else {
-      TraverseTree(render_root);
+      TraverseTree(render_root, 0);
     }
   }
 
-  void RenderPage::TraverseTree(RenderObject *render) {
+  void RenderPage::TraverseTree(RenderObject *render,int index) {
 
     if (render == nullptr)
       return;
 
     if (render->hasNewLayout()) {
-      SendLayoutAction(render);
+      SendLayoutAction(render, index);
       render->setHasNewLayout(false);
     }
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
       if (child != nullptr) {
-        TraverseTree(child);
+        TraverseTree(child, it-render->ChildListIterBegin());
       }
     }
   }
@@ -511,11 +511,11 @@ namespace WeexCore {
     PostRenderAction(action);
   }
 
-  void RenderPage::SendLayoutAction(RenderObject *render) {
+  void RenderPage::SendLayoutAction(RenderObject *render, int index) {
     if (render == nullptr)
       return;
 
-    RenderAction *action = new RenderActionLayout(PageId(), render);
+    RenderAction *action = new RenderActionLayout(PageId(), render, index);
     PostRenderAction(action);
   }
 

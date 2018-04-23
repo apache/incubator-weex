@@ -619,7 +619,7 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
 
   int flag = 0;
 
-  if (pageId == nullptr || task == nullptr)
+  if (pageId == nullptr)
     return createInt32Result(flag);
 
   flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(pageId, task, callback);

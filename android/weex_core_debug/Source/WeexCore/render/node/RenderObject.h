@@ -126,7 +126,7 @@ namespace WeexCore {
         }
         return kTypeLayout;
       } else if (key == FLEX_DIRECTION) {
-        setFlexDirection(GetWXCoreFlexDirection(value));
+        setFlexDirection(GetWXCoreFlexDirection(value), updating);
         return kTypeLayout;
       } else if (key == JUSTIFY_CONTENT) {
         setJustifyContent(GetWXCoreJustifyContent(value));

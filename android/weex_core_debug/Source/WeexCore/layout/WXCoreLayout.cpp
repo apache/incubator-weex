@@ -483,16 +483,21 @@ namespace WeexCore {
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight) != r
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeBottom) != b) {
         setHasNewLayout(true);
-        mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeLeft, l);
-        mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeTop, t);
-        mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeRight, r);
-        mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeBottom, b);
+        setFrame(&mLayoutResult->mLayoutPosition, l, t, r, b);
       }
     }
 
+  void WXCoreLayoutNode::setFrame(WXCorePosition* position,const float l, const float t, const float r, const float b){
+    position->setPosition(kPositionEdgeLeft, l);
+    position->setPosition(kPositionEdgeTop, t);
+    position->setPosition(kPositionEdgeRight, r);
+    position->setPosition(kPositionEdgeBottom, b);
+  }
+
   void WXCoreLayoutNode::layout(float left, float top, float right, float bottom, const bool absoluteFlexItem, const std::pair<float,float>* const renderPageSize) {
     if(absoluteFlexItem) {
-      setFrame(left, top, right, bottom);
+      absoultePositon = new WXCorePosition();
+      setFrame(absoultePositon, left, top, right, bottom);
     }
     else{
       switch (mCssStyle->mPositionType) {
@@ -555,13 +560,17 @@ namespace WeexCore {
                         mParent->getLayoutPositionRight(),
                         mParent->getLayoutPositionBottom(),
                         this, &tempLine);
-      if (isnan(getStylePositionLeft()) && isnan(getStylePositionRight())) {
-        left = getLayoutPositionLeft();
-        right = getLayoutPositionRight();
-      }
-      if (isnan(getStylePositionTop()) && isnan(getStylePositionBottom())) {
-        top = getLayoutPositionTop();
-        bottom = getLayoutPositionBottom();
+      if(absoultePositon != nullptr) {
+        if (isnan(getStylePositionLeft()) && isnan(getStylePositionRight())) {
+          left = absoultePositon->getPosition(kPositionEdgeLeft);
+          right = absoultePositon->getPosition(kPositionEdgeRight);
+        }
+        if (isnan(getStylePositionTop()) && isnan(getStylePositionBottom())) {
+          top = absoultePositon->getPosition(kPositionEdgeTop);
+          bottom = absoultePositon->getPosition(kPositionEdgeBottom);
+        }
+        delete absoultePositon;
+        absoultePositon = nullptr;
       }
     }
   }

@@ -388,8 +388,23 @@ namespace WeexCore {
             RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
             std::string temp = "{";
             temp.append(r.Stringify());
-            int index = temp.find('}');
-            std::string value = temp.substr(0, index + 1);
+            int endIndex = temp.find('}');
+            if(endIndex > 0) {
+              // has found!
+              int startIndex = 0;
+              int leftMatchSize = matchNum(temp, "{", startIndex, endIndex) - 1;
+              while (leftMatchSize > 0 && startIndex < endIndex) {
+                startIndex = endIndex + 1;
+                int markIndex = temp.find('}', startIndex);
+                if(markIndex > 0) {
+                  endIndex = markIndex;
+                  leftMatchSize--;
+                }
+                leftMatchSize += matchNum(temp, "{", startIndex, endIndex);
+              }
+            }
+            std::string value = temp.substr(0, endIndex + 1);
+
             if (0 == strcmp(key, "attr")) {
               render->AddAttr(key2, value);
             } else if (0 == strcmp(key, "style")) {
@@ -519,8 +534,23 @@ namespace WeexCore {
         RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
         std::string temp = "{";
         temp.append(r.Stringify());
-        int index = temp.find_last_of('}');
-        std::string value = temp.substr(0, index);
+        int endIndex = temp.find('}');
+        if(endIndex > 0) {
+          // has found!
+          int startIndex = 0;
+          int leftMatchSize = matchNum(temp, "{", startIndex, endIndex) - 1;
+          while (leftMatchSize > 0 && startIndex < endIndex) {
+            startIndex = endIndex + 1;
+            int markIndex = temp.find('}', startIndex);
+            if(markIndex > 0) {
+              endIndex = markIndex;
+              leftMatchSize--;
+            }
+            leftMatchSize += matchNum(temp, "{", startIndex, endIndex);
+          }
+        }
+        std::string value = temp.substr(0, endIndex + 1);
+
         std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();

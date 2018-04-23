@@ -1408,6 +1408,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         @Override
         public void run() {
           WXBridgeManager.getInstance().onInstanceClose(getInstanceId());
+          inactiveAddElementAction.clear();
         }
       });
     }

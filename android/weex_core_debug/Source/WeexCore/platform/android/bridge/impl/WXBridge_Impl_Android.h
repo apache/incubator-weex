@@ -86,7 +86,7 @@ namespace WeexCore {
 
     int callLayout(const char* pageId, const char* ref,
                    int top, int bottom, int left, int right,
-                   int height, int width);
+                   int height, int width, int index);
 
     int callUpdateStyle(const char* pageId, const char* ref,
                         std::vector<std::pair<std::string, std::string>> *style,
