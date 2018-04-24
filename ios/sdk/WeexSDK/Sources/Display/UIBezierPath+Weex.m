@@ -37,7 +37,11 @@ static const float kCircleControlPoint = 0.447715;
     // +------------------+
     //  \\      top     //
     //   \\+----------+//
-    [path addLineToPoint:CGPointMake(CGRectGetMaxX(rect) - topRightRadius, rect.origin.y)];
+    CGPoint topRightPoint = CGPointMake(CGRectGetMaxX(rect) - topRightRadius, rect.origin.y);
+    if (isnan(topRightPoint.x) || isnan(topRightPoint.y)) {
+        return path;
+    }
+    [path addLineToPoint:topRightPoint];
     if (topRightRadius > 0) {
         [path addCurveToPoint:CGPointMake(CGRectGetMaxX(rect), rect.origin.y + topRightRadius)
                 controlPoint1:CGPointMake(CGRectGetMaxX(rect) - topRightRadius * kCircleControlPoint, rect.origin.y)
