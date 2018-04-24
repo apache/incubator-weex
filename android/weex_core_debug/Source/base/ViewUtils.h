@@ -1,7 +1,7 @@
 #ifndef WEEX_PROJECT_VIEWUTILS_H
 #define WEEX_PROJECT_VIEWUTILS_H
 
-#include <WeexCore/config/CoreEnvironment.h>
+#include <core/config/core_environment.h>
 #include <cmath>
 #include <cstdlib>
 

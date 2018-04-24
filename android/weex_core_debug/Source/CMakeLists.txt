@@ -23,52 +23,47 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 
 add_library(weexjsc SHARED
 
-    ./base/Compatible.cpp
     ./base/fpconv.cpp
-    ./WeexCore/platform/android/jniprebuild/jni_load.cc
-    ./WeexCore/platform/android/base/jni/android_jni.cpp
-    ./WeexCore/platform/android/base/jni/scoped_java_ref.cpp
-    ./WeexCore/platform/android/base/base64/base64.cpp
-    ./WeexCore/platform/android/base/base64/modp_base64/modp_b64.cc
-    ./WeexCore/platform/android/base/string/ScopedJString.cpp
-    ./WeexCore/platform/android/base/string/ScopedJStringUTF8.cpp
+    ./android/jniprebuild/jni_load.cc
+    ./android/base/jni/android_jni.cpp
+    ./android/base/jni/scoped_java_ref.cpp
+    ./android/base/base64/base64.cpp
+    ./android/base/base64/modp_base64/modp_b64.cc
+    ./android/base/string/scoped_jstring.cpp
+    ./android/base/string/scoped_jstring_utf8.cpp
+    ./android/bridge/impl/bridge_impl_android.cpp
+    ./android/bridge/impl/weexcore_impl_android.cpp
+    ./android/bridge/impl/measure_mode_impl_android.cpp
+    ./android/bridge/impl/content_box_measurement_impl_android.cpp
 
-    ./WeexCore/platform/android/jsengine/multiprocess/WeexJSConnection.cpp
-    ./WeexCore/platform/android/jsengine/multiprocess/WeexProxy.cpp
-    ./WeexCore/platform/android/jsengine/multiprocess/ExtendJSApi.cpp
+    ./android/jsengine/multiprocess/WeexJSConnection.cpp
+    ./android/jsengine/multiprocess/WeexProxy.cpp
+    ./android/jsengine/multiprocess/ExtendJSApi.cpp
 
+    ./core/render/manager/render_manager.cpp
+    ./core/render/page/render_page.cpp
+    ./core/render/node/render_object.cpp
+    ./core/render/node/factory/render_creator.cpp
+    ./core/render/action/render_action_add_event.cpp
+    ./core/render/action/render_action_remove_event.cpp
+    ./core/render/action/render_action_add_element.cpp
+    ./core/render/action/render_action_remove_element.cpp
+    ./core/render/action/render_action_move_element.cpp
+    ./core/render/action/render_action_createbody.cpp
+    ./core/render/action/render_action_createfinish.cpp
+    ./core/render/action/render_action_layout.cpp
+    ./core/render/action/render_action_update_attr.cpp
+    ./core/render/action/render_action_update_style.cpp
 
-    ./WeexCore/platform/android/bridge/impl/WXBridge_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/impl/WeexCore_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
-    ./WeexCore/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
+    ./core/parser/dom_parser.cpp
 
-    ./WeexCore/render/manager/RenderManager.cpp
-    ./WeexCore/render/page/RenderPage.cpp
-    ./WeexCore/render/node/RenderObject.cpp
+    ./core/layout/layout.cpp
+    ./core/layout/style.cpp
 
-    ./WeexCore/render/node/factory/RenderCreator.cpp
+    ./core/css/css_value_getter.cpp
 
-    ./WeexCore/render/action/RenderActionAddEvent.cpp
-    ./WeexCore/render/action/RenderActionRemoveEvent.cpp
-    ./WeexCore/render/action/RenderActionAddElement.cpp
-    ./WeexCore/render/action/RenderActionRemoveElement.cpp
-    ./WeexCore/render/action/RenderActionMoveElement.cpp
-    ./WeexCore/render/action/RenderActionCreateBody.cpp
-    ./WeexCore/render/action/RenderActionCreateFinish.cpp
-    ./WeexCore/render/action/RenderActionLayout.cpp
-    ./WeexCore/render/action/RenderActionUpdateAttr.cpp
-    ./WeexCore/render/action/RenderActionUpdateStyle.cpp
-
-    ./WeexCore/parser/DomParser.cpp
-
-    ./WeexCore/layout/WXCoreLayout.cpp
-    ./WeexCore/layout/WXCoreStyle.cpp
-
-    ./WeexCore/css/CssValueGetter.cpp
-
-    ./WeexCore/config/CoreEnvironment.cpp
-    ./WeexCore/moniter/RenderPerformance.cpp
+    ./core/config/core_environment.cpp
+    ./core/moniter/render_performance.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)
@@ -86,11 +81,11 @@ add_library(weexjsc SHARED
  #   )
 
     target_include_directories(weexjsc
-                                PUBLIC
-                                .)
+                               PUBLIC
+                               .)
 
     target_link_libraries(weexjsc 
-                                android
-                                IPC
-                                log
-                                z)
+                          android
+                          IPC
+                          log
+                          z)
