@@ -133,7 +133,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path '../weex_core_debug/CMakeLists.txt'
+            path '../../weex_core/CMakeLists.txt'
         }
     }
 
