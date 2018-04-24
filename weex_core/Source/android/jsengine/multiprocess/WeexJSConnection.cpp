@@ -12,6 +12,8 @@
 #include <IPC/IPCFutexPageQueue.h>
 #include <IPC/IPCException.h>
 #include <IPC/IPCSender.h>
+#include <WeexCore/platform/android/base/LogUtils.h>
+#include <unistd.h>
 #include <android/base/log_utils.h>
 
 extern const char *s_cacheDir;

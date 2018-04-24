@@ -44,6 +44,38 @@ namespace WeexCore {
 
   Bridge_Impl_Android::~Bridge_Impl_Android() {}
 
+  void Bridge_Impl_Android::setGlobalRef(jobject &jRef) {
+    jThis = jRef;
+    jSetJSFrmVersionMethodId = NULL;
+    jReportExceptionMethodId = NULL;
+    jCallNativeMethodId = NULL;
+    jCallNativeModuleMethodId = NULL;
+    jCallNativeComponentMethodId = NULL;
+
+    jSetTimeoutNativeMethodId = NULL;
+    jLogMethodId = NULL;
+    jCallUpdateFinishMethodId = NULL;
+
+    jCallRefreshFinishMethodId = NULL;
+    jCallRemoveElementMethodId = NULL;
+    jCallMoveElementMethodId = NULL;
+    jCallAddEventMethodId = NULL;
+    jCallRemoveEventMethodId = NULL;
+
+    jMapConstructorMethodId = NULL;
+    jMapPutMethodId = NULL;
+    jSetConstructorMethodId = NULL;
+    jSetAddMethodId = NULL;
+
+    jCallCreateBodyMethodId = NULL;
+    jCallAddElementMethodId = NULL;
+    jCallUpdateStyleMethodId = NULL;
+    jCallHasTransitionProsMethodId = NULL;
+    jCallUpdateAttrsMethodId = NULL;
+    jCallLayoutMethodId = NULL;
+    jCallCreateFinishMethodId = NULL;
+  }
+
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
     std::map<std::string, std::string>::const_iterator it = cMap->begin();
     std::map<std::string, std::string>::const_iterator end = cMap->end();

@@ -304,7 +304,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
                       WXEnvironment.getApplication(), WXBridgeManager.this);
               if (mWxDebugProxy != null) {
-                mWxDebugProxy.start();
+                mWxDebugProxy.start(new WXJsFunctions());
               }
             }
           }
@@ -626,7 +626,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+    if (callback == null || callback.isEmpty() || UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick
