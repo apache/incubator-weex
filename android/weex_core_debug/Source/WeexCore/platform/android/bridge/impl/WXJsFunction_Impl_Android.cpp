@@ -159,8 +159,14 @@ void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array) {
 }
 
 void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jstring domStr) {
+
+    if (pageId == nullptr || domStr == nullptr)
+        return;
+
     const char *page = env->GetStringUTFChars(pageId, NULL);
     const char *dom = env->GetStringUTFChars(domStr, NULL);
+    if (page == nullptr || dom == nullptr || strlen(dom) == 0)
+        return;
     RenderManager::GetInstance()->CreatePage(page, dom);
 }
 

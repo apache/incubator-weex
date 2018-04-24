@@ -626,7 +626,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+    if (callback == null || callback.isEmpty() || UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick

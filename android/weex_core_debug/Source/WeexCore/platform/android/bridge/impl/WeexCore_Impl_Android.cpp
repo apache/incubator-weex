@@ -73,6 +73,10 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
                              jstring cacheDir,
                              jboolean pieSupport) {
   jThis = env->NewGlobalRef(jcaller);
+  jclass tempClass = env->FindClass(
+          "com/taobao/weex/bridge/WXBridge");
+  jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
+  env->DeleteLocalRef(tempClass);
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
@@ -307,6 +311,10 @@ static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, j
 
 static jint InitFramework(JNIEnv *env, jobject object, jstring script, jobject params) {
   jThis = env->NewGlobalRef(object);
+  jclass tempClass = env->FindClass(
+          "com/taobao/weex/bridge/WXBridge");
+  jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
+  env->DeleteLocalRef(tempClass);
   return WeexProxy::doInitFramework(env, jThis, script, params);
 }
 
