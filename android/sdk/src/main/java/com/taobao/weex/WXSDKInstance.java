@@ -333,6 +333,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(mNestedInstanceInterceptor != null){
       mNestedInstanceInterceptor.onCreateNestInstance(sdkInstance,container);
     }
+    if(sdkInstance != null){
+        sdkInstance.setComponentObserver(this.getComponentObserver());
+    }
     return sdkInstance;
   }
 
