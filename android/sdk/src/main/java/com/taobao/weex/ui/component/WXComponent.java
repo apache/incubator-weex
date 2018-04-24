@@ -1021,7 +1021,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void updateBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
-      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+//      WXLogUtils.w("BoxShadow", "box-shadow disabled");
       return;
     }
 
@@ -1089,7 +1089,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void clearBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
-      WXLogUtils.w("BoxShadow", "box-shadow disabled");
+//      WXLogUtils.w("BoxShadow", "box-shadow disabled");
       return;
     }
 
