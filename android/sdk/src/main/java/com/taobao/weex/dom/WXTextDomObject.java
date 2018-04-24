@@ -116,7 +116,7 @@ public class WXTextDomObject extends WXDomObject {
          }
       }
       textDomObject.hasBeenMeasured = true;
-      width = textDomObject.getTextWidth(textDomObject.mTextPaint,width, forceWidth);
+      width = textDomObject.getTextWidth(textDomObject.mTextPaint, width, forceWidth);
       if(width > 0 && textDomObject.mText != null) {
         textDomObject.layout = textDomObject.createLayout(width, true, null);
         textDomObject.previousWidth = textDomObject.layout.getWidth();
@@ -145,6 +145,7 @@ public class WXTextDomObject extends WXDomObject {
   private int mFontWeight = UNSET;
   private int mNumberOfLines = UNSET;
   private int mFontSize = UNSET;
+  private String mWordBreak = "";
   private int mLineHeight = UNSET;
   private boolean mIncludeFontPadding = false;
   private float previousWidth = Float.NaN;
@@ -317,6 +318,9 @@ public class WXTextDomObject extends WXDomObject {
       if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         mFontFamily = WXStyle.getFontFamily(style);
       }
+      if (style.containsKey(Constants.Name.WORD_BREAK)) {
+        mWordBreak = WXStyle.getWordBreak(style);
+      }
       mAlignment = WXStyle.getTextAlignment(style);
       textOverflow = WXStyle.getTextOverflow(style);
       int lineHeight = WXStyle.getLineHeight(style,getViewPortWidth());
@@ -346,6 +350,9 @@ public class WXTextDomObject extends WXDomObject {
       if (direction != null && "text".equals(mType)) {
         forceRtl = direction.equals(Constants.Name.RTL);
       }
+      if (mWordBreak != null && "break-all".equals(mWordBreak)) {
+        spanned = createSpanned(breakAllText(mText));
+      }
       layout = StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
           Layout.Alignment.ALIGN_NORMAL, 1, 0, mIncludeFontPadding, forceRtl);
     } else {
@@ -371,6 +378,44 @@ public class WXTextDomObject extends WXDomObject {
       }
     }
     return layout;
+  }
+
+  /**
+   * According the give String break all word and return a new String.
+   * @param text the give text.
+   */
+  @NonNull
+  private String breakAllText(String text) {
+      float contentWidth = WXDomUtils.getContentWidth(this);
+      String[] rawTextLines = text.replaceAll("\r", "").split("\n");
+      StringBuilder builder = new StringBuilder();
+
+      for (String rawTextLine : rawTextLines) {
+          mTextPaint.setTextSize(mFontSize);
+          if (mTextPaint.measureText(rawTextLine) <= (int) Math.ceil(contentWidth)) {
+              builder.append(rawTextLine);
+          } else {
+              float lineWidth = 0;
+              for (int index = 0; index != rawTextLine.length(); ++index) {
+                  char c = rawTextLine.charAt(index);
+                  lineWidth += mTextPaint.measureText(String.valueOf(c));
+                  if (lineWidth <= (int) Math.ceil(contentWidth)) {
+                      builder.append(c);
+                  } else {
+                      builder.append("\n");
+                      lineWidth = 0;
+                      --index;
+                  }
+              }
+          }
+          builder.append("\n");
+      }
+
+      if (!text.endsWith("\n")) {
+          builder.deleteCharAt(builder.length() - 1);
+      }
+
+      return builder.toString();
   }
 
   /**

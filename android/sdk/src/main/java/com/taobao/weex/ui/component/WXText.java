@@ -132,6 +132,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       case Constants.Name.TEXT_OVERFLOW:
       case Constants.Name.LINE_HEIGHT:
       case Constants.Name.VALUE:
+      case Constants.Name.WORD_BREAK:
         return true;
       case Constants.Name.FONT_FAMILY:
         return true;

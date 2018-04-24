@@ -96,6 +96,7 @@ public class Constants {
     String FONT_WEIGHT = "fontWeight";
     String FONT_STYLE = "fontStyle";
     String FONT_SIZE = "fontSize";
+    String WORD_BREAK = "wordBreak";
     String COLOR = "color";
     String LINES = "lines";
     String FONT_FAMILY = "fontFamily";
