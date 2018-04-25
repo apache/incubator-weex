@@ -705,4 +705,251 @@ WeexProxy::execJSOnInstance(JNIEnv *env, jobject jcaller, jstring instanceId, js
   }
 }
 
+jint WeexProxy::initAppFramework(JNIEnv* env,
+                         jobject jcaller,
+                         jstring jinstanceid,
+                         jstring jframwork,
+                         jobjectArray jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return false;
+  }
+  if (jframwork == NULL && jargs == NULL) {
+    LOGE("native_initAppFramework jframwork is NULL");
+    return false;
+  }
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  try {
+
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITAPPFRAMEWORK));
+    addString(env, serializer.get(), jinstanceid);
+    addString(env, serializer.get(), jframwork);
+    for (int i = 0; i < length; i++) {
+      jobject jArg = env->GetObjectArrayElement(jargs, i);
+
+      jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+      jint jTypeInt = env->GetIntField(jArg, jTypeId);
+
+      jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+      jobject jDataObj = env->GetObjectField(jArg, jDataId);
+
+      jfieldID jKeyId = env->GetFieldID(jWXJSObject, "key", "Ljava/lang/String;");
+      jobject jKeyObj = env->GetObjectField(jArg, jKeyId);
+      addString(env, serializer.get(), (jstring) jKeyObj);
+
+      if (jTypeInt == 1) {
+        if (jDoubleValueMethodId == NULL) {
+          jclass jDoubleClazz = env->FindClass("java/lang/Double");
+          jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+          env->DeleteLocalRef(jDoubleClazz);
+        }
+        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+        serializer->add(jDoubleObj);
+      } else if (jTypeInt == 2) {
+        jstring jDataStr = (jstring)jDataObj;
+        addString(env, serializer.get(), jDataStr);
+      } else if (jTypeInt == 3) {
+        jstring jDataStr = (jstring)jDataObj;
+        addJSONString(env, serializer.get(), jDataStr);
+      }
+//            else if (jTypeInt == 4) {
+//                jbyteArray array = (jbyteArray)jDataObj;
+//                addWSONByteArray(env, serializer.get(), array);
+//            }
+      else {
+        serializer->addJSUndefined();
+      }
+
+      env->DeleteLocalRef(jKeyObj);
+      env->DeleteLocalRef(jDataObj);
+      env->DeleteLocalRef(jArg);
+    }
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    return result->get<jint>();
+  } catch (IPCException& e) {
+    LOGE("initAppFramework error %s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
+jint WeexProxy::destoryAppContext(JNIEnv* env,
+                              jobject jcaller,
+                              jstring jinstanceid) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return false;
+  }
+  if (jinstanceid == NULL) {
+    LOGE("createAppContext jbundle is NULL");
+    return false;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::DESTORYAPPCONTEXT));
+    addString(env, serializer.get(), jinstanceid);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    return true;
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
+jint WeexProxy::createAppContext(JNIEnv* env,
+                      jobject jcaller,
+                      jstring jinstanceid,
+                      jstring jbundle,
+                      jobject jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return false;
+  }
+  if (jinstanceid == NULL || jbundle == NULL) {
+    LOGE("createAppContext jbundle is NULL");
+    return false;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CREATEAPPCONTEXT));
+    addString(env, serializer.get(), jinstanceid);
+    addString(env, serializer.get(), jbundle);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    return result->get<jint>();
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
+jbyteArray WeexProxy::execJsOnAppWithResult(JNIEnv* env,
+        jobject jcaller,
+        jstring jinstanceid,
+        jstring jbundle,
+        jobject jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return NULL;
+  }
+  if (jinstanceid == NULL || jbundle == NULL) {
+    LOGE("native_execJsOnApp jbundle is NULL");
+    return NULL;
+  }
+  try {
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSONAPPWITHRESULT));
+    addString(env, serializer.get(), jinstanceid);
+    addString(env, serializer.get(), jbundle);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    if (result->getType() != IPCType::BYTEARRAY) {
+      return NULL;
+    }
+    if(result->getByteArrayLength() == 0){
+      return NULL;
+    }
+    jbyteArray array = env->NewByteArray(result->getByteArrayLength());
+    env->SetByteArrayRegion(array, 0, result->getByteArrayLength(),
+                            reinterpret_cast<const jbyte*>(result->getByteArrayContent()));
+    return array;
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return NULL;
+  }
+  return NULL;
+}
+
+jint WeexProxy::execJsOnApp(JNIEnv* env,
+                            jobject jcaller,
+                            jstring jinstanceid,
+                            jstring jfunction,
+                            jobjectArray jargs) {
+  if (!sSender) {
+    LOGE("have not connected to a js server");
+    return false;
+  }
+  if (jinstanceid == NULL || jfunction == NULL) {
+    LOGE("native_execJsOnApp jbundle is NULL");
+    return false;
+  }
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  try {
+    std::unique_ptr <IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CALLJSONAPPCONTEXT));
+    addString(env, serializer.get(), jinstanceid);
+    addString(env, serializer.get(), jfunction);
+
+    for (int i = 0; i < length; i++) {
+      jobject jArg = env->GetObjectArrayElement(jargs, i);
+
+      jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+      jint jTypeInt = env->GetIntField(jArg, jTypeId);
+
+      jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+      jobject jDataObj = env->GetObjectField(jArg, jDataId);
+      if (jTypeInt == 1) {
+        if (jDoubleValueMethodId == NULL) {
+          jclass jDoubleClazz = env->FindClass("java/lang/Double");
+          jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+          env->DeleteLocalRef(jDoubleClazz);
+        }
+        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+        serializer->add(jDoubleObj);
+      } else if (jTypeInt == 2) {
+        jstring jDataStr = (jstring)jDataObj;
+        addString(env, serializer.get(), jDataStr);
+      } else if (jTypeInt == 3) {
+        jstring jDataStr = (jstring)jDataObj;
+        addJSONString(env, serializer.get(), jDataStr);
+      }
+//            else if (jTypeInt == 4) {
+//                jbyteArray array = (jbyteArray)jDataObj;
+//                addWSONByteArray(env, serializer.get(), array);
+//            }
+      else {
+        serializer->addJSUndefined();
+      }
+      env->DeleteLocalRef(jDataObj);
+      env->DeleteLocalRef(jArg);
+    }
+
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
+    if (result->getType() != IPCType::INT32) {
+      LOGE("execJS Unexpected result type");
+      return false;
+    }
+    return result->get<jint>();
+
+  } catch (IPCException& e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    reportServerCrash(jinstanceid);
+    return false;
+  }
+  return true;
+}
+
 }  // namespace WeexCore

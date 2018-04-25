@@ -89,6 +89,29 @@ public:
                                     jstring instanceId,
                                     jstring script,
                                     jint type);
+    static jint initAppFramework(JNIEnv* env,
+                                    jobject jcaller,
+                                    jstring jinstanceid,
+                                    jstring jframwork,
+                                    jobjectArray jargs);
+    static jint destoryAppContext(JNIEnv* env,
+                                  jobject jcaller,
+                                  jstring jinstanceid);
+    static jint createAppContext(JNIEnv* env,
+                                 jobject jcaller,
+                                 jstring jinstanceid,
+                                 jstring jbundle,
+                                 jobject jargs);
+    static jbyteArray execJsOnAppWithResult(JNIEnv* env,
+                                      jobject jcaller,
+                                      jstring jinstanceid,
+                                      jstring jbundle,
+                                      jobject jargs);
+    static jint execJsOnApp(JNIEnv* env,
+                            jobject jcaller,
+                            jstring jinstanceid,
+                            jstring jfunction,
+                            jobjectArray jargs);
 };
 }
 #endif //_WEEX_PROXY_H_

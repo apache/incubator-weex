@@ -28,6 +28,7 @@ namespace WeexCore {
 
   private:
     jobject jThis;
+    jobject jVMThis;
 
   public:
     static Bridge_Impl_Android *m_instance;
@@ -56,6 +57,10 @@ namespace WeexCore {
     }
 
     void setGlobalRef(jobject &jRef);
+
+    void setGlobalWMRef(jobject &jRef) {
+      jWMThis = jRef;
+    }
 
     void setJSVersion(const char* version);
 
@@ -119,6 +124,11 @@ namespace WeexCore {
 
     int callHasTransitionPros(const char* pageId, const char* ref,
                               std::vector<std::pair<std::string, std::string>> *style);
+
+    // will change future to char *
+    void handlePostMessage(jstring jVmId, jbyteArray jData);
+
+    void handleDispatchMessage(jstring jClientId, jstring jVmId, jbyteArray jData, jstring jCallback);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

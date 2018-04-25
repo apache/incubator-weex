@@ -77,6 +77,10 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
                            handleCallGCanvasLinkNative);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK),
                            handleT3DLinkNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::POSTMESSAGE),
+                           handlePostMessage);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::DISPATCHMESSAGE),
+                           handleDispatchMessage);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
@@ -655,6 +659,45 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
     callback = nullptr;
   }
   return createInt32Result(flag);
+}
+
+std::unique_ptr<IPCResult> handlePostMessage(IPCArguments *arguments) {
+  LOGE("handlePostMessage");
+  JNIEnv* env = getJNIEnv();
+  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 0);
+  jstring jVmId = getArgumentAsJString(env, arguments, 1);
+//  if (jPostMessage == NULL) {
+//    jPostMessage = env->GetMethodID(jWMBridgeClazz,
+//                                    "postMessage",
+//                                    "(Ljava/lang/String;[B)V");
+//  }
+//  env->CallVoidMethod(jWMThis, jPostMessage, jVmId, jData);
+  Bridge_Impl_Android::getInstance()->handlePostMessage(jVmId, jData);
+  env->DeleteLocalRef(jData);
+  env->DeleteLocalRef(jVmId);
+
+  return createInt32Result(static_cast<int32_t>(true));
+
+}
+
+std::unique_ptr<IPCResult> handleDispatchMessage(IPCArguments *arguments) {
+  LOGE("handleDispatchMessage");
+  JNIEnv* env = getJNIEnv();
+  jstring jClientId = getArgumentAsJString(env, arguments, 0);
+  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 1);
+  jstring jCallback = getArgumentAsJString(env, arguments, 2);
+  jstring jVmId = getArgumentAsJString(env, arguments, 3);
+//  if (jDispatchMeaasge == NULL) {
+//    jDispatchMeaasge = env->GetMethodID(jWMBridgeClazz,
+//                                        "dispatchMessage",
+//                                        "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)V");
+//  }
+//  env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
+  Bridge_Impl_Android::getInstance()->handleDispatchMessage(jClientId, jVmId, jData, jCallback);
+  env->DeleteLocalRef(jClientId);
+  env->DeleteLocalRef(jData);
+  env->DeleteLocalRef(jCallback);
+  return createInt32Result(static_cast<int32_t>(true));
 }
 
 namespace WeexCore {

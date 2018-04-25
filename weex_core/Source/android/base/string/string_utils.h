@@ -115,6 +115,21 @@ static inline char* getArumentAsCStr(IPCArguments *arguments, int argument) {
     return ret;
 }
 
+static inline jbyteArray getArgumentAsJByteArray(JNIEnv* env, IPCArguments* arguments, size_t argument)
+{
+  jbyteArray ba = nullptr;
+  if (argument >= arguments->getCount())
+    return nullptr;
+  if (arguments->getType(argument) == IPCType::BYTEARRAY) {
+    const IPCByteArray* ipcBA = arguments->getByteArray(argument);
+    int strLen = ipcBA->length;
+    ba = env->NewByteArray(strLen);
+    env->SetByteArrayRegion(ba, 0, strLen,
+                            reinterpret_cast<const jbyte*>(ipcBA->content));
+  }
+  return ba;
+}
+
 static inline jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments, int argument) {
   jstring ret = nullptr;
   if (arguments->getType(argument) == IPCType::STRING) {
