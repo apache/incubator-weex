@@ -18,6 +18,7 @@
  */
 package com.alibaba.weex.extend.module;
 
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 /**
  * Created by zhengshihan on 2016/12/28.
  */
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class SyncTestModule extends WXModule {
 
     @JSMethod(uiThread = false)

@@ -38,6 +38,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IModuleInvokeGateway;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
@@ -47,7 +48,6 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -67,7 +67,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-import com.taobao.weex.wson.Wson;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,10 +86,10 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
+
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 
 
 /**
@@ -342,6 +341,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
         }
         return validateInfo;
+      }
+    }
+
+    IModuleInvokeGateway gateway = WXSDKManager.getInstance().getModuleInvokeGateway();
+    if (gateway != null) {
+      boolean allowAccess = gateway.allowAccess(instanceId, moduleStr, methodStr);
+      if (!allowAccess) {
+        //TODO: Notification js that the call has been rejected
+        WXLogUtils.e("[WXBridgeManager] permission denied: " + moduleStr + "." + methodStr);
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (instance != null) {
+          Map<String, Object> event = new HashMap<>();
+          event.put("msg", "PERMISSION_DENIED");
+          event.put("module", moduleStr);
+          event.put("method", methodStr);
+          instance.fireGlobalEventCallback("invokeFailed", event);
+        }
+        return null;
       }
     }
     return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
@@ -1975,7 +1992,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       instance.callJsTime(System.currentTimeMillis()-start);
     }
   }
-  
+
   public void invokeCreateInstanceContext(String instanceId, String namespace, String function,
                                           WXJSObject[] args, boolean logTaskDetail) {
     WXLogUtils.d("invokeCreateInstanceContext instanceId:" + instanceId + " function:"

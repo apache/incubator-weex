@@ -21,6 +21,7 @@ package com.taobao.weex.appfram.websocket;
 import android.os.Looper;
 
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * Created by moxun on 16/12/27.
  */
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WebSocketModule extends WXSDKEngine.DestroyableModule {
 
     private static final String TAG = "WebSocketModule";

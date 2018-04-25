@@ -28,6 +28,7 @@ import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IModuleInvokeGateway;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -93,6 +94,7 @@ public class WXSDKManager {
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
   private ITracingAdapter mTracingAdapter;
   private WXValidateProcessor mWXValidateProcessor;
+  private IModuleInvokeGateway mModuleInvokeGateway;
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
 
@@ -478,6 +480,14 @@ public class WXSDKManager {
 
   public IWXAccessibilityRoleAdapter getAccessibilityRoleAdapter() {
     return mRoleAdapter;
+  }
+
+  public void setModuleInvokeGateway(IModuleInvokeGateway gateway) {
+    mModuleInvokeGateway = gateway;
+  }
+
+  public IModuleInvokeGateway getModuleInvokeGateway() {
+    return mModuleInvokeGateway;
   }
 
   public interface InstanceLifeCycleCallbacks {

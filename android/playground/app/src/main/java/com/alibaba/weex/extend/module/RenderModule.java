@@ -20,10 +20,11 @@ package com.alibaba.weex.extend.module;
 
 import android.util.Log;
 
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class RenderModule extends WXModule {
 
   @JSMethod

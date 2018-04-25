@@ -31,8 +31,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.alibaba.weex.extend.module.location.ILocatable;
 import com.alibaba.weex.extend.module.location.LocationFactory;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.Destroyable;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXModule;
 
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import java.util.Map;
 /**
  * Created by lixinke on 16/9/10.
  */
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class GeolocationModule extends WXModule implements Destroyable {
 
   private ILocatable mILocatable;

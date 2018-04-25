@@ -18,11 +18,13 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 
 /**
  * Report template error.
  */
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXInstanceWrap extends WXModule {
 
   @JSMethod

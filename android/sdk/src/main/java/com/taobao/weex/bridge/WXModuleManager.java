@@ -211,7 +211,17 @@ public class WXModuleManager {
     }
   }
 
-
+  public static Class<? extends WXModule> findModuleClass(String instanceId, String moduleName) {
+    ModuleFactory factory = null;
+    if (sModuleFactoryMap.get(moduleName) != null) {
+      factory = sModuleFactoryMap.get(moduleName).mFactory;
+    }
+    WXModule target = findModule(instanceId, moduleName, factory);
+    if (target != null) {
+      return target.getClass();
+    }
+    return null;
+  }
 
   private static WXModule findModule(String instanceId, String moduleStr,ModuleFactory factory) {
     // find WXModule

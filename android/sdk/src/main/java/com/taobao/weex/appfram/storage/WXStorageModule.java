@@ -22,11 +22,12 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 
 import java.util.Map;
-
+@AccessRestriction
 public class WXStorageModule extends WXSDKEngine.DestroyableModule implements IWXStorage {
 
     IWXStorageAdapter mStorageAdapter;

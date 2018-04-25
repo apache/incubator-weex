@@ -26,8 +26,9 @@ import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -38,7 +39,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@AccessRestriction
 public class WXClipboardModule extends WXModule implements IWXClipboard {
 
     private final String CLIP_KEY = "WEEX_CLIP_KEY_MAIN";

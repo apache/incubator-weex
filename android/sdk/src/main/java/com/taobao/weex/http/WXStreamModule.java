@@ -20,12 +20,12 @@ package com.taobao.weex.http;
 
 import android.net.Uri;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -43,7 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXStreamModule extends WXModule {
 
   public static final String STATUS_TEXT = "statusText";

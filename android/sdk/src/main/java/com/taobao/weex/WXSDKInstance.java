@@ -557,7 +557,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
-    mBundleUrl = url;
+    setBundleUrl(url);
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
     }

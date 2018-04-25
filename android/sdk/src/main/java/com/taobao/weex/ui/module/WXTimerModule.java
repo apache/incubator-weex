@@ -18,13 +18,6 @@
  */
 package com.taobao.weex.ui.module;
 
-import static com.taobao.weex.bridge.WXBridgeManager.KEY_ARGS;
-import static com.taobao.weex.bridge.WXBridgeManager.KEY_METHOD;
-import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALLBACK;
-import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALL_JS;
-import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_INTERVAL;
-import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_TIMEOUT;
-
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.FloatRange;
@@ -35,6 +28,7 @@ import android.util.SparseArray;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXHashMap;
@@ -45,11 +39,19 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.taobao.weex.bridge.WXBridgeManager.KEY_ARGS;
+import static com.taobao.weex.bridge.WXBridgeManager.KEY_METHOD;
+import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALLBACK;
+import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALL_JS;
+import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_INTERVAL;
+import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_TIMEOUT;
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXTimerModule extends WXModule implements Destroyable, Handler.Callback {
 
   @IntDef({MODULE_TIMEOUT, MODULE_INTERVAL})

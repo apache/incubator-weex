@@ -35,6 +35,7 @@ import android.widget.Checkable;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.taobao.weex.annotation.AccessRestriction;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
@@ -50,7 +51,7 @@ import java.util.Map;
 /**
  * Created by moxun on 16/10/27.
  */
-
+@AccessRestriction(AccessRestriction.PUBLIC)
 public class WXPickersModule extends WXModule {
 
     private static final String SUCCESS = "success";
