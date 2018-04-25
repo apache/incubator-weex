@@ -326,6 +326,7 @@ public class Constants {
 
     String STOP_PROPAGATION = "stopPropagation";
     String ONMESSAGE = "message";
+    String NATIVE_BACK = "nativeback";
   }
 
   public interface PSEUDO {

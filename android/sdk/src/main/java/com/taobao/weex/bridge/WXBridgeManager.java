@@ -29,9 +29,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
-import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -81,6 +79,7 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1903,7 +1902,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  private boolean isJSThread() {
+  public boolean isJSThread() {
     return mJSThread != null && mJSThread.getId() == Thread.currentThread().getId();
   }
 
