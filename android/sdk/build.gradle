@@ -35,6 +35,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
+
 version = "Devtool-WeexCore-1.0.3-SNAPSHOT"
 
 android {
