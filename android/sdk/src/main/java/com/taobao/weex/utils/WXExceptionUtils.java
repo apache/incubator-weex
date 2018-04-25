@@ -86,7 +86,7 @@ public class WXExceptionUtils {
 
 	  if (null != instance && instance.getContext() != null && instance.getBundleUrl() != null) {
 		bundleUrlCommit = instance.getBundleUrl();
-		exceptionMsgCommit += "\n instance.getTemplateInfo()==" + instance.getTemplateInfo();
+		commitMap.put("templateInfo_instance",instance.getTemplateInfo());
 		if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
 		  if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
 			bundleUrlCommit = degradeUrl;
