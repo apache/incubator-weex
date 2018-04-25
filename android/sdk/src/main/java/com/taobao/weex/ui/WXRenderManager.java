@@ -24,12 +24,10 @@ import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.ui.action.BasicGraphicAction;
-import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -44,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WXRenderManager {
 
-  private ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
+  private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
 
   public WXRenderManager() {

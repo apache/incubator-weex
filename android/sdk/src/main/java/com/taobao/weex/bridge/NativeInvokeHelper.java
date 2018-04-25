@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
  * Created by sospartan on 10/11/2016.
  */
 
-public final class NativeInvokeHelper {
+public class NativeInvokeHelper {
   private String mInstanceId;
 
   public NativeInvokeHelper(String instanceId){
@@ -60,7 +60,7 @@ public final class NativeInvokeHelper {
     return null;
   }
 
-  private Object[] prepareArguments(Type[] paramClazzs, JSONArray args) throws Exception {
+  protected Object[] prepareArguments(Type[] paramClazzs, JSONArray args) throws Exception {
     Object[] params = new Object[paramClazzs.length];
     Object value;
     Type paramClazz;

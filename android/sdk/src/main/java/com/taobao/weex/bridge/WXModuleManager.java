@@ -210,7 +210,9 @@ public class WXModuleManager {
     }
   }
 
-
+  public static boolean hasModule(String module) {
+    return sGlobalModuleMap.containsKey(module) || sModuleFactoryMap.containsKey(module);
+  }
 
   private static WXModule findModule(String instanceId, String moduleStr,ModuleFactory factory) {
     // find WXModule

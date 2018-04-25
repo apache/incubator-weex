@@ -529,6 +529,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mReceiver = null;
   }
 
+  @Override
+  public void onBackPressed() {
+    if (!mInstance.onBackPressed()) {
+      super.onBackPressed();
+    }
+  }
+
   private static class NavigatorAdapter implements IActivityNavBarSetter {
 
     @Override
