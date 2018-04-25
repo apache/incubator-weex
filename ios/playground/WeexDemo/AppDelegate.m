@@ -132,14 +132,14 @@
 #ifdef DEBUG
     [self atAddPlugin];
     [WXDebugTool setDebug:YES];
-    [WXLog setLogLevel:WXLogLevelLog];
+    [WXLog setLogLevel:WeexLogLevelLog];
     
     #ifndef UITEST
         [[ATManager shareInstance] show];
     #endif
 #else
     [WXDebugTool setDebug:NO];
-    [WXLog setLogLevel:WXLogLevelError];
+    [WXLog setLogLevel:WeexLogLevelError];
 #endif
 }
 
