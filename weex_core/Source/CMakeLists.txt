@@ -64,54 +64,6 @@ add_library(weexjsc SHARED
 
     ./core/config/core_environment.cpp
     ./core/moniter/render_performance.cpp
-
-    ./base/Compatible.cpp
-    ./base/fpconv.cpp
-    ./core/platform/android/jniprebuild/jni_load.cc
-    ./core/platform/android/base/jni/android_jni.cpp
-    ./core/platform/android/base/jni/scoped_java_ref.cpp
-    ./core/platform/android/base/base64/base64.cpp
-    ./core/platform/android/base/base64/modp_base64/modp_b64.cc
-    ./core/platform/android/base/string/ScopedJString.cpp
-    ./core/platform/android/base/string/ScopedJStringUTF8.cpp
-
-    ./core/platform/android/jsengine/multiprocess/WeexJSConnection.cpp
-    ./core/platform/android/jsengine/multiprocess/WeexProxy.cpp
-    ./core/platform/android/jsengine/multiprocess/ExtendJSApi.cpp
-
-
-    ./core/platform/android/bridge/impl/WXBridge_Impl_Android.cpp
-    ./core/platform/android/bridge/impl/WeexCore_Impl_Android.cpp
-    ./core/platform/android/bridge/impl/MeasureMode_Impl_Android.cpp
-    ./core/platform/android/bridge/impl/ContentBoxMeasurement_Impl_Android.cpp
-
-    ./core/render/manager/RenderManager.cpp
-    ./core/render/page/RenderPage.cpp
-    ./core/render/node/RenderObject.cpp
-
-    ./core/render/node/factory/RenderCreator.cpp
-
-    ./core/render/action/RenderActionAddEvent.cpp
-    ./core/render/action/RenderActionRemoveEvent.cpp
-    ./core/render/action/RenderActionAddElement.cpp
-    ./core/render/action/RenderActionRemoveElement.cpp
-    ./core/render/action/RenderActionMoveElement.cpp
-    ./core/render/action/RenderActionCreateBody.cpp
-    ./core/render/action/RenderActionCreateFinish.cpp
-    ./core/render/action/RenderActionLayout.cpp
-    ./core/render/action/RenderActionUpdateAttr.cpp
-    ./core/render/action/RenderActionUpdateStyle.cpp
-
-    ./core/parser/DomParser.cpp
-
-    ./core/layout/WXCoreLayout.cpp
-    ./core/layout/WXCoreStyle.cpp
-
-
-    ./core/css/CssValueGetter.cpp
-
-    ./core/config/CoreEnvironment.cpp
-    ./core/moniter/RenderPerformance.cpp
     )
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)
