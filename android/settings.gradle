@@ -8,5 +8,5 @@ project(":weex_sdk").projectDir=new File("sdk")
 include ":commons"
 include ":weex_debug"
 
-include ":weex_inspector"
+//include ":weex_inspector"
 //project(":weex_inspector").projectDir = new File("/Users/darin/Downloads/code/2018-04-22-weex-dev-tool/dev-tool-github/inspector")
