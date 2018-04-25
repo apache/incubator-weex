@@ -54,6 +54,9 @@ static jmethodID jCallUpdateAttrsMethodId;
 static jmethodID jCallLayoutMethodId;
 static jmethodID jCallCreateFinishMethodId;
 
+static jmethodID jPostMessage;
+static jmethodID jDispatchMeaasge;
+
 namespace WeexCore {
 
   Bridge_Impl_Android *Bridge_Impl_Android::m_instance = nullptr;
@@ -890,4 +893,24 @@ namespace WeexCore {
     return flag;
   }
 
+
+  void Bridge_Impl_Android::handlePostMessage(jstring jVmId, jbyteArray jData) {
+    JNIEnv *env = getJNIEnv();
+    if (jPostMessage == NULL) {
+      jPostMessage = env->GetMethodID(jWMBridgeClazz,
+                                    "postMessage",
+                                    "(Ljava/lang/String;[B)V");
+    }
+    env->CallVoidMethod(jWMThis, jPostMessage, jVmId, jData);
+  }
+
+  void Bridge_Impl_Android::handleDispatchMessage(jstring jClientId, jstring jVmId, jbyteArray jData, jstring jCallback) {
+    JNIEnv *env = getJNIEnv();
+    if (jDispatchMeaasge == NULL) {
+      jDispatchMeaasge = env->GetMethodID(jWMBridgeClazz,
+                                        "dispatchMessage",
+                                        "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)V");
+    }
+    env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
+  }
 } //end WeexCore

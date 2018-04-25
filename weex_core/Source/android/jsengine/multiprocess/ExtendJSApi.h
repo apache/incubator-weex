@@ -76,6 +76,10 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
 
 static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments *arguments);
 
+static std::unique_ptr<IPCResult> handlePostMessage(IPCArguments *arguments);
+
+static std::unique_ptr<IPCResult> handleDispatchMessage(IPCArguments *arguments);
+
 
 static void reportException(const int instanceID, const char *func, const char *exception_string);
 
