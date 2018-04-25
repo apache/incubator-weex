@@ -330,9 +330,9 @@ public class WeexUiTestCaseTcElementOpt extends ActivityInstrumentationTestCase2
 //                            screenShot("TC_Event_ElementOpt_04_finish");
 //                            Log.e(TAG, "TC_Event_ElementOpt_04_finish");
                         }
-                        if(childValue.equals("点击我，addEvent")){
+                        if(childValue.equals("点击我，applyEvent")){
 
-                            Log.e(TAG, "点击我，addEvent find");
+                            Log.e(TAG, "点击我，applyEvent find");
                             final View wenbenClickAndThenAddText1 = child;
                             mInstrumentation.runOnMainSync(new Runnable() {
                                 @Override
@@ -343,7 +343,7 @@ public class WeexUiTestCaseTcElementOpt extends ActivityInstrumentationTestCase2
                                     wenbenClickAndThenAddText1.requestFocus();
                                     wenbenClickAndThenAddText1.performClick();
 
-                                    Log.e(TAG, "点击我，addEvent click 1!!");
+                                    Log.e(TAG, "点击我，applyEvent click 1!!");
                                 }
                             });
 

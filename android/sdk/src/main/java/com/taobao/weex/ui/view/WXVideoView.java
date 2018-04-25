@@ -122,8 +122,8 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       setBackgroundColor(WXResourceUtils.getColor("#ee000000"));
       mProgressBar = new ProgressBar(context);
       FrameLayout.LayoutParams pLayoutParams =
-          new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-              FrameLayout.LayoutParams.WRAP_CONTENT);
+              new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                      FrameLayout.LayoutParams.WRAP_CONTENT);
       mProgressBar.setLayoutParams(pLayoutParams);
       pLayoutParams.gravity = Gravity.CENTER;
       addView(mProgressBar);
@@ -228,8 +228,8 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       Context context = getContext();
       WXVideoView video = new WXVideoView(context);
       FrameLayout.LayoutParams videoLayoutParams =
-          new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-              FrameLayout.LayoutParams.MATCH_PARENT);
+              new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                      FrameLayout.LayoutParams.MATCH_PARENT);
       videoLayoutParams.gravity = Gravity.CENTER;
       video.setLayoutParams(videoLayoutParams);
       addView(video, 0);//first child

@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.bridge;
 
-import java.util.Map;
-
 /**
  * Created by sospartan on 5/24/16.
  */

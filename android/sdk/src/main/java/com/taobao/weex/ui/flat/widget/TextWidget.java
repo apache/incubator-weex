@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.Layout;
+
 import com.taobao.weex.ui.flat.FlatGUIContext;
 
 @RestrictTo(Scope.LIBRARY)

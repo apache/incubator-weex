@@ -33,7 +33,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXVideoView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -54,12 +54,12 @@ public class WXVideo extends WXComponent<FrameLayout> {
   private boolean mError;
 
   @Deprecated
-  public WXVideo(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+  public WXVideo(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXVideo(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+  public WXVideo(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         mPrepared = false;
         mError = true;
 
-        if ( getDomObject().getEvents().contains(Constants.Event.FAIL)) {
+        if (getEvents().contains(Constants.Event.FAIL)) {
           WXVideo.this.notify(Constants.Event.FAIL, Constants.Value.STOP);
         }
         return true;
@@ -120,7 +120,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onCompletion");
         }
-        if ( getDomObject().getEvents().contains(Constants.Event.FINISH)) {
+        if (getEvents().contains(Constants.Event.FINISH)) {
           WXVideo.this.notify(Constants.Event.FINISH, Constants.Value.STOP);
         }
       }
@@ -133,7 +133,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onPause");
         }
-        if ( getDomObject().getEvents().contains(Constants.Event.PAUSE)) {
+        if (getEvents().contains(Constants.Event.PAUSE)) {
           WXVideo.this.notify(Constants.Event.PAUSE, Constants.Value.PAUSE);
         }
       }
@@ -144,7 +144,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onStart");
         }
 
-        if ( getDomObject().getEvents().contains(Constants.Event.START)) {
+        if (getEvents().contains(Constants.Event.START)) {
           WXVideo.this.notify(Constants.Event.START, Constants.Value.PLAY);
         }
       }

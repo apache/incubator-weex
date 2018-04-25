@@ -30,7 +30,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXUtils;
@@ -48,12 +48,12 @@ public class WXWeb extends WXComponent {
     protected IWebView mWebView;
 
     @Deprecated
-    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        this(instance,dom,parent,isLazy);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+        this(instance, parent, isLazy, basicComponentData);
     }
 
-    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-        super(instance, dom, parent, isLazy);
+    public WXWeb(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, isLazy, basicComponentData);
         createWebView();
     }
 
@@ -84,7 +84,7 @@ public class WXWeb extends WXComponent {
         mWebView.setOnPageListener(new IWebView.OnPageListener() {
             @Override
             public void onReceivedTitle(String title) {
-                if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
+                if (getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
                     fireEvent(Constants.Event.RECEIVEDTITLE, params);
@@ -93,7 +93,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageStart(String url) {
-                if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
+                if (getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     fireEvent(Constants.Event.PAGESTART, params);
@@ -102,7 +102,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
-                if ( getDomObject().getEvents().contains(Constants.Event.PAGEFINISH)) {
+                if (getEvents().contains(Constants.Event.PAGEFINISH)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
@@ -185,7 +185,7 @@ public class WXWeb extends WXComponent {
     }
 
     private void fireEvent(String type, Object message) {
-        if (getDomObject().getEvents().contains(Constants.Event.ERROR)) {
+        if (getEvents().contains(Constants.Event.ERROR)) {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);

@@ -47,7 +47,6 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
-import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
 import com.alibaba.weex.https.HotRefreshManager;
 import com.alibaba.weex.https.WXHttpManager;
@@ -62,7 +61,6 @@ import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -232,14 +230,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
 
     RenderContainer renderContainer = new RenderContainer(this);
-    mContainer.addView(renderContainer);
-
     mInstance = new WXSDKInstance(this);
     mInstance.setRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
     mInstance.setNestedInstanceInterceptor(this);
     mInstance.setBundleUrl(url);
     mInstance.setTrackComponent(true);
+    mContainer.addView(renderContainer);
 
     WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
@@ -250,7 +247,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         Log.i(TAG, "into--[http:onSuccess] url:" + url);
         try {
           mConfigMap.put("bundleUrl", url);
-          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil.getDisplayHeight(WXPageActivity.this), WXRenderStrategy.APPEND_ASYNC);
+          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
@@ -306,12 +303,10 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if(comp == null){
       return;
     }
-    ImmutableDomObject dom;
     String id;
     View view;
     if((view = comp.getHostView())!=null &&
-        (dom = comp.getDomObject()) != null &&
-        (id = (String) dom.getAttrs().get("testId"))!=null &&
+        (id = (String) comp.getAttrs().get("testId"))!=null &&
         !map.containsKey(id)){
       Pair<String,Integer> pair = Utility.nextID();
       view.setId(pair.second);

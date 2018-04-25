@@ -19,33 +19,31 @@
 
 package com.alibaba.weex.benchmark;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.action.ViewActions;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.UiDevice;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
-
 import com.alibaba.weex.BenchmarkActivity;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
-
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class WeexNativeCompareTest {
@@ -60,7 +58,7 @@ public class WeexNativeCompareTest {
   private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
 
   @Rule
-  public BenchmarkActivityTestRule mActivityRule = new BenchmarkActivityTestRule(
+  public ActivityTestRule<BenchmarkActivity> mActivityRule = new ActivityTestRule(
       BenchmarkActivity.class);
   @Rule
   public RepeatRule repeatRule = new RepeatRule();

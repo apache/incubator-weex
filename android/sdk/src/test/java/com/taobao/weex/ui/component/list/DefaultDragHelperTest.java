@@ -20,9 +20,6 @@ package com.taobao.weex.ui.component.list;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXListDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.component.ComponentTest;
 import com.taobao.weex.ui.component.WXComponent;

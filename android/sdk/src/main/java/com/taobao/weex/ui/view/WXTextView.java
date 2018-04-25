@@ -40,7 +40,7 @@ import java.lang.ref.WeakReference;
  * TextView wrapper
  */
 public class WXTextView extends View implements WXGestureObservable, IWXTextView,
-                                                IRenderStatus<WXText>, IRenderResult<WXText> {
+        IRenderStatus<WXText>, IRenderResult<WXText> {
 
   private WeakReference<WXText> mWeakReference;
   private WXGesture wxGesture;
@@ -120,7 +120,7 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   @Nullable
   @Override
   public WXText getComponent() {
-     return null != mWeakReference ? mWeakReference.get() : null;
+    return null != mWeakReference ? mWeakReference.get() : null;
   }
 
   public void enableCopy(boolean enable) {

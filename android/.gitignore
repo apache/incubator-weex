@@ -2,7 +2,12 @@
 .idea
 local.properties
 *iml
-build
 captures
 .settings
 .project
+*.pyc
+weex_core/build32/
+weex_core/build64/
+cscope.out
+weex_core/*.so
+build/

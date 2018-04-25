@@ -23,8 +23,7 @@ import android.graphics.LinearGradient;
 import android.graphics.PathEffect;
 import android.graphics.Shader;
 import android.support.annotation.Nullable;
-
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 
 enum BorderStyle {
   SOLID,
@@ -36,28 +35,28 @@ enum BorderStyle {
    * for implementing {@link #DASHED} or {@link #DASHED}
    * @param borderWidth width of the edge
    * @param borderColor color of the edge
-   * @param edge the index of the ede. See {@link Spacing}
+   * @param edge the index of the ede. See {@link CSSShorthand}
    * @return An object of {@link LinearGradient} without color transitions for {@link #DOTTED}
    * or {@link #DASHED}, null otherwise
    */
   @Nullable
-  Shader getLineShader(float borderWidth, int borderColor, int edge) {
+  Shader getLineShader(float borderWidth, int borderColor, CSSShorthand.EDGE edge) {
     switch (this) {
       case DOTTED:
-        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
+        if (edge == CSSShorthand.EDGE.LEFT || edge == CSSShorthand.EDGE.RIGHT) {
           return new LinearGradient(0, 0, 0, borderWidth * 2, new int[]{borderColor, Color
-              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
-        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
+                  .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else if (edge == CSSShorthand.EDGE.TOP || edge == CSSShorthand.EDGE.BOTTOM) {
           return new LinearGradient(0, 0, borderWidth * 2, 0, new int[]{borderColor, Color
-              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+                  .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
         }
       case DASHED:
-        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
+        if (edge == CSSShorthand.EDGE.LEFT || edge == CSSShorthand.EDGE.RIGHT) {
           return new LinearGradient(0, 0, 0, borderWidth * 6, new int[]{borderColor, Color
-              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
-        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
+                  .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else if (edge == CSSShorthand.EDGE.TOP || edge == CSSShorthand.EDGE.BOTTOM) {
           return new LinearGradient(0, 0, borderWidth * 6, 0, new int[]{borderColor, Color
-              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+                  .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
         }
       default:
         return null;

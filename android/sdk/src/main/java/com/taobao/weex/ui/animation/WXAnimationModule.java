@@ -21,31 +21,22 @@ package com.taobao.weex.ui.animation;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.RenderAction;
-import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.component.WXComponent;
-
-
-import static com.taobao.weex.dom.action.Actions.getAnimationAction;
 
 public class WXAnimationModule extends WXModule {
 
   @JSMethod
-  public void transition(@Nullable String ref, @Nullable JSONObject animation, @Nullable String callBack) {
-    if (!TextUtils.isEmpty(ref) && animation != null && mWXSDKInstance != null) {
-      DOMAction animationActions = getAnimationAction(ref, animation, callBack);
+  public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
+    if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
-      WXSDKManager.getInstance().getWXDomManager().postActionDelay(mWXSDKInstance.getInstanceId(),
-                                                                   animationActions,
-                                                                   false, WXDomHandler.DELAY_TIME);
+      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance.getInstanceId(), ref, animation, callBack);
+      WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
   }
 
@@ -55,9 +46,11 @@ public class WXAnimationModule extends WXModule {
     private WXAnimationBean wxAnimationBean;
     private String callback;
 
-    public void execute(WXSDKInstance mInstance, WXComponent component) {
-      RenderAction action = Actions.getAnimationAction(component.getRef(), wxAnimationBean, callback);
-      WXSDKManager.getInstance().getWXRenderManager().runOnThread(mInstance.getInstanceId(), action);
+    public void execute(WXSDKInstance instance, WXComponent component) {
+      if (null != instance && null != component) {
+        GraphicActionAnimation action = new GraphicActionAnimation(instance.getInstanceId(), component.getRef(), wxAnimationBean, callback);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
     }
 
     public AnimationHolder(WXAnimationBean wxAnimationBean, String callback) {

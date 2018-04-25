@@ -27,7 +27,7 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.taobao.weappplus_sdk.R;
+import com.taobao.weex.R;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -36,7 +36,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -45,8 +45,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 @Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer{
-
+public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   public static final  String STRATEGY_NONE =  "none";
   public static final  String STRATEGY_NORMAL =  "normal";
@@ -113,7 +112,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     @Override
     public void onException(NestedContainer container, String errCode, String msg) {
       if (TextUtils.equals(errCode, WXErrorCode.
-			  WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode()) && container instanceof WXEmbed) {
+              WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode()) && container instanceof WXEmbed) {
         final WXEmbed comp = ((WXEmbed)container);
         final ImageView imageView = new ImageView(comp.getContext());
         imageView.setImageResource(R.drawable.error);
@@ -188,24 +187,24 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     mListener = new EmbedRenderListener(this);
 
-    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
-    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
-    if(instance instanceof EmbedManager) {
-      Object itemId = node.getAttrs().get(ITEM_ID);
+    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270, instance.getInstanceViewPortWidth());
+    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260, instance.getInstanceViewPortWidth());
+    if (instance instanceof EmbedManager) {
+      Object itemId = getAttrs().get(ITEM_ID);
       if (itemId != null) {
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
       }
     }
-    this.priority = WXUtils.getString(node.getAttrs().get(Constants.Name.PRIORITY), PRIORITY_NORMAL);
-    this.strategy = WXUtils.getString(node.getAttrs().get(Constants.Name.STRATEGY), STRATEGY_NONE);
+    this.priority = WXUtils.getString(getAttrs().get(Constants.Name.PRIORITY), PRIORITY_NORMAL);
+    this.strategy = WXUtils.getString(getAttrs().get(Constants.Name.STRATEGY), STRATEGY_NONE);
   }
 
   @Override
@@ -229,7 +228,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       case Constants.Name.PRIORITY:
         String priority = WXUtils.getString(param,null);
         if (priority != null){
-           setPriority(priority);
+          setPriority(priority);
         }
         return true;
     }
@@ -278,10 +277,10 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   @WXComponentProp(name = Constants.Name.PRIORITY)
   public void setPriority(String priority) {
-       if(TextUtils.isEmpty(priority)){
-         return;
-       }
-       this.priority = priority;
+    if(TextUtils.isEmpty(priority)){
+      return;
+    }
+    this.priority = priority;
   }
 
   /**
@@ -327,18 +326,16 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     if(TextUtils.isEmpty(url)){
       mListener.mEventListener.onException(this,
-			  WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
+              WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
               WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorMsg() + "!!wx embed src url is null"
-	  );
+      );
       return sdkInstance;
     }
 
-    ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            url,
-                            null, null, layoutParams.width,
-                            layoutParams.height,
-                            WXRenderStrategy.APPEND_ASYNC);
+            url,
+            null, null,
+            WXRenderStrategy.APPEND_ASYNC);
     return sdkInstance;
   }
 
@@ -375,7 +372,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       getInstance().removeOnInstanceVisibleListener(this);
     }
   }
-
 
   private void  doAutoEmbedMemoryStrategy(){
     /**
@@ -491,16 +487,16 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private void destoryNestInstance(){
     if(getInstance().hiddenEmbeds != null && getInstance().hiddenEmbeds.contains(this)){
-        getInstance().hiddenEmbeds.remove(this);
+      getInstance().hiddenEmbeds.remove(this);
     }
     if (mNestedInstance != null) {
-       mNestedInstance.destroy();
-       mNestedInstance = null;
+      mNestedInstance.destroy();
+      mNestedInstance = null;
     }
     if(WXEnvironment.isApkDebugable()){
-       WXLogUtils.w("WXEmbed destoryNestInstance priority " + priority + " index " + getDomObject().getAttrs().get("index")
-        + "  " + hiddenTime  + " embeds size " + (getInstance().hiddenEmbeds == null ?  0 : getInstance().hiddenEmbeds.size())
-       + " strategy " + this.strategy);
+      WXLogUtils.w("WXEmbed destoryNestInstance priority " + priority + " index " + getAttrs().get("index")
+              + "  " + hiddenTime  + " embeds size " + (getInstance().hiddenEmbeds == null ?  0 : getInstance().hiddenEmbeds.size())
+              + " strategy " + this.strategy);
     }
   }
 }

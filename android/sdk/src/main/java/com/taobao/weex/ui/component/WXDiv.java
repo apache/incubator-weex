@@ -22,13 +22,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 
 /**
  * div component
@@ -39,23 +40,19 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   private WidgetGroup mWidgetGroup;
 
   public static class Ceator implements ComponentCreator {
-
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent)
-        throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXDiv(instance, node, parent);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXDiv(instance, parent, basicComponentData);
     }
   }
 
   @Deprecated
-  public WXDiv(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId,
-      boolean isLazy) {
-    this(instance, dom, parent);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXDiv(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WXDiv(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
-
 
   @Override
   protected WXFrameLayout initComponentHostView(@NonNull Context context) {
@@ -67,7 +64,7 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   @Override
   public boolean promoteToView(boolean checkAncestor) {
     return !intendToBeFlatContainer() ||
-        getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXDiv.class);
+            getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXDiv.class);
   }
 
   /**
@@ -89,6 +86,9 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
 
   @Override
   protected void mountFlatGUI() {
+    if(widgets == null){
+      widgets = new LinkedList<>();
+    }
     if (promoteToView(true)) {
       if(getHostView()!=null) {
         getHostView().mountFlatGUI(widgets);
@@ -114,5 +114,4 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   public boolean isVirtualComponent() {
     return !promoteToView(true);
   }
-
 }

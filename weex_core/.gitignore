@@ -1,0 +1,5 @@
+*.pyc
+build32/
+build64/
+cmake-build-debug
+cscope.out
