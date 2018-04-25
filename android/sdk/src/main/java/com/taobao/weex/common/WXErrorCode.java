@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,9 +22,9 @@ package com.taobao.weex.common;
 public enum WXErrorCode {
 
 
-    /*
-     * environment
-     **/
+  /*
+   * environment
+   **/
   /**
    * Failure for load so library
    */
@@ -213,7 +213,7 @@ public enum WXErrorCode {
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "WX_RENDER_ERR_JS_CREATE_INSTANCE",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR,
-                     ErrorGroup.JS),
+          ErrorGroup.JS),
 
 
   /**
@@ -244,7 +244,7 @@ public enum WXErrorCode {
    * once this case occured,network requist response header and statuscode need track into errmsg.
    */
   WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR("-1004", "degradeToH5|wx_user_intercept_error |Content-Type is not application/javascript, " +
-                                                 "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+          "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
 
   /**
    * degrade for other reason. such as white screen which block error for some unknown reason.
@@ -278,7 +278,7 @@ public enum WXErrorCode {
   }
 
   public void appendErrMsg(String err) {
-   appendMsg=err;
+    appendMsg=err;
   }
 
   public String getErrorCode() {

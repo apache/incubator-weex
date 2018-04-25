@@ -26,7 +26,7 @@ public interface IWXDebugProxy {
 
     String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
-    void start();
+    void start(IWXJsFunctions jsFunctions);
 
     void stop(boolean reload);
 

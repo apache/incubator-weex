@@ -48,7 +48,6 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
-import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
@@ -68,7 +67,6 @@ public class WXSDKManager {
 
   private static volatile WXSDKManager sManager;
   private static AtomicInteger sInstanceId = new AtomicInteger(0);
-  private final WXDomManager mWXDomManager;
   private final WXWorkThreadManager mWXWorkThreadManager;
   private WXBridgeManager mBridgeManager;
   /** package **/ WXRenderManager mWXRenderManager;
@@ -106,7 +104,6 @@ public class WXSDKManager {
 
   private WXSDKManager(WXRenderManager renderManager) {
     mWXRenderManager = renderManager;
-    mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
     mWXWorkThreadManager = new WXWorkThreadManager();
     mWXAnalyzerList = new ArrayList<>();
@@ -196,10 +193,6 @@ public class WXSDKManager {
     mBridgeManager.restart();
   }
 
-  public WXDomManager getWXDomManager() {
-    return mWXDomManager;
-  }
-
   public WXBridgeManager getWXBridgeManager() {
     return mBridgeManager;
   }
@@ -221,9 +214,6 @@ public class WXSDKManager {
   }
 
   public void destroy() {
-    if (mWXDomManager != null) {
-      mWXDomManager.destroy();
-    }
     if (mWXWorkThreadManager != null) {
       mWXWorkThreadManager.destroy();
     }
@@ -307,7 +297,6 @@ public class WXSDKManager {
       }
     }
     mWXRenderManager.removeRenderStatement(instanceId);
-    mWXDomManager.removeDomStatement(instanceId);
     mBridgeManager.destroyInstance(instanceId);
     WXModuleManager.destroyInstanceModules(instanceId);
   }
@@ -352,7 +341,7 @@ public class WXSDKManager {
 
   public ClassLoaderAdapter getClassLoaderAdapter() {
     if(mClassLoaderAdapter == null){
-        mClassLoaderAdapter = new ClassLoaderAdapter();
+      mClassLoaderAdapter = new ClassLoaderAdapter();
     }
     return mClassLoaderAdapter;
   }

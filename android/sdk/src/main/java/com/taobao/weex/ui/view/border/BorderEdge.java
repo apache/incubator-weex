@@ -21,10 +21,8 @@ package com.taobao.weex.ui.view.border;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
-
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 
 /**
  * Edge for border. Every border has four edges, and each edge has a previous corner and a post
@@ -34,21 +32,24 @@ class BorderEdge {
 
   private
   @NonNull
-  final BorderCorner mPreCorner;
+  BorderCorner mPreCorner;
   private
   @NonNull
-  final BorderCorner mPostCorner;
+  BorderCorner mPostCorner;
 
-  private final int mEdge;
-  private final float mBorderWidth;
+  private CSSShorthand.EDGE mEdge;
+  private float mBorderWidth;
 
-  BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner,
-             @BorderWidthStyleColorType int edge, float
-      borderWidth) {
+  BorderEdge() {
+  }
+
+  BorderEdge set(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner,
+                 float borderWidth, CSSShorthand.EDGE edge) {
     mPreCorner = preCorner;
     mPostCorner = postCorner;
-    mEdge = edge;
     mBorderWidth = borderWidth;
+    mEdge = edge;
+    return this;
   }
 
   /**
@@ -57,63 +58,32 @@ class BorderEdge {
    * @param paint the paint which is used to draw.
    */
   void drawEdge(@NonNull Canvas canvas, @NonNull Paint paint) {
-    RectF oval;
-    PointF lineStart = mPreCorner.getCornerEnd();
     paint.setStrokeWidth(mBorderWidth);
 
-    drawRoundedCorner(canvas, paint, mPreCorner,
-                      mPreCorner.getAngleBisectorDegree(),
-                      mPreCorner.getSharpCornerStart(), lineStart);
+    mPreCorner.drawRoundedCorner(canvas, paint, mPreCorner.getAngleBisectorDegree());
 
     paint.setStrokeWidth(mBorderWidth);
-    PointF lineEnd = mPostCorner.getCornerStart();
-    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
 
-    drawRoundedCorner(canvas, paint, mPostCorner,
-                      mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                      lineEnd, mPostCorner.getSharpCornerEnd());
-  }
+    final float lineStartX = mPreCorner.getRoundCornerEndX();
+    final float lineStartY = mPreCorner.getRoundCornerEndY();
 
-  /**
-   * Draw the Rounded corner.
-   * @param canvas the canvas where the edge will be drawn
-   * @param paint the paint which is used to draw
-   * @param borderCorner the corner to be drawn
-   * @param startAngle the startAngle of the corner
-   * @param startPoint the startPoint of the line
-   * @param endPoint the endPoint of the line
-   */
-  private void drawRoundedCorner(@NonNull Canvas canvas, @NonNull Paint paint,
-                                 @NonNull BorderCorner borderCorner, float startAngle,
-                                 @NonNull PointF startPoint, @NonNull PointF endPoint) {
-    if (borderCorner.hasOuterCorner()) {
-      RectF oval;
-      if (borderCorner.hasInnerCorner()) {
-        oval = borderCorner.getOvalIfInnerCornerExist();
-      } else {
-        paint.setStrokeWidth(borderCorner.getOuterCornerRadius());
-        oval = borderCorner.getOvalIfInnerCornerNotExist();
-      }
-      /*Due to the problem of hardware-acceleration, border-radius in some case will not
-       be rendered if Path.addArc used instead and the following condition met.
-       1. hardware-acceleration enabled
-       2. System version is Android 4.1
-       3. Screen width is 720px.
-       http://dotwe.org/weex/421b9ad09fde51c0b49bb56b37fcf955
-      */
-      canvas.drawArc(oval, startAngle, BorderCorner.SWEEP_ANGLE, false, paint);
-    } else {
-      canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, paint);
-    }
+    final float lineEndX = mPostCorner.getRoundCornerStartX();
+    final float lineEndY = mPostCorner.getRoundCornerStartY();
+
+    canvas.drawLine(lineStartX, lineStartY, lineEndX, lineEndY, paint);
+
+    mPostCorner.drawRoundedCorner(canvas, paint, mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE);
   }
 
   /**
    * The index of the edge
    * @return index of edge. May be one of
-   * {@link Spacing#TOP},{@link Spacing#BOTTOM},{@link Spacing#RIGHT},{@link Spacing#LEFT}.
    */
-  public @BorderWidthStyleColorType
-  int getEdge() {
+  public CSSShorthand.EDGE getEdge() {
     return mEdge;
+  }
+
+  public float getBorderWidth() {
+    return mBorderWidth;
   }
 }

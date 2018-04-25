@@ -35,7 +35,6 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
 
   private static final long serialVersionUID = -8186587029452440107L;
 
-
   /**
    *  event data format
    *  {
@@ -57,6 +56,7 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
    * */
   private ArrayMap mEventBindingArgs;
   private ArrayMap<String, List<Object>> mEventBindingArgsValues;
+
 
   @Override
   public void clear() {
@@ -146,8 +146,6 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     }
   }
 
-
-
   @Override
   public WXEvent clone() {
     WXEvent event = new WXEvent();
@@ -158,6 +156,4 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     event.mEventBindingArgsValues = null; //this should not be clone, it dynamic args
     return  event;
   }
-
-
 }

@@ -20,7 +20,7 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXEditText;
 
 /**
@@ -31,22 +31,17 @@ import com.taobao.weex.ui.view.WXEditText;
 public class WXInput extends AbstractEditComponent{
 
   @Deprecated
-  public WXInput(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
-  public WXInput(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+  public WXInput(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
     editText.setSingleLine();//default use single line , same to ios
-  }
-
-  @Override
-  protected MeasureOutput measure(int width, int height) {
-    return super.measure(width, height);
   }
 }

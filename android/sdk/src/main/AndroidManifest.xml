@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.taobao.weappplus_sdk"
+          package="com.taobao.weex"
           android:versionCode="1"
           android:versionName="1.0">
 
@@ -32,6 +32,7 @@ under the License.
                 android:enabled="true"
                 android:exported="false">
         </receiver>
-    </application>
 
+
+    </application>
 </manifest>

@@ -19,6 +19,7 @@
 package com.taobao.weex.ui;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;

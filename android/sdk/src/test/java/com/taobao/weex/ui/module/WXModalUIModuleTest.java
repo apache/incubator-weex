@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.module;
 
-import com.alibaba.fastjson.JSON;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.JSCallback;
@@ -57,25 +56,25 @@ public class WXModalUIModuleTest {
 
   @Test
   public void testToast() throws Exception {
-    module.toast(JSON.parseObject("{}"));
+    module.toast("{}");
   }
 
   @Test
   public void testAlert() throws Exception {
     JSCallback callback = Mockito.mock(JSCallback.class);
-    module.alert(JSON.parseObject("{}"),callback);
+    module.alert("{}",callback);
 
   }
 
   @Test
   public void testConfirm() throws Exception {
     JSCallback callback = Mockito.mock(JSCallback.class);
-    module.confirm(JSON.parseObject("{}"),callback);
+    module.confirm("{}",callback);
   }
 
   @Test
   public void testPrompt() throws Exception {
     JSCallback callback = Mockito.mock(JSCallback.class);
-    module.prompt(JSON.parseObject("{}"),callback);
+    module.prompt("{}",callback);
   }
 }

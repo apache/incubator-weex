@@ -34,7 +34,7 @@ public class SingleFunctionParser<V> extends FunctionParser<String, List<V>> {
   }
 
   public interface NonUniformMapper<V>{
-     List<V> map(List<String> raw);
+    List<V> map(List<String> raw);
   }
 
   /**

@@ -83,12 +83,12 @@ public class TypefaceUtil {
 
     int want = 0;
     if ((weight == Typeface.BOLD)
-      || ((oldStyle & Typeface.BOLD) != 0 && weight == WXStyle.UNSET)) {
+            || ((oldStyle & Typeface.BOLD) != 0 && weight == WXStyle.UNSET)) {
       want |= Typeface.BOLD;
     }
 
     if ((style == Typeface.ITALIC)
-      || ((oldStyle & Typeface.ITALIC) != 0 && style == WXStyle.UNSET)) {
+            || ((oldStyle & Typeface.ITALIC) != 0 && style == WXStyle.UNSET)) {
       want |= Typeface.ITALIC;
     }
 
