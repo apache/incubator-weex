@@ -1,6 +1,6 @@
 #!/bin/bash
 CURRENT_PATH=$(cd `dirname $0`; pwd)
-ROOT_WEEX_JAVA_PATH=$CURRENT_PATH"/../../../../../../sdk/src/main/java/"
+ROOT_WEEX_JAVA_PATH=$CURRENT_PATH"../../../../android/sdk/src/main/java/"
 WEEX_OUTPUT_DIR=$CURRENT_PATH"/jniheader/"
 WEEX_GEN_FILE=$CURRENT_PATH"/jni_generator.py"
 while read line

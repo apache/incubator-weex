@@ -40,7 +40,6 @@ public class WXA extends WXDiv {
 
   @Override
   protected void onHostViewInitialized(WXFrameLayout host) {
-    super.onHostViewInitialized(host);
     addClickListener(new OnClickListener() {
       @Override
       public void onHostViewClick() {
@@ -51,6 +50,7 @@ public class WXA extends WXDiv {
         }
       }
     });
+    super.onHostViewInitialized(host);
   }
 
   @Override
