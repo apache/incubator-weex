@@ -37,6 +37,8 @@
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
 #import "WXLayoutDefine.h"
+#import "WXSDKInstance_performance.h"
+#import "WXRootView.h"
 
 static NSThread *WXComponentThread;
 
@@ -284,12 +286,16 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         component->_lazyCreateView = YES;
     }
     
+    [self recordMaximumVirtualDom:component];
+    
     if (!component->_isTemplate) {
         __weak typeof(self) weakSelf = self;
+        BOOL isFSCreateFinish = [self weexInstance].isJSCreateFinish;
         [self _addUITask:^{
             [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
             [supercomponent insertSubview:component atIndex:index];
             [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+            [weakSelf onElementChange:isFSCreateFinish];
         }];
     }
     
@@ -348,6 +354,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [_indexDict removeObjectForKey:ref];
     
     __weak typeof(self) weakSelf = self;
+    BOOL isFSCreateFinish = [self weexInstance].isJSCreateFinish;
     [self _addUITask:^{
         [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
         if (component.supercomponent) {
@@ -355,9 +362,53 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         [component removeFromSuperview];
         [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
+        [weakSelf onElementChange:isFSCreateFinish];
     }];
     
     [self _checkFixedSubcomponentToRemove:component];
+    
+}
+
+- (void)onElementChange:(BOOL)isFSCreateFinish
+{
+    if (!isFSCreateFinish) {
+        return;
+    }
+    
+    UIView *root = [self weexInstance].rootView;
+    BOOL hasEvent = TRUE;
+    if (root && [root isKindOfClass:[WXRootView class]]) {
+        WXRootView* wxRootView = (WXRootView *)root;
+        hasEvent = [wxRootView isHasEvent];
+    }
+    if (hasEvent) {
+        return;
+    }
+    double current = CACurrentMediaTime()*1000;
+    
+    double diff =  current - [self weexInstance].performance.jsCreateFinishTime;
+    if (diff > 8000) {
+        return;
+    }
+    [self weexInstance].performance.interactionTime = current - self.weexInstance.performance.renderTimeOrigin;
+}
+
+- (void)recordMaximumVirtualDom:(WXComponent*) component
+{
+    WXAssertComponentExist(component);
+    if(!component){
+        return;
+    }
+    int maxDeep =0;
+    while (component) {
+        maxDeep++;
+        component = component.supercomponent;
+    }
+    if(maxDeep > [self weexInstance].performance.maxVdomDeep)
+    {
+        [self weexInstance].performance.maxVdomDeep = maxDeep;
+    }
+   
 }
 
 - (void)_checkFixedSubcomponentToRemove:(WXComponent *)component
@@ -678,6 +729,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
             instance.renderFinish(rootView);
         }
     }];
+    [instance updatePerDicAfterCreateFinish];
 }
 
 - (void)updateFinish

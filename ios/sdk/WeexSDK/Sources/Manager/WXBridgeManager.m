@@ -29,6 +29,8 @@
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
 #import "WXBridgeContext.h"
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
 
 @interface WXBridgeManager ()
 
@@ -345,6 +347,10 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     }
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     
+    if(instance && !instance.isJSCreateFinish)
+    {
+        instance.performance.fsCallEventNum++;
+    }
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
     [self callJsMethod:method];
 }
