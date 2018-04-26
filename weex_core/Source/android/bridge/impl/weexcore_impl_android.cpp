@@ -565,6 +565,14 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     }
     styleKeyCache.clear();
 
+    for (auto iter = RefCache.begin(); iter != RefCache.end(); iter++) {
+      if (iter->second != nullptr) {
+        delete iter->second;
+        iter->second = nullptr;
+      }
+    }
+    RefCache.clear();
+
     if (jThis)
       env->DeleteGlobalRef(jThis);
     if (jWMThis)
