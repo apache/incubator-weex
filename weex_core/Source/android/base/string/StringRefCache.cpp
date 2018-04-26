@@ -1,13 +1,12 @@
 #include <iostream>
 #include <map>
-#include <android/base/log_utils.h>
 #include "StringRefCache.h"
 
 
 void StringRefCache::clearRefCache(JNIEnv *env) {
     for (auto iter = mCache.begin(); iter != mCache.end(); iter++) {
         if (iter->second != nullptr) {
-            env->DeleteGlobalRef(iter->second);
+            env->DeleteWeakGlobalRef(iter->second);
             iter->second = nullptr;
         }
     }
@@ -20,7 +19,7 @@ jstring StringRefCache::GetString(JNIEnv *env, const char *key) {
         return (jstring) iter->second;
     } else {
         const jstring jRef = env->NewStringUTF(key);
-        const jobject jGlobalRef = env->NewGlobalRef(jRef);
+        const jobject jGlobalRef = env->NewWeakGlobalRef(jRef);
         mCache.insert(std::pair<const char *, jobject>(key, jGlobalRef));
         env->DeleteLocalRef(jRef);
         return (jstring) jGlobalRef;
