@@ -150,7 +150,7 @@
 		744D61151E4AF23E00B624B3 /* WXDiffUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 744D61131E4AF23E00B624B3 /* WXDiffUtil.m */; };
 		745B2D681E5A8E1E0092D38A /* WXMultiColumnLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D5E1E5A8E1E0092D38A /* WXMultiColumnLayout.h */; };
 		745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D5F1E5A8E1E0092D38A /* WXMultiColumnLayout.m */; };
-		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
+		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		745B2D6B1E5A8E1E0092D38A /* WXRecyclerComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D611E5A8E1E0092D38A /* WXRecyclerComponent.mm */; };
 		745B2D6C1E5A8E1E0092D38A /* WXRecyclerDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D621E5A8E1E0092D38A /* WXRecyclerDataController.h */; };
 		745B2D6D1E5A8E1E0092D38A /* WXRecyclerDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D631E5A8E1E0092D38A /* WXRecyclerDataController.m */; };
