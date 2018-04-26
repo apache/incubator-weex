@@ -36,6 +36,8 @@
 		17E5ACDB2091F05700EE81F1 /* WXComponent+Layout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 176BE43B209172330086B6AF /* WXComponent+Layout.mm */; };
 		17E5ACDC2091F05E00EE81F1 /* WXCoreLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17C7B4FE20452E1700A2296A /* WXCoreLayout.cpp */; };
 		17E5ACDD2091F06300EE81F1 /* WXCoreStyle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17C7B50120452E1800A2296A /* WXCoreStyle.cpp */; };
+		17E5ACE2209211BD00EE81F1 /* WXTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = 333D9A261F41507A007CED39 /* WXTransition.mm */; };
+		17E5ACE3209211C200EE81F1 /* WXTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 333D9A251F41507A007CED39 /* WXTransition.h */; };
 		17F2D6E72087227300084378 /* WXAnalyzerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 17C74F0E2072147A00AB4CAB /* WXAnalyzerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C1A2BED1D91172800539AA1 /* WXConvertTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C1A2BEC1D91172800539AA1 /* WXConvertTests.m */; };
 		1D3000F11D40B9AC004F3B4F /* WXClipboardModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D3000EF1D40B9AB004F3B4F /* WXClipboardModule.h */; };
@@ -150,7 +152,7 @@
 		744D61151E4AF23E00B624B3 /* WXDiffUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 744D61131E4AF23E00B624B3 /* WXDiffUtil.m */; };
 		745B2D681E5A8E1E0092D38A /* WXMultiColumnLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D5E1E5A8E1E0092D38A /* WXMultiColumnLayout.h */; };
 		745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D5F1E5A8E1E0092D38A /* WXMultiColumnLayout.m */; };
-		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
+		745B2D6A1E5A8E1E0092D38A /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		745B2D6B1E5A8E1E0092D38A /* WXRecyclerComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D611E5A8E1E0092D38A /* WXRecyclerComponent.mm */; };
 		745B2D6C1E5A8E1E0092D38A /* WXRecyclerDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D621E5A8E1E0092D38A /* WXRecyclerDataController.h */; };
 		745B2D6D1E5A8E1E0092D38A /* WXRecyclerDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 745B2D631E5A8E1E0092D38A /* WXRecyclerDataController.m */; };
@@ -1946,6 +1948,7 @@
 				DCA445FF1EFA5A4600D0CFA8 /* WXInstanceWrap.h in Headers */,
 				DCE2CF9C1F46D4310021BDC4 /* WXVoiceOverModule.h in Headers */,
 				C42E8FAB1F3C7C09001EBE9D /* WXExtendCallNativeProtocol.h in Headers */,
+				17E5ACE3209211C200EE81F1 /* WXTransition.h in Headers */,
 				DCA445F31EFA5A2500D0CFA8 /* WXFooterComponent.h in Headers */,
 				DCA446151EFA5A9000D0CFA8 /* WXBridgeContext.h in Headers */,
 				DCA4461A1EFA5AA000D0CFA8 /* WXInvocationConfig.h in Headers */,
@@ -2224,6 +2227,7 @@
 				742AD7321DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.m in Sources */,
 				74CFDD421F45941E007A1A66 /* WXRecycleListTemplateManager.m in Sources */,
 				747DF6831E31AEE4005C53A8 /* WXLength.m in Sources */,
+				17E5ACE2209211BD00EE81F1 /* WXTransition.mm in Sources */,
 				77E65A0E1C155E99008B8775 /* WXDivComponent.m in Sources */,
 				ED053502207F4DEB007B4568 /* JSContext+Weex.m in Sources */,
 				2A60CE9D1C91733E00857B9F /* WXSwitchComponent.mm in Sources */,
