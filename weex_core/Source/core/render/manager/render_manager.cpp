@@ -197,7 +197,7 @@ namespace WeexCore {
 #if RENDER_LOG
     LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
 #endif
-
+    page->OnRenderPageClose();
     mPages.erase(pageId);
     delete page;
     page = nullptr;

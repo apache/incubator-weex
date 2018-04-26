@@ -24,6 +24,7 @@
 #include "bridge_impl_android.h"
 #include <core/layout/style.h>
 #include <map>
+#include <android/base/string/StringRefCache.h>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -373,8 +374,10 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    StringRefCache* refCache = GetStringRefCache(pageId);
+    jstring jPageId = refCache->GetString(env, pageId);
+    jstring jRef = refCache->GetString(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -452,10 +455,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateBody");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
@@ -474,9 +473,10 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
-    jstring jParentRef = env->NewStringUTF(parentRef);
+    StringRefCache* refCache = GetStringRefCache(pageId);
+    jstring jPageId = refCache->GetString(env, pageId);
+    jstring jRef = refCache->GetString(env, ref);
+    jstring jParentRef = refCache->GetString(env, parentRef);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -552,12 +552,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-    if (jParentRef != nullptr)
-      env->DeleteLocalRef(jParentRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);

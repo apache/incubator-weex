@@ -23,6 +23,7 @@
 #include <android/base/string/scoped_jstring.h>
 #include <android/base/string/scoped_jstring_utf8.h>
 #include <android/jsengine/multiprocess/WeexJSConnection.h>
+#include <android/base/string/StringRefCache.h>
 #include <jni.h>
 #include <string>
 #include <unistd.h>
@@ -43,6 +44,7 @@ extern jstring getComponentTypeFromCache(const std::string type);
 extern jstring putComponentTypeToCache(const std::string type);
 extern jstring getStyleKeyFromCache(const std::string key);
 extern jstring putStyleKeyToCache(const std::string key);
+extern StringRefCache *GetStringRefCache(const char * pageId);
 
 namespace WeexCore {
 

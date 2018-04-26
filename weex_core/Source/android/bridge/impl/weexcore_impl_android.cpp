@@ -41,6 +41,15 @@ jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
 std::map<std::string, jobject> styleKeyCache;
 
+struct ptrCmp
+{
+    bool operator()( const char * s1, const char * s2 ) const
+    {
+      return strcmp( s1, s2 ) < 0;
+    }
+};
+std::map<const char *, StringRefCache *, ptrCmp> RefCache;
+
 static JavaVM *sVm = NULL;
 
 JNIEnv *getJNIEnv() {
@@ -85,6 +94,17 @@ jstring putStyleKeyToCache(const std::string key) {
   styleKeyCache.insert(std::pair<std::string, jobject>(key, jGlobalKey));
   env->DeleteLocalRef(jKey);
   return (jstring) jGlobalKey;
+}
+
+StringRefCache *GetStringRefCache(const char * pageId) {
+  std::map<const char *, StringRefCache *>::const_iterator iter = RefCache.find(pageId);
+  if (iter != RefCache.end()) {
+    return (StringRefCache *)(iter->second);
+  } else {
+    StringRefCache* refCache = new StringRefCache();
+    RefCache.insert(std::pair<const char *, StringRefCache *>(pageId, refCache));
+    return refCache;
+  }
 }
 
 static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
@@ -163,10 +183,10 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
-#if RENDER_LOG
-    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", jString2StrFast(env, instanceId).c_str(),
-         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
-#endif
+//#if RENDER_LOG
+//    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", jString2StrFast(env, instanceId).c_str(),
+//         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
+//#endif
 
     if (!page->needLayout.load()) {
       page->needLayout.store(true);
