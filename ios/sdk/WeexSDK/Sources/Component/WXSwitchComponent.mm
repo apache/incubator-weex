@@ -20,6 +20,7 @@
 #import "WXSwitchComponent.h"
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+Layout.h"
 
 @interface WXSwitchView : UISwitch
 
@@ -68,8 +69,19 @@
             _tintColor = [WXConvert UIColor:attributes[@"tintColor"]];
         }
         
-        self.cssNode->style.dimensions[CSS_WIDTH] = 51;
-        self.cssNode->style.dimensions[CSS_HEIGHT] = 31;
+//#ifndef USE_FLEX
+        if (![WXComponent isUseFlex])
+        {
+            self.cssNode->style.dimensions[CSS_WIDTH] = 51;
+            self.cssNode->style.dimensions[CSS_HEIGHT] = 31;
+        }
+//#else
+        else
+        {
+            self.flexCssNode->setStyleWidth(51,NO);
+            self.flexCssNode->setStyleHeight(31);
+        }
+//#endif
     }
     return self;
 }

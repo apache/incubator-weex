@@ -77,6 +77,7 @@ typedef enum : NSUInteger {
     BOOL _syncDestroyComponentManager;
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context
+    CGFloat _defaultPixelScaleFactor;
 }
 
 - (void)dealloc
@@ -102,7 +103,7 @@ typedef enum : NSUInteger {
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
-
+        
         [WXSDKManager storeInstance:self forID:_instanceId];
         
         _bizType = @"";
@@ -122,6 +123,7 @@ typedef enum : NSUInteger {
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             _syncDestroyComponentManager = [[configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL] boolValue];
         }
+        _defaultPixelScaleFactor = CGFLOAT_MIN;
         
         [self addObservers];
     }
@@ -183,6 +185,9 @@ typedef enum : NSUInteger {
 
 - (void)setFrame:(CGRect)frame
 {
+#ifdef DEBUG
+    NSLog(@"test -> setFrame :%@,instance :%@",NSStringFromCGRect(frame),self);
+#endif
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;
         WXPerformBlockOnMainThread(^{
@@ -583,7 +588,12 @@ typedef enum : NSUInteger {
     if (self.viewportWidth > 0) {
         return [WXUtility portraitScreenSize].width / self.viewportWidth;
     } else {
-        return [WXUtility defaultPixelScaleFactor];
+        if (_defaultPixelScaleFactor != CGFLOAT_MIN) {
+            return _defaultPixelScaleFactor;
+        }
+        
+        _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
+        return _defaultPixelScaleFactor;
     }
 }
 

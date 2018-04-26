@@ -36,15 +36,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 @package
     NSString *_type;
     NSMutableArray *_subcomponents;
-    /**
-     *  Layout
-     */
-    css_node_t *_cssNode;
-    BOOL _isLayoutDirty;
-    CGRect _calculatedFrame;
-    CGPoint _absolutePosition;
-    WXPositionType _positionType;
-    
     
     //Transition
     WXTransition *_transition;
@@ -211,6 +202,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
+
+- (void)_initFlexCssNodeWithStyles:(NSDictionary *)styles;
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 

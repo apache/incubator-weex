@@ -22,6 +22,7 @@
 #import "WXLoadingIndicator.h"
 #import "WXComponent_internal.h"
 #import "WXLog.h"
+#import "WXComponent+Layout.h"
 
 @interface WXLoadingComponent()
 
@@ -48,7 +49,18 @@
                 WXLogError(@"");
             }
         }
-        self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+//#ifndef USE_FLEX
+        if(![WXComponent isUseFlex])
+        {
+             self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+        }
+//#else
+        else
+        {
+             self.flexCssNode->setStylePositionType(WeexCore::kAbsolute);
+        }
+       
+//#endif
     }
     return self;
 }

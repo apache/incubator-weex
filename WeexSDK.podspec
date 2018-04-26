@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios
   s.ios.deployment_target = '8.0'
   s.source =  { :path => '.' }
-  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
+  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c,cpp}'
   s.resources = 'pre-build/*.js','ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
 
   s.user_target_xcconfig  = { 'FRAMEWORK_SEARCH_PATHS' => "'$(PODS_ROOT)/WeexSDK'" }
