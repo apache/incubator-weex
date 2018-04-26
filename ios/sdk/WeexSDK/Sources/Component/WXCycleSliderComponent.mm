@@ -23,6 +23,7 @@
 #import "NSTimer+Weex.h"
 #import "WXSDKManager.h"
 #import "WXUtility.h"
+#import "WXComponent+Layout.h"
 
 typedef NS_ENUM(NSInteger, Direction) {
     DirectionNone = 1 << 0,
@@ -421,7 +422,17 @@ typedef NS_ENUM(NSInteger, Direction) {
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
         _infinite = attributes[@"infinite"] ? [WXConvert BOOL:attributes[@"infinite"]] : YES;
-        self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
+//#ifndef USE_FLEX
+        if (![WXComponent isUseFlex]) {
+            self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
+        }
+//#else
+        else
+        {
+              self.flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
+        }
+//#endif
+        
     }
     return self;
 }

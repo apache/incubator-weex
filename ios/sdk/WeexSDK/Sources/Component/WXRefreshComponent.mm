@@ -22,6 +22,7 @@
 #import "WXLoadingIndicator.h"
 #import "WXComponent_internal.h"
 #import "WXLog.h"
+#import "WXComponent+Layout.h"
 
 @interface WXRefreshComponent()
 
@@ -51,7 +52,17 @@
                 WXLogError(@"");
             }
         }
-        self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+//#ifndef USE_FLEX
+        if (![WXComponent isUseFlex]) {
+          self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+        }
+//#else
+        else
+        {
+            self.flexCssNode->setStylePositionType(WeexCore::kAbsolute);
+        }
+       
+//#endif
     }
     return self;
 }
@@ -86,6 +97,9 @@
     if (!_refreshEvent || _displayState) {
         return;
     }
+#ifdef DEBUG
+    WXLogDebug(@"flexLayout -> refreshComponent : refresh ref:%@",self.ref);
+#endif
     [self fireEvent:@"refresh" params:nil];
 }
 
@@ -94,6 +108,9 @@
     if (!_pullingdownEvent) {
         return ;
     }
+#ifdef DEBUG
+    WXLogDebug(@"flexLayout -> refreshComponent : pullingdown ,ref:%@",self.ref);
+#endif
     
     [self fireEvent:@"pullingdown" params:param];
 }

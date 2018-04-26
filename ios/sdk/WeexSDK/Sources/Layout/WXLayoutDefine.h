@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#if defined __cplusplus
+extern "C" {
+#endif
 
 #define WX_LAYOUT_NAMESPACE wx_
 
@@ -53,5 +56,8 @@
 
 #import "Layout.h"
 
+#if defined __cplusplus
+};
+#endif
 
 

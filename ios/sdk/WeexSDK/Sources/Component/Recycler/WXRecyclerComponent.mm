@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -33,6 +34,8 @@
 #import "NSObject+WXSwizzle.h"
 #import "WXComponent+Events.h"
 #import "WXRecyclerDragController.h"
+#import "WXComponent+Layout.h"
+#import "WXScrollerComponent+Layout.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -465,7 +468,17 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+        return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    }
+//#else
+    else
+    {
+        return self.flexScrollerCSSNode->getStyleWidth();
+    }
+//#endif
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -635,12 +648,29 @@ typedef enum : NSUInteger {
 
 - (void)_fillPadding
 {
-    UIEdgeInsets padding = {
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
-    };
+    UIEdgeInsets padding;
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+        padding = {
+            WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
+            WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
+            WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
+            WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
+        };
+    }
+//#else
+    else
+    {
+        padding = {
+            WXFloorPixelValue(self.flexCssNode->getPaddingTop() + self.flexCssNode->getBorderWidthTop()),
+            WXFloorPixelValue(self.flexCssNode->getPaddingLeft() + self.flexCssNode->getBorderWidthLeft()),
+            WXFloorPixelValue(self.flexCssNode->getPaddingBottom() + self.flexCssNode->getBorderWidthBottom()),
+            WXFloorPixelValue(self.flexCssNode->getPaddingRight() + self.flexCssNode->getBorderWidthRight())
+        };
+    }
+//#endif
+    
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         _padding = padding;

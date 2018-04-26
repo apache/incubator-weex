@@ -32,6 +32,7 @@
 #import "WXBridgeManager.h"
 #import "WXSDKManager.h"
 #import "WXComponent+DataBinding.h"
+#import "WXComponent+Layout.h"
 
 @interface WXRecycleListComponentView:UICollectionView
 @end

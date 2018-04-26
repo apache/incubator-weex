@@ -24,6 +24,7 @@
 #import "WXIndicatorComponent.h"
 #import "WXSDKInstance.h"
 #import "NSTimer+Weex.h"
+#import "WXComponent+Layout.h"
 
 #define MAX_VISIBLE_ITEMS 30
 #define MIN_TOGGLE_DURATION 0.2
@@ -488,14 +489,14 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return [self viewOrSuperview:view.superview implementsSelector:selector];
 }
 
-- (id)viewOrSuperview:(UIView *)view ofClass:(Class)class
+- (id)viewOrSuperview:(UIView *)view ofClass:(Class)swizzClass
 {
     if (!view || view == self.contentView) {
         return nil;
-    } else if ([view isKindOfClass:class]) {
+    } else if ([view isKindOfClass:swizzClass]) {
         return view;
     }
-    return [self viewOrSuperview:view.superview ofClass:class];
+    return [self viewOrSuperview:view.superview ofClass:swizzClass];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch
@@ -1447,8 +1448,16 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
     }
-    self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
-    
+//#ifndef USE_FLEX
+    if (![WXComponent isUseFlex]) {
+        self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
+    }
+//#else
+    else
+    {
+        self.flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
+    }
+//#endif
     return self;
 }
 
