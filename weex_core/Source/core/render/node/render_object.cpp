@@ -1,0 +1,139 @@
+#include <core/render/node/render_object.h>
+#include <android/bridge/impl/content_box_measurement_impl_android.h>
+#include <android/bridge/impl/measure_mode_impl_android.h>
+#include <android/base/jni/scoped_java_ref.h>
+#include <android/bridge/impl/weexcore_impl_android.h>
+#include <android/base/string/string_utils.h>
+#include <string.h>
+
+using namespace std;
+namespace WeexCore {
+
+  RenderObject::RenderObject() {
+    mStyles = new StylesMap();
+    mAttributes = new AttributesMap();
+    mEvents = new EventsSet();
+    mMeasureFunc_Impl_Android = nullptr;
+    mIsRootRender = false;
+  }
+
+  RenderObject::~RenderObject() {
+
+    JNIEnv *env = getJNIEnv();
+
+    mParentRender = nullptr;
+
+    if (mStyles != nullptr) {
+      delete mStyles;
+      mStyles = nullptr;
+    }
+    if (mAttributes != nullptr) {
+      delete mAttributes;
+      mAttributes = nullptr;
+    }
+    if (mEvents != nullptr) {
+      delete mEvents;
+      mEvents = nullptr;
+    }
+
+    if (mMeasureFunc_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mMeasureFunc_Impl_Android);
+      mMeasureFunc_Impl_Android = nullptr;
+    }
+
+    for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      RenderObject* child = static_cast<RenderObject*>(*it);
+      if (child != nullptr) {
+        delete child;
+        child = nullptr;
+      }
+    }
+  }
+
+  void RenderObject::ApplyDefaultStyle() {
+    std::map<std::string, std::string> *style = GetDefaultStyle();
+
+    if (style == nullptr)
+      return;
+
+    for (auto iter = style->cbegin(); iter != style->cend(); iter++)
+      AddStyle(iter->first, iter->second);
+
+    if (style != nullptr) {
+      delete style;
+      style = nullptr;
+    }
+  }
+
+  void RenderObject::ApplyDefaultAttr() {
+    std::map<std::string, std::string> *attrs = GetDefaultAttr();
+
+    if (attrs == nullptr)
+      return;
+
+    for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+        UpdateAttr(iter->first, iter->second);
+    }
+
+    if (attrs != nullptr) {
+      delete attrs;
+      attrs = nullptr;
+    }
+  }
+
+  WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+                              float height, MeasureMode heightMeasureMode) {
+    JNIEnv *env = getJNIEnv();
+    WXCoreSize size;
+    size.height = 0;
+    size.width = 0;
+
+    jobject measureFunc = ((RenderObject *) node)->GetMeasureFuncImplAndroid();
+
+    if (node == nullptr || measureFunc == nullptr)
+      return size;
+
+    int widthMode = Unspecified(env);
+    int heightMode = Unspecified(env);
+    if (widthMeasureMode == kExactly)
+      widthMode = Exactly(env);
+    if (heightMeasureMode == kExactly)
+      heightMode = Exactly(env);
+    cumsmeasure_Imple_Android(env, measureFunc,
+                              width, height,
+                              widthMode, heightMode);
+    size.width = GetLayoutWidth(env, measureFunc);
+    size.height = GetLayoutHeight(env, measureFunc);
+
+    return size;
+  }
+
+  bool RenderObject::BindMeasureFuncImplAndroid(jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android == nullptr)
+      return false;
+    this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_impl_android);
+    setMeasureFunc(measureFunc_Impl);
+    return true;
+  }
+
+  bool RenderObject::BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios) {
+    if (measureFunc_impl_ios == nullptr)
+      return false;
+    setMeasureFunc(measureFunc_impl_ios);
+    return true;
+  }
+
+  void RenderObject::onLayoutBefore() {
+    if (this->GetMeasureFuncImplAndroid() == nullptr)
+      return;
+    JNIEnv *env = getJNIEnv();
+    LayoutBeforeImplAndroid(env, this->GetMeasureFuncImplAndroid());
+  }
+
+  void RenderObject::onLayoutAfter(float width, float height) {
+    if (this->GetMeasureFuncImplAndroid() == nullptr)
+      return;
+    JNIEnv *env = getJNIEnv();
+    LayoutAfterImplAndroid(env, this->GetMeasureFuncImplAndroid(), width, height);
+  }
+} //end WeexCore

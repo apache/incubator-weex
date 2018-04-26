@@ -34,21 +34,23 @@ public final class NativeInvokeHelper {
   private String mInstanceId;
 
   public NativeInvokeHelper(String instanceId){
-      mInstanceId = instanceId;
+    mInstanceId = instanceId;
   }
 
   public Object invoke(final Object target,final Invoker invoker,JSONArray args) throws Exception {
     final Object[] params = prepareArguments(
-        invoker.getParameterTypes(),
-        args);
+            invoker.getParameterTypes(),
+            args);
     if (invoker.isRunOnUIThread()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
-          try {
-            invoker.invoke(target, params);
-          } catch (Exception e) {
-            throw new RuntimeException(target + "Invoker " + invoker.toString() ,e);
+          if (invoker != null) {
+            try {
+              invoker.invoke(target, params);
+            } catch (Exception e) {
+              throw new RuntimeException(target + "Invoker " + invoker.toString(), e);
+            }
           }
         }
       }, 0);

@@ -18,11 +18,8 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.view.ViewGroup;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.ui.view.WXScrollView;
 import org.junit.After;
 import org.junit.Before;
@@ -31,8 +28,6 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 8/25/16.

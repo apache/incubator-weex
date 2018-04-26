@@ -52,8 +52,8 @@ public class WXRefreshView extends FrameLayout {
   private void setupViews() {
     linearLayout = new LinearLayout(getContext());
     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams
-                                                                     .MATCH_PARENT,FrameLayout
-        .LayoutParams.MATCH_PARENT);
+            .MATCH_PARENT,FrameLayout
+            .LayoutParams.MATCH_PARENT);
     linearLayout.setOrientation(LinearLayout.VERTICAL);
     linearLayout.setGravity(Gravity.CENTER);
     addView(linearLayout,lp);

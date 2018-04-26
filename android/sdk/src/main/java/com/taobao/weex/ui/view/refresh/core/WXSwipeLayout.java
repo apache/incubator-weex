@@ -241,20 +241,20 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   public boolean startNestedScroll(int axes) {
     boolean result = mNestedScrollingChildHelper.startNestedScroll(axes);
     if(result){
-       if(mNestedScrollAcceptedParent == null){
-            ViewParent parent  = this.getParent();
-            View child = this;
-            while (parent != null) {
-              if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
-                 mNestedScrollAcceptedParent = parent;
-                 break;
-              }
-              if(parent instanceof  View){
-                child = (View) parent;
-              }
-              parent = parent.getParent();
-            }
-       }
+      if(mNestedScrollAcceptedParent == null){
+        ViewParent parent  = this.getParent();
+        View child = this;
+        while (parent != null) {
+          if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
+            mNestedScrollAcceptedParent = parent;
+            break;
+          }
+          if(parent instanceof  View){
+            child = (View) parent;
+          }
+          parent = parent.getParent();
+        }
+      }
     }
     return result;
   }
@@ -385,6 +385,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     int spinnerDy = (int) calculateDistanceY(target, dy);
 
+    mRefreshing = false;
+
     if (!isConfirm) {
       if (spinnerDy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;
@@ -403,7 +405,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       }else if (!canChildScrollDown() && mPullLoadEnable
               && mTargetView.getTranslationY() < 0
               && dy < 0){
-         consumed[1] += dy;
+        consumed[1] += dy;
       }else{
         consumed[1] += spinnerDy;
       }
@@ -685,8 +687,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       if (mTargetView instanceof AbsListView) {
         final AbsListView absListView = (AbsListView) mTargetView;
         return absListView.getChildCount() > 0
-               && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
-                                                                    .getTop() < absListView.getPaddingTop());
+                && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+                .getTop() < absListView.getPaddingTop());
       } else {
         return ViewCompat.canScrollVertically(mTargetView, -1) || mTargetView.getScrollY() > 0;
       }
@@ -708,9 +710,9 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         final AbsListView absListView = (AbsListView) mTargetView;
         if (absListView.getChildCount() > 0) {
           int lastChildBottom = absListView.getChildAt(absListView.getChildCount() - 1)
-              .getBottom();
+                  .getBottom();
           return absListView.getLastVisiblePosition() == absListView.getAdapter().getCount() - 1
-                 && lastChildBottom <= absListView.getMeasuredHeight();
+                  && lastChildBottom <= absListView.getMeasuredHeight();
         } else {
           return false;
         }

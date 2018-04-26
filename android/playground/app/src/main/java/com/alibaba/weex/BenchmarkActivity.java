@@ -45,8 +45,7 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
   public final static String ROOT = "root";
   private final static String TAG = "WEEX";
   private final static String URL =
-      "http://h5.waptest.taobao.com/app/weextc031/build/TC_Monitor_List_WithAppendTree.js";
-  public static CountingIdlingResource countingIdlingResource;
+      "http://h5.m.taobao.com/js/src/weexlist.js";
   private WXSDKInstance mInstance;
   private LinearLayout root;
   private long startTime;
@@ -135,10 +134,12 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
 
   @Override
   public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-    if (countingIdlingResource != null) {
-      countingIdlingResource.decrement();
-    }
-    perfEnd = true;
+    root.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        perfEnd = true;
+      }
+    }, 1000);
   }
 
   @Override
@@ -151,12 +152,17 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
 
   }
 
+  public boolean isRenderFinish(){
+    return perfEnd;
+  }
+
   public WXSDKInstance getWXInstance() {
     return mInstance;
   }
 
   public void loadWeexPage(final boolean weex) {
     isWeex=weex;
+    perfEnd = false;
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -168,9 +174,6 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
           Map<String, Object> options = new HashMap<>();
           options.put(WXSDKInstance.BUNDLE_URL, "file://assets/hello_weex.js");
           mInstance.registerRenderListener(BenchmarkActivity.this);
-          if (countingIdlingResource != null) {
-            countingIdlingResource.increment();
-          }
           perfStart = true;
           Log.v(TAG, "Start: " + startTime);
           startTime = System.currentTimeMillis();
@@ -178,8 +181,6 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
                            WXFileUtils.loadAsset("hello.js", BenchmarkActivity.this),
                            options,
                            null,
-                           root.getWidth(),
-                           root.getHeight(),
                            WXRenderStrategy.APPEND_ASYNC);
         } else {
           root.removeAllViews();
@@ -196,6 +197,7 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
   }
 
   public void loadWeexPage(final String url) {
+    perfEnd = false;
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -206,16 +208,11 @@ public class BenchmarkActivity extends AppCompatActivity implements IWXRenderLis
         Map<String, Object> options = new HashMap<>();
         options.put(WXSDKInstance.BUNDLE_URL, url);
         mInstance.registerRenderListener(BenchmarkActivity.this);
-        if (countingIdlingResource != null) {
-          countingIdlingResource.increment();
-        }
         mInstance.renderByUrl(
             TAG,
             url,
             options,
             null,
-            root.getWidth(),
-            root.getHeight(),
             WXRenderStrategy.APPEND_ASYNC);
       }
     });

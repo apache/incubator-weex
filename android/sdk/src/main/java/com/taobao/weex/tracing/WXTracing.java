@@ -39,7 +39,7 @@ public class WXTracing {
   public static int nextId() {
     return sIdGenerator.getAndIncrement();
   }
-  
+
   public static boolean isAvailable() {
     return WXEnvironment.isApkDebugable();
   }

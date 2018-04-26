@@ -20,9 +20,6 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.dom.DOMActionContext;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.TraceableAction;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -54,69 +51,71 @@ public class ComponentUtils {
     /**
      * build component tree and dom tree for template list
      * */
-    public static synchronized final WXComponent buildTree(WXDomObject domObject, WXVContainer parent){
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(parent.getInstanceId());
-        if(domActionContext == null){
-            return null;
-        }
-        DomTreeBuilder builder = new DomTreeBuilder();
-        domObject.traverseTree(
-                domActionContext.getAddDOMConsumer(),
-                domActionContext.getApplyStyleConsumer()
-        );
-        return builder.buildComponentTree(domActionContext, domObject, parent);
-    }
+    // TODO
+//    public static synchronized final WXComponent buildTree(WXDomObject domObject, WXVContainer parent){
+//        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(parent.getInstanceId());
+//        if(domActionContext == null){
+//            return null;
+//        }
+//        DomTreeBuilder builder = new DomTreeBuilder();
+//        domObject.traverseTree(
+//                domActionContext.getAddDOMConsumer(),
+//                domActionContext.getApplyStyleConsumer()
+//        );
+//        return builder.buildComponentTree(domActionContext, domObject, parent);
+//    }
 
 
     /**
      * dom tree build
      * */
-    static class DomTreeBuilder extends TraceableAction {
-
-        private WXComponent buildComponentTree(DOMActionContext context, WXDomObject dom, WXVContainer parent) {
-            if (dom == null) {
-                return null;
-            }
-            long startNanos = System.nanoTime();
-            dom.setCloneThis(true);
-            WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
-            if (component != null) {
-                component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
-                component.mTraceInfo.rootEventId = mTracingEventId;
-                component.mTraceInfo.domQueueTime = mDomQueueTime;
-            }
-            context.registerComponent(dom.getRef(), component);
-            if (component instanceof WXVContainer) {
-                WXVContainer container = (WXVContainer) component;
-                WXDomObject parentDom = (WXDomObject) container.getDomObject();
-                for (int i = 0; i < dom.childCount(); ++i) {
-                    WXDomObject child = dom.getChild(i);
-                    if (child != null) {
-                        WXComponent childComponent = buildComponentTree(context, child, container);
-                        container.addChild(childComponent);
-                        WXDomObject childDomObject = (WXDomObject) childComponent.getDomObject();
-                        if(childDomObject != child) {
-                            int index = parentDom.index(child);
-                            parentDom.add(childDomObject, index);
-                            if(index >= 0) {
-                                parentDom.remove(child);
-                                i--;
-                            }
-                            RuntimeException exception = new IllegalArgumentException(childDomObject.getClass().getName()
-                                    + " not support clone this");
-                            WXLogUtils.e("weex", exception);
-                            if(WXEnvironment.isApkDebugable()){
-                                throw  exception;
-                            }
-                        }
-                    }
-                }
-            }
-            dom.setCloneThis(false);
-            if (component != null) {
-                component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
-            }
-            return component;
-        }
-    }
+    // TODO
+//    static class DomTreeBuilder extends TraceableAction {
+//
+//        private WXComponent buildComponentTree(DOMActionContext context, WXDomObject dom, WXVContainer parent) {
+//            if (dom == null) {
+//                return null;
+//            }
+//            long startNanos = System.nanoTime();
+//            dom.setCloneThis(true);
+//            WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
+//            if (component != null) {
+//                component.mTraceInfo.domThreadStart = dom.mDomThreadTimestamp;
+//                component.mTraceInfo.rootEventId = mTracingEventId;
+//                component.mTraceInfo.domQueueTime = mDomQueueTime;
+//            }
+//            context.registerComponent(dom.getRef(), component);
+//            if (component instanceof WXVContainer) {
+//                WXVContainer container = (WXVContainer) component;
+//                WXDomObject parentDom = (WXDomObject) container.getDomObject();
+//                for (int i = 0; i < dom.childCount(); ++i) {
+//                    WXDomObject child = dom.getChild(i);
+//                    if (child != null) {
+//                        WXComponent childComponent = buildComponentTree(context, child, container);
+//                        container.addChild(childComponent);
+//                        WXDomObject childDomObject = (WXDomObject) childComponent.getDomObject();
+//                        if(childDomObject != child) {
+//                            int index = parentDom.index(child);
+//                            parentDom.add(childDomObject, index);
+//                            if(index >= 0) {
+//                                parentDom.remove(child);
+//                                i--;
+//                            }
+//                            RuntimeException exception = new IllegalArgumentException(childDomObject.getClass().getName()
+//                                    + " not support clone this");
+//                            WXLogUtils.e("weex", exception);
+//                            if(WXEnvironment.isApkDebugable()){
+//                                throw  exception;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            dom.setCloneThis(false);
+//            if (component != null) {
+//                component.mTraceInfo.domThreadNanos = System.nanoTime() - startNanos;
+//            }
+//            return component;
+//        }
+//    }
 }

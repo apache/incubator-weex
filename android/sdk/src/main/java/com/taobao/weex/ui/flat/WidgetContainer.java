@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -23,22 +23,24 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.Pair;
 import android.view.ViewGroup;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.widget.AndroidViewWidget;
 import com.taobao.weex.ui.flat.widget.Widget;
+
 import java.util.LinkedList;
 import java.util.List;
 
 @RestrictTo(Scope.LIBRARY)
 public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<T> {
 
-  protected List<Widget> widgets = new LinkedList<>();
+  protected List<Widget> widgets;
 
-  public WidgetContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WidgetContainer(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   protected abstract void mountFlatGUI();
@@ -82,6 +84,9 @@ public abstract class WidgetContainer<T extends ViewGroup> extends WXVContainer<
   }
 
   private void addFlatChild(Widget widget, int index) {
+    if(widgets == null){
+      widgets = new LinkedList<>();
+    }
     if (index >= widgets.size()) {
       widgets.add(widget);
     } else {

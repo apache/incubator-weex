@@ -20,13 +20,10 @@ package com.taobao.weex.ui;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 8/4/16.
