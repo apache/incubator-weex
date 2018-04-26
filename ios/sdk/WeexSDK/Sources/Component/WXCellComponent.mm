@@ -38,7 +38,7 @@
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
 #ifdef DEBUG
-    NSLog(@"test -> init Cell: ref:%@, styles:%@",ref,styles);
+    WXLogDebug(@"flexLayout -> init Cell: ref:%@, styles:%@",ref,styles);
 #endif
     
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];

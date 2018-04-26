@@ -98,7 +98,7 @@
         return;
     }
 #ifdef DEBUG
-    NSLog(@"test -> refreshComponent : refresh ref:%@",self.ref);
+    WXLogDebug(@"flexLayout -> refreshComponent : refresh ref:%@",self.ref);
 #endif
     [self fireEvent:@"refresh" params:nil];
 }
@@ -109,7 +109,7 @@
         return ;
     }
 #ifdef DEBUG
-    NSLog(@"test -> refreshComponent : pullingdown ,ref:%@",self.ref);
+    WXLogDebug(@"flexLayout -> refreshComponent : pullingdown ,ref:%@",self.ref);
 #endif
     
     [self fireEvent:@"pullingdown" params:param];

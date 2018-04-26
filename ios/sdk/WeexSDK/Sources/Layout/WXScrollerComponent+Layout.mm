@@ -18,6 +18,7 @@
  */
 
 #import "WXScrollerComponent+Layout.h"
+#import "WXLog.h"
 
 @implementation WXScrollerComponent (FlexLayout)
 
@@ -35,7 +36,7 @@
 {
     self.flexScrollerCSSNode->addChildAt(subcomponent.flexCssNode, (uint32_t) index);
 #ifdef DEBUG
-    NSLog(@"test -> ref:%@,subNodeIndex:%ld,childCount:%ld",self.ref,(long)index,_flexScrollerCSSNode->getChildCount());
+    WXLogDebug(@"flexLayout -> ref:%@,subNodeIndex:%ld,childCount:%ld",self.ref,(long)index,_flexScrollerCSSNode->getChildCount());
 #endif
    
 //    WXLogInfo(@"FlexLayout -- P:%@ -> C:%@",self,subcomponent);
@@ -44,7 +45,7 @@
 {
     self.flexScrollerCSSNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG
-    NSLog(@"test -> ref:%@ ,scrollerCSSNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
+    WXLogDebug(@"flexLayout -> ref:%@ ,scrollerCSSNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
 #endif
 }
 

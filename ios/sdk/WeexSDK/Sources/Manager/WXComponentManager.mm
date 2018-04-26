@@ -347,7 +347,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 //#ifndef USE_FLEX
     if(![WXComponent isUseFlex])
     {
-        NSLog(@"test -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
+        WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
               supercomponent.type,
               supercomponent.ref,
               supercomponent.cssNode->style.dimensions[CSS_WIDTH],
@@ -362,7 +362,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 //#else
     else
     {
-        NSLog(@"test -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
+        WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
               supercomponent.type,
               supercomponent.ref,
               supercomponent.flexCssNode->getStyleWidth(),
@@ -972,7 +972,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         return;
     }
 #ifdef DEBUG
-    NSLog(@"test -> action__ calculateLayout root");
+    WXLogDebug(@"flexLayout -> action__ calculateLayout root");
 #endif
     
 //#ifndef USE_FLEX
@@ -1003,11 +1003,13 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 //#ifdef USE_FLEX
 - (void) _printFlexComonentFrame:(WXComponent *)component
 {
-    NSLog(@"node ref:%@, type:%@ , frame:%@",
+#ifdef DEBUG
+    WXLogDebug(@"node ref:%@, type:%@ , frame:%@",
           component.ref,
           component.type,
           NSStringFromCGRect(component.view.layer.frame)
           );
+#endif
     
   
     
@@ -1063,7 +1065,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         _rootCSSNode->layout.should_update = false;
 #ifdef DEBUG
-        NSLog(@"test -> root _calculateRootFrame");
+        WXLogDebug(@"flexLayout -> root _calculateRootFrame");
 #endif
         
         CGRect frame = CGRectMake(WXRoundPixelValue(_rootCSSNode->layout.position[CSS_LEFT]),
@@ -1086,7 +1088,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         _rootFlexCSSNode->setHasNewLayout(false);
 #ifdef DEBUG
-        NSLog(@"test -> root _calculateRootFrame");
+        WXLogDebug(@"flexLayout -> root _calculateRootFrame");
 #endif
         
         

@@ -139,8 +139,8 @@
         }
         
 #ifdef DEBUG
-        NSLog(@"test -> init component: ref : %@ , styles: %@",ref,styles);
-        NSLog(@"test -> init component: ref : %@ , attributes: %@",ref,attributes);
+        WXLogDebug(@"flexLayout -> init component: ref : %@ , styles: %@",ref,styles);
+        WXLogDebug(@"flexLayout -> init component: ref : %@ , attributes: %@",ref,attributes);
 #endif
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
 
@@ -233,7 +233,7 @@
     {
         if(self.flexCssNode){
 #ifdef DEBUG
-            NSLog(@"test -> dealloc %@",self.ref);
+            WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
 #endif
             delete self.flexCssNode;
         }
@@ -368,7 +368,7 @@
         
         _view = [self loadView];
 #ifdef DEBUG
-        NSLog(@"test -> loadView:addr-(%p),componentRef-(%@)",_view,self.ref);
+        WXLogDebug(@"flexLayout -> loadView:addr-(%p),componentRef-(%@)",_view,self.ref);
 #endif
         _layer = _view.layer;
         _view.frame = [self _fixIllegalFrame:_calculatedFrame];
@@ -589,7 +589,7 @@
             [self _insertChildCssNode:subcomponent atIndex:actualIndex];
         }else{
 #ifdef DEBUG
-            NSLog(@"test -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
+            WXLogDebug(@"flexLayout -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
                   self.ref,
                   self.type,
                   subcomponent.ref,
@@ -743,14 +743,14 @@
     }
 #ifdef DEBUG
     NSDictionary *copySelfStyle = [NSDictionary dictionaryWithDictionary:self.styles];
-    NSLog(@"tempTest -> ref:%@ style before : %@",self.ref,copySelfStyle);
+    WXLogDebug(@"flexLayout -> ref:%@ style before : %@",self.ref,copySelfStyle);
     
     if (styles) {
-        NSLog(@"tempTest -> ref:%@ update styles : %@",self.ref,styles);
+        WXLogDebug(@"flexLayout -> ref:%@ update styles : %@",self.ref,styles);
     }
     
     if (resetStyles) {
-        NSLog(@"tempTest -> ref:%@ update resetStyles : %@",self.ref,resetStyles);
+        WXLogDebug(@"flexLayout -> ref:%@ update resetStyles : %@",self.ref,resetStyles);
     }
 #endif
     
@@ -762,7 +762,7 @@
 #ifdef DEBUG
     //self.styles may change
     copySelfStyle = [NSDictionary dictionaryWithDictionary:self.styles];
-    NSLog(@"tempTest -> ref:%@ style after : %@",self.ref,copySelfStyle);
+    WXLogDebug(@"flexLayout -> ref:%@ style after : %@",self.ref,copySelfStyle);
 #endif
 }
 

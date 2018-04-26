@@ -238,7 +238,7 @@ static BOOL sUseFlex = TRUE;
             [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
         }
 #ifdef DEBUG
-        NSLog(@"test -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
+        WXLogDebug(@"flexLayout -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
 #endif
     }
     
@@ -265,7 +265,7 @@ static BOOL sUseFlex = TRUE;
             
             [self _frameDidCalculated:isFrameChanged];
 #ifdef DEBUG
-            NSLog(@"test -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
+            WXLogDebug(@"flexLayout -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
 #endif
         }
     
@@ -765,7 +765,7 @@ static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t w
     CGSize constrainedSize = CGSizeMake(width, height);
     CGSize resultSize = measureBlock(constrainedSize);
 #ifdef DEBUG
-    NSLog(@"test -> measureblock %@, resultSize:%@",
+    WXLogDebug(@"flexLayout -> measureblock %@, resultSize:%@",
           component.type,
           NSStringFromCGSize(resultSize)
           );
@@ -799,7 +799,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
     CGSize constrainedSize = CGSizeMake(width, height);
     CGSize resultSize = measureBlock(constrainedSize);
 #ifdef DEBUG
-    NSLog(@"test -> measureblock %@, resultSize:%@",
+    WXLogDebug(@"flexLayout -> measureblock %@, resultSize:%@",
           component.type,
           NSStringFromCGSize(resultSize)
           );
@@ -942,7 +942,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 {
     self.flexCssNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG
-    NSLog(@"test -> ref:%@ ,flexCssNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
+    WXLogDebug(@"flexLayout -> ref:%@ ,flexCssNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
 #endif
 }
 

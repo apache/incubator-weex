@@ -137,7 +137,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: addElement : %@",elementData[@"type"]);
+            WXLogDebug(@"flexLayout -> action: addElement : %@",elementData[@"type"]);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -163,7 +163,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: createBody %@ ref:%@",bodyData[@"type"],bodyData[@"ref"]);
+            WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@",bodyData[@"type"],bodyData[@"ref"]);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -190,7 +190,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: removeElement ref:%@",ref);
+            WXLogDebug(@"flexLayout -> action: removeElement ref:%@",ref);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -216,7 +216,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: moveElement ,ref:%@ to ref:%@",ref,parentRef);
+            WXLogDebug(@"flexLayout -> action: moveElement ,ref:%@ to ref:%@",ref,parentRef);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -241,7 +241,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: updateAttrs ref:%@,attr:%@",ref,attrsData);
+            WXLogDebug(@"flexLayout -> action: updateAttrs ref:%@,attr:%@",ref,attrsData);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -268,7 +268,7 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             
 #ifdef DEBUG
-            NSLog(@"test -> action: updateStyles ref:%@,styles:%@",ref,stylesData);
+            WXLogDebug(@"flexLayout -> action: updateStyles ref:%@,styles:%@",ref,stylesData);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -293,7 +293,7 @@ _Pragma("clang diagnostic pop") \
         
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: addEvent ref:%@",ref);
+            WXLogDebug(@"flexLayout -> action: addEvent ref:%@",ref);
 #endif
             
             WXComponentManager *manager = instance.componentManager;
@@ -319,7 +319,7 @@ _Pragma("clang diagnostic pop") \
         
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action :removeEvent ref:%@",ref);
+            WXLogDebug(@"flexLayout -> action :removeEvent ref:%@",ref);
 #endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -344,7 +344,7 @@ _Pragma("clang diagnostic pop") \
         [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            NSLog(@"test -> action: createFinish :%@",instanceId);
+            WXLogDebug(@"flexLayout -> action: createFinish :%@",instanceId);
 #endif
             
             WXComponentManager *manager = instance.componentManager;
@@ -370,7 +370,7 @@ _Pragma("clang diagnostic pop") \
             return nil;
         }
 #ifdef DEBUG
-        NSLog(@"test -> action: callNativeModule : %@ . %@",moduleName,methodName);
+        WXLogDebug(@"flexLayout -> action: callNativeModule : %@ . %@",moduleName,methodName);
 #endif
         NSMutableDictionary * newOptions = [options mutableCopy];
         NSMutableArray * newArguments = [arguments mutableCopy];
@@ -402,7 +402,7 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
        
 #ifdef DEBUG
-        NSLog(@"test -> action: callNativeComponent ref:%@",componentRef);
+        WXLogDebug(@"flexLayout -> action: callNativeComponent ref:%@",componentRef);
 #endif
         
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];

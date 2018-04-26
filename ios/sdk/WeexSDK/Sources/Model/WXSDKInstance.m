@@ -186,7 +186,7 @@ typedef enum : NSUInteger {
 - (void)setFrame:(CGRect)frame
 {
 #ifdef DEBUG
-    NSLog(@"test -> setFrame :%@,instance :%@",NSStringFromCGRect(frame),self);
+    WXLogDebug(@"flexLayout -> setFrame :%@,instance :%@",NSStringFromCGRect(frame),self);
 #endif
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;

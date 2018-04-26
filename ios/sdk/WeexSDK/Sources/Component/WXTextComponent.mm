@@ -401,7 +401,7 @@ do {\
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
 #ifdef DEBUG
-        NSLog(@"test -> measureblock %@, constrainedSize:%@",
+        WXLogDebug(@"flexLayout -> measureblock %@, constrainedSize:%@",
               self.type,
               NSStringFromCGSize(constrainedSize)
               );
