@@ -191,10 +191,24 @@ dependencies {
     testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
 }
+
 if(file('../license/LICENSE').exists()){
     license {
         header = file('../license/LICENSE')
-        excludes(["com/taobao/weex/dom/flex/*.java"])
+        mapping('cpp','JAVADOC_STYLE')
+        mapping('h','JAVADOC_STYLE')
+    }
+
+    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp']).
+                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
+                         'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
+                         'Source/android/jniprebuild/jniheader/*.h',
+                         'Source/base/Compatible.cpp',
+                         'Source/base/fpconv.cpp',
+                         'Source/base/fpconv.h',
+                         'Source/base/powers.h',
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp'])
     }
     preBuild.dependsOn licenseFormat
 }
