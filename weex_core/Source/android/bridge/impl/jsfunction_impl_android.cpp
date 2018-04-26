@@ -2,7 +2,7 @@
 // Created by Darin on 27/03/2018.
 //
 
-#include "WXJsFunction_Impl_Android.h"
+#include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
 #include "../../jniprebuild/jniheader/WXJsFunctions_jni.h"
 #include "bridge_impl_android.h"
