@@ -80,4 +80,7 @@ This product contains shelljs Guava(https://github.com/shelljs/shelljs) develope
 by shelljs  , licensed under BSD 3-clause "New" or "Revised" License.
 
 This product contains software rapidjson(https://github.com/Tencent/rapidjson) developed
-by tencent , licensed under the MIT License.
+by tencent  , licensed under the MIT License.
+
+This product contains software flexbox-layout(https://github.com/google/flexbox-layout) developed
+by google  , licensed under the Apache License.
