@@ -37,28 +37,11 @@
 
 - (void)setNeedsLayout
 {
-    WXComponent *supercomponent = [self supercomponent];
-    if (self->_virtualComponentId || self->_templateComponent) {
-        // we will generate a virtualComponentId for recycleList virtual component or templateComponent for recycleList component template.
-        // as for recyclelist component, it depends on the input data, not the new layout, here will not try to clear slibling child layout.
-        _isLayoutDirty = YES;
-        [supercomponent setNeedsLayout];
-    } else {
-        if(supercomponent){
-            for (WXComponent *siblingComponent in [supercomponent subcomponents]) {
-                [siblingComponent _needRecalculateLayout];
-            }
-            [supercomponent setNeedsLayout];
-        } else {
-            [self _needRecalculateLayout];
-        }
-    }
-}
-
-- (void)_needRecalculateLayout
-{
     _isLayoutDirty = YES;
-    [self _clearLayoutCSS];
+    WXComponent *supercomponent = [self supercomponent];
+    if(supercomponent){
+        [supercomponent setNeedsLayout];
+    }
 }
 
 - (BOOL)needsLayout
@@ -232,23 +215,6 @@
         [self.ancestorScroller adjustSticky];
     }
     [self layoutDidFinish];
-}
-
-/**
- * clear the layout variables on css node
- **/
-- (void)_clearLayoutCSS {
-    memset(&(_cssNode->layout), 0, sizeof(_cssNode->layout));
-    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-    
-    // Such that the comparison is always going to be false
-    _cssNode->layout.last_requested_dimensions[CSS_WIDTH] = -1;
-    _cssNode->layout.last_requested_dimensions[CSS_HEIGHT] = -1;
-    _cssNode->layout.last_parent_max_width = -1;
-    _cssNode->layout.last_parent_max_height = -1;
-    _cssNode->layout.last_direction = (css_direction_t)-1;
-    _cssNode->layout.should_update = true;
 }
 
 #define WX_STYLE_FILL_CSS_NODE(key, cssProp, type)\

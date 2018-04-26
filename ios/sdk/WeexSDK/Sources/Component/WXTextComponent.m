@@ -481,7 +481,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
     // handle text direction style, default ltr
-    if ([_direction isEqualToString:@"rtl"]) {
+    if (_cssNode->layout.direction == CSS_DIRECTION_RTL) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.
             _textAlign = NSTextAlignmentRight;
@@ -563,7 +563,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
     // handle text direction style, default ltr
-    if ([_direction isEqualToString:@"rtl"]) {
+    if (_cssNode->layout.direction == CSS_DIRECTION_RTL) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.
             _textAlign = NSTextAlignmentRight;
