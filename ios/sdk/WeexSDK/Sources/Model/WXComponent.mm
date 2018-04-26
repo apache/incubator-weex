@@ -39,6 +39,7 @@
 #import "WXComponent+BoxShadow.h"
 #import "WXTracingManager.h"
 #import "WXComponent+Events.h"
+#import "WXComponent+Layout.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -137,14 +138,17 @@
             _testId = [WXConvert NSString:attributes[@"testId"]];
         }
         
+#ifdef DEBUG
+        NSLog(@"test -> init component: ref : %@ , styles: %@",ref,styles);
+        NSLog(@"test -> init component: ref : %@ , attributes: %@",ref,attributes);
+#endif
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
+
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
-        
     }
-    
     return self;
 }
 
@@ -163,18 +167,40 @@
     } else {
         component->_templateComponent = self->_templateComponent;
     }
-    memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
-    component->_cssNode->context = (__bridge void *)component;
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+        memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
+        component->_cssNode->context = (__bridge void *)component;
+    }
+//#else
+    else
+    {
+        //memcpy((void*)component->_flexCssNode,self.flexCssNode,sizeof(WeexCore::WXCoreLayoutNode));
+        component->_flexCssNode->copyStyle(self.flexCssNode);
+        component->_flexCssNode->copyMeasureFunc(self.flexCssNode);
+        component->_flexCssNode->setContext((__bridge void *)component);
+    }
+//#endif
     component->_calculatedFrame = self.calculatedFrame;
     
     NSMutableArray *subcomponentsCopy = [NSMutableArray array];
-    for (WXComponent *subcomponent in self.subcomponents) {
-        WXComponent *subcomponentCopy = [subcomponent copy];
-        subcomponentCopy->_supercomponent = component;
-        [subcomponentsCopy addObject:subcomponentCopy];
-    }
     
-    component->_subcomponents = subcomponentsCopy;
+    if ([WXComponent isUseFlex]) {
+        component->_subcomponents = subcomponentsCopy;
+        NSUInteger count = [self.subcomponents count];
+        for (NSInteger i = 0 ; i < count;i++){
+            WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
+            [component _insertSubcomponent:subcomponentCopy atIndex:i];
+        }
+    }else{
+        for (WXComponent *subcomponent in self.subcomponents) {
+            WXComponent *subcomponentCopy = [subcomponent copy];
+            subcomponentCopy->_supercomponent = component;
+            [subcomponentsCopy addObject:subcomponentCopy];
+        }
+        component->_subcomponents = subcomponentsCopy;
+    }
     
     WXPerformBlockOnComponentThread(^{
         [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
@@ -195,9 +221,24 @@
 
 - (void)dealloc
 {
-    free_css_node(_cssNode);
-
-//    [self _removeAllEvents];
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+         free_css_node(_cssNode);
+    }
+//#else
+    else
+    {
+        if(self.flexCssNode){
+#ifdef DEBUG
+            NSLog(@"test -> dealloc %@",self.ref);
+#endif
+            delete self.flexCssNode;
+        }
+    }
+//#endif
+    //[self _removeAllEvents];
+    
     // remove all gesture and all
     if (_isTemplate && self.attributes[@"@templateId"]) {
         [[WXSDKManager bridgeMgr] callComponentHook:_weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"destroy" args:nil competion:nil];
@@ -325,9 +366,11 @@
         [self viewWillLoad];
         
         _view = [self loadView];
-        
+#ifdef DEBUG
+        NSLog(@"test -> loadView:addr-(%p),componentRef-(%@)",_view,self.ref);
+#endif
         _layer = _view.layer;
-        _view.frame = _calculatedFrame;
+        _view.frame = [self _fixIllegalFrame:_calculatedFrame];
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
         if (![self _needsDrawBorder]) {
@@ -405,6 +448,16 @@
     }
 }
 
+- (CGRect)_fixIllegalFrame:(CGRect)frame{
+    CGPoint origin = frame.origin;
+    CGSize size = frame.size;
+    CGRect fixedFrame = CGRectMake(isnan(origin.x)?0.0f:origin.x
+                                   , isnan(origin.y)?0.0f:origin.y
+                                   , isnan(size.width)?0.0f:size.width
+                                   , isnan(size.height)?0.0f:size.height);
+    return fixedFrame;
+}
+
 - (void)_buildViewHierarchyLazily
 {
     if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
@@ -455,10 +508,13 @@
     return _absolutePosition;
 }
 
+//#ifndef USE_FLEX
 - (css_node_t *)cssNode
 {
     return _cssNode;
 }
+//#else
+//#endif
 
 - (void)_addEventParams:(NSDictionary *)params
 {
@@ -519,6 +575,29 @@
     if (_useCompositing || _isCompositingChild) {
         subcomponent->_isCompositingChild = YES;
     }
+//#ifndef USE_FLEX
+    if(![WXComponent isUseFlex])
+    {
+        
+    }
+//#else
+    else
+    {
+        if (subcomponent->_isNeedJoinLayoutSystem) {
+            NSInteger actualIndex = [self getActualNodeIndex:subcomponent atIndex:index];
+            [self _insertChildCssNode:subcomponent atIndex:actualIndex];
+        }else{
+#ifdef DEBUG
+            NSLog(@"test -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
+                  self.ref,
+                  self.type,
+                  subcomponent.ref,
+                  subcomponent.type
+                  );
+#endif
+        }
+    }
+//#endif
     
     [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
@@ -528,6 +607,16 @@
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
+//#ifndef USE_FLEX
+      if (![WXComponent isUseFlex]) {
+      }
+//#else
+    else
+    {
+        //subcomponent->_isNeedJoinLayoutSystem = NO;
+        [self _rmChildCssNode:subcomponent];
+    }
+//#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
@@ -649,15 +738,35 @@
     } else {
         [self _transitionUpdateViewProperty:styles];
     }
+#ifdef DEBUG
+    NSDictionary *copySelfStyle = [NSDictionary dictionaryWithDictionary:self.styles];
+    NSLog(@"tempTest -> ref:%@ style before : %@",self.ref,copySelfStyle);
+    
+    if (styles) {
+        NSLog(@"tempTest -> ref:%@ update styles : %@",self.ref,styles);
+    }
+    
+    if (resetStyles) {
+        NSLog(@"tempTest -> ref:%@ update resetStyles : %@",self.ref,resetStyles);
+    }
+#endif
+    
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     [self updateStyles:styles];
     [self resetStyles:resetStyles];
+    
+#ifdef DEBUG
+    //self.styles may change
+    copySelfStyle = [NSDictionary dictionaryWithDictionary:self.styles];
+    NSLog(@"tempTest -> ref:%@ style after : %@",self.ref,copySelfStyle);
+#endif
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
 {
     WXAssertMainThread();
+
     
     [self _updateNavBarAttributes:attributes];
     
@@ -710,7 +819,7 @@
         if(strongSelf) {
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
-            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
             if (gradientLayer) {
                 _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
                 strongSelf.view.backgroundColor = _backgroundColor;
