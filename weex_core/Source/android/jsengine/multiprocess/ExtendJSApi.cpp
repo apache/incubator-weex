@@ -662,7 +662,7 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> handlePostMessage(IPCArguments *arguments) {
-  LOGE("handlePostMessage");
+  // LOGE("handlePostMessage");
   JNIEnv* env = getJNIEnv();
   jbyteArray jData = getArgumentAsJByteArray(env, arguments, 0);
   jstring jVmId = getArgumentAsJString(env, arguments, 1);
@@ -681,7 +681,7 @@ std::unique_ptr<IPCResult> handlePostMessage(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> handleDispatchMessage(IPCArguments *arguments) {
-  LOGE("handleDispatchMessage");
+  // LOGE("handleDispatchMessage");
   JNIEnv* env = getJNIEnv();
   jstring jClientId = getArgumentAsJString(env, arguments, 0);
   jbyteArray jData = getArgumentAsJByteArray(env, arguments, 1);
