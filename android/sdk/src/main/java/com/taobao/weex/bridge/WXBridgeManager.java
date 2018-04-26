@@ -800,8 +800,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try{
       execJSOnInstance(callback, instanceId, js, type);
       waitLatch.await(100, TimeUnit.MILLISECONDS);
-      return  callback.getResult().toString();
-    }catch (Exception e){
+      if (callback != null && callback.getResult() != null) {
+        return  callback.getResult().toString();
+      }
+      return "";
+    }catch (Throwable e){
       WXLogUtils.e("syncCallExecJsOnInstance", e);
       return  "";
     }
