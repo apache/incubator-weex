@@ -41,14 +41,9 @@ jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
 std::map<std::string, jobject> styleKeyCache;
 
-struct ptrCmp
-{
-    bool operator()( const char * s1, const char * s2 ) const
-    {
-      return strcmp( s1, s2 ) < 0;
-    }
-};
-std::map<const char *, StringRefCache *, ptrCmp> RefCache;
+constexpr auto cmp = [](const char* a, const char* b){return strcmp(a,b);};
+
+std::map<const char *, StringRefCache *, decltype(cmp)> RefCache(cmp);
 
 static JavaVM *sVm = NULL;
 

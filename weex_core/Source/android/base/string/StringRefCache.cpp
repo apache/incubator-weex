@@ -2,6 +2,9 @@
 #include <map>
 #include "StringRefCache.h"
 
+constexpr auto cmp = [](const char* a, const char* b){return strcmp(a,b);};
+
+std::map<const char *, jobject, decltype(cmp)> mCache(cmp);
 
 void StringRefCache::clearRefCache(JNIEnv *env) {
     for (auto iter = mCache.begin(); iter != mCache.end(); iter++) {
