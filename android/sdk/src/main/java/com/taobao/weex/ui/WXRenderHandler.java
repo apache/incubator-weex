@@ -30,7 +30,8 @@ class WXRenderHandler extends Handler {
 
     public final boolean post(String instanceId, Runnable r) {
         Message msg = Message.obtain(this, r);
-        msg.obj = instanceId.hashCode();
+        // Use what to match runnable. Make sure don't override callback method.
+        msg.what = instanceId.hashCode();
         return sendMessageDelayed(msg, 0);
     }
 

@@ -99,8 +99,12 @@ public class WXRenderManager {
     if (statement != null) {
       statement.destroy();
     }
-    final Object token = instanceId == null ? null : instanceId.hashCode();
-    mWXRenderHandler.removeCallbacksAndMessages(token);
+    if(instanceId == null) {
+      mWXRenderHandler.removeCallbacksAndMessages(null);
+    } else {
+      // use hashCode to match message's what.
+      mWXRenderHandler.removeMessages(instanceId.hashCode());
+    }
   }
 
   public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
