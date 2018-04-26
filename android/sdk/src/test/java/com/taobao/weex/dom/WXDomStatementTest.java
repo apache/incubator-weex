@@ -27,7 +27,6 @@ import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.WXSDKManagerTest;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
-import com.taobao.weex.dom.action.TestActions;
 import com.taobao.weex.ui.WXRenderManager;
 
 import org.junit.After;
@@ -269,10 +268,10 @@ public class WXDomStatementTest {
 
   @Test
   public void testCreateFinish() throws Exception {
-//    createBody();
-//    createFinish();
-//
-//    stmt.batch();
+    createBody();
+    createFinish();
+
+    stmt.batch();
   }
 
   @Test

@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
 @RestrictTo(Scope.LIBRARY)
@@ -43,9 +44,12 @@ public interface Widget {
 
   void setContentBox(int leftOffset, int topOffset, int rightOffset, int bottomOffset);
 
-  @NonNull Point getLocInFlatContainer();
+  @NonNull
+  Point getLocInFlatContainer();
 
-  @Nullable BorderDrawable getBackgroundAndBorder();
+  @Nullable
+  BorderDrawable getBackgroundAndBorder();
 
-  @NonNull Rect getBorderBox();
+  @NonNull
+  Rect getBorderBox();
 }

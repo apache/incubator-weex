@@ -21,7 +21,6 @@ package com.taobao.weex.ui.component;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.view.WXSwitchView;
 
@@ -35,8 +34,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 28/09/2016.

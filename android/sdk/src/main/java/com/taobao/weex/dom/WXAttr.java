@@ -25,7 +25,6 @@ import static java.lang.Boolean.parseBoolean;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
@@ -53,8 +52,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * static attrs
    * */
-  private @NonNull final ArrayMap<String, Object> attr;
-
+  private @NonNull final Map<String, Object> attr;
 
   /**
    * dynamic binding attrs, can be null, only weex use
@@ -73,6 +71,10 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
     attr.putAll(filterBindingStatement(standardMap));
+  }
+
+  public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
+    attr = standardMap;
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -427,7 +429,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return attr.values();
   }
 
-
   /**
    * can by null, in most contion without template list, the value is null
    * */
@@ -462,10 +463,10 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     Set<Map.Entry<String,Object>> entries = attrs.entrySet();
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
-        Map.Entry<String,Object> entry = it.next();
-        if(filterBindingStatement(entry.getKey(), entry.getValue())){
-           it.remove();
-        }
+      Map.Entry<String,Object> entry = it.next();
+      if(filterBindingStatement(entry.getKey(), entry.getValue())){
+        it.remove();
+      }
     }
     return attrs;
   }
@@ -474,51 +475,51 @@ public class WXAttr implements Map<String, Object>,Cloneable {
    * filter dynamic attrs and statements
    * */
   private boolean filterBindingStatement(String key, Object value) {
-        if(COMPONENT_PROPS.equals(key)){
-          ELUtils.bindingBlock(value);
-          return  false;
-        }
-        for(String exclude : EXCLUDES_BINDING){
-             if(key.equals(exclude)){
-                return  false;
-             }
-        }
-        if(ELUtils.isBinding(value)){
-          if(mBindingAttrs == null){
-              mBindingAttrs = new ArrayMap<String, Object>();
-          }
-          value = ELUtils.bindingBlock(value);
-          mBindingAttrs.put(key, value);
-          return  true;
-        }
-        if(WXStatement.WX_IF.equals(key)){
-          if(mStatement == null){
-             mStatement = new WXStatement();
-          }
-          if(value != null) {
-            mStatement.put(key, Parser.parse(value.toString()));
-          }
-          return  true;
-        }
-
-        if(WXStatement.WX_FOR.equals(key)){
-           if(mStatement == null){
-              mStatement = new WXStatement();
-           }
-           value = ELUtils.vforBlock(value);
-           if(value != null) {
-              mStatement.put(key, value);
-              return  true;
-           }
-        }
-
-        if(WXStatement.WX_ONCE.equals(key)){
-          if(mStatement == null){
-             mStatement = new WXStatement();
-          }
-          mStatement.put(key, true);
-        }
+    if(COMPONENT_PROPS.equals(key)){
+      ELUtils.bindingBlock(value);
+      return  false;
+    }
+    for(String exclude : EXCLUDES_BINDING){
+      if(key.equals(exclude)){
         return  false;
+      }
+    }
+    if(ELUtils.isBinding(value)){
+      if(mBindingAttrs == null){
+        mBindingAttrs = new ArrayMap<String, Object>();
+      }
+      value = ELUtils.bindingBlock(value);
+      mBindingAttrs.put(key, value);
+      return  true;
+    }
+    if(WXStatement.WX_IF.equals(key)){
+      if(mStatement == null){
+        mStatement = new WXStatement();
+      }
+      if(value != null) {
+        mStatement.put(key, Parser.parse(value.toString()));
+      }
+      return  true;
+    }
+
+    if(WXStatement.WX_FOR.equals(key)){
+      if(mStatement == null){
+        mStatement = new WXStatement();
+      }
+      value = ELUtils.vforBlock(value);
+      if(value != null) {
+        mStatement.put(key, value);
+        return  true;
+      }
+    }
+
+    if(WXStatement.WX_ONCE.equals(key)){
+      if(mStatement == null){
+        mStatement = new WXStatement();
+      }
+      mStatement.put(key, true);
+    }
+    return  false;
   }
 
   public void skipFilterPutAll(Map<String,Object> attrs){
@@ -533,8 +534,8 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       wxAttr.mBindingAttrs = new ArrayMap<>(mBindingAttrs);
     }
     if (mStatement != null){
-       wxAttr.mStatement = new WXStatement(mStatement);
-     }
+      wxAttr.mStatement = new WXStatement(mStatement);
+    }
     return wxAttr;
   }
 }

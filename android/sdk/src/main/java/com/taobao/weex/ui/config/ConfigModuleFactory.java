@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.config;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;

@@ -21,7 +21,6 @@ package com.taobao.weex.http;
 import android.os.Looper;
 import android.telecom.Call;
 
-import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -95,7 +94,7 @@ public class WXStreamModuleTest {
 
     WXStreamModule streamModule = new WXStreamModule(adapter);
     Callback cb = new Callback();
-    streamModule.fetch(JSON.parseObject("{}"),cb,null);
+    streamModule.fetch("",cb,null);
 
     assert   !(boolean)cb.mData.get("ok");
   }
@@ -117,7 +116,7 @@ public class WXStreamModuleTest {
 
     WXStreamModule streamModule = createModule(adapter);
     Callback cb = new Callback();
-    streamModule.fetch(JSON.parseObject("{'url':'http://www.taobao.com'}"),cb,null);
+    streamModule.fetch("{'url':'http://www.taobao.com'}",cb,null);
 
     assert   (boolean)cb.mData.get("ok");
   }
@@ -136,7 +135,7 @@ public class WXStreamModuleTest {
 
     WXStreamModule streamModule = createModule(adapter);
     Callback cb = new Callback();
-    streamModule.fetch(JSON.parseObject("{'url':'http://www.taobao.com'}"),null,cb);
+    streamModule.fetch("{'url':'http://www.taobao.com'}",null,cb);
 
     assert   ((Map<String,String>)cb.mData.get("headers")).get("key").equals("someval");
   }
@@ -147,7 +146,7 @@ public class WXStreamModuleTest {
     JSCallback progress = mock(JSCallback.class);
     JSCallback finish = mock(JSCallback.class);
     System.out.print("request start "+System.currentTimeMillis());
-    streamModule.fetch(JSON.parseObject("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}"),finish,progress);
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,progress);
     verify(progress,timeout(10*1000).atLeastOnce()).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
     verify(finish,timeout(10*1000).times(1)).invoke(anyMapOf(String.class, Object.class));
     System.out.print("\nrequest finish"+System.currentTimeMillis());
@@ -166,10 +165,10 @@ public class WXStreamModuleTest {
     });
     Callback finish = new Callback();
 
-    streamModule.fetch(JSON.parseObject("{}"),finish,null);
+    streamModule.fetch("",finish,null);
     assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_INVALID_REQUEST);
 
-    streamModule.fetch(JSON.parseObject("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}"),finish,null);
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
     assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_CONNECT_FAILED);
 
     streamModule = createModule(new IWXHttpAdapter() {
@@ -180,7 +179,7 @@ public class WXStreamModuleTest {
         listener.onHttpFinish(response);
       }
     });
-    streamModule.fetch(JSON.parseObject("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}"),finish,null);
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
     assertEquals(finish.mData.get(WXStreamModule.STATUS),302);
     assertEquals(finish.mData.get(WXStreamModule.STATUS).getClass(),Integer.class);
     assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.getStatusText("302"));

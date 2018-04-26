@@ -29,8 +29,6 @@ import android.view.View;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.animation.CameraDistanceProperty;
-import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXUtils;
@@ -102,7 +100,7 @@ public class TransformParser {
     }
 
     public static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
-                                                                   final int height, final int viewportW) {
+                                                                  final int height, final int viewportW) {
         if (!TextUtils.isEmpty(rawTransform)) {
             FunctionParser<Property<View,Float>, Float> parser = new FunctionParser<>
                     (rawTransform, new FunctionParser.Mapper<Property<View,Float>, Float>() {
@@ -116,7 +114,7 @@ public class TransformParser {
                             return new HashMap<>();
                         }
 
-                        private Map<Property<View,Float>, Float> convertParam(int width, int height,int viewportW,
+                        private Map<Property<View,Float>, Float> convertParam(int width, int height, int viewportW,
                                                                               @NonNull List<Property<View,Float>> propertyList,
                                                                               @NonNull List<String> rawValue) {
 
@@ -157,7 +155,8 @@ public class TransformParser {
                             return convertedList;
                         }
 
-                        private @NonNull List<Float> parseRotationZ(@NonNull List<String> rawValue) {
+                        private @NonNull
+                        List<Float> parseRotationZ(@NonNull List<String> rawValue) {
                             List<Float> convertedList = new ArrayList<>(1);
                             int suffix;
                             for (String raw : rawValue) {
@@ -178,7 +177,7 @@ public class TransformParser {
                          */
                         private List<Float> parseTranslation(List<Property<View,Float>> propertyList,
                                                              int width, int height,
-                                                             @NonNull List<String> rawValue,int viewportW) {
+                                                             @NonNull List<String> rawValue, int viewportW) {
                             List<Float> convertedList = new ArrayList<>(2);
                             String first = rawValue.get(0);
                             if (propertyList.size() == 1) {
@@ -190,7 +189,7 @@ public class TransformParser {
                         }
 
                         private void parseSingleTranslation(List<Property<View,Float>> propertyList, int width, int height,
-                                                            List<Float> convertedList, String first,int viewportW) {
+                                                            List<Float> convertedList, String first, int viewportW) {
                             if (propertyList.contains(View.TRANSLATION_X)) {
                                 convertedList.add(parsePercentOrPx(first, width,viewportW));
                             } else if (propertyList.contains(View.TRANSLATION_Y)) {
@@ -200,7 +199,7 @@ public class TransformParser {
 
                         private void parseDoubleTranslation(int width, int height,
                                                             @NonNull List<String> rawValue,
-                                                            List<Float> convertedList, String first,int viewportW) {
+                                                            List<Float> convertedList, String first, int viewportW) {
                             String second;
                             if (rawValue.size() == 1) {
                                 second = first;
@@ -212,7 +211,7 @@ public class TransformParser {
                         }
 
                         private Float parseCameraDistance(List<String> rawValue){
-                            float ret=Float.MAX_VALUE;
+                            float ret= Float.MAX_VALUE;
                             if(rawValue.size() == 1){
                                 float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(rawValue.get(0)), viewportW);
                                 float scale = WXEnvironment.getApplication().getResources().getDisplayMetrics().density;
@@ -250,12 +249,12 @@ public class TransformParser {
         return null;
     }
 
-    private static Pair<Float, Float> parsePivot(@NonNull List<String> list, int width, int height,int viewportW) {
+    private static Pair<Float, Float> parsePivot(@NonNull List<String> list, int width, int height, int viewportW) {
         return new Pair<>(
                 parsePivotX(list.get(0), width,viewportW), parsePivotY(list.get(1), height,viewportW));
     }
 
-    private static float parsePivotX(String x, int width,int viewportW) {
+    private static float parsePivotX(String x, int width, int viewportW) {
         String value = x;
         if (WXAnimationBean.Style.LEFT.equals(x)) {
             value = ZERO;
@@ -267,7 +266,7 @@ public class TransformParser {
         return parsePercentOrPx(value, width,viewportW);
     }
 
-    private static float parsePivotY(String y, int height,int viewportW) {
+    private static float parsePivotY(String y, int height, int viewportW) {
         String value = y;
         if (WXAnimationBean.Style.TOP.equals(y)) {
             value = ZERO;
@@ -279,7 +278,7 @@ public class TransformParser {
         return parsePercentOrPx(value, height,viewportW);
     }
 
-    private static float parsePercentOrPx(String raw, int unit,int viewportW) {
+    private static float parsePercentOrPx(String raw, int unit, int viewportW) {
         final int precision = 1;
         int suffix;
         if ((suffix = raw.lastIndexOf(WXUtils.PERCENT)) != -1) {

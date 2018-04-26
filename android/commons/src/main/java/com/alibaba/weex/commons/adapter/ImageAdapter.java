@@ -54,10 +54,6 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
         if (url.startsWith("//")) {
           temp = "http:" + url;
         }
-        if (view.getLayoutParams().width <= 0 || view.getLayoutParams().height <= 0) {
-          return;
-        }
-
 
         if(!TextUtils.isEmpty(strategy.placeHolder)){
           Picasso.Builder builder=new Picasso.Builder(WXEnvironment.getApplication());

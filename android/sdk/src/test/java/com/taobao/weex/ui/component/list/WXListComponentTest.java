@@ -20,9 +20,6 @@ package com.taobao.weex.ui.component.list;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXListDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.component.ComponentTest;
 import com.taobao.weex.ui.component.WXComponent;
@@ -114,7 +111,7 @@ public class WXListComponentTest {
     ComponentTest.create(div);
 
     WXDomObject dom = new WXListDomObject();
-    dom.getAttrs().put(Constants.Name.TRANSFORM,"scale(0.9,0.8);translate(10,20);opacity(0.5);rotate(100)");
+    dom.getAttrs().put(WXListComponent.TRANSFORM,"scale(0.9,0.8);translate(10,20);opacity(0.5);rotate(100)");
     component = create(div,dom);
     ComponentTest.create(component);
   }

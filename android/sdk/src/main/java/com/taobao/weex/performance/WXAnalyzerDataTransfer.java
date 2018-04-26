@@ -67,11 +67,11 @@ public class WXAnalyzerDataTransfer {
       }
 
       data = new JSONObject()
-          .put("instanceId", instanceId)
-          .put("url", instance.getBundleUrl())
-          .put("dimensionMap", dimensionMap)
-          .put("measureMap", measureMap)
-          .toString();
+              .put("instanceId", instanceId)
+              .put("url", instance.getBundleUrl())
+              .put("dimensionMap", dimensionMap)
+              .put("measureMap", measureMap)
+              .toString();
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -98,12 +98,12 @@ public class WXAnalyzerDataTransfer {
     String data = "";
     try {
       data = new JSONObject()
-          .put("instanceId", instanceId)
-          .put("url", instance.getBundleUrl())
-          .put("errorCode", errorCode.getErrorCode())
-          .put("errorMsg", errorCode.getErrorMsg())
-          .put("errorGroup", errorCode.getErrorGroup())
-          .toString();
+              .put("instanceId", instanceId)
+              .put("url", instance.getBundleUrl())
+              .put("errorCode", errorCode.getErrorCode())
+              .put("errorMsg", errorCode.getErrorMsg())
+              .put("errorGroup", errorCode.getErrorGroup())
+              .toString();
     } catch (Exception e) {
       e.printStackTrace();
     }
