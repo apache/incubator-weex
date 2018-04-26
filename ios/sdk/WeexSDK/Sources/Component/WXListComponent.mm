@@ -164,11 +164,6 @@
     return [[WXTableView alloc] init];
 }
 
-//- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
-//{
-////    [super _insertChildCssNode:subcomponent atIndex:(uint32_t)index];
-//}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
