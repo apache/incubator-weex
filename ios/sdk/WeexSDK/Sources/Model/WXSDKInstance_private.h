@@ -34,6 +34,11 @@
 @property (nonatomic, strong) NSMutableDictionary *attrConfigs;
 @property (nonatomic, strong) NSString *mainBundleString;
 
+// add monitor information
+@property (nonatomic, strong) NSString *callCreateInstanceContext;
+@property (nonatomic, strong) NSString *createInstanceContextResult;
+@property (nonatomic, strong) NSString *executeRaxApiResult;
+
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
