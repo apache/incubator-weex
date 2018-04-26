@@ -166,6 +166,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static long lastCrashTime = 0;
 
   private static String mRaxApi = null;
+  private static String mRaxExtApi = null;
 
   // add for clound setting, default value is true
   // can use it to control weex sandbox
@@ -1294,11 +1295,29 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         WXJSObject apiObj;
         if (type == BundType.Rax) {
-          if (mRaxApi == null) {
-            mRaxApi =  WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
+          boolean isWindmill = false;
+          try {
+            if (options != null) {
+              String container = (String) options.get("container");
+              isWindmill = "windmill".equals(container);
+            }
+          } catch (Throwable t) {
+            t.printStackTrace();
           }
-          apiObj = new WXJSObject(WXJSObject.String,
-                  mRaxApi);
+
+          if (isWindmill) {
+            if (mRaxExtApi == null) {
+              mRaxExtApi = WXFileUtils.loadAsset("weex-rax-extra-api.js", WXEnvironment.getApplication());
+            }
+            apiObj = new WXJSObject(WXJSObject.String,
+                mRaxExtApi);
+          } else {
+            if (mRaxApi == null) {
+              mRaxApi = WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
+            }
+            apiObj = new WXJSObject(WXJSObject.String,
+                mRaxApi);
+          }
         } else {
           apiObj = new WXJSObject(WXJSObject.String,
                   "");
