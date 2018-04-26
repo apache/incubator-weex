@@ -19,8 +19,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define WXLogLevel WeexLogLevel
-
 typedef NS_ENUM(NSInteger, WXLogFlag) {
     WXLogFlagError      = 1 << 0,
     WXLogFlagWarning    = 1 << 1,
@@ -32,7 +30,7 @@ typedef NS_ENUM(NSInteger, WXLogFlag) {
 /**
  *  Use Log levels to filter logs.
  */
-typedef NS_ENUM(NSUInteger, WeexLogLevel){
+typedef NS_ENUM(NSUInteger, WXLogLevel){
     /**
      *  No logs
      */

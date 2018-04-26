@@ -534,22 +534,16 @@
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/ATSDK.bundle",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/en.lproj",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/zh-Hans.lproj",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/default.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/grad.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/pattern.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/radiation.glsl",
 				"${PODS_ROOT}/../../../pre-build/native-bundle-main.js",
-				"${PODS_ROOT}/../../../pre-build/weex-main-jsfm.js",
-				"${PODS_ROOT}/../../../pre-build/weex-polyfill.js",
-				"${PODS_ROOT}/../../../pre-build/weex-rax-api.js",
 				"${PODS_ROOT}/../../sdk/WeexSDK/Resources/wx_load_error@3x.png",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ATSDK.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en.lproj",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/zh-Hans.lproj",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/native-bundle-main.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-main-jsfm.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-polyfill.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-rax-api.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wx_load_error@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -599,22 +593,16 @@
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/ATSDK.bundle",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/en.lproj",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/zh-Hans.lproj",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/default.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/grad.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/pattern.glsl",
+				"${PODS_ROOT}/GCanvas/GCanvas.framework/radiation.glsl",
 				"${PODS_ROOT}/../../../pre-build/native-bundle-main.js",
-				"${PODS_ROOT}/../../../pre-build/weex-main-jsfm.js",
-				"${PODS_ROOT}/../../../pre-build/weex-polyfill.js",
-				"${PODS_ROOT}/../../../pre-build/weex-rax-api.js",
 				"${PODS_ROOT}/../../sdk/WeexSDK/Resources/wx_load_error@3x.png",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ATSDK.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en.lproj",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/zh-Hans.lproj",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/native-bundle-main.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-main-jsfm.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-polyfill.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-rax-api.js",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wx_load_error@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
