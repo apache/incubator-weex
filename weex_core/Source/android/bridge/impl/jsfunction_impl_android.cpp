@@ -81,8 +81,8 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
 
 #if JSAPI_LOG
     LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s",
-      jString2StrFast(env, jInstanceId).c_str(), jString2StrFast(env, jmodule).c_str(),
-      jString2StrFast(env, jmethod).c_str(), jByteArray2Str(env, jArgString).c_str());
+         jString2StrFast(env, instanceId).c_str(), jString2StrFast(env, module).c_str(),
+         jString2StrFast(env, method).c_str(), jByteArray2Str(env, arguments).c_str());
 #endif
 
     // add for android support
