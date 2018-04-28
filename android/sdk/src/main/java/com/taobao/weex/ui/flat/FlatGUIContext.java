@@ -48,7 +48,7 @@ public class FlatGUIContext implements Destroyable {
   private Map<Widget, WXComponent> widgetToComponent = new ArrayMap<>();
 
   public boolean isFlatUIEnabled(WXComponent component) {
-    return false;
+    return component.isFlatUIEnabled();
   }
 
   public void register(@NonNull WXComponent descendant, @NonNull WidgetContainer ancestor) {
