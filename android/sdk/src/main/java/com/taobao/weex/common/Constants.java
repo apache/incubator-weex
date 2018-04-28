@@ -189,6 +189,8 @@ public class Constants {
     String ARIA_HIDDEN = "ariaHidden";
     String ROLE = "role";
 
+    String STACKSIZE_LIMIT = "stacksizeLimit";
+
     String DIRECTION = "direction";
     String RTL = "rtl";
 
