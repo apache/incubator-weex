@@ -112,11 +112,11 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       Field scroller = ViewPager.class.getDeclaredField("mScroller");
       scroller.setAccessible(true);
       Field interpolator = ViewPager.class
-          .getDeclaredField("sInterpolator");
+              .getDeclaredField("sInterpolator");
       interpolator.setAccessible(true);
 
       mScroller = new WXSmoothScroller(getContext(),
-          (Interpolator) interpolator.get(null));
+              (Interpolator) interpolator.get(null));
       scroller.set(this, mScroller);
     } catch (Exception e) {
       WXLogUtils.e("[CircleViewPager] postInitViewPager: ", e);

@@ -23,7 +23,6 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.utils.WXUtils;
@@ -141,7 +140,7 @@ public class CellDataManager {
     public void setListData(JSONArray listData) {
         if(this.listData != listData) {
             if(this.listData != null){
-                if(WXUtils.getBoolean(templateList.getDomObject().getAttrs().get("exitDetach"), true)){
+                if(WXUtils.getBoolean(templateList.getAttrs().get("exitDetach"), true)){
                     for(int i=0; i<this.listData.size(); i++){
                         cleanRenderState(renderStates.remove(i));
                     }

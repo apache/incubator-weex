@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.animation;
 
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 
@@ -51,8 +50,8 @@ public class WXAnimationModuleTest {
 
   @Test
   public void testTransition() throws Exception {
-    module.transition("", JSONObject.parseObject("{}"),"");
-    module.transition("test", JSONObject.parseObject("{\"test\":\"test\"}"),"");
+    module.transition("","","");
+    module.transition("test","test","");
   }
 
   @Test

@@ -18,11 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.view.View;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by sospartan on 7/27/16.

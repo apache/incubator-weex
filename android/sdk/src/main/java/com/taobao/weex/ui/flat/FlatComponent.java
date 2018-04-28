@@ -22,6 +22,7 @@ package com.taobao.weex.ui.flat;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
+
 import com.taobao.weex.ui.flat.widget.Widget;
 
 @RestrictTo(Scope.LIBRARY)
@@ -29,5 +30,6 @@ public interface FlatComponent<T extends Widget> {
 
   boolean promoteToView(boolean checkAncestor);
 
-  @NonNull T getOrCreateFlatWidget();
+  @NonNull
+  T getOrCreateFlatWidget();
 }

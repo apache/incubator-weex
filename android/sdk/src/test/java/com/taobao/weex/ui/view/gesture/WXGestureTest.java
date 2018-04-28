@@ -18,13 +18,11 @@
  */
 package com.taobao.weex.ui.view.gesture;
 
-import android.provider.Settings;
 import android.view.MotionEvent;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.TestActivity;
 import com.taobao.weex.ui.component.ComponentTest;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXDivTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,10 +30,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 27/09/2016.

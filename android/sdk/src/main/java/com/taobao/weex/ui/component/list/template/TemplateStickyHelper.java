@@ -28,6 +28,7 @@ import android.widget.FrameLayout;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,8 +99,7 @@ public class TemplateStickyHelper {
                 bounceRecyclerView.removeView(stickyFakeViewHolder.itemView);
                 stickyFakeViewHolder.itemView.setTranslationY(0);
                 if(stickyFakeViewHolder.getComponent() != null
-                        && stickyFakeViewHolder.getComponent().getDomObject() != null
-                        && stickyFakeViewHolder.getComponent().getDomObject().getEvents().contains(Constants.Event.UNSTICKY)){
+                        && stickyFakeViewHolder.getComponent().getEvents().contains(Constants.Event.UNSTICKY)){
                     stickyFakeViewHolder.getComponent().fireEvent(Constants.Event.UNSTICKY);
                 }
             }
@@ -124,7 +124,7 @@ public class TemplateStickyHelper {
 
         //onCreate holder for match position if not exist
         View stickyFakeView = bounceRecyclerView.getChildAt(bounceRecyclerView.getChildCount() - 1);
-        if(!(stickyFakeView.getTag() instanceof  TemplateViewHolder)
+        if(!(stickyFakeView.getTag() instanceof TemplateViewHolder)
                 || ((TemplateViewHolder) stickyFakeView.getTag()).getHolderPosition() != matchStickyPosition){
 
              //remove previous sticky header
@@ -134,8 +134,7 @@ public class TemplateStickyHelper {
                 bounceRecyclerView.removeView(stickyFakeViewHolder.itemView);
                 stickyFakeViewHolder.itemView.setTranslationY(0);
                 if(stickyFakeViewHolder.getComponent() != null
-                        && stickyFakeViewHolder.getComponent().getDomObject() != null
-                        && stickyFakeViewHolder.getComponent().getDomObject().getEvents().contains(Constants.Event.UNSTICKY)){
+                        && stickyFakeViewHolder.getComponent().getEvents().contains(Constants.Event.UNSTICKY)){
                     stickyFakeViewHolder.getComponent().fireEvent(Constants.Event.UNSTICKY);
                 }
             }
@@ -157,11 +156,10 @@ public class TemplateStickyHelper {
                 parent.removeView(fakeStickyHolder.itemView);
             }
             bounceRecyclerView.addView(fakeStickyHolder.itemView, params);
-            fakeStickyHolder.getComponent().setLayout(fakeStickyHolder.getComponent().getDomObject());
+            fakeStickyHolder.getComponent().setLayout(fakeStickyHolder.getComponent());
             stickyFakeView = fakeStickyHolder.itemView;
             if(fakeStickyHolder.getComponent() != null
-                    && fakeStickyHolder.getComponent().getDomObject() != null
-                    && fakeStickyHolder.getComponent().getDomObject().getEvents().contains(Constants.Event.STICKY)){
+                    && fakeStickyHolder.getComponent().getEvents().contains(Constants.Event.STICKY)){
                 fakeStickyHolder.getComponent().fireEvent(Constants.Event.STICKY);
             }
         }

@@ -23,7 +23,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
-import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -42,30 +41,31 @@ public class GapItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        int position = parent.getChildAdapterPosition(view);
-        if(position < 0){
-            return;
-        }
-        if(view.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams){
-            StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
-            if(params.isFullSpan()){
-                return;
-            }
-            WXComponent component = listComponent.getChild(position);
-            if(component instanceof  WXCell){
-                WXCell cell = (WXCell) component;
-                if(cell.isFixed() || cell.isSticky()){
-                    return;
-                }
-                WXRecyclerDomObject recyclerDomObject = listComponent.getRecyclerDom();
-                if(recyclerDomObject.getSpanOffsets() == null){
-                    return;
-                }
-                float spanOffset = recyclerDomObject.getSpanOffsets()[params.getSpanIndex()];
-                int   spanOffsetPx =  Math.round(WXViewUtils.getRealPxByWidth(spanOffset, recyclerDomObject.getViewPortWidth()));
-                outRect.left =  spanOffsetPx;
-                outRect.right = -spanOffsetPx;
-            }
-        }
+        // TODO
+//        int position = parent.getChildAdapterPosition(view);
+//        if(position < 0){
+//            return;
+//        }
+//        if(view.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams){
+//            StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
+//            if(params.isFullSpan()){
+//                return;
+//            }
+//            WXComponent component = listComponent.getChild(position);
+//            if(component instanceof WXCell){
+//                WXCell cell = (WXCell) component;
+//                if(cell.isFixed() || cell.isSticky()){
+//                    return;
+//                }
+//                WXRecyclerDomObject recyclerDomObject = listComponent.getRecyclerDom();
+//                if(recyclerDomObject.getSpanOffsets() == null){
+//                    return;
+//                }
+//                float spanOffset = recyclerDomObject.getSpanOffsets()[params.getSpanIndex()];
+//                int   spanOffsetPx =  Math.round(WXViewUtils.getRealPxByWidth(spanOffset, recyclerDomObject.getViewPortWidth()));
+//                outRect.left =  spanOffsetPx;
+//                outRect.right = -spanOffsetPx;
+//            }
+//        }
     }
 }

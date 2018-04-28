@@ -21,7 +21,7 @@ package com.taobao.weex.bridge;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * Created by fengjunjie
@@ -34,7 +34,7 @@ public interface WXValidateProcessor {
 
     WXComponentValidateResult onComponentValidate(WXSDKInstance wxsdkInstance,
                                                   String componentName,
-                                                  WXDomObject parentDomObject);
+                                                  WXComponent parentComponent);
 
     boolean needValidate(String bundleUrl);
 

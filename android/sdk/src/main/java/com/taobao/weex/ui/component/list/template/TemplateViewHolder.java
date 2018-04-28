@@ -19,16 +19,8 @@
 package com.taobao.weex.ui.component.list.template;
 import android.os.AsyncTask;
 import android.view.View;
-
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by furture on 2017/8/17.
@@ -41,7 +33,8 @@ public class TemplateViewHolder extends ListBaseViewHolder {
      * */
     private WXCell template;
 
-    private CSSLayoutContext layoutContext;
+    // TODO
+//    private CSSLayoutContext layoutContext;
 
     private int holderPosition = -1;
 
@@ -62,16 +55,17 @@ public class TemplateViewHolder extends ListBaseViewHolder {
         super(view, viewType);
     }
 
-    public CSSLayoutContext getLayoutContext() {
-        if(layoutContext == null){
-            layoutContext = new CSSLayoutContext();
-        }
-        return layoutContext;
-    }
-
-    public void setLayoutContext(CSSLayoutContext layoutContext){
-        this.layoutContext = layoutContext;
-    }
+    // TODO
+//    public CSSLayoutContext getLayoutContext() {
+//        if(layoutContext == null){
+//            layoutContext = new CSSLayoutContext();
+//        }
+//        return layoutContext;
+//    }
+//
+//    public void setLayoutContext(CSSLayoutContext layoutContext){
+//        this.layoutContext = layoutContext;
+//    }
 
 
     public int getHolderPosition() {
