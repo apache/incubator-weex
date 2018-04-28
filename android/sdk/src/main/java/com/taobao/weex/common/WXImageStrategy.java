@@ -20,6 +20,8 @@ package com.taobao.weex.common;
 
 import android.widget.ImageView;
 
+import com.taobao.weex.WXSDKInstance;
+
 import java.util.Map;
 
 public class WXImageStrategy {
@@ -47,6 +49,12 @@ public class WXImageStrategy {
   public int blurRadius;
 
   public String placeHolder;
+
+  /**
+   * running weex instanceId
+   * @see WXSDKInstance#mInstanceId
+   */
+  public String instanceId;;
 
   public ImageListener getImageListener() {
     return imageListener;
