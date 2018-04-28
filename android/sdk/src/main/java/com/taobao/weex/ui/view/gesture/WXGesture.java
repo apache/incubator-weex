@@ -160,6 +160,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     if(requestDisallowInterceptTouchEvent){
+      requestDisallowInterceptTouchEvent = false;
       return false;
     }
     try {

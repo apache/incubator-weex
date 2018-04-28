@@ -172,6 +172,8 @@ public class SimpleComponentHolder implements IFComponentHolder{
     }catch (IndexOutOfBoundsException e){
       e.printStackTrace();
       //ignore: getMethods may throw this
+    }catch (Exception e){ // in meizhu mobile, throw class not found exception in getMethods
+      WXLogUtils.e(TAG, e);
     }
     return new Pair<>(methods,mInvokers);
   }

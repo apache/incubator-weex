@@ -24,4 +24,5 @@
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText;
 - (BOOL)useCoreText;
+
 @end

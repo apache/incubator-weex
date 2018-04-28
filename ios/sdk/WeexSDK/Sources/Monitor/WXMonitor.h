@@ -35,6 +35,21 @@ typedef enum : NSUInteger {
     WXPTFirstScreenRender,
     WXPTAllRender,
     WXPTBundleSize,
+    //new point
+    //doc see @WXPerformance
+    WXPTFsCallJsTime,
+    WXPTFsCallJsNum,
+    WXPTFsCallNativeTime,
+    WXPTFsCallNativeNum,
+    WXPTFsCallEventNum,
+    WXPTFsReqNetNum,
+    WXPTCellExceedNum,
+    WXPTMaxDeepVDom,
+    WXPTImgWrongSizeNum,
+    WXPTTimerNum,
+    WXPTInteractionTime,
+    WXPTWrongImgSize,
+    //end
     WXPTEnd
 } WXPerformanceTag;
 
@@ -46,6 +61,16 @@ typedef enum : NSUInteger {
     WXMTJSService,
 } WXMonitorTag;
 
+typedef NS_ENUM(NSInteger, CommitState)
+{
+    MonitorCommit,
+    
+    //just use on Debug mode
+    DebugAfterRequest,
+    DebugAfterFSFinish,
+    DebugAfterExist,
+    DebugOnRealTime
+};
 
 #define WX_MONITOR_SUCCESS_ON_PAGE(tag, pageName) [WXMonitor monitoringPointDidSuccess:tag onPage:pageName];
 #define WX_MONITOR_FAIL_ON_PAGE(tag, errorCode, errorMessage, pageName) \
@@ -75,5 +100,7 @@ NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN \
 
 + (void)monitoringPointDidSuccess:(WXMonitorTag)tag onPage:(NSString *)pageName;
 + (void)monitoringPoint:(WXMonitorTag)tag didFailWithError:(NSError *)error onPage:(NSString *)pageName;
+
++ (void)performanceFinishWithState:(CommitState) state instance:(WXSDKInstance *)instance;
 
 @end

@@ -319,7 +319,12 @@ public class WXImage extends WXComponent<ImageView> {
             fireEvent(Constants.Event.ONLOAD, params);
           }
         }
-        monitorImgSize(imageView);
+
+      imageStrategy.instanceId = getInstanceId();
+      IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
+      if (imgLoaderAdapter != null) {
+        imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
+            getAttrs().getImageQuality(), imageStrategy);
       }
     });
 

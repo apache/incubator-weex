@@ -596,6 +596,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
+    wxRequest.instanceId = getInstanceId();
     wxRequest.paramMap.put(KEY_USER_AGENT, WXHttpUtil.assembleUserAgent(mContext,WXEnvironment.getConfig()));
     WXHttpListener httpListener =
             new WXHttpListener(pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
