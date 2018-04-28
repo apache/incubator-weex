@@ -71,8 +71,14 @@ public class WXRenderManager {
     return statement.getWXSDKInstance();
   }
 
+  @RestrictTo(Scope.LIBRARY)
   public void postOnUiThread(Runnable runnable, long delayMillis) {
     mWXRenderHandler.postDelayed(WXThread.secure(runnable), delayMillis);
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void postOnUiThread(Runnable runnable,final String instanceId){
+    mWXRenderHandler.post(instanceId, WXThread.secure(runnable));
   }
 
   @RestrictTo(Scope.LIBRARY)
