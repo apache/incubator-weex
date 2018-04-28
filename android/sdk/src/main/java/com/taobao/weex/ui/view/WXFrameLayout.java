@@ -94,22 +94,22 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
     return mWidgets != null || super.verifyDrawable(who);
   }
 
-//  @Override
-//  protected void dispatchDraw(Canvas canvas) {
-//    try {
-//      if (mWidgets != null) {
-//        canvas.save();
-//        canvas.translate(getPaddingLeft(), getPaddingTop());
-//        for (Widget widget : mWidgets) {
-//          widget.draw(canvas);
-//        }
-//        canvas.restore();
-//      } else {
-//        WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
-//        super.dispatchDraw(canvas);
-//      }
-//    }catch (Throwable e){
-//      WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
-//    }
-//  }
+  @Override
+  protected void dispatchDraw(Canvas canvas) {
+    try {
+      if (mWidgets != null) {
+        canvas.save();
+        canvas.translate(getPaddingLeft(), getPaddingTop());
+        for (Widget widget : mWidgets) {
+          widget.draw(canvas);
+        }
+        canvas.restore();
+      } else {
+        WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
+        super.dispatchDraw(canvas);
+      }
+    }catch (Throwable e){
+      WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
+    }
+  }
 }
