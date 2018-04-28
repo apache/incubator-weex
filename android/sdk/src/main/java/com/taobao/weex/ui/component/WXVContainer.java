@@ -29,11 +29,13 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -596,7 +598,20 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         if (mBoxShadowHost == null) {
           mBoxShadowHost = new BoxShadowHost(getContext());
           WXViewUtils.setBackGround(mBoxShadowHost, null);
-          mBoxShadowHost.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+          Spacing padding = this.getDomObject().getPadding();
+          Spacing border = this.getDomObject().getBorder();
+
+          int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
+          int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
+          int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
+          int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
+
+          ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
+          layoutParams.setMargins(-left, -top, -right, -bottom);
+
+          mBoxShadowHost.setLayoutParams(layoutParams);
+
           hostView.addView(mBoxShadowHost);
         }
         hostView.removeView(mBoxShadowHost);

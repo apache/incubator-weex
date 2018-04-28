@@ -65,12 +65,12 @@ import java.util.regex.Pattern;
 
 public class BoxShadowUtil {
   private static final String TAG = "BoxShadowUtil";
-  private static boolean sBoxShadowEnabled = false /*disable box-shadow temporary*/;
+  private static boolean sBoxShadowEnabled = true /*disable box-shadow temporary*/;
 
   private static Pattern sColorPattern;
 
   public static void setBoxShadowEnabled(boolean enabled) {
-    //sBoxShadowEnabled = enabled;
+    sBoxShadowEnabled = enabled;
     WXLogUtils.w(TAG, "Switch box-shadow status: " + enabled);
   }
 
@@ -194,6 +194,8 @@ public class BoxShadowUtil {
   private static void setNormalBoxShadow(View target, List<BoxShadowOptions> options, float quality, float[] radii) {
     int h = target.getHeight();
     int w = target.getWidth();
+
+    ViewGroup.LayoutParams p = target.getLayoutParams();
 
     if (h == 0 || w == 0) {
       Log.w(TAG, "Target view is invisible, ignore set shadow.");
