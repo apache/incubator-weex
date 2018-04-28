@@ -476,8 +476,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         }
       };
     }
-    getHostView().removeCallbacks(mAppearComponentsRunnable);
-    getHostView().postDelayed(mAppearComponentsRunnable, mAppearDelay);
+    if (getHostView() != null) {
+      getHostView().removeCallbacks(mAppearComponentsRunnable);
+      getHostView().postDelayed(mAppearComponentsRunnable, mAppearDelay);
+    }
   }
 
   @Override
