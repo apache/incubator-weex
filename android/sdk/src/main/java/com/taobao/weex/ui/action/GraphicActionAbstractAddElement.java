@@ -57,7 +57,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
 
     WXComponent component = WXComponentFactory.newInstance(instance, parent, basicComponentData);
     WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
-    if(mStyle.containsKey(Constants.Name.TRANSFORM)) {
+    if(mStyle.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
       Map<String, Object> animationMap = new ArrayMap<>(2);
       animationMap.put(Constants.Name.TRANSFORM, mStyle.get(Constants.Name.TRANSFORM));
       animationMap

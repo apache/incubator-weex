@@ -58,7 +58,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
     if (null != mStyle) {
       component.addStyle(mStyle, mIsCausedByPesudo);
-      if(style.containsKey(Constants.Name.TRANSFORM)) {
+      if(style.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
         Map<String, Object> animationMap = new ArrayMap<>(2);
         animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
         animationMap
@@ -95,11 +95,13 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
     if (null != mStyle) {
       component.addStyle(mStyle, mIsCausedByPesudo);
-      Map<String, Object> animationMap = new ArrayMap<>(2);
-      animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
-      animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
-      component.addAnimationForElement(animationMap);
-      WXBridgeManager.getInstance().markDirty(component.getInstanceId(), component.getRef(), true);
+      if(style.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null){
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+        animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+        component.addAnimationForElement(animationMap);
+        WXBridgeManager.getInstance().markDirty(component.getInstanceId(), component.getRef(), true);
+      }
     }
 
     if (null != paddings) {
