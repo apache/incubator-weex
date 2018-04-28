@@ -170,6 +170,16 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private boolean waste = false;
 
+  private boolean hasStackSizeLimit = false;
+
+  protected void setStackSizeLimit(boolean hasStackSizeLimit) {
+    this.hasStackSizeLimit = hasStackSizeLimit;
+  }
+
+  public boolean isStackSizeLimit() {
+    return hasStackSizeLimit;
+  }
+
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;

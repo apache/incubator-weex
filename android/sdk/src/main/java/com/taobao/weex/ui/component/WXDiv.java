@@ -20,8 +20,12 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.widget.ImageView;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
@@ -113,5 +117,29 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   @Override
   public boolean isVirtualComponent() {
     return !promoteToView(true);
+  }
+
+  @WXComponentProp(name = Constants.Name.STACKSIZE_LIMIT)
+  public void setStackSizeLimitModle(String stackSizeLimit) {
+    setStackSizeLimit(getStackSizeLimit(stackSizeLimit));
+  }
+
+  private boolean getStackSizeLimit(String stackSizeLimit) {
+    boolean ret = false;
+    if (TextUtils.isEmpty(stackSizeLimit)) {
+      return ret;
+    }
+
+    switch (stackSizeLimit) {
+      case "true":
+        ret = true;
+        break;
+      case "false":
+        ret = false;
+        break;
+      default:
+        break;
+    }
+    return ret;
   }
 }
