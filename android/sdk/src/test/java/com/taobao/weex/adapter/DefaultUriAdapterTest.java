@@ -110,7 +110,7 @@ public class DefaultUriAdapterTest {
     assertEquals(Uri.parse(host + "/test2"), uri);
 
     uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse(""));
-    assertEquals(Uri.parse(""), uri);
+    assertEquals(Uri.parse(bundleUrl), uri);
   }
 
 }

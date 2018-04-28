@@ -44,5 +44,6 @@
 @property (nonatomic, assign) UITableViewRowAnimation deleteAnimation;
 @property (nonatomic, assign) BOOL keepScrollPosition;
 @property (nonatomic, weak) id<WXCellRenderDelegate> delegate;
+@property (nonatomic, strong) NSString *zIndex;
 
 @end

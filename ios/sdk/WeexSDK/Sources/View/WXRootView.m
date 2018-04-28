@@ -20,6 +20,12 @@
 #import "WXRootView.h"
 #import "WXSDKInstance.h"
 
+@interface WXRootView()
+
+@property (nonatomic, assign) BOOL mHasEvent;
+
+@end
+
 @implementation WXRootView
 
 - (void)setFrame:(CGRect)frame
@@ -34,6 +40,17 @@
     if (shouldNotifyLayout && _instance.onLayoutChange) {
         _instance.onLayoutChange(self);
     }
+}
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    _mHasEvent = TRUE;
+    return [super hitTest:point withEvent:event];
+}
+
+- (BOOL)isHasEvent
+{
+    return _mHasEvent;
 }
 
 @end

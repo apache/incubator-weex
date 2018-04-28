@@ -20,6 +20,7 @@
 #import "WXIndicatorComponent.h"
 #import "WXConvert.h"
 #import "WXSDKInstance.h"
+#import "WXUtility.h"
 
 @implementation WXIndicatorView
 
@@ -43,27 +44,35 @@
 - (void)setPointCount:(NSInteger)pointCount
 {
     _pointCount = pointCount;
-    [self setNeedsDisplay];
+    WXPerformBlockOnMainThread(^{
+        [self setNeedsDisplay];
+    });
 }
 
 - (void)setCurrentPoint:(NSInteger)currentPoint
 {
     if (currentPoint < _pointCount && currentPoint >= 0) {
         _currentPoint = currentPoint;
-        [self setNeedsDisplay];
+        WXPerformBlockOnMainThread(^{
+            [self setNeedsDisplay];
+        });
     }
 }
 
 - (void)setPointSize:(CGFloat)pointSize
 {
     _pointSize = pointSize;
-    [self setNeedsDisplay];
+    WXPerformBlockOnMainThread(^{
+        [self setNeedsDisplay];
+    });
 }
 
 - (void)setPointSpace:(CGFloat)pointSpace
 {
     _pointSpace = pointSpace;
-    [self setNeedsDisplay];
+    WXPerformBlockOnMainThread(^{
+        [self setNeedsDisplay];
+    });
 }
 
 - (void)drawRect:(CGRect)rect
@@ -203,7 +212,9 @@
     }
     
     if (styleChange) {
-        [self setNeedsDisplay];
+        WXPerformBlockOnMainThread(^{
+            [self setNeedsDisplay];
+        });
     }
 }
 

@@ -33,6 +33,8 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 #import <pthread/pthread.h>
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
 
 @interface WXImageView : UIImageView
 
@@ -95,7 +97,6 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
-        [self configFilter:styles];
         
         _imageQuality = WXImageQualityNone;
         if (styles[@"quality"]) {
@@ -113,6 +114,8 @@ WX_EXPORT_METHOD(@selector(save:))
             _downloadImageWithURL = [WXConvert BOOL:attributes[@"compositing"]];
         }
         
+        [self configFilter:styles needUpdate:NO];
+        
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;
@@ -128,7 +131,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
-- (void)configFilter:(NSDictionary *)styles
+- (void)configFilter:(NSDictionary *)styles needUpdate:(BOOL)needUpdate
 {
     if (styles[@"filter"]) {
         NSString *filter = styles[@"filter"];
@@ -145,7 +148,9 @@ WX_EXPORT_METHOD(@selector(save:))
             NSString *matchString = [filter substringWithRange:matchRange];
             if (matchString && matchString.length > 0) {
                 _blurRadius = [matchString doubleValue];
-                [self updateImage];
+                if (needUpdate) {
+                    [self updateImage];
+                }
             }
         }
     }
@@ -166,11 +171,11 @@ WX_EXPORT_METHOD(@selector(save:))
     
     // iOS 11 needs a NSPhotoLibraryUsageDescription key for permission
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
-        if (!info[@"NSPhotoLibraryUsageDescription"]) {
+        if (!info[@"NSPhotoLibraryAddUsageDescription"]) {
             if (resultCallback) {
                 resultCallback(@{
                                  @"success" : @(false),
-                                 @"errorDesc": @"This maybe crash above iOS 10 because it attempted to access privacy-sensitive data without a usage description.  The app's Info.plist must contain an NSPhotoLibraryUsageDescription key with a string value explaining to the user how the app uses this data."
+                                 @"errorDesc": @"This maybe crash above iOS 11 because it attempted to save image without a usage description.  The app's Info.plist must contain an NSPhotoLibraryAddUsageDescription key with a string value explaining to the user how the app uses this data."
                                  }, NO);
             }
             return;
@@ -241,7 +246,7 @@ WX_EXPORT_METHOD(@selector(save:))
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         [self updateImage];
     }
-    [self configFilter:styles];
+    [self configFilter:styles needUpdate:YES];
 }
 
 - (void)dealloc
@@ -382,6 +387,10 @@ WX_EXPORT_METHOD(@selector(save:))
                 // log error message for error
                 WXLogError(@"Error downloading image: %@, detail:%@", imageURL.absoluteString, [error localizedDescription]);
             }
+            UIImageView *imageView = (UIImageView *)strongSelf.view;
+            if (imageView && imageView.image != image) {
+                imageView.image = image;
+            }
             if (strongSelf.imageLoadEvent) {
                 NSMutableDictionary *sizeDict = [NSMutableDictionary new];
                 sizeDict[@"naturalWidth"] = @0;
@@ -393,6 +402,14 @@ WX_EXPORT_METHOD(@selector(save:))
                     [sizeDict setObject:[error description]?:@"" forKey:@"errorDesc"];
                 }
                 [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
+            }
+            //check view/img size
+            if (!error && image && weakSelf.view) {
+                double imageSize = image.size.width * image.scale * image.size.height * image.scale;
+                double viewSize = weakSelf.view.frame.size.height *  weakSelf.view.frame.size.width;
+                if (imageSize > viewSize) {
+                    self.weexInstance.performance.imgWrongSizeNum++;
+                }
             }
         }];
     } else {

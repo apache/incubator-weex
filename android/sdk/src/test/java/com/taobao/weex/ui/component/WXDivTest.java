@@ -18,16 +18,11 @@
  */
 package com.taobao.weex.ui.component;
 
-import static org.junit.Assert.assertEquals;
-
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.flat.FlatGUIContext;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +30,8 @@ import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by gulin on 16/2/24.
@@ -61,7 +58,6 @@ public class WXDivTest {
     public void setUp() throws Exception {
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
-        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         WXDomObject divDom = new WXDomObject();
         WXDomObject spy = Mockito.spy(divDom);
@@ -77,7 +73,6 @@ public class WXDivTest {
     public void testAddChild(){
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
-        Mockito.when(instance.getFlatUIContext()).thenReturn(new FlatGUIContext());
 
         WXDomObject testDom = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom.getPadding()).thenReturn(new Spacing());

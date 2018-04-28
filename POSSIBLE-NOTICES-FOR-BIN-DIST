@@ -49,9 +49,6 @@ by facebook , licensed under the BSD-3-Clause License.
 This product contains software animated-gif(https://github.com/facebook/fresco) developed
 by facebook , licensed under the BSD-3-Clause License.
 
-This product contains software yoga(https://github.com/facebook/yoga) developed
-by facebook , licensed under the BSD-3-Clause License.
-
 This product contains software SocketRocket(https://github.com/facebook/SocketRocket) developed
 by facebook , licensed under the BSD-3-Clause License.
 
@@ -81,3 +78,18 @@ by google  , licensed under the Apache License.
 
 This product contains shelljs Guava(https://github.com/shelljs/shelljs) developed
 by shelljs  , licensed under BSD 3-clause "New" or "Revised" License.
+
+This product contains software fpconv(https://github.com/night-shift/fpconv) developed
+by night-shift  , licensed under the MIT License.
+
+This product contains software rapidjson(https://github.com/Tencent/rapidjson) developed
+by tencent  , licensed under the MIT License.
+
+This product contains software flexbox-layout(https://github.com/google/flexbox-layout) developed
+by google  , licensed under the Apache License.
+
+This product contains software IPC(https://source.android.com/) developed
+by google  , licensed under the Apache License.
+
+This product contains software JNI(https://chromium.googlesource.com/) developed
+by google, licensed under the BSD-style License.

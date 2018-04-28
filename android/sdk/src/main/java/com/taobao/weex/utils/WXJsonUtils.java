@@ -25,9 +25,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.wson.Wson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,39 +90,4 @@ public class WXJsonUtils {
       }
     }
   }
-
-
-  /**
-   * total entry, with wson support, and  can degrade to json
-   * */
-  public static final Object parseWson(byte[] data){
-    if(data == null){
-      return  null;
-    }
-    try{
-      if(USE_WSON){
-        return  Wson.parse(data);
-      }else{
-        return  JSON.parse(new String(data, "UTF-8"));
-      }
-    }catch (Exception e){
-      WXLogUtils.e("weex wson parse error ", e);
-      return  null;
-    }
-  }
-
-
-  public static final WXJSObject wsonWXJSObject(Object tasks){
-    //CompatibleUtils.checkDiff(tasks);
-    if(USE_WSON) {
-      return new WXJSObject(WXJSObject.WSON, Wson.toWson(tasks));
-    }else{
-      return new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(tasks));
-    }
-  }
-  /**
-   * config whether use json or wson,  you should update this value by updateGlobalConfig(String config)
-   * in WXBridgeManager class  method
-   * */
-  public static  boolean USE_WSON = true;
 }

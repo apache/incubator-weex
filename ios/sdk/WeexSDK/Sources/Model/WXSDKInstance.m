@@ -49,6 +49,7 @@
 #import "WXMonitor.h"
 #import "WXBridgeContext.h"
 #import "WXJSCoreBridge.h"
+#import "WXSDKInstance_performance.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -75,7 +76,8 @@ typedef enum : NSUInteger {
     BOOL _needDestroy;
     BOOL _syncDestroyComponentManager;
     BOOL _debugJS;
-    id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context
+    id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
+    CGFloat _defaultPixelScaleFactor;
 }
 
 - (void)dealloc
@@ -101,7 +103,7 @@ typedef enum : NSUInteger {
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
-
+        
         [WXSDKManager storeInstance:self forID:_instanceId];
         
         _bizType = @"";
@@ -115,10 +117,13 @@ typedef enum : NSUInteger {
         _trackComponent = NO;
         _performanceCommit = NO;
         
+        _performance = [[WXPerformance alloc] init];
+        
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             _syncDestroyComponentManager = [[configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL] boolValue];
         }
+        _defaultPixelScaleFactor = CGFLOAT_MIN;
         
         [self addObservers];
     }
@@ -140,7 +145,6 @@ typedef enum : NSUInteger {
     }
     
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
-    
     if(!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
@@ -158,6 +162,9 @@ typedef enum : NSUInteger {
     
     if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
         [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
+    }
+    if (!_debugJS) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_JSCONTEXT_CREATE_NOTIFICATION object:_instanceJavaScriptContext.javaScriptContext];
     }
     
     return _instanceJavaScriptContext;
@@ -178,6 +185,9 @@ typedef enum : NSUInteger {
 
 - (void)setFrame:(CGRect)frame
 {
+#ifdef DEBUG
+    WXLogDebug(@"flexLayout -> setFrame :%@,instance :%@",NSStringFromCGRect(frame),self);
+#endif
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;
         WXPerformBlockOnMainThread(^{
@@ -230,6 +240,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -408,6 +419,8 @@ typedef enum : NSUInteger {
         
         [strongSelf _renderWithMainBundleString:jsBundleString];
         [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
+        [WXMonitor performanceFinishWithState:DebugAfterRequest instance:strongSelf];
+    
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
@@ -505,6 +518,7 @@ typedef enum : NSUInteger {
     }
     
     if (!_performanceCommit && state == WeexInstanceDisappear) {
+        [self updatePerDicBeforExit];
         WX_MONITOR_INSTANCE_PERF_COMMIT(self);
         _performanceCommit = YES;
     }
@@ -574,7 +588,12 @@ typedef enum : NSUInteger {
     if (self.viewportWidth > 0) {
         return [WXUtility portraitScreenSize].width / self.viewportWidth;
     } else {
-        return [WXUtility defaultPixelScaleFactor];
+        if (_defaultPixelScaleFactor != CGFLOAT_MIN) {
+            return _defaultPixelScaleFactor;
+        }
+        
+        _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
+        return _defaultPixelScaleFactor;
     }
 }
 

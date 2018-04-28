@@ -25,6 +25,8 @@
 #import "WXJSExceptionInfo.h"
 #import "WXUtility.h"
 #import "WXSDKManager.h"
+#import "WXAnalyzerCenter+Transfer.h"
+
 
 
 @implementation WXExceptionUtils
@@ -51,6 +53,9 @@
     id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
     if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
         [jsExceptionHandler onJSException:jsExceptionInfo];
+    }
+    if ([WXAnalyzerCenter isOpen]) {
+        [WXAnalyzerCenter transErrorInfo:jsExceptionInfo];
     }
 }
 

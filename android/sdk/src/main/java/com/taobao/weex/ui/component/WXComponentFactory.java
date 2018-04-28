@@ -23,9 +23,9 @@ import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -37,42 +37,45 @@ import java.util.Set;
  * Component factory
  */
 public class WXComponentFactory {
-  private static Map<String,Set<String>> sComponentTypes=new HashMap<>();
-  public static Set<String> getComponentTypesByInstanceId(String instanceId){
+  private static Map<String, Set<String>> sComponentTypes = new HashMap<>();
+
+  public static Set<String> getComponentTypesByInstanceId(String instanceId) {
     return sComponentTypes.get(instanceId);
   }
-  public static void removeComponentTypesByInstanceId(String instanceId){
+
+  public static void removeComponentTypesByInstanceId(String instanceId) {
     sComponentTypes.remove(instanceId);
   }
 
-  public static WXComponent newInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    if (instance == null || node == null || TextUtils.isEmpty(node.getType()) ) {
+  public static WXComponent newInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }
 
-
-    if(sComponentTypes.get(instance.getInstanceId())==null){
-      Set<String> types=new HashSet<>();
-      sComponentTypes.put(instance.getInstanceId(),types);
+    if (sComponentTypes.get(instance.getInstanceId()) == null) {
+      Set<String> types = new HashSet<>();
+      sComponentTypes.put(instance.getInstanceId(), types);
     }
-    sComponentTypes.get(instance.getInstanceId()).add(node.getType());
+    sComponentTypes.get(instance.getInstanceId()).add(basicComponentData.mComponentType);
 
-    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getType());
+    IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
     if (holder == null) {
+      if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
-                node.getType() + "]" + " class not found";
+                basicComponentData.mComponentType + "]" + " class not found";
         WXLogUtils.e(tag);
+      }
       //For compatible reason of JS framework, unregistered type will be treated as container.
       holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
-      if(holder == null){
+      if (holder == null) {
         throw new WXRuntimeException("Container component not found.");
       }
     }
 
     try {
-      return holder.createInstance(instance, node, parent);
-    } catch (Exception e) {
-      WXLogUtils.e("WXComponentFactory Exception type:[" + node.getType() + "] ", e);
+      return holder.createInstance(instance, parent, basicComponentData);
+    } catch (Throwable e) {
+      WXLogUtils.e("WXComponentFactory Exception type:[" + basicComponentData.mComponentType + "] ", e);
     }
 
     return null;

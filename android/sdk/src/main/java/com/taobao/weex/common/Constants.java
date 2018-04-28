@@ -121,12 +121,12 @@ public class Constants {
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
     String LAYOUT = "layout";
-    String COLUMN_WIDTH= "columnWidth";
-    String COLUMN_COUNT= "columnCount";
-    String COLUMN_GAP= "columnGap";
+    String COLUMN_WIDTH = "columnWidth";
+    String COLUMN_COUNT = "columnCount";
+    String COLUMN_GAP = "columnGap";
+    String SHOW_SCROLLBAR = "showScrollbar";
     String LEFT_GAP= "leftGap";
     String RIGHT_GAP= "rightGap";
-    String SHOW_SCROLLBAR= "showScrollbar";
     String OVERFLOW = "overflow";
     String TYPE = "type";
     String PLACEHOLDER = "placeholder";
@@ -191,7 +191,7 @@ public class Constants {
 
     String DIRECTION = "direction";
     String RTL = "rtl";
-    
+
     String STICKY_OFFSET = "stickyOffset";
     String HAS_FIXED_SIZE = "hasFixedSize";
     String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
@@ -207,10 +207,6 @@ public class Constants {
     String INCLUDE_FONT_PADDING = "includeFontPadding";
     String ENABLE_COPY = "enableCopy";
 
-    String THUMB_TINT_COLOR = "thumbTintColor";
-    String ON_THUMB_TINT_COLOR = "onThumbTintColor";
-    String TINT_COLOR = "tintColor";
-    String ON_TINT_COLOR = "onTintColor";
 
     interface  Recycler{
       String LIST_DATA = "listData";
@@ -229,7 +225,6 @@ public class Constants {
     String FLAT = "flat";
     String RIPPLE_ENABLED = "rippleEnabled";
 
-
     String SHOULD_STOP_PROPAGATION_INIT_RESULT = "shouldStopPropagationInitResult";
     String SHOULD_STOP_PROPAGATION_INTERVAL = "shouldStopPropagationInterval";
 
@@ -245,8 +240,8 @@ public class Constants {
     int AUTO = -1;
     int COLUMN_GAP_NORMAL = 32;
     int COLUMN_COUNT_NORMAL = 1;
-    String MULTI_COLUMN= "multi-column";
-    String GRID= "grid";
+    String MULTI_COLUMN = "multi-column";
+    String GRID = "grid";
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
@@ -322,7 +317,7 @@ public class Constants {
 
     String ON_TRANSITION_END = "transitionEnd";
 
-    interface SLOT_LIFECYCLE{
+    interface SLOT_LIFECYCLE {
       String CREATE = "create";
       String ATTACH = "attach";
       String DETACH = "detach";
@@ -357,7 +352,7 @@ public class Constants {
     String SAVE_PATH = "v8";
   }
 
-  public interface  TimeFunction{
+  public interface TimeFunction {
     String LINEAR = "linear";
     String EASE_IN_OUT = "ease-in-out";
     String EASE_IN = "ease-in";

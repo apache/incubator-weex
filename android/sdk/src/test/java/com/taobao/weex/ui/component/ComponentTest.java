@@ -21,9 +21,6 @@ package com.taobao.weex.ui.component;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -52,10 +49,10 @@ public class ComponentTest {
       parent.createChildViewAt(-1);
     }
 
-    comp.setLayout(domObject);
+    comp.setLayout(comp);
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
+//    domObject = new TestDomObject();
+//    comp.updateDom(domObject);
     comp.applyLayoutAndEvent(comp);
 
     addEvent(comp);

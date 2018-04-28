@@ -23,8 +23,7 @@ import android.view.Gravity;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.TextAreaEditTextDomObject;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXUtils;
 
@@ -32,8 +31,12 @@ import com.taobao.weex.utils.WXUtils;
  * Created by sospartan on 7/11/16.
  */
 public class Textarea extends AbstractEditComponent {
-  public Textarea(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-    super(instance, dom, parent, isLazy);
+
+  public static final int DEFAULT_ROWS = 2;
+  private int mNumberOfLines = DEFAULT_ROWS;
+
+  public Textarea(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+    super(instance, parent, isLazy, basicComponentData);
   }
 
   @Override
@@ -45,9 +48,9 @@ public class Textarea extends AbstractEditComponent {
   @Override
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
-    String rowsStr = (String) getDomObject().getStyles().get(Constants.Name.ROWS);
+    String rowsStr = (String) getStyles().get(Constants.Name.ROWS);
 
-    int rows = TextAreaEditTextDomObject.DEFAULT_ROWS;
+    int rows = DEFAULT_ROWS;
     try{
       if(!TextUtils.isEmpty(rowsStr)) {
         rows = Integer.parseInt(rowsStr);
@@ -86,5 +89,31 @@ public class Textarea extends AbstractEditComponent {
     }
 
     text.setLines(rows);
+  }
+
+  @Override
+  protected float getMeasureHeight(){
+    return getMeasuredLineHeight() * mNumberOfLines;
+  }
+
+  @Override
+  protected void updateStyleAndAttrs() {
+    super.updateStyleAndAttrs();
+    Object raw = getAttrs().get(Constants.Name.ROWS);
+    if (raw == null) {
+      return;
+    } else if (raw instanceof String) {
+      String rowsStr = (String) raw;
+      try {
+        int lines = Integer.parseInt(rowsStr);
+        if (lines > 0) {
+          mNumberOfLines = lines;
+        }
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+      }
+    } else if (raw instanceof Integer) {
+      mNumberOfLines = (Integer) raw;
+    }
   }
 }

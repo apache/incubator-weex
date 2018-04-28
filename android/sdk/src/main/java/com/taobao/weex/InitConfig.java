@@ -180,7 +180,7 @@ public class InitConfig {
       config.framework=this.framework;
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
-      config.mJSExceptionAdapter= this.mJSExceptionAdapter;
+      config.mJSExceptionAdapter=this.mJSExceptionAdapter;
       config.classLoaderAdapter = this.classLoaderAdapter;
       return config;
     }

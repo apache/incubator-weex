@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,11 +31,8 @@ import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.action.Actions;
-import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.config.ConfigModuleFactory;
+import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -83,7 +80,7 @@ public class WXModuleManager {
       return false;
     }
 
-    if (TextUtils.equals(moduleName, WXDomModule.WXDOM)) {
+    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
       WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
@@ -93,7 +90,7 @@ public class WXModuleManager {
     } catch (Throwable e) {
 
     }
-    AutoScanConfigRegister.preLoad(factory);
+
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()
             .post(new Runnable() {
@@ -122,6 +119,7 @@ public class WXModuleManager {
               }
             });
     return true;
+
   }
 
   static boolean registerNativeModule(String moduleName, ModuleFactory factory) throws WXException {
@@ -181,14 +179,14 @@ public class WXModuleManager {
         return null;
       }
     } catch (Exception e) {
-	  WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED,
-			  "callModuleMethod",
-			  WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
-			  + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
-			  + WXLogUtils.getStackTrace(e),
-			  null);
-	  WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED,
+              "callModuleMethod",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED.getErrorMsg()
+                      + "callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. "
+                      + WXLogUtils.getStackTrace(e),
+              null);
+      WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
@@ -204,8 +202,8 @@ public class WXModuleManager {
     }
     // we are in preRender mode
     if(invoker.isRunOnUIThread()) {/*ASYNC CALL*/
-      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
-      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
+//      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
+//      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
       return null;
     } else {/*SYNC CALL*/
       return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
@@ -486,5 +484,4 @@ public class WXModuleManager {
       }
     }
   }
-
 }

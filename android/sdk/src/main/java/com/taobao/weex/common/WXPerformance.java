@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,7 +19,6 @@
 package com.taobao.weex.common;
 
 import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXViewUtils;
@@ -31,7 +30,7 @@ import java.util.Map;
 
 public class WXPerformance {
 
-  @RestrictTo(Scope.LIBRARY)
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
   public enum Dimension {
     JSLibVersion,
     WXSDKVersion,
@@ -126,7 +125,7 @@ public class WXPerformance {
 
   public static final String DEFAULT = "default";
 
-  @RestrictTo(Scope.LIBRARY_GROUP)
+  @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
   public static final String CACHE_TYPE = "cacheType";
 
   public static final int VIEW_LIMIT_HEIGHT = WXViewUtils.getScreenHeight() / 2;
@@ -145,10 +144,10 @@ public class WXPerformance {
   @Deprecated
   public String templateUrl;
 
-  @RestrictTo(Scope.LIBRARY_GROUP)
+  @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
   public String cacheType = "unknown";
 
-  @RestrictTo(Scope.LIBRARY)
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
   public long renderTimeOrigin;
 
   public long fsRenderTime;
@@ -161,7 +160,7 @@ public class WXPerformance {
    * Time used for
    * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
    */
-  @RestrictTo(Scope.LIBRARY)
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
   public long callCreateInstanceTime;
 
 
@@ -326,7 +325,7 @@ public class WXPerformance {
   public String errMsg;
   private StringBuilder mErrMsgBuilder;
 
-  public String args = "";
+  public String args="";
 
   public String connectionType;
   public String requestType;
@@ -340,19 +339,45 @@ public class WXPerformance {
   /**
    * TODO These dimensions will be moved to elsewhere
    */
-  @RestrictTo(Scope.LIBRARY)
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
   @Deprecated
   public String wxDims[] = new String[5];
 
   /**
    * TODO These dimensions will be moved to elsewhere
    */
-  @RestrictTo(Scope.LIBRARY)
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
   @Deprecated
   public long measureTimes[] = new long[5];
 
-  public WXPerformance() {
-    mErrMsgBuilder = new StringBuilder();
+
+  /**
+   * RenderAction
+   */
+  public int mCallCreateBodySumTime = 0;
+  public int mCallAddElementSumTime = 0;
+
+  public int mCallLayoutSumTime = 0;
+  public int mCallLayoutUpdateDemissionSumTime = 0;
+  public int mCallLayoutApplyLayoutAndEventSumTime = 0;
+  public int mCallLayoutBindDataSumTime = 0;
+
+  public int mActionTotalSumTime = 0;
+  public int mActionLayoutCount = 0;
+  public int mActionLayoutSumTime = 0;
+
+  public int mActionAddElementCount = 0;
+  public int mActionAddElementSumTime = 0;
+
+  public int mActionCreateBodyCount = 0;
+  public int mActionCreateBodySumTime = 0;
+
+  public int mActionOtherCount = 0;
+  public int mActionOtherSumTime = 0;
+
+
+  public WXPerformance(){
+    mErrMsgBuilder=new StringBuilder();
   }
 
   public static void init() {
@@ -467,44 +492,44 @@ public class WXPerformance {
   public String toString() {
     if (WXEnvironment.isApkDebugable()) {
       return "bizType:" + bizType + ",pageName:" + pageName + ",templateLoadTime" + templateLoadTime
-             + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
-             + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
-             + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
-             + ",screenRenderTime:" + screenRenderTime
-             + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-             + ",componentCount:" + componentCount
-             + ",syncTaskTime:" + syncTaskTime
-             + ",pureNetworkTime:" + pureNetworkTime
-             + ",networkTime:" + networkTime
-             + ",actualNetworkTime:" + actualNetworkTime
-             + ",packageSpendTime:" + packageSpendTime
-             + ",connectionType:" + connectionType
-             + ",requestType:" + requestType
-             + ",initInvokeTime:" + WXEnvironment.sSDKInitInvokeTime + ",initExecuteTime:" + WXEnvironment.sSDKInitExecuteTime
-             + ",SDKInitTime:" + WXEnvironment.sSDKInitTime
-             + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
-             + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
-             + ",arg:" + args
-             + ",errMsg:" + getErrMsg();
+              + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
+              + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
+              + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
+              + ",screenRenderTime:" + screenRenderTime
+              + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + ",componentCount:" + componentCount
+              + ",syncTaskTime:" + syncTaskTime
+              + ",pureNetworkTime:" + pureNetworkTime
+              + ",networkTime:" + networkTime
+              + ",actualNetworkTime:" + actualNetworkTime
+              + ",packageSpendTime:" + packageSpendTime
+              + ",connectionType:" + connectionType
+              + ",requestType:" + requestType
+              + ",initInvokeTime:" + WXEnvironment.sSDKInitInvokeTime + ",initExecuteTime:" + WXEnvironment.sSDKInitExecuteTime
+              + ",SDKInitTime:" + WXEnvironment.sSDKInitTime
+              + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
+              + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
+              + ",arg:" + args
+              + ",errMsg:" + getErrMsg();
     }
     return super.toString();
   }
 
   public String getPerfData() {
     return "networkTime:" + networkTime
-           + " actualNetworkTime:" + actualNetworkTime
-           + " connectionType:" + connectionType
-           + " requestType:" + requestType
-           + " firstScreenRenderTime:" + screenRenderTime
-           + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-           + " componentCount:" + componentCount
-           + " JSTemplateSize:" + JSTemplateSize
-           + " SDKInitTime:" + WXEnvironment.sSDKInitTime
-           + " totalTime:" + totalTime
-           + " JSLibVersion:" + JSLibVersion
-           + " WXSDKVersion:" + WXSDKVersion
-           + " pageName:" + pageName
-           + " useScroller:" + useScroller;
+            + " actualNetworkTime:" + actualNetworkTime
+            + " connectionType:" + connectionType
+            + " requestType:" + requestType
+            + " firstScreenRenderTime:" + screenRenderTime
+            + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+            + " componentCount:" + componentCount
+            + " JSTemplateSize:" + JSTemplateSize
+            + " SDKInitTime:" + WXEnvironment.sSDKInitTime
+            + " totalTime:" + totalTime
+            + " JSLibVersion:" + JSLibVersion
+            + " WXSDKVersion:" + WXSDKVersion
+            + " pageName:" + pageName
+            + " useScroller:" + useScroller;
 
   }
 
@@ -516,7 +541,6 @@ public class WXPerformance {
     mErrMsgBuilder.append(msg);
   }
 
-
   public void beforeInstanceRender(String instanceId) {
     renderTimeOrigin = System.currentTimeMillis();
   }
@@ -524,4 +548,11 @@ public class WXPerformance {
   public void afterInstanceDestroy(String instanceId) {
   }
 
+  public int renderSumTime() {
+    return mActionAddElementSumTime + mActionCreateBodySumTime + mActionLayoutSumTime + mActionOtherSumTime;
+  }
+
+  public int renderSumCount() {
+    return mActionAddElementCount + mActionCreateBodyCount + mActionLayoutCount + mActionOtherCount;
+  }
 }

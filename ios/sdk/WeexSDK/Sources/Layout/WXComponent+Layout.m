@@ -26,6 +26,8 @@
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
 #import "WXLayoutDefine.h"
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
 
 @implementation WXComponent (Layout)
 
@@ -35,21 +37,11 @@
 
 - (void)setNeedsLayout
 {
+    _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
     if(supercomponent){
-        for (WXComponent *siblingComponent in [supercomponent subcomponents]) {
-            [siblingComponent _needRecalculateLayout];
-        }
         [supercomponent setNeedsLayout];
-    } else {
-        [self _needRecalculateLayout];
     }
-}
-
-- (void)_needRecalculateLayout
-{
-    _isLayoutDirty = YES;
-    [self _clearLayoutCSS];
 }
 
 - (BOOL)needsLayout
@@ -127,6 +119,13 @@
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
     WXAssertComponentThread();
+    if (isChanged) {
+        CGFloat mainScreenWidth = [[UIScreen mainScreen] bounds].size.width;
+        CGFloat mainScreenHeight = [[UIScreen mainScreen] bounds].size.height;
+        if (mainScreenHeight/2 < _calculatedFrame.size.height && mainScreenWidth/2 < _calculatedFrame.size.width) {
+            [self weexInstance].performance.cellExceedNum++;
+        }
+    }
     
     if ([self isViewLoaded] && isChanged && [self isViewFrameSyncWithCalculated]) {
         
@@ -216,23 +215,6 @@
         [self.ancestorScroller adjustSticky];
     }
     [self layoutDidFinish];
-}
-
-/**
- * clear the layout variables on css node
- **/
-- (void)_clearLayoutCSS {
-    memset(&(_cssNode->layout), 0, sizeof(_cssNode->layout));
-    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-    
-    // Such that the comparison is always going to be false
-    _cssNode->layout.last_requested_dimensions[CSS_WIDTH] = -1;
-    _cssNode->layout.last_requested_dimensions[CSS_HEIGHT] = -1;
-    _cssNode->layout.last_parent_max_width = -1;
-    _cssNode->layout.last_parent_max_height = -1;
-    _cssNode->layout.last_direction = (css_direction_t)-1;
-    _cssNode->layout.should_update = true;
 }
 
 #define WX_STYLE_FILL_CSS_NODE(key, cssProp, type)\

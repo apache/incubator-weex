@@ -27,10 +27,10 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
@@ -81,13 +81,13 @@ public class ConfigComponentHolder implements IFComponentHolder {
 
 
     @Override
-    public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         if(mClass == null || mClassLoader != instance.getContext().getClassLoader()){
             mClass = WXSDKManager.getInstance().getClassLoaderAdapter().getComponentClass(mType, mClassName, instance);
             mClassLoader = instance.getContext().getClassLoader();
         }
         ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
-        WXComponent component = creator.createInstance(instance,node,parent);
+        WXComponent component = creator.createInstance(instance, parent, basicComponentData);
 
         component.bindHolder(this);
         return component;
