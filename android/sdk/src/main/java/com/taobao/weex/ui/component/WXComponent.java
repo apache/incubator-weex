@@ -63,6 +63,7 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -170,14 +171,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private boolean waste = false;
 
-  private boolean hasStackSizeLimit = false;
+  private boolean hasLayerLimit = false;
 
-  protected void setStackSizeLimit(boolean hasStackSizeLimit) {
-    this.hasStackSizeLimit = hasStackSizeLimit;
+  protected void setLayerLimit(boolean hasLayerLimit) {
+    this.hasLayerLimit = hasLayerLimit;
   }
 
-  public boolean isStackSizeLimit() {
-    return hasStackSizeLimit;
+  public boolean isLayerLimit() {
+    return hasLayerLimit;
   }
 
   private ContentBoxMeasurement contentBoxMeasurement;
