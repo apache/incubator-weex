@@ -96,7 +96,7 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    if (getComponent() != null && getComponent().isStackSizeLimit()) {
+    if (getComponent() != null && getComponent().isLayerLimit()) {
       dispatchDrawInterval(canvas);
     } else {
       try {
