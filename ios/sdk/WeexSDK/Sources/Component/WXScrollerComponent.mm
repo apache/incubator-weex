@@ -620,6 +620,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
         [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
     }
+    
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillBeginDragging:)]) {
+            [delegate scrollViewWillBeginDragging:scrollView];
+        }
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -705,6 +712,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         inset.bottom = 0;
     }
     [scrollView setContentInset:inset];
+    
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndScrollingAnimation:)]) {
+            [delegate scrollViewDidEndScrollingAnimation:scrollView];
+        }
+    }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
@@ -715,6 +729,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
             NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
             [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        }
+    }
+    
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)]) {
+            [delegate scrollViewDidEndDecelerating:scrollView];
         }
     }
 }
@@ -732,6 +753,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             }
         } else if (velocity.y > 0) {
             // drop up
+        }
+    }
+    
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewWillEndDragging:withVelocity:targetContentOffset:)]) {
+            [delegate scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
         }
     }
 }
@@ -756,6 +784,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (!decelerate) {
         _isScrolling = NO;
         [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:nil afterDelay:0.1];
+    }
+    
+    NSHashTable *delegates = [_delegates copy];
+    for (id<UIScrollViewDelegate> delegate in delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)]) {
+            [delegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+        }
     }
 }
 
