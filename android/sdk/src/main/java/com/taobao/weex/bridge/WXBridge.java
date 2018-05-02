@@ -482,6 +482,17 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public int callAppendTreeCreateFinish(String instanceId, String ref) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callAppendTreeCreateFinish(instanceId, ref);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callAppendTreeCreateFinish throw exception:" + e.getMessage());
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {

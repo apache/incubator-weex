@@ -47,7 +47,7 @@ namespace WeexCore {
 
     void SendCreateBodyAction(RenderObject *render);
 
-    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index);
+    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion);
 
     void SendRemoveElementAction(const std::string &ref);
 
@@ -65,6 +65,8 @@ namespace WeexCore {
     void SendUpdateAttrAction(RenderObject *render, std::vector<std::pair<std::string, std::string>> *attrs);
 
     void SendCreateFinishAction();
+
+    void SendAppendTreeCreateFinish(const std::string &ref);
 
     void PostRenderAction(render_action *action);
 
