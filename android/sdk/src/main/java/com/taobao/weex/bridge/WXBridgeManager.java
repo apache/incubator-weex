@@ -59,6 +59,7 @@ import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.GraphicActionAddEvent;
+import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionCreateBody;
 import com.taobao.weex.ui.action.GraphicActionCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionLayout;
@@ -2538,11 +2539,36 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callLayout exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callUpdateAttrs",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callLayout",
               WXLogUtils.getStackTrace(e), null);
     }
 
     WXSDKManager.getInstance().getSDKInstance(pageId).callLayoutTime(System.currentTimeMillis() - start);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAppendTreeCreateFinish(String instanceId, String ref) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callAppendTreeCreateFinish >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      GraphicActionAppendTreeCreateFinish action = new GraphicActionAppendTreeCreateFinish(instanceId, ref);
+      WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAppendTreeCreateFinish exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callAppendTreeCreateFinish",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -2561,14 +2587,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       long start = System.currentTimeMillis();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-          instance.firstScreenCreateInstanceTime(start);
-          GraphicActionCreateFinish action = new GraphicActionCreateFinish(instanceId);
-          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+        instance.firstScreenCreateInstanceTime(start);
+        GraphicActionCreateFinish action = new GraphicActionCreateFinish(instanceId);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callUpdateFinish",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callCreateFinish",
               WXLogUtils.getStackTrace(e), null);
     }
 

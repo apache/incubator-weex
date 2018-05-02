@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -606,5 +607,9 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     public BoxShadowHost(Context context) {
       super(context);
     }
+  }
+
+  public void appendTreeCreateFinish() {
+    
   }
 }

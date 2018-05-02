@@ -149,6 +149,8 @@ public interface IWXBridge extends IWXObject {
 
   int callCreateFinish(String instanceId);
 
+  int callAppendTreeCreateFinish(String instanceId, String ref);
+
   int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
 
   void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);

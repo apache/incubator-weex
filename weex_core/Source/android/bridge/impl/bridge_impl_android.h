@@ -122,6 +122,8 @@ namespace WeexCore {
 
     int callCreateFinish(const char* pageId);
 
+    int callAppendTreeCreateFinish(const char* pageId, const char* ref);
+
     int callHasTransitionPros(const char* pageId, const char* ref,
                               std::vector<std::pair<std::string, std::string>> *style);
 

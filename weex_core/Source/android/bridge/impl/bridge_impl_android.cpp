@@ -53,6 +53,7 @@ static jmethodID jCallHasTransitionProsMethodId;
 static jmethodID jCallUpdateAttrsMethodId;
 static jmethodID jCallLayoutMethodId;
 static jmethodID jCallCreateFinishMethodId;
+static jmethodID jCallAppendTreeCreateFinishMethodId;
 
 static jmethodID jPostMessage;
 static jmethodID jDispatchMeaasge;
@@ -846,6 +847,30 @@ namespace WeexCore {
 
     if (jPageId != nullptr)
       env->DeleteLocalRef(jPageId);
+    return flag;
+  }
+
+  int Bridge_Impl_Android::callAppendTreeCreateFinish(const char *pageId, const char *ref) {
+    JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jRef = env->NewStringUTF(ref);
+
+    if (jCallAppendTreeCreateFinishMethodId == NULL)
+      jCallAppendTreeCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
+                                             "callAppendTreeCreateFinish",
+                                             "(Ljava/lang/String;Ljava/lang/String;)I");
+
+    int flag = 0;
+    flag = env->CallIntMethod(jThis, jCallAppendTreeCreateFinishMethodId, jPageId, jRef);
+
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callAppendTreeCreateFinish");
+    }
+
+    if (jPageId != nullptr)
+      env->DeleteLocalRef(jPageId);
+    if (jRef != nullptr)
+      env->DeleteLocalRef(jRef);
     return flag;
   }
 

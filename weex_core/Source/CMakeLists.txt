@@ -52,6 +52,7 @@ add_library(weexjsc SHARED
     ./core/render/action/render_action_move_element.cpp
     ./core/render/action/render_action_createbody.cpp
     ./core/render/action/render_action_createfinish.cpp
+    ./core/render/action/render_action_appendtree_createfinish.cpp
     ./core/render/action/render_action_layout.cpp
     ./core/render/action/render_action_update_attr.cpp
     ./core/render/action/render_action_update_style.cpp
