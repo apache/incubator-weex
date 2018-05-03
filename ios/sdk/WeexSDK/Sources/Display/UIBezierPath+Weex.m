@@ -49,7 +49,7 @@ static const float kCircleControlPoint = 0.447715;
     //  \\      top     //
     //   \\+----------+//
     CGPoint topRightPoint = CGPointMake(CGRectGetMaxX(rect) - topRightRadius, rect.origin.y);
-    if ([WXUtility isValidPoint:topRightPoint]) {
+    if (![WXUtility isValidPoint:topRightPoint]) {
         return path;
     }
     [path addLineToPoint:topRightPoint];
