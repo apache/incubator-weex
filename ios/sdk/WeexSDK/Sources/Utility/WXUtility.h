@@ -203,6 +203,15 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (BOOL)isBlankString:(NSString * _Nullable)string ;
 
+
+/**
+ check a point is valid or not. A zero point is also valid
+
+ @param point a point value to check
+ @return true if point.x and point.y are all valid value for a number.
+ */
++ (BOOL)isValidPoint:(CGPoint)point;
+
 /**
  * @abstract Returns a standard error object
  *
