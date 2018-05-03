@@ -23,7 +23,7 @@
 
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env) {
-    RegisterNativesImpl(env);
+      return RegisterNativesImpl(env);
   }
 
   void cumsmeasure_Imple_Android(JNIEnv *env, jobject measureFunc_Impl_Android,
@@ -43,12 +43,16 @@ namespace WeexCore {
   }
 
   float GetLayoutWidth(JNIEnv *env, jobject measureFunc_impl_android) {
-    if (measureFunc_impl_android != nullptr)
-      Java_ContentBoxMeasurement_getWidth(env, measureFunc_impl_android);
+    if (measureFunc_impl_android != nullptr) {
+        return Java_ContentBoxMeasurement_getWidth(env, measureFunc_impl_android);
+    }
+    return 0.0;
   }
 
   float GetLayoutHeight(JNIEnv *env, jobject measureFunc_impl_android) {
-    if (measureFunc_impl_android != nullptr)
-      Java_ContentBoxMeasurement_getHeight(env, measureFunc_impl_android);
+    if (measureFunc_impl_android != nullptr) {
+        return Java_ContentBoxMeasurement_getHeight(env, measureFunc_impl_android);
+    }
+    return 0.0;
   }
 }
