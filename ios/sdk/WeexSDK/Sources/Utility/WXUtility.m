@@ -352,6 +352,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return false;
 }
 
++ (BOOL)isValidPoint:(CGPoint)point
+{
+    return !(isnan(point.x)) && !(isnan(point.y));
+}
+
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message
 {
     message = message ? : @"";
