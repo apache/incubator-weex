@@ -269,9 +269,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       mChildren.add(index, child);
     }
-
-    if (isLayerLimit())
-      child.setLayerLimit(true);
   }
 
   public final int indexOf(WXComponent comp) {

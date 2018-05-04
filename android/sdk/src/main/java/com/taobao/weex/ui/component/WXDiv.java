@@ -32,6 +32,8 @@ import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.utils.WXUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
@@ -119,27 +121,14 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
     return !promoteToView(true);
   }
 
-  @WXComponentProp(name = Constants.Name.LAYER_LIMIT)
-  public void setLayerLimitModle(String layerLimit) {
-    setLayerLimit(getLayerLimit(layerLimit));
-  }
-
-  private boolean getLayerLimit(String layerLimit) {
-    boolean ret = false;
-    if (TextUtils.isEmpty(layerLimit)) {
-      return ret;
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key) {
+      case Constants.Name.LAYERLIMIT:
+      case Constants.Name.LAYER_LIMIT:
+        getInstance().setLayerLimit(WXUtils.getBoolean(param, false));
+        return true;
     }
-
-    switch (layerLimit) {
-      case "true":
-        ret = true;
-        break;
-      case "false":
-        ret = false;
-        break;
-      default:
-        break;
-    }
-    return ret;
+    return super.setProperty(key, param);
   }
 }

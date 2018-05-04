@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -221,13 +222,13 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.SRC:
-        String src = WXUtils.getString(param,null);
+        String src = WXUtils.getString(param, null);
         if (src != null)
           setSrc(src);
         return true;
       case Constants.Name.PRIORITY:
-        String priority = WXUtils.getString(param,null);
-        if (priority != null){
+        String priority = WXUtils.getString(param, null);
+        if (priority != null) {
           setPriority(priority);
         }
         return true;
@@ -332,10 +333,13 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       return sdkInstance;
     }
 
+    sdkInstance.setLayerLimit(getInstance().isLayerLimit());
+
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
             url,
             null, null,
             WXRenderStrategy.APPEND_ASYNC);
+
     return sdkInstance;
   }
 

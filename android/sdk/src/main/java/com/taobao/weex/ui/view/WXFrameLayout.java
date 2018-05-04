@@ -23,12 +23,17 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
+
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.lang.ref.WeakReference;
@@ -96,12 +101,22 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    if (getComponent() != null && getComponent().isLayerLimit()) {
-      dispatchDrawInterval(canvas);
+    if (getComponent() != null && getComponent().getInstance().isLayerLimit()) {
+      try {
+        dispatchDrawInterval(canvas);
+      } catch (StackOverflowError e) {
+        int deep = calLayerDeep(this, 0);
+        WXExceptionUtils.commitCriticalExceptionRT(getComponent().getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW,
+                "draw android view",
+                WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW.getErrorMsg() + "Layer overflow limit error: " + deep + " layers!",
+                null);
+        throw new LayerOverFlowLimitException("Layer overflow limit error: " + deep + " layers!");
+      }
     } else {
       try {
         dispatchDrawInterval(canvas);
-      }catch (Throwable e){
+      } catch (StackOverflowError e){
         WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
       }
     }
@@ -119,5 +134,20 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
       super.dispatchDraw(canvas);
     }
+  }
+
+  static class LayerOverFlowLimitException extends RuntimeException {
+
+    public LayerOverFlowLimitException(String message) {
+      super(message);
+    }
+  }
+
+  private int calLayerDeep(View view, int deep) {
+    deep++;
+    if (view.getParent() != null && view.getParent() instanceof View) {
+      return calLayerDeep((View) view.getParent(), deep);
+    }
+    return deep;
   }
 }
