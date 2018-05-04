@@ -46,6 +46,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   }
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    long createComponentStart = System.currentTimeMillis();
     if (basicComponentData != null) {
       basicComponentData.addStyle(mStyle);
       basicComponentData.addAttr(mAttributes);
@@ -64,7 +65,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
           .put(Constants.Name.TRANSFORM_ORIGIN, mStyle.get(Constants.Name.TRANSFORM_ORIGIN));
       component.addAnimationForElement(animationMap);
     }
-    WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionAddElementCount();
+    instance.onComponentCreate(component,System.currentTimeMillis() -createComponentStart);
     return component;
   }
 
