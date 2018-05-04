@@ -105,21 +105,27 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       try {
         dispatchDrawInterval(canvas);
       } catch (StackOverflowError e) {
-        int deep = calLayerDeep(this, 0);
-        WXExceptionUtils.commitCriticalExceptionRT(getComponent().getInstanceId(),
-                WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW,
-                "draw android view",
-                WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW.getErrorMsg() + "Layer overflow limit error: " + deep + " layers!",
-                null);
+        int deep = reportLayerOverFlowError();
         throw new LayerOverFlowLimitException("Layer overflow limit error: " + deep + " layers!");
       }
     } else {
       try {
         dispatchDrawInterval(canvas);
       } catch (StackOverflowError e){
+        reportLayerOverFlowError();
         WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
       }
     }
+  }
+
+  private int reportLayerOverFlowError() {
+    int deep = calLayerDeep(this, 0);
+    WXExceptionUtils.commitCriticalExceptionRT(getComponent().getInstanceId(),
+            WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW,
+            "draw android view",
+            WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW.getErrorMsg() + "Layer overflow limit error: " + deep + " layers!",
+            null);
+    return deep;
   }
 
   private void dispatchDrawInterval(Canvas canvas) {
