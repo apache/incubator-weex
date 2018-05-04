@@ -201,7 +201,6 @@ public enum WXErrorCode {
   WX_KEY_EXCEPTION_DOM_MODULEINVO("-9317", "[WX_KEY_EXCEPTION_DOM_MODULEINVO] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
 
-
   /**
    * WX Key Exception Commit RT JsBridge eg. js excute runtime error
    */
@@ -212,8 +211,8 @@ public enum WXErrorCode {
    * renderErrorCode
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "WX_RENDER_ERR_JS_CREATE_INSTANCE",ErrorType.RENDER_ERROR,ErrorGroup.JS),
-  WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR,
-          ErrorGroup.JS),
+  WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR, ErrorGroup.JS),
+  WX_RENDER_ERR_LAYER_OVERFLOW("-9602", "WX_RENDER_ERR_LAYER_OVERFLOW", ErrorType.RENDER_ERROR, ErrorGroup.JS),
 
 
   /**

@@ -171,16 +171,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private boolean waste = false;
 
-  private boolean hasLayerLimit = false;
-
-  protected void setLayerLimit(boolean hasLayerLimit) {
-    this.hasLayerLimit = hasLayerLimit;
-  }
-
-  public boolean isLayerLimit() {
-    return hasLayerLimit;
-  }
-
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
