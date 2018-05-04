@@ -21,43 +21,36 @@ package com.taobao.weex.ui.component;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.ATagUtil;
-import com.taobao.weex.utils.WXLogUtils;
 
 @Component(lazyload = false)
 public class WXA extends WXDiv {
 
   @Deprecated
-  public WXA(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent);
+  public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXA(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
-    super(instance, dom, parent);
+  public WXA(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
   protected void onHostViewInitialized(WXFrameLayout host) {
-    super.onHostViewInitialized(host);
     addClickListener(new OnClickListener() {
       @Override
       public void onHostViewClick() {
         String href;
-        ImmutableDomObject domObject = getDomObject();
-        if (domObject != null) {
-          WXAttr attr = domObject.getAttrs();
-          if (attr !=null && (href = (String)attr.get("href")) != null) {
-            ATagUtil.onClick(null, getInstanceId(), href);
-          }
-        } else {
-          WXLogUtils.d("WXA", "Property href is empty.");
+        WXAttr attr = getAttrs();
+        if (attr !=null && (href = (String)attr.get("href")) != null) {
+          ATagUtil.onClick(null, getInstanceId(), href);
         }
       }
     });
+    super.onHostViewInitialized(host);
   }
 
   @Override

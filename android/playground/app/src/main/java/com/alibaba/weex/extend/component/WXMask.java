@@ -124,10 +124,10 @@ import android.widget.PopupWindow;
 
 import com.alibaba.weex.extend.view.WXMaskView;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.HashMap;
@@ -142,8 +142,8 @@ public class WXMask extends WXVContainer {
   private PopupWindow mPopupWindow;
   private WXMaskView mContainerView;
 
-  public WXMask(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
-    super(instance, dom, parent);
+  public WXMask(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
@@ -211,11 +211,10 @@ public class WXMask extends WXVContainer {
 
   @Override
   protected void setHostLayoutParams(View host, int width, int height, int left, int right, int top, int bottom) {
-    ImmutableDomObject domObject = getDomObject();
-    left = get(LEFT, domObject);
-    right = get(RIGHT, domObject);
-    top = get(TOP, domObject);
-    bottom = get(BOTTOM, domObject);
+    left = get(LEFT);
+    right = get(RIGHT);
+    top = get(TOP);
+    bottom = get(BOTTOM);
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
     params.setMargins(left, top, right, bottom);
     getHostView().setLayoutParams(params);
@@ -226,19 +225,19 @@ public class WXMask extends WXVContainer {
   private static final int TOP = 2;
   private static final int BOTTOM = 3;
 
-  private int get(int type, ImmutableDomObject domObject) {
+  private int get(int type) {
     try {
-      Spacing margin = domObject.getMargin();
-      WXStyle style = domObject.getStyles();
+      CSSShorthand margin = getMargin();
+      WXStyle style = getStyles();
       switch (type) {
         case LEFT:
-          return add(style.getLeft(), margin.get(Spacing.LEFT));
+          return add(style.getLeft(), margin.get(CSSShorthand.EDGE.LEFT));
         case RIGHT:
-          return add(style.getRight(), margin.get(Spacing.RIGHT));
+          return add(style.getRight(), margin.get(CSSShorthand.EDGE.RIGHT));
         case TOP:
-          return add(style.getTop(), margin.get(Spacing.TOP));
+          return add(style.getTop(), margin.get(CSSShorthand.EDGE.TOP));
         case BOTTOM:
-          return add(style.getBottom(), margin.get(Spacing.BOTTOM));
+          return add(style.getBottom(), margin.get(CSSShorthand.EDGE.BOTTOM));
       }
     } catch (Throwable t) {
       //ignore

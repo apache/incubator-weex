@@ -28,13 +28,10 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
-import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.TypefaceUtil;
-import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
@@ -70,7 +67,7 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
-  public static boolean sForceEnableDevTool = false;
+  public static final boolean sForceEnableDevTool = false;
   public static String sDebugWsUrl = "";
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
@@ -83,6 +80,11 @@ public class WXEnvironment {
   public static long sSDKInitExecuteTime = 0;//time cost to execute init job
   /** from init to sdk-ready **/
   public static long sSDKInitTime =0;
+
+  /**
+   * component and modules ready
+   * */
+  public static long sComponentsAndModulesReadyTime = 0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
@@ -129,7 +131,7 @@ public class WXEnvironment {
     }
     configs.putAll(options);
     if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
+      configs.put(WXConfig.appName, sApplication.getPackageName());
     }
     return configs;
   }
@@ -209,7 +211,7 @@ public class WXEnvironment {
     boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + "isX86AndExclueded: "+ isX86AndExcluded);
+              + "isX86AndExclueded: "+ isX86AndExcluded);
     }
     return isCPUSupport;
   }
@@ -245,7 +247,7 @@ public class WXEnvironment {
 
   private static String getDevId() {
     return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+            .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
   }
 
   public static Application getApplication() {
@@ -322,8 +324,7 @@ public class WXEnvironment {
   public static void  setApkDebugable(boolean debugable){
     isApkDebug  = debugable;
     if(!isApkDebug){
-       openDebugLog = false;
+      openDebugLog = false;
     }
   }
-
 }

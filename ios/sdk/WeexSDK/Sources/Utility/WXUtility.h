@@ -203,6 +203,15 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (BOOL)isBlankString:(NSString * _Nullable)string ;
 
+
+/**
+ check a point is valid or not. A zero point is also valid
+
+ @param point a point value to check
+ @return true if point.x and point.y are all valid value for a number.
+ */
++ (BOOL)isValidPoint:(CGPoint)point;
+
 /**
  * @abstract Returns a standard error object
  *
@@ -253,6 +262,9 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (CGFloat)defaultPixelScaleFactor;
 
+#if defined __cplusplus
+extern "C" {
+#endif
 /**
  * @abstract Returns the scale of the main screen.
  *
@@ -276,7 +288,11 @@ CGFloat WXFloorPixelValue(CGFloat value);
  *
  */
 CGFloat WXCeilPixelValue(CGFloat value);
-
+    
+#if defined __cplusplus
+};
+#endif
+    
 /**
  *  @abstract check whether the file is exist
  *
@@ -404,6 +420,10 @@ CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelS
  */
 + (NSDictionary *_Nullable)linearGradientWithBackgroundImage:(NSString *_Nullable)backgroundImage;
 
+#if defined __cplusplus
+extern "C" {
+#endif
+    
 /**
  *  @abstract compare float a and b, if a equal b, return true,or reture false.
  *
@@ -434,6 +454,10 @@ BOOL WXFloatGreaterThan(CGFloat a, CGFloat b);
  *
  */
 BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
+
+#if defined __cplusplus
+};
+#endif
 
 /**
  *  @abstract convert returnKeyType to type string .

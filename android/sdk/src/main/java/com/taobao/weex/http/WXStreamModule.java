@@ -55,7 +55,7 @@ public class WXStreamModule extends WXModule {
     this(null);
   }
   public WXStreamModule(IWXHttpAdapter adapter){
-   mAdapter = adapter;
+    mAdapter = adapter;
   }
 
   /**
@@ -93,10 +93,10 @@ public class WXStreamModule extends WXModule {
       public void onResponse(WXResponse response, Map<String, String> headers) {
         if(callback != null && mWXSDKInstance != null)
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback,
-            (response == null || response.originalData == null) ? "{}" :
-              readAsString(response.originalData,
-                headers!=null?getHeader(headers,"Content-Type"):""
-              ));
+                  (response == null || response.originalData == null) ? "{}" :
+                          readAsString(response.originalData,
+                                  headers!=null?getHeader(headers,"Content-Type"):""
+                          ));
       }
     }, null);
   }
@@ -266,13 +266,14 @@ public class WXStreamModule extends WXModule {
     wxRequest.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
     wxRequest.body = options.getBody();
     wxRequest.timeoutMs = options.getTimeout();
+    wxRequest.instanceId = mWXSDKInstance.getInstanceId();
 
     if(options.getHeaders()!=null)
-    if (wxRequest.paramMap == null) {
-      wxRequest.paramMap = options.getHeaders();
-    }else{
-      wxRequest.paramMap.putAll(options.getHeaders());
-    }
+      if (wxRequest.paramMap == null) {
+        wxRequest.paramMap = options.getHeaders();
+      }else{
+        wxRequest.paramMap.putAll(options.getHeaders());
+      }
 
 
     IWXHttpAdapter adapter = ( mAdapter==null && mWXSDKInstance != null) ? mWXSDKInstance.getWXHttpAdapter() : mAdapter;

@@ -52,7 +52,7 @@ import java.util.Map.Entry;
  * Custom-defined scrollView
  */
 public class WXScrollView extends ScrollView implements Callback, IWXScroller,
-                                                        WXGestureObservable,NestedScrollingChild {
+        WXGestureObservable,NestedScrollingChild {
 
   private NestedScrollingChildHelper childHelper;
   private float ox;
@@ -147,8 +147,8 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
 
       if (mRedirectTouchToStickyView) {
         mRedirectTouchToStickyView = ev.getY() <= mCurrentStickyView.getHeight()
-                                     && ev.getX() >= mCurrentStickyView.getLeft()
-                                     && ev.getX() <= mCurrentStickyView.getRight();
+                && ev.getX() >= mCurrentStickyView.getLeft()
+                && ev.getX() <= mCurrentStickyView.getRight();
       }
     }
 
@@ -176,7 +176,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       int realOffset = (mStickyOffset <= 0 ? mStickyOffset : 0);
       canvas.translate(mStickyP[0], getScrollY() + realOffset);
       canvas.clipRect(0, realOffset, mCurrentStickyView.getWidth(),
-                      mCurrentStickyView.getHeight());
+              mCurrentStickyView.getHeight());
       mCurrentStickyView.draw(canvas);
       canvas.restore();
     }

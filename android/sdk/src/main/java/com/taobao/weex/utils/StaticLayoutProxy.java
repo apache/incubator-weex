@@ -55,13 +55,13 @@ public class StaticLayoutProxy {
       try {
         Class<StaticLayout> clazz = StaticLayout.class;
         Constructor<StaticLayout> constructor = clazz.getConstructor(CharSequence.class, TextPaint.class,
-            int.class, Layout.Alignment.class, TextDirectionHeuristic.class,
-            float.class, float.class,
-            boolean.class);
+                int.class, Layout.Alignment.class, TextDirectionHeuristic.class,
+                float.class, float.class,
+                boolean.class);
 
         if (constructor != null) {
           return constructor.newInstance(source, paint, width,
-              align, textDir, spacingmult, spacingadd, includepad);
+                  align, textDir, spacingmult, spacingadd, includepad);
         }
       } catch (Throwable e) {
         e.printStackTrace();

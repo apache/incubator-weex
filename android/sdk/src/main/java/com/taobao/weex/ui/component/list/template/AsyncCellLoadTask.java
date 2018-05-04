@@ -98,7 +98,7 @@ class AsyncCellLoadTask extends AsyncTask<Void,Void, Void> {
                 ConcurrentLinkedQueue<WXCell> queue =  cellCache.cells;
                 Iterator<WXCell> iterator =  queue.iterator();
                 while (iterator.hasNext()){
-                    WXCell  component =  iterator.next();
+                    WXCell component =  iterator.next();
                     if(component.isLazy()){
                         templateList.doCreateCellViewBindData(component, template, true);
                         return iterator.hasNext();

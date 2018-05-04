@@ -19,13 +19,9 @@
 package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
-import com.taobao.weex.ui.component.list.WXListComponent;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 8/29/16.

@@ -22,7 +22,7 @@ import android.util.Pair;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
@@ -42,7 +42,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   private Class mClass;
 
 
-  public ExternalLoaderComponentHolder(String type, IExternalComponentGetter clzGetter) {
+  public ExternalLoaderComponentHolder(String type,IExternalComponentGetter clzGetter) {
     this.mClzGetter = clzGetter;
     mType = type;
   }
@@ -62,15 +62,13 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
     return true;
   }
 
-
-
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    if(mClass == null){
-      mClass = mClzGetter.getExternalComponentClass(mType,instance);
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    if (mClass == null) {
+      mClass = mClzGetter.getExternalComponentClass(mType, instance);
     }
     ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
-    WXComponent component = creator.createInstance(instance,node,parent);
+    WXComponent component = creator.createInstance(instance, parent, basicComponentData);
 
     component.bindHolder(this);
     return component;
@@ -94,7 +92,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   }
 
   @Override
-  public String[] getMethods() {
+  public synchronized String[] getMethods() {
     if(mMethodInvokers == null && !generate()){
       //generate failed
       return new String[0];

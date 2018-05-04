@@ -46,6 +46,8 @@
 #import "WXMonitor.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXConfigCenterProtocol.h"
+#import "WXSDKInstance_performance.h"
+#import "JSContext+Weex.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -134,6 +136,9 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: addElement : %@",elementData[@"type"]);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -157,6 +162,9 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@",bodyData[@"type"],bodyData[@"ref"]);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -181,6 +189,9 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: removeElement ref:%@",ref);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -204,6 +215,9 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: moveElement ,ref:%@ to ref:%@",ref,parentRef);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -226,6 +240,9 @@ _Pragma("clang diagnostic pop") \
         
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: updateAttrs ref:%@,attr:%@",ref,attrsData);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -249,6 +266,10 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
+            
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: updateStyles ref:%@,styles:%@",ref,stylesData);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -271,6 +292,10 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: addEvent ref:%@",ref);
+#endif
+            
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -293,6 +318,9 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action :removeEvent ref:%@",ref);
+#endif
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -315,6 +343,10 @@ _Pragma("clang diagnostic pop") \
         }
         [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
         WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: createFinish :%@",instanceId);
+#endif
+            
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -337,6 +369,9 @@ _Pragma("clang diagnostic pop") \
             WXLogInfo(@"instance not found for callNativeModule:%@.%@, maybe already destroyed", moduleName, methodName);
             return nil;
         }
+#ifdef DEBUG
+        WXLogDebug(@"flexLayout -> action: callNativeModule : %@ . %@",moduleName,methodName);
+#endif
         NSMutableDictionary * newOptions = [options mutableCopy];
         NSMutableArray * newArguments = [arguments mutableCopy];
         
@@ -365,6 +400,11 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
+       
+#ifdef DEBUG
+        WXLogDebug(@"flexLayout -> action: callNativeComponent ref:%@",componentRef);
+#endif
+        
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
         [method invoke];
@@ -417,6 +457,9 @@ _Pragma("clang diagnostic pop") \
         WXLogInfo(@"instance already destroyed, task ignored");
         return -1;
     }
+    
+    NSTimeInterval startTime = CACurrentMediaTime()*1000;
+    
     for (NSDictionary *task in tasks) {
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
@@ -435,7 +478,11 @@ _Pragma("clang diagnostic pop") \
     }
     
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
-    
+    if (!instance.isJSCreateFinish) {
+        NSTimeInterval diff = CACurrentMediaTime()*1000-startTime;
+        instance.performance.fsCallNativeNum++;
+        instance.performance.fsCallNativeTime =  instance.performance.fsCallNativeTime + diff;
+    }
     return 1;
 }
 
@@ -496,6 +543,7 @@ _Pragma("clang diagnostic pop") \
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
             }
         } else {
+            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@",instanceIdString, newOptions,data];
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     if (@available(iOS 8.0, *)) {
@@ -504,6 +552,7 @@ _Pragma("clang diagnostic pop") \
                         // Fallback
                     }
                 }
+                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [[instanceContextEnvironment toDictionary] allKeys]];
                 JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
                 JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
                 for (NSString * key in [[instanceContextEnvironment toDictionary] allKeys]) {
@@ -526,10 +575,11 @@ _Pragma("clang diagnostic pop") \
                 
                 if (raxAPIScript) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
+                    sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", [[sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject toDictionary] allKeys]];
                 }
                 
-                if ([NSURL URLWithString:sdkInstance.pageName]) {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]];
+                if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
+                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
@@ -856,11 +906,20 @@ _Pragma("clang diagnostic pop") \
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];
+        NSTimeInterval start = -1;
+        if (execInstance && !(execInstance.isJSCreateFinish)) {
+            start = CACurrentMediaTime()*1000;
+        }
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
             [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
             [self callJSMethod:@"callJS" args:@[execIns, tasks]];
         }
+        if (execInstance && !(execInstance.isJSCreateFinish)) {
+            NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
+            execInstance.performance.fsCallJsNum++;
+            execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
+         }
     }
     
     if (hasTask) {
@@ -890,20 +949,52 @@ _Pragma("clang diagnostic pop") \
     };
     context.exceptionHandler = ^(JSContext *context, JSValue *exception){
         context.exception = exception;
+        NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];;
+        NSString *bundleUrl = nil;
+        NSString *message = nil;
+        NSDictionary *userInfo = nil;
+        BOOL commitException = YES;
+        WXSDKInstance * instance = nil;
+        if ([WXSDKManager sharedInstance].multiContext) {
+            if (context.instanceId) {
+                // instance page javaScript runtime exception
+                 instance = [WXSDKManager instanceForID:context.instanceId];
+                if (instance) {
+                    // instance already existed
+                    commitException = YES;
+                } else {
+                    // instance already destroyed
+                    commitException = NO;
+                }
+            } else {
+                // weex-main-jsfm.js runtime exception throws
+                message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
+                if (!JSValueIsUndefined(context.JSGlobalContextRef, exception[@"sourceURL"].JSValueRef)) {
+                    bundleUrl = exception[@"sourceURL"].toString;
+                } else {
+                    bundleUrl = @"weex-main-jsfm";
+                }
+                userInfo = [NSDictionary dictionary];
+            }
+        } else {
+            instance = [WXSDKEngine topInstance];
+        }
         
-        WXSDKInstance *instance = [WXSDKEngine topInstance];
-        NSString *bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
-        NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];
-        NSString *message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
-        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                         instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",@"jsMainBundleStringContentLength",
-                                         instance.userInfo[@"jsMainBundleStringContentMd5"]?:@"",@"jsMainBundleStringContentMd5",nil];
-        WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:userInfo];
+        if (instance) {
+            bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
+            message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString];
+            userInfo = @{@"jsMainBundleStringContentLength":instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",
+                         @"jsMainBundleStringContentMd5":instance.userInfo[@"jsMainBundleStringContentMd5"]?:@""};
+        }
         
-        [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
-        if (instance.onJSRuntimeException) {
-            instance.onJSRuntimeException(jsExceptionInfo);
+        if (commitException) {
+            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:[userInfo mutableCopy]];
+            
+            [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+            WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
+            if (instance.onJSRuntimeException) {
+                instance.onJSRuntimeException(jsExceptionInfo);
+            }
         }
     };
     

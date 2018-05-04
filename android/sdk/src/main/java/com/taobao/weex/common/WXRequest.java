@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.WXSDKInstance;
+
 import java.util.Map;
 
 public class WXRequest {
@@ -49,4 +51,10 @@ public class WXRequest {
    * The default timeout
    */
   public static final int DEFAULT_TIMEOUT_MS = 3000;
+
+  /**
+   * running weex instanceId
+   * @see WXSDKInstance#mInstanceId
+   */
+  public String instanceId;;
 }
