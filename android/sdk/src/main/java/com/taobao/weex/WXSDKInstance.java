@@ -1124,10 +1124,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(mWXPerformance.screenRenderTime<0.001){
       mWXPerformance.screenRenderTime =  time;
     }
-    mWXPerformance.componentCount = WXComponent.mComponentNum;
-    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
+    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + mWXPerformance.componentCount);
 
-    WXComponent.mComponentNum = 0;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1282,8 +1280,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.mActionLayoutSumTime += time;
     }
 
-  public void callActionAddElementTime(long time) {
-      mWXPerformance.mActionAddElementSumTime += time;
+  public void onComponentCreate(WXComponent component,long createTime) {
+      mWXPerformance.mActionAddElementCount++;
+      mWXPerformance.mActionAddElementSumTime += createTime;
+      if (!mEnd){
+        mWXPerformance.fsComponentCreateTime+=createTime;
+        mWXPerformance.fsComponentCount++;
+      }
+      mWXPerformance.componentCount++;
+      mWXPerformance.componentCreateTime+=createTime;
   }
 
   public void callActionCreateBodyTime(long time) {
@@ -1292,10 +1297,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void callActionOtherTime(long time) {
         mWXPerformance.mActionOtherSumTime += time;
-    }
-
-  public void callActionAddElementCount() {
-        mWXPerformance.mActionAddElementCount++;
     }
 
   public void callActionCreateBodyCount() {
@@ -1355,9 +1356,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void createInstanceFinished(long time) {
-    if (time > 0) {
-      mWXPerformance.communicateTime = time;
-    }
+
   }
 
   private void destroyView(View rootView) {
