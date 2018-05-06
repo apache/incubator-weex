@@ -115,7 +115,7 @@ export default class WeexInstance {
   supports (condition) {
     if (typeof condition !== 'string') return null
 
-    const res = condition.match(/^@(\w+)\/(\w+)(\.(\w+))?$/i)
+    const res = condition.match(/^@(\w+)\/([\w-]+)(\.(\w+))?$/i)
     if (res) {
       const type = res[1]
       const name = res[2]
