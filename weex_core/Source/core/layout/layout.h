@@ -235,15 +235,15 @@ namespace WeexCore {
       markDirty();
     }
 
+    inline bool haveMeasureFunc() const {
+      return nullptr != measureFunc;
+    }
+
     inline WXCoreMeasureFunc getMeasureFunc() const {
       return measureFunc;
     }
 
-    inline bool haveMeasureFunc() const {
-      return measureFunc != nullptr;
-    }
-
-    /** ================================ context =================================== **/
+      /** ================================ context =================================== **/
 
 
     inline void *getContext() const {
@@ -257,13 +257,6 @@ namespace WeexCore {
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
-        markDirty();
-      }
-    }
-
-    inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
-      if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
-        memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
         markDirty();
       }
     }

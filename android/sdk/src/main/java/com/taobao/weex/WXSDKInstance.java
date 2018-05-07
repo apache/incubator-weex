@@ -63,6 +63,7 @@ import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
@@ -172,6 +173,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
   private boolean hasLayerLimit = false;
+
+  private Map<String, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
 
   public void setLayerLimit(boolean hasLayerLimit) {
     this.hasLayerLimit = hasLayerLimit;
@@ -1424,6 +1427,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(templateRef != null){
         templateRef = null;
       }
+      if (null != mContentBoxMeasurements) {
+        mContentBoxMeasurements.clear();
+      }
       mWXPerformance.afterInstanceDestroy(mInstanceId);
 
       WXBridgeManager.getInstance().post(new Runnable() {
@@ -1984,5 +1990,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       });
     }
+  }
+
+  public void addContentBoxMeasurement(String ref, ContentBoxMeasurement contentBoxMeasurement) {
+    mContentBoxMeasurements.put(ref, contentBoxMeasurement);
+  }
+
+  public ContentBoxMeasurement getContentBoxMeasurement(String ref) {
+    return mContentBoxMeasurements.get(ref);
   }
 }

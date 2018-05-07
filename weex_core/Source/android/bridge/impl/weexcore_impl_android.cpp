@@ -115,9 +115,7 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instanceId, jstring ref, jobject contentBoxMeasurement) {
-  if (contentBoxMeasurement == nullptr)
-    return;
+static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instanceId, jstring ref) {
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
@@ -127,7 +125,7 @@ static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instan
   if (render == nullptr)
     return;
 
-  render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
+  render->BindMeasureFuncImplAndroid();
 }
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller, jstring instanceId) {

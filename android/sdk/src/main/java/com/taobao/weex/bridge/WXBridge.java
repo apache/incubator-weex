@@ -59,7 +59,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeTakeHeapSnapshot(String filename);
 
-  private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+  private native void nativeBindMeasurementToWXCore(String instanceId, String ref);
 
   private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
@@ -506,8 +506,21 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
-    nativeBindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
+  public void bindMeasurementToWXCore(String instanceId, String ref) {
+    nativeBindMeasurementToWXCore(instanceId, ref);
+  }
+
+  @Override
+  public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+    ContentBoxMeasurement obj = null;
+    try {
+      obj = WXBridgeManager.getInstance().getMeasurementFunc(instanceId, ref);
+    } catch (Throwable e) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "getMeasurementFunc throw exception:" + e.getMessage());
+      }
+    }
+    return obj;
   }
 
   @Override

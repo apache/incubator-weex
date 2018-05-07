@@ -153,7 +153,9 @@ public interface IWXBridge extends IWXObject {
 
   int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
 
-  void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+  void bindMeasurementToWXCore(String instanceId, String ref);
+
+  ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref);
 
   void setRenderContainerWrapContent(boolean wrap, String instanceId);
 

@@ -55,6 +55,7 @@ static jmethodID jCallUpdateAttrsMethodId;
 static jmethodID jCallLayoutMethodId;
 static jmethodID jCallCreateFinishMethodId;
 static jmethodID jCallAppendTreeCreateFinishMethodId;
+static jmethodID jCallGetMeasurementMethodId;
 
 static jmethodID jPostMessage;
 static jmethodID jDispatchMeaasge;
@@ -97,6 +98,8 @@ namespace WeexCore {
     jCallUpdateAttrsMethodId = NULL;
     jCallLayoutMethodId = NULL;
     jCallCreateFinishMethodId = NULL;
+
+    jCallGetMeasurementMethodId = NULL;
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
@@ -824,8 +827,10 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callAppendTreeCreateFinish(const char *pageId, const char *ref) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    StringRefCache* refCache = GetStringRefCache(pageId);
+    jstring jPageId = refCache->GetString(env, pageId);
+    jstring jRef = refCache->GetString(env, ref);
 
     if (jCallAppendTreeCreateFinishMethodId == NULL)
       jCallAppendTreeCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -838,11 +843,6 @@ namespace WeexCore {
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callAppendTreeCreateFinish");
     }
-
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     return flag;
   }
 
@@ -907,5 +907,18 @@ namespace WeexCore {
                                         "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)V");
     }
     env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
+  }
+
+  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
+    JNIEnv *env = getJNIEnv();
+    StringRefCache* refCache = GetStringRefCache(pageId);
+    jstring jPageId = refCache->GetString(env, pageId);
+    jstring jRef = refCache->GetString(env, ref);
+    if (jCallGetMeasurementMethodId == NULL) {
+      jCallGetMeasurementMethodId = env->GetMethodID(jBridgeClazz,
+                                                     "getMeasurementFunc",
+                                                     "(Ljava/lang/String;Ljava/lang/String;)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
+    }
+    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, jRef);
   }
 } //end WeexCore
