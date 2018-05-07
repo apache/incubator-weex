@@ -23,7 +23,7 @@
 #include <android/base/string/scoped_jstring.h>
 #include <android/base/string/scoped_jstring_utf8.h>
 #include <android/jsengine/multiprocess/WeexJSConnection.h>
-#include <android/base/string/StringRefCache.h>
+#include <android/base/string/string_ref_cache.h>
 #include <jni.h>
 #include <string>
 #include <unistd.h>

@@ -24,7 +24,7 @@
 #include "bridge_impl_android.h"
 #include <core/layout/style.h>
 #include <map>
-#include <android/base/string/StringRefCache.h>
+#include <android/base/string/string_ref_cache.h>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
