@@ -43,4 +43,9 @@ public class GraphicSize {
   public void setHeight(float height) {
     this.mHeight = height;
   }
+
+  public void update(float width, float height) {
+    this.mWidth = width;
+    this.mHeight = height;
+  }
 }

@@ -66,7 +66,6 @@ import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
-import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -81,7 +80,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -98,8 +96,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
-  private Runnable mAppearComponentsRunnable = null;
-  private long mAppearDelay = 50;
+  private Runnable mAppearChangeRunnable = null;
+  private long mAppearChangeRunnableDelay = 50;
 
   private boolean isScrollable = true;
   private ArrayMap<String, Long> mRefToViewType;
@@ -226,9 +224,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void destroy() {
-    if(mAppearComponentsRunnable != null) {
-      getHostView().removeCallbacks(mAppearComponentsRunnable);
-      mAppearComponentsRunnable = null;
+    if(mAppearChangeRunnable != null) {
+      getHostView().removeCallbacks(mAppearChangeRunnable);
+      mAppearChangeRunnable = null;
     }
     super.destroy();
     if (mStickyMap != null)
@@ -269,7 +267,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       keepPositionLayoutDelay = WXUtils.getNumberInt(getAttrs().get(Constants.Name.KEEP_POSITION_LAYOUT_DELAY), (int)keepPositionLayoutDelay);
     }
     if(getAttrs().get("appearActionDelay") != null){
-      mAppearDelay =  WXUtils.getNumberInt(getAttrs().get("appearActionDelay"), (int)mAppearDelay);
+      mAppearChangeRunnableDelay =  WXUtils.getNumberInt(getAttrs().get("appearActionDelay"), (int) mAppearChangeRunnableDelay);
     }
 
     mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
@@ -466,19 +464,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void bindAppearEvent(WXComponent component) {
     setAppearanceWatch(component, AppearanceHelper.APPEAR, true);
-    if(mAppearComponentsRunnable == null){
-      mAppearComponentsRunnable =  new Runnable() {
+    if(mAppearChangeRunnable == null){
+      mAppearChangeRunnable =  new Runnable() {
         @Override
         public void run() {
-          if(mAppearComponentsRunnable != null) {
+          if(mAppearChangeRunnable != null) {
             notifyAppearStateChange(0, 0, 0, 0);
           }
         }
       };
     }
     if (getHostView() != null) {
-      getHostView().removeCallbacks(mAppearComponentsRunnable);
-      getHostView().postDelayed(mAppearComponentsRunnable, mAppearDelay);
+      getHostView().removeCallbacks(mAppearChangeRunnable);
+      getHostView().postDelayed(mAppearChangeRunnable, mAppearChangeRunnableDelay);
     }
   }
 
@@ -1200,9 +1198,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
-    if(mAppearComponentsRunnable != null) {
-      getHostView().removeCallbacks(mAppearComponentsRunnable);
-      mAppearComponentsRunnable = null;
+    if(mAppearChangeRunnable != null) {
+      getHostView().removeCallbacks(mAppearChangeRunnable);
+      mAppearChangeRunnable = null;
     }
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();

@@ -45,7 +45,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   public static final int UNSET = -1;
 
   @NonNull
-  private final Map<String,Object> mStyles;
+  private Map<String,Object> mStyles;
 
   @Nullable
   private Map<String,Map<String,Object>> mPesudoStyleMap;// clz_group:{styleMap}
@@ -69,7 +69,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public WXStyle(Map<String, Object> mStyles, boolean byPesudo) {
     this();
-    this.putAll(filterBindingStyles(mStyles), byPesudo);
+    this.putAll(mStyles, byPesudo);
   }
 
   @Nullable
@@ -360,6 +360,9 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   public Object put(String key, Object value) {
+    if(addBindingStyleIfStatement(key, value)){
+      return null;
+    }
     return mStyles.put(key,value);
   }
 
@@ -378,6 +381,11 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (!byPesudo) {
       processPesudoClasses(map);
     }
+  }
+
+  public void updateStyle(Map<? extends String, ?> map, boolean byPesudo){
+      parseBindingStylesStatements(map);
+      putAll(map, byPesudo);
   }
 
 
@@ -447,26 +455,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return mStyles.values();
   }
 
-  @Override
-  protected WXStyle clone(){
-    WXStyle style = new WXStyle();
-    style.mStyles.putAll(this.mStyles);
 
-    if(mPesudoStyleMap != null) {
-      style.mPesudoStyleMap = new ArrayMap<>();
-      for (Entry<String, Map<String, Object>> entry : this.mPesudoStyleMap.entrySet()) {
-        Map<String, Object> valueClone = new ArrayMap<>();
-        valueClone.putAll(entry.getValue());
-        style.mPesudoStyleMap.put(entry.getKey(), valueClone);
-      }
-    }
-
-    if(mPesudoResetStyleMap!=null) {
-      style.mPesudoResetStyleMap = new ArrayMap<>();
-      style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
-    }
-    return style;
-  }
 
   private void initPesudoMapsIfNeed(Map<? extends String, ?> styles){
     if(mPesudoStyleMap == null){
@@ -480,10 +469,18 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     }
   }
 
+
+
+  public void  parseStatements(){
+    if(this.mStyles != null){
+      this.mStyles = parseBindingStylesStatements(this.mStyles);
+    }
+  }
+
   /**
    * filter dynamic state ment
    * */
-  private Map<String, Object> filterBindingStyles(Map styles) {
+  private Map<String, Object> parseBindingStylesStatements(Map styles) {
     if(styles == null || styles.size() == 0){
       return styles;
     }
@@ -491,7 +488,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
       Map.Entry<String,Object> entry = it.next();
-      if(filterBindingStyle(entry.getKey(), entry.getValue())){
+      if(addBindingStyleIfStatement(entry.getKey(), entry.getValue())){
+        if(mPesudoStyleMap != null){
+          mPesudoStyleMap.remove(entry.getKey());
+        }
+        if(mPesudoResetStyleMap != null){
+          mPesudoResetStyleMap.remove(entry.getKey());
+        }
         it.remove();
       }
     }
@@ -501,7 +504,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic attrs and statements
    * */
-  private boolean filterBindingStyle(String key, Object value) {
+  private boolean addBindingStyleIfStatement(String key, Object value) {
     if(ELUtils.isBinding(value)){
       if(mBindingStyle == null){
         mBindingStyle = new ArrayMap<String, Object>();
@@ -516,4 +519,30 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   public ArrayMap<String, Object> getBindingStyle() {
     return mBindingStyle;
   }
+
+  @Override
+  public WXStyle clone(){
+    WXStyle style = new WXStyle();
+    style.mStyles.putAll(this.mStyles);
+    if(mBindingStyle != null){
+      style.mBindingStyle = new ArrayMap<>(mBindingStyle);
+    }
+    if(mPesudoStyleMap != null) {
+      style.mPesudoStyleMap = new ArrayMap<>();
+      for (Entry<String, Map<String, Object>> entry : this.mPesudoStyleMap.entrySet()) {
+        Map<String, Object> valueClone = new ArrayMap<>();
+        valueClone.putAll(entry.getValue());
+        style.mPesudoStyleMap.put(entry.getKey(), valueClone);
+      }
+    }
+
+    if(mPesudoResetStyleMap!=null) {
+      style.mPesudoResetStyleMap = new ArrayMap<>();
+      style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
+    }
+
+
+    return style;
+  }
+
 }

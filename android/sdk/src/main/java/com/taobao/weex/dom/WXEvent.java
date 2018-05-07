@@ -23,9 +23,11 @@ import android.support.v4.util.ArrayMap;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.binding.ELUtils;
+import com.taobao.weex.dom.binding.JSONUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -95,19 +97,21 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
 
   public void addEvent(Object event) {
     if(event instanceof CharSequence){
+      if(JSONUtils.isJSON(event.toString())){
+        addEvent(JSONUtils.toJSON(event.toString()));
+        return;
+      }
       String eventName = event.toString();
       if(!contains(eventName)){
         add(eventName);
       }
     }else if(event instanceof JSONObject){
       JSONObject bindings = (JSONObject) event;
-      String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
-      Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
-      if (eventName != null) {
-        putEventBindingArgs(eventName, args);
-      }
+      addBindingEvent(bindings);
     }
   }
+
+
 
   public static String getEventName(Object event){
     if(event instanceof CharSequence){
@@ -123,15 +127,38 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     return  event.toString();
   }
 
-  public void putEventBindingArgs(String event, Object args){
-    if(!contains(event)){
-      add(event);
+
+  public void parseStatements() {
+     if(!isEmpty()){
+       for(int i=0; i<size(); i++){
+         String event =  get(i);
+         if(JSONUtils.isJSON(event)){
+           JSONObject object = JSONUtils.toJSON(event);
+           String eventName = addBindingEvent(object);
+           set(i, eventName);
+         }
+       }
+     }
+  }
+
+  private String addBindingEvent(JSONObject bindings){
+    String eventName = bindings.getString(WXEvent.EVENT_KEY_TYPE);
+    Object args = bindings.get(WXEvent.EVENT_KEY_ARGS);
+    if (eventName != null) {
+      addBindingArgsEvent(eventName, args);
+    }
+    return eventName;
+  }
+
+  private void addBindingArgsEvent(String eventName, Object args){
+    if(!contains(eventName)){
+      add(eventName);
     }
     if(args != null){
       if(mEventBindingArgs == null){
         mEventBindingArgs = new ArrayMap();
       }
-      mEventBindingArgs.put(event, ELUtils.bindingBlock(args));
+      mEventBindingArgs.put(eventName, ELUtils.bindingBlock(args));
     }
   }
 
@@ -156,4 +183,6 @@ public class WXEvent extends ArrayList<String> implements Serializable, Cloneabl
     event.mEventBindingArgsValues = null; //this should not be clone, it dynamic args
     return  event;
   }
+
+
 }

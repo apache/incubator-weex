@@ -40,13 +40,15 @@ namespace WeexCore {
     IRenderFactory *factory;
     if (type == kRenderText) {
       factory = new RenderTextFactory();
-    } else if (type == kRenderCell || type == kRenderHeader) {
+    } else if (type == kRenderCell
+               || type == kRenderHeader
+               || type == kRenderCellSlot) {
       factory = new RenderCellFactory();
     } else if (type == kRenderIndicator) {
       factory = new RenderIndicatorFactory();
     } else if (type == kRenderInput) {
       factory = new RenderInputFactory();
-    } else if (type == kRenderList || type == kRenderWaterfall) {
+    } else if (type == kRenderList || type == kRenderWaterfall || type == kRenderRecycleList) {
       factory = new RenderListFactory();
     } else if (type == kRenderMask) {
       factory = new RenderMaskFactory();

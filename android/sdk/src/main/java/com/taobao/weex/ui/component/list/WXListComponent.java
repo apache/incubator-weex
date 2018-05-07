@@ -97,9 +97,9 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   private boolean hasColumnPros() {
-    return mColumnWidth != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH)) ||
-            mColumnCount != WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT)) ||
-            mColumnGap != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP));
+    return (getAttrs().containsKey(Constants.Name.COLUMN_WIDTH) && mColumnWidth != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH))) ||
+            (getAttrs().containsKey(Constants.Name.COLUMN_COUNT) &&  mColumnCount != WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT))) ||
+            (getAttrs().containsKey(Constants.Name.COLUMN_GAP) && mColumnGap != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP)));
   }
 
   /**

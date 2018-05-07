@@ -472,7 +472,8 @@ namespace WeexCore {
                                           std::set<std::string> *events,
                                           const WXCoreMargin &margins,
                                           const WXCorePadding &paddings,
-                                          const WXCoreBorderWidth &borders) {
+                                          const WXCoreBorderWidth &borders,
+                                          bool willLayout) {
     JNIEnv *env = getJNIEnv();
     jstring jPageId = env->NewStringUTF(pageId);
     jstring jRef = env->NewStringUTF(ref);
@@ -535,7 +536,7 @@ namespace WeexCore {
     if (jCallAddElementMethodId == NULL)
       jCallAddElementMethodId = env->GetMethodID(jBridgeClazz,
                                                            "callAddElement",
-                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
+                                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[FZ)I");
 
     jstring jComponentType = getComponentTypeFromCache(componentType);
     if (jComponentType == nullptr) {
@@ -544,7 +545,7 @@ namespace WeexCore {
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementMethodId, jPageId, jComponentType, jRef, index,
-                              jParentRef, jStyles, jAttributes, jEvents, jMargins, jPaddings, jBorders);
+                              jParentRef, jStyles, jAttributes, jEvents, jMargins, jPaddings, jBorders, willLayout);
 
     page->CallBridgeTime(getCurrentTime() - startTimeCallBridge);
 

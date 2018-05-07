@@ -27,6 +27,7 @@ import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
+import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import java.util.Map;
 import java.util.Set;
@@ -129,6 +130,13 @@ public abstract class WXBasicComponent<T extends View> {
     mBasicComponentData.addStyle(styles, byPesudo);
   }
 
+  public final void updateStyle(Map<String, Object> styles, boolean byPesudo){
+    if (styles == null || styles.isEmpty()) {
+      return;
+    }
+    mBasicComponentData.getStyles().updateStyle(styles, byPesudo);
+  }
+
   public final void addEvent(Set<String> events) {
     if (events == null || events.isEmpty()) {
       return;
@@ -167,7 +175,7 @@ public abstract class WXBasicComponent<T extends View> {
     return mRef;
   }
 
-  protected GraphicPosition getLayoutPosition() {
+  public GraphicPosition getLayoutPosition() {
     if (mLayoutPosition == null) {
       mLayoutPosition = new GraphicPosition(0, 0, 0, 0);
     }
@@ -178,7 +186,7 @@ public abstract class WXBasicComponent<T extends View> {
     this.mLayoutPosition = mLayoutPosition;
   }
 
-  protected GraphicSize getLayoutSize() {
+  public GraphicSize getLayoutSize() {
     if (mLayoutSize == null) {
       mLayoutSize = new GraphicSize(0, 0);
     }

@@ -100,7 +100,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
       long start = System.currentTimeMillis();
       if(layoutPosition !=null && layoutSize != null) {
-        child.updateDemission(layoutSize, layoutPosition);
+        child.setDemission(layoutSize, layoutPosition);
       }
       child.applyLayoutAndEvent(child);
       WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutaAplyLayoutAndEventTime(System.currentTimeMillis() - start);

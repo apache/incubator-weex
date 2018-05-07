@@ -21,7 +21,7 @@
 namespace WeexCore {
 
   RenderActionAddElement::RenderActionAddElement(const std::string &pageId, const RenderObject *render,
-                                                 const RenderObject *parent, int index) {
+                                                 const RenderObject *parent, int index, bool willLayout) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
@@ -33,6 +33,7 @@ namespace WeexCore {
     this->mRef = render->Ref();
     this->mParentRef = parent->Ref();
     this->mIndex = index;
+    this->mWillLayout = willLayout;
   }
 
   void RenderActionAddElement::ExecuteAction() {
@@ -43,7 +44,7 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
                                                        mIndex, mParentRef.c_str(), mStyles, mAttributes,
-                                                       mEvents, mMargins, mPaddings, mBorders);
+                                                       mEvents, mMargins, mPaddings, mBorders, mWillLayout);
     page->JniCallTime(getCurrentTime() - startTime);
     page->AddElementActionJNITime(getCurrentTime() - startTime);
   }

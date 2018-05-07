@@ -16,26 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERTEXT_H
-#define WEEX_PROJECT_RENDERTEXT_H
+//
+// Created by furture on 2018/5/4.
+//
 
-#include <core/render/node/render_object.h>
-#include <core/render/page/render_page.h>
+#ifndef WEEX_PROJECT_NATIVE_RENDER_OBJECT_UTILS_IMPL_ANDROID_H
+#define WEEX_PROJECT_NATIVE_RENDER_OBJECT_UTILS_IMPL_ANDROID_H
 
-namespace WeexCore {
-  class RenderText : public RenderObject {
-  private:
-    inline void UpdateAttr(std::string key, std::string value) {
-      RenderObject::UpdateAttr(key, value);
-      markDirty();
-    }
 
-    inline StyleType UpdateStyle(std::string key, std::string value) {
-      StyleType resultType = RenderObject::ApplyStyle(key, value, true);
-      markDirty();
-      return resultType;
-    }
-  };
+#include <jni.h>
+
+namespace WeexCore{
+    bool RegisterJNINativeRenderObjectUtils(JNIEnv *env);
 }
 
-#endif //WEEX_PROJECT_RENDERTEXT_H
+
+#endif //WEEX_PROJECT_NATIVE_RENDER_OBJECT_UTILS_IMPL_ANDROID_H
