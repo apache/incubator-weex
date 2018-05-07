@@ -122,7 +122,6 @@
                              CALLCREATEINSTANCETIME:        [NSNumber numberWithInt:DebugAfterFSFinish],
                              COMMUNICATETOTALTIME:          [NSNumber numberWithInt:DebugAfterExist],
                              FSRENDERTIME:                  [NSNumber numberWithInt:DebugAfterExist],
-                             COMPONENTCOUNT:                [NSNumber numberWithInt:DebugAfterExist],
                              CACHEPROCESSTIME:              [NSNumber numberWithInt:DebugAfterRequest],
                              CACHERATIO:                    [NSNumber numberWithInt:DebugAfterRequest],
                              M_FS_CALL_JS_TIME:             [NSNumber numberWithInt:DebugAfterFSFinish],
@@ -134,7 +133,11 @@
                              M_MAX_DEEP_VDOM:               [NSNumber numberWithInt:DebugAfterExist],
                              M_IMG_WRONG_SIZE_NUM:          [NSNumber numberWithInt:DebugAfterExist],
                              M_TIMER_NUM:                   [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_INTERACTION_TIME:            [NSNumber numberWithInt:DebugAfterExist]
+                             M_INTERACTION_TIME:            [NSNumber numberWithInt:DebugAfterExist],
+                             M_COMPONENT_FS_TIME:           @(DebugAfterFSFinish),
+                             M_COMPONENT_FS_COUNT:          @(DebugAfterFSFinish),
+                             COMPONENTCOUNT:                @(DebugAfterExist),
+                             M_COMPONENT_TIME:              @(DebugAfterExist)
                              };
         
     });

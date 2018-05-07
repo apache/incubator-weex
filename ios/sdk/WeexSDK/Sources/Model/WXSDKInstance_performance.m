@@ -38,6 +38,8 @@
     WX_MONITOR_PERF_SET(WXPTFsCallNativeTime, self.performance.fsCallNativeTime, self);
     WX_MONITOR_PERF_SET(WXPTFsReqNetNum, self.performance.fsReqNetNum, self);
     WX_MONITOR_PERF_SET(WXPTTimerNum, self.performance.timerNum, self);
+    WX_MONITOR_PERF_SET(WXPTFsComponentCount,self.performance.fsComponentCount,self);
+    WX_MONITOR_PERF_SET(WXPTFsComponentCreateTime,self.performance.fsComponentCreateTime,self);
 }
 
 
@@ -47,6 +49,8 @@
     WX_MONITOR_PERF_SET(WXPTMaxDeepVDom,self.performance.maxVdomDeep,self);
     WX_MONITOR_PERF_SET(WXPTImgWrongSizeNum,self.performance.imgWrongSizeNum,self);
     WX_MONITOR_PERF_SET(WXPTInteractionTime,self.performance.interactionTime,self);
+    WX_MONITOR_PERF_SET(WXPTComponentCount,self.performance.componentCount,self);
+    WX_MONITOR_PERF_SET(WXPTComponentCreateTime,self.performance.componentCreateTime,self);
 }
 
 @end

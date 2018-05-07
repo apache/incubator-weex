@@ -49,6 +49,10 @@ typedef enum : NSUInteger {
     WXPTTimerNum,
     WXPTInteractionTime,
     WXPTWrongImgSize,
+    WXPTFsComponentCount,
+    WXPTFsComponentCreateTime,
+    WXPTComponentCount,
+    WXPTComponentCreateTime,
     //end
     WXPTEnd
 } WXPerformanceTag;

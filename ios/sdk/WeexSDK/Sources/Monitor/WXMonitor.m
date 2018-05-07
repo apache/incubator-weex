@@ -147,7 +147,6 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         }
     }
     WXPerformBlockOnComponentThread(^{
-        commitDict[COMPONENTCOUNT] = @([instance numberOfComponents]);
         WXPerformBlockOnMainThread(^{
             [self commitPerformanceWithDict:commitDict instance:instance comitState:state];
         });
@@ -181,7 +180,11 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXPTCellExceedNum):M_CELL_EXCEED_NUM,
                           @(WXPTWrongImgSize):M_IMG_WRONG_SIZE_NUM,
                           @(WXPTInteractionTime):M_INTERACTION_TIME,
-                          @(WXPTFsReqNetNum):M_FS_REQUEST_NET_NUM
+                          @(WXPTFsReqNetNum):M_FS_REQUEST_NET_NUM,
+                          @(WXPTFsComponentCreateTime):M_COMPONENT_FS_TIME,
+                          @(WXPTFsComponentCount):M_COMPONENT_FS_COUNT,
+                          @(WXPTComponentCreateTime):M_COMPONENT_TIME,
+                          @(WXPTComponentCount):COMPONENTCOUNT
                           };
     });
     

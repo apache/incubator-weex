@@ -548,6 +548,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (WXComponent *)_buildComponentForData:(NSDictionary *)data supercomponent:(WXComponent *)supercomponent
 {
+    double buildSartTime = CACurrentMediaTime()*1000;
     NSString *ref = data[@"ref"];
     NSString *type = data[@"type"];
     NSDictionary *styles = data[@"style"];
@@ -592,6 +593,15 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     [_indexDict setObject:component forKey:component.ref];
     [component readyToRender];// notify redyToRender event when init
+    
+    double diffTime = CACurrentMediaTime()*1000 - buildSartTime;
+    if (!(self.weexInstance.isJSCreateFinish)) {
+        self.weexInstance.performance.fsComponentCount++;
+        self.weexInstance.performance.fsComponentCreateTime+=diffTime;
+    }
+    self.weexInstance.performance.componentCount++;
+    self.weexInstance.performance.componentCreateTime+=diffTime;
+    
     return component;
 }
 
