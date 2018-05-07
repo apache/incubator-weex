@@ -88,31 +88,33 @@ public class BasicComponentData<T extends View> {
   }
 
   public final void addShorthand(float[] shorthand, CSSShorthand.TYPE type) {
+    if (shorthand == null) {
+      shorthand = new float[] {0, 0, 0, 0};
+    }
     if (shorthand.length == 4) {
       switch (type) {
         case MARGIN:
-          if(mMargins == null){
+          if (mMargins == null) {
             mMargins = new CSSShorthand(shorthand);
-          }
-          else{
+          } else {
             mMargins.replace(shorthand);
           }
           break;
         case PADDING:
-          if(mPaddings == null){
+          if (mPaddings == null) {
             mPaddings = new CSSShorthand(shorthand);
-          }
-          else{
+          } else {
             mPaddings.replace(shorthand);
           }
           break;
         case BORDER:
-          if(mBorders == null){
+          if (mBorders == null) {
             mBorders = new CSSShorthand(shorthand);
-          }
-          else{
+          } else {
             mBorders.replace(shorthand);
           }
+          break;
+        default:
           break;
       }
     }

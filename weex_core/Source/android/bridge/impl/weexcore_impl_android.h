@@ -45,6 +45,7 @@ extern jstring putComponentTypeToCache(const std::string type);
 extern jstring getStyleKeyFromCache(const std::string key);
 extern jstring putStyleKeyToCache(const std::string key);
 extern StringRefCache *GetStringRefCache(const char * pageId);
+extern jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]);
 
 namespace WeexCore {
 

@@ -412,27 +412,25 @@ namespace WeexCore {
     float c_margins[4];
     float c_paddings[4];
     float c_borders[4];
-    jfloatArray jMargins = env->NewFloatArray(4);
-    jfloatArray jPaddings = env->NewFloatArray(4);
-    jfloatArray jBorders = env->NewFloatArray(4);
 
     c_margins[0] = margins.getMargin(kMarginTop);
     c_margins[1] = margins.getMargin(kMarginBottom);
     c_margins[2] = margins.getMargin(kMarginLeft);
     c_margins[3] = margins.getMargin(kMarginRight);
-    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
 
     c_paddings[0] = paddings.getPadding(kPaddingTop);
     c_paddings[1] = paddings.getPadding(kPaddingBottom);
     c_paddings[2] = paddings.getPadding(kPaddingLeft);
     c_paddings[3] = paddings.getPadding(kPaddingRight);
-    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
 
     c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
     c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
     c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
     c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
-    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
+
+    jfloatArray jMargins = c2jFloatArray(env, c_margins);
+    jfloatArray jPaddings = c2jFloatArray(env, c_paddings);
+    jfloatArray jBorders = c2jFloatArray(env, c_borders);
 
     long long startTimeCallBridge = getCurrentTime();
 
@@ -511,27 +509,25 @@ namespace WeexCore {
     float c_margins[4];
     float c_paddings[4];
     float c_borders[4];
-    jfloatArray jMargins = env->NewFloatArray(4);
-    jfloatArray jPaddings = env->NewFloatArray(4);
-    jfloatArray jBorders = env->NewFloatArray(4);
 
     c_margins[0] = margins.getMargin(kMarginTop);
     c_margins[1] = margins.getMargin(kMarginBottom);
     c_margins[2] = margins.getMargin(kMarginLeft);
     c_margins[3] = margins.getMargin(kMarginRight);
-    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
 
     c_paddings[0] = paddings.getPadding(kPaddingTop);
     c_paddings[1] = paddings.getPadding(kPaddingBottom);
     c_paddings[2] = paddings.getPadding(kPaddingLeft);
     c_paddings[3] = paddings.getPadding(kPaddingRight);
-    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
 
     c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
     c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
     c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
     c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
-    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
+
+    jfloatArray jMargins = c2jFloatArray(env, c_margins);
+    jfloatArray jPaddings = c2jFloatArray(env, c_paddings);
+    jfloatArray jBorders = c2jFloatArray(env, c_borders);
 
     long long startTimeCallBridge = getCurrentTime();
 

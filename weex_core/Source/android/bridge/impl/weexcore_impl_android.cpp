@@ -102,6 +102,22 @@ StringRefCache *GetStringRefCache(const char * pageId) {
   }
 }
 
+jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]) {
+  if (nullptr == c_array) {
+    return nullptr;
+  }
+  if (0 == c_array[0]
+      && 0 == c_array[1]
+      && 0 == c_array[2]
+      && 0 == c_array[3]) {
+    // Default value;
+    return nullptr;
+  }
+  jfloatArray jArray = env->NewFloatArray(4);
+  env->SetFloatArrayRegion(jArray, 0, 4, c_array);
+  return jArray;
+}
+
 static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
                              jstring framework,
                              jobject params,
