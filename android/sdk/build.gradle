@@ -87,12 +87,15 @@ android {
     }
 
     def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
+    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexjsc.so").length();
     def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
     println "ARMEABI_Size: "+ARMEABI_Size;
+    println "ARMEABIV7_Size:" + ARMEABIV7_Size;
     println "X86_Size:" + X86_Size;
 
     defaultConfig {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
+        buildConfigField "long", "ARMEABIV7_Size", "${ARMEABIV7_Size}"
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
@@ -104,7 +107,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi","x86"
+            abiFilters "armeabi-v7a","armeabi","x86"
         }
 
         externalNativeBuild {
