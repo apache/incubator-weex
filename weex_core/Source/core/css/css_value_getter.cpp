@@ -23,82 +23,88 @@
 
 namespace WeexCore {
 
-  const WXCoreFlexDirection &GetWXCoreFlexDirection(const std::string &value) {
-    if (value == COLUMN) {
+  const WXCoreFlexDirection GetWXCoreFlexDirection(const std::string &value) {
+    const char *c_value = value.c_str();
+    if(strcmp(c_value, COLUMN) == 0) {
       return WeexCore::kFlexDirectionColumn;
-    } else if (value == ROW) {
+    } else if (strcmp(c_value, ROW) == 0) {
       return WeexCore::kFlexDirectionRow;
-    } else if (value == COLUMN_REVERSE) {
+    } else if (strcmp(c_value, COLUMN_REVERSE) == 0) {
       return WeexCore::kFlexDirectionColumnReverse;
-    } else if (value == ROW_REVERSE) {
+    } else if (strcmp(c_value, ROW_REVERSE) == 0) {
       return WeexCore::kFlexDirectionRowReverse;
     }
     return WeexCore::kFlexDirectionColumn;
   }
 
-  const WXCoreJustifyContent &GetWXCoreJustifyContent(const std::string &value) {
-    if (value == FLEX_START) {
+  const WXCoreJustifyContent GetWXCoreJustifyContent(const std::string &value) {
+    const char *c_value = value.c_str();
+    if (strcmp(c_value, FLEX_START) == 0) {
       return WeexCore::kJustifyFlexStart;
-    } else if (value == FLEX_END) {
+    } else if (strcmp(c_value, FLEX_END) == 0) {
       return WeexCore::kJustifyFlexEnd;
-    } else if (value == CENTER) {
+    } else if (strcmp(c_value, CENTER) == 0) {
       return WeexCore::kJustifyCenter;
-    } else if (value == SPACE_BETWEEN) {
+    } else if (strcmp(c_value, SPACE_BETWEEN) == 0) {
       return WeexCore::kJustifySpaceBetween;
-    } else if (value == SPACE_AROUND) {
+    } else if (strcmp(c_value, SPACE_AROUND) == 0) {
       return WeexCore::kJustifySpaceAround;
     }
     return WeexCore::kJustifyFlexStart;
   }
 
-  const WXCoreAlignItems &GetWXCoreAlignItem(const std::string &value) {
-    if (value == STRETCH) {
+  const WXCoreAlignItems GetWXCoreAlignItem(const std::string &value) {
+    const char *c_value = value.c_str();
+    if (strcmp(c_value, STRETCH) == 0) {
       return WeexCore::kAlignItemsStretch;
-    } else if (value == FLEX_START) {
+    } else if (strcmp(c_value, FLEX_START) == 0) {
       return WeexCore::kAlignItemsFlexStart;
-    } else if (value == FLEX_END) {
+    } else if (strcmp(c_value, FLEX_END) == 0) {
       return WeexCore::kAlignItemsFlexEnd;
-    } else if (value == CENTER) {
+    } else if (strcmp(c_value, CENTER) == 0) {
       return WeexCore::kAlignItemsCenter;
     }
     return WeexCore::kAlignItemsStretch;
   }
 
-  const WXCoreFlexWrap &GetWXCoreFlexWrap(const std::string &value) {
-    if (value == NOWRAP) {
+  const WXCoreFlexWrap GetWXCoreFlexWrap(const std::string &value) {
+    const char *c_value = value.c_str();
+    if (strcmp(c_value, NOWRAP) == 0) {
       return WeexCore::kNoWrap;
-    } else if (value == WRAP) {
+    } else if (strcmp(c_value, WRAP) == 0) {
       return WeexCore::kWrap;
-    } else if (value == WRAP_REVERSE) {
+    } else if (strcmp(c_value, WRAP_REVERSE) == 0) {
       return WeexCore::kWrapReverse;
     }
     return WeexCore::kNoWrap;
   }
 
-  const WXCoreAlignSelf &GetWXCoreAlignSelf(const std::string &value) {
-    if (value == AUTO) {
+  const WXCoreAlignSelf GetWXCoreAlignSelf(const std::string &value) {
+    const char *c_value = value.c_str();
+    if (strcmp(c_value, AUTO) == 0) {
       return WeexCore::kAlignSelfAuto;
-    } else if (value == STRETCH) {
+    } else if (strcmp(c_value, STRETCH) == 0) {
       return WeexCore::kAlignSelfStretch;
-    } else if (value == FLEX_START) {
+    } else if (strcmp(c_value, FLEX_START) == 0) {
       return WeexCore::kAlignSelfFlexStart;
-    } else if (value == FLEX_END) {
+    } else if (strcmp(c_value, FLEX_END) == 0) {
       return WeexCore::kAlignSelfFlexEnd;
-    } else if (value == CENTER) {
+    } else if (strcmp(c_value, CENTER) == 0) {
       return WeexCore::kAlignSelfCenter;
     }
     return WeexCore::kAlignSelfAuto;
   }
 
-  const WXCorePositionType &GetWXCorePositionType(const std::string &value) {
+  const WXCorePositionType GetWXCorePositionType(const std::string &value) {
+    const char *c_value = value.c_str();
     auto ret = kRelative;
-    if (value == RELATIVE) {
+    if (strcmp(c_value, RELATIVE) == 0) {
       ret = kRelative;
-    } else if (value == ABSOLUTE) {
+    } else if (strcmp(c_value, ABSOLUTE) == 0) {
       ret = kAbsolute;
-    } else if(value == STICKY){
+    } else if(strcmp(c_value, STICKY) == 0){
       ret = kSticky;
-    }else if(value == FIXED){
+    }else if(strcmp(c_value, FIXED) == 0){
       ret = kFixed;
     }
     return ret;
