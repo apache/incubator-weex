@@ -63,4 +63,12 @@ public class GraphicPosition {
   public void setBottom(float bottom) {
     this.mBottom = bottom;
   }
+
+
+  public void update(float top, float bottom, float left, float right) {
+    this.mTop = top;
+    this.mBottom = bottom;
+    this.mLeft = left;
+    this.mRight = right;
+  }
 }

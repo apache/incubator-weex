@@ -26,6 +26,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.Map;
@@ -42,6 +43,7 @@ public class BasicComponentData<T extends View> {
   private CSSShorthand mMargins;
   private CSSShorthand mPaddings;
   private CSSShorthand mBorders;
+  private long renderObjectPr = 0;
 
   public BasicComponentData(String ref, String componentType, String parentRef) {
     this.mRef = ref;
@@ -261,5 +263,46 @@ public class BasicComponentData<T extends View> {
 
   public final void setBorders(@NonNull CSSShorthand mBorders) {
     this.mBorders = mBorders;
+  }
+
+
+
+  @Override
+  public BasicComponentData clone() throws CloneNotSupportedException {
+    BasicComponentData basicComponentData = new BasicComponentData(mRef, mComponentType, mParentRef);
+    basicComponentData.setBorders(getBorder().clone());
+    basicComponentData.setMargins(getMargin().clone());
+    basicComponentData.setPaddings(getPadding().clone());
+    if(mAttributes != null){
+      basicComponentData.mAttributes = mAttributes.clone();
+    }
+    if(mStyles != null){
+      basicComponentData.mStyles = mStyles.clone();
+    }
+    if(mEvents != null){
+      basicComponentData.mEvents = mEvents.clone();
+    }
+
+    if(renderObjectPr != 0){
+      basicComponentData.setRenderObjectPr(NativeRenderObjectUtils.nativeCopyRenderObject(renderObjectPr));
+    }
+    return basicComponentData;
+  }
+
+  public long getRenderObjectPr() {
+    return renderObjectPr;
+  }
+
+  public boolean isRenderPtrEmpty(){
+    return  renderObjectPr == 0;
+  }
+
+  public synchronized void setRenderObjectPr(long renderObjectPr) {
+    if(this.renderObjectPr != renderObjectPr){
+      if(this.renderObjectPr != 0){
+        throw  new  RuntimeException("RenderObjectPr has " + renderObjectPr + " old renderObjectPtr " + this.renderObjectPr);
+      }
+      this.renderObjectPr = renderObjectPr;
+    }
   }
 }

@@ -4,6 +4,7 @@
 #include <android/bridge/impl/measure_mode_impl_android.h>
 #include <android/bridge/impl/content_box_measurement_impl_android.h>
 #include <android/bridge/impl/jsfunction_impl_android.h>
+#include <android/bridge/impl/native_render_object_utils_impl_android.h>
 
 jint JNI_OnLoad (JavaVM *vm, void *reserved)
 {
@@ -18,6 +19,7 @@ jint JNI_OnLoad (JavaVM *vm, void *reserved)
     WeexCore::RegisterJNIMeasureMode(env);
     WeexCore::RegisterJNIContentBoxMeasurement(env);
     WeexCore::RegisterWXJsFunction(env);
+    WeexCore::RegisterJNINativeRenderObjectUtils(env);
     return WeexCore::OnLoad(vm, reserved);
 }
 

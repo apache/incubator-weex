@@ -50,6 +50,13 @@ namespace WeexCore {
       return mType;
     }
 
+    void copyFrom(IRenderObject* src){
+        WXCoreLayoutNode::copyFrom(src);
+        SetRef(src->Ref());
+        SetPageId(src->PageId());
+        SetType(src->Type());
+    }
+
   private:
     std::string mPageId = "";
     std::string mRef = "";

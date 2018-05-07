@@ -261,6 +261,10 @@ namespace WeexCore {
       }
     }
 
+    void copyFrom(WXCoreLayoutNode* srcNode){
+      memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+    }
+
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
       if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
         memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
@@ -673,6 +677,14 @@ namespace WeexCore {
       return mChildList.cend();
     }
 
+    inline bool hasChild(const WXCoreLayoutNode* const child){
+       if(std::find(mChildList.begin(), mChildList.end(), child) != mChildList.end()){
+         return true;
+       }else{
+         return false;
+       }
+    }
+
     inline void removeChild(const WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
@@ -706,6 +718,10 @@ namespace WeexCore {
 
     inline WXCoreLayoutNode *getParent() const {
       return mParent;
+    }
+
+    inline void setParent(WXCoreLayoutNode * const parent, WXCoreLayoutNode * const child) const {
+       child->mParent = parent;
     }
 
     inline bool isBFC(WXCoreLayoutNode* const node) const {

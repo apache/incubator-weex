@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.ui.component.list;
 
-import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
-
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -27,6 +25,7 @@ import android.support.annotation.RestrictTo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -38,7 +37,10 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 import java.util.LinkedList;
+
+import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
 
 /**
  * Root component for components in {@link WXListComponent}
@@ -60,6 +62,10 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private Object  renderData;
 
     private boolean isSourceUsed = false;
+
+    private boolean isAppendTreeDone;
+
+    private CellAppendTreeListener cellAppendTreeListener;
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -223,5 +229,30 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     public void setSourceUsed(boolean sourceUsed) {
         isSourceUsed = sourceUsed;
+    }
+
+
+    public boolean isAppendTreeDone(){
+        return isAppendTreeDone;
+    }
+
+    @Override
+    public void appendTreeCreateFinish() {
+        super.appendTreeCreateFinish();
+        isAppendTreeDone = true;
+        if(cellAppendTreeListener != null){
+            cellAppendTreeListener.onAppendTreeDone();
+        }
+    }
+
+    public void setCellAppendTreeListener(CellAppendTreeListener cellAppendTreeListener) {
+        this.cellAppendTreeListener = cellAppendTreeListener;
+        if(isAppendTreeDone){
+            cellAppendTreeListener.onAppendTreeDone();
+        }
+    }
+
+    public interface CellAppendTreeListener{
+        public void onAppendTreeDone();
     }
 }

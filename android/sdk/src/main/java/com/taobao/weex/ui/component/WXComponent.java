@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,6 +100,7 @@ import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
 import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
@@ -219,7 +221,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    WXBridgeManager.getInstance().bindMeasurementToWXCore(getInstanceId(), getRef(), contentBoxMeasurement);
+    WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr(), contentBoxMeasurement);
   }
 
   public void updateStyles(WXComponent component) {
@@ -626,10 +628,24 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void updateDemission(GraphicSize size, GraphicPosition position) {
+  public void setDemission(GraphicSize size, GraphicPosition position) {
     setLayoutPosition(position);
     setLayoutSize(size);
   }
+
+  public void updateDemission(float top, float bottom, float left, float right, float height, float width) {
+    getLayoutPosition().update(top, bottom, left, right);
+    getLayoutSize().update(width, height);
+  }
+
+
+  public void applyLayoutOnly(){
+    if(!isLazy()) {
+      setLayout(this);
+      setPadding(this.getPadding(), this.getBorder());
+    }
+  }
+
 
   public void refreshData(WXComponent component) {
 
@@ -2073,7 +2089,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public void setWaste(boolean waste) {
     if(this.waste != waste){
       this.waste = waste;
-      if(waste){
+      if(!WXBasicComponentType.RECYCLE_LIST.equals(getParent().getComponentType())){
+          NativeRenderObjectUtils.nativeRenderObjectChildWaste(getRenderObjectPtr(), waste);
+      }
+
+     if(waste){
         //update dom not show, and put style to hidden
         getStyles().put(Constants.Name.VISIBILITY, Constants.Value.HIDDEN);
         //if component not init, mark lazy init when use, reduce view count
@@ -2085,13 +2105,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           getHostView().setVisibility(View.GONE);
         }
       }else{
-        getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
+       getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
         if(getHostView() == null){
           if(mLazy) { // when parent is lazy just mark node lazy false
             if(mParent != null && mParent.isLazy()){
               lazy(false);
             }else{
-              ComponentUtils.initLazyComponent(this, mParent);
+              Statements.initLazyComponent(this, mParent);
             }
           }
         }else{
@@ -2181,5 +2201,66 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /***/
   public void lazy(boolean lazy) {
     mLazy = lazy;
+  }
+
+  public long getRenderObjectPtr(){
+    if(getBasicComponentData().isRenderPtrEmpty()){
+      getBasicComponentData().setRenderObjectPr(NativeRenderObjectUtils.nativeGetRenderObject(getInstanceId(), getRef()));
+    }
+    return getBasicComponentData().getRenderObjectPr();
+  }
+
+
+  public void updateNativeAttr(String key, Object value){
+    if(key == null){
+      return;
+    }
+    if(value == null){
+      value  = "";
+    }
+    getBasicComponentData().getAttrs().put(key, value);
+    NativeRenderObjectUtils.nativeUpdateRenderObjectAttr(getRenderObjectPtr(), key, value.toString());
+  }
+
+  public  void  nativeUpdateAttrs(Map<String, Object> dynamic){
+    Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
+    /**
+     * diff attrs, see attrs has update, remove none update attrs
+     * */
+    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+    while (iterator.hasNext()){
+      Map.Entry<String, Object> objectEntry = iterator.next();
+      if(objectEntry.getKey() == null){
+        continue;
+      }
+      updateNativeAttr(objectEntry.getKey(), objectEntry.getValue());
+    }
+  }
+
+
+  public void updateNativeStyle(String key, Object value){
+    if(key == null){
+      return;
+    }
+    if(value == null){
+      value  = "";
+    }
+    getBasicComponentData().getStyles().put(key, value);
+    NativeRenderObjectUtils.nativeUpdateRenderObjectStyle(getRenderObjectPtr(), key, value.toString());
+  }
+
+  public  void  updateNativeStyles(Map<String, Object> dynamic){
+    Set<Map.Entry<String, Object>> entries = dynamic.entrySet();
+    /**
+     * diff attrs, see attrs has update, remove none update attrs
+     * */
+    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+    while (iterator.hasNext()){
+      Map.Entry<String, Object> objectEntry = iterator.next();
+      if(objectEntry.getKey() == null){
+        continue;
+      }
+      updateNativeStyle(objectEntry.getKey(), objectEntry.getValue());
+    }
   }
 }

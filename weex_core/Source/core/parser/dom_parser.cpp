@@ -22,7 +22,6 @@
 #include <core/render/node/render_object.h>
 #include <core/render/page/render_page.h>
 #include <core/render/node/factory/render_creator.h>
-#include <android/base/log_utils.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -41,6 +40,26 @@ namespace WeexCore {
       }
     }
     return num;
+  }
+
+  static inline int GetSplitIndex(std::string temp, const char * leftChar, const char * rightChar){
+    int endIndex = temp.find(rightChar);
+    if(endIndex > 0) {
+      // has found!
+      int temp_length = temp.length();
+      int startIndex = 0;
+      int leftMatchSize = matchNum(temp, leftChar, startIndex, endIndex) - 1;
+      while (leftMatchSize > 0 && startIndex <= endIndex && startIndex < temp_length) {
+        startIndex = endIndex + 1;
+        int markIndex = temp.find(rightChar, startIndex);
+        if(markIndex > 0) {
+          endIndex = markIndex;
+          leftMatchSize--;
+        }
+        leftMatchSize += matchNum(temp, leftChar, startIndex, endIndex);
+      }
+    }
+    return endIndex;
   }
 
   bool JsonParserHandler::Null() {
@@ -240,6 +259,22 @@ namespace WeexCore {
     return result;
   }
 
+  const std::string JsonParser::GetObjectStr() {
+      std::string temp = "{";
+      temp.append(Stringify());
+      int endIndex = GetSplitIndex(temp, "{", "}");
+      SkipValue();
+      return temp.substr(0, endIndex + 1);
+  }
+
+  const std::string JsonParser::GetArrayStr() {
+      std::string temp = "[";
+      temp.append(Stringify());
+      int endIndex = GetSplitIndex(temp, "[", "]");
+      SkipValue();
+      return temp.substr(0, endIndex + 1);
+  }
+
   const char *JsonParser::Stringify() {
     return ss_.src_;
   }
@@ -362,30 +397,12 @@ namespace WeexCore {
             }
           } else if (r.PeekType() == kArrayType) {
             RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
-            std::string temp = "[";
-            temp.append(r.Stringify());
-              int endIndex = temp.find(']');
-              if(endIndex > 0) {
-                  // has found!
-                  int startIndex = 0;
-                  int leftMatchSize = matchNum(temp, "[", startIndex, endIndex) - 1;
-                  while (leftMatchSize > 0 && startIndex < endIndex) {
-                      startIndex = endIndex + 1;
-                      int markIndex = temp.find(']', startIndex);
-                      if(markIndex > 0) {
-                          endIndex = markIndex;
-                          leftMatchSize--;
-                      }
-                      leftMatchSize += matchNum(temp, "[", startIndex, endIndex);
-                  }
-              }
-            std::string value = temp.substr(0, endIndex + 1);
+            std::string value = r.GetArrayStr();
             if (0 == strcmp(key, "attr")) {
               render->AddAttr(key2, value);
             } else if (0 == strcmp(key, "style")) {
               render->AddStyle(key2, value);
             }
-            r.SkipValue();
           } else if (r.PeekType() == kTrueType) {
             RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
             if (0 == strcmp(key, "attr")) {
@@ -404,47 +421,40 @@ namespace WeexCore {
             r.SkipValue();
           } else if (r.PeekType() == kObjectType) {
             RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
-            std::string temp = "{";
-            temp.append(r.Stringify());
-            int endIndex = temp.find('}');
-            if(endIndex > 0) {
-              // has found!
-              int startIndex = 0;
-              int leftMatchSize = matchNum(temp, "{", startIndex, endIndex) - 1;
-              while (leftMatchSize > 0 && startIndex < endIndex) {
-                startIndex = endIndex + 1;
-                int markIndex = temp.find('}', startIndex);
-                if(markIndex > 0) {
-                  endIndex = markIndex;
-                  leftMatchSize--;
-                }
-                leftMatchSize += matchNum(temp, "{", startIndex, endIndex);
-              }
-            }
-            std::string value = temp.substr(0, endIndex + 1);
-
+            std::string value = r.GetObjectStr();
             if (0 == strcmp(key, "attr")) {
               render->AddAttr(key2, value);
             } else if (0 == strcmp(key, "style")) {
               render->AddStyle(key2, value);
             }
-            r.SkipValue();
           } else {
             r.SkipValue();
           }
         }
       } else if (0 == strcmp(key, "event")) {
-        RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
-        r.EnterArray();
-        while (r.NextArrayValue()) {
-          RAPIDJSON_ASSERT(r.PeekType() == kStringType);
-          const char *temp_event = r.GetString();
-          render->AddEvent(temp_event);
-          if (temp_event != nullptr) {
-            delete[]temp_event;
-            temp_event = nullptr;
+          if (r.PeekType() == kArrayType) {
+              RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
+              r.EnterArray();
+              while (r.NextArrayValue()) {
+                  std::string temp_event_str;
+                  if(r.PeekType() == kStringType) {
+                      RAPIDJSON_ASSERT(r.PeekType() == kStringType);
+                      const char *temp_event = r.GetString();
+                      temp_event_str.append(temp_event);
+                      delete[]temp_event;
+                  } else if(r.PeekType() == kObjectType){
+                      RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+                      temp_event_str = r.GetObjectStr();
+                  } else {
+                      r.SkipValue();
+                  }
+
+                  if (temp_event_str.length() > 0) {
+                      render->AddEvent(temp_event_str);
+                  }
+              }
           }
-        }
+
       } else if (0 == strcmp(key, "children")) {
         RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
         r.EnterArray();
@@ -476,7 +486,6 @@ namespace WeexCore {
  * @return {@link RenderObject*}
  */
   RenderObject *Json2RenderObject(char *data, const std::string &pageId) {
-
     JsonParser r(data);
     return ParseJsonObject(r, nullptr, 0, pageId);
   }
@@ -512,27 +521,9 @@ namespace WeexCore {
         }
       } else if (r.PeekType() == kArrayType) {
         RAPIDJSON_ASSERT(r.PeekType() == kArrayType);
-        std::string temp = "[";
-        temp.append(r.Stringify());
-        int endIndex = temp.find(']');
-        if(endIndex > 0) {
-          // has found!
-          int startIndex = 0;
-          int leftMatchSize = matchNum(temp, "[", startIndex, endIndex) - 1;
-          while (leftMatchSize > 0 && startIndex < endIndex) {
-            startIndex = endIndex + 1;
-            int markIndex = temp.find(']', startIndex);
-            if(markIndex > 0) {
-              endIndex = markIndex;
-              leftMatchSize--;
-            }
-            leftMatchSize += matchNum(temp, "[", startIndex, endIndex);
-          }
-        }
-        std::string value = temp.substr(0, endIndex + 1);
+        std::string value = r.GetArrayStr();
         std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
-        r.SkipValue();
       } else if (r.PeekType() == kTrueType) {
         RAPIDJSON_ASSERT(r.PeekType() == kTrueType);
         std::pair<std::string, std::string> myPair(key, "true");
@@ -550,25 +541,7 @@ namespace WeexCore {
         r.SkipValue();
       } else if (r.PeekType() == kObjectType) {
         RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
-        std::string temp = "{";
-        temp.append(r.Stringify());
-        int endIndex = temp.find('}');
-        if(endIndex > 0) {
-          // has found!
-          int startIndex = 0;
-          int leftMatchSize = matchNum(temp, "{", startIndex, endIndex) - 1;
-          while (leftMatchSize > 0 && startIndex < endIndex) {
-            startIndex = endIndex + 1;
-            int markIndex = temp.find('}', startIndex);
-            if(markIndex > 0) {
-              endIndex = markIndex;
-              leftMatchSize--;
-            }
-            leftMatchSize += matchNum(temp, "{", startIndex, endIndex);
-          }
-        }
-        std::string value = temp.substr(0, endIndex + 1);
-
+        std::string value = r.GetObjectStr();
         std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
         r.SkipValue();

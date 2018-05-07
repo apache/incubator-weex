@@ -27,7 +27,7 @@ namespace WeexCore {
 
   public:
     RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
-                           int index);
+                           int index, bool willLayout= true);
 
     void ExecuteAction();
 
@@ -43,6 +43,7 @@ namespace WeexCore {
     std::string mParentRef;
     std::string mRef;
     int mIndex;
+    bool mWillLayout;
   };
 }
 

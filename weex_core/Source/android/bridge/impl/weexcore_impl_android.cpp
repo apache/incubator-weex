@@ -115,6 +115,15 @@ static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instan
   render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
 }
 
+static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
+                                          jlong ptr,
+                                          jobject contentBoxMeasurement){
+  RenderObject *render =  convert_long_to_render_object(ptr);
+  if(render){
+    render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
+  }
+}
+
 static void OnInstanceClose(JNIEnv *env, jobject jcaller, jstring instanceId) {
   RenderManager::GetInstance()->ClosePage(jString2StrFast(env, instanceId));
 }

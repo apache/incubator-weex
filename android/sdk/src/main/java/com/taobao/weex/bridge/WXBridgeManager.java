@@ -2285,7 +2285,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                            float[] margins, float[] paddings, float[] borders) {
+                            float[] margins, float[] paddings, float[] borders,boolean willLayout) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callAddElement: call CreateBody tasks is null");
@@ -2315,7 +2315,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final GraphicActionAddElement action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
             styles, attributes, events, margins, paddings, borders);
-        WXSDKManager.getInstance().getSDKInstance(pageId).addInActiveAddElementAction(ref, action);
+        if(willLayout) {
+          WXSDKManager.getInstance().getSDKInstance(pageId).addInActiveAddElementAction(ref, action);
+        }else{
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(pageId, action);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
@@ -2626,6 +2630,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
     mWXBridge.bindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
   }
+
+  public void bindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement){
+    mWXBridge.bindMeasurementToRenderObject(ptr, contentBoxMeasurement);
+  }
+
 
   /**
    * Native: Layout

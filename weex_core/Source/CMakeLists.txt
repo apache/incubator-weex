@@ -37,6 +37,7 @@ add_library(weexjsc SHARED
     ./android/bridge/impl/measure_mode_impl_android.cpp
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
+    ./android/bridge/impl/native_render_object_utils_impl_android.cpp
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
     ./android/jsengine/multiprocess/WeexProxy.cpp

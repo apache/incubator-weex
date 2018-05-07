@@ -65,6 +65,7 @@ public class WXBridge implements IWXBridge {
   private native void nativeTakeHeapSnapshot(String filename);
 
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+  private native void nativeBindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement);
 
   private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
@@ -327,12 +328,12 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                            float[] margins, float[] paddings, float[] borders) {
+                            float[] margins, float[] paddings, float[] borders,  boolean willLayout) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callAddElement(instanceId, componentType, ref, index, parentRef,
-              styles, attributes, events, margins, paddings, borders);
+              styles, attributes, events, margins, paddings, borders, willLayout);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -513,6 +514,11 @@ public class WXBridge implements IWXBridge {
   @Override
   public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
     nativeBindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
+  }
+
+  @Override
+  public void bindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement){
+    nativeBindMeasurementToRenderObject(ptr, contentBoxMeasurement);
   }
 
   @Override

@@ -233,6 +233,8 @@ public class Constants {
 
 
     String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
+
+    String ORIENTATION  = "orientation";
   }
 
   public interface Value {

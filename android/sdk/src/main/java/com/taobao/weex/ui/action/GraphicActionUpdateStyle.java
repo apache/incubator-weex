@@ -57,7 +57,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
       return;
     }
     if (null != mStyle) {
-      component.addStyle(mStyle, mIsCausedByPesudo);
+      component.updateStyle(mStyle, mIsCausedByPesudo);
       if(style.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
         Map<String, Object> animationMap = new ArrayMap<>(2);
         animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));

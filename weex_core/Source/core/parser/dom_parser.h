@@ -111,6 +111,10 @@ namespace WeexCore {
 
     const char *GetString();
 
+    const std::string GetObjectStr();
+
+    const std::string GetArrayStr();
+
     const char *Stringify();
 
     bool GetBool();

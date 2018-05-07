@@ -52,7 +52,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * static attrs
    * */
-  private @NonNull final Map<String, Object> attr;
+  private @NonNull Map<String, Object> attr;
 
   /**
    * dynamic binding attrs, can be null, only weex use
@@ -70,11 +70,12 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
     this();
-    attr.putAll(filterBindingStatement(standardMap));
+    attr.putAll(standardMap);
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
-    attr = standardMap;
+    this();
+    attr.putAll(standardMap);
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -254,6 +255,20 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return scrollDirection.toString();
   }
 
+  public int getOrientation() {
+    String direction = getScrollDirection();
+    if(!TextUtils.isEmpty(direction)){
+      if(direction.equals(Constants.Value.HORIZONTAL.equals(direction))){
+        return Constants.Orientation.HORIZONTAL;
+      }
+    }
+    Object value = get(Name.ORIENTATION);
+    if(value != null && Constants.Value.HORIZONTAL.equals(value.toString())){
+      return Constants.Orientation.HORIZONTAL;
+    }
+    return Constants.Orientation.VERTICAL;
+  }
+
   public float getElevation(int viewPortW) {
     Object obj = get(Constants.Name.ELEVATION);
     float ret = Float.NaN;
@@ -402,7 +417,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public Object put(String key, Object value) {
-    if(filterBindingStatement(key, value)){
+    if(addBindingAttrIfStatement(key, value)){
       return null;
     }
     return attr.put(key,value);
@@ -410,7 +425,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.attr.putAll(filterBindingStatement(map));
+    this.attr.putAll(map);
   }
 
   @Override
@@ -453,10 +468,18 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   }
 
 
+
+  public void parseStatements(){
+    if(this.attr != null){
+       this.attr = filterStatementsFromAttrs(this.attr);
+    }
+  }
+
+
   /**
    * filter dynamic state ment
    * */
-  public Map<String, Object> filterBindingStatement(Map attrs) {
+  private Map<String, Object> filterStatementsFromAttrs(Map attrs) {
     if(attrs == null || attrs.size() == 0){
       return attrs;
     }
@@ -464,7 +487,12 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
       Map.Entry<String,Object> entry = it.next();
-      if(filterBindingStatement(entry.getKey(), entry.getValue())){
+      if(COMPONENT_PROPS.equals(entry.getKey())){
+        Object blockValue = ELUtils.bindingBlock(entry.getValue());
+        entry.setValue(blockValue);
+        continue;
+      }
+      if(addBindingAttrIfStatement(entry.getKey(), entry.getValue())){
         it.remove();
       }
     }
@@ -474,11 +502,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic attrs and statements
    * */
-  private boolean filterBindingStatement(String key, Object value) {
-    if(COMPONENT_PROPS.equals(key)){
-      ELUtils.bindingBlock(value);
-      return  false;
-    }
+  private boolean addBindingAttrIfStatement(String key, Object value) {
     for(String exclude : EXCLUDES_BINDING){
       if(key.equals(exclude)){
         return  false;
@@ -527,7 +551,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   }
 
   @Override
-  protected WXAttr clone() {
+  public WXAttr clone() {
     WXAttr wxAttr = new WXAttr();
     wxAttr.skipFilterPutAll(attr);
     if (mBindingAttrs != null) {

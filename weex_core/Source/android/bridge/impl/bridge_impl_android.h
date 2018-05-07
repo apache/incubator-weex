@@ -101,7 +101,8 @@ namespace WeexCore {
                        std::set<std::string> *events,
                        const WXCoreMargin &margins,
                        const WXCorePadding &paddings,
-                       const WXCoreBorderWidth &borders);
+                       const WXCoreBorderWidth &borders,
+                       bool willLayout= true);
 
     int callRemoveElement(const char* pageId, const char* ref);
 

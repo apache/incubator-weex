@@ -16,26 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERTEXT_H
-#define WEEX_PROJECT_RENDERTEXT_H
+package com.taobao.weex.dom.binding;
 
-#include <core/render/node/render_object.h>
-#include <core/render/page/render_page.h>
+import com.alibaba.fastjson.JSONObject;
 
-namespace WeexCore {
-  class RenderText : public RenderObject {
-  private:
-    inline void UpdateAttr(std::string key, std::string value) {
-      RenderObject::UpdateAttr(key, value);
-      markDirty();
+/**
+ * Created by furture on 2018/5/8.
+ */
+
+public class JSONUtils {
+
+
+    public static boolean isJSON(Object json){
+        if(json instanceof JSONObject){
+            return true;
+        }
+        if(json instanceof String){
+            return ((String) json).startsWith("{");
+        }
+        return false;
     }
 
-    inline StyleType UpdateStyle(std::string key, std::string value) {
-      StyleType resultType = RenderObject::ApplyStyle(key, value, true);
-      markDirty();
-      return resultType;
+    public static JSONObject toJSON(Object json){
+        if(json instanceof JSONObject){
+            return (JSONObject) json;
+        }
+        return JSONObject.parseObject(json.toString());
     }
-  };
+
+
+    public static boolean isJSON(String json){
+        return json.startsWith("{");
+    }
 }
-
-#endif //WEEX_PROJECT_RENDERTEXT_H

@@ -74,7 +74,8 @@ namespace WeexCore {
                                std::set<std::string> *events,
                                const WXCoreMargin &margins,
                                const WXCorePadding &paddings,
-                               const WXCoreBorderWidth &borders) = 0;
+                               const WXCoreBorderWidth &borders,
+                               bool willLayout= true) = 0;
 
     virtual int callLayout(const char* pageId, const char* ref,
                            int top, int bottom, int left, int right,
