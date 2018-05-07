@@ -23,7 +23,7 @@
 #include <android/base/string/scoped_jstring.h>
 #include <android/base/string/scoped_jstring_utf8.h>
 #include <android/jsengine/multiprocess/WeexJSConnection.h>
-#include <android/base/string/string_ref_cache.h>
+#include <android/base/string/jstring_cache.h>
 #include <jni.h>
 #include <string>
 #include <unistd.h>
@@ -42,9 +42,8 @@ extern jclass jWMBridgeClazz;
 extern JNIEnv *getJNIEnv();
 extern jstring getComponentTypeFromCache(const std::string type);
 extern jstring putComponentTypeToCache(const std::string type);
-extern jstring getStyleKeyFromCache(const std::string key);
-extern jstring putStyleKeyToCache(const std::string key);
-extern StringRefCache *GetStringRefCache(const char * pageId);
+extern jstring getKeyFromCache(JNIEnv *env, const char *key);
+extern JStringCache *GetStringRefCache(const char * pageId);
 extern jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]);
 
 namespace WeexCore {

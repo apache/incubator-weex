@@ -658,7 +658,7 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageClose() {
-    StringRefCache *refCache = GetStringRefCache(mPageId.c_str());
+    JStringCache *refCache = GetStringRefCache(mPageId.c_str());
     if(nullptr != refCache) {
       refCache->clearRefCache(getJNIEnv());
     }

@@ -24,7 +24,7 @@
 #include "bridge_impl_android.h"
 #include <core/layout/style.h>
 #include <map>
-#include <android/base/string/string_ref_cache.h>
+#include <android/base/string/jstring_cache.h>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -109,10 +109,7 @@ namespace WeexCore {
     jstring jValue;
 
     for (; it != end; ++it) {
-      jKey = getStyleKeyFromCache(it->first.c_str());
-      if (jKey == nullptr) {
-        jKey = putStyleKeyToCache(it->first.c_str());
-      }
+      jKey = getKeyFromCache(env, it->first.c_str());
 
       jValue = env->NewStringUTF(it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
@@ -125,10 +122,9 @@ namespace WeexCore {
     jstring jValue;
 
     for (int i = 0; i < cVector->size(); ++i) {
-      jKey = env->NewStringUTF((*cVector)[i].first.c_str());
+      jKey = getKeyFromCache(env, (*cVector)[i].first.c_str());
       jValue = env->NewStringUTF((*cVector)[i].second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
-      env->DeleteLocalRef(jKey);
       env->DeleteLocalRef(jValue);
     }
   }
@@ -378,7 +374,7 @@ namespace WeexCore {
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -474,7 +470,7 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
     jstring jParentRef = refCache->GetString(env, parentRef);
@@ -563,7 +559,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveElement(const char* pageId, const char* ref) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -583,7 +579,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
     jstring jParentRef = refCache->GetString(env, parentRef);
@@ -603,7 +599,7 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callAddEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -625,7 +621,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -651,7 +647,7 @@ namespace WeexCore {
                                            std::vector<std::pair<std::string, std::string>> *border) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -716,7 +712,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callUpdateAttr(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *attrs) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -766,7 +762,7 @@ namespace WeexCore {
                                       int height, int width, int index) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -797,7 +793,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callCreateFinish(const char* pageId) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -824,7 +820,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callAppendTreeCreateFinish(const char *pageId, const char *ref) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -845,7 +841,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callHasTransitionPros(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *style) {
     JNIEnv *env = getJNIEnv();
 
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
 
@@ -907,7 +903,7 @@ namespace WeexCore {
 
   jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
     JNIEnv *env = getJNIEnv();
-    StringRefCache* refCache = GetStringRefCache(pageId);
+    JStringCache* refCache = GetStringRefCache(pageId);
     jstring jPageId = refCache->GetString(env, pageId);
     jstring jRef = refCache->GetString(env, ref);
     if (jCallGetMeasurementMethodId == NULL) {

@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef StringCache_h
-#define StringCache_h
+#ifndef jstring_cache_h
+#define jstring_cache_h
 
 #include <jni.h>
 #include <map>
 
-class StringRefCache;
+class JStringCache;
 
-class StringRefCache {
+class JStringCache {
 
 public:
-    StringRefCache() {}
+    JStringCache() {}
 
-    ~StringRefCache() {}
+    ~JStringCache() {}
 
 public:
     jstring GetString(JNIEnv *env, const char *key);

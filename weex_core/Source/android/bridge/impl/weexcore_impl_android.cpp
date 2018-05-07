@@ -39,11 +39,12 @@ jmethodID jDoubleValueMethodId;
 jobject jThis;
 jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
-std::map<std::string, jobject> styleKeyCache;
 
 constexpr auto cmp = [](const char* a, const char* b){return strcmp(a,b);};
 
-std::map<const char *, StringRefCache *, decltype(cmp)> RefCache(cmp);
+std::map<const char *, JStringCache *, decltype(cmp)> RefCache(cmp);
+
+JStringCache KeyCache;
 
 static JavaVM *sVm = NULL;
 
@@ -73,31 +74,17 @@ jstring putComponentTypeToCache(const std::string type) {
   return (jstring) jGlobalType;
 }
 
-jstring getStyleKeyFromCache(const std::string key) {
-  std::map<std::string, jobject>::const_iterator iter = styleKeyCache.find(key);
-  if (iter != styleKeyCache.end()) {
-    return (jstring)(iter->second);
-  } else {
-    return nullptr;
-  }
+jstring getKeyFromCache(JNIEnv *env, const char *key) {
+  return KeyCache.GetString(env, key);
 }
 
-jstring putStyleKeyToCache(const std::string key) {
-  JNIEnv *env = getJNIEnv();
-  jstring jKey = env->NewStringUTF(key.c_str());
-  jobject jGlobalKey = env->NewGlobalRef(jKey);
-  styleKeyCache.insert(std::pair<std::string, jobject>(key, jGlobalKey));
-  env->DeleteLocalRef(jKey);
-  return (jstring) jGlobalKey;
-}
-
-StringRefCache *GetStringRefCache(const char * pageId) {
-  std::map<const char *, StringRefCache *>::const_iterator iter = RefCache.find(pageId);
+JStringCache *GetStringRefCache(const char * pageId) {
+  std::map<const char *, JStringCache *>::const_iterator iter = RefCache.find(pageId);
   if (iter != RefCache.end()) {
-    return (StringRefCache *)(iter->second);
+    return (JStringCache *)(iter->second);
   } else {
-    StringRefCache* refCache = new StringRefCache();
-    RefCache.insert(std::pair<const char *, StringRefCache *>(pageId, refCache));
+    JStringCache* refCache = new JStringCache();
+    RefCache.insert(std::pair<const char *, JStringCache *>(pageId, refCache));
     return refCache;
   }
 }
@@ -566,15 +553,9 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     }
     componentTypeCache.clear();
 
-    for (auto iter = styleKeyCache.begin(); iter != styleKeyCache.end(); iter++) {
-      if (iter->second != nullptr) {
-        env->DeleteGlobalRef(iter->second);
-        iter->second = nullptr;
-      }
-    }
-    styleKeyCache.clear();
-
     RefCache.clear();
+
+    KeyCache.clearRefCache(env);
 
     if (jThis)
       env->DeleteGlobalRef(jThis);

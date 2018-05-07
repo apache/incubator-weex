@@ -18,13 +18,13 @@
  */
 #include <iostream>
 #include <map>
-#include "string_ref_cache.h"
+#include "jstring_cache.h"
 
 constexpr auto cmp = [](const char* a, const char* b){return strcmp(a,b);};
 
 std::map<const char *, jobject, decltype(cmp)> mCache(cmp);
 
-void StringRefCache::clearRefCache(JNIEnv *env) {
+void JStringCache::clearRefCache(JNIEnv *env) {
     for (auto iter = mCache.begin(); iter != mCache.end(); iter++) {
         if (iter->second != nullptr) {
             env->DeleteWeakGlobalRef(iter->second);
@@ -34,7 +34,7 @@ void StringRefCache::clearRefCache(JNIEnv *env) {
     mCache.clear();
 }
 
-jstring StringRefCache::GetString(JNIEnv *env, const char *key) {
+jstring JStringCache::GetString(JNIEnv *env, const char *key) {
     std::map<const char *, jobject>::iterator iter = mCache.find(key);
     if (iter != mCache.end() && env->IsSameObject(iter->second, NULL) == JNI_FALSE) {
         return (jstring) iter->second;
