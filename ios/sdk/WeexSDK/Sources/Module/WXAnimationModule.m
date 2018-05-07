@@ -245,7 +245,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.scale.y";
                 newInfo.fromValue = @(oldTransform.scaleY);
-                newInfo.toValue = @(wxTransform.scaleX);
+                newInfo.toValue = @(wxTransform.scaleY);
                 [infos addObject:newInfo];
             }
             
