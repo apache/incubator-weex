@@ -185,4 +185,5 @@ public interface IWXBridge extends IWXObject {
 
   void setViewPortWidth(String instanceId, float value);
 
+  void reportNativeInitStatus(String statusCode, String errorMsg);
 }

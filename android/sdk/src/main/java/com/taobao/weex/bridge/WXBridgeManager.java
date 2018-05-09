@@ -30,6 +30,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -37,6 +38,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -71,6 +73,7 @@ import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
@@ -174,6 +177,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // if true will open weex sandbox for multi context
   private volatile static boolean isSandBoxContext = true;
 
+  // add for cloud setting, default value is false.
+  // weexcore use single process or not
+  private static boolean isUseSingleProcess = false;
+
   private enum BundType {
     Vue,
     Rax,
@@ -232,6 +239,25 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     }
     return mBridgeManager;
+  }
+
+  public void setUseSingleProcess(final boolean flag) {
+    if (flag != isUseSingleProcess) {
+      isUseSingleProcess = flag;
+//      //we should reinit framework if js framework has been initialized
+//      if (isJSFrameworkInit()) {
+//        if (isJSThread()) {
+//          WXSDKEngine.reload();
+//        } else {
+//          post(new Runnable() {
+//            @Override
+//            public void run() {
+//              WXSDKEngine.reload();
+//            }
+//          });
+//        }
+//      }
+    }
   }
 
   public void setSandBoxContext(final boolean flag) {
@@ -1798,6 +1824,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
+    wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
