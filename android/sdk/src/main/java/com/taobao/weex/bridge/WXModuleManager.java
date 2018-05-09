@@ -59,12 +59,6 @@ public class WXModuleManager {
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
-  /**
-   * monitor keys
-   */
-  private static String MONITOR_ERROR_CODE = "errCode";
-  private static String MONITOR_ARG = "arg";
-  private static String MONITOR_ERROR_MSG = "errMsg";
 
   /**
    * module object dictionary
@@ -168,9 +162,9 @@ public class WXModuleManager {
         IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
         if(userTrackAdapter != null) {
           HashMap<String, Serializable> data = new HashMap<String, Serializable>();
-          data.put(MONITOR_ERROR_CODE, "101");
-          data.put(MONITOR_ARG, moduleStr + "." + methodStr);
-          data.put(MONITOR_ERROR_MSG, instance.getBundleUrl());
+          data.put(IWXUserTrackAdapter.MONITOR_ERROR_CODE, "101");
+          data.put(IWXUserTrackAdapter.MONITOR_ARG, moduleStr + "." + methodStr);
+          data.put(IWXUserTrackAdapter.MONITOR_ERROR_MSG, instance.getBundleUrl());
           userTrackAdapter.commit(instance.getContext(), null, IWXUserTrackAdapter.INVOKE_MODULE, null, data);
         }
         return dispatchCallModuleMethod(instance,wxModule,args,invoker);
