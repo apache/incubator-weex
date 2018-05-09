@@ -59,6 +59,7 @@ export default class Element extends Node {
     this.attr = props.attr || {}
     this.style = props.style || {}
     this.classStyle = props.classStyle || {}
+    this.classList = props.classList || []
     this.event = {}
     this.children = []
     this.pureChildren = []
@@ -373,6 +374,7 @@ export default class Element extends Node {
   }
 
   /**
+   * TODO: deprecated
    * Set style properties from class.
    * @param {object} classStyle
    */
@@ -390,6 +392,27 @@ export default class Element extends Node {
         { action: 'updateStyle' },
         [this.ref, this.toStyle()]
       )
+    }
+  }
+
+  /**
+   * Set class list.
+   * @param {array} classList
+   */
+  setClassList (classList) {
+    const classes = typeof classList === 'string'
+      ? classList.split(/\s+/)
+      : Array.from(classList)
+    if (Array.isArray(classes) && classes.length > 0) {
+      this.classList = classes
+      const taskCenter = getTaskCenter(this.docId)
+      if (taskCenter) {
+        taskCenter.send(
+          'dom',
+          { action: 'updateClassList' },
+          [this.ref, this.classList.slice()]
+        )
+      }
     }
   }
 
@@ -485,9 +508,17 @@ export default class Element extends Node {
   toJSON () {
     const result = {
       ref: this.ref.toString(),
-      type: this.type,
-      attr: this.attr,
-      style: this.toStyle()
+      type: this.type
+    }
+    if (!isEmpty(this.attr)) {
+      result.attr = this.attr
+    }
+    if (this.classList.length > 0) {
+      result.classList = this.classList.slice()
+    }
+    const style = this.toStyle()
+    if (!isEmpty(style)) {
+      result.style = style
     }
     const event = []
     for (const type in this.event) {

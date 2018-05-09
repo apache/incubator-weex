@@ -149,6 +149,22 @@ export default class Document {
   }
 
   /**
+  * Register StyleSheets.
+  * @param {string} scopeId
+  * @return {array<object>} styleSheets
+  */
+  registerStyleSheets (scopeId, styleSheets) {
+    const sheets = Array.isArray(styleSheets) ? styleSheets : [styleSheets]
+    if (this.taskCenter && sheets.length) {
+      return this.taskCenter.send(
+        'dom',
+        { action: 'registerStyleSheets' },
+        [scopeId, sheets]
+      )
+    }
+  }
+
+  /**
   * Fire an event on specified element manually.
   * @param {object} element
   * @param {string} event type

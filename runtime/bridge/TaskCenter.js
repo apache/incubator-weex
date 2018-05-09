@@ -132,12 +132,13 @@ export function init () {
     refreshFinish: global.callRefreshFinish,
 
     createBody: global.callCreateBody,
-
+    registerStyleSheets: global.callRegisterStyleSheets,
     addElement: global.callAddElement,
     removeElement: global.callRemoveElement,
     moveElement: global.callMoveElement,
     updateAttrs: global.callUpdateAttrs,
     updateStyle: global.callUpdateStyle,
+    updateClassList: global.callUpdateClassList,
 
     addEvent: global.callAddEvent,
     removeEvent: global.callRemoveEvent
