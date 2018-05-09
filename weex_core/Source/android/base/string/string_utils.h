@@ -26,6 +26,7 @@
 #include <IPC/IPCByteArray.h>
 #include <malloc.h>
 #include "scoped_jstring.h"
+#include "scoped_jstring_utf8.h"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -153,6 +154,11 @@ static inline void addString(JNIEnv *env, IPCSerializer *serializer, jstring str
   const uint16_t *chars = scopedString.getChars();
   size_t charsLength = scopedString.getCharsLength();
   serializer->add(chars, charsLength);
+}
+static inline void addByteArrayString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
+  ScopedJStringUTF8 scopedJStringUTF8(env,str);
+  const char *string = scopedJStringUTF8.getChars();
+  serializer->add(string,strlen(string));
 }
 
 static inline void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring str) {

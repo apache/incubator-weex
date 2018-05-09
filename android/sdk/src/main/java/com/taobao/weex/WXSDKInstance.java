@@ -182,6 +182,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   /**
+   * set make weexCore run in single process mode
+   * @param flag true means weexCore run in single process mode or multi process mode
+   */
+  public void setUseSingleProcess(boolean flag) {
+    WXBridgeManager.getInstance().setUseSingleProcess(flag);
+  }
+
+  /**
    * set open SandBox
    * @param flag
    */
