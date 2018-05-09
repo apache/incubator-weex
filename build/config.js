@@ -54,6 +54,13 @@ const configs = {
         + `var global = this; var process = {env:{}};`
     }
   },
+  'weex-polyfill': {
+    input: absolute('runtime/entries/polyfill.js'),
+    output: {
+      format: 'iife',
+      file: absolute('pre-build/weex-polyfill')
+    }
+  },
   'weex-vue': {
     input: absolute('runtime/entries/vue.js'),
     output: {
