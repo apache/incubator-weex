@@ -63,6 +63,25 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     if ([value isKindOfClass:[NSString class]]) {
         NSString *valueString = (NSString *)value;
+        if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
+            valueString = [valueString substringToIndex:(valueString.length - 2)];
+        }
+        if ([value hasPrefix:@"env(safe-area-inset-"] &&[value hasSuffix:@")"]){
+            NSUInteger start = [value rangeOfString:@"env(safe-area-inset-"].location +@"env(safe-area-inset-".length;
+            NSUInteger end = [value rangeOfString:@")" options:NSBackwardsSearch].location;
+            value = [value substringWithRange:NSMakeRange(start, end-start)];
+            return [self safeAreaInset:value];
+        }
+        return [valueString doubleValue];
+    }
+    
+    return [self double:value];
+}
+
++ (CGFloat)flexCGFloat:(id)value
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *valueString = (NSString *)value;
         if (valueString.length <=0) {
             return NAN;
         }
@@ -81,7 +100,6 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         }
         return [valueString doubleValue];
     }
-    
     return [self double:value];
 }
 
@@ -160,6 +178,16 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 + (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor
 {
     CGFloat pixel = [self CGFloat:value];
+    
+    if ([value isKindOfClass:[NSString class]] && ([value hasSuffix:@"wx"]|| [value hasPrefix:@"env(safe-area-inset-"])) {
+        return pixel;
+    }
+    return pixel * scaleFactor;
+}
+
++ (WXPixelType)WXFlexPixelType:(id)value scaleFactor:(CGFloat)scaleFactor
+{
+    CGFloat pixel = [self flexCGFloat:value];
     
     if ([value isKindOfClass:[NSString class]] && ([value hasSuffix:@"wx"]|| [value hasPrefix:@"env(safe-area-inset-"])) {
         return pixel;
