@@ -23,6 +23,8 @@
 #import "WXComponent_internal.h"
 #import "WXLog.h"
 #import "WXComponent+Layout.h"
+#import "WXPullRefreshProtocol.h"
+#import "WXHandlerFactory.h"
 
 @interface WXRefreshComponent()
 
@@ -30,6 +32,11 @@
 @property (nonatomic) BOOL initFinished;
 @property (nonatomic) BOOL refreshEvent;
 @property (nonatomic) BOOL pullingdownEvent;
+
+@property (nonatomic) BOOL bPulling;
+@property (nonatomic) BOOL bRefreshing;
+@property (nonatomic) BOOL bFinalAnimation;
+@property (nonatomic) CGFloat finalAnimationDuration;
 
 @property (nonatomic, weak) WXLoadingIndicator *indicator;
 
@@ -52,6 +59,11 @@
                 WXLogError(@"");
             }
         }
+        if (attributes[@"finalAnimationDuration"]) {
+            _finalAnimationDuration = [WXConvert CGFloat:attributes[@"finalAnimationDuration"]];
+        } else {
+            _finalAnimationDuration = 1;
+        }
 //#ifndef USE_FLEX
         if (![WXComponent isUseFlex]) {
           self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
@@ -63,6 +75,9 @@
         }
        
 //#endif
+        _bFinalAnimation = NO;
+        _bPulling = NO;
+        _bRefreshing = NO;
     }
     return self;
 }
@@ -90,6 +105,10 @@
     _displayState = NO;
     _refreshEvent = NO;
     _initFinished = NO;
+
+    _bPulling = NO;
+    _bRefreshing = NO;
+    _bFinalAnimation = NO;
 }
 
 - (void)refresh
@@ -100,6 +119,21 @@
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> refreshComponent : refresh ref:%@",self.ref);
 #endif
+    id <WXPullRefreshProtocol> nativeImp = [WXHandlerFactory handlerForProtocol:@protocol(WXPullRefreshProtocol)];
+    if (nativeImp) {
+        if ([nativeImp respondsToSelector:@selector(endPulling)]) {
+            if (_bPulling) {
+                [nativeImp endPulling];
+                _bPulling = NO;
+            }
+        }
+        if ([nativeImp respondsToSelector:@selector(startRefreshing:)]) {
+            if (!_bRefreshing) {
+                [nativeImp startRefreshing:self.view];
+                _bRefreshing = YES;
+            }
+        }
+    }
     [self fireEvent:@"refresh" params:nil];
 }
 
@@ -111,7 +145,15 @@
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> refreshComponent : pullingdown ,ref:%@",self.ref);
 #endif
-    
+    id <WXPullRefreshProtocol> nativeImp = [WXHandlerFactory handlerForProtocol:@protocol(WXPullRefreshProtocol)];
+    if (nativeImp && [nativeImp respondsToSelector:@selector(startPulling:)]) {
+        if (!_bPulling) {
+            [nativeImp startPulling:self.view];
+            _bPulling = YES;
+        } else if ([nativeImp respondsToSelector:@selector(pulling:)]){
+            [nativeImp pulling:param];
+        }
+    }
     [self fireEvent:@"pullingdown" params:param];
 }
 
@@ -132,10 +174,30 @@
             _displayState = YES;
         } else if ([attributes[@"display"] isEqualToString:@"hide"]) {
             _displayState = NO;
+        } else if ([attributes[@"display"] isEqualToString:@"endRefresh"]) {
+            id <WXPullRefreshProtocol> nativeImp = [WXHandlerFactory handlerForProtocol:@protocol(WXPullRefreshProtocol)];
+            if (nativeImp && [nativeImp respondsToSelector:@selector(endRefreshing)]) {
+                if (_bRefreshing) {
+                    [nativeImp endRefreshing];
+                    _bRefreshing = NO;
+                }
+            }
+            if (nativeImp && [nativeImp respondsToSelector:@selector(startFinalAnimation:duration:)]) {
+                if (!_bFinalAnimation) {
+                    [nativeImp startFinalAnimation:self.view duration:_finalAnimationDuration];
+                    _bFinalAnimation = YES;
+                }
+            }
         } else {
             WXLogError(@"");
         }
         [self setDisplay];
+    }
+
+    if (attributes[@"finalAnimationDuration"]) {
+        _finalAnimationDuration = [WXConvert CGFloat:attributes[@"finalAnimationDuration"]];
+    } else {
+        _finalAnimationDuration = 1;
     }
 }
 
@@ -193,7 +255,15 @@
         }
         [scrollerProtocol setContentOffset:offset animated:YES];
     }
-  
+    if (!_displayState) {
+        id <WXPullRefreshProtocol> nativeImp = [WXHandlerFactory handlerForProtocol:@protocol(WXPullRefreshProtocol)];
+        if (nativeImp && [nativeImp respondsToSelector:@selector(endFinalAnimation)]) {
+            if (_bFinalAnimation) {
+                [nativeImp endFinalAnimation];
+                _bFinalAnimation = NO;
+            }
+        }
+    }
 }
 
 - (BOOL)displayState

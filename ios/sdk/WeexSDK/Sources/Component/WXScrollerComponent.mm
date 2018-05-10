@@ -632,7 +632,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             instance.onScroll(scrollView.contentOffset);
         }
     }
-    
+    BOOL bPulling = NO;
     if (_lastContentOffset.x > scrollView.contentOffset.x) {
         _direction = @"right";
     } else if (_lastContentOffset.x < scrollView.contentOffset.x) {
@@ -642,20 +642,23 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     } else if(_lastContentOffset.y > scrollView.contentOffset.y) {
         _direction = @"down";
+        bPulling = YES;
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
         if (WXScrollDirectionVertical == _scrollDirection) {
             [self handleLoadMore];
         }
     }
-    
+
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    [_refreshComponent pullingdown:@{
-             REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
-             REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
-             REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
-             @"type":@"pullingdown"
-    }];
+    if (bPulling) {
+        [_refreshComponent pullingdown:@{
+                 REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
+                 REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
+                 REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
+                 @"type":@"pullingdown"
+        }];
+    }
     _lastContentOffset = scrollView.contentOffset;
     // check sticky
     [self adjustSticky];

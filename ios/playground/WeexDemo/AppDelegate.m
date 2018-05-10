@@ -38,6 +38,7 @@
 #import "WXNavigationHandlerImpl.h"
 //#import "WXAnalyzerCenter.h"
 
+#import "WXPullRefreshDefaultImpl.h"
 
 #ifdef DEBUG
 #import "DebugAnalyzer.h"
@@ -123,7 +124,8 @@
     [WXSDKEngine registerHandler:[WXEventModule new] withProtocol:@protocol(WXEventModuleProtocol)];
     [WXSDKEngine registerHandler:[WXConfigCenterDefaultImpl new] withProtocol:@protocol(WXConfigCenterProtocol)];
     [WXSDKEngine registerHandler:[WXNavigationHandlerImpl new] withProtocol:@protocol(WXNavigationProtocol)];
-    
+    [WXSDKEngine registerHandler:[WXPullRefreshDefaultImpl new] withProtocol:@protocol(WXPullRefreshProtocol)];
+
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
     [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];

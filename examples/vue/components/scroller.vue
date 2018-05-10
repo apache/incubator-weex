@@ -1,7 +1,7 @@
 <template>
   <scroller class="list" append="tree" ref="scroller">
-    <refresh class="refresh-view" :display="refresh_display" @refresh="onrefresh" @pullingdown="pullingdown">
-      <img id="roate" ref="roate" src="http://gw.alicdn.com/bao/uploaded/TB1xDrVNFXXXXbEXFXXXXXXXXXX-48-48.png" style="width: 50px;height: 50px;"></img>
+    <refresh class="refresh-view" :display="refresh_display" @refresh="onrefresh" @pullingdown="pullingdown" :finalAnimationDuration="myduration">
+      <!-- <image id="roate" ref="roate" src="http://gw.alicdn.com/bao/uploaded/TB1xDrVNFXXXXbEXFXXXXXXXXXX-48-48.png" style="width: 50px;height: 50px;"></image> -->
     </refresh>
     <div v-for="(sec, i) in sections" :key="i" class="section">
       <div class="header">
@@ -21,6 +21,7 @@
   .refresh-view {
     height: 120px;
     width: 750px;
+    background-color: #c0c0c0;
     display: -ms-flex;
     display: -webkit-flex;
     display: flex;
@@ -74,6 +75,7 @@
 </style>
 
 <script>
+var duration = 2500
   const dom = weex.requireModule('dom')
   console.log(dom)
   module.exports = {
@@ -86,9 +88,13 @@
       onrefresh: function(e) {
         var self = this;
         self.refresh_display = 'show';
+        self.myduration = duration;
         setTimeout(function () {
+          setTimeout(function(){
           self.refresh_display = 'hide';
-        }, 3000)
+          },duration);
+          self.refresh_display = 'endRefresh';
+        }, duration)
       },
       onloading: function(e) {
         var self = this;
@@ -107,6 +113,7 @@
       return {
         refresh_display: 'hide',
         loading_display: 'hide',
+        myduration:0,
         sections: [
           {
             title: 'Header 1',
