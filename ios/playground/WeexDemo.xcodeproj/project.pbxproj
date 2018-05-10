@@ -39,8 +39,6 @@
 		C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C43CDA021F1C6E01005A6B03 /* libz.tbd */; };
 		C47B78D21F299E27001D3B0C /* WXExtendCallNativeTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */; };
 		D04712C920A1A277008FB048 /* WXPullRefreshDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = D04712C820A1A277008FB048 /* WXPullRefreshDefaultImpl.m */; };
-		D0F9759F209B142300BCC1A3 /* QNRotateImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F97598209B142300BCC1A3 /* QNRotateImageView.m */; };
-		D0F975A0209B142300BCC1A3 /* QNWaveLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F9759A209B142300BCC1A3 /* QNWaveLayer.m */; };
 		DC15A3C7200C505C009C8977 /* WXTitleBarModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A3C6200C505C009C8977 /* WXTitleBarModule.m */; };
 		DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */; };
 		DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */; };
@@ -110,10 +108,6 @@
 		C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtendCallNativeTest.m; sourceTree = "<group>"; };
 		D04712C720A1A277008FB048 /* WXPullRefreshDefaultImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXPullRefreshDefaultImpl.h; path = extend/handler/WXPullRefreshDefaultImpl.h; sourceTree = "<group>"; };
 		D04712C820A1A277008FB048 /* WXPullRefreshDefaultImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXPullRefreshDefaultImpl.m; path = extend/handler/WXPullRefreshDefaultImpl.m; sourceTree = "<group>"; };
-		D0F97597209B142300BCC1A3 /* QNRotateImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QNRotateImageView.h; sourceTree = "<group>"; };
-		D0F97598209B142300BCC1A3 /* QNRotateImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QNRotateImageView.m; sourceTree = "<group>"; };
-		D0F97599209B142300BCC1A3 /* QNWaveLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QNWaveLayer.h; sourceTree = "<group>"; };
-		D0F9759A209B142300BCC1A3 /* QNWaveLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QNWaveLayer.m; sourceTree = "<group>"; };
 		DC15A3C5200C505C009C8977 /* WXTitleBarModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXTitleBarModule.h; path = extend/module/WXTitleBarModule.h; sourceTree = "<group>"; };
 		DC15A3C6200C505C009C8977 /* WXTitleBarModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXTitleBarModule.m; path = extend/module/WXTitleBarModule.m; sourceTree = "<group>"; };
 		DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNavigationHandlerImpl.m; sourceTree = "<group>"; };
@@ -267,21 +261,9 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		D0F9758E209B142300BCC1A3 /* RefreshHelper */ = {
-			isa = PBXGroup;
-			children = (
-				D0F97597209B142300BCC1A3 /* QNRotateImageView.h */,
-				D0F97598209B142300BCC1A3 /* QNRotateImageView.m */,
-				D0F97599209B142300BCC1A3 /* QNWaveLayer.h */,
-				D0F9759A209B142300BCC1A3 /* QNWaveLayer.m */,
-			);
-			path = RefreshHelper;
-			sourceTree = "<group>";
-		};
 		D5ADF0861C77133B00597CA6 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				D0F9758E209B142300BCC1A3 /* RefreshHelper */,
 				2AE88A291C8544D7003329DE /* scanner */,
 				DCABAFED1D029642001C8592 /* debug */,
 				74CC79E91C2B9E4700829368 /* UIViewController+WXDemoNaviBar.h */,
@@ -646,7 +628,6 @@
 			files = (
 				17C1DB57206B675D000E0CEB /* DebugAnzlyzer.m in Sources */,
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
-				D0F9759F209B142300BCC1A3 /* QNRotateImageView.m in Sources */,
 				DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
@@ -664,7 +645,6 @@
 				DCABAFFE1D029753001C8592 /* WXImgLoaderDefaultImpl.m in Sources */,
 				747DF6681E2F176A005C53A8 /* UIView+UIThreadCheck.m in Sources */,
 				C47B78D21F299E27001D3B0C /* WXExtendCallNativeTest.m in Sources */,
-				D0F975A0209B142300BCC1A3 /* QNWaveLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
