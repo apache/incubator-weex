@@ -131,7 +131,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final String ROOT = "_root";
 
   private int mFixedProp = 0;
-  public static int mComponentNum = 0;
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
@@ -197,7 +196,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
-    ++mComponentNum;
 
     if (instance != null)
       setViewPortWidth(instance.getInstanceViewPortWidth());

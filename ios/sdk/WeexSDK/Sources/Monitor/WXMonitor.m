@@ -103,14 +103,8 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
 
 + (void)performanceFinishWithState:(CommitState) state instance:(WXSDKInstance *)instance
 {
-    BOOL collectValue = (state == MonitorCommit);
-    
-#ifdef DEBUG
-    collectValue = TRUE;
-#endif
-    
-    if(!collectValue)
-    {
+    BOOL collectValue = (state == MonitorCommit)?TRUE:[WXAnalyzerCenter isOpen];
+    if(!collectValue){
         return;
     }
     NSMutableDictionary *commitDict = [NSMutableDictionary dictionary];

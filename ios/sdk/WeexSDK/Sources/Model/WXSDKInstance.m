@@ -485,9 +485,6 @@ typedef enum : NSUInteger {
     }
 
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-    if (_instanceJavaScriptContext && !_debugJS) {
-        JSGarbageCollect(_instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef);
-    }
     _instanceJavaScriptContext = nil;
     
     if (_componentManager) {

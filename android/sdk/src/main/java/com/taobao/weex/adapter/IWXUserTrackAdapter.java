@@ -42,6 +42,14 @@ public interface IWXUserTrackAdapter {
   String JS_BRIDGE = "jsBridge";
   String STREAM_MODULE = "streamModule";
   String INVOKE_MODULE = "invokeModule";
+  String INIT_FRAMEWORK = "initFramework";
+
+  /**
+   * monitor keys
+   */
+  String MONITOR_ERROR_CODE = "errCode";
+  String MONITOR_ARG = "arg";
+  String MONITOR_ERROR_MSG = "errMsg";
 
   void commit(Context context, String eventId, String type, WXPerformance perf, Map<String, Serializable> params);
 }

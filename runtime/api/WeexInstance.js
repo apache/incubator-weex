@@ -60,6 +60,7 @@ export default class WeexInstance {
     this.config = config || {}
     this.document = new Document(id, this.config.bundleUrl)
     this.requireModule = this.requireModule.bind(this)
+    this.importScript = this.importScript.bind(this)
     this.isRegisteredModule = isRegisteredModule
     this.isRegisteredComponent = isRegisteredComponent
   }
@@ -126,6 +127,31 @@ export default class WeexInstance {
     }
 
     return null
+  }
+
+  importScript (src, options = {}) {
+    const id = getId(this)
+    const taskCenter = getTaskCenter(id)
+    return new Promise((resolve, reject) => {
+      if (!taskCenter || typeof taskCenter.send !== 'function') {
+        reject(new Error(`[JS Framework] Failed to import script "${src}", `
+          + `no taskCenter (${id}) matched.`))
+      }
+      try {
+        taskCenter.send('module', {
+          module: 'script',
+          method: 'importScript'
+        }, [src, options], {
+          callback: [
+            result => resolve(result),
+            error => reject(error)
+          ]
+        })
+      }
+      catch (e) {
+        reject(e)
+      }
+    })
   }
 
   // registerStyleSheet (styles) {
