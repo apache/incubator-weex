@@ -155,6 +155,24 @@ public enum WXErrorCode {
   WX_ERR_JS_FRAMEWORK("-1002", "js framework error",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_ERR_JS_REINIT_FRAMEWORK("-1003", "js reinit framework error",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  /**
+   * Single progress init error
+   */
+  WX_ERR_SINGLE_PROCESS_DLOPEN_FILE_NOT_EXIST("-1004", "so file is not exist",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_ERR_SINGLE_PROCESS_DLOPEN_FLAIED("-1005", "dlopen so file failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_ERR_SINGLE_PROCESS_DLSYM_FAILED("-1006", "find function from so file failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_ERR_SINGLE_PROCESS_JS_FRAMEWORK("-1007", "js framework  init singleProcess failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_JS_FRAMEWORK_INIT_MULPROCESS_FAILED("-1008", "js framework init multiProcess failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_JS_FRAMEWORK_REINIT_MULPROCESS_FAILED("-1009", "js framework reinit multiProcess failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_JS_FRAMEWORK_INIT_FAILED("-1010", "js framework init  failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
+  WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
 
   /**
