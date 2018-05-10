@@ -95,6 +95,7 @@ namespace WeexCore {
     jCallHasTransitionProsMethodId = NULL;
     jCallUpdateAttrsMethodId = NULL;
     jCallLayoutMethodId = NULL;
+    jCallAppendTreeCreateFinishMethodId = NULL;
     jCallCreateFinishMethodId = NULL;
   }
 
