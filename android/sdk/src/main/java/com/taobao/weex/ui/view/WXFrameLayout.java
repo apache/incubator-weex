@@ -105,8 +105,8 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       try {
         dispatchDrawInterval(canvas);
       } catch (StackOverflowError e) {
-        int deep = reportLayerOverFlowError();
-        throw new LayerOverFlowLimitException("Layer overflow limit error: " + deep + " layers!");
+        reportLayerOverFlowError();
+        WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
       }
     } else {
       try {
