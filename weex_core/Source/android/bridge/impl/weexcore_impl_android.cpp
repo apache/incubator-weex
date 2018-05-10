@@ -151,20 +151,96 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean
   page->SetRenderContainerWidthWrapContent(wrap);
 }
 
-static jint PrintFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  jlongArray jRet = env->NewLongArray(3);
+
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
-    return 0;
+    return jRet;
 
-  return page->PrintFirstScreenLog();
+  std::vector<long> temp = page->PrintFirstScreenLog();
+
+  jlong ret[3];
+
+  ret[0] = temp[0];
+  ret[1] = temp[1];
+  ret[2] = temp[2];
+  env->SetLongArrayRegion(jRet, 0, 3, ret);
+
+  return jRet;
 }
 
-static jint PrintRenderFinishTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
+  jlongArray jRet = env->NewLongArray(3);
+
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page == nullptr)
     return 0;
 
-  return page->PrintRenderSuccessLog();
+  std::vector<long> temp = page->PrintRenderSuccessLog();
+
+  jlong ret[3];
+
+  ret[0] = temp[0];
+  ret[1] = temp[1];
+  ret[2] = temp[2];
+  env->SetLongArrayRegion(jRet, 0, 3, ret);
+
+  return jRet;
+}
+
+static jlong GetFirstScreenCallBridgeTime(JNIEnv* env, jobject jcaller,
+                                          jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetFirstScreenCallBridgeTime();
+}
+
+static jlong GetFirstScreenCssLayoutTime(JNIEnv* env, jobject jcaller,
+                                         jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetFirstScreenCssLayoutTime();
+}
+
+static jlong GetFirstScreenParseJsonTime(JNIEnv* env, jobject jcaller,
+                                         jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetFirstScreenParseJsonTime();
+}
+
+static jlong GetOnRenderSuccessCallBridgeTime(JNIEnv* env, jobject jcaller,
+                                              jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetOnRenderSuccessCallBridgeTime();
+}
+
+static jlong GetOnRenderSuccessCssLayoutTime(JNIEnv* env, jobject jcaller,
+                                             jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetOnRenderSuccessCssLayoutTime();
+}
+
+static jlong GetOnRenderSuccessParseJsonTime(JNIEnv* env, jobject jcaller,
+                                             jstring instanceId) {
+  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
+  if (page == nullptr)
+    return 0;
+
+  return page->GetOnRenderSuccessParseJsonTime();
 }
 
 //Notice that this method is invoked from main thread.

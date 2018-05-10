@@ -19,6 +19,8 @@
 #ifndef WEEX_PROJECT_WXPERFORMANCE_H
 #define WEEX_PROJECT_WXPERFORMANCE_H
 
+#include <vector>
+
 namespace WeexCore {
 
   typedef enum PerformanceStage {
@@ -29,40 +31,30 @@ namespace WeexCore {
 
   public:
 
-    long long jniCallTime;
-
-    long long jniCallBridgeTime;
+    long long callBridgeTime;
 
     long long cssLayoutTime;
 
-    long long addElementActionJNITime;
-
-    long long addEventActionJNITime;
-
-    long long removeEventActionJNITime;
-
-    long long layoutActionJniTime;
-
     long long parseJsonTime;
 
-    long long buildRenderObjectTime;
+    long long firstScreenCallBridgeTime;
 
-    long long createJMapJNITime;
+    long long firstScreenCssLayoutTime;
 
-    RenderPerformance() : jniCallTime(0), jniCallBridgeTime(0), cssLayoutTime(0),
-                          addElementActionJNITime(0),
-                          layoutActionJniTime(0), parseJsonTime(0), buildRenderObjectTime(0),
-                          createJMapJNITime(0) {}
+    long long firstScreenParseJsonTime;
 
-    inline int PrintPerformanceLog(PerformanceStage performanceStage) {
-      return PrintPerformanceLogImplAndroid(performanceStage);
-    }
+    long long onRenderSuccessCallBridgeTime;
 
-  private:
+    long long onRenderSuccessCssLayoutTime;
 
-    int PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage);
+    long long onRenderSuccessParseJsonTime;
 
-    int PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage);
+    RenderPerformance() : callBridgeTime(0), cssLayoutTime(0), parseJsonTime(0),
+                          firstScreenCallBridgeTime(0), firstScreenCssLayoutTime(0),
+                          firstScreenParseJsonTime(0), onRenderSuccessCallBridgeTime(0),
+                          onRenderSuccessCssLayoutTime(0), onRenderSuccessParseJsonTime(0) {}
+
+    std::vector<long> PrintPerformanceLog(PerformanceStage performanceStage);
   };
 }
 

@@ -102,29 +102,27 @@ namespace WeexCore {
 
     void Batch();
 
-    void JniCallTime(const long long &time);
-
     void CssLayoutTime(const long long &time);
 
-    void AddEventActionJNITime(const long long &time);
+    long long GetFirstScreenCssLayoutTime();
 
-    void RemoveEventActionJNITime(const long long &time);
-
-    void AddElementActionJNITime(const long long &time);
-
-    void LayoutActionJniTime(const long long &time);
+    long long GetOnRenderSuccessCssLayoutTime();
 
     void ParseJsonTime(const long long &time);
 
-    void BuildRenderTreeTime(const long long &time);
+    long long GetFirstScreenParseJsonTime();
 
-    void CreateJMapJNITime(const long long &time);
+    long long GetOnRenderSuccessParseJsonTime();
 
     void CallBridgeTime(const long long &time);
 
-    int PrintFirstScreenLog();
+    long long GetFirstScreenCallBridgeTime();
 
-    int PrintRenderSuccessLog();
+    long long GetOnRenderSuccessCallBridgeTime();
+
+    std::vector<long> PrintFirstScreenLog();
+
+    std::vector<long> PrintRenderSuccessLog();
 
     void LayoutImmediately();
 
@@ -138,10 +136,6 @@ namespace WeexCore {
     }
 
     void SetRootRenderObject(RenderObject *root);
-
-    inline RenderObject * GetRootRenderObject() const {
-      return render_root;
-    }
 
     inline std::string PageId() {
       return mPageId;

@@ -40,9 +40,11 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   protected float[] mMargins;
   protected float[] mPaddings;
   protected float[] mBorders;
+  private long startTime;
 
   public GraphicActionAbstractAddElement(String pageId, String ref) {
     super(pageId, ref);
+    startTime = System.currentTimeMillis();
   }
 
   protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
@@ -67,6 +69,11 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     }
     instance.onComponentCreate(component,System.currentTimeMillis() -createComponentStart);
     return component;
+  }
+
+  @Override
+  public void executeAction() {
+    WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionAddElementTime(System.currentTimeMillis() - startTime);
   }
 
   public String getComponentType() {

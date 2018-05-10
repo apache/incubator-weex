@@ -39,13 +39,8 @@ public class GraphicActionLayout extends BasicGraphicAction {
       return;
     }
 
-    long start = System.currentTimeMillis();
     component.setDemission(mLayoutSize, mLayoutPosition);
-    WXSDKManager.getInstance().getSDKInstance(getPageId()).callLayoutUpdateDemissionTime(System.currentTimeMillis() - start);
-
     component.setLayout(component);
     component.setPadding(component.getPadding(), component.getBorder());
-
-    WXSDKManager.getInstance().getSDKInstance(getPageId()).callActionLayoutCount();
   }
 }
