@@ -18,8 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -27,21 +25,18 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.support.v4.util.ArrayMap;
-
-import com.taobao.weex.bridge.WXBridge;
-import com.taobao.weex.common.WXPerformance.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -61,6 +56,7 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.WXPerformance.Dimension;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
@@ -83,6 +79,8 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
+import com.taobao.weex.utils.WXUtils;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -93,6 +91,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
 /**
@@ -170,6 +170,24 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
+
+  private boolean hasLayerLimit = false;
+
+  public void setLayerLimit(boolean hasLayerLimit) {
+    this.hasLayerLimit = hasLayerLimit;
+  }
+
+  public boolean isLayerLimit() {
+    return hasLayerLimit;
+  }
+
+  /**
+   * set make weexCore run in single process mode
+   * @param flag true means weexCore run in single process mode or multi process mode
+   */
+  public void setUseSingleProcess(boolean flag) {
+    WXBridgeManager.getInstance().setUseSingleProcess(flag);
+  }
 
   /**
    * set open SandBox
@@ -995,6 +1013,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXComponent comp = getRootComponent();
     if(comp != null) {
       WXEvent events= comp.getEvents();
+      boolean hasNativeBackHook = events.contains(Constants.Event.NATIVE_BACK);
+      if (hasNativeBackHook) {
+        EventResult result = comp.fireEventWait(Constants.Event.NATIVE_BACK, null);
+        if (WXUtils.getBoolean(result.getResult(), false)) {
+          return true;
+        }
+      }
+
       boolean hasBackPressed = events.contains(Constants.Event.CLICKBACKITEM);
       if (hasBackPressed) {
         fireEvent(comp.getRef(), Constants.Event.CLICKBACKITEM,null, null);
@@ -1106,10 +1132,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(mWXPerformance.screenRenderTime<0.001){
       mWXPerformance.screenRenderTime =  time;
     }
-    mWXPerformance.componentCount = WXComponent.mComponentNum;
-    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
+    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + mWXPerformance.componentCount);
 
-    WXComponent.mComponentNum = 0;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1264,8 +1288,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.mActionLayoutSumTime += time;
     }
 
-  public void callActionAddElementTime(long time) {
-      mWXPerformance.mActionAddElementSumTime += time;
+  public void onComponentCreate(WXComponent component,long createTime) {
+      mWXPerformance.mActionAddElementCount++;
+      mWXPerformance.mActionAddElementSumTime += createTime;
+      if (!mEnd){
+        mWXPerformance.fsComponentCreateTime+=createTime;
+        mWXPerformance.fsComponentCount++;
+      }
+      mWXPerformance.componentCount++;
+      mWXPerformance.componentCreateTime+=createTime;
   }
 
   public void callActionCreateBodyTime(long time) {
@@ -1274,10 +1305,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void callActionOtherTime(long time) {
         mWXPerformance.mActionOtherSumTime += time;
-    }
-
-  public void callActionAddElementCount() {
-        mWXPerformance.mActionAddElementCount++;
     }
 
   public void callActionCreateBodyCount() {
@@ -1337,9 +1364,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void createInstanceFinished(long time) {
-    if (time > 0) {
-      mWXPerformance.communicateTime = time;
-    }
+
   }
 
   private void destroyView(View rootView) {

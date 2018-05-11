@@ -53,6 +53,8 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
       /** uiThread = false **/
       @Override
       public void measureInternal(float width, float height, int widthMeasureMode, int heightMeasureMode) {
+        mMeasureWidth = 0;
+        mMeasureHeight = 0;
         try {
           WXSwitchView wxSwitchView = new WXSwitchView(instance.getContext());
           int widthSpec, heightSpec;
@@ -69,8 +71,6 @@ public class WXSwitch extends WXComponent<WXSwitchView> {
         } catch (RuntimeException e) {
           WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
-        mMeasureWidth = 0;
-        mMeasureHeight = 0;
       }
 
       /** uiThread = false **/

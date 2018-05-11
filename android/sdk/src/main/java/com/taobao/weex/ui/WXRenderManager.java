@@ -24,12 +24,10 @@ import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.ui.action.BasicGraphicAction;
-import com.taobao.weex.ui.action.IExecutable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -44,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WXRenderManager {
 
-  private ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
+  private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
 
   public WXRenderManager() {
@@ -73,8 +71,14 @@ public class WXRenderManager {
     return statement.getWXSDKInstance();
   }
 
+  @RestrictTo(Scope.LIBRARY)
   public void postOnUiThread(Runnable runnable, long delayMillis) {
     mWXRenderHandler.postDelayed(WXThread.secure(runnable), delayMillis);
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void postOnUiThread(Runnable runnable,final String instanceId){
+    mWXRenderHandler.post(instanceId, WXThread.secure(runnable));
   }
 
   @RestrictTo(Scope.LIBRARY)
@@ -101,8 +105,12 @@ public class WXRenderManager {
     if (statement != null) {
       statement.destroy();
     }
-    final Object token = instanceId == null ? null : instanceId.hashCode();
-    mWXRenderHandler.removeCallbacksAndMessages(token);
+    if(instanceId == null) {
+      mWXRenderHandler.removeCallbacksAndMessages(null);
+    } else {
+      // use hashCode to match message's what.
+      mWXRenderHandler.removeMessages(instanceId.hashCode());
+    }
   }
 
   public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {

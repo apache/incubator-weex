@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cfloat>
 
 namespace WeexCore {
 
@@ -352,9 +353,24 @@ namespace WeexCore {
     }
 
     inline bool isWrapRequired(const float &width, const float &height,
-                               const float &currentLength, const float &childLength) const {
-      float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
-      return !isSingleFlexLine(freeMainSize) && freeMainSize < childLength;
+                             const float &currentLength, const float &childLength) const {
+        float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
+        return !isSingleFlexLine(freeMainSize)
+        && freeMainSize < childLength
+        && !almostEqualRelative(childLength,freeMainSize);          //childLength is bigger than freeMainSize but not almost equal (precision)
+    }
+      
+    inline bool almostEqualRelative(const float A, const float B) const{
+        float maxRelDiff = FLT_EPSILON;
+        // Calculate the difference.
+        float diff = std::fabs(A - B);
+        float absA = std::fabs(A);
+        float absB = std::fabs(B);
+        // Find the largest
+        float largest = (absB > absA) ? absB : absA;
+      
+        if (diff <= largest * maxRelDiff) return true;
+        return false;
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.

@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 #import <Foundation/Foundation.h>
 #import "WXAnalyzerCenter.h"
 #import "WXAnalyzerProtocol.h"
@@ -51,7 +70,7 @@
        }else if([self checkDataWithSate:timeState checkKey:key limitDic:commitDimenKeys]){
            [self _transDimenValue:instance key:key withVal:[data valueForKey:key]];
        }else{
-          // WXLogDebug(@"WXAnalyzerDataTransfer -> unKnowPerformanceKey :%@",key);
+           WXLogDebug(@"WXAnalyzerDataTransfer -> unKnowPerformanceKey :%@",key);
        }
     }
 }
@@ -66,10 +85,7 @@
         return FALSE;
     }
     CommitState limitSate = [[limitDic objectForKey:key] intValue];
-    if (timeState != limitSate) {
-        return FALSE;
-    }
-    return TRUE;
+    return timeState == limitSate;
 }
 
 + (NSDictionary *) getKeys:(BOOL) measureOrDimen
@@ -106,7 +122,6 @@
                              CALLCREATEINSTANCETIME:        [NSNumber numberWithInt:DebugAfterFSFinish],
                              COMMUNICATETOTALTIME:          [NSNumber numberWithInt:DebugAfterExist],
                              FSRENDERTIME:                  [NSNumber numberWithInt:DebugAfterExist],
-                             COMPONENTCOUNT:                [NSNumber numberWithInt:DebugAfterExist],
                              CACHEPROCESSTIME:              [NSNumber numberWithInt:DebugAfterRequest],
                              CACHERATIO:                    [NSNumber numberWithInt:DebugAfterRequest],
                              M_FS_CALL_JS_TIME:             [NSNumber numberWithInt:DebugAfterFSFinish],
@@ -117,7 +132,12 @@
                              M_CELL_EXCEED_NUM:             [NSNumber numberWithInt:DebugAfterFSFinish],
                              M_MAX_DEEP_VDOM:               [NSNumber numberWithInt:DebugAfterExist],
                              M_IMG_WRONG_SIZE_NUM:          [NSNumber numberWithInt:DebugAfterExist],
-                             M_TIMER_NUM:                   [NSNumber numberWithInt:DebugAfterFSFinish]
+                             M_TIMER_NUM:                   [NSNumber numberWithInt:DebugAfterFSFinish],
+                             M_INTERACTION_TIME:            [NSNumber numberWithInt:DebugAfterExist],
+                             M_COMPONENT_FS_TIME:           @(DebugAfterFSFinish),
+                             M_COMPONENT_FS_COUNT:          @(DebugAfterFSFinish),
+                             COMPONENTCOUNT:                @(DebugAfterExist),
+                             M_COMPONENT_TIME:              @(DebugAfterExist)
                              };
         
     });
@@ -214,6 +234,9 @@
 
 +(BOOL) needTransfer
 {
+    if(![self isOpen]){
+        return FALSE;
+    }
     NSMutableArray* analyzerList = [self getAnalyzerList];
     if (nil == analyzerList || analyzerList.count <= 0) {
         return FALSE;

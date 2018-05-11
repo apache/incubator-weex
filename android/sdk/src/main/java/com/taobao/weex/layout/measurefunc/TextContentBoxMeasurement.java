@@ -37,6 +37,7 @@ import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
 
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextDecorationSpan;
 import com.taobao.weex.dom.WXAttr;
@@ -167,30 +168,33 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
    **/
   @Override
   public void layoutAfter(float computedWidth, float computedHeight) {
-    if (hasBeenMeasured) {
-      if (layout != null &&
-              WXDomUtils.getContentWidth(mComponent.getPadding(), mComponent.getBorder(), computedWidth)
-                      != previousWidth) {
+    if(mComponent!=null) {
+      if (hasBeenMeasured) {
+        if (layout != null &&
+            WXDomUtils
+                .getContentWidth(mComponent.getPadding(), mComponent.getBorder(), computedWidth)
+                != previousWidth) {
+          recalculateLayout(computedWidth);
+        }
+      } else {
+        updateStyleAndText();
         recalculateLayout(computedWidth);
       }
-    } else {
-      updateStyleAndText();
-      recalculateLayout(computedWidth);
-    }
-    hasBeenMeasured = false;
-    if (layout != null && !layout.equals(atomicReference.get()) &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-        warmUpTextLayoutCache(layout);
+      hasBeenMeasured = false;
+      if (layout != null && !layout.equals(atomicReference.get()) &&
+          Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+          warmUpTextLayoutCache(layout);
+        }
       }
+      swap();
+      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          mComponent.updateExtra(atomicReference.get());
+        }
+      }, mComponent.getInstanceId());
     }
-    swap();
-    mComponent.getInstance().runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        mComponent.updateExtra(atomicReference.get());
-      }
-    });
   }
 
   private void updateStyleAndText() {

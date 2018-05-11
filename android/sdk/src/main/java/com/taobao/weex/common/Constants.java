@@ -189,6 +189,9 @@ public class Constants {
     String ARIA_HIDDEN = "ariaHidden";
     String ROLE = "role";
 
+    String LAYERLIMIT = "layerLimit";
+    String LAYER_LIMIT = "layer-limit";
+
     String DIRECTION = "direction";
     String RTL = "rtl";
 
@@ -326,6 +329,7 @@ public class Constants {
 
     String STOP_PROPAGATION = "stopPropagation";
     String ONMESSAGE = "message";
+    String NATIVE_BACK = "nativeback";
   }
 
   public interface PSEUDO {

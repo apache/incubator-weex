@@ -35,6 +35,7 @@
 #include <IPC/IPCSender.h>
 #include <IPC/IPCString.h>
 #include <IPC/Serializing/IPCSerializer.h>
+#include "core/../include/WeexApiHeader.h"
 
 namespace WeexCore {
 
@@ -48,8 +49,12 @@ public:
 
     static jint doInitFramework(JNIEnv *env, jobject object, jstring script, jobject params);
 
-    static void
+    static std::vector<INIT_FRAMEWORK_PARAMS *>
     initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
+
+    static jint
+    initFrameworkInSingleProcess(JNIEnv *env, jstring script, std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams);
+    static jint initFrameworkInMultiProcess(JNIEnv *env, jstring script, IPCSerializer *serializer);
 
     static const char *getCacheDir(JNIEnv *env);
 
@@ -65,7 +70,7 @@ public:
     reportException(const char *instanceID, const char *func, const char *exception_string);
 
     static void reportServerCrash(jstring jinstanceid);
-
+    static void reportNativeInitStatus(const char *statusCode, const char *errorMsg);
     static jbyteArray execJSWithResult(JNIEnv* env, jobject jthis,
                                        jstring jinstanceid,
                                        jstring jnamespace,
@@ -89,6 +94,29 @@ public:
                                     jstring instanceId,
                                     jstring script,
                                     jint type);
+    static jint initAppFramework(JNIEnv* env,
+                                    jobject jcaller,
+                                    jstring jinstanceid,
+                                    jstring jframwork,
+                                    jobjectArray jargs);
+    static jint destoryAppContext(JNIEnv* env,
+                                  jobject jcaller,
+                                  jstring jinstanceid);
+    static jint createAppContext(JNIEnv* env,
+                                 jobject jcaller,
+                                 jstring jinstanceid,
+                                 jstring jbundle,
+                                 jobject jargs);
+    static jbyteArray execJsOnAppWithResult(JNIEnv* env,
+                                      jobject jcaller,
+                                      jstring jinstanceid,
+                                      jstring jbundle,
+                                      jobject jargs);
+    static jint execJsOnApp(JNIEnv* env,
+                            jobject jcaller,
+                            jstring jinstanceid,
+                            jstring jfunction,
+                            jobjectArray jargs);
 };
 }
 #endif //_WEEX_PROXY_H_

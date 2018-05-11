@@ -76,6 +76,7 @@ namespace WeexCore {
 
   constexpr char COLOR[] = "color";
   constexpr char BACKGROUND_COLOR[] = "backgroundColor";
+  constexpr char APPEND[] = "append";
 }
 
 #endif //WEEXV8_CONSTANTSNAME_H

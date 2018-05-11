@@ -27,13 +27,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Communication interface for Java code and JavaScript code.
@@ -482,6 +487,17 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public int callAppendTreeCreateFinish(String instanceId, String ref) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callAppendTreeCreateFinish(instanceId, ref);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callAppendTreeCreateFinish throw exception:" + e.getMessage());
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -572,5 +588,30 @@ public class WXBridge implements IWXBridge {
   @Override
   public void setViewPortWidth(String instanceId, float value) {
     nativeSetViewPortWidth(instanceId, value);
+  }
+
+  public void reportNativeInitStatus(String statusCode, String errorMsg) {
+    if (WXErrorCode.WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS.getErrorCode().equals(statusCode)
+            || WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED.getErrorCode().equals(statusCode)) {
+      IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+      if (userTrackAdapter != null) {
+        Map<String, Serializable> params = new HashMap<>(3);
+        params.put(IWXUserTrackAdapter.MONITOR_ERROR_CODE, statusCode);
+        params.put(IWXUserTrackAdapter.MONITOR_ARG, "InitFrameworkNativeError");
+        params.put(IWXUserTrackAdapter.MONITOR_ERROR_MSG, errorMsg);
+        Log.e("Dyy", "reportNativeInitStatus is running and errorCode is " + statusCode + " And errorMsg is " + errorMsg);
+        userTrackAdapter.commit(null, null, IWXUserTrackAdapter.INIT_FRAMEWORK, null, params);
+      }
+
+      return;
+    }
+
+    for (WXErrorCode e : WXErrorCode.values()) {
+      if (e.getErrorType().equals(WXErrorCode.ErrorType.NATIVE_ERROR)
+              && e.getErrorCode().equals(statusCode)) {
+        WXExceptionUtils.commitCriticalExceptionRT(null, e, "initFramework", errorMsg, null);
+        break;
+      }
+    }
   }
 }

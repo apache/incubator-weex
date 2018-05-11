@@ -20,14 +20,20 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Log;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.utils.WXUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
@@ -113,5 +119,16 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   @Override
   public boolean isVirtualComponent() {
     return !promoteToView(true);
+  }
+
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key) {
+      case Constants.Name.LAYERLIMIT:
+      case Constants.Name.LAYER_LIMIT:
+        getInstance().setLayerLimit(WXUtils.getBoolean(param, false));
+        return true;
+    }
+    return super.setProperty(key, param);
   }
 }

@@ -18,13 +18,14 @@
  */
 #include <android/base/string/string_utils.h>
 #include <base/ViewUtils.h>
+#include <core/api/WeexJSCoreApi.h>
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;
 
-static WeexCore::FunType gCanvasFunc = nullptr;
+WeexCore::FunType gCanvasFunc = nullptr;
 
-static WeexCore::FunTypeT3d t3dFunc = nullptr;
+WeexCore::FunTypeT3d t3dFunc = nullptr;
 
 /**
 * This class aim to extend JS Api
@@ -77,18 +78,18 @@ void ExtendJSApi::initFunction(IPCHandler *handler) {
                            handleCallGCanvasLinkNative);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK),
                            handleT3DLinkNative);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::POSTMESSAGE),
+                           handlePostMessage);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::DISPATCHMESSAGE),
+                           handleDispatchMessage);
 }
 
 std::unique_ptr<IPCResult> handleSetJSVersion(IPCArguments *arguments) {
   const char* version = getArumentAsCStr(arguments, 0);
-  LOGA("init JSFrm version %s", version);
-  Bridge_Impl_Android::getInstance()->setJSVersion(version);
+  _setJSVersion(version);
   return createVoidResult();
 }
 
-void reportException(const char* pageId, const char *func, const char *exception_string) {
-  Bridge_Impl_Android::getInstance()->reportException(pageId, func, exception_string);
-}
 
 std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
   const char *pageId = nullptr;
@@ -111,7 +112,7 @@ std::unique_ptr<IPCResult> handleReportException(IPCArguments *arguments) {
   }
 
   LOGE(" ReportException : %s", exceptionInfo);
-  reportException(pageId, func, exceptionInfo);
+  _reportException(pageId, func, exceptionInfo);
   return createVoidResult();
 }
 
@@ -123,7 +124,7 @@ std::unique_ptr<IPCResult> handle(IPCArguments *arguments) {
 
 std::unique_ptr<IPCResult> handleCallNativeLog(IPCArguments *arguments) {
   const char* str_array = getArumentAsCStr(arguments, 0);
-  Bridge_Impl_Android::getInstance()->callNativeLog(str_array);
+  _callNativeLog(str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -134,7 +135,7 @@ std::unique_ptr<IPCResult> handleSetTimeout(IPCArguments *arguments) {
   if (callbackID == nullptr || time == nullptr)
     return createInt32Result(static_cast<int32_t>(false));
 
-  Bridge_Impl_Android::getInstance()->setTimeout(callbackID, time);
+  _setTimeout(callbackID,time);
 
   if (callbackID != nullptr) {
     delete[]callbackID;
@@ -155,7 +156,7 @@ std::unique_ptr<IPCResult> handleSetInterval(IPCArguments *arguments) {
     return createInt32Result(-1);
 
   long time_ = atoi(_time);
-  int _timerId = (atoi(pageId) << 16) | (atoi(callbackID));
+  int _timerId = _setInterval(pageId,callbackID,_time);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -193,17 +194,7 @@ std::unique_ptr<IPCResult> handleCallNative(IPCArguments *arguments) {
   char* task = getArumentAsCStr(arguments, 1);
   char* callback = getArumentAsCStr(arguments, 2);
 
-  if (pageId != nullptr && task != nullptr) {
-#if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId, task);
-#endif
-
-    if (strcmp(task, "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") == 0) {
-      RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
-    } else {
-      Bridge_Impl_Android::getInstance()->callNative(pageId, task, callback);
-    }
-  }
+    _callNative(pageId, task, callback);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -232,10 +223,7 @@ static std::unique_ptr<IPCResult> handleCallGCanvasLinkNative(IPCArguments *argu
   LOGD("[ExtendJSApi] handleCallGCanvasLinkNative >>>> pageId: %s, type: %d, args: %s", pageId, type, args);
 #endif
 
-  const char *retVal = NULL;
-  if (gCanvasFunc) {
-    retVal = callGCanvasFun(gCanvasFunc, pageId, type, args);
-  }
+  const char *retVal = _callGCanvasLinkNative(pageId,type,args);
 
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
@@ -260,12 +248,7 @@ static std::unique_ptr<IPCResult> handleT3DLinkNative(IPCArguments* arguments)
   LOGD("[ExtendJSApi] handleT3DLinkNative >>>> type: %d, args: %s", type, args);
 #endif
 
-  const char* retVal = NULL;
-  if (t3dFunc) {
-    retVal = WeexCore::weexCallT3dFunc(t3dFunc, type, args);
-  }
-
-
+  const char*retVal = _t3dLinkNative(type, args);
 
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
@@ -285,45 +268,7 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
   char* argString = getArumentAsCStr(arguments, 3);
   char* optString = getArumentAsCStr(arguments, 4);
 
-  std::unique_ptr<IPCResult> ret = createInt32Result(-1);
-
-  if (pageId != nullptr && module != nullptr && method != nullptr) {
-#if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s, opt: %s",
-         pageId, module, method, argString, optString);
-#endif
-
-    // add for android support
-    jobject result;
-    result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
-                                                                  argString, optString);
-
-    if (result == nullptr)
-      return ret;
-
-    JNIEnv *env = getJNIEnv();
-    jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-    jint jTypeInt = env->GetIntField(result, jTypeId);
-    jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-    jobject jDataObj = env->GetObjectField(result, jDataId);
-    if (jTypeInt == 1) {
-      if (jDoubleValueMethodId == NULL) {
-        jclass jDoubleClazz = env->FindClass("java/lang/Double");
-        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
-        env->DeleteLocalRef(jDoubleClazz);
-      }
-      jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
-      ret = std::move(createDoubleResult(jDoubleObj));
-
-    } else if (jTypeInt == 2) {
-      jstring jDataStr = (jstring) jDataObj;
-      ret = std::move(createStringResult(env, jDataStr));
-    } else if (jTypeInt == 3) {
-      jstring jDataStr = (jstring) jDataObj;
-      ret = std::move(createJSONStringResult(env, jDataStr));
-    }
-    env->DeleteLocalRef(jDataObj);
-  }
+  std::unique_ptr<IPCResult> ret = _callNativeModule(pageId,module,method,argString,optString);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -355,15 +300,7 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   char* argString = getArumentAsCStr(arguments, 3);
   char* optString = getArumentAsCStr(arguments, 4);
 
-  if (pageId != nullptr && ref != nullptr && method != nullptr) {
-
-#if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeComponent >>>> pageId: %s, ref: %s, method: %s, arg: %s, opt: %s",
-         pageId, ref, method, argString, optString);
-#endif
-
-    Bridge_Impl_Android::getInstance()->callNativeComponent(pageId, ref, method, argString, optString);
-  }
+    _callNativeComponent(pageId, ref, method, argString, optString);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -396,11 +333,7 @@ std::unique_ptr<IPCResult> functionCallCreateBody(IPCArguments *arguments) {
   if (pageId == nullptr || domStr == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallCreateBody >>>> pageId: %s, domStr: %s", pageId, domStr);
-#endif
-
-  RenderManager::GetInstance()->CreatePage(pageId, domStr) ? 0 : -1;
+  _callCreateBody(pageId,domStr);
 
   delete[]pageId;
   delete[]domStr;
@@ -413,37 +346,8 @@ std::unique_ptr<IPCResult> handleCallAddElement(IPCArguments *arguments) {
   char *parentRef = getArumentAsCStr(arguments, 1);
   char *domStr = getArumentAsCStr(arguments, 2);
   char *index_cstr = getArumentAsCStr(arguments, 3);
-  int index = atoi(index_cstr);
 
-  if (pageId == nullptr || parentRef == nullptr || domStr == nullptr || index_cstr == nullptr ||
-      index < -1)
-    return createInt32Result(0);
-
-#if JSAPI_LOG
-
-  std::string log = "";
-  log.append("pageId: ").append(pageId).append(", parentRef: ").append(parentRef).append(", domStr: ").append(domStr);
-  int log_index = 0;
-  int maxLength = 800;
-  std::string sub;
-  while (log_index < log.length()) {
-    if (log.length() <= log_index + maxLength) {
-      sub = log.substr(log_index);
-    } else {
-      sub = log.substr(log_index, maxLength);
-    }
-
-
-    if (log_index == 0)
-      LOGD("[ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
-    else
-      LOGD("      [ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
-
-    log_index += maxLength;
-  }
-#endif
-
-  RenderManager::GetInstance()->AddRenderObject(pageId, parentRef, index, domStr);
+    _callAddElement(pageId,parentRef,domStr,index_cstr);
 
   delete[]pageId;
   delete[]parentRef;
@@ -460,12 +364,7 @@ std::unique_ptr<IPCResult> functionCallRemoveElement(IPCArguments *arguments) {
   if (pageId == nullptr || ref == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s", pageId,
-       ref);
-#endif
-
-  RenderManager::GetInstance()->RemoveRenderObject(pageId, ref);
+ _callRemoveElement(pageId,ref);
 
   delete[]pageId;
   delete[]ref;
@@ -484,12 +383,7 @@ std::unique_ptr<IPCResult> functionCallMoveElement(IPCArguments *arguments) {
       index < -1)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s, parentRef: %s, index: %d",
-       pageId, ref, parentRef, index);
-#endif
-
-  RenderManager::GetInstance()->MoveRenderObject(pageId, ref, parentRef, index);
+  _callMoveElement(pageId, ref, parentRef, index);
 
   delete[]pageId;
   delete[]ref;
@@ -507,12 +401,7 @@ std::unique_ptr<IPCResult> functionCallAddEvent(IPCArguments *arguments) {
   if (pageId == nullptr || ref == nullptr || event == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallAddEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
-#endif
-
-  RenderManager::GetInstance()->AddEvent(pageId, ref, event);
+  _callAddEvent(pageId,ref,event);
 
   delete[]pageId;
   delete[]ref;
@@ -529,12 +418,7 @@ std::unique_ptr<IPCResult> functionCallRemoveEvent(IPCArguments *arguments) {
   if (pageId == nullptr || ref == nullptr || event == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallRemoveEvent >>>> pageId: %s, ref: %s, event: %s", pageId,
-       ref, event);
-#endif
-
-  RenderManager::GetInstance()->RemoveEvent(pageId, ref, event);
+ _callRemoveEvent(pageId,ref,event);
 
   delete[]pageId;
   delete[]ref;
@@ -551,12 +435,7 @@ std::unique_ptr<IPCResult> functionCallUpdateStyle(IPCArguments *arguments) {
   if (pageId == nullptr || ref == nullptr || data == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallUpdateStyle >>>> pageId: %s, ref: %s, data: %s", pageId,
-       ref, data);
-#endif
-
-  RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
+  _callUpdateStyle(pageId,ref,data);
 
   delete[] pageId;
   delete[] ref;
@@ -573,12 +452,7 @@ std::unique_ptr<IPCResult> functionCallUpdateAttrs(IPCArguments *arguments) {
   if (pageId == nullptr || ref == nullptr || data == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallUpdateAttrs >>>> pageId: %s, ref: %s, data: %s", pageId,
-       ref, data);
-#endif
-
-  RenderManager::GetInstance()->UpdateAttr(pageId, ref, data);
+ _callUpdateAttrs(pageId, ref,data);
 
   delete[] pageId;
   delete[] ref;
@@ -593,11 +467,7 @@ std::unique_ptr<IPCResult> functionCallCreateFinish(IPCArguments *arguments) {
   if (pageId == nullptr)
     return createInt32Result(0);
 
-#if JSAPI_LOG
-  LOGD("[ExtendJSApi] functionCallCreateFinish >>>> pageId: %s", pageId);
-#endif
-
-  RenderManager::GetInstance()->CreateFinish(pageId);
+ _callCreateFinish(pageId);
 
   delete[]pageId;
   return createInt32Result(0);
@@ -613,7 +483,7 @@ std::unique_ptr<IPCResult> functionCallUpdateFinish(IPCArguments *arguments) {
   if (pageId == nullptr || task == nullptr)
     return createInt32Result(flag);
 
-  flag = Bridge_Impl_Android::getInstance()->callUpdateFinish(pageId, task, callback);
+  flag = _callUpdateFinish(pageId,task,callback);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -640,7 +510,7 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
   if (pageId == nullptr)
     return createInt32Result(flag);
 
-  flag = Bridge_Impl_Android::getInstance()->callRefreshFinish(pageId, task, callback);
+  flag = _callRefreshFinish(pageId, task, callback);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -655,6 +525,45 @@ std::unique_ptr<IPCResult> functionCallRefreshFinish(IPCArguments *arguments) {
     callback = nullptr;
   }
   return createInt32Result(flag);
+}
+
+std::unique_ptr<IPCResult> handlePostMessage(IPCArguments *arguments) {
+  // LOGE("handlePostMessage");
+  JNIEnv* env = getJNIEnv();
+  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 0);
+  jstring jVmId = getArgumentAsJString(env, arguments, 1);
+//  if (jPostMessage == NULL) {
+//    jPostMessage = env->GetMethodID(jWMBridgeClazz,
+//                                    "postMessage",
+//                                    "(Ljava/lang/String;[B)V");
+//  }
+//  env->CallVoidMethod(jWMThis, jPostMessage, jVmId, jData);
+  Bridge_Impl_Android::getInstance()->handlePostMessage(jVmId, jData);
+  env->DeleteLocalRef(jData);
+  env->DeleteLocalRef(jVmId);
+
+  return createInt32Result(static_cast<int32_t>(true));
+
+}
+
+std::unique_ptr<IPCResult> handleDispatchMessage(IPCArguments *arguments) {
+  // LOGE("handleDispatchMessage");
+  JNIEnv* env = getJNIEnv();
+  jstring jClientId = getArgumentAsJString(env, arguments, 0);
+  jbyteArray jData = getArgumentAsJByteArray(env, arguments, 1);
+  jstring jCallback = getArgumentAsJString(env, arguments, 2);
+  jstring jVmId = getArgumentAsJString(env, arguments, 3);
+//  if (jDispatchMeaasge == NULL) {
+//    jDispatchMeaasge = env->GetMethodID(jWMBridgeClazz,
+//                                        "dispatchMessage",
+//                                        "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)V");
+//  }
+//  env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
+  Bridge_Impl_Android::getInstance()->handleDispatchMessage(jClientId, jVmId, jData, jCallback);
+  env->DeleteLocalRef(jClientId);
+  env->DeleteLocalRef(jData);
+  env->DeleteLocalRef(jCallback);
+  return createInt32Result(static_cast<int32_t>(true));
 }
 
 namespace WeexCore {

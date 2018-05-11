@@ -982,9 +982,12 @@ _Pragma("clang diagnostic pop") \
         
         if (instance) {
             bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
-            message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString];
+            message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@\n%@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString, instance.callCreateInstanceContext?:@"", instance.createInstanceContextResult?:@"", instance.executeRaxApiResult?:@""];
             userInfo = @{@"jsMainBundleStringContentLength":instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",
                          @"jsMainBundleStringContentMd5":instance.userInfo[@"jsMainBundleStringContentMd5"]?:@""};
+            if ([self checkEmptyScreen:instance]) {
+                errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
+            }
         }
         
         if (commitException) {
@@ -1056,5 +1059,25 @@ _Pragma("clang diagnostic pop") \
             }
         }
     }];
+}
+
++ (BOOL) checkEmptyScreen:(WXSDKInstance *) instance
+{
+    if(!instance){
+        return false;
+    }
+    if (!(instance.rootView)  ) {
+        return true;
+    }
+    CGRect rootFrame = instance.rootView.frame;
+
+    if (rootFrame.size.height <=0 || rootFrame.size.width <=0) {
+        return true;
+    }
+    
+    if (!(instance.rootView.subviews) || instance.rootView.subviews.count <=0) {
+        return true;
+    }
+    return false;
 }
 @end

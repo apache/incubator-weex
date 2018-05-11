@@ -48,6 +48,14 @@
 //time of user could interace : firsrScreen view or async load veiew(net lazyload) are show)
 @property (nonatomic, assign) double interactionTime;
 
+//in firsrScreen ,create component count
+@property (nonatomic,assign) double fsComponentCount;
+//in firsrScreen ,create component time
+@property (nonatomic,assign) double fsComponentCreateTime;
+//all componentCreate count in instance life
+@property (nonatomic,assign) double componentCount;
+//all componentCreate time in instance life
+@property (nonatomic,assign) double componentCreateTime;
 @end
 
 

@@ -245,7 +245,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.scale.y";
                 newInfo.fromValue = @(oldTransform.scaleY);
-                newInfo.toValue = @(wxTransform.scaleX);
+                newInfo.toValue = @(wxTransform.scaleY);
                 [infos addObject:newInfo];
             }
             
@@ -309,7 +309,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 - (void)transitionWithArgs:(NSDictionary *)args withProperty:(NSString *)property target:(WXComponent *)target
 {
     [_transition.filterStyles setObject:args[@"styles"][property] forKey:property];
-    [_transition.oldFilterStyles setObject:target.styles[property] forKey:property];
+    [_transition.oldFilterStyles setObject:target.styles[property] ?:0 forKey:property];
     [target _modifyStyles:@{property:args[@"styles"][property]}];
     [_transitionDic setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
     [_transitionDic setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];

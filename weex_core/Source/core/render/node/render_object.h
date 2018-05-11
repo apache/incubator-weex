@@ -399,6 +399,14 @@ namespace WeexCore {
       return mIsRootRender;
     }
 
+    inline bool IsAppendTree(){
+      std::string append = GetAttr(APPEND);
+      if(append == "tree"){
+        return true;
+      }
+      return false;
+    }
+
   private:
     RenderObject *mParentRender;
     StylesMap *mStyles;

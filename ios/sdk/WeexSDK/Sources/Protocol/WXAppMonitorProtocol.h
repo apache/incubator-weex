@@ -47,6 +47,7 @@
 #define COMMUNICATETOTALTIME    @"communicateTotalTime"
 #define FSRENDERTIME    @"fsRenderTime"
 #define COMPONENTCOUNT      @"componentCount"
+#define M_COMPONENT_TIME    @"componentCreateTime"
 
 #define CACHEPROCESSTIME    @"cacheProcessTime"
 #define CACHERATIO          @"cacheRatio"
@@ -64,6 +65,8 @@
 #define M_TIMER_NUM             @"timerCount"
 #define M_WRONG_IMG_NUM         @"imgSizeCount"
 #define M_INTERACTION_TIME      @"interactionTime"
+#define M_COMPONENT_FS_COUNT    @"fsComponentCount"
+#define M_COMPONENT_FS_TIME     @"fsComponentCreateTime"
 
 
 

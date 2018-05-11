@@ -22,18 +22,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.BasicComponentData;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -577,13 +575,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           mBoxShadowHost = new BoxShadowHost(getContext());
           WXViewUtils.setBackGround(mBoxShadowHost, null);
 
-          Spacing padding = this.getDomObject().getPadding();
-          Spacing border = this.getDomObject().getBorder();
+          CSSShorthand padding = this.getPadding();
+          CSSShorthand border = this.getBorder();
 
-          int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
-          int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
-          int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
-          int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
+          int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
+          int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
+          int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
+          int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
 
           ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
           layoutParams.setMargins(-left, -top, -right, -bottom);
@@ -606,5 +604,9 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     public BoxShadowHost(Context context) {
       super(context);
     }
+  }
+
+  public void appendTreeCreateFinish() {
+    
   }
 }

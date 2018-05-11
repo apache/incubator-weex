@@ -25,6 +25,7 @@
 #include <core/render/action/render_action_update_attr.h>
 #include <core/render/action/render_action_layout.h>
 #include <core/render/action/render_action_createfinish.h>
+#include <core/render/action/render_action_appendtree_createfinish.h>
 #include <core/layout/layout.h>
 #include <android/base/string/string_utils.h>
 #include <core/moniter/render_performance.h>
@@ -180,7 +181,7 @@ namespace WeexCore {
 
     PushRenderToRegisterMap(child);
     BuildRenderTreeTime(getCurrentTime() - startTime);
-    SendAddElementAction(child, parent, insertPosition);
+    SendAddElementAction(child, parent, insertPosition, false);
 
     Batch();
     return true;
@@ -496,13 +497,17 @@ namespace WeexCore {
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
       if (child != nullptr) {
-        SendAddElementAction(child, render, i);
+        SendAddElementAction(child, render, i, true);
       }
       ++i;
     }
+
+    if (i > 0 && render->IsAppendTree()) {
+      SendAppendTreeCreateFinish(render->Ref());
+    }
   }
 
-  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index) {
+  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion) {
     if (child == nullptr || parent == nullptr)
       return;
 
@@ -513,9 +518,13 @@ namespace WeexCore {
     for(auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd(); it++) {
       RenderObject* grandson = static_cast<RenderObject*>(*it);
       if (grandson != nullptr) {
-        SendAddElementAction(grandson, child, i);
+        SendAddElementAction(grandson, child, i, true);
       }
       ++i;
+    }
+
+    if (!is_recursion && i > 0 && child->IsAppendTree()) {
+      SendAppendTreeCreateFinish(child->Ref());
     }
   }
 
@@ -554,6 +563,11 @@ namespace WeexCore {
 
   void RenderPage::SendCreateFinishAction() {
     render_action *action = new RenderActionCreateFinish(PageId());
+    PostRenderAction(action);
+  }
+
+  void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {
+    render_action *action = new RenderActionAppendTreeCreateFinish(PageId(), ref);
     PostRenderAction(action);
   }
 

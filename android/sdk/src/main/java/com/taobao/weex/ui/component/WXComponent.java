@@ -63,6 +63,7 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -130,7 +131,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final String ROOT = "_root";
 
   private int mFixedProp = 0;
-  public static int mComponentNum = 0;
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
@@ -196,7 +196,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
-    ++mComponentNum;
 
     if (instance != null)
       setViewPortWidth(instance.getInstanceViewPortWidth());

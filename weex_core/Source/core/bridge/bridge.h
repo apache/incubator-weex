@@ -94,6 +94,8 @@ namespace WeexCore {
     virtual int callRemoveElement(const char* pageId, const char* ref) = 0;
 
     virtual int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) = 0;
+
+    virtual int callAppendTreeCreateFinish(const char* pageId, const char* ref) = 0;
   };
 } //end WeexCore
 #endif //Bridge_h
