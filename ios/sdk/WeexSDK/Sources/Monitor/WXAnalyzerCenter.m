@@ -171,7 +171,7 @@
     
     NSMutableDictionary *wrapDic = [data mutableCopy];
     [wrapDic setObject:instance.instanceId forKey:@"instanceId"];
-    [wrapDic setObject:[instance.scriptURL absoluteString] forKey:@"url"];
+    [wrapDic setObject:[instance.scriptURL absoluteString]?:@"unSetscriptURL" forKey:@"url"];
     [wrapDic setValue:GROUP_ANALYZER forKey:@"group"];
     [wrapDic setValue:module forKey:@"module"];
     [wrapDic setValue:type forKey:@"type"];
