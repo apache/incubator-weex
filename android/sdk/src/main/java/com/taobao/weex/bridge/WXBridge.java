@@ -212,7 +212,10 @@ public class WXBridge implements IWXBridge {
    */
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-    JSONArray argArray = JSON.parseArray(new String(arguments));
+    JSONArray argArray = null;
+    if (arguments != null) {
+      argArray = JSON.parseArray(new String(arguments));
+    }
     JSONObject optionsObj = null;
     if (options != null) {
       optionsObj = JSON.parseObject(new String(options));
