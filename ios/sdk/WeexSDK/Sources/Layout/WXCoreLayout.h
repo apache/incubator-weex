@@ -257,6 +257,10 @@ namespace WeexCore {
 
     inline void reset() {
       if (isDirty()) {
+        //todo tmp solution if mLayoutResult is nil (mutil thread ?)
+        if (nullptr == mLayoutResult) {
+            mLayoutResult = new WXCorelayoutResult();
+        }
         mLayoutResult->reset();
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
