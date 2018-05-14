@@ -58,6 +58,17 @@ jint WeexProxy::doInitFramework(JNIEnv *env,
   bool reinit = false;
   startInitFrameWork:
   try {
+
+
+    LOGE("WeexProxy doInitFramework");
+    JStringCache *refCache = GetStringRefCache("");
+    for (int i = 0; i < 10; i++) {
+        LOGD("init cache, key: %s", std::to_string(i).c_str());
+      refCache->GetString(env, std::to_string(i).c_str());
+//      refCache->GetString(env, std::to_string(i).c_str());
+//      refCache->GetString(env, std::to_string(i).c_str());
+    }
+
     sHandler = std::move(createIPCHandler());
     sConnection.reset(new WeexJSConnection());
     sSender = sConnection->start(sHandler.get(), reinit);

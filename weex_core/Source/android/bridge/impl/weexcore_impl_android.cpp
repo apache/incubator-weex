@@ -46,6 +46,8 @@ std::map<const char *, JStringCache *, decltype(cmp)> RefCache(cmp);
 
 JStringCache KeyCache;
 
+JStringCache* refCache;
+
 static JavaVM *sVm = NULL;
 
 JNIEnv *getJNIEnv() {
@@ -79,14 +81,18 @@ jstring getKeyFromCache(JNIEnv *env, const char *key) {
 }
 
 JStringCache *GetStringRefCache(const char * pageId) {
-  std::map<const char *, JStringCache *>::const_iterator iter = RefCache.find(pageId);
-  if (iter != RefCache.end()) {
-    return (JStringCache *)(iter->second);
-  } else {
-    JStringCache* refCache = new JStringCache();
-    RefCache.insert(std::pair<const char *, JStringCache *>(pageId, refCache));
+//  std::map<const char *, JStringCache *>::const_iterator iter = RefCache.find(pageId);
+//  if (iter != RefCache.end()) {
+//    return (JStringCache *)(iter->second);
+//  } else {
+//    JStringCache* refCache = new JStringCache();
+//    RefCache.insert(std::pair<const char *, JStringCache *>(pageId, refCache));
+//    return refCache;
+//  }
+    if(nullptr == refCache) {
+        refCache = new JStringCache();
+    }
     return refCache;
-  }
 }
 
 jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]) {
@@ -555,7 +561,7 @@ jint OnLoad(JavaVM *vm, void *reserved) {
 
     RefCache.clear();
 
-    KeyCache.clearRefCache(env);
+//    KeyCache.clearRefCache(env);
 
     if (jThis)
       env->DeleteGlobalRef(jThis);
