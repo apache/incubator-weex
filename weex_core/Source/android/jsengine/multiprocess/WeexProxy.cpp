@@ -122,7 +122,7 @@ namespace WeexCore {
     }
 
     jint
-    WeexProxy::initFrameworkInMultiProcess(JNIEnv *env, jstring script, IPCSerializer *serializer) {
+    WeexProxy::initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params) {
         bool reinit = false;
         startInitFrameWork:
         try {
@@ -139,13 +139,15 @@ namespace WeexCore {
                 }
             } else {
                 // initHandler(sHandler.get());
+
                 ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
 
                 pExtensionJSApi->initFunction(sHandler.get());
 
                 // using base::debug::TraceEvent;
                 // TraceEvent::StartATrace(env);
-
+                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+                initFromParam(env, script, params, serializer.get());
                 serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
 
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();
@@ -177,30 +179,27 @@ namespace WeexCore {
                                     jobject params) {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
-        std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-        const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env, script,
-                                                                                        params,
-                                                                                        serializer.get());
+
         LOGE("doInitFramework is running");
-        if (g_use_single_process) {
-            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
-                //reportNativeInitStatus("-1011", "init Single Process Success");
-                return true;
-            }
-
-            if (initFrameworkInMultiProcess(env, script, serializer.get())) {
-                return true;
-            }
-        } else {
-            if (initFrameworkInMultiProcess(env, script, serializer.get())) {
-                return true;
-            }
-
-            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
-                reportNativeInitStatus("-1011", "init Single Process Success");
-                return true;
-            }
+//        if (g_use_single_process) {
+//            if (initFrameworkInSingleProcess(env, script, nullptr)) {
+//                //reportNativeInitStatus("-1011", "init Single Process Success");
+//                return true;
+//            }
+//
+//            if (initFrameworkInMultiProcess(env, script, params)) {
+//                return true;
+//            }
+//        } else {
+        if (initFrameworkInMultiProcess(env, script, params)) {
+            return true;
         }
+
+//            if (initFrameworkInSingleProcess(env, script, nullptr)) {
+//                reportNativeInitStatus("-1011", "init Single Process Success");
+//                return true;
+//            }
+//        }
         reportNativeInitStatus("-1010", "init Failed");
         return false;
 
@@ -462,9 +461,11 @@ namespace WeexCore {
             WEEX_CORE_JS_API_FUNCTIONS *functions);
 
     jint
-    WeexProxy::initFrameworkInSingleProcess(JNIEnv *env, jstring script,
-                                            std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams) {
-
+    WeexProxy::initFrameworkInSingleProcess(JNIEnv *env, jstring script, jobject params) {
+        std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+        const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env, script,
+                                                                                        params,
+                                                                                        serializer.get());
         std::string soPath = "";
 
         // -----------------------------------------------
@@ -904,7 +905,7 @@ namespace WeexCore {
                 if (js_server_api_functions != nullptr) {
                     param = getValueWithTypePtr();
                     if (param == nullptr)
-                        return false;
+                        return nullptr;
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
