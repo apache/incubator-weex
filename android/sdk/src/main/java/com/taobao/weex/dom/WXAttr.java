@@ -425,7 +425,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.attr.putAll(map);
+    // copy on write.
+    Map<String, Object> copyAttr = new ArrayMap<>();
+    copyAttr.putAll(this.attr);
+    copyAttr.putAll(map);
+    this.attr = copyAttr;
   }
 
   @Override
