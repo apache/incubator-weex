@@ -264,7 +264,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       margin->insert(margin->end(), (*iter)),
                                   flag = true;
                                 });
@@ -277,7 +277,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       padding->insert(padding->end(), (*iter)),
                                   flag = true;
                                 });
@@ -290,7 +290,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       border->insert(border->end(), (*iter)),
                                   flag = true;
                                 });
@@ -573,50 +573,14 @@ namespace WeexCore {
       mWXCorePerformance->cssLayoutTime += time;
   }
 
-  long long RenderPage::GetFirstScreenCssLayoutTime() {
-    if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->firstScreenCssLayoutTime;
-    return 0;
-  }
-
-  long long RenderPage::GetOnRenderSuccessCssLayoutTime() {
-    if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->onRenderSuccessCssLayoutTime;
-    return 0;
-  }
-
   void RenderPage::ParseJsonTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->parseJsonTime += time;
   }
 
-  long long RenderPage::GetFirstScreenParseJsonTime() {
-if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->firstScreenParseJsonTime;
-    return 0;
-  }
-
-  long long RenderPage::GetOnRenderSuccessParseJsonTime() {
-    if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->onRenderSuccessParseJsonTime;
-    return 0;
-  }
-
   void RenderPage::CallBridgeTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->callBridgeTime += time;
-  }
-
-  long long RenderPage::GetFirstScreenCallBridgeTime() {
-    if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->firstScreenCallBridgeTime;
-    return 0;
-  }
-
-  long long RenderPage::GetOnRenderSuccessCallBridgeTime() {
-    if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->onRenderSuccessCallBridgeTime;
-    return 0;
   }
 
   std::vector<long> RenderPage::PrintFirstScreenLog() {

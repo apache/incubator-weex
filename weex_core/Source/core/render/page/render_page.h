@@ -24,6 +24,7 @@
 #include <map>
 #include <jni.h>
 #include <cmath>
+#include <atomic>
 
 namespace WeexCore {
 
@@ -104,21 +105,9 @@ namespace WeexCore {
 
     void CssLayoutTime(const long long &time);
 
-    long long GetFirstScreenCssLayoutTime();
-
-    long long GetOnRenderSuccessCssLayoutTime();
-
     void ParseJsonTime(const long long &time);
 
-    long long GetFirstScreenParseJsonTime();
-
-    long long GetOnRenderSuccessParseJsonTime();
-
     void CallBridgeTime(const long long &time);
-
-    long long GetFirstScreenCallBridgeTime();
-
-    long long GetOnRenderSuccessCallBridgeTime();
 
     std::vector<long> PrintFirstScreenLog();
 

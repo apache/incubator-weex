@@ -189,60 +189,6 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
   return jRet;
 }
 
-static jlong GetFirstScreenCallBridgeTime(JNIEnv* env, jobject jcaller,
-                                          jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetFirstScreenCallBridgeTime();
-}
-
-static jlong GetFirstScreenCssLayoutTime(JNIEnv* env, jobject jcaller,
-                                         jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetFirstScreenCssLayoutTime();
-}
-
-static jlong GetFirstScreenParseJsonTime(JNIEnv* env, jobject jcaller,
-                                         jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetFirstScreenParseJsonTime();
-}
-
-static jlong GetOnRenderSuccessCallBridgeTime(JNIEnv* env, jobject jcaller,
-                                              jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetOnRenderSuccessCallBridgeTime();
-}
-
-static jlong GetOnRenderSuccessCssLayoutTime(JNIEnv* env, jobject jcaller,
-                                             jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetOnRenderSuccessCssLayoutTime();
-}
-
-static jlong GetOnRenderSuccessParseJsonTime(JNIEnv* env, jobject jcaller,
-                                             jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
-
-  return page->GetOnRenderSuccessParseJsonTime();
-}
-
 //Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
