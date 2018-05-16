@@ -117,7 +117,7 @@ namespace WeexCore {
     }
 
     inline bool isNAN() {
-      return isnan(mTop) || isnan(mBottom) || isnan(mLeft) || isnan(mRight);
+        return std::isnan(mTop) || std::isnan(mBottom) || std::isnan(mLeft) || std::isnan(mRight);
     }
 
     inline void reset() {

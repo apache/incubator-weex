@@ -175,7 +175,14 @@ namespace WeexCore {
         (widthMeasureMode == kUnspecified
             || heightMeasureMode == kUnspecified)) {
       float constrainsWidth = width;
-      if(widthMeasureMode == kExactly && !isnan(width)){
+      if(isnan(width)){
+        if(!isnan(mCssStyle->mMaxWidth)){
+          constrainsWidth = mCssStyle->mMaxWidth;
+        }
+      }
+
+      if((!isnan(width)&&widthMeasureMode == kExactly) ||
+          (isnan(width) && !isnan(mCssStyle->mMaxWidth))) {
         constrainsWidth -= sumPaddingBorderAlongAxis(this, true);
       }
       WXCoreSize dimension = measureFunc(this, constrainsWidth,
