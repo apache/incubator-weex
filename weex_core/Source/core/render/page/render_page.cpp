@@ -657,11 +657,5 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageClose() {
-//    JStringCache *refCache = GetStringRefCache(mPageId.c_str());
-//    if(nullptr != refCache) {
-//      refCache->clearRefCache(getJNIEnv());
-//    }
-//    delete refCache;
-//    refCache = nullptr;
   }
 } //namespace WeexCore

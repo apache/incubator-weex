@@ -32,7 +32,7 @@ public:
     ~JStringCache() {}
 
 public:
-    jstring GetString(JNIEnv *env, const char *key);
+    jstring GetString(JNIEnv *env, std::string key);
     void clearRefCache(JNIEnv *env);
 };
 

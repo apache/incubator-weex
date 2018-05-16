@@ -374,9 +374,8 @@ namespace WeexCore {
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -470,10 +469,9 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     JNIEnv *env = getJNIEnv();
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
-    jstring jParentRef = refCache->GetString(env, parentRef);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
+    jstring jParentRef = getKeyFromCache(env, parentRef);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -559,9 +557,8 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveElement(const char* pageId, const char* ref) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallRemoveElementMethodId == NULL) {
       jCallRemoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -579,10 +576,9 @@ namespace WeexCore {
   int Bridge_Impl_Android::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
-    jstring jParentRef = refCache->GetString(env, parentRef);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
+    jstring jParentRef = getKeyFromCache(env, parentRef);
 
     if (jCallMoveElementMethodId == NULL) {
       jCallMoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -599,9 +595,8 @@ namespace WeexCore {
 
   int Bridge_Impl_Android::callAddEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallAddEventMethodId == NULL) {
       jCallAddEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -621,9 +616,8 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveEvent(const char* pageId, const char* ref, const char *event) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallRemoveEventMethodId == NULL) {
       jCallRemoveEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -647,9 +641,8 @@ namespace WeexCore {
                                            std::vector<std::pair<std::string, std::string>> *border) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -712,9 +705,8 @@ namespace WeexCore {
   int Bridge_Impl_Android::callUpdateAttr(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *attrs) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -762,9 +754,8 @@ namespace WeexCore {
                                       int height, int width, int index) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -793,8 +784,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callCreateFinish(const char* pageId) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -820,9 +810,8 @@ namespace WeexCore {
   int Bridge_Impl_Android::callAppendTreeCreateFinish(const char *pageId, const char *ref) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallAppendTreeCreateFinishMethodId == NULL)
       jCallAppendTreeCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -841,9 +830,8 @@ namespace WeexCore {
   int Bridge_Impl_Android::callHasTransitionPros(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *style) {
     JNIEnv *env = getJNIEnv();
 
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     if (page == nullptr)
@@ -903,9 +891,8 @@ namespace WeexCore {
 
   jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
     JNIEnv *env = getJNIEnv();
-    JStringCache* refCache = GetStringRefCache(pageId);
-    jstring jPageId = refCache->GetString(env, pageId);
-    jstring jRef = refCache->GetString(env, ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
     if (jCallGetMeasurementMethodId == NULL) {
       jCallGetMeasurementMethodId = env->GetMethodID(jBridgeClazz,
                                                      "getMeasurementFunc",

@@ -40,13 +40,7 @@ jobject jThis;
 jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
 
-constexpr auto cmp = [](const char* a, const char* b){return strcmp(a,b);};
-
-std::map<const char *, JStringCache *, decltype(cmp)> RefCache(cmp);
-
-JStringCache KeyCache;
-
-JStringCache* refCache;
+JStringCache refCache;
 
 static JavaVM *sVm = NULL;
 
@@ -77,22 +71,7 @@ jstring putComponentTypeToCache(const std::string type) {
 }
 
 jstring getKeyFromCache(JNIEnv *env, const char *key) {
-  return KeyCache.GetString(env, key);
-}
-
-JStringCache *GetStringRefCache(const char * pageId) {
-//  std::map<const char *, JStringCache *>::const_iterator iter = RefCache.find(pageId);
-//  if (iter != RefCache.end()) {
-//    return (JStringCache *)(iter->second);
-//  } else {
-//    JStringCache* refCache = new JStringCache();
-//    RefCache.insert(std::pair<const char *, JStringCache *>(pageId, refCache));
-//    return refCache;
-//  }
-    if(nullptr == refCache) {
-        refCache = new JStringCache();
-    }
-    return refCache;
+  return refCache.GetString(env, key);
 }
 
 jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]) {
@@ -559,9 +538,7 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     }
     componentTypeCache.clear();
 
-    RefCache.clear();
-
-//    KeyCache.clearRefCache(env);
+    refCache.clearRefCache(env);
 
     if (jThis)
       env->DeleteGlobalRef(jThis);

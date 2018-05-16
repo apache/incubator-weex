@@ -59,16 +59,6 @@ jint WeexProxy::doInitFramework(JNIEnv *env,
   startInitFrameWork:
   try {
 
-
-    LOGE("WeexProxy doInitFramework");
-    JStringCache *refCache = GetStringRefCache("");
-    for (int i = 0; i < 10; i++) {
-        LOGD("init cache, key: %s", std::to_string(i).c_str());
-      refCache->GetString(env, std::to_string(i).c_str());
-//      refCache->GetString(env, std::to_string(i).c_str());
-//      refCache->GetString(env, std::to_string(i).c_str());
-    }
-
     sHandler = std::move(createIPCHandler());
     sConnection.reset(new WeexJSConnection());
     sSender = sConnection->start(sHandler.get(), reinit);
@@ -621,11 +611,11 @@ WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstance
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CREATEINSTANCE));
     addString(env, serializer.get(), jinstanceid);
     addString(env, serializer.get(), jfunction);
-
     // get temp data, such as js bundle
     jobject jArg = env->GetObjectArrayElement(jargs,1);
     jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
     jobject jDataObj = env->GetObjectField(jArg, jDataId);
+
     jstring jscript = (jstring) jDataObj;
     addString(env, serializer.get(), jscript);
     jstring opts = getJsonData(env, jargs, 2);
