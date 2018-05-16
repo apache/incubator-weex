@@ -40,7 +40,5 @@ namespace WeexCore {
     Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
                                                        mIndex, mParentRef.c_str(), mStyles, mAttributes,
                                                        mEvents, mMargins, mPaddings, mBorders, mWillLayout);
-    page->JniCallTime(getCurrentTime() - startTime);
-    page->AddElementActionJNITime(getCurrentTime() - startTime);
   }
 }

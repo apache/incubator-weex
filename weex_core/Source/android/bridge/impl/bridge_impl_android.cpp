@@ -593,8 +593,6 @@ namespace WeexCore {
     env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jBorders);
 
-    if (page != nullptr)
-      page->CallBridgeTime(getCurrentTime() - startTime);
     return flag;
   }
 
