@@ -84,9 +84,9 @@ public class WXExceptionUtils {
 				}
 			}
 
-			if (null != instance && instance.getContext() != null && instance.getBundleUrl() != null) {
+			if (null != instance) {
 				bundleUrlCommit = instance.getBundleUrl();
-				exceptionMsgCommit += "\n instance.getTemplateInfo()==" + instance.getTemplateInfo();
+				commitMap.put("templateInfo",instance.getTemplateInfo());
 				if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
 					if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
 						bundleUrlCommit = degradeUrl;
@@ -98,7 +98,7 @@ public class WXExceptionUtils {
 			if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
 				bundleUrlCommit = WXSDKInstance.requestUrl;
 			}
-			if (commitMap != null && commitMap.size() > 0) {
+			if (commitMap.size() > 0) {
 				bundleUrlCommit = TextUtils.isEmpty(commitMap.get("weexUrl")) ? commitMap.get("weexUrl")
 								: commitMap.get("bundleUrl");
 			}

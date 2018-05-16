@@ -20,6 +20,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Source/IPC)
 ## include_directories for include head file
 ## include_directories(${CMAKE_SOURCE_DIR}/Source/IPC)
 
+include_directories("include")
 
 add_library(weexjsc SHARED
 
@@ -37,10 +38,13 @@ add_library(weexjsc SHARED
     ./android/bridge/impl/measure_mode_impl_android.cpp
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
+    ./android/bridge/impl/native_render_object_utils_impl_android.cpp
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
     ./android/jsengine/multiprocess/WeexProxy.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
+
+    ./core/api/WeexJSCoreApi.cpp
 
     ./core/render/manager/render_manager.cpp
     ./core/render/page/render_page.cpp

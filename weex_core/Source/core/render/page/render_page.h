@@ -47,7 +47,7 @@ namespace WeexCore {
 
     void SendCreateBodyAction(RenderObject *render);
 
-    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion);
+    void SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion, bool willLayout= true);
 
     void SendRemoveElementAction(const std::string &ref);
 

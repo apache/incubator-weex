@@ -67,7 +67,7 @@ export class TaskCenter {
    * @param  {any}        v
    * @return {primitive}
    */
-  normalize (v) {
+  normalize (v, deep = false) {
     const type = typof(v)
     if (v && v instanceof Element) {
       return v.ref
@@ -78,13 +78,29 @@ export class TaskCenter {
     if (type === 'Function') {
       return this.callbackManager.add(v).toString()
     }
+    if (deep) {
+      if (type === 'Object') {
+        const object = {}
+        for (const key in v) {
+          object[key] = this.normalize(v[key], true)
+        }
+        return object
+      }
+      if (type === 'Array') {
+        return v.map(item => this.normalize(item, true))
+      }
+    }
     return normalizePrimitive(v)
   }
 
   send (type, params, args, options) {
     const { action, component, ref, module, method } = params
 
+    // normalize args and options
     args = args.map(arg => this.normalize(arg))
+    if (typof(options) === 'Object') {
+      options = this.normalize(options, true)
+    }
 
     switch (type) {
       case 'dom':

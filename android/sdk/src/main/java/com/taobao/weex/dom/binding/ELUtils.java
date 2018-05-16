@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.dom.binding;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
@@ -60,6 +61,8 @@ public class ELUtils {
                     return  true;
                 }
             }
+        }else if(value instanceof String){
+            return ((String) value).indexOf(BINDING) >= 0;
         }
         return  false;
     }
@@ -92,6 +95,13 @@ public class ELUtils {
             for(int i=0; i<array.size(); i++){
                 bindingBlock(array.get(i));
             }
+        }else if(value instanceof String){
+            String json = value.toString();
+            if(json.startsWith("{")){
+                return bindingBlock(JSON.parseObject(json));
+            }else if(json.startsWith("[")){
+                return bindingBlock(JSON.parseArray(json));
+            }
         }
         return  value;
     }
@@ -104,6 +114,8 @@ public class ELUtils {
                     ((JSONObject) vfor).put(WXStatement.WX_FOR_LIST, Parser.parse(list.toString()));
                 }
             }
+        }else if(vfor instanceof  String){
+            return vforBlock(JSONObject.parseObject(vfor.toString()));
         }else{
             if(WXEnvironment.isApkDebugable()){
                 WXLogUtils.e("weex", "weex vfor is illegal " + vfor);
@@ -111,6 +123,5 @@ public class ELUtils {
         }
         return vfor;
     }
-
 
 }

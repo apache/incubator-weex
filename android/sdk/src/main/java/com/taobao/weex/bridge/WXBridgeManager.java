@@ -30,6 +30,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -37,6 +38,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -71,6 +73,7 @@ import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
@@ -174,6 +177,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // if true will open weex sandbox for multi context
   private volatile static boolean isSandBoxContext = true;
 
+  // add for cloud setting, default value is false.
+  // weexcore use single process or not
+  private static boolean isUseSingleProcess = false;
+
   private enum BundType {
     Vue,
     Rax,
@@ -232,6 +239,25 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     }
     return mBridgeManager;
+  }
+
+  public void setUseSingleProcess(final boolean flag) {
+    if (flag != isUseSingleProcess) {
+      isUseSingleProcess = flag;
+//      //we should reinit framework if js framework has been initialized
+//      if (isJSFrameworkInit()) {
+//        if (isJSThread()) {
+//          WXSDKEngine.reload();
+//        } else {
+//          post(new Runnable() {
+//            @Override
+//            public void run() {
+//              WXSDKEngine.reload();
+//            }
+//          });
+//        }
+//      }
+    }
   }
 
   public void setSandBoxContext(final boolean flag) {
@@ -1207,16 +1233,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       public void run() {
         long start = System.currentTimeMillis();
         invokeCreateInstance(instance, template, options, data);
-        final long endTime = System.currentTimeMillis();
-        final long totalTime = endTime- start;
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-              instance.getWXPerformance().callCreateInstanceTime = endTime;
-            instance.createInstanceFinished(totalTime);
-          }
-        }, 0);
+        instance.getWXPerformance().callCreateInstanceTime = System.currentTimeMillis();
+        long totalTime =  instance.getWXPerformance().callCreateInstanceTime - start;
+        if (totalTime > 0) {
+          instance.getWXPerformance().communicateTime = totalTime;
+        }
       }
     }, instanceId);
   }
@@ -1798,6 +1819,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
+    wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
@@ -2263,7 +2285,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                            float[] margins, float[] paddings, float[] borders) {
+                            float[] margins, float[] paddings, float[] borders,boolean willLayout) {
     long start = System.currentTimeMillis();
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
       WXLogUtils.d("[WXBridgeManager] callAddElement: call CreateBody tasks is null");
@@ -2293,7 +2315,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(pageId) != null) {
         final GraphicActionAddElement action = new GraphicActionAddElement(pageId, ref, componentType, parentRef, index,
             styles, attributes, events, margins, paddings, borders);
-        WXSDKManager.getInstance().getSDKInstance(pageId).addInActiveAddElementAction(ref, action);
+        if(willLayout) {
+          WXSDKManager.getInstance().getSDKInstance(pageId).addInActiveAddElementAction(ref, action);
+        }else{
+          WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(pageId, action);
+        }
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddElement exception: ", e);
@@ -2613,6 +2639,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     return contentBoxMeasurement;
   }
+
+  public void bindMeasurementToRenderObject(long ptr){
+    mWXBridge.bindMeasurementToRenderObject(ptr);
+  }
+
 
   /**
    * Native: Layout

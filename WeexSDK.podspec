@@ -36,6 +36,9 @@ Pod::Spec.new do |s|
 
 #  s.xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => '$(inherited) DEBUG=1' }
 
+  s.private_header_files = 'ios/sdk/WeexSDK/Sources/Component/RecycleList/WXJSASTParser.h',
+                           'ios/sdk/WeexSDK/Sources/Layout/WXScrollerComponent+Layout.h'
+
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC'}
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit', 'OpenGLES', 'CoreText', 'QuartzCore', 'CoreGraphics'

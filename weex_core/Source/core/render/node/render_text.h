@@ -28,9 +28,6 @@ namespace WeexCore {
     inline void UpdateAttr(std::string key, std::string value) {
       RenderObject::UpdateAttr(key, value);
       markDirty();
-      RenderPage* page = GetRenderPage();
-      if (page != nullptr)
-        GetRenderPage()->Batch();
     }
 
     inline StyleType UpdateStyle(std::string key, std::string value) {

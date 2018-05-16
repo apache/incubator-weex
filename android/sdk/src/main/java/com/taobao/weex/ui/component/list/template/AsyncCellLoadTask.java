@@ -59,6 +59,7 @@ class AsyncCellLoadTask extends AsyncTask<Void,Void, Void> {
             WXCell component = (WXCell) templateList.copyComponentFromSourceCell(source);
             if(WXEnvironment.isOpenDebugLog() && WXRecyclerTemplateList.ENABLE_TRACE_LOG){
                 WXLogUtils.d(WXRecyclerTemplateList.TAG, " AsyncCellLoadTask load " + template
+                        + "  " +  component.hashCode()
                 + " used " + (System.currentTimeMillis() - start));
             }
             if(component == null){

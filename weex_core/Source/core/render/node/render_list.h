@@ -38,7 +38,45 @@ namespace WeexCore {
     float mAvailableWidth = 0;
     float mColumnGap = COLUMN_GAP_NORMAL;
     bool mIsSetFlex = false;
+    std::vector<RenderObject*> cellSlots;
+    std::vector<RenderObject*> cellSlotsCopys;
+      
+  public:
+      ~RenderList(){
 
+          if(cellSlotsCopys.size() > 0){
+              for(auto it = cellSlotsCopys.begin(); it != cellSlotsCopys.end(); ++it){
+                  RenderObject* child =  *it;
+                  if(child){
+                      delete child;
+                      child = nullptr;
+                  }
+              }
+              cellSlotsCopys.clear();
+          }
+
+          if(cellSlots.size() > 0){
+              for(auto it = cellSlots.begin(); it != cellSlots.end(); ++it){
+                  RenderObject* child =  *it;
+                  if(child){
+                      delete child;
+                      child = nullptr;
+                  }
+              }
+              cellSlots.clear();
+          }
+      }
+      
+  public:
+      void addCellSlotCopyTrack(RenderObject* cellSlot){
+          cellSlot->setParent(this, cellSlot);
+          cellSlotsCopys.push_back(cellSlot);
+      }
+      
+      std::vector<RenderObject*> &CellSlots(){
+          return cellSlots;
+      }
+      
     std::map<std::string, std::string> *GetDefaultStyle() {
       std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
 
@@ -117,10 +155,11 @@ namespace WeexCore {
             }
 
             mIsPreCalculateCellWidth = true;
-            attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, std::to_string(mColumnCount)));
-            attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, std::to_string(mColumnWidth)));
-            attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, std::to_string(mColumnGap)));
-
+            if(getColumnCount() > 0 || getColumnWidth() > 0 || mColumnCount > COLUMN_COUNT_NORMAL){
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, std::to_string(mColumnCount)));
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, std::to_string(mColumnGap)));
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, std::to_string(mColumnWidth)));
+            }
         }
         return attrs;
     }
@@ -143,28 +182,49 @@ namespace WeexCore {
 
 
     int AddRenderObject(int index, RenderObject *child) {
-      index = RenderObject::AddRenderObject(index, child);
+        if(Type() == kRenderRecycleList
+                && (child->Type() == kRenderCellSlot ||  child->Type() == kRenderCell || child->Type()  == kRenderHeader)){
+            child->setParent(this, child);
+            cellSlots.insert(cellSlots.end(), child);
+            index = -1;
+        }else{
+            index = RenderObject::AddRenderObject(index, child);
+        }
 
-      if (!mIsPreCalculateCellWidth) {
-        preCalculateCellWidth();
-      }
+        if (!mIsPreCalculateCellWidth) {
+            preCalculateCellWidth();
+        }
 
-      if(mColumnWidth != 0 && !isnan(mColumnWidth)) {
-        //LOGE("listen child->ApplyStyle %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
-        AddRenderObjectWidth(child, false);
-      }
-      return index;
+        if(mColumnWidth != 0 && !isnan(mColumnWidth)) {
+            //LOGE("listen child->ApplyStyle %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
+            AddRenderObjectWidth(child, false);
+        }
+        return index;
     }
 
     void AddRenderObjectWidth(RenderObject *child, const bool updating) {
-        if (Type() == kRenderWaterfall) {
+        if (Type() == kRenderWaterfall || Type() == kRenderRecycleList) {
             if(child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
                 child->ApplyStyle(WIDTH, std::to_string(mAvailableWidth), updating);
-            } else if (child->Type() == kRenderCell){
-                child->ApplyStyle(WIDTH, std::to_string(mColumnWidth), updating);
             } else if (child->getStypePositionType() == kSticky) {
                 child->ApplyStyle(WIDTH, std::to_string(GetViewPortWidth()), updating);
+            } else if (child->Type() == kRenderCell || child->Type() == kRenderCellSlot){
+                child->ApplyStyle(WIDTH, std::to_string(mColumnWidth), updating);
             }
+        }
+    }
+
+    void UpdatePreCalculateCellAttrs(std::map<std::string, std::string> * attrs){
+        if (attrs == nullptr){
+            return;
+        }
+
+        for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+            RenderObject::UpdateAttr(iter->first, iter->second);
+        }
+        if (attrs != nullptr) {
+            delete attrs;
+            attrs = nullptr;
         }
     }
 
@@ -172,7 +232,7 @@ namespace WeexCore {
       RenderObject::UpdateAttr(key, value);
 
       if(!GetAttr(COLUMN_COUNT).empty() || !GetAttr(COLUMN_GAP).empty() || !GetAttr(COLUMN_WIDTH).empty()){
-        preCalculateCellWidth();
+          UpdatePreCalculateCellAttrs(preCalculateCellWidth());
 
         if(mColumnWidth == 0 && isnan(mColumnWidth)) {
           return;

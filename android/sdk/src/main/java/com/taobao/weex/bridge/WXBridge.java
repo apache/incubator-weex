@@ -27,13 +27,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Communication interface for Java code and JavaScript code.
@@ -58,6 +63,8 @@ public class WXBridge implements IWXBridge {
   public native String nativeExecJSOnInstance(String instanceId, String script, int type);
 
   private native void nativeTakeHeapSnapshot(String filename);
+
+  private native void nativeBindMeasurementToRenderObject(long ptr);
 
   private native void nativeBindMeasurementToWXCore(String instanceId, String ref);
 
@@ -206,7 +213,10 @@ public class WXBridge implements IWXBridge {
    */
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-    JSONArray argArray = JSON.parseArray(new String(arguments));
+    JSONArray argArray = null;
+    if (arguments != null) {
+      argArray = JSON.parseArray(new String(arguments));
+    }
     JSONObject optionsObj = null;
     if (options != null) {
       optionsObj = JSON.parseObject(new String(options));
@@ -322,12 +332,12 @@ public class WXBridge implements IWXBridge {
   @Override
   public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                            float[] margins, float[] paddings, float[] borders) {
+                            float[] margins, float[] paddings, float[] borders,  boolean willLayout) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
 
     try {
       errorCode = WXBridgeManager.getInstance().callAddElement(instanceId, componentType, ref, index, parentRef,
-              styles, attributes, events, margins, paddings, borders);
+              styles, attributes, events, margins, paddings, borders, willLayout);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -524,6 +534,11 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public void bindMeasurementToRenderObject(long ptr){
+    nativeBindMeasurementToRenderObject(ptr);
+  }
+
+  @Override
   public void setRenderContainerWrapContent(boolean wrap, String instanceId) {
     nativeSetRenderContainerWrapContent(wrap, instanceId);
   }
@@ -596,5 +611,30 @@ public class WXBridge implements IWXBridge {
   @Override
   public void setViewPortWidth(String instanceId, float value) {
     nativeSetViewPortWidth(instanceId, value);
+  }
+
+  public void reportNativeInitStatus(String statusCode, String errorMsg) {
+    if (WXErrorCode.WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS.getErrorCode().equals(statusCode)
+            || WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED.getErrorCode().equals(statusCode)) {
+      IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+      if (userTrackAdapter != null) {
+        Map<String, Serializable> params = new HashMap<>(3);
+        params.put(IWXUserTrackAdapter.MONITOR_ERROR_CODE, statusCode);
+        params.put(IWXUserTrackAdapter.MONITOR_ARG, "InitFrameworkNativeError");
+        params.put(IWXUserTrackAdapter.MONITOR_ERROR_MSG, errorMsg);
+        Log.e("Dyy", "reportNativeInitStatus is running and errorCode is " + statusCode + " And errorMsg is " + errorMsg);
+        userTrackAdapter.commit(null, null, IWXUserTrackAdapter.INIT_FRAMEWORK, null, params);
+      }
+
+      return;
+    }
+
+    for (WXErrorCode e : WXErrorCode.values()) {
+      if (e.getErrorType().equals(WXErrorCode.ErrorType.NATIVE_ERROR)
+              && e.getErrorCode().equals(statusCode)) {
+        WXExceptionUtils.commitCriticalExceptionRT(null, e, "initFramework", errorMsg, null);
+        break;
+      }
+    }
   }
 }

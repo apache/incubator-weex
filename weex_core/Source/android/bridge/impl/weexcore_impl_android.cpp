@@ -103,17 +103,12 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instanceId, jstring ref) {
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  render->BindMeasureFuncImplAndroid();
+static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
+                                          jlong ptr){
+  RenderObject *render =  convert_long_to_render_object(ptr);
+  if(render){
+      render->BindMeasureFuncImplAndroid();
+  }
 }
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller, jstring instanceId) {

@@ -6,3 +6,12 @@ build
 captures
 .settings
 .project
+/incrementalDeploy.sh
+/incrementalInstall.sh
+/incremental_settings.gradle
+/incrementalbuild.gradle
+/incrementalDeployAssemble.sh
+/incrementalDeployOnline.sh
+/incrementalClean.sh
+/incrementalDeployContinuous.sh
+/incrementalDeployOld.sh

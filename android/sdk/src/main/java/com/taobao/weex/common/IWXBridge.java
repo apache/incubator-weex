@@ -126,7 +126,7 @@ public interface IWXBridge extends IWXObject {
 
   public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                            float[] margins, float[] paddings, float[] borders);
+                            float[] margins, float[] paddings, float[] borders, boolean willLayout);
 
   int callRemoveElement(String instanceId, String ref);
 
@@ -156,6 +156,8 @@ public interface IWXBridge extends IWXObject {
   void bindMeasurementToWXCore(String instanceId, String ref);
 
   ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref);
+
+  void bindMeasurementToRenderObject(long ptr);
 
   void setRenderContainerWrapContent(boolean wrap, String instanceId);
 
@@ -187,4 +189,5 @@ public interface IWXBridge extends IWXObject {
 
   void setViewPortWidth(String instanceId, float value);
 
+  void reportNativeInitStatus(String statusCode, String errorMsg);
 }

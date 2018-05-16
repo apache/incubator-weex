@@ -34,6 +34,14 @@
 #include <android/base/log_utils.h>
 #include <android/bridge/impl/bridge_impl_android.h>
 
+
+#define JSON_OBJECT_MARK_CHAR  '{'
+#define JSON_ARRAY_MARK_CHAR  '['
+
+#define convert_render_object_to_long(render)    ((jlong)((intptr_t)render))
+
+#define convert_long_to_render_object(ptr)   ((RenderObject *)((intptr_t)ptr))
+
 namespace WeexCore {
 
   class RenderObject;
@@ -56,7 +64,7 @@ namespace WeexCore {
     friend class RenderPage;
 
 
-  private:
+  public:
     inline void LayoutBefore() {
       if (isDirty()) {
         onLayoutBefore();
@@ -96,6 +104,22 @@ namespace WeexCore {
       return nullptr;
     }
 
+    void copyFrom(RenderObject* src){
+      IRenderObject::copyFrom(src);
+      this->mStyles->insert(src->mStyles->begin(), src->mStyles->end());
+      this->mAttributes->insert(src->mAttributes->begin(), src->mAttributes->end());
+      this->mEvents->insert(src->mEvents->begin(), src->mEvents->end());
+    }
+
+    inline void mapInsertOrAssign(std::map<std::string, std::string> *targetMap, const std::string& key, const std::string& value) {
+      std::map<std::string, std::string>::iterator it = targetMap->find(key);
+      if(it != targetMap->end()){
+        it->second = value;
+      }else{
+        targetMap->insert({key, value});
+      }
+    }
+
    protected:
     bool UpdateStyle(const std::string key, const std::string value,
                       float fallback, std::function<void(float)> functor){
@@ -127,7 +151,15 @@ namespace WeexCore {
 
     void onLayoutAfter(float width, float height);
 
+
+
     virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
+      bool  insert = false;
+      if(value.length() > 0 && (value.at(0) == JSON_OBJECT_MARK_CHAR || value.at(0) == JSON_ARRAY_MARK_CHAR)){
+        mapInsertOrAssign(mStyles, key, value);
+        insert = true;
+      }
+
       if (key == ALIGN_ITEMS) {
         setAlignItems(GetWXCoreAlignItem(value));
         return kTypeLayout;
@@ -177,7 +209,7 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
-        mStyles->insert(std::pair<std::string, std::string>(key, value));
+        mapInsertOrAssign(mStyles, key, value);
         return kTypeStyle;
       } else if (key == LEFT) {
         UpdateStyle(key, value, NAN, [=](float foo){setStylePosition(kPositionEdgeLeft, foo);});
@@ -237,7 +269,9 @@ namespace WeexCore {
         UpdateStyle(key, value, 0, [=](float foo){setPadding(kPaddingBottom, foo);});
         return kTypePadding;
       } else {
-        mStyles->insert(std::pair<std::string, std::string>(key, value));
+        if(!insert){
+          mapInsertOrAssign(mStyles, key, value);
+        }
         return kTypeStyle;
       }
     }
@@ -298,11 +332,11 @@ namespace WeexCore {
     }
 
     inline void AddAttr(std::string key, std::string value) {
-      mAttributes->insert(std::pair<std::string, std::string>(key, value));
+      mapInsertOrAssign(mAttributes, key, value);
     }
 
     virtual void UpdateAttr(std::string key, std::string value) {
-      AddAttr(key, value);
+      mapInsertOrAssign(mAttributes, key, value);
     }
 
     virtual StyleType UpdateStyle(std::string key, std::string value) {

@@ -37,6 +37,7 @@
   "scripts": {
     "build:jsfm": "node build/build.js jsfm",
     "build:env": "WEEX_FREEZE=true node build/build.js env",
+    "build:polyfill": "node build/build.js polyfill",
     "build:native": "node build/build.js native",
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",

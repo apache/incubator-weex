@@ -18,6 +18,10 @@
  */
 package com.taobao.weex.bridge;
 
+import android.util.Log;
+
+import com.taobao.weex.utils.WXLogUtils;
+
 import java.util.Map;
 
 public class WXParams {
@@ -34,6 +38,7 @@ public class WXParams {
   private String logLevel;
   private String needInitV8;
   private String cacheDir;
+  private String useSingleProcess;
 
   private Map<String, String> options;
 
@@ -137,6 +142,15 @@ public class WXParams {
       return "";
     }
     return logLevel;
+  }
+
+  public String getUseSingleProcess() {
+    WXLogUtils.e("getUseSingleProcess is running");
+    return useSingleProcess;
+  }
+
+  public void setUseSingleProcess(String useSingleProcess) {
+    this.useSingleProcess = useSingleProcess;
   }
 
   public void setLogLevel(String logLevel) {

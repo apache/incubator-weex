@@ -48,7 +48,11 @@ class RenderContextImpl implements RenderContext {
 
   public void destroy() {
     mWXSDKInstance = null;
-    mRegistry.clear();
+    try {
+      mRegistry.clear();
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
   }
 
   public WXSDKInstance getWXSDKInstance() {
@@ -69,6 +73,7 @@ class RenderContextImpl implements RenderContext {
     mRegistry.put(ref, comp);
   }
 
+  @Override
   public WXComponent unregisterComponent(String ref) {
     return mRegistry.remove(ref);
   }

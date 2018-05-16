@@ -71,6 +71,8 @@ public class WXPerformance {
     fsCallNativeTotalTime(0D, 5000D),
     fsCallNativeTotalNum(0D, Double.MAX_VALUE),
     fsCallEventTotalNum(0D, Double.MAX_VALUE),
+    fsComponentCount(0D,100000D),
+    fsComponentCreateTime(0D,Double.MAX_VALUE),
     fsRenderTime(0D, 5000D),
     fsRequestNum(0D, 100D),
     callCreateFinishTime(0D, 10000D),
@@ -78,7 +80,8 @@ public class WXPerformance {
     communicateTotalTime(0D, 5000D),
     maxDeepViewLayer(0D, Double.MAX_VALUE),
     maxDeepVDomLayer(0D, Double.MAX_VALUE),
-    componentCount(0D, Double.MAX_VALUE),
+    componentCount(0D, 1000000),
+    componentCreateTime(0D,Double.MAX_VALUE),
     avgFps(0D, 61D),
     timerCount(0D, Double.MAX_VALUE),
 
@@ -145,7 +148,7 @@ public class WXPerformance {
   public String templateUrl;
 
   @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-  public String cacheType = "unknown";
+  public String cacheType = "none";
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
   public long renderTimeOrigin;
@@ -173,6 +176,10 @@ public class WXPerformance {
   public int fsCallNativeTotalNum;
 
   public int fsRequestNum;
+
+  public int fsComponentCount;
+
+  public int fsComponentCreateTime;
 
   public int cellExceedNum;
 
@@ -298,6 +305,7 @@ public class WXPerformance {
    */
   public long componentCount;
 
+  public long componentCreateTime;
   /**
    * Version of JavaScript libraray
    */
@@ -328,7 +336,7 @@ public class WXPerformance {
   public String args="";
 
   public String connectionType;
-  public String requestType;
+  public String requestType="other";
 
   public String zCacheInfo;
 
@@ -408,12 +416,15 @@ public class WXPerformance {
     quotas.put(Measure.fsCallJsTotalNum.toString(), (double) fsCallJsTotalNum);
     quotas.put(Measure.fsCallNativeTotalTime.toString(), (double) fsCallNativeTotalTime);
     quotas.put(Measure.fsCallNativeTotalNum.toString(), (double) fsCallNativeTotalNum);
+    quotas.put(Measure.fsComponentCount.toString(),(double)fsComponentCount);
+    quotas.put(Measure.fsComponentCreateTime.toString(),(double)fsComponentCreateTime);
     quotas.put(Measure.fsRenderTime.toString(), fsRenderTime);
     quotas.put(Measure.fsRequestNum.toString(), (double) fsRequestNum);
     quotas.put(Measure.communicateTotalTime.toString(), totalTime);
     quotas.put(Measure.maxDeepViewLayer.toString(), (double) maxDeepViewLayer);
     quotas.put(Measure.maxDeepVDomLayer.toString(), (double) maxDeepVDomLayer);
     quotas.put(Measure.componentCount.toString(), (double) componentCount);
+    quotas.put(Measure.componentCreateTime.toString(),(double)componentCreateTime);
     quotas.put(Measure.cellExceedNum.toString(), (double) cellExceedNum);
     quotas.put(Measure.timerCount.toString(), (double) timerInvokeCount);
     quotas.put(Measure.avgFps.toString(), (double) avgFPS);

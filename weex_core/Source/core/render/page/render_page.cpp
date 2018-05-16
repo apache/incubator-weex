@@ -34,6 +34,8 @@
 #include <core/render/action/render_action_add_event.h>
 #include <core/render/action/render_action_remove_event.h>
 #include <core/css/constants_value.h>
+#include <core/render/node/factory/render_type.h>
+#include <core/render/node/render_list.h>
 #include "render_page.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
@@ -366,7 +368,7 @@ namespace WeexCore {
     for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
       render->UpdateAttr((*iter).first, (*iter).second);
     }
-
+    Batch();
     if (attrs != nullptr) {
       attrs->clear();
       attrs->shrink_to_fit();
@@ -507,20 +509,35 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion) {
+  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion, bool willLayout) {
     if (child == nullptr || parent == nullptr)
       return;
+    if(parent != nullptr && parent->Type() == WeexCore::kRenderRecycleList){
+        willLayout = false;
+    }
 
-    render_action *action = new RenderActionAddElement(PageId(), child, parent, index);
+    render_action *action = new RenderActionAddElement(PageId(), child, parent, index, willLayout);
     PostRenderAction(action);
 
     Index i = 0;
     for(auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd(); it++) {
       RenderObject* grandson = static_cast<RenderObject*>(*it);
       if (grandson != nullptr) {
-        SendAddElementAction(grandson, child, i, true);
+        SendAddElementAction(grandson, child, i, true, willLayout);
       }
       ++i;
+    }
+
+    if(child->Type() == WeexCore::kRenderRecycleList){
+      RenderList* renderList = (RenderList*)child;
+      std::vector<RenderObject*>& cellSlots = renderList->CellSlots();
+      for(auto it = cellSlots.begin(); it != cellSlots.end(); it++) {
+        RenderObject* grandson = static_cast<RenderObject*>(*it);
+        if (grandson != nullptr) {
+          SendAddElementAction(grandson, child, -1, true, willLayout);
+        }
+        ++i;
+      }
     }
 
     if (!is_recursion && i > 0 && child->IsAppendTree()) {

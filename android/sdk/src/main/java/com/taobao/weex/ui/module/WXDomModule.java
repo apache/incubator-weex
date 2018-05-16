@@ -23,10 +23,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.binding.JSONUtils;
 import com.taobao.weex.ui.action.ActionAddRule;
 import com.taobao.weex.ui.action.ActionGetComponentRect;
 import com.taobao.weex.ui.action.ActionInvokeMethod;
 import com.taobao.weex.ui.action.GraphicActionScrollToElement;
+import com.taobao.weex.ui.action.UpdateComponentDataAction;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -45,6 +47,8 @@ public final class WXDomModule extends WXModule {
   public static final String GET_COMPONENT_RECT = "getComponentRect";
   public static final String WXDOM = "dom";
   public static final String INVOKE_METHOD = "invokeMethod";
+
+  public static final String UPDATE_COMPONENT_DATA = "updateComponentData";
 
   /**
    * Methods expose to js. Every method which will be called in js should add to this array.
@@ -108,6 +112,12 @@ public final class WXDomModule extends WXModule {
                   .executeAction();
           break;
         }
+        case UPDATE_COMPONENT_DATA:
+          if(args == null || args.size() < 3){
+            return null;
+          }
+          new UpdateComponentDataAction(mWXSDKInstance.getInstanceId(), args.getString(0), JSONUtils.toJSON(args.get(1)), args.getString(2)).executeAction();
+          break;
         default:
           WXLogUtils.e("Unknown dom action.");
           break;
