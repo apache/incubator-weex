@@ -53,8 +53,9 @@ public:
     initFromParam(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
 
     static jint
-    initFrameworkInSingleProcess(JNIEnv *env, jstring script, jobject params);
-    static jint initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params);
+    initFrameworkInSingleProcess(JNIEnv *env, jstring script,
+                                    const std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams);
+    static jint initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
 
     static const char *getCacheDir(JNIEnv *env);
 

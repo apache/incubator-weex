@@ -156,9 +156,9 @@ namespace WeexCore {
 
             mIsPreCalculateCellWidth = true;
             if(getColumnCount() > 0 || getColumnWidth() > 0 || mColumnCount > COLUMN_COUNT_NORMAL){
-                attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, std::to_string(mColumnCount)));
-                attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, std::to_string(mColumnGap)));
-                attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, std::to_string(mColumnWidth)));
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, to_string(mColumnCount)));
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, to_string(mColumnGap)));
+                attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, to_string(mColumnWidth)));
             }
         }
         return attrs;
@@ -205,11 +205,11 @@ namespace WeexCore {
     void AddRenderObjectWidth(RenderObject *child, const bool updating) {
         if (Type() == kRenderWaterfall || Type() == kRenderRecycleList) {
             if(child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
-                child->ApplyStyle(WIDTH, std::to_string(mAvailableWidth), updating);
+                child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
             } else if (child->getStypePositionType() == kSticky) {
-                child->ApplyStyle(WIDTH, std::to_string(GetViewPortWidth()), updating);
+                child->ApplyStyle(WIDTH, to_string(GetViewPortWidth()), updating);
             } else if (child->Type() == kRenderCell || child->Type() == kRenderCellSlot){
-                child->ApplyStyle(WIDTH, std::to_string(mColumnWidth), updating);
+                child->ApplyStyle(WIDTH, to_string(mColumnWidth), updating);
             }
         }
     }

@@ -94,6 +94,10 @@ public class WXPerformance {
     measureTime4(0D, Double.MAX_VALUE),
     measureTime5(0D, Double.MAX_VALUE),
 
+    callBridgeTime(0D, Double.MAX_VALUE),
+    cssLayoutTime(0D, Double.MAX_VALUE),
+    parseJsonTime(0D, Double.MAX_VALUE),
+
     communicateTime(0D, 5000D),
     screenRenderTime(0D, 5000D),
     totalTime(0D, 5000D),
@@ -234,7 +238,7 @@ public class WXPerformance {
   /**
    * Call native Time spent when rendering first screen
    */
-  public long callNativeTime;
+  public long callBridgeTime;
 
   /**
    * Create Instance Time spent when rendering first screen
@@ -244,23 +248,7 @@ public class WXPerformance {
   /**
    * Call native Time spent when rendering first screen
    */
-  public long batchTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
   public long parseJsonTime;
-
-  /**
-   * UpdateDomObj Time spent when rendering first screen
-   */
-  public long updateDomObjTime;
-
-  /**
-   * ApplyUpdate Time spent when rendering first screen
-   */
-  public long applyUpdateTime;
-
 
   /**
    * CssLayout Time spent when rendering first screen
@@ -362,27 +350,8 @@ public class WXPerformance {
   /**
    * RenderAction
    */
-  public int mCallCreateBodySumTime = 0;
-  public int mCallAddElementSumTime = 0;
-
-  public int mCallLayoutSumTime = 0;
-  public int mCallLayoutUpdateDemissionSumTime = 0;
-  public int mCallLayoutApplyLayoutAndEventSumTime = 0;
-  public int mCallLayoutBindDataSumTime = 0;
-
-  public int mActionTotalSumTime = 0;
-  public int mActionLayoutCount = 0;
-  public int mActionLayoutSumTime = 0;
-
   public int mActionAddElementCount = 0;
   public int mActionAddElementSumTime = 0;
-
-  public int mActionCreateBodyCount = 0;
-  public int mActionCreateBodySumTime = 0;
-
-  public int mActionOtherCount = 0;
-  public int mActionOtherSumTime = 0;
-
 
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
@@ -437,6 +406,10 @@ public class WXPerformance {
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
     quotas.put(Measure.imgSizeCount.toString(), wrongImgSizeCount);
     quotas.put(Measure.interactionTime.toString(), (double) interactionTime);
+
+    quotas.put(Measure.callBridgeTime.toString(), (double) callBridgeTime);
+    quotas.put(Measure.cssLayoutTime.toString(), (double) cssLayoutTime);
+    quotas.put(Measure.parseJsonTime.toString(), (double) parseJsonTime);
 
     // TODO the following attribute is no longer needed and will be deleted soon.
     quotas.put(Measure.screenRenderTime.toString(), (double) screenRenderTime);
@@ -557,13 +530,5 @@ public class WXPerformance {
   }
 
   public void afterInstanceDestroy(String instanceId) {
-  }
-
-  public int renderSumTime() {
-    return mActionAddElementSumTime + mActionCreateBodySumTime + mActionLayoutSumTime + mActionOtherSumTime;
-  }
-
-  public int renderSumCount() {
-    return mActionAddElementCount + mActionCreateBodyCount + mActionLayoutCount + mActionOtherCount;
   }
 }

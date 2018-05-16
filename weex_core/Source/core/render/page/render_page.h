@@ -24,6 +24,7 @@
 #include <map>
 #include <jni.h>
 #include <cmath>
+#include <atomic>
 
 namespace WeexCore {
 
@@ -102,29 +103,15 @@ namespace WeexCore {
 
     void Batch();
 
-    void JniCallTime(const long long &time);
-
     void CssLayoutTime(const long long &time);
-
-    void AddEventActionJNITime(const long long &time);
-
-    void RemoveEventActionJNITime(const long long &time);
-
-    void AddElementActionJNITime(const long long &time);
-
-    void LayoutActionJniTime(const long long &time);
 
     void ParseJsonTime(const long long &time);
 
-    void BuildRenderTreeTime(const long long &time);
-
-    void CreateJMapJNITime(const long long &time);
-
     void CallBridgeTime(const long long &time);
 
-    int PrintFirstScreenLog();
+    std::vector<long> PrintFirstScreenLog();
 
-    int PrintRenderSuccessLog();
+    std::vector<long> PrintRenderSuccessLog();
 
     void LayoutImmediately();
 
@@ -138,10 +125,6 @@ namespace WeexCore {
     }
 
     void SetRootRenderObject(RenderObject *root);
-
-    inline RenderObject * GetRootRenderObject() const {
-      return render_root;
-    }
 
     inline std::string PageId() {
       return mPageId;

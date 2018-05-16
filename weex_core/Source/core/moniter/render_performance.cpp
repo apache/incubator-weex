@@ -17,34 +17,29 @@
  * under the License.
  */
 #include "render_performance.h"
-#include <android/base/log_utils.h>
 
 namespace WeexCore {
 
-  int
-  RenderPerformance::PrintPerformanceLogImplAndroid(const PerformanceStage &performanceStage) {
+  std::vector<long> RenderPerformance::PrintPerformanceLog(PerformanceStage performanceStage) {
 
-#if PERFORMANCE_LOG
+    std::vector<long> ret(3);
 
     if (performanceStage == onFirstScreen) {
-      LOGD("[WeexCore render time]onFirstScreen");
+      firstScreenCallBridgeTime = callBridgeTime;
+      firstScreenCssLayoutTime = cssLayoutTime;
+      firstScreenParseJsonTime = parseJsonTime;
+      ret[0] = firstScreenCallBridgeTime;
+      ret[1] = firstScreenCssLayoutTime;
+      ret[2] = firstScreenParseJsonTime;
     } else {
-      LOGD("[WeexCore render time]onRenderSuccess");
+      onRenderSuccessCallBridgeTime = callBridgeTime;
+      onRenderSuccessCssLayoutTime = cssLayoutTime;
+      onRenderSuccessParseJsonTime = parseJsonTime;
+      ret[0] = onRenderSuccessCallBridgeTime;
+      ret[1] = onRenderSuccessCssLayoutTime;
+      ret[2] = onRenderSuccessParseJsonTime;
     }
-    LOGD("[WeexCore render time]      jniCallTime: %lld", jniCallTime);
-    LOGD("[WeexCore render time]        -addElementActionJNITime: %lld", addElementActionJNITime);
-    LOGD("[WeexCore render time]         layoutActionJNITime: %lld", layoutActionJniTime);
-    LOGD("[WeexCore render time]        -jniCallBridgeTime: %lld", jniCallBridgeTime);
-    LOGD("[WeexCore render time]         createJMapJNITime: %lld", createJMapJNITime);
-    LOGD("[WeexCore render time]      cssLayoutTime: %lld", cssLayoutTime);
-    LOGD("[WeexCore render time]      parseJsonTime: %lld", parseJsonTime);
-    LOGD("[WeexCore render time]      buildRenderObjectTime: %lld", buildRenderObjectTime);
-#endif
 
-    return cssLayoutTime;
-  }
-
-  int RenderPerformance::PrintPerformanceLogImplIOS(const PerformanceStage &performanceStage) {
-    return 0;
+    return ret;
   }
 }
