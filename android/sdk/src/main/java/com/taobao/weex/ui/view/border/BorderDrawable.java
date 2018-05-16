@@ -438,6 +438,10 @@ public class BorderDrawable extends Drawable {
       mRectBounds.set(getBounds());
     }
 
+    if (null == mBorderWidth) {
+      return;
+    }
+
     final float leftBorderWidth = mBorderWidth.get(EDGE.LEFT);
     final float topBorderWidth = mBorderWidth.get(EDGE.TOP);
     final float bottomBorderWidth = mBorderWidth.get(EDGE.BOTTOM);
