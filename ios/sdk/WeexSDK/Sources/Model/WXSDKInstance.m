@@ -50,6 +50,7 @@
 #import "WXBridgeContext.h"
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
+#import "WXPageEventNotifyEvent.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -263,6 +264,11 @@ typedef enum : NSUInteger {
         self.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:mainBundleString];
     }
     
+    id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEvent respondsToSelector:@selector(pageDestroy:)]) {
+        [pageEvent pageStart:self.instanceId];
+    }
+
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
     WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
     

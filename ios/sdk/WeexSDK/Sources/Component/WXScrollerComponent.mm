@@ -31,6 +31,7 @@
 #import "WXComponent+Events.h"
 #import "WXScrollerComponent+Layout.h"
 #import "WXCoreLayout.h"
+#import "WXPageEventNotifyEvent.h"
 
 @interface WXScrollerComponentView:UIScrollView
 @end
@@ -99,6 +100,8 @@
     
     BOOL _shouldNotifiAppearDescendantView;
     BOOL _shouldRemoveScrollerListener;
+    CGPoint _scrollStartPoint;
+    CGPoint _scrollEndPoint;
 
     //css_node_t *_scrollerCSSNode;
     
@@ -614,6 +617,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         [_refreshComponent setIndicatorHidden:NO];
     }
     
+    _scrollStartPoint = scrollView.contentOffset;
+    
     if (_scrollStartEvent) {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
@@ -729,6 +734,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
             NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
             [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        }
+    }
+    if (!_isScrolling) {
+        _scrollEndPoint = scrollView.contentOffset;
+        id<WXPageEventNotifyEventProtocol> eventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+        if ([eventNotify respondsToSelector:@selector(notifyScrollEvent:from:to:)]) {
+            [eventNotify notifyScrollEvent:self.weexInstance.instanceId from:_scrollStartPoint to:_scrollEndPoint];
         }
     }
     
