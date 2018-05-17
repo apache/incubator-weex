@@ -609,8 +609,8 @@
 		DCE2CF9B1F46D4220021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCE2CF9C1F46D4310021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCE2CF9D1F46D4370021BDC4 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */; };
-		DCE7F1EF20AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; };
-		DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; };
+		DCE7F1EF20AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCEA54621F2B7DB4000ECB23 /* WXTracingManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCEA54631F2B7DBA000ECB23 /* WXTracingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */; };
 		DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */; };
