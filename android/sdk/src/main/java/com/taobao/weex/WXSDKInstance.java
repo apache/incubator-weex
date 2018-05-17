@@ -171,16 +171,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private ComponentObserver mComponentObserver;
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
-  private boolean hasLayerLimit = false;
-
-  public void setLayerLimit(boolean hasLayerLimit) {
-    this.hasLayerLimit = hasLayerLimit;
-  }
-
-  public boolean isLayerLimit() {
-    return hasLayerLimit;
-  }
-
   /**
    * set make weexCore run in single process mode
    * @param flag true means weexCore run in single process mode or multi process mode

@@ -322,6 +322,8 @@ public class Constants {
 
     String ON_TRANSITION_END = "transitionEnd";
 
+    String LAYEROVERFLOW = "layeroverflow";
+
     interface SLOT_LIFECYCLE {
       String CREATE = "create";
       String ATTACH = "attach";

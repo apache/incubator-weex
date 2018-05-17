@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -101,30 +101,26 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    if (getComponent() != null && getComponent().getInstance().isLayerLimit()) {
-      try {
-        dispatchDrawInterval(canvas);
-      } catch (StackOverflowError e) {
+    try {
+      dispatchDrawInterval(canvas);
+    } catch (Throwable e) {
+      if (getComponent() != null) {
+        getComponent().notifyLayerOverFlow();
         reportLayerOverFlowError();
-        WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
       }
-    } else {
-      try {
-        dispatchDrawInterval(canvas);
-      } catch (StackOverflowError e){
-        reportLayerOverFlowError();
-        WXLogUtils.e("FlatGUI Crashed when dispatchDraw", WXLogUtils.getStackTrace(e));
-      }
+      WXLogUtils.e("Layer overflow limit error", WXLogUtils.getStackTrace(e));
     }
   }
 
   private int reportLayerOverFlowError() {
     int deep = calLayerDeep(this, 0);
-    WXExceptionUtils.commitCriticalExceptionRT(getComponent().getInstanceId(),
-            WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW,
-            "draw android view",
-            WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW.getErrorMsg() + "Layer overflow limit error: " + deep + " layers!",
-            null);
+    if (getComponent() != null) {
+      WXExceptionUtils.commitCriticalExceptionRT(getComponent().getInstanceId(),
+              WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW,
+              "draw android view",
+              WXErrorCode.WX_RENDER_ERR_LAYER_OVERFLOW.getErrorMsg() + "Layer overflow limit error: " + deep + " layers!",
+              null);
+    }
     return deep;
   }
 
@@ -139,13 +135,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
     } else {
       WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
       super.dispatchDraw(canvas);
-    }
-  }
-
-  static class LayerOverFlowLimitException extends RuntimeException {
-
-    public LayerOverFlowLimitException(String message) {
-      super(message);
     }
   }
 

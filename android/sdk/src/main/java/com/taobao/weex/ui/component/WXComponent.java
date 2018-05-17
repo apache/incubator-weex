@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.support.v4.util.ArraySet;
 import com.taobao.weex.dom.CSSShorthand.CORNER;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,6 +26,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -296,7 +296,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    */
   public void addEvent(final String type) {
     if (mAppendEvents == null) {
-      mAppendEvents = new ArraySet<>();
+      mAppendEvents = new HashSet<>();
     }
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
@@ -332,7 +332,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           mGesture.setPreventMoveEvent(isPreventMove);
         }
         if (mGestureType == null) {
-          mGestureType = new ArraySet<>();
+          mGestureType = new HashSet<>();
         }
         mGestureType.add(type);
         ((WXGestureObservable)view).registerGestureListener(mGesture);
@@ -1184,7 +1184,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         @Override
         public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
           super.onInitializeAccessibilityNodeInfo(host, info);
-          info.setRoleDescription(finalRole);
+          try {
+            info.setRoleDescription(finalRole);
+          } catch (Exception e) {
+            WXLogUtils.e("SetRole failed!");
+          }
         }
       };
       ViewCompat.setAccessibilityDelegate(host, delegate);
