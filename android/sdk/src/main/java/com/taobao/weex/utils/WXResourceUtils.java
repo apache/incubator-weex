@@ -277,7 +277,7 @@ public class WXResourceUtils {
       Shader shader = new LinearGradient(points[0], points[1],
               points[2], points[3],
               getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
-              Shader.TileMode.REPEAT);
+              Shader.TileMode.CLAMP);
       return shader;
     }
     return null;
