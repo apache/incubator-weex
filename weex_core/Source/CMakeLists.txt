@@ -24,7 +24,6 @@ include_directories("include")
 
 add_library(weexjsc SHARED
 
-    ./base/fpconv.cpp
     ./android/jniprebuild/jni_load.cc
     ./android/base/jni/android_jni.cpp
     ./android/base/jni/scoped_java_ref.cpp

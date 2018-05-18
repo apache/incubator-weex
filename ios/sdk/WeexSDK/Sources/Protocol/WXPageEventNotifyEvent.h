@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,18 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "render_action_update_attr.h"
 
-namespace WeexCore {
+#import "WXJSExceptionInfo.h"
 
-  RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string>> *mAttrs) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mAttrs = mAttrs;
-  }
+@protocol WXPageEventNotifyEventProtocol <NSObject>
 
-  void RenderActionUpdateAttr::ExecuteAction() {
-    Bridge_Impl_Android::getInstance()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
-  }
-}
+- (void)hitTest:(CGPoint)point withEvent:(UIEvent *)event withView:(UIView*)view;
+
+- (void)notifyScrollEvent:(NSString*)instanceId from:(CGPoint)from to:(CGPoint)to;
+
+- (void)pageStart:(NSString*)instanceId;
+
+- (void)pageDestroy:(NSString*)instanceId;
+
+@end

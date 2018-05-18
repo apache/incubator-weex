@@ -33,6 +33,7 @@
 #include <core/css/constants_value.h>
 #include <android/base/log_utils.h>
 #include <android/bridge/impl/bridge_impl_android.h>
+#include <functional>
 
 
 #define JSON_OBJECT_MARK_CHAR  '{'

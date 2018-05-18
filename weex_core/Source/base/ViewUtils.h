@@ -22,6 +22,7 @@
 #include <core/config/core_environment.h>
 #include <cmath>
 #include <cstdlib>
+#include <sstream>
 
 namespace WeexCore {
 
@@ -31,6 +32,13 @@ namespace WeexCore {
   const std::string SCALE("scale");
   const std::string AUTO_UNIT("auto");
   const std::string NONE("none");
+
+  template<typename T>
+  inline std::string to_string(const T &n) {
+    std::ostringstream stm;
+    stm << n;
+    return stm.str();
+  }
 
   inline std::string &Trim(std::string &s) {
     if (s.empty()) {

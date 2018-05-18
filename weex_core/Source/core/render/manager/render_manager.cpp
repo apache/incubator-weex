@@ -34,12 +34,13 @@ namespace WeexCore {
 
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
+
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     RenderObject *root = Json2RenderObject(c_data, pageId);
-    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
-    page->BuildRenderTreeTime(getCurrentTime() - startTime);
+
+    page->updateDirty(true);
     return page->CreateRootRender(root);
   }
 
@@ -59,7 +60,7 @@ namespace WeexCore {
     char *c_data = (char *) data.data();
     RenderObject *child = Json2RenderObject(c_data, pageId);
     page->ParseJsonTime(getCurrentTime() - startTime);
-    page->BuildRenderTreeTime(getCurrentTime() - startTime);
+
     if (child == nullptr)
       return false;
 
@@ -111,9 +112,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     std::vector<std::pair<std::string, std::string>> *attrs = Json2Pairs(c_data);
-    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
-    page->BuildRenderTreeTime(getCurrentTime() - startTime);
+
+    page->updateDirty(true);
     return page->UpdateAttr(ref, attrs);
   }
 
@@ -131,9 +132,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
     char *c_data = (char *) data.data();
     std::vector<std::pair<std::string, std::string>> *styles = Json2Pairs(c_data);
-    page->updateDirty(true);
     page->ParseJsonTime(getCurrentTime() - startTime);
-    page->BuildRenderTreeTime(getCurrentTime() - startTime);
+
+    page->updateDirty(true);
     return page->UpdateStyle(ref, styles);
   }
 

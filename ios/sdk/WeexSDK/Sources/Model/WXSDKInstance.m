@@ -50,6 +50,7 @@
 #import "WXBridgeContext.h"
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
+#import "WXPageEventNotifyEvent.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -78,6 +79,7 @@ typedef enum : NSUInteger {
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
     CGFloat _defaultPixelScaleFactor;
+    BOOL _bReleaseInstanceInMainThread;
 }
 
 - (void)dealloc
@@ -124,6 +126,7 @@ typedef enum : NSUInteger {
             _syncDestroyComponentManager = [[configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL] boolValue];
         }
         _defaultPixelScaleFactor = CGFLOAT_MIN;
+        _bReleaseInstanceInMainThread = YES;
         
         [self addObservers];
     }
@@ -263,6 +266,11 @@ typedef enum : NSUInteger {
         self.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:mainBundleString];
     }
     
+    id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEvent respondsToSelector:@selector(pageStart:)]) {
+        [pageEvent pageStart:self.instanceId];
+    }
+
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
     WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
     
@@ -313,7 +321,10 @@ typedef enum : NSUInteger {
         [WXTextComponent setRenderUsingCoreText:useCoreText];
         BOOL useThreadSafeLock = [[configCenter configForKey:@"iOS_weex_ext_config.useThreadSafeLock" defaultValue:@YES isDefault:NULL] boolValue];
         [WXUtility setThreadSafeCollectionUsingLock:useThreadSafeLock];
-        
+
+        //Reading config from orange for Release instance in Main Thread or not
+        _bReleaseInstanceInMainThread = [[configCenter configForKey:@"iOS_weex_ext_config.releaseInstanceInMainThread" defaultValue:@(YES) isDefault:nil] boolValue];
+
         BOOL shoudMultiContext = NO;
         shoudMultiContext = [[configCenter configForKey:@"iOS_weex_ext_config.createInstanceUsingMutliContext" defaultValue:@(YES) isDefault:NULL] boolValue];
         if(shoudMultiContext && ![WXSDKManager sharedInstance].multiContext) {
@@ -472,6 +483,10 @@ typedef enum : NSUInteger {
         return;
     }
     
+    id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEvent respondsToSelector:@selector(pageDestroy:)]) {
+        [pageEvent pageDestroy:self.instanceId];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_WILL_DESTROY_NOTIFICATION object:nil userInfo:@{@"instanceId":self.instanceId}];
     
     [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
@@ -494,7 +509,15 @@ typedef enum : NSUInteger {
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
         [strongSelf.componentManager unload];
-        [WXSDKManager removeInstanceforID:strongSelf.instanceId];
+        //Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
+        if (!_bReleaseInstanceInMainThread) {
+            [WXSDKManager removeInstanceforID:strongSelf.instanceId];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [WXSDKManager removeInstanceforID:strongSelf.instanceId];
+            });
+        }
+        //+}
     });
     if(url.length > 0){
         [WXPrerenderManager addGlobalTask:url callback:nil];

@@ -577,14 +577,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
 
-    long start = System.currentTimeMillis();
     long parseNanos = System.nanoTime();
     JSONArray array = JSON.parseArray(tasks);
     parseNanos = System.nanoTime() - parseNanos;
-
-    if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-      WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
-    }
 
     if (null != array && array.size() > 0) {
       int size = array.size();
@@ -2279,7 +2274,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    WXSDKManager.getInstance().getSDKInstance(pageId).callCreateBodyTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -2328,7 +2322,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    WXSDKManager.getInstance().getSDKInstance(pageId).callAddElementTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -2569,7 +2562,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXLogUtils.getStackTrace(e), null);
     }
 
-    WXSDKManager.getInstance().getSDKInstance(pageId).callLayoutTime(System.currentTimeMillis() - start);
     return IWXBridge.INSTANCE_RENDERING;
   }
 
@@ -2690,12 +2682,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mWXBridge.setStyleHeight(instanceId, ref, value);
   }
 
-  public int printFirstScreenRenderTime(String instanceId) {
-    return mWXBridge.printFirstScreenRenderTime(instanceId);
+  public long[] getFirstScreenRenderTime(String instanceId) {
+    return mWXBridge.getFirstScreenRenderTime(instanceId);
   }
 
-  public int printRenderFinishTime(String instanceId) {
-    return mWXBridge.printRenderFinishTime(instanceId);
+  public long[] getRenderFinishTime(String instanceId) {
+    return mWXBridge.getRenderFinishTime(instanceId);
   }
 
   public void setViewPortWidth(String instanceId, float value) {

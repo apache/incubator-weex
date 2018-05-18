@@ -17,6 +17,7 @@
  * under the License.
  */
 #include "layout.h"
+#include <tuple>
 
 using namespace WeexCore;
 

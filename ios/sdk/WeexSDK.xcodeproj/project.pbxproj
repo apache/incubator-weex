@@ -609,6 +609,8 @@
 		DCE2CF9B1F46D4220021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCE2CF9C1F46D4310021BDC4 /* WXVoiceOverModule.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCE2CF9D1F46D4370021BDC4 /* WXVoiceOverModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */; };
+		DCE7F1EF20AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCEA54621F2B7DB4000ECB23 /* WXTracingManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCEA54631F2B7DBA000ECB23 /* WXTracingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */; };
 		DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */; };
@@ -977,6 +979,7 @@
 		DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionProtocol.h; sourceTree = "<group>"; };
 		DCE2CF981F46D4220021BDC4 /* WXVoiceOverModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVoiceOverModule.m; sourceTree = "<group>"; };
 		DCE2CF991F46D4220021BDC4 /* WXVoiceOverModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXVoiceOverModule.h; sourceTree = "<group>"; };
+		DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXPageEventNotifyEvent.h; path = Protocol/WXPageEventNotifyEvent.h; sourceTree = "<group>"; };
 		DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInvocationConfig.h; sourceTree = "<group>"; };
 		DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInvocationConfig.m; sourceTree = "<group>"; };
 		DCF0CD9D1EAF3A6B0062CA8F /* native-bundle-main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "native-bundle-main.js"; path = "../../../../pre-build/native-bundle-main.js"; sourceTree = "<group>"; };
@@ -1345,6 +1348,7 @@
 				746A2F431DF82607004719D0 /* Network */,
 				77D1611C1C02DD3C0010B15B /* Protocol */,
 				74C27A001CEC4371004E488E /* Supporting Files */,
+				DCE7F1EE20AD358A00D471E7 /* WXPageEventNotifyEvent.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1803,6 +1807,7 @@
 				77D161301C02DE4E0010B15B /* WXComponent.h in Headers */,
 				2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */,
 				744BEA551D05178F00452B5D /* WXComponent+Display.h in Headers */,
+				DCE7F1EF20AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */,
 				741081231CED6756001BC6E5 /* WXComponentFactory.h in Headers */,
 				59D3CA4A1CFC3CE1008835DC /* NSTimer+Weex.h in Headers */,
 				C4424E5B1F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h in Headers */,
@@ -1893,6 +1898,7 @@
 				C42E8FAD1F3C7C3F001EBE9D /* WXExtendCallNativeManager.h in Headers */,
 				DCA445CB1EFA590600D0CFA8 /* WXComponent+Layout.h in Headers */,
 				DCA4460F1EFA5A8100D0CFA8 /* WXDiffUtil.h in Headers */,
+				DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */,
 				DCA445F91EFA5A3700D0CFA8 /* WXClipboardModule.h in Headers */,
 				DCA445FD1EFA5A4000D0CFA8 /* WXAnimationModule.h in Headers */,
 				DCA446101EFA5A8500D0CFA8 /* WXBridgeMethod.h in Headers */,

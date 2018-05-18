@@ -75,10 +75,10 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
     jboolean wrap,
     jstring instanceId);
 
-static jint PrintFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
+static jlongArray GetFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
-static jint PrintRenderFinishTime(JNIEnv* env, jobject jcaller,
+static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
     jstring instanceId);
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
@@ -220,16 +220,16 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(SetRenderContainerWrapContent) },
-    { "nativePrintFirstScreenRenderTime",
+    { "nativeGetFirstScreenRenderTime",
 "("
 "Ljava/lang/String;"
 ")"
-"I", reinterpret_cast<void*>(PrintFirstScreenRenderTime) },
-    { "nativePrintRenderFinishTime",
+"[J", reinterpret_cast<void*>(GetFirstScreenRenderTime) },
+    { "nativeGetRenderFinishTime",
 "("
 "Ljava/lang/String;"
 ")"
-"I", reinterpret_cast<void*>(PrintRenderFinishTime) },
+"[J", reinterpret_cast<void*>(GetRenderFinishTime) },
     { "nativeSetDefaultHeightAndWidthIntoRootDom",
 "("
 "Ljava/lang/String;"

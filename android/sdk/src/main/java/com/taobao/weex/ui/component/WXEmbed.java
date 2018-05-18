@@ -333,8 +333,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       return sdkInstance;
     }
 
-    sdkInstance.setLayerLimit(getInstance().isLayerLimit());
-
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
             url,
             null, null,

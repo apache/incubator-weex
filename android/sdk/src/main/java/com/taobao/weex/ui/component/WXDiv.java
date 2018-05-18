@@ -120,15 +120,4 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
   public boolean isVirtualComponent() {
     return !promoteToView(true);
   }
-
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.LAYERLIMIT:
-      case Constants.Name.LAYER_LIMIT:
-        getInstance().setLayerLimit(WXUtils.getBoolean(param, false));
-        return true;
-    }
-    return super.setProperty(key, param);
-  }
 }

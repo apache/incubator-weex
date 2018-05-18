@@ -178,12 +178,18 @@ public class WXViewUtils {
 
   public static int getScreenHeight(Context cxt) {
     if(cxt!=null){
+      Resources res = cxt.getResources();
       mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
+      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
+        mScreenWidth = res
+                .getDisplayMetrics()
+                .widthPixels;
+        mScreenHeight = mScreenHeight > mScreenWidth ? mScreenHeight : mScreenWidth;
+      }
     } else if (WXEnvironment.isApkDebugable()){
       throw new WXRuntimeException("Error Context is null When getScreenHeight");
     }
     return mScreenHeight;
-
   }
 
   /**

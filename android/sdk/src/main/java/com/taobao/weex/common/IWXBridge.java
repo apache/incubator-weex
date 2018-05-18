@@ -120,11 +120,11 @@ public interface IWXBridge extends IWXObject {
   void reportServerCrash(String instanceId, String crashFile);
 
 
-  public int callCreateBody(String instanceId, String componentType, String ref,
+  int callCreateBody(String instanceId, String componentType, String ref,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders);
 
-  public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
+  int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders, boolean willLayout);
 
@@ -136,7 +136,7 @@ public interface IWXBridge extends IWXObject {
 
   int callRemoveEvent(String instanceId, String ref, String event);
 
-  public int callUpdateStyle(String instanceId, String ref,
+  int callUpdateStyle(String instanceId, String ref,
                              HashMap<String, Object> styles,
                              HashMap<String, String> paddings,
                              HashMap<String, String> margins,
@@ -161,9 +161,9 @@ public interface IWXBridge extends IWXObject {
 
   void setRenderContainerWrapContent(boolean wrap, String instanceId);
 
-  int printFirstScreenRenderTime(String instanceId);
+  long[] getFirstScreenRenderTime(String instanceId);
 
-  int printRenderFinishTime(String instanceId);
+  long[] getRenderFinishTime(String instanceId);
 
   void setDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
 

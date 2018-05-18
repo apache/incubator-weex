@@ -18,11 +18,14 @@
  */
 package com.taobao.weex.dom;
 
-import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
-import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
-import static java.lang.Boolean.parseBoolean;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import com.taobao.weex.common.Constants;
@@ -35,11 +38,10 @@ import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+
+import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
+import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
+import static java.lang.Boolean.parseBoolean;
 
 /**
  * store value of component attribute
@@ -53,6 +55,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
    * static attrs
    * */
   private @NonNull Map<String, Object> attr;
+  private Map<String, Object> writeAttr;
 
   /**
    * dynamic binding attrs, can be null, only weex use
@@ -401,6 +404,13 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public Object get(Object key) {
+    Map<String, Object> temp = writeAttr;
+    if (null != temp) {
+      Object obj = temp.get(key);
+      if (null != obj) {
+        return obj;
+      }
+    }
     return attr.get(key);
   }
 
@@ -425,7 +435,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.attr.putAll(map);
+    //this.attr.putAll(map);
+    if (this.writeAttr == null) {
+      this.writeAttr = new ArrayMap<>();
+    }
+    this.writeAttr.putAll(map);
   }
 
   @Override
@@ -467,14 +481,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     this.mStatement = mStatement;
   }
 
-
-
   public void parseStatements(){
     if(this.attr != null){
        this.attr = filterStatementsFromAttrs(this.attr);
     }
   }
-
 
   /**
    * filter dynamic state ment
@@ -548,6 +559,14 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public void skipFilterPutAll(Map<String,Object> attrs){
     this.attr.putAll(attrs);
+  }
+
+  @UiThread
+  public void mergeAttr() {
+    if (null != this.writeAttr) {
+      this.attr.putAll(this.writeAttr);
+      this.writeAttr = null;
+    }
   }
 
   @Override

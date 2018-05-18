@@ -172,17 +172,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private ComponentObserver mComponentObserver;
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
-  private boolean hasLayerLimit = false;
-
   private Map<String, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
-
-  public void setLayerLimit(boolean hasLayerLimit) {
-    this.hasLayerLimit = hasLayerLimit;
-  }
-
-  public boolean isLayerLimit() {
-    return hasLayerLimit;
-  }
 
   /**
    * set make weexCore run in single process mode
@@ -1122,14 +1112,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     firstScreenRenderFinished();
 
     long time = System.currentTimeMillis() - mRenderStartTime;
+    long[] renderFinishTime = WXBridgeManager.getInstance().getRenderFinishTime(getInstanceId());
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
-    WXLogUtils.renderPerformanceLog("   firstCallAddElementSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementSumTime);
-    WXLogUtils.renderPerformanceLog("   firstCallLayoutSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutSumTime);
     WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
-    WXLogUtils.renderPerformanceLog("   TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
-    WXLogUtils.renderPerformanceLog("   TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+    WXLogUtils.renderPerformanceLog("   onRenderSuccessCallBridgeTime", renderFinishTime[0]);
+    WXLogUtils.renderPerformanceLog("   onRenderSuccessCssLayoutTime", renderFinishTime[1]);
+    WXLogUtils.renderPerformanceLog("   onRenderSuccessParseJsonTime", renderFinishTime[2]);
 
-    WXBridgeManager.getInstance().printRenderFinishTime(getInstanceId());
+    mWXPerformance.callBridgeTime = renderFinishTime[0];
+    mWXPerformance.cssLayoutTime = renderFinishTime[1];
+    mWXPerformance.parseJsonTime = renderFinishTime[2];
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -1249,47 +1241,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  public void callNativeTime(final long time) {
-    if (!mEnd){
-      mWXPerformance.fsCallNativeTotalTime += time;
-      mWXPerformance.fsCallNativeTotalNum++;
-    }
-  }
-
   public void callJsTime(final long time){
     if (!mEnd){
       mWXPerformance.fsCallJsTotalTime+=time;
       mWXPerformance.fsCallJsTotalNum++;
     }
   }
-
-  public void callCreateBodyTime(long time) {
-        mWXPerformance.mCallCreateBodySumTime += time;
-    }
-
-  public void callAddElementTime(long time) {
-      mWXPerformance.mCallAddElementSumTime += time;
-  }
-
-  public void callLayoutTime(long time) {
-      mWXPerformance.mCallLayoutSumTime += time;
-  }
-
-  public void callLayoutUpdateDemissionTime(long time) {
-      mWXPerformance.mCallLayoutUpdateDemissionSumTime += time;
-  }
-
-  public void callLayoutaAplyLayoutAndEventTime(long time) {
-      mWXPerformance.mCallLayoutApplyLayoutAndEventSumTime += time;
-  }
-
-  public void callLayoutBindDataCoreTime(long time) {
-      mWXPerformance.mCallLayoutBindDataSumTime += time;
-  }
-
-  public void callActionLayoutTime(long time) {
-        mWXPerformance.mActionLayoutSumTime += time;
-    }
 
   public void onComponentCreate(WXComponent component,long createTime) {
       mWXPerformance.mActionAddElementCount++;
@@ -1302,28 +1259,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXPerformance.componentCreateTime+=createTime;
   }
 
-  public void callActionCreateBodyTime(long time) {
-      mWXPerformance.mActionCreateBodySumTime += time;
-  }
-
-  public void callActionOtherTime(long time) {
-        mWXPerformance.mActionOtherSumTime += time;
-    }
-
-  public void callActionCreateBodyCount() {
-        mWXPerformance.mActionCreateBodyCount++;
-    }
-
-  public void callActionLayoutCount() {
-        mWXPerformance.mActionLayoutCount++;
-    }
-
-  public void callActionOtherCount() {
-        mWXPerformance.mActionOtherCount++;
-    }
-
-  public void jsonParseTime(long time) {
-    mWXPerformance.parseJsonTime += time;
+  public void callActionAddElementTime(long time) {
+      mWXPerformance.mActionAddElementSumTime += time;
   }
 
   public void firstScreenRenderFinished() {
@@ -1347,23 +1284,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
       mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
       mWXPerformance.fsRenderTime = System.currentTimeMillis();
-      WXLogUtils.renderPerformanceLog("firstScreenJSFAndWeexCoreExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
+      long[] fitstScreenPerformance = WXBridgeManager.getInstance().getFirstScreenRenderTime(getInstanceId());
       WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
-      WXLogUtils.renderPerformanceLog("   firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
-      WXLogUtils.renderPerformanceLog("   firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
-      WXLogUtils.renderPerformanceLog("   firstCallCreateBodySumTime（"+mWXPerformance.mActionCreateBodyCount+"）", mWXPerformance.mCallCreateBodySumTime);
-      WXLogUtils.renderPerformanceLog("   firstCallAddElementSumTime（"+mWXPerformance.mActionAddElementCount+"）", mWXPerformance.mCallAddElementSumTime);
-      WXLogUtils.renderPerformanceLog("   firstCallLayoutSumTime（"+mWXPerformance.mActionLayoutCount+"）", mWXPerformance.mCallLayoutSumTime);
-      WXLogUtils.renderPerformanceLog("   firstScreenRenderSumTime", mWXPerformance.renderSumTime());
-      WXLogUtils.renderPerformanceLog("       firstActionCreateBodySumTime", mWXPerformance.mActionCreateBodySumTime);
-      WXLogUtils.renderPerformanceLog("       firstActionAddElementSumTime", mWXPerformance.mActionAddElementSumTime);
-      WXLogUtils.renderPerformanceLog("       firstActionLayoutSumTime", mWXPerformance.mActionLayoutSumTime);
-      WXLogUtils.renderPerformanceLog("           firstCallLayoutUpdateDemissionSumTime", mWXPerformance.mCallLayoutUpdateDemissionSumTime);
-      WXLogUtils.renderPerformanceLog("           firstCallLayoutApplyLayoutAndEventSumTime", mWXPerformance.mCallLayoutApplyLayoutAndEventSumTime);
-      WXLogUtils.renderPerformanceLog("           firstCallLayoutBindDataSumTime", mWXPerformance.mCallLayoutBindDataSumTime);
-      WXLogUtils.renderPerformanceLog("       firstActionOtherSumTime（"+mWXPerformance.mActionOtherCount+"）", mWXPerformance.mActionOtherSumTime);
-
-    WXBridgeManager.getInstance().printFirstScreenRenderTime(getInstanceId());
+      WXLogUtils.renderPerformanceLog("    firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
+      WXLogUtils.renderPerformanceLog("    firstScreenCallBridgeTime", fitstScreenPerformance[0]);
+      WXLogUtils.renderPerformanceLog("    firstScreenCssLayoutTime", fitstScreenPerformance[1]);
+      WXLogUtils.renderPerformanceLog("    firstScreenParseJsonTime", fitstScreenPerformance[2]);
   }
 
   public void createInstanceFinished(long time) {
