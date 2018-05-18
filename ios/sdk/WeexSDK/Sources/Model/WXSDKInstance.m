@@ -267,7 +267,7 @@ typedef enum : NSUInteger {
     }
     
     id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
-    if ([pageEvent respondsToSelector:@selector(pageDestroy:)]) {
+    if ([pageEvent respondsToSelector:@selector(pageStart:)]) {
         [pageEvent pageStart:self.instanceId];
     }
 
@@ -482,7 +482,11 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
-
+    
+    id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEvent respondsToSelector:@selector(pageDestroy:)]) {
+        [pageEvent pageDestroy:self.instanceId];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_WILL_DESTROY_NOTIFICATION object:nil userInfo:@{@"instanceId":self.instanceId}];
     
     [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
