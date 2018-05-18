@@ -63,8 +63,8 @@ public class WXApplication extends Application {
      **/
 //    initDebugEnvironment(true, false, "DEBUG_SERVER_HOST");
     WXBridgeManager.updateGlobalConfig("wson_on");
-    WXEnvironment.setOpenDebugLog(true);
-    WXEnvironment.setApkDebugable(true);
+    WXEnvironment.setOpenDebugLog(false);
+    WXEnvironment.setApkDebugable(false);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
