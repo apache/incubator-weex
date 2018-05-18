@@ -43,7 +43,6 @@ extern JNIEnv *getJNIEnv();
 extern jstring getComponentTypeFromCache(const std::string type);
 extern jstring putComponentTypeToCache(const std::string type);
 extern jstring getKeyFromCache(JNIEnv *env, const char *key);
-extern JStringCache *GetStringRefCache(const char * pageId);
 extern jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]);
 
 namespace WeexCore {

@@ -20,20 +20,27 @@
 #define jstring_cache_h
 
 #include <jni.h>
-#include <map>
+#include <list>
+#include <unordered_map>
 
 class JStringCache;
 
 class JStringCache {
 
 public:
-    JStringCache() {}
+    JStringCache(int capacity) : capacity(capacity) {}
 
     ~JStringCache() {}
 
 public:
+    int capacity;
+    std::list<std::pair<std::string, jobject>> cacheList;
+    std::unordered_map<std::string, std::list<std::pair<std::string, jobject>>::iterator> posMap;
     jstring GetString(JNIEnv *env, std::string key);
     void clearRefCache(JNIEnv *env);
+
+private:
+    void put(std::string key, jobject value);
 };
 
 #endif

@@ -40,7 +40,7 @@ jobject jThis;
 jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
 
-JStringCache refCache;
+JStringCache refCache(2048);
 
 static JavaVM *sVm = NULL;
 

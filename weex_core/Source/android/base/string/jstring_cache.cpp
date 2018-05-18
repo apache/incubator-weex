@@ -17,40 +17,53 @@
  * under the License.
  */
 #include <iostream>
-#include <map>
 #include "jstring_cache.h"
 
-std::map<std::string, jobject> mCache;
-
 void JStringCache::clearRefCache(JNIEnv *env) {
-    for (auto iter = mCache.begin(); iter != mCache.end(); iter++) {
-        if (iter->second != nullptr) {
-            env->DeleteWeakGlobalRef(iter->second);
-            iter->second = nullptr;
+    for (auto iter = cacheList.begin(); iter != cacheList.end(); iter++) {
+        std::pair<std::string, jobject> pair = *iter;
+        if (nullptr != pair.second) {
+            env->DeleteWeakGlobalRef(pair.second);
+            pair.second = nullptr;
         }
     }
-    mCache.clear();
+    if (!posMap.empty()) {
+        posMap.clear();
+    }
+    cacheList.clear();
+}
+
+void JStringCache::put(std::string key, jobject value) {
+//    LOGD("Remove cache jstring_cache key: %s, find: %s, max: %s", key.c_str(), posMap.find(key) != posMap.end() ? "TRUE" : "FALSE", cacheList.size() >= capacity ? "TRUE" : "FALSE");
+    if (posMap.find(key) != posMap.end()) {
+        cacheList.erase(posMap[key]);
+    } else if (cacheList.size() >= capacity) {
+        posMap.erase(cacheList.back().first);
+        cacheList.pop_back();
+    }
+    cacheList.push_front({key, value});
+    posMap[key] = cacheList.begin();
 }
 
 jstring JStringCache::GetString(JNIEnv *env, std::string key) {
-    std::map<std::string, jobject>::iterator iter = mCache.find(key);
-    if (iter != mCache.end()) {
-        // Has found
-        if(env->IsSameObject(iter->second, NULL) == JNI_FALSE) {
+//    LOGW("JStringCache map size: %d, list size: %d", posMap.size(), cacheList.size());
+    if (posMap.find(key) != posMap.end()) {
+        jobject obj = posMap[key]->second;
+        if (env->IsSameObject(obj, NULL) == JNI_FALSE) {
             // JObject is still active
-//            LOGE("FOUND cache jstring_cache GetString key: %s,for cache key: %s, map size: %d", key.c_str(), env->GetStringUTFChars((jstring) iter->second, false), mCache.size());
-            return (jstring) iter->second;
+            put(key, obj);
+//            LOGE("FOUND cache jstring_cache GetString key: %s,for cache key: %s", key.c_str(), env->GetStringUTFChars((jstring) obj, JNI_FALSE));
+            return (jstring) posMap[key]->second;
         }
-        if(env->IsSameObject(iter->second, NULL) == JNI_TRUE) {
-            // Should delete WeakGlobalRef
-            env->DeleteWeakGlobalRef(iter->second);
-            iter->second = nullptr;
-            mCache.erase(iter);
+        if (env->IsSameObject(obj, NULL) == JNI_TRUE) {
+            // Should delete WeakGlobalRef.
+//            LOGD("delete WeakGlobalRef: key: %s", key.c_str());
+            env->DeleteWeakGlobalRef(obj);
         }
     }
     const jstring jRef = env->NewStringUTF(key.c_str());
     const jobject jGlobalRef = env->NewWeakGlobalRef(jRef);
-    mCache.insert(std::pair<std::string, jobject>(key, jGlobalRef));
+    put(key, jGlobalRef);
     env->DeleteLocalRef(jRef);
     return (jstring) jGlobalRef;
 }
