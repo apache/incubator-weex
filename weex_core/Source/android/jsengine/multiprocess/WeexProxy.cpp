@@ -26,6 +26,7 @@
 #include <core/api/WeexJSCoreApi.h>
 
 #include <dlfcn.h>
+#include <errno.h>
 
 const char *s_cacheDir;
 bool s_start_pie = true;
@@ -713,6 +714,8 @@ namespace WeexCore {
                     int c_value_len = strlen(c_value_chars);
                     serializer->add(c_key_chars, c_key_len);
                     serializer->add(c_value_chars, c_value_len);
+                    initFrameworkParams.push_back(
+                            genInitFrameworkParams(c_key_chars, c_value_chars));
                     WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey),
                                                                 jString2Str(env, jvalue));
                 }
