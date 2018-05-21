@@ -166,7 +166,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jstring jFunc = env->NewStringUTF(func);
     jstring jExceptionString = env->NewStringUTF(exception_string);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jReportExceptionMethodId == NULL) {
       jReportExceptionMethodId = env->GetMethodID(jBridgeClazz,
@@ -175,8 +175,6 @@ namespace WeexCore {
     }
     env->CallVoidMethod(jThis, jReportExceptionMethodId, jPageId, jFunc, jExceptionString);
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jFunc != nullptr)
       env->DeleteLocalRef(jFunc);
     if (jExceptionString != nullptr)
@@ -194,7 +192,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     int flag = -1;
 
@@ -212,8 +210,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -234,7 +230,7 @@ namespace WeexCore {
     jstring jMethod = env->NewStringUTF(method);
     jbyteArray jArgString = newJByteArray(env, argString);
     jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     jobject result = nullptr;
 
@@ -248,8 +244,6 @@ namespace WeexCore {
       result = env->CallObjectMethod(jThis, jCallNativeModuleMethodId, jPageId, jModule, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jModule != nullptr)
       env->DeleteLocalRef(jModule);
     if (jMethod != nullptr)
@@ -274,8 +268,8 @@ namespace WeexCore {
     jstring jMethod = env->NewStringUTF(method);
     jbyteArray jArgString = newJByteArray(env, argString);
     jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMethod != nullptr) {
       if (jCallNativeComponentMethodId == NULL) {
@@ -286,10 +280,6 @@ namespace WeexCore {
       env->CallVoidMethod(jThis, jCallNativeComponentMethodId, jPageId, jRef, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     if (jMethod != nullptr)
       env->DeleteLocalRef(jMethod);
     if (jArgString != nullptr)
@@ -348,7 +338,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jCallUpdateFinishMethodId == NULL) {
       jCallUpdateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -362,8 +352,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -382,7 +370,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jCallRefreshFinishMethodId == NULL) {
       jCallRefreshFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -395,8 +383,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -656,6 +642,7 @@ namespace WeexCore {
 
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
+    env->DeleteLocalRef(jEventId);
     return flag;
   }
 
@@ -683,6 +670,7 @@ namespace WeexCore {
 
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
+    env->DeleteLocalRef(jEventId);
     return flag;
   }
 
