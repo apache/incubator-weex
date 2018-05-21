@@ -70,7 +70,7 @@ add_library(weexjsc SHARED
 
     ./core/config/core_environment.cpp
     ./core/moniter/render_performance.cpp
-    )
+        core/bridge/js_bridge.cpp core/bridge/js_bridge.h core/bridge/wx_type_define.h core/manager/wx_core_manager.cpp core/manager/wx_core_manager.h)
 
  #    set(weexjsc_LIBRARY_TYPE SHARED)
 
