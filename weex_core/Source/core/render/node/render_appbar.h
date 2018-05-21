@@ -21,7 +21,6 @@
 
 #include <core/render/node/render_object.h>
 #include <string>
-#include <android/base/string/string_utils.h>
 
 namespace WeexCore {
   class RenderAppBar : public RenderObject {

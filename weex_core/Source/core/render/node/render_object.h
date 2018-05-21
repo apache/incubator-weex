@@ -31,7 +31,7 @@
 #include <base/ViewUtils.h>
 #include <core/render/page/render_page.h>
 #include <core/css/constants_value.h>
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 
 
 #define JSON_OBJECT_MARK_CHAR  '{'
