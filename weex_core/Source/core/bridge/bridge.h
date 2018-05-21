@@ -24,6 +24,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <core/bridge/wx_type_define.h>
 
 namespace WeexCore {
 
@@ -40,10 +41,14 @@ namespace WeexCore {
     virtual void reportException(const char* pageId, const char *func, const char *exception_string) = 0;
 
     virtual int callNative(const char* pageId, const char *task, const char *callback) = 0;
-
+#ifdef __ANDROID__
     virtual jobject callNativeModule(const char* pageId, const char *module, const char *method,
                                      const char *argString, const char *optString) = 0;
 
+#else
+        virtual WeexCore::WXValue callNativeModule(const char* pageId, const char *module, const char *method,
+                                         const char *argString, const char *optString) = 0;
+#endif
     virtual void callNativeComponent(const char* pageId, const char* ref, const char *method,
                                      const char *argString, const char *optString) = 0;
 

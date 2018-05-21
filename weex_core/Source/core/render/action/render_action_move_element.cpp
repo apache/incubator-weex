@@ -34,7 +34,8 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
+      WXCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
+   // Bridge_Impl_Android::getInstance()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
     page->JniCallTime(getCurrentTime() - startTime);
   }
 }

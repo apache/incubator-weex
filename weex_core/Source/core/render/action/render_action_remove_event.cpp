@@ -32,8 +32,8 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-
-    Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    WXCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    //Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
 
     page->JniCallTime(getCurrentTime() - startTime);
     page->RemoveEventActionJNITime(getCurrentTime() - startTime);

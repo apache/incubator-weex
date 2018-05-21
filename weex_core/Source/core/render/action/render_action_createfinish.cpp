@@ -30,7 +30,8 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
+    WXCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
+   // Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
 
     page->JniCallTime(getCurrentTime() - startTime);
   }

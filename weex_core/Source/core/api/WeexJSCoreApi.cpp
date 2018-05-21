@@ -25,6 +25,7 @@
 #include <core/render/manager/render_manager.h>
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <android/base/string/string_utils.h>
+#include <core/manager/wx_core_manager.h>
 
 using namespace WeexCore;
 
@@ -49,7 +50,8 @@ void _callNative(const char *pageId, const char *task, const char *callback) {
     if (strcmp(task, "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") == 0) {
         RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
     } else {
-        Bridge_Impl_Android::getInstance()->callNative(pageId, task, callback);
+       WXCoreManager::getInstance()->getPlatformBridge()->callNative(pageId,task,callback);
+       // Bridge_Impl_Android::getInstance()->callNative(pageId, task, callback);
     }
 
 };
@@ -64,10 +66,11 @@ _callNativeModule(const char *pageId, const char *module, const char *method,
          pageId, module, method, argString, optString);
 #endif
 
+       // WXCoreManager::getInstance()->getPlatformBridge()->callNativeModule(pageId, module, method,
+//                                                                            argString, optString);
         // add for android support
         jobject result;
-        result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
-                                                                      argString, optString);
+        result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method, argString, optString);
 
         if (result == nullptr)
             return ret;

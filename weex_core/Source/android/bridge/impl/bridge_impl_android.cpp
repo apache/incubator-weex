@@ -208,7 +208,7 @@ namespace WeexCore {
     return flag;
   }
 
-  jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
+    jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
                                                 const char *argString, const char *optString) {
     JNIEnv *env = getJNIEnv();
     jstring jModule = env->NewStringUTF(module);
@@ -239,7 +239,31 @@ namespace WeexCore {
       env->DeleteLocalRef(jArgString);
     if (jOptString != nullptr)
       env->DeleteLocalRef(jOptString);
-    return result;
+
+
+     return result;
+
+//    jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+//      jint jTypeInt = env->GetIntField(result, jTypeId);
+//      jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//      jobject jDataObj = env->GetObjectField(result, jDataId);
+//      if (jTypeInt == 1) {
+//        if (jDoubleValueMethodId == NULL) {
+//          jclass jDoubleClazz = env->FindClass("java/lang/Double");
+//          jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+//          env->DeleteLocalRef(jDoubleClazz);
+//        }
+//        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+//      } else if (jTypeInt == 2) {
+//        jstring jDataStr = (jstring) jDataObj;
+//        //ret = std::move(createStringResult(env, jDataStr));
+//      } else if (jTypeInt == 3) {
+//        jstring jDataStr = (jstring) jDataObj;
+//        //ret = std::move(createJSONStringResult(env, jDataStr));
+//      }
+//      env->DeleteLocalRef(jDataObj);
+
+
   }
 
   void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref,

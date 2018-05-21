@@ -33,9 +33,12 @@ namespace WeexCore {
       return;
 
     long long startTime = getCurrentTime();
-    Bridge_Impl_Android::getInstance()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                   mTop, mBottom, mLeft, mRight,
-                                                   mHeight, mWidth, index);
+      WXCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
+                                                                    mTop, mBottom, mLeft, mRight,
+                                                                    mHeight, mWidth, index);
+//    Bridge_Impl_Android::getInstance()->callLayout(mPageId.c_str(), mRef.c_str(),
+//                                                   mTop, mBottom, mLeft, mRight,
+//                                                   mHeight, mWidth, index);
     page->JniCallTime(getCurrentTime() - startTime);
     page->LayoutActionJniTime(getCurrentTime() - startTime);
   }

@@ -78,4 +78,6 @@ TypeName(const TypeName&) = delete;      \
 void operator=(const TypeName&) = delete
 #endif
 
+#endif //__ANDROID__
+
 #endif /* LogDefines_h */
