@@ -17,7 +17,7 @@
  * under the License.
  */
 #include "render_performance.h"
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 
 namespace WeexCore {
 
