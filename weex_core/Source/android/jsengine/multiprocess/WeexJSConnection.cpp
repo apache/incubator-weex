@@ -32,6 +32,7 @@
 #include <IPC/IPCSender.h>
 #include <unistd.h>
 #include <android/base/log_utils.h>
+#include <errno.h>
 
 extern const char *s_cacheDir;
 extern bool s_start_pie;
