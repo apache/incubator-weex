@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by Darin on 27/03/2018.
-//
 
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"

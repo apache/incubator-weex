@@ -210,7 +210,7 @@ if(file('../license/LICENSE').exists()){
     }
 
     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp']).
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc']).
                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
                          'Source/android/jniprebuild/jniheader/*.h',
