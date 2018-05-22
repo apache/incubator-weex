@@ -24,6 +24,7 @@
 #include <core/config/core_environment.h>
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <core/api/WeexJSCoreApi.h>
+#include <core/manager/wx_core_manager.h>
 
 #include <dlfcn.h>
 
@@ -179,6 +180,7 @@ namespace WeexCore {
                                     jobject params) {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
+        WXCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
 
         LOGE("doInitFramework is running");
 //        if (g_use_single_process) {
