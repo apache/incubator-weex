@@ -58,6 +58,8 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
 }
 
 static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
+  if (jstr == nullptr)
+    return std::string("");
   const char *nativeString = env->GetStringUTFChars(jstr, JNI_FALSE);
   return std::string(nativeString);
 }

@@ -65,7 +65,6 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -304,6 +303,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
     final View view = getRealView();
+
+    if (type.equals(Constants.Event.LAYEROVERFLOW))
+      addLayerOverFlowListener(getRef());
+
     if (type.equals(Constants.Event.CLICK)) {
       if (view == null) {
         // wait next time to add.
@@ -1402,6 +1405,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (getEvents() == null || mAppendEvents == null || mGestureType == null) {
       return;
     }
+
+    if (type.equals(Constants.Event.LAYEROVERFLOW))
+      removeLayerOverFlowListener(getRef());
+
     getEvents().remove(type);
     mAppendEvents.remove(type);//only clean append events, not dom's events.
     mGestureType.remove(type);
@@ -2275,5 +2282,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       updateNativeStyle(objectEntry.getKey(), objectEntry.getValue());
     }
+  }
+
+  public void addLayerOverFlowListener(String ref) {
+    if (getInstance() != null)
+      getInstance().addLayerOverFlowListener(ref);
+  }
+
+  public void removeLayerOverFlowListener(String ref) {
+    if (getInstance() != null)
+      getInstance().removeLayerOverFlowListener(ref);
   }
 }
