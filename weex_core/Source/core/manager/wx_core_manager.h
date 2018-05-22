@@ -30,29 +30,41 @@
 
 namespace WeexCore {
     class WXCoreManager {
+    public:
+
+        static WXCoreManager *getInstance() {
+            return s_instance;
+        }
+
+        Bridge *getPlatformBridge() {
+            return s_instance->platform_bridge;
+        }
+
+        JSBridge *getJSBridge() {
+            return s_instance->js_bridge;
+        }
+
+        WXCoreManager *setJSBridge(JSBridge *bridge) {
+            s_instance->js_bridge = bridge;
+        }
+
+        WXCoreManager *setPlatformBridge(Bridge *bridge) {
+            s_instance->platform_bridge = bridge;
+        }
+
     protected:
         WXCoreManager() {};
 
         ~WXCoreManager() {};
-    public:
-        void init(Bridge *platformBridge, JSBridge *jsBridge);
-
-        void destroy();
-
-        static WXCoreManager *getInstance();
-
-        Bridge *getPlatformBridge();
-
-        JSBridge *getJSBridge();
-
 
     private:
-        static WXCoreManager *s_instance;
-        Bridge *platform_bridge;
-        JSBridge *js_bridge;
+        Bridge *platform_bridge = nullptr;
+        JSBridge *js_bridge = nullptr;
         //todo core_bridge
+        static WXCoreManager *s_instance;
     };
-}
 
+    const WXCoreManager *WXCoreManager::s_instance = new WXCoreManager;
+}
 
 #endif //WEEXV8_WX_CORE_MANAGER_H

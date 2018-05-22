@@ -168,7 +168,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXFirstScreenJSFExecuteTime) : FIRSETSCREENJSFEXECUTETIME,
                           @(WXPTFirstScreenRender) : SCREENRENDERTIME,
                           @(WXPTAllRender) : TOTALTIME,
-                          @(WXPTBundleSize) : JSTEMPLATESIZE,
+                          @(WXPTBundleSize) : JSTEMPLATESIZE
                            @(WXPTFsCallJsTime): M_FS_CALL_JS_TIME,
                            @(WXPTFsCallJsNum): M_FS_CALL_JS_NUM,
                            @(WXPTFsCallNativeTime): M_FS_CALL_NATIVE_TIME,
