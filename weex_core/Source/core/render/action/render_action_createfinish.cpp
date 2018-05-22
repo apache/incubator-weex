@@ -25,7 +25,7 @@ namespace WeexCore {
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-    WXCoreManager::getInstance()->getPlatformBridge()->->callCreateFinish(mPageId.c_str());
+    WXCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
     //Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
   }
 }
