@@ -146,6 +146,7 @@
         [self.delegate updateController:self willPerformUpdateWithNewData:newData];
         [UIView setAnimationsEnabled:NO];
         WXLogDebug(@"UICollectionView update:%@", diffResult);
+        if(!diffResult.hasChanges) { return ; }
         [self applyUpdate:diffResult toCollectionView:self.collectionView];
     } copy];
     
