@@ -481,21 +481,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 -(void)updatePattern
 {
-//#ifndef USE_FLEX
-    if (![WXComponent isUseFlex]) {
-        UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-            [self setPadding:padding];
-        }
-        
-        UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-            [self setBorder:border];
-        }
-        
-    }
-//#else
-    else{
         UIEdgeInsets padding_flex = UIEdgeInsetsMake(
                                                      self.flexCssNode->getPaddingTop(),
                                                      self.flexCssNode->getPaddingLeft(),
@@ -516,8 +501,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         if (!UIEdgeInsetsEqualToEdgeInsets(border_flex, _border)) {
             [self setBorder:border_flex];
         }
-    }
-//#endif
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -526,29 +509,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     return ^CGSize (CGSize constrainedSize) {
         
         CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:nil];
-        
-//#ifndef USE_FLEX
-        if (![WXComponent isUseFlex]) {
-            //TODO:more elegant way to use max and min constrained size
-            if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-                computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-                computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-                computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-                computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
-            }
-        }
-//#else
-        else
-        {
             if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
                 computedSize.width = MAX(computedSize.width, weakSelf.flexCssNode->getMinWidth());
             }
@@ -564,9 +524,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
             if (!isnan(weakSelf.flexCssNode->getMaxHeight())) {
                 computedSize.height = MIN(computedSize.height, weakSelf.flexCssNode->getMaxHeight());
             }
-        }
-       
-//#endif
         return (CGSize) {
             WXCeilPixelValue(computedSize.width),
             WXCeilPixelValue(computedSize.height)

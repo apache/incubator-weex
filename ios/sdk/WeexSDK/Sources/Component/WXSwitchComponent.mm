@@ -67,20 +67,9 @@
 
         if(attributes[@"tintColor"]){
             _tintColor = [WXConvert UIColor:attributes[@"tintColor"]];
-        }        
-//#ifndef USE_FLEX
-        if (![WXComponent isUseFlex])
-        {
-            self.cssNode->style.dimensions[CSS_WIDTH] = 51;
-            self.cssNode->style.dimensions[CSS_HEIGHT] = 31;
         }
-//#else
-        else
-        {
-            self.flexCssNode->setStyleWidth(51,NO);
-            self.flexCssNode->setStyleHeight(31);
-        }
-//#endif
+        self.flexCssNode->setStyleWidth(51,NO);
+        self.flexCssNode->setStyleHeight(31);
     }
     return self;
 }

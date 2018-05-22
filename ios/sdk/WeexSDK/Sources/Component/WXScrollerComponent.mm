@@ -156,23 +156,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-//#ifndef USE_FLEX
-        if(![WXComponent isUseFlex])
-        {
-            _scrollerCSSNode = new_css_node();
-            
-            // let scroller fill the rest space if it is a child component and has no fixed height & width
-            if (((_scrollDirection == WXScrollDirectionVertical &&
-                  isUndefined(self.cssNode->style.dimensions[CSS_HEIGHT])) ||
-                 (_scrollDirection == WXScrollDirectionHorizontal &&
-                  isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]))) &&
-                self.cssNode->style.flex <= 0.0) {
-                self.cssNode->style.flex = 1.0;
-            }
-        }
-//#else
-        else
-        {
             _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
             // let scroller fill the rest space if it is a child component and has no fixed height & width
             if (((_scrollDirection == WXScrollDirectionVertical &&
@@ -182,8 +165,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                 self.flexCssNode->getFlex() <= 0.0) {
                 self.flexCssNode->setFlex(1.0);
             }
-        }
-//#endif
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -265,13 +246,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
-//#ifndef USE_FLEX
-    if (![WXComponent isUseFlex]) {
-         free(_scrollerCSSNode);
-    }
-//#else
-    else
-    {
         if(_flexScrollerCSSNode){
             delete _flexScrollerCSSNode;
             
@@ -279,8 +253,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             
             _flexScrollerCSSNode=nullptr;
         }
-    }
-//#endif
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -919,48 +891,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
      *  layout from children to scroller to get scroller's contentSize
      */
     if ([self needsLayout]) {
-//#ifndef USE_FLEX
-        if (![WXComponent isUseFlex]) {
-            memcpy(_scrollerCSSNode, self.cssNode, sizeof(css_node_t));
-            _scrollerCSSNode->children_count = (int)[self childrenCountForScrollerLayout];
-            
-            _scrollerCSSNode->style.position[CSS_LEFT] = 0;
-            _scrollerCSSNode->style.position[CSS_TOP] = 0;
-            
-            if (_scrollDirection == WXScrollDirectionVertical) {
-                _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_COLUMN;
-                _scrollerCSSNode->style.dimensions[CSS_WIDTH] = _cssNode->layout.dimensions[CSS_WIDTH];
-                _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-            } else {
-                _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
-                _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = _cssNode->layout.dimensions[CSS_HEIGHT];
-                _scrollerCSSNode->style.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-            }
-            
-            _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-            _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-            
-            layoutNode(_scrollerCSSNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                print_css_node(_scrollerCSSNode, (css_print_options_t)(CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN));
-            }
-            CGSize size = {
-                WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_WIDTH]),
-                WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_HEIGHT])
-            };
-            
-            if (!CGSizeEqualToSize(size, _contentSize)) {
-                _contentSize = size;
-                [dirtyComponents addObject:self];
-            }
-            
-            _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-            _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-        }
-      
-//#else
-        else
-        {
             _flexScrollerCSSNode->copyStyle(_flexCssNode);
             _flexScrollerCSSNode->copyMeasureFunc(_flexCssNode);
             
@@ -988,8 +918,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                 _contentSize = size;
                 [dirtyComponents addObject:self];
             }
-        }
-//#endif
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];

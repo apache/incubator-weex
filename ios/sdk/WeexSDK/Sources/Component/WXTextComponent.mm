@@ -278,25 +278,6 @@ do {\
         _observerIconfont = YES;
     }
     
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        UIEdgeInsets padding = {
-            WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
-            WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
-            WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
-            WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
-        };
-        
-        if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-            _padding = padding;
-            [self setNeedsRepaint];
-        }
-    }
-  
-//#else
-    else
-    {
         UIEdgeInsets flex_padding = {
             WXFloorPixelValue(self.flexCssNode->getPaddingTop()+ self.flexCssNode->getBorderWidthTop()),
             WXFloorPixelValue(self.flexCssNode->getPaddingLeft() + self.flexCssNode->getBorderWidthLeft()),
@@ -308,8 +289,6 @@ do {\
             _padding = flex_padding;
             [self setNeedsRepaint];
         }
-    }
-//#endif
     
 }
 
@@ -410,20 +389,6 @@ do {\
         NSTextStorage *textStorage = nil;
         
         //TODO:more elegant way to use max and min constrained size
-//#ifndef USE_FLEX
-        if(![WXComponent isUseFlex])
-        {
-            if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-                constrainedSize.width = MAX(constrainedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-                constrainedSize.width = MIN(constrainedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
-            }
-        }
-//#else
-        else
-        {
             if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
                 constrainedSize.width = MAX(constrainedSize.width, weakSelf.flexCssNode->getMinWidth());
             }
@@ -431,8 +396,6 @@ do {\
             if (!isnan(weakSelf.flexCssNode->getMaxWidth())) {
                 constrainedSize.width = MIN(constrainedSize.width, weakSelf.flexCssNode->getMaxWidth());
             }
-        }
-//#endif
         
         if (![self useCoreText]) {
             textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
@@ -442,30 +405,6 @@ do {\
         } else {
             computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
         }
-//#ifndef USE_FLEX
-        if(![WXComponent isUseFlex])
-        {
-            //TODO:more elegant way to use max and min constrained size
-            if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-                computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-                computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-                computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
-            }
-            
-            if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-                computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
-            }
-        }
-       
-//#else
-        else
-        {
             if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
                 computedSize.width = MAX(computedSize.width, weakSelf.flexCssNode->getMinWidth());
             }
@@ -481,9 +420,6 @@ do {\
             if (!isnan(weakSelf.flexCssNode->getMaxHeight())) {
                 computedSize.height = MIN(computedSize.height, weakSelf.flexCssNode->getMaxHeight());
             }
-        }
-    
-//#endif
         if (textStorage && [WXUtility isBlankString:textStorage.string]) {
             //  if the text value is empty or nil, then set the height is 0.
             computedSize.height = 0;
@@ -562,12 +498,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
     // handle text direction style, default ltr
-    BOOL isRtl = false;
-    if ([WXComponent isUseFlex]) {
-        isRtl = [_direction isEqualToString:@"rtl"];
-    }else{
-        isRtl = _cssNode->layout.direction == CSS_DIRECTION_RTL;
-    }
+    BOOL isRtl = [_direction isEqualToString:@"rtl"];
     if (isRtl) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.
@@ -650,12 +581,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
     // handle text direction style, default ltr
-    BOOL isRtl = false;
-    if ([WXComponent isUseFlex]) {
-        isRtl = [_direction isEqualToString:@"rtl"];
-    }else{
-        isRtl = _cssNode->layout.direction == CSS_DIRECTION_RTL;
-    }
+    BOOL isRtl = [_direction isEqualToString:@"rtl"];
     if (isRtl) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.

@@ -69,25 +69,6 @@
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex]){
-        if (self.delegate && (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) || _isUseContainerWidth)) {
-            self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate headerWidthForLayout:self];
-            //TODO: set _isUseContainerWidth to NO if updateStyles have width
-            _isUseContainerWidth = YES;
-        }
-        
-        if ([self needsLayout]) {
-            layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                print_css_node(self.cssNode, (css_print_options_t)(CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN));
-            }
-        }
-    }
-   
-//#else
-    else
-    {
         if (self.delegate && ( isnan(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {
             self.flexCssNode->setStyleWidth([self.delegate headerWidthForLayout:self],NO);
             //TODO: set _isUseContainerWidth to NO if updateStyles have width
@@ -100,10 +81,6 @@
             renderPageSize.second = self.weexInstance.frame.size.height;
             self.flexCssNode->calculateLayout(renderPageSize);
         }
-    }
-    
-    
-//#endif
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
 }
 
