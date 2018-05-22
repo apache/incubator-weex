@@ -41,6 +41,7 @@
 #import "WXResourceLoader.h"
 #import "WXRecyclerComponent.h"
 #import "WXPrerenderManager.h"
+#import "WXPageEventNotifyEvent.h"
 #import "WXNetworkProtocol.h"
 #import "WXNavigationProtocol.h"
 #import "WXMonitor.h"

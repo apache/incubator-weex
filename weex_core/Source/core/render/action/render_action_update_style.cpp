@@ -34,16 +34,9 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
-    if (page == nullptr)
-      return;
-
-    long long startTime = getCurrentTime();
-      WXCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
-                                                                         mPadding, mBorder);
-//    Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
-//                                                        mPadding, mBorder);
-    if (page != nullptr)
-      page->JniCallTime(getCurrentTime() - startTime);
+    WXCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
+                                                        mPadding, mBorder);
+    // Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
+    //                                                     mPadding, mBorder);
   }
 }

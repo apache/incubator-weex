@@ -37,21 +37,11 @@ namespace WeexCore {
   }
 
   void RenderActionAddElement::ExecuteAction() {
-    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
-    if (page == nullptr)
-      return;
-
-    long long startTime = getCurrentTime();
-
-      WXCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                                 mIndex, mParentRef.c_str(), mStyles, mAttributes,
-                                                                 mEvents, mMargins, mPaddings, mBorders, mWillLayout);
-//
-//    Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-//                                                       mIndex, mParentRef.c_str(), mStyles, mAttributes,
-//                                                       mEvents, mMargins, mPaddings, mBorders, mWillLayout);
-    page->JniCallTime(getCurrentTime() - startTime);
-    page->AddElementActionJNITime(getCurrentTime() - startTime);
+    WXCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+                                                       mIndex, mParentRef.c_str(), mStyles, mAttributes,
+                                                       mEvents, mMargins, mPaddings, mBorders, mWillLayout);
+    // Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+    //                                                    mIndex, mParentRef.c_str(), mStyles, mAttributes,
+    //                                                    mEvents, mMargins, mPaddings, mBorders, mWillLayout);
   }
-
 }

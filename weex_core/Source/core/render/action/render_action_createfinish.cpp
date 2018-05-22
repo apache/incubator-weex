@@ -25,14 +25,7 @@ namespace WeexCore {
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
-    if (page == nullptr)
-      return;
-
-    long long startTime = getCurrentTime();
-    WXCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
-   // Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
-
-    page->JniCallTime(getCurrentTime() - startTime);
+    WXCoreManager::getInstance()->getPlatformBridge()->->callCreateFinish(mPageId.c_str());
+    //Bridge_Impl_Android::getInstance()->callCreateFinish(mPageId.c_str());
   }
 }

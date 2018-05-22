@@ -28,19 +28,12 @@ namespace WeexCore {
   }
 
   void RenderActionLayout::ExecuteAction() {
-    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
-    if (page == nullptr)
-      return;
-
-    long long startTime = getCurrentTime();
-      WXCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                                    mTop, mBottom, mLeft, mRight,
-                                                                    mHeight, mWidth, index);
-//    Bridge_Impl_Android::getInstance()->callLayout(mPageId.c_str(), mRef.c_str(),
-//                                                   mTop, mBottom, mLeft, mRight,
-//                                                   mHeight, mWidth, index);
-    page->JniCallTime(getCurrentTime() - startTime);
-    page->LayoutActionJniTime(getCurrentTime() - startTime);
+    WXCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
+                                                   mTop, mBottom, mLeft, mRight,
+                                                   mHeight, mWidth, index);
+    // Bridge_Impl_Android::getInstance()->callLayout(mPageId.c_str(), mRef.c_str(),
+    //                                                mTop, mBottom, mLeft, mRight,
+    //                                                mHeight, mWidth, index);
   }
 
   void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {

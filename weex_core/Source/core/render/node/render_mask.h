@@ -44,8 +44,8 @@ namespace WeexCore {
       }
 
       style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
-      style->insert(std::pair<std::string, std::string>(WIDTH, std::to_string(getWebPxByWidth(width, GetViewPortWidth()))));
-      style->insert(std::pair<std::string, std::string>(HEIGHT, std::to_string(getWebPxByWidth(height, GetViewPortWidth()))));
+      style->insert(std::pair<std::string, std::string>(WIDTH, to_string(getWebPxByWidth(width, GetViewPortWidth()))));
+      style->insert(std::pair<std::string, std::string>(HEIGHT, to_string(getWebPxByWidth(height, GetViewPortWidth()))));
       style->insert(std::pair<std::string, std::string>(TOP, "0"));
       return style;
     }

@@ -27,6 +27,7 @@
 #include <core/manager/wx_core_manager.h>
 
 #include <dlfcn.h>
+#include <errno.h>
 
 const char *s_cacheDir;
 bool s_start_pie = true;
@@ -35,7 +36,7 @@ static IPCSender *sSender;
 static std::unique_ptr<IPCHandler> sHandler;
 static std::unique_ptr<WeexJSConnection> sConnection;
 static WEEX_CORE_JS_SERVER_API_FUNCTIONS *js_server_api_functions = nullptr;
-bool g_use_single_process = true;
+bool g_use_single_process = false;
 
 namespace WeexCore {
     void WeexProxy::reset() {
@@ -123,7 +124,11 @@ namespace WeexCore {
     }
 
     jint
-    WeexProxy::initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params) {
+    WeexProxy::initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params,
+                                           IPCSerializer *serializer) {
+
+        IPCSerializer *realSerializer = nullptr;
+        std::unique_ptr<IPCSerializer> serializerTemp(createIPCSerializer());
         bool reinit = false;
         startInitFrameWork:
         try {
@@ -139,6 +144,15 @@ namespace WeexCore {
                     return false;
                 }
             } else {
+                if (reinit) {
+                    initFromParam(env, script,
+                                  params,
+                                  serializerTemp.get());
+                    realSerializer = serializerTemp.get();
+                } else {
+                    realSerializer = serializer;
+                }
+
                 // initHandler(sHandler.get());
 
                 ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
@@ -147,11 +161,8 @@ namespace WeexCore {
 
                 // using base::debug::TraceEvent;
                 // TraceEvent::StartATrace(env);
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-                initFromParam(env, script, params, serializer.get());
-                serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+                realSerializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
+                std::unique_ptr<IPCBuffer> buffer = realSerializer->finish();
                 std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
                 if (result->getType() != IPCType::INT32) {
                     LOGE("initFramework Unexpected result type");
@@ -181,27 +192,32 @@ namespace WeexCore {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
         WXCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
+        std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+        const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
+                                                                                        script,
+                                                                                        params,
+                                                                                        serializer.get());
+        LOGE("Single process ? %s", g_use_single_process ? "true" : "false");
+        if (g_use_single_process) {
+            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
+                //reportNativeInitStatus("-1011", "init Single Process Success");
+                return true;
+            }
 
-        LOGE("doInitFramework is running");
-//        if (g_use_single_process) {
-//            if (initFrameworkInSingleProcess(env, script, nullptr)) {
-//                //reportNativeInitStatus("-1011", "init Single Process Success");
-//                return true;
-//            }
-//
-//            if (initFrameworkInMultiProcess(env, script, params)) {
-//                return true;
-//            }
-//        } else {
-        if (initFrameworkInMultiProcess(env, script, params)) {
-            return true;
+            if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
+                return true;
+            }
+        } else {
+            if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
+                return true;
+            }
+
+            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
+                reportNativeInitStatus("-1011", "init Single Process Success");
+                return true;
+            }
         }
 
-//            if (initFrameworkInSingleProcess(env, script, nullptr)) {
-//                reportNativeInitStatus("-1011", "init Single Process Success");
-//                return true;
-//            }
-//        }
         reportNativeInitStatus("-1010", "init Failed");
         return false;
 
@@ -447,7 +463,8 @@ namespace WeexCore {
                 callDIspatchMessage
         };
 
-        auto *functions = (WEEX_CORE_JS_API_FUNCTIONS *) malloc(sizeof(WEEX_CORE_JS_API_FUNCTIONS));
+        auto *functions = (WEEX_CORE_JS_API_FUNCTIONS *) malloc(
+                sizeof(WEEX_CORE_JS_API_FUNCTIONS));
 
         if (!functions) {
             return nullptr;
@@ -463,11 +480,8 @@ namespace WeexCore {
             WEEX_CORE_JS_API_FUNCTIONS *functions);
 
     jint
-    WeexProxy::initFrameworkInSingleProcess(JNIEnv *env, jstring script, jobject params) {
-        std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-        const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env, script,
-                                                                                        params,
-                                                                                        serializer.get());
+    WeexProxy::initFrameworkInSingleProcess(JNIEnv *env, jstring script,
+                                            const std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams) {
         std::string soPath = "";
 
         // -----------------------------------------------
@@ -702,6 +716,8 @@ namespace WeexCore {
                     int c_value_len = strlen(c_value_chars);
                     serializer->add(c_key_chars, c_key_len);
                     serializer->add(c_value_chars, c_value_len);
+                    initFrameworkParams.push_back(
+                            genInitFrameworkParams(c_key_chars, c_value_chars));
                     WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey),
                                                                 jString2Str(env, jvalue));
                 }
@@ -920,7 +936,8 @@ namespace WeexCore {
                 if (jTypeInt == 1) {
                     if (jDoubleValueMethodId == NULL) {
                         jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
+                                                                "()D");
                         env->DeleteLocalRef(jDoubleClazz);
                     }
                     jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
@@ -1166,7 +1183,8 @@ namespace WeexCore {
     }
 
     jstring
-    WeexProxy::execJSOnInstance(JNIEnv *env, jobject jcaller, jstring instanceId, jstring script,
+    WeexProxy::execJSOnInstance(JNIEnv *env, jobject jcaller, jstring instanceId,
+                                jstring script,
                                 jint type) {
         if (instanceId == NULL || script == NULL) {
             return env->NewStringUTF("");
@@ -1252,7 +1270,8 @@ namespace WeexCore {
                 if (jTypeInt == 1) {
                     if (jDoubleValueMethodId == NULL) {
                         jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
+                                                                "()D");
                         env->DeleteLocalRef(jDoubleClazz);
                     }
                     jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
@@ -1483,7 +1502,8 @@ namespace WeexCore {
                 if (jTypeInt == 1) {
                     if (jDoubleValueMethodId == NULL) {
                         jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
+                                                                "()D");
                         env->DeleteLocalRef(jDoubleClazz);
                     }
                     jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
@@ -1534,7 +1554,8 @@ namespace WeexCore {
                 ScopedJStringUTF8 instanceId(env, jinstanceid);
                 ScopedJStringUTF8 funcChar(env, jfunction);
                 return js_server_api_functions->funcCallJSOnAppContext(instanceId.getChars(),
-                                                                       funcChar.getChars(), params);
+                                                                       funcChar.getChars(),
+                                                                       params);
             } else {
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();
                 std::unique_ptr<IPCResult> result = sSender->send(buffer.get());

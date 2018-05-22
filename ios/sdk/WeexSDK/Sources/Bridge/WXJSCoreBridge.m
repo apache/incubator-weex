@@ -109,6 +109,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    _jsContext.instanceId = nil;
+}
+
 - (void)setJSContext:(JSContext *)context
 {
     _jsContext = context;

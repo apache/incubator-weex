@@ -663,7 +663,6 @@
 #pragma mark Updating
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    NSLog(@"tempTest updating");
     
     BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
     if (isTransitionTag) {

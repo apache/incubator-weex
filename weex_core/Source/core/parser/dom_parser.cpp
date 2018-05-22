@@ -18,10 +18,10 @@
  */
 
 #include "dom_parser.h"
-#include <base/fpconv.h>
 #include <core/render/node/render_object.h>
 #include <core/render/page/render_page.h>
 #include <core/render/node/factory/render_creator.h>
+#include <base/ViewUtils.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -365,23 +365,10 @@ namespace WeexCore {
         while (const char *key2 = r.NextObjectKey()) {
           if (r.PeekType() == kNumberType) {
             RAPIDJSON_ASSERT(r.PeekType() == kNumberType);
-            char *temp = new char[65];
             if (0 == strcmp(key, "attr")) {
-              int len = fpconv_dtoa(r.GetDouble(), temp);
-              temp[len] = '\0';
-              char value[len + 1];
-              strcpy(value, temp);
-              render->AddAttr(key2, value);
+              render->AddAttr(key2, to_string(r.GetDouble()));
             } else if (0 == strcmp(key, "style")) {
-              int len = fpconv_dtoa(r.GetDouble(), temp);
-              temp[len] = '\0';
-              char value[len + 1];
-              strcpy(value, temp);
-              render->AddStyle(key2, value);
-            }
-            if (temp != nullptr) {
-              delete[]temp;
-              temp = nullptr;
+              render->AddStyle(key2, to_string(r.GetDouble()));
             }
           } else if (r.PeekType() == kStringType) {
             RAPIDJSON_ASSERT(r.PeekType() == kStringType);
@@ -499,17 +486,8 @@ namespace WeexCore {
     while (const char *key = r.NextObjectKey()) {
       if (r.PeekType() == kNumberType) {
         RAPIDJSON_ASSERT(r.PeekType() == kNumberType);
-        char *temp = new char[65];
-        int len = fpconv_dtoa(r.GetDouble(), temp);
-        temp[len] = '\0';
-        char value[len + 1];
-        strcpy(value, temp);
-        std::pair<std::string, std::string> myPair(key, value);
+        std::pair<std::string, std::string> myPair(key, to_string(r.GetDouble()));
         pairs->insert(pairs->end(), myPair);
-        if (temp != nullptr) {
-          delete[]temp;
-          temp = nullptr;
-        }
       } else if (r.PeekType() == kStringType) {
         RAPIDJSON_ASSERT(r.PeekType() == kStringType);
         const char *value = r.GetString();

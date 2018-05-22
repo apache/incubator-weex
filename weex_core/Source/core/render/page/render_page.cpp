@@ -143,7 +143,6 @@ namespace WeexCore {
     if (root == nullptr)
       return false;
 
-    long long startTime = getCurrentTime();
     SetRootRenderObject(root);
 
     if (isnan(render_root->getStyleWidth())) {
@@ -157,7 +156,6 @@ namespace WeexCore {
     }
     PushRenderToRegisterMap(root);
 
-    BuildRenderTreeTime(getCurrentTime() - startTime);
     SendCreateBodyAction(root);
     return true;
   }
@@ -170,7 +168,6 @@ namespace WeexCore {
   }
 
   bool RenderPage::AddRenderObject(const std::string &parentRef, int insertPosition, RenderObject *child) {
-    long long startTime = getCurrentTime();
     RenderObject *parent = GetRenderObject(parentRef);
     if (parent == nullptr || child == nullptr) {
       return false;
@@ -183,7 +180,6 @@ namespace WeexCore {
     }
 
     PushRenderToRegisterMap(child);
-    BuildRenderTreeTime(getCurrentTime() - startTime);
     SendAddElementAction(child, parent, insertPosition, false);
 
     Batch();
@@ -191,7 +187,6 @@ namespace WeexCore {
   }
 
   bool RenderPage::RemoveRenderObject(const std::string &ref) {
-    long long startTime = getCurrentTime();
     RenderObject *child = GetRenderObject(ref);
     if (child == nullptr)
       return false;
@@ -205,15 +200,11 @@ namespace WeexCore {
     RemoveRenderFromRegisterMap(child);
     delete child;
 
-    BuildRenderTreeTime(getCurrentTime() - startTime);
-
     SendRemoveElementAction(ref);
     return true;
   }
 
   bool RenderPage::MoveRenderObject(const std::string &ref, const std::string &parentRef, int index) {
-    long long startTime = getCurrentTime();
-
     RenderObject *child = GetRenderObject(ref);
     if (child == nullptr)
       return false;
@@ -236,14 +227,11 @@ namespace WeexCore {
     child->getParent()->removeChild(child);
     newParent->addChildAt(child, index);
 
-    BuildRenderTreeTime(getCurrentTime() - startTime);
-
     SendMoveElementAction(ref, parentRef, index);
     return true;
   }
 
   bool RenderPage::UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *src) {
-    long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || src == nullptr || src->empty())
       return false;
@@ -258,7 +246,6 @@ namespace WeexCore {
     int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
 
     if (result == 1) {
-      BuildRenderTreeTime(getCurrentTime() - startTime);
       SendUpdateStyleAction(render, src, margin, padding, border);
     } else {
       for (auto iter = src->begin(); iter != src->end(); iter++) {
@@ -278,7 +265,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       margin->insert(margin->end(), (*iter)),
                                   flag = true;
                                 });
@@ -291,7 +278,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       padding->insert(padding->end(), (*iter)),
                                   flag = true;
                                 });
@@ -304,7 +291,7 @@ namespace WeexCore {
                                 (*iter).second,
                                 0,
                                 [=, &flag](float foo) {
-                                  (*iter).second = std::to_string(foo),
+                                  (*iter).second = to_string(foo),
                                       border->insert(border->end(), (*iter)),
                                   flag = true;
                                 });
@@ -312,8 +299,6 @@ namespace WeexCore {
         }
       }
     }
-
-    BuildRenderTreeTime(getCurrentTime() - startTime);
 
     if (style != nullptr || margin != nullptr || padding != nullptr || border != nullptr)
       SendUpdateStyleAction(render, style, margin, padding, border);
@@ -359,7 +344,6 @@ namespace WeexCore {
   }
 
   bool RenderPage::UpdateAttr(const std::string &ref, std::vector<std::pair<std::string, std::string>> *attrs) {
-    long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr || attrs == nullptr || attrs->empty())
       return false;
@@ -409,13 +393,11 @@ namespace WeexCore {
   }
 
   bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
-    long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
       return false;
 
     render->AddEvent(event);
-    BuildRenderTreeTime(getCurrentTime() - startTime);
 
     render_action *action = new RenderActionAddEvent(mPageId, ref, event);
     PostRenderAction(action);
@@ -423,13 +405,11 @@ namespace WeexCore {
   }
 
   bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
-    long long startTime = getCurrentTime();
     RenderObject *render = GetRenderObject(ref);
     if (render == nullptr)
       return false;
 
     render->RemoveEvent(event);
-    BuildRenderTreeTime(getCurrentTime() - startTime);
 
     render_action *action = new RenderActionRemoveEvent(mPageId, ref, event);
     PostRenderAction(action);
@@ -589,34 +569,9 @@ namespace WeexCore {
     PostRenderAction(action);
   }
 
-  void RenderPage::JniCallTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->jniCallTime += time;
-  }
-
   void RenderPage::CssLayoutTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
       mWXCorePerformance->cssLayoutTime += time;
-  }
-
-  void RenderPage::AddEventActionJNITime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->addEventActionJNITime += time;
-  }
-
-  void RenderPage::RemoveEventActionJNITime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->removeEventActionJNITime += time;
-  }
-
-  void RenderPage::AddElementActionJNITime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->addElementActionJNITime += time;
-  }
-
-  void RenderPage::LayoutActionJniTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->layoutActionJniTime += time;
   }
 
   void RenderPage::ParseJsonTime(const long long &time) {
@@ -624,31 +579,23 @@ namespace WeexCore {
       mWXCorePerformance->parseJsonTime += time;
   }
 
-  void RenderPage::BuildRenderTreeTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->buildRenderObjectTime += time;
-  }
-
-  void RenderPage::CreateJMapJNITime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->createJMapJNITime += time;
-  }
-
   void RenderPage::CallBridgeTime(const long long &time) {
     if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->jniCallBridgeTime += time;
+      mWXCorePerformance->callBridgeTime += time;
   }
 
-  int RenderPage::PrintFirstScreenLog() {
+  std::vector<long> RenderPage::PrintFirstScreenLog() {
+    std::vector<long> ret;
     if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
-    return 0;
+      ret = mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+    return ret;
   }
 
-  int RenderPage::PrintRenderSuccessLog() {
+  std::vector<long> RenderPage::PrintRenderSuccessLog() {
+    std::vector<long> ret;
     if (mWXCorePerformance != nullptr)
-      return mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
-    return 0;
+      ret = mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+    return ret;
   }
 
   void RenderPage::Batch() {

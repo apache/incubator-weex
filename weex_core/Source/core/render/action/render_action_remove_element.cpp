@@ -26,13 +26,7 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-    RenderPage *page = RenderManager::GetInstance()->GetPage(mPageId);
-    if (page == nullptr)
-      return;
-
-    long long startTime = getCurrentTime();
-      WXCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
+    WXCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
     //Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId.c_str(), mRef.c_str());
-    page->JniCallTime(getCurrentTime() - startTime);
   }
 }

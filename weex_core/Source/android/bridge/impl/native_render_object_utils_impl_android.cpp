@@ -95,10 +95,6 @@ static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
 }
 
 static  void showRenderObjectLayout(RenderObject *renderObject, int level){
-//   LOGE("RenderObject", "layout %s %d %p %f %f %f %f ",  renderObject->Type().c_str(),
-//                        renderObject->getStypePositionType(),
-//                        renderObject, renderObject->getLayoutHeight(), renderObject->getLayoutWidth(),
-//    renderObject->getLayoutPositionLeft(), renderObject->getLayoutPositionRight());
     for(auto it = renderObject->ChildListIterBegin(); it != renderObject->ChildListIterEnd(); it++){
         RenderObject* child = static_cast<RenderObject*>(*it);
         showRenderObjectLayout(child, level + 1);

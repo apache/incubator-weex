@@ -38,6 +38,8 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * All container components must implement this class
@@ -348,6 +350,16 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       component.notifyAppearStateChange(wxEventType, direction);
     }
   }
+
+  public void notifyLayerOverFlow() {
+    if (containsEvent(Constants.Event.LAYEROVERFLOW)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("ref", getRef());
+      params.put("instanceid", getInstanceId());
+      fireEvent(Constants.Event.LAYEROVERFLOW, params);
+    }
+  }
+
 
   /********************************************************
    *  begin hook Activity life cycle callback             *

@@ -19,6 +19,8 @@
 
 #import "WXRootView.h"
 #import "WXSDKInstance.h"
+#import "WXPageEventNotifyEvent.h"
+#import "WXSDKEngine.h"
 
 @interface WXRootView()
 
@@ -45,6 +47,10 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
     _mHasEvent = TRUE;
+    id<WXPageEventNotifyEventProtocol> pageEventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEventNotify respondsToSelector:@selector(hitTest:withEvent:withView:)]){
+        [pageEventNotify hitTest:point withEvent:event withView:self];
+    }
     return [super hitTest:point withEvent:event];
 }
 
