@@ -1,5 +1,3 @@
 cmake_minimum_required(VERSION 3.4.1)
-project(weexv8)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-#include(Android)
+project(WeexCore)
 add_subdirectory(Source)
