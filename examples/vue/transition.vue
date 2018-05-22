@@ -1,6 +1,6 @@
 <template>
     <list class="list">
-        <cell class="cell" v-for="(item, i) in panels" @click="change(i)">
+        <cell class="cell" v-for="(item, i) in panels" :key="i" @click="change(i)">
             <div class="panel" :style="{height: item.height,width:item.width,backgroundColor:item.bgc,opacity:item.opacity,transform:item.transform}">
                  <text class="text">{{item.label}}</text> 
             </div>
