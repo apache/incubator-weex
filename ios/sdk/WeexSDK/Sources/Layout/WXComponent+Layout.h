@@ -20,15 +20,9 @@
 #import "WXComponent.h"
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
-#import "WXLayoutDefine.h"
 #import "WXCoreLayout.h"
 
 #define FlexUndefined NAN
-//#define USE_FLEX
-
-
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,44 +35,28 @@ extern "C" {
 @interface WXComponent ()
 {
     @package
-    /**
-     *  Layout
-     */
-//#ifndef USE_FLEX
-    css_node_t *_cssNode;
-//#else
 #ifdef __cplusplus
     WeexCore::WXCoreLayoutNode *_flexCssNode;
 #endif // __cplusplus
-//#endif //USE_FLEX
     BOOL _isLayoutDirty;
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
 }
 
-//#ifndef USE_FLEX
 /**
  * @abstract Return the css node used to layout.
  *
  * @warning Subclasses must not override this.
  */
-@property(nonatomic, readonly, assign) css_node_t *cssNode;
-//#else
 #ifdef __cplusplus
 @property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
 #endif
-//#endif
 
 @end
 
 @interface WXComponent (Layout)
-//#ifndef USE_FLEX
-//#else
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
 - (void)_rmChildCssNode:(WXComponent*)subcomponent;
 - (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;
-+ (void) setUseFlex:(BOOL) useFlex;
-+ (BOOL) isUseFlex;
-//#endif
 @end
