@@ -39,7 +39,8 @@ jmethodID jDoubleValueMethodId;
 jobject jThis;
 jobject jWMThis;
 std::map<std::string, jobject> componentTypeCache;
-std::map<std::string, jobject> styleKeyCache;
+
+JStringCache refCache(2048);
 
 static JavaVM *sVm = NULL;
 
@@ -69,22 +70,24 @@ jstring putComponentTypeToCache(const std::string type) {
   return (jstring) jGlobalType;
 }
 
-jstring getStyleKeyFromCache(const std::string key) {
-  std::map<std::string, jobject>::const_iterator iter = styleKeyCache.find(key);
-  if (iter != styleKeyCache.end()) {
-    return (jstring)(iter->second);
-  } else {
-    return nullptr;
-  }
+jstring getKeyFromCache(JNIEnv *env, const char *key) {
+  return refCache.GetString(env, key);
 }
 
-jstring putStyleKeyToCache(const std::string key) {
-  JNIEnv *env = getJNIEnv();
-  jstring jKey = env->NewStringUTF(key.c_str());
-  jobject jGlobalKey = env->NewGlobalRef(jKey);
-  styleKeyCache.insert(std::pair<std::string, jobject>(key, jGlobalKey));
-  env->DeleteLocalRef(jKey);
-  return (jstring) jGlobalKey;
+jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]) {
+  if (nullptr == c_array) {
+    return nullptr;
+  }
+  if (0 == c_array[0]
+      && 0 == c_array[1]
+      && 0 == c_array[2]
+      && 0 == c_array[3]) {
+    // Default value;
+    return nullptr;
+  }
+  jfloatArray jArray = env->NewFloatArray(4);
+  env->SetFloatArrayRegion(jArray, 0, 4, c_array);
+  return jArray;
 }
 
 static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
@@ -100,27 +103,11 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
   return WeexProxy::doInitFramework(env, jThis, framework, params, cacheDir, pieSupport);
 }
 
-static void BindMeasurementToWXCore(JNIEnv *env, jobject jcaller, jstring instanceId, jstring ref, jobject contentBoxMeasurement) {
-  if (contentBoxMeasurement == nullptr)
-    return;
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
-}
-
 static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
-                                          jlong ptr,
-                                          jobject contentBoxMeasurement){
+                                          jlong ptr){
   RenderObject *render =  convert_long_to_render_object(ptr);
   if(render){
-    render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
+      render->BindMeasureFuncImplAndroid();
   }
 }
 
@@ -194,10 +181,10 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
-#if RENDER_LOG
-    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", jString2StrFast(env, instanceId).c_str(),
-         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
-#endif
+//#if RENDER_LOG
+//    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", jString2StrFast(env, instanceId).c_str(),
+//         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
+//#endif
 
     if (!page->needLayout.load()) {
       page->needLayout.store(true);
@@ -568,13 +555,7 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     }
     componentTypeCache.clear();
 
-    for (auto iter = styleKeyCache.begin(); iter != styleKeyCache.end(); iter++) {
-      if (iter->second != nullptr) {
-        env->DeleteGlobalRef(iter->second);
-        iter->second = nullptr;
-      }
-    }
-    styleKeyCache.clear();
+    refCache.clearRefCache(env);
 
     if (jThis)
       env->DeleteGlobalRef(jThis);
