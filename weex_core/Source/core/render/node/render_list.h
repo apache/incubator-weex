@@ -40,7 +40,9 @@ namespace WeexCore {
     bool mIsSetFlex = false;
     std::vector<RenderObject*> cellSlots;
     std::vector<RenderObject*> cellSlotsCopys;
-      
+    float mLeftGap = 0;
+    float mRightGap = 0;
+
   public:
       ~RenderList(){
 
@@ -128,6 +130,9 @@ namespace WeexCore {
             mColumnWidth = getColumnWidth();
             mColumnGap = getColumnGap();
 
+            mLeftGap = getLeftGap();
+            mRightGap = getRightGap();
+
             mAvailableWidth = getStyleWidth()- getWebPxByWidth(getPaddingLeft(), GetRenderPage()->ViewPortWidth()) - getWebPxByWidth(getPaddingRight(), GetRenderPage()->ViewPortWidth());
 
             if (AUTO_VALUE == mColumnCount && AUTO_VALUE == mColumnWidth) {
@@ -135,33 +140,54 @@ namespace WeexCore {
                 mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
                 mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
             } else if (AUTO_VALUE == mColumnWidth && AUTO_VALUE != mColumnCount) {
-                mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
+                mColumnWidth = (mAvailableWidth - mLeftGap - mRightGap - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
                 mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
             } else if (AUTO_VALUE != mColumnWidth && AUTO_VALUE == mColumnCount) {
-                mColumnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
+                mColumnCount = (int)round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = mColumnCount > 0 ? mColumnCount :1;
                 if (mColumnCount <= 0) {
                     mColumnCount = COLUMN_COUNT_NORMAL;
                 }
-                mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
+                mColumnWidth =((mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / mColumnCount) - mColumnGap;
 
-            } else if(AUTO_VALUE != mColumnWidth && AUTO_VALUE != mColumnCount){
-                int columnCount = round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
+            } else if(AUTO_VALUE != mColumnWidth && AUTO_VALUE != mColumnCount) {
+                int columnCount = (int)round((mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
                 if (mColumnCount <= 0) {
                     mColumnCount = COLUMN_COUNT_NORMAL;
                 }
-                mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
+                mColumnWidth= ((mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / mColumnCount) - mColumnGap;
             }
 
+            std::string spanOffsets = calcSpanOffset();
+
             mIsPreCalculateCellWidth = true;
-            if(getColumnCount() > 0 || getColumnWidth() > 0 || mColumnCount > COLUMN_COUNT_NORMAL){
+            if (getColumnCount() > 0 || getColumnWidth() > 0 || mColumnCount > COLUMN_COUNT_NORMAL) {
                 attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, to_string(mColumnCount)));
                 attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, to_string(mColumnGap)));
                 attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, to_string(mColumnWidth)));
             }
+            if (spanOffsets.length() > 0) {
+                attrs->insert(std::pair<std::string, std::string>(SPAN_OFFSETS, to_string(spanOffsets)));
+            }
         }
         return attrs;
+    }
+
+    std::string calcSpanOffset() {
+        std::string spanOffsets;
+        if (mLeftGap > 0 || mRightGap > 0) {
+            spanOffsets.append("[");
+            for (int i = 0; i < mColumnCount; i++) {
+                float spanOffset = mLeftGap + i * ((mColumnWidth + mColumnGap) - (mAvailableWidth + mColumnGap) / mColumnCount);
+                spanOffsets.append(to_string(spanOffset));
+                if(i != mColumnCount - 1) {
+                    spanOffsets.append(",");
+                }
+            }
+            spanOffsets.append("]");
+        }
+        return spanOffsets;
     }
 
     float getStyleWidth() {
@@ -277,6 +303,28 @@ namespace WeexCore {
       float columnWidthValue = getFloat(columnWidth.c_str());
       return (columnWidthValue > 0 && !isnan(columnWidthValue)) ? columnWidthValue : 0;
     }
+
+      float getLeftGap() {
+          std::string leftGap = GetAttr(LEFT_GAP);
+
+          if (leftGap.empty() || leftGap == AUTO) {
+              return 0;
+          }
+
+          float leftGapValue = getFloat(leftGap.c_str());
+          return (leftGapValue > 0 && !isnan(leftGapValue)) ? leftGapValue : 0;
+      }
+
+      float getRightGap() {
+          std::string rightGap = GetAttr(RIGHT_GAP);
+
+          if (rightGap.empty() || rightGap == AUTO) {
+              return 0;
+          }
+
+          float rightGapValue = getFloat(rightGap.c_str());
+          return (rightGapValue > 0 && !isnan(rightGapValue)) ? rightGapValue : 0;
+      }
 
     int getOrientation(){
       std::string direction = GetAttr(SCROLL_DIRECTION);

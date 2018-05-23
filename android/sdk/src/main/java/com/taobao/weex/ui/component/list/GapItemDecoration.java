@@ -41,31 +41,34 @@ public class GapItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        // TODO
-//        int position = parent.getChildAdapterPosition(view);
-//        if(position < 0){
-//            return;
-//        }
-//        if(view.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams){
-//            StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
-//            if(params.isFullSpan()){
-//                return;
-//            }
-//            WXComponent component = listComponent.getChild(position);
-//            if(component instanceof WXCell){
-//                WXCell cell = (WXCell) component;
-//                if(cell.isFixed() || cell.isSticky()){
-//                    return;
-//                }
-//                WXRecyclerDomObject recyclerDomObject = listComponent.getRecyclerDom();
-//                if(recyclerDomObject.getSpanOffsets() == null){
-//                    return;
-//                }
-//                float spanOffset = recyclerDomObject.getSpanOffsets()[params.getSpanIndex()];
-//                int   spanOffsetPx =  Math.round(WXViewUtils.getRealPxByWidth(spanOffset, recyclerDomObject.getViewPortWidth()));
-//                outRect.left =  spanOffsetPx;
-//                outRect.right = -spanOffsetPx;
-//            }
-//        }
+        final Float[] spanOffsets = listComponent.getSpanOffsets();
+        if (spanOffsets == null) {
+            return;
+        }
+        int position = parent.getChildAdapterPosition(view);
+        if(position < 0) {
+            return;
+        }
+        if(view.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams){
+            StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
+            if(params.isFullSpan()){
+                return;
+            }
+            WXComponent component = listComponent.getChild(position);
+            if(component instanceof WXCell){
+                WXCell cell = (WXCell) component;
+                if(cell.isFixed() || cell.isSticky()) {
+                    return;
+                }
+
+                if (params.getSpanIndex() >= spanOffsets.length) {
+                    return;
+                }
+                float spanOffset = listComponent.getSpanOffsets()[params.getSpanIndex()];
+                int   spanOffsetPx =  Math.round(WXViewUtils.getRealPxByWidth(spanOffset, listComponent.getViewPortWidth()));
+                outRect.left =  spanOffsetPx;
+                outRect.right = -spanOffsetPx;
+            }
+        }
     }
 }

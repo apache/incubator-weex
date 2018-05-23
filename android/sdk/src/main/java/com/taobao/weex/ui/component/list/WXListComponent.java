@@ -18,14 +18,19 @@
  */
 package com.taobao.weex.ui.component.list;
 
-import android.content.Context;
-import android.util.Log;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+
+import android.content.Context;
+import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -39,8 +44,6 @@ import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
-
-import java.util.Map;
 
 /**
  * Unlike other components, there is immutable bi-directional association between View and
@@ -56,6 +59,9 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   //  private WXRecyclerDomObject mDomObject;
   private float mPaddingLeft;
   private float mPaddingRight;
+  private String mSpanOffsetsStr;
+  private Float[] mSpanOffsets;
+  private boolean hasSetGapItemDecoration = false;
 
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -75,10 +81,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }
-    // TODO
-    //    if(mRecyclerDom != null && mRecyclerDom.getSpanOffsets() != null){
-    //      bounceRecyclerView.getInnerView().addItemDecoration(new GapItemDecoration(this));
-    //    }
     return bounceRecyclerView;
   }
 
@@ -143,34 +145,39 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     mColumnWidth = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH));
     mPaddingLeft = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_LEFT));
     mPaddingRight = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_RIGHT));
-    // TODO
-    //      mLeftGap = mRecyclerDom.getLeftGap();
-    //      mRightGap = mRecyclerDom.getRightGap();
-    //      mRecyclerDom.preCalculateCellWidth();
+    mSpanOffsetsStr = (String)getAttrs().get(Constants.Name.SPAN_OFFSETS);
+
+    try {
+      if (!TextUtils.isEmpty(mSpanOffsetsStr)) {
+        List<Float> list = JSON.parseArray(mSpanOffsetsStr, Float.class);
+        final int size = list.size();
+        if (null == mSpanOffsets || mSpanOffsets.length != size) {
+          mSpanOffsets = new Float[size];
+        }
+        list.toArray(mSpanOffsets);
+      } else {
+        mSpanOffsets = null;
+      }
+    } catch (Throwable e) {
+      WXLogUtils.w("Parser SpanOffsets error ", e);
+    }
+
+    if (!hasSetGapItemDecoration && null != getSpanOffsets() && null != getHostView()
+        && null != getHostView().getInnerView()) {
+      hasSetGapItemDecoration = true;
+      getHostView().getInnerView().addItemDecoration(new GapItemDecoration(this));
+    }
   }
 
-  // TODO
-//  @WXComponentProp(name = Constants.Name.LEFT_GAP)
-  //  public void setLeftGap(float leftGap)  {
-  //    if(mRecyclerDom != null && mRecyclerDom.getLeftGap() != mLeftGap){
-  //      markComponentUsable();
-  //      mRecyclerDom.preCalculateCellWidth();
-  //      updateRecyclerAttr();
-  //      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-  //      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-  //    }
-  //  }
-  //
-  //  @WXComponentProp(name = Constants.Name.RIGHT_GAP)
-  //  public void setRightGap(float rightGap)  {
-  //    if(mRecyclerDom != null && mRecyclerDom.getRightGap() != mRightGap){
-  //      markComponentUsable();
-  //      mRecyclerDom.preCalculateCellWidth();
-  //      updateRecyclerAttr();
-  //      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-  //      wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-  //    }
-  //  }
+  @WXComponentProp(name = Constants.Name.SPAN_OFFSETS)
+  public void setSpanOffsets(String spanOffsets)  {
+    if (!TextUtils.equals(spanOffsets, mSpanOffsetsStr)) {
+      markComponentUsable();
+      updateRecyclerAttr();
+      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+      wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
+    }
+  }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnWidth)  {
@@ -184,7 +191,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
-    if(columnCount != mColumnCount){
+    if(columnCount != mColumnCount) {
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -282,5 +289,9 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     return WXBasicComponentType.WATERFALL.equals(component.getComponentType())
             || WXBasicComponentType.RECYCLE_LIST.equals(component.getComponentType())
             || WXBasicComponentType.RECYCLER.equals(component.getComponentType());
+  }
+
+  public Float[] getSpanOffsets() {
+    return mSpanOffsets;
   }
 }

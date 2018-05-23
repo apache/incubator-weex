@@ -73,6 +73,9 @@ namespace WeexCore {
   constexpr char COLUMN_WIDTH[] = "columnWidth";
   constexpr char COLUMN_COUNT[] = "columnCount";
   constexpr char COLUMN_GAP[] = "columnGap";
+  constexpr char LEFT_GAP[] = "leftGap";
+  constexpr char RIGHT_GAP[] = "rightGap";
+  constexpr char SPAN_OFFSETS[] = "spanOffsets";
 
   constexpr char COLOR[] = "color";
   constexpr char BACKGROUND_COLOR[] = "backgroundColor";

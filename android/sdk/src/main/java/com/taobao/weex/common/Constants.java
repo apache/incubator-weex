@@ -127,6 +127,7 @@ public class Constants {
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
     String LAYOUT = "layout";
+    String SPAN_OFFSETS = "spanOffsets";
     String COLUMN_WIDTH = "columnWidth";
     String COLUMN_COUNT = "columnCount";
     String COLUMN_GAP = "columnGap";
