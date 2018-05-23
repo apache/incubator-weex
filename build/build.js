@@ -85,8 +85,8 @@ async function build (name) {
 
   const config = getConfig(pkgName)
   const minifyConfig = getConfig(pkgName, true)
-  const ES6Config = getConfig(pkgName, false, true)
-  const ES6MinifyConfig = getConfig(pkgName, true, true)
+  // const ES6Config = getConfig(pkgName, false, true)
+  // const ES6MinifyConfig = getConfig(pkgName, true, true)
 
   if (isWatch) {
     return await runRollupOnWatch(config)
@@ -95,8 +95,8 @@ async function build (name) {
     console.log(`\n => start to build ${pkgName}\n`)
     await runRollup(config)
     await runRollup(minifyConfig)
-    await runRollup(ES6Config)
-    await runRollup(ES6MinifyConfig)
+    // await runRollup(ES6Config)
+    // await runRollup(ES6MinifyConfig)
   }
 }
 
