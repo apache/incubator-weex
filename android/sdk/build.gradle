@@ -45,7 +45,7 @@ android {
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
 
-    delete 'libs/armeabi/libweexjsc.so'
+    delete 'libs/armeabi/libweexcore.so'
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
@@ -81,20 +81,20 @@ android {
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/armeabi/libweexjsc.so"
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/armeabi/libweexcore.so"
             overwrite false
         }
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexjsc.so"
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/x86/libweexcore.so"
             overwrite false
         }
     }
 
-    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
-    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexjsc.so").length();
-    def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
+    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
+    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexcore.so").length();
+    def X86_Size = new File(projectDir,"libs/x86/libweexcore.so").length();
     println "ARMEABI_Size: "+ARMEABI_Size;
     println "ARMEABIV7_Size:" + ARMEABIV7_Size;
     println "X86_Size:" + X86_Size;

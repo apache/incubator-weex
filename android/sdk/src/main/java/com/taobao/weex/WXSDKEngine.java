@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -102,7 +102,7 @@ public class WXSDKEngine implements Serializable {
 
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
 
-  private static final String V8_SO_NAME = "weexjsc";
+  private static final String V8_SO_NAME = "weexcore";
   private volatile static boolean mIsInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
