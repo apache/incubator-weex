@@ -52,9 +52,13 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   env->DeleteLocalRef(strencode);
   env->DeleteLocalRef(barr);
 
-  std::string stemp(rtn);
-  free(rtn);
-  return stemp;
+  if(rtn !=NULL) {
+    std::string stemp(rtn);
+    free(rtn);
+    return stemp;
+  } else {
+    return "";
+  }
 }
 
 static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
@@ -72,14 +76,16 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
     rtn = (char *) malloc(alen + 1);
     memcpy(rtn, ba, alen);
     rtn[alen] = 0;
-  } else {
-    return "";
   }
   env->ReleaseByteArrayElements(barr, ba, 0);
 
-  std::string stemp(rtn);
-  free(rtn);
-  return stemp;
+  if(rtn != NULL) {
+    std::string stemp(rtn);
+    free(rtn);
+    return stemp;
+  } else {
+    return "";
+  }
 }
 
 static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
