@@ -1,4 +1,4 @@
-<!-- 
+<!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
 distributed with this work for additional information
@@ -19,14 +19,7 @@ under the License.
 <project xmlns:rat="antlib:org.apache.rat.anttasks"
     xmlns="antlib:org.apache.tools.ant">
     <rat:report>
-        <fileset dir="../" includes="**/*.xml,**/*.m,**/*.h,**/*.mm,**/*.java,**/*.js">
-        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/Layout.*"/>
-        <exclude name="**/android/sdk/src/main/java/com/taobao/weex/dom/flex/*.java"/>
-        <!-- 
-        exclude:
-        - ios test dependency folder
-        - css layout source code under android sdk
-        -->
+        <fileset dir="../" includes="**/*.xml,**/*.m,**/*.h,**/*.mm,**/*.cpp,**/*.java,**/*.js">
         </fileset>
     </rat:report>
 </project>

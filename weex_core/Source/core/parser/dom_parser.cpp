@@ -522,7 +522,6 @@ namespace WeexCore {
         std::string value = r.GetObjectStr();
         std::pair<std::string, std::string> myPair(key, value);
         pairs->insert(pairs->end(), myPair);
-        r.SkipValue();
       } else {
         r.SkipValue();
       }

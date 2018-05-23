@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by furture on 2018/5/4.
-//
 
 #ifndef WEEX_PROJECT_NATIVE_RENDER_OBJECT_UTILS_IMPL_ANDROID_H
 #define WEEX_PROJECT_NATIVE_RENDER_OBJECT_UTILS_IMPL_ANDROID_H

@@ -24,7 +24,6 @@
 
 
 #import <Foundation/Foundation.h>
-#import "WXLayoutDefine.h"
 #import "WXType.h"
 
 @class WXSDKInstance;

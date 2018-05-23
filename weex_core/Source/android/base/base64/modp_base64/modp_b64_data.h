@@ -1,6 +1,22 @@
-// VC8 doesn't have stdint.h.  On the other hand, some compilers don't like
-// the below code, because basictypes.h itself includes stdint.h and the
-// typedefs below can cause conflicts.
+/**
+ * \file
+ * <PRE>
+ * High performance base64 encoder / decoder
+ * Version 1.3 -- 17-Mar-2006
+ *
+ * Copyright &copy; 2005, 2006, Nick Galbreath -- nickg [at] modp [dot] com
+ * All rights reserved.
+ *
+ * http://modp.com/release/base64
+ *
+ * Released under bsd license.  See modp_b64.c for details.
+ * </pre>
+ *
+ * The default implementation is the standard b64 encoding with padding.
+ * It's easy to change this to use "URL safe" characters and to remove
+ * padding.  See the modp_b64.c source code for details.
+ *
+ */
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 

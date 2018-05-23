@@ -69,26 +69,7 @@
 - (void)triggerLayout
 {
     WXAssertComponentThread();
-    
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        //TODO: _isUseContainerWidth?
-        if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH])) {
-            self.cssNode->style.dimensions[CSS_WIDTH] = ((WXScrollerComponent *)(self.supercomponent)).scrollerCSSNode->style.dimensions[CSS_WIDTH];
-        }
-        
-        if ([self needsLayout]) {
-            layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                print_css_node(self.cssNode, (css_print_options_t)(CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN));
-            }
-        }
-    }
 
-//#else
-    else
-    {
         if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
             self.flexCssNode->setStyleWidth(((WXScrollerComponent *)(self.supercomponent)).flexScrollerCSSNode->getStyleWidth(),NO);
         }
@@ -102,8 +83,6 @@
                 
             }
         }
-    }
-//#endif
     
     NSMutableSet<WXComponent *> *dirtyComponents = [NSMutableSet set];
     [self _calculateFrameWithSuperAbsolutePosition:CGPointZero gatherDirtyComponents:dirtyComponents];

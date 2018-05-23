@@ -351,16 +351,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
-  public void notifyLayerOverFlow() {
-    if (containsEvent(Constants.Event.LAYEROVERFLOW)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("ref", getRef());
-      params.put("instanceid", getInstanceId());
-      fireEvent(Constants.Event.LAYEROVERFLOW, params);
-    }
-  }
-
-
   /********************************************************
    *  begin hook Activity life cycle callback             *
    ********************************************************/

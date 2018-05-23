@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by Darin on 27/03/2018.
-//
 
 #ifndef WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
 #define WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H

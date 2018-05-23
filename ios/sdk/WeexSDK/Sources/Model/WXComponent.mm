@@ -169,40 +169,28 @@
     } else {
         component->_templateComponent = self->_templateComponent;
     }
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        memcpy(component->_cssNode, self.cssNode, sizeof(css_node_t));
-        component->_cssNode->context = (__bridge void *)component;
-    }
-//#else
-    else
-    {
-        //memcpy((void*)component->_flexCssNode,self.flexCssNode,sizeof(WeexCore::WXCoreLayoutNode));
-        component->_flexCssNode->copyStyle(self.flexCssNode);
-        component->_flexCssNode->copyMeasureFunc(self.flexCssNode);
-        component->_flexCssNode->setContext((__bridge void *)component);
-    }
-//#endif
+    //memcpy((void*)component->_flexCssNode,self.flexCssNode,sizeof(WeexCore::WXCoreLayoutNode));
+    component->_flexCssNode->copyStyle(self.flexCssNode);
+    component->_flexCssNode->copyMeasureFunc(self.flexCssNode);
+    component->_flexCssNode->setContext((__bridge void *)component);
     component->_calculatedFrame = self.calculatedFrame;
     
     NSMutableArray *subcomponentsCopy = [NSMutableArray array];
     
-    if ([WXComponent isUseFlex]) {
         component->_subcomponents = subcomponentsCopy;
         NSUInteger count = [self.subcomponents count];
         for (NSInteger i = 0 ; i < count;i++){
             WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
             [component _insertSubcomponent:subcomponentCopy atIndex:i];
         }
-    }else{
-        for (WXComponent *subcomponent in self.subcomponents) {
-            WXComponent *subcomponentCopy = [subcomponent copy];
-            subcomponentCopy->_supercomponent = component;
-            [subcomponentsCopy addObject:subcomponentCopy];
-        }
-        component->_subcomponents = subcomponentsCopy;
-    }
+//    else{
+//        for (WXComponent *subcomponent in self.subcomponents) {
+//            WXComponent *subcomponentCopy = [subcomponent copy];
+//            subcomponentCopy->_supercomponent = component;
+//            [subcomponentsCopy addObject:subcomponentCopy];
+//        }
+//        component->_subcomponents = subcomponentsCopy;
+//    }
     
     WXPerformBlockOnComponentThread(^{
         [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
@@ -223,22 +211,12 @@
 
 - (void)dealloc
 {
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-         free_css_node(_cssNode);
-    }
-//#else
-    else
-    {
-        if(self.flexCssNode){
+    if(self.flexCssNode){
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
+        WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
 #endif
-            delete self.flexCssNode;
-        }
+        delete self.flexCssNode;
     }
-//#endif
     
     // remove all gesture and all
     if (_isTemplate && self.attributes[@"@templateId"]) {
@@ -509,14 +487,6 @@
     return _absolutePosition;
 }
 
-//#ifndef USE_FLEX
-- (css_node_t *)cssNode
-{
-    return _cssNode;
-}
-//#else
-//#endif
-
 - (void)_addEventParams:(NSDictionary *)params
 {
     pthread_mutex_lock(&_propertyMutex);
@@ -576,14 +546,6 @@
     if (_useCompositing || _isCompositingChild) {
         subcomponent->_isCompositingChild = YES;
     }
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        
-    }
-//#else
-    else
-    {
         if (subcomponent->_isNeedJoinLayoutSystem) {
             NSInteger actualIndex = [self getActualNodeIndex:subcomponent atIndex:index];
             [self _insertChildCssNode:subcomponent atIndex:actualIndex];
@@ -597,8 +559,6 @@
                   );
 #endif
         }
-    }
-//#endif
     
     [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
@@ -608,16 +568,8 @@
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
-//#ifndef USE_FLEX
-      if (![WXComponent isUseFlex]) {
-      }
-//#else
-    else
-    {
         //subcomponent->_isNeedJoinLayoutSystem = NO;
         [self _rmChildCssNode:subcomponent];
-    }
-//#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
@@ -663,7 +615,6 @@
 #pragma mark Updating
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    NSLog(@"tempTest updating");
     
     BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
     if (isTransitionTag) {
