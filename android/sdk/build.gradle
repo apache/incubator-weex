@@ -72,11 +72,11 @@ android {
         include 'weex-rax-api.js'
     }
 
-    copy {
-        from '../../pre-build'
-        into new File(projectDir,"assets")
-        include 'weex-rax-extra-api.js'
-    }
+//    copy {
+//        from '../../pre-build'
+//        into new File(projectDir,"assets")
+//        include 'weex-rax-extra-api.js'
+//    }
 
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
