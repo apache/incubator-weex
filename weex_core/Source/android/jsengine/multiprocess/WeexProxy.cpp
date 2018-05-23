@@ -716,8 +716,8 @@ namespace WeexCore {
                     serializer->add(c_value_chars, c_value_len);
                     initFrameworkParams.push_back(
                             genInitFrameworkParams(c_key_chars, c_value_chars));
-                    WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey),
-                                                                jString2Str(env, jvalue));
+                    WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, jkey),
+                                                                jString2StrFast(env, jvalue));
                 }
             }
             env->DeleteLocalRef(jobjArray);
