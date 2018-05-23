@@ -162,6 +162,23 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private List<OnWXScrollListener> mWXScrollListeners;
 
+  private List<String> mLayerOverFlowListeners;
+
+  public List<String> getLayerOverFlowListeners() {
+    return mLayerOverFlowListeners;
+  }
+
+  public void addLayerOverFlowListener(String ref) {
+    if (mLayerOverFlowListeners == null)
+      mLayerOverFlowListeners = new ArrayList<>();
+    mLayerOverFlowListeners.add(ref);
+  }
+
+  public void removeLayerOverFlowListener(String ref) {
+    if (mLayerOverFlowListeners != null)
+      mLayerOverFlowListeners.remove(ref);
+  }
+
   /**
    * whether we are in preRender mode
    * */
@@ -1337,6 +1354,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
       if (mComponentObserver != null) {
         mComponentObserver = null;
+      }
+
+      if (mLayerOverFlowListeners != null) {
+        mLayerOverFlowListeners.clear();
       }
 
       getFlatUIContext().destroy();

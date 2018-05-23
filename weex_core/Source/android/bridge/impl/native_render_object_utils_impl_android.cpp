@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by furture on 2018/5/4.
-//
 
 #include "native_render_object_utils_impl_android.h"
 #include <android/base/jni/android_jni.h>

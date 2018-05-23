@@ -196,7 +196,6 @@ namespace WeexCore {
         }
 
         if(mColumnWidth != 0 && !isnan(mColumnWidth)) {
-            //LOGE("listen child->ApplyStyle %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
             AddRenderObjectWidth(child, false);
         }
         return index;
@@ -241,8 +240,6 @@ namespace WeexCore {
         int count = getChildCount();
         for (Index i = 0; i < count; i++) {
           RenderObject *child = GetChild(i);
-          //LOGE("listen child->UpdateAttr %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
-          // ApplyStyle(WIDTH, std::to_string(mColumnWidth));
           AddRenderObjectWidth(this, true);
         }
       }

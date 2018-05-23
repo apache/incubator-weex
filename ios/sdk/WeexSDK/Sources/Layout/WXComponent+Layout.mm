@@ -32,7 +32,6 @@ bool flexIsUndefined(float value) {
     return isnan(value);
 }
 
-static BOOL sUseFlex = TRUE;
 
 
 @implementation WXComponent (Layout)
@@ -45,13 +44,12 @@ static BOOL sUseFlex = TRUE;
 {
     _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
-    if ([WXComponent isUseFlex]) {
-        //protet nil ptr
-        if (self.flexCssNode) {
-            self.flexCssNode->markDirty();
-        }else{
-            WXLogError(@"flexCssNode is nil");
-        }
+    
+    //protet nil ptr
+    if (self.flexCssNode) {
+        self.flexCssNode->markDirty();
+    }else{
+        WXLogError(@"flexCssNode is nil");
     }
     
     if(supercomponent){
@@ -78,36 +76,6 @@ static BOOL sUseFlex = TRUE;
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-//#ifndef USE_FLEX
-    if (! [WXComponent isUseFlex]) {
-        _cssNode = new_css_node();
-        
-        _cssNode->print = cssNodePrint;
-        _cssNode->get_child = cssNodeGetChild;
-        _cssNode->is_dirty = cssNodeIsDirty;
-        if ([self measureBlock]) {
-            _cssNode->measure = cssNodeMeasure;
-        }
-        _cssNode->context = (__bridge void *)self;
-        
-        [self _recomputeCSSNodeChildren];
-        [self _fillCSSNode:styles isUpdate:NO];
-        
-        // To be in conformity with Android/Web, hopefully remove this in the future.
-        if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-            if (isUndefined(_cssNode->style.dimensions[CSS_HEIGHT]) && self.weexInstance.frame.size.height) {
-                _cssNode->style.dimensions[CSS_HEIGHT] = self.weexInstance.frame.size.height;
-            }
-            
-            if (isUndefined(_cssNode->style.dimensions[CSS_WIDTH]) && self.weexInstance.frame.size.width) {
-                _cssNode->style.dimensions[CSS_WIDTH] = self.weexInstance.frame.size.width;
-            }
-        }
-    }
-
-//#else
-    else
-    {
         _flexCssNode = new WeexCore::WXCoreLayoutNode();
         if ([self measureBlock]) {
             _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
@@ -125,8 +93,6 @@ static BOOL sUseFlex = TRUE;
                 _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
             }
         }
-    }
-//#endif
 }
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
@@ -141,13 +107,6 @@ static BOOL sUseFlex = TRUE;
 
 - (void)_recomputeCSSNodeChildren
 {
-//#ifndef USE_FLEX
-    if (![WXComponent isUseFlex]) {
-        _cssNode->children_count = (int)[self _childrenCountForLayout];
-    }
-//#else
-    
-//#endif
 }
 
 - (NSUInteger)_childrenCountForLayout
@@ -216,45 +175,6 @@ static BOOL sUseFlex = TRUE;
 {
     WXAssertComponentThread();
 
-//#ifndef USE_FLEX
-    if (![WXComponent isUseFlex])
-    {
-        if (!_cssNode->layout.should_update) {
-            return;
-        }
-        _cssNode->layout.should_update = false;
-        _isLayoutDirty = NO;
-        
-        CGRect newFrame = CGRectMake(isnan(WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]))?0:WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]),
-                                     isnan(WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]))?0:WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]),
-                                     isnan(WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]))?0:WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
-                                     isnan(WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]))?0:WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
-        
-        BOOL isFrameChanged = NO;
-        if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
-            isFrameChanged = YES;
-            _calculatedFrame = newFrame;
-            [dirtyComponents addObject:self];
-        }
-        
-        _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-        _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-        _cssNode->layout.position[CSS_LEFT] = 0;
-        _cssNode->layout.position[CSS_TOP] = 0;
-        
-        [self _frameDidCalculated:isFrameChanged];
-        NSArray * subcomponents = [_subcomponents copy];
-        for (WXComponent *subcomponent in subcomponents) {
-            [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
-        }
-#ifdef DEBUG
-        WXLogDebug(@"flexLayout -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
-#endif
-    }
-    
-//#else
-    else
-    {
         if (self.flexCssNode->hasNewLayout()) {
             self.flexCssNode->setHasNewLayout(false);
             _isLayoutDirty = NO;
@@ -283,8 +203,6 @@ static BOOL sUseFlex = TRUE;
         for (WXComponent *subcomponent in subcomponents) {
             [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
         }
-    }
-//#endif
 }
 
 - (void)_layoutDidFinish
@@ -297,45 +215,7 @@ static BOOL sUseFlex = TRUE;
     [self layoutDidFinish];
 }
 
-//#ifndef USE_FLEX
-
-#define WX_STYLE_FILL_CSS_NODE(key, cssProp, type)\
-do {\
-    id value = styles[@#key];\
-    if (value) {\
-        typeof(_cssNode->style.cssProp) convertedValue = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
-        _cssNode->style.cssProp = convertedValue;\
-        [self setNeedsLayout];\
-    }\
-} while(0);
-
-#define WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp)\
-do {\
-    id value = styles[@#key];\
-    if (value) {\
-        CGFloat pixel = [self WXPixelType:value];\
-        if (isnan(pixel)) {\
-            WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
-        } else {\
-            _cssNode->style.cssProp = pixel;\
-            [self setNeedsLayout];\
-        }\
-    }\
-} while(0);
-
-#define WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(key, cssProp)\
-do {\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_TOP])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_LEFT])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_RIGHT])\
-    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_BOTTOM])\
-} while(0);
-
-//#else
-
 #define WX_STYLE_FLEX_NODE_JUDGE_LEGAL(key) styles[key]&&!isnan([WXConvert WXPixelType:styles[key] scaleFactor:self.weexInstance.pixelScaleFactor])
-
-//#endif
 
 - (CGFloat)WXPixelType:(id)value
 {
@@ -344,58 +224,6 @@ do {\
 
 - (void)_fillCSSNode:(NSDictionary *)styles isUpdate:(BOOL)isUpdate
 {
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        WX_STYLE_FILL_CSS_NODE(direction, direction, css_direction_t)
-        // flex
-        WX_STYLE_FILL_CSS_NODE(flex, flex, CGFloat)
-        WX_STYLE_FILL_CSS_NODE(flexDirection, flex_direction, css_flex_direction_t)
-        WX_STYLE_FILL_CSS_NODE(alignItems, align_items, css_align_t)
-        WX_STYLE_FILL_CSS_NODE(alignSelf, align_self, css_align_t)
-        WX_STYLE_FILL_CSS_NODE(flexWrap, flex_wrap, css_wrap_type_t)
-        WX_STYLE_FILL_CSS_NODE(justifyContent, justify_content, css_justify_t)
-        
-        // position
-        WX_STYLE_FILL_CSS_NODE(position, position_type, css_position_type_t)
-        WX_STYLE_FILL_CSS_NODE_PIXEL(top, position[CSS_TOP])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(left, position[CSS_LEFT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(right, position[CSS_RIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position[CSS_BOTTOM])
-        
-        // dimension
-        WX_STYLE_FILL_CSS_NODE_PIXEL(width, dimensions[CSS_WIDTH])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(height, dimensions[CSS_HEIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(minWidth, minDimensions[CSS_WIDTH])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(minHeight, minDimensions[CSS_HEIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(maxWidth, maxDimensions[CSS_WIDTH])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(maxHeight, maxDimensions[CSS_HEIGHT])
-        
-        // margin
-        WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(margin, margin)
-        WX_STYLE_FILL_CSS_NODE_PIXEL(marginTop, margin[CSS_TOP])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(marginLeft, margin[CSS_LEFT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(marginRight, margin[CSS_RIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(marginBottom, margin[CSS_BOTTOM])
-        
-        // border
-        WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(borderWidth, border)
-        WX_STYLE_FILL_CSS_NODE_PIXEL(borderTopWidth, border[CSS_TOP])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(borderLeftWidth, border[CSS_LEFT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(borderRightWidth, border[CSS_RIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(borderBottomWidth, border[CSS_BOTTOM])
-        
-        // padding
-        WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(padding, padding)
-        WX_STYLE_FILL_CSS_NODE_PIXEL(paddingTop, padding[CSS_TOP])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(paddingLeft, padding[CSS_LEFT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(paddingRight, padding[CSS_RIGHT])
-        WX_STYLE_FILL_CSS_NODE_PIXEL(paddingBottom, padding[CSS_BOTTOM])
-    }
-   
-//#else
-    else
-    {
         // flex
         if (styles[@"flex"]) {
             _flexCssNode->setFlex([WXConvert CGFloat:styles[@"flex"]]);
@@ -534,9 +362,6 @@ do {\
         }
         
         [self setNeedsLayout];
-    }
- 
-//#endif
 }
 
 -(CGFloat)judgePropValuePropValue:(NSString *)propValue defaultValue:(CGFloat)defaultValue{
@@ -546,26 +371,6 @@ do {\
     }
     return defaultValue;
 }
-
-//#ifndef USE_FLEX
-
-#define WX_STYLE_RESET_CSS_NODE(key, cssProp, defaultValue)\
-do {\
-    if (styles && [styles containsObject:@#key]) {\
-        _cssNode->style.cssProp = defaultValue;\
-        [self setNeedsLayout];\
-    }\
-} while(0);
-
-#define WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(key, cssProp, defaultValue)\
-do {\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_TOP], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_LEFT], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_RIGHT], defaultValue)\
-    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_BOTTOM], defaultValue)\
-} while(0);
-
-//#else
 
 #define WX_FLEX_STYLE_RESET_CSS_NODE(key, defaultValue)\
 do {\
@@ -595,88 +400,34 @@ do {\
     }\
 } while(0);
 
-//#endif
-
 
 - (void)_resetCSSNode:(NSArray *)styles
 {
-//#ifndef USE_FLEX
-    if(![WXComponent isUseFlex])
-    {
-        WX_STYLE_RESET_CSS_NODE(direction, direction, CSS_DIRECTION_LTR)
-        // flex
-        WX_STYLE_RESET_CSS_NODE(flex, flex, 0.0)
-        WX_STYLE_RESET_CSS_NODE(flexDirection, flex_direction, CSS_FLEX_DIRECTION_COLUMN)
-        WX_STYLE_RESET_CSS_NODE(alignItems, align_items, CSS_ALIGN_STRETCH)
-        WX_STYLE_RESET_CSS_NODE(alignSelf, align_self, CSS_ALIGN_AUTO)
-        WX_STYLE_RESET_CSS_NODE(flexWrap, flex_wrap, CSS_NOWRAP)
-        WX_STYLE_RESET_CSS_NODE(justifyContent, justify_content, CSS_JUSTIFY_FLEX_START)
-        
-        // position
-        WX_STYLE_RESET_CSS_NODE(position, position_type, CSS_POSITION_RELATIVE)
-        WX_STYLE_RESET_CSS_NODE(top, position[CSS_TOP], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(left, position[CSS_LEFT], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(right, position[CSS_RIGHT], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(bottom, position[CSS_BOTTOM], CSS_UNDEFINED)
-        
-        // dimension
-        WX_STYLE_RESET_CSS_NODE(width, dimensions[CSS_WIDTH], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(height, dimensions[CSS_HEIGHT], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(minWidth, minDimensions[CSS_WIDTH], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(minHeight, minDimensions[CSS_HEIGHT], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(maxWidth, maxDimensions[CSS_WIDTH], CSS_UNDEFINED)
-        WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
-        
-        // margin
-        WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(margin, margin, 0.0)
-        WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], 0.0)
-        WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], 0.0)
-        
-        // border
-        WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(borderWidth, border, 0.0)
-        WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], 0.0)
-        WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], 0.0)
-        
-        // padding
-        WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(padding, padding, 0.0)
-        WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], 0.0)
-        WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], 0.0)
-        WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
-    }
-   
-//#else
-    else
-    {
         if (styles.count<=0) {
             return;
         }
         
         WX_FLEX_STYLE_RESET_CSS_NODE(flex, @0.0)
-        WX_FLEX_STYLE_RESET_CSS_NODE(flexDirection, @(CSS_FLEX_DIRECTION_COLUMN))
-        WX_FLEX_STYLE_RESET_CSS_NODE(alignItems, @(CSS_ALIGN_STRETCH))
-        WX_FLEX_STYLE_RESET_CSS_NODE(alignSelf, @(CSS_ALIGN_AUTO))
-        WX_FLEX_STYLE_RESET_CSS_NODE(flexWrap, @(CSS_NOWRAP))
-        WX_FLEX_STYLE_RESET_CSS_NODE(justifyContent, @(CSS_JUSTIFY_FLEX_START))
+        WX_FLEX_STYLE_RESET_CSS_NODE(flexDirection, @(WeexCore::kFlexDirectionColumn))
+        WX_FLEX_STYLE_RESET_CSS_NODE(alignItems, @(WeexCore::kAlignItemsStretch))
+        WX_FLEX_STYLE_RESET_CSS_NODE(alignSelf, @(WeexCore::kAlignSelfAuto))
+        WX_FLEX_STYLE_RESET_CSS_NODE(flexWrap, @(WeexCore::kNoWrap))
+        WX_FLEX_STYLE_RESET_CSS_NODE(justifyContent, @(WeexCore::kJustifyFlexStart))
         
         // position
-        WX_FLEX_STYLE_RESET_CSS_NODE(position, @(CSS_POSITION_RELATIVE))
-        WX_FLEX_STYLE_RESET_CSS_NODE(top, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(left, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(right, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(bottom, @(CSS_UNDEFINED))
+        WX_FLEX_STYLE_RESET_CSS_NODE(position, @(WeexCore::kRelative))
+        WX_FLEX_STYLE_RESET_CSS_NODE(top, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(left, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(right, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(bottom, @(NAN))
         
         // dimension
-        WX_FLEX_STYLE_RESET_CSS_NODE(width, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(height, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(minWidth, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(minHeight, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(maxWidth, @(CSS_UNDEFINED))
-        WX_FLEX_STYLE_RESET_CSS_NODE(maxHeight, @(CSS_UNDEFINED))
+        WX_FLEX_STYLE_RESET_CSS_NODE(width, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(height, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(minWidth, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(minHeight, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(maxWidth, @(NAN))
+        WX_FLEX_STYLE_RESET_CSS_NODE(maxHeight, @(NAN))
         
         // margin
         WX_FLEX_STYLE_RESET_CSS_NODE_GIVEN_DIRECTION_KEY(margin
@@ -713,81 +464,10 @@ do {\
         WX_FLEX_STYLE_RESET_CSS_NODE(paddingLeft, @(0.0))
         WX_FLEX_STYLE_RESET_CSS_NODE(paddingRight, @(0.0))
         WX_FLEX_STYLE_RESET_CSS_NODE(paddingBottom, @(0.0))
-    }
-    
-    
-//#endif
+
 }
 
 #pragma mark CSS Node Override
-
-//#ifndef USE_FLEX
-#if defined __cplusplus
-extern "C" {
-#endif
-static void cssNodePrint(void *context)
-{
-    WXComponent *component = (__bridge WXComponent *)context;
-    // TODO:
-    printf("%s:%s ", component.ref.UTF8String, component->_type.UTF8String);
-}
-
-static css_node_t * cssNodeGetChild(void *context, int i)
-{
-    WXComponent *component = (__bridge WXComponent *)context;
-    NSArray *subcomponents = component->_subcomponents;
-    for (int j = 0; j <= i && j < subcomponents.count; j++) {
-        WXComponent *child = subcomponents[j];
-        if (!child->_isNeedJoinLayoutSystem) {
-            i++;
-        }
-    }
-    
-    if(i >= 0 && i < subcomponents.count){
-        WXComponent *child = subcomponents[i];
-//        WXLogInfo(@"FlexLayout -- P:%@ -> C:%@",component,(__bridge WXComponent *)child->_cssNode->context);
-        return child->_cssNode;
-    }
-    
-    WXAssert(NO, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
-    return NULL;
-}
-
-static bool cssNodeIsDirty(void *context)
-{
-    WXAssertComponentThread();
-    
-    WXComponent *component = (__bridge WXComponent *)context;
-    BOOL needsLayout = [component needsLayout];
-    
-    return needsLayout;
-}
-    
-static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t widthMode, float height, css_measure_mode_t heightMode)
-{
-    WXComponent *component = (__bridge WXComponent *)context;
-    CGSize (^measureBlock)(CGSize) = [component measureBlock];
-    
-    if (!measureBlock) {
-        return (css_dim_t){NAN, NAN};
-    }
-    
-    CGSize constrainedSize = CGSizeMake(width, height);
-    CGSize resultSize = measureBlock(constrainedSize);
-#ifdef DEBUG
-    WXLogDebug(@"flexLayout -> measureblock %@, resultSize:%@",
-          component.type,
-          NSStringFromCGSize(resultSize)
-          );
-#endif
-    
-    return (css_dim_t){(float)resultSize.width, (float)resultSize.height};
-}
-#if defined __cplusplus
-};
-#endif
-
-//#else
 
 static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node, float width, WeexCore::MeasureMode widthMeasureMode,float height, WeexCore::MeasureMode heightMeasureMode){
     
@@ -957,17 +637,5 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 }
 
 
-+ (void) setUseFlex:(BOOL)useFlex
-{
-    sUseFlex =useFlex;
-}
-
-
-+ (BOOL) isUseFlex
-{
-    return sUseFlex;
-}
-
-//#endif
 
 @end

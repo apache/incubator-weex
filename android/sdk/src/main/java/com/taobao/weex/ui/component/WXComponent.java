@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.CSSShorthand.CORNER;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -64,7 +65,6 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -115,6 +115,7 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.utils.BoxShadowUtil;
 import com.taobao.weex.utils.WXDataStructureUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -302,6 +303,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
     final View view = getRealView();
+
+    if (type.equals(Constants.Event.LAYEROVERFLOW))
+      addLayerOverFlowListener(getRef());
+
     if (type.equals(Constants.Event.CLICK)) {
       if (view == null) {
         // wait next time to add.
@@ -661,25 +666,32 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       String key = entry.getKey();
       Object param = entry.getValue();
       String value = WXUtils.getString(param, null);
-      if (TextUtils.isEmpty(value)) {
-        param = convertEmptyProperty(key, value);
-      }
-      if (!setProperty(key, param)) {
-        if (mHolder == null) {
-          return;
+
+      if (key == null) {
+        WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_NULL_KEY, "updateProperties",
+                WXErrorCode.WX_RENDER_ERR_NULL_KEY.getErrorMsg(), null);
+      } else {
+        if (TextUtils.isEmpty(value)) {
+          param = convertEmptyProperty(key, value);
         }
-        Invoker invoker = mHolder.getPropertyInvoker(key);
-        if (invoker != null) {
-          try {
-            Type[] paramClazzs = invoker.getParameterTypes();
-            if (paramClazzs.length != 1) {
-              WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
-              return;
+        if (!setProperty(key, param)) {
+          if (mHolder == null) {
+            return;
+          }
+          Invoker invoker = mHolder.getPropertyInvoker(key);
+          if (invoker != null) {
+            try {
+              Type[] paramClazzs = invoker.getParameterTypes();
+              if (paramClazzs.length != 1) {
+                WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
+                return;
+              }
+              param = WXReflectionUtils.parseArgument(paramClazzs[0], param);
+              invoker.invoke(this, param);
+            } catch (Exception e) {
+              WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
             }
-            param = WXReflectionUtils.parseArgument(paramClazzs[0], param);
-            invoker.invoke(this, param);
-          } catch (Exception e) {
-            WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
           }
         }
       }
@@ -1393,6 +1405,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (getEvents() == null || mAppendEvents == null || mGestureType == null) {
       return;
     }
+
+    if (type.equals(Constants.Event.LAYEROVERFLOW))
+      removeLayerOverFlowListener(getRef());
+
     getEvents().remove(type);
     mAppendEvents.remove(type);//only clean append events, not dom's events.
     mGestureType.remove(type);
@@ -2266,5 +2282,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       updateNativeStyle(objectEntry.getKey(), objectEntry.getValue());
     }
+  }
+
+  public void addLayerOverFlowListener(String ref) {
+    if (getInstance() != null)
+      getInstance().addLayerOverFlowListener(ref);
+  }
+
+  public void removeLayerOverFlowListener(String ref) {
+    if (getInstance() != null)
+      getInstance().removeLayerOverFlowListener(ref);
   }
 }

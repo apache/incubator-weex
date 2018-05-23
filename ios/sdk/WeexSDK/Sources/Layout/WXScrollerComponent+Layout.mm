@@ -22,12 +22,6 @@
 
 @implementation WXScrollerComponent (FlexLayout)
 
-//#ifndef USE_FLEX
-- (css_node_t *)scrollerCSSNode
-{
-    return _scrollerCSSNode;
-}
-//#else
 - (WeexCore::WXCoreLayoutNode *)flexScrollerCSSNode{
     return _flexScrollerCSSNode;
 }
@@ -49,5 +43,4 @@
 #endif
 }
 
-//#endif
 @end

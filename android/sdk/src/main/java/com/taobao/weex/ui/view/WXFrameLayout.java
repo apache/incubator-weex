@@ -28,7 +28,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.gesture.WXGesture;
@@ -37,7 +41,9 @@ import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * FrameLayout wrapper
@@ -105,7 +111,7 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       dispatchDrawInterval(canvas);
     } catch (Throwable e) {
       if (getComponent() != null) {
-        getComponent().notifyLayerOverFlow();
+        notifyLayerOverFlow();
         reportLayerOverFlowError();
       }
       WXLogUtils.e("Layer overflow limit error", WXLogUtils.getStackTrace(e));
@@ -144,5 +150,25 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       return calLayerDeep((View) view.getParent(), deep);
     }
     return deep;
+  }
+
+  public void notifyLayerOverFlow() {
+    if (getComponent() == null)
+      return;
+
+    WXSDKInstance instance = getComponent().getInstance();
+    if (instance == null)
+      return;
+
+    if (instance.getLayerOverFlowListeners() == null)
+      return;
+
+    for (String ref : instance.getLayerOverFlowListeners()) {
+      WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instance.getInstanceId(), ref);
+      Map<String, Object> params = new HashMap<>();
+      params.put(Constants.Weex.REF, ref);
+      params.put(Constants.Weex.INSTANCEID, component.getInstanceId());
+      component.fireEvent(Constants.Event.LAYEROVERFLOW, params);
+    }
   }
 }

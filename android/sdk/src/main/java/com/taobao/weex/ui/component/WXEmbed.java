@@ -20,7 +20,6 @@ package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -500,5 +499,17 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
               + "  " + hiddenTime  + " embeds size " + (getInstance().hiddenEmbeds == null ?  0 : getInstance().hiddenEmbeds.size())
               + " strategy " + this.strategy);
     }
+  }
+
+  @Override
+  public void addLayerOverFlowListener(String ref) {
+    if (mNestedInstance != null)
+      mNestedInstance.addLayerOverFlowListener(getRef());
+  }
+
+  @Override
+  public void removeLayerOverFlowListener(String ref) {
+    if (mNestedInstance != null)
+      mNestedInstance.removeLayerOverFlowListener(ref);
   }
 }
