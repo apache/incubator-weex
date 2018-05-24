@@ -500,7 +500,6 @@ typedef enum : NSUInteger {
     }
 
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-    _instanceJavaScriptContext = nil;
     
     if (_componentManager) {
         [_componentManager invalidate];
