@@ -117,13 +117,13 @@ namespace WeexCore {
 
     std::map<std::string, std::string> *GetDefaultAttr() {
       if (!mIsPreCalculateCellWidth) {
-        return preCalculateCellWidth();
+        preCalculateCellWidth();
       }
       return nullptr;
     }
 
 
-    std::map<std::string, std::string> *preCalculateCellWidth() {
+    inline void preCalculateCellWidth() {
         std::map<std::string, std::string> *attrs = new std::map<std::string, std::string>();
         if (Attributes() != nullptr) {
             mColumnCount = getColumnCount();
@@ -170,8 +170,22 @@ namespace WeexCore {
             if (spanOffsets.length() > 0) {
                 attrs->insert(std::pair<std::string, std::string>(SPAN_OFFSETS, to_string(spanOffsets)));
             }
+
+            for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+              RenderObject::UpdateAttr(iter->first, iter->second);
+            }
         }
-        return attrs;
+
+      RenderPage *page = GetRenderPage();
+
+      if (page != nullptr)
+        page->SendUpdateAttrAction(this, attrs);
+
+      if (attrs != nullptr) {
+        attrs->clear();
+        delete attrs;
+        attrs = nullptr;
+      }
     }
 
     std::string calcSpanOffset() {
@@ -239,25 +253,11 @@ namespace WeexCore {
         }
     }
 
-    void UpdatePreCalculateCellAttrs(std::map<std::string, std::string> * attrs){
-        if (attrs == nullptr){
-            return;
-        }
-
-        for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
-            RenderObject::UpdateAttr(iter->first, iter->second);
-        }
-        if (attrs != nullptr) {
-            delete attrs;
-            attrs = nullptr;
-        }
-    }
-
     void UpdateAttr(std::string key, std::string value) {
       RenderObject::UpdateAttr(key, value);
 
       if(!GetAttr(COLUMN_COUNT).empty() || !GetAttr(COLUMN_GAP).empty() || !GetAttr(COLUMN_WIDTH).empty()){
-          UpdatePreCalculateCellAttrs(preCalculateCellWidth());
+          preCalculateCellWidth();
 
         if(mColumnWidth == 0 && isnan(mColumnWidth)) {
           return;
