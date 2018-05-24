@@ -52,8 +52,7 @@ set(COMMON_SRCS
   ./core/moniter/render_performance.cpp
   ./core/manager/wx_core_manager.cpp
   ./core/bridge/js_bridge.cpp
-
-)
+        )
 
 if (ANDROID)
   set (ANDROID_SRCS
@@ -77,7 +76,7 @@ if (ANDROID)
     ./android/jsengine/multiprocess/WeexProxy.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
 
-  )
+        )
 
   add_library(${WEEXCORE_LIBRARY_NAME} SHARED
     ${COMMON_SRCS}
