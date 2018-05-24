@@ -26,6 +26,7 @@
 
 #include <core/bridge/bridge.h>
 #include <core/bridge/js_bridge.h>
+//#include <core/bridge/platform_bridge.h>
 
 
 namespace WeexCore {
@@ -61,6 +62,7 @@ namespace WeexCore {
     private:
         Bridge *platform_bridge;
         JSBridge *js_bridge;
+
         //todo core_bridge
 
     };
