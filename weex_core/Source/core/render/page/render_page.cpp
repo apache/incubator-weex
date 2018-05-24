@@ -606,7 +606,6 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageInit() {
-
   }
 
   void RenderPage::OnRenderProcessStart() {
@@ -622,6 +621,5 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageClose() {
-
   }
 } //namespace WeexCore

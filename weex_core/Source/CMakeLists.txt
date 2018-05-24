@@ -60,6 +60,7 @@ if (ANDROID)
     ./android/base/base64/modp_base64/modp_b64.cc
     ./android/base/string/scoped_jstring.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
+    ./android/base/string/jstring_cache.cpp
     ./android/bridge/impl/bridge_impl_android.cpp
     ./android/bridge/impl/weexcore_impl_android.cpp
     ./android/bridge/impl/measure_mode_impl_android.cpp
