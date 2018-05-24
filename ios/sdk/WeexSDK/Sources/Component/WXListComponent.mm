@@ -923,6 +923,11 @@
 
 - (void)_insertTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
 {
+    NSInteger numberOfRows = ((WXSectionComponent *)[_sections wx_safeObjectAtIndex:indexPath.section]).rows.count;
+    if (indexPath.row > numberOfRows || indexPath.row < 0) {
+        WXLogError(@"inserting cell at row %ld out of range in section:%ld", indexPath.row, indexPath.section);
+        return;
+    }
     [self _performUpdates:^{
         if ([_updataType  isEqual: @"reload"]) {
             [_tableView reloadData];
