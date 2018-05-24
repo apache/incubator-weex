@@ -143,6 +143,7 @@ typedef enum : NSUInteger {
         return _instanceJavaScriptContext;
     }
     
+    WXAssertBridgeThread();
     if (_instanceJavaScriptContext) {
         _instanceJavaScriptContext = nil;
     }
