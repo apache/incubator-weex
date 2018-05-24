@@ -64,7 +64,6 @@ namespace WeexCore {
 
     friend class RenderPage;
 
-
   public:
     inline void LayoutBefore() {
       if (isDirty()) {
@@ -210,6 +209,9 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
+        if (value == STICKY) {
+          mIsSticky = true;
+        }
         mapInsertOrAssign(mStyles, key, value);
         return kTypeStyle;
       } else if (key == LEFT) {
@@ -438,12 +440,16 @@ namespace WeexCore {
       return mIsRootRender;
     }
 
-    inline bool IsAppendTree(){
+    inline bool IsAppendTree() {
       std::string append = GetAttr(APPEND);
-      if(append == "tree"){
+      if(append == "tree") {
         return true;
       }
       return false;
+    }
+
+    inline bool IsSticky() {
+      return mIsSticky;
     }
 
   private:
@@ -453,6 +459,7 @@ namespace WeexCore {
     EventsSet *mEvents;
     float mViewPortWidth = -1;
     bool mIsRootRender;
+    bool mIsSticky = false;
   };
 } //end WeexCore
 #endif //RenderObject_h
