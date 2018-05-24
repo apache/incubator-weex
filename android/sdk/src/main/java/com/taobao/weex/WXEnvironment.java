@@ -94,6 +94,8 @@ public class WXEnvironment {
 
   private static String sGlobalFontFamily;
 
+  public static final String CORE_SO_NAME = "weexcore";
+
   private static Map<String, String> options = new HashMap<>();
   static {
     options.put(WXConfig.os, OS);
