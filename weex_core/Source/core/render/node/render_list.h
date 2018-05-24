@@ -205,8 +205,8 @@ namespace WeexCore {
         if (Type() == kRenderWaterfall || Type() == kRenderRecycleList) {
             if(child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
                 child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
-            } else if (child->getStypePositionType() == kSticky) {
-                child->ApplyStyle(WIDTH, to_string(GetViewPortWidth()), updating);
+            } else if (child->IsSticky()) {
+                child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
             } else if (child->Type() == kRenderCell || child->Type() == kRenderCellSlot){
                 child->ApplyStyle(WIDTH, to_string(mColumnWidth), updating);
             }
