@@ -49,7 +49,6 @@
 #import "WXModalUIModule.h"
 #import "WXLog.h"
 #import "WXListComponent.h"
-#import "WXLayoutDefine.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXJSExceptionInfo.h"
 #import "WXIndicatorComponent.h"
@@ -77,7 +76,6 @@
 #import "WXAnalyzerCenter.h"
 #import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
-#import "Layout.h"
 #import "JSContext+Weex.h"
 
 #endif /* __OBJC__ */

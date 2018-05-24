@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by furture on 2018/5/4.
-//
 
 #include "native_render_object_utils_impl_android.h"
 #include <android/base/jni/android_jni.h>
@@ -95,6 +92,11 @@ static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
 }
 
 static  void showRenderObjectLayout(RenderObject *renderObject, int level){
+    LOGE("RenderObject layout %s %d %p %f %f %f %f ",  renderObject->Type().c_str(),
+         renderObject->getStypePositionType(),
+         renderObject, renderObject->getLayoutHeight(), renderObject->getLayoutWidth(),
+         renderObject->getLayoutPositionLeft(), renderObject->getLayoutPositionRight());
+
     for(auto it = renderObject->ChildListIterBegin(); it != renderObject->ChildListIterEnd(); it++){
         RenderObject* child = static_cast<RenderObject*>(*it);
         showRenderObjectLayout(child, level + 1);

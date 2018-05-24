@@ -32,6 +32,7 @@
 #include <core/render/page/render_page.h>
 #include <core/css/constants_value.h>
 #include <android/base/log_utils.h>
+#include <android/bridge/impl/bridge_impl_android.h>
 #include <functional>
 
 
@@ -62,7 +63,6 @@ namespace WeexCore {
   class RenderObject : public IRenderObject {
 
     friend class RenderPage;
-
 
   public:
     inline void LayoutBefore() {
@@ -143,9 +143,9 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    bool BindMeasureFuncImplAndroid(jobject measureFunc_impl_android);
+    void BindMeasureFuncImplAndroid();
 
-    bool BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
+    void BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
 
     void onLayoutBefore();
 
@@ -209,6 +209,9 @@ namespace WeexCore {
         return kTypeLayout;
       } else if (key == POSITION) {
         setStylePositionType(GetWXCorePositionType(value));
+        if (value == STICKY) {
+          mIsSticky = true;
+        }
         mapInsertOrAssign(mStyles, key, value);
         return kTypeStyle;
       } else if (key == LEFT) {
@@ -281,7 +284,10 @@ namespace WeexCore {
     void ApplyDefaultAttr();
 
     inline jobject GetMeasureFuncImplAndroid() {
-      return mMeasureFunc_Impl_Android;
+      if (!haveMeasureFunc()) {
+        return nullptr;
+      }
+      return Bridge_Impl_Android::getInstance()->getMeasureFunc(PageId().c_str(), Ref().c_str());
     }
 
     inline RenderObject *GetChild(const Index &index) {
@@ -434,12 +440,16 @@ namespace WeexCore {
       return mIsRootRender;
     }
 
-    inline bool IsAppendTree(){
+    inline bool IsAppendTree() {
       std::string append = GetAttr(APPEND);
-      if(append == "tree"){
+      if(append == "tree") {
         return true;
       }
       return false;
+    }
+
+    inline bool IsSticky() {
+      return mIsSticky;
     }
 
   private:
@@ -447,9 +457,9 @@ namespace WeexCore {
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
-    jobject mMeasureFunc_Impl_Android;
     float mViewPortWidth = -1;
     bool mIsRootRender;
+    bool mIsSticky = false;
   };
 } //end WeexCore
 #endif //RenderObject_h

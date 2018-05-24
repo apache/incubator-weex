@@ -222,7 +222,6 @@ namespace WeexCore {
         }
 
         if(mColumnWidth != 0 && !isnan(mColumnWidth)) {
-            //LOGE("listen child->ApplyStyle %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
             AddRenderObjectWidth(child, false);
         }
         return index;
@@ -232,8 +231,8 @@ namespace WeexCore {
         if (Type() == kRenderWaterfall || Type() == kRenderRecycleList) {
             if(child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
                 child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
-            } else if (child->getStypePositionType() == kSticky) {
-                child->ApplyStyle(WIDTH, to_string(GetViewPortWidth()), updating);
+            } else if (child->IsSticky()) {
+                child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
             } else if (child->Type() == kRenderCell || child->Type() == kRenderCellSlot){
                 child->ApplyStyle(WIDTH, to_string(mColumnWidth), updating);
             }
@@ -267,8 +266,6 @@ namespace WeexCore {
         int count = getChildCount();
         for (Index i = 0; i < count; i++) {
           RenderObject *child = GetChild(i);
-          //LOGE("listen child->UpdateAttr %s %s", child->Ref().c_str(), std::to_string(mColumnWidth).c_str());
-          // ApplyStyle(WIDTH, std::to_string(mColumnWidth));
           AddRenderObjectWidth(this, true);
         }
       }

@@ -42,10 +42,10 @@ namespace WeexCore {
     virtual int callNative(const char* pageId, const char *task, const char *callback) = 0;
 
     virtual jobject callNativeModule(const char* pageId, const char *module, const char *method,
-                                     const char *argString, const char *optString) = 0;
+                                     const char *arguments, int argumentsLength, const char *options, int optionsLength) = 0;
 
     virtual void callNativeComponent(const char* pageId, const char* ref, const char *method,
-                                     const char *argString, const char *optString) = 0;
+                                     const char *arguments, int argumentsLength, const char *options, int optionsLength) = 0;
 
     virtual void setTimeout(const char* callbackID, const char* time) = 0;
 

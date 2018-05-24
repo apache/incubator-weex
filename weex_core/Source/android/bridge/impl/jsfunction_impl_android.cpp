@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by Darin on 27/03/2018.
-//
 
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
@@ -43,6 +40,15 @@ static const char *getCharFromJByte(JNIEnv *env, jbyteArray jbyteArray1) {
 
     return jByteArray2Str(env, jbyteArray1).c_str();
 }
+
+static const int getJByteArraySize(JNIEnv *env, jbyteArray array){
+    if(array == nullptr){
+        return  0;
+    }
+    jsize size = env->GetArrayLength(array);
+    return size;
+}
+
 
 static const char *getCharFromJString(JNIEnv *env, jstring string) {
     if (string == nullptr)
@@ -94,7 +100,7 @@ void jsHandleCallNative(JNIEnv *env, jobject object, jstring instanceId, jbyteAr
 void
 jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstring module,
                          jstring method, jbyteArray
-                         arguments, jbyteArray options) {
+                         arguments, jbyteArray options, jboolean from) {
 
 
 #if JSAPI_LOG
@@ -110,7 +116,9 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
             getCharFromJString(env, module),
             getCharFromJString(env, method),
             getCharFromJByte(env, arguments),
-            getCharFromJByte(env, options));
+            getJByteArraySize(env, arguments),
+            getCharFromJByte(env, options),
+            getJByteArraySize(env, options));
 
     jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
     jint jTypeInt = env->GetIntField(result, jTypeId);
@@ -129,31 +137,44 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
     } else if (jTypeInt == 3) {
         jstring jDataStr = (jstring) jDataObj;
         //ret = std::move(createJSONStringResult(env, jDataStr));
+    } else if (jTypeInt == 4) {
+        jbyteArray array = (jbyteArray)jDataObj;
+        if(array != nullptr){
+            int length = env->GetArrayLength(array);
+            void* data = env->GetByteArrayElements(array, 0);
+            //ret = std::move(createByteArrayResult((const char*)data, length));
+            env->ReleaseByteArrayElements(array, (jbyte*)data, 0);
+        }
     }
     env->DeleteLocalRef(jDataObj);
+    if(result != nullptr){
+        env->DeleteLocalRef(result);
+    }
     //return ret;
 }
 
 void
 jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jstring componentRef,
                             jstring method,
-                            jbyteArray arguments, jbyteArray options) {
+                            jbyteArray arguments, jbyteArray options, jboolean from) {
 
     Bridge_Impl_Android::getInstance()->callNativeComponent(getCharFromJString(env, instanceId),
                                                             getCharFromJString(env, componentRef),
                                                             getCharFromJString(env, method),
                                                             getCharFromJByte(env, arguments),
-                                                            getCharFromJByte(env, options));
+                                                            getJByteArraySize(env, arguments),
+                                                            getCharFromJByte(env, options),
+                                                            getJByteArraySize(env, options));
 
 }
 
 void
-jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jstring dom,
+jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jbyteArray dom,
                        jstring index) {
 
     const char *instanceChar = env->GetStringUTFChars(instanceId, 0);
     const char *refChar = env->GetStringUTFChars(ref, 0);
-    const char *domChar = env->GetStringUTFChars(dom, 0);
+    const char *domChar = getCharFromJByte(env, dom);
     const char *indexChar = env->GetStringUTFChars(index, 0);
 
     int indexI = atoi(indexChar);
@@ -176,13 +197,12 @@ void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array) {
     Bridge_Impl_Android::getInstance()->callNativeLog(getCharFromJByte(env, str_array));
 }
 
-void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jstring domStr) {
-
+void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr, jboolean from) {
     if (pageId == nullptr || domStr == nullptr)
         return;
 
     const char *page = env->GetStringUTFChars(pageId, NULL);
-    const char *dom = env->GetStringUTFChars(domStr, NULL);
+    const char *dom = getCharFromJByte(env, domStr);
     if (page == nullptr || dom == nullptr || strlen(dom) == 0)
         return;
     RenderManager::GetInstance()->CreatePage(page, dom);
@@ -211,17 +231,17 @@ jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jby
 }
 
 void
-jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring data) {
+jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from) {
     RenderManager::GetInstance()->UpdateAttr(env->GetStringUTFChars(pageId, 0),
                                              env->GetStringUTFChars(ref, 0),
-                                             env->GetStringUTFChars(data, 0));
+                                             getCharFromJByte(env, data));
 }
 
 void
-jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring data) {
+jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from) {
     RenderManager::GetInstance()->UpdateStyle(env->GetStringUTFChars(pageId, 0),
                                               env->GetStringUTFChars(ref, 0),
-                                              env->GetStringUTFChars(data, 0));
+                                              getCharFromJByte(env, data));
 }
 
 void jsFunctionCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref) {

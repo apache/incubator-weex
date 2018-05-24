@@ -34,22 +34,22 @@ static void jsHandleCallNative(JNIEnv *env, jobject object, jstring instanceId, 
 static void
 jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstring module,
                          jstring method, jbyteArray
-                         arguments, jbyteArray options);
+                         arguments, jbyteArray options,jboolean from);
 
 static void
 jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jstring componentRef,
                             jstring method,
-                            jbyteArray arguments, jbyteArray options);
+                            jbyteArray arguments, jbyteArray options, jboolean from);
 
 static void
-jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jstring dom,
+jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jbyteArray dom,
                        jstring index);
 
 static void jsHandleSetTimeout(JNIEnv *env, jobject object, jstring callbackId, jstring time);
 
 static void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array);
 
-static void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jstring domStr);
+static void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr, jboolean from);
 
 static void
 jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
@@ -62,10 +62,10 @@ jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jby
                             jstring callback);
 
 static void
-jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring data);
+jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from);
 
 static void
-jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring data);
+jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from);
 
 static void jsFunctionCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref);
 
@@ -103,13 +103,13 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
                 "(Ljava/lang/String;[BLjava/lang/String;)V",
                 reinterpret_cast<void *>(jsHandleCallNative)},
         {"jsHandleCallNativeModule",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)V",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[BZ)V",
                 reinterpret_cast<void *>(jsHandleCallNativeModule)},
         {"jsHandleCallNativeComponent",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[B)V",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B[BZ)V",
                 reinterpret_cast<void *>(jsHandleCallNativeComponent)},
         {"jsHandleCallAddElement",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;Z)V",
                 reinterpret_cast<void *>(jsHandleCallAddElement)},
         {"jsHandleSetTimeout",
                 "(Ljava/lang/String;Ljava/lang/String;)V",
@@ -118,7 +118,7 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
                 "([B)V",
                 reinterpret_cast<void *>(jsHandleCallNativeLog)},
         {"jsFunctionCallCreateBody",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/String;[BZ)V",
                 reinterpret_cast<void *>(jsFunctionCallCreateBody)},
         {"jsFunctionCallUpdateFinish",
                 "(Ljava/lang/String;[BLjava/lang/String;)V",
@@ -130,10 +130,10 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
                 "(Ljava/lang/String;[BLjava/lang/String;)V",
                 reinterpret_cast<void *>(jsFunctionCallRefreshFinish)},
         {"jsFunctionCallUpdateAttrs",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/String;Ljava/lang/String;[BZ)V",
                 reinterpret_cast<void *>(jsFunctionCallUpdateAttrs)},
         {"jsFunctionCallUpdateStyle",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/String;Ljava/lang/String;[BZ)V",
                 reinterpret_cast<void *>(jsFunctionCallUpdateStyle)},
         {"jsFunctionCallRemoveElement",
                 "(Ljava/lang/String;Ljava/lang/String;)V",

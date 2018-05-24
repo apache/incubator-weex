@@ -26,6 +26,12 @@ public class Constants {
     int VERTICAL = 1;
   }
 
+  public interface Weex {
+    String REF = "ref";
+    String INSTANCEID = "instanceid";
+    String TYPE = "type";
+  }
+
   public interface Name {
 
     String DEFAULT_WIDTH = "defaultWidth";

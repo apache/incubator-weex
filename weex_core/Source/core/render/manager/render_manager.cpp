@@ -16,28 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/parser/dom_parser.h>
 #include <core/render/manager/render_manager.h>
 #include <core/render/page/render_page.h>
 #include <core/render/node/render_object.h>
 #include <base/TimeUtils.h>
+#include <core/parser/dom_wson.h>
 
 namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-  bool RenderManager::CreatePage(std::string pageId, const std::string &data) {
+  bool RenderManager::CreatePage(std::string pageId, const  char* data) {
 
 #if RENDER_LOG
-    LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s", pageId.c_str(), data.c_str());
+    wson_parser parser(data);
+    LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s", pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
 
     RenderPage *page = new RenderPage(pageId);
     mPages.insert(std::pair<std::string, RenderPage *>(pageId, page));
 
     long long startTime = getCurrentTime();
-    char *c_data = (char *) data.data();
-    RenderObject *root = Json2RenderObject(c_data, pageId);
+    RenderObject *root = Wson2RenderObject(data, pageId);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     page->updateDirty(true);
@@ -45,20 +45,20 @@ namespace WeexCore {
   }
 
   bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
-                                      int index, const std::string &data) {
+                                      int index, const char* data) {
 
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
       return false;
 
 #if RENDER_LOG
+    wson_parser parser(data);
     LOGD("[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: %d, dom data: %s",
-         pageId.c_str(), parentRef.c_str(), index, data.c_str());
+         pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
 #endif
 
     long long startTime = getCurrentTime();
-    char *c_data = (char *) data.data();
-    RenderObject *child = Json2RenderObject(c_data, pageId);
+    RenderObject *child = Wson2RenderObject(data, pageId);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     if (child == nullptr)
@@ -99,19 +99,19 @@ namespace WeexCore {
   }
 
   bool RenderManager::UpdateAttr(const std::string &pageId, const std::string &ref,
-                                 const std::string &data) {
+                                 const char* data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
 
 #if RENDER_LOG
+    wson_parser parser(data);
     LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
-         pageId.c_str(), ref.c_str(), data.c_str());
+         pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
 #endif
 
     long long startTime = getCurrentTime();
-    char *c_data = (char *) data.data();
-    std::vector<std::pair<std::string, std::string>> *attrs = Json2Pairs(c_data);
+    std::vector<std::pair<std::string, std::string>> *attrs = Wson2Pairs(data);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     page->updateDirty(true);
@@ -119,19 +119,19 @@ namespace WeexCore {
   }
 
   bool RenderManager::UpdateStyle(const std::string &pageId, const std::string &ref,
-                                  const std::string &data) {
+                                  const char* data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
 
 #if RENDER_LOG
+    wson_parser parser(data);
     LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
-         pageId.c_str(), ref.c_str(), data.c_str());
+         pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
 #endif
 
     long long startTime = getCurrentTime();
-    char *c_data = (char *) data.data();
-    std::vector<std::pair<std::string, std::string>> *styles = Json2Pairs(c_data);
+    std::vector<std::pair<std::string, std::string>> *styles = Wson2Pairs(data);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     page->updateDirty(true);
@@ -198,7 +198,7 @@ namespace WeexCore {
 #if RENDER_LOG
     LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
 #endif
-
+    page->OnRenderPageClose();
     mPages.erase(pageId);
     delete page;
     page = nullptr;

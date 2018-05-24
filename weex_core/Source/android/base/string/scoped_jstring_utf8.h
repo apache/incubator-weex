@@ -19,12 +19,10 @@
 #ifndef _SCOPED_JSTRING_UTF_8_H_
 #define _SCOPED_JSTRING_UTF_8_H_
 
-#include <locale.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <thread>
 #include <type_traits>
 #include "../base64/base64.h"
 #include <jni.h>

@@ -20,7 +20,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import "WXLog.h"
-#import "WXLayoutDefine.h"
 #import "WXType.h"
 
 @class WXLength;
@@ -56,12 +55,6 @@ typedef CGFloat WXPixelType;
 // WXPixelType that use flexCGFloat to convert
 + (WXPixelType)WXFlexPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
-+ (css_direction_t)css_direction_t:(id)value;
-+ (css_flex_direction_t)css_flex_direction_t:(id)value;
-+ (css_align_t)css_align_t:(id)value;
-+ (css_wrap_type_t)css_wrap_type_t:(id)value;
-+ (css_justify_t)css_justify_t:(id)value;
-+ (css_position_type_t)css_position_type_t:(id)value;
 
 + (UIViewContentMode)UIViewContentMode:(id)value;
 + (WXImageQuality)WXImageQuality:(id)value;

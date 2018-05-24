@@ -25,6 +25,7 @@
 #include <core/render/manager/render_manager.h>
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <android/base/string/string_utils.h>
+#include <wson/wson_parser.h>
 
 using namespace WeexCore;
 
@@ -56,7 +57,7 @@ void _callNative(const char *pageId, const char *task, const char *callback) {
 
 std::unique_ptr<IPCResult>
 _callNativeModule(const char *pageId, const char *module, const char *method,
-                  const char *argString, const char *optString) {
+                  const char *arguments, int argumentsLength, const char *options, int optionsLength) {
     std::unique_ptr<IPCResult> ret = createInt32Result(-1);
     if (pageId != nullptr && module != nullptr && method != nullptr) {
 #if JSAPI_LOG
@@ -67,10 +68,10 @@ _callNativeModule(const char *pageId, const char *module, const char *method,
         // add for android support
         jobject result;
         result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
-                                                                      argString, optString);
-
-        if (result == nullptr)
+                                                                      arguments,  argumentsLength, options, optionsLength);
+        if (result == nullptr){
             return ret;
+        }
 
         JNIEnv *env = getJNIEnv();
         jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
@@ -92,16 +93,26 @@ _callNativeModule(const char *pageId, const char *module, const char *method,
         } else if (jTypeInt == 3) {
             jstring jDataStr = (jstring) jDataObj;
             ret = std::move(createJSONStringResult(env, jDataStr));
+        } else if (jTypeInt == 4) {
+            jbyteArray array = (jbyteArray)jDataObj;
+            if(array != nullptr){
+                int length = env->GetArrayLength(array);
+                void* data = env->GetByteArrayElements(array, 0);
+                ret = std::move(createByteArrayResult((const char*)data, length));
+                env->ReleaseByteArrayElements(array, (jbyte*)data, 0);
+            }
         }
         env->DeleteLocalRef(jDataObj);
+        if(result != nullptr){
+            env->DeleteLocalRef(result);
+        }
     }
 
     return ret;
 }
 
-void _callNativeComponent(const char *pageId, const char *ref,
-                          const char *method, const char *argString,
-                          const char *optString) {
+void _callNativeComponent(const char *pageId, const char *ref, const char *method,
+                          const char *arguments, int argumentsLength, const char *options, int optionsLength) {
     if (pageId != nullptr && ref != nullptr && method != nullptr) {
 
 #if JSAPI_LOG
@@ -109,8 +120,8 @@ void _callNativeComponent(const char *pageId, const char *ref,
          pageId, ref, method, argString, optString);
 #endif
 
-        Bridge_Impl_Android::getInstance()->callNativeComponent(pageId, ref, method, argString,
-                                                                optString);
+        Bridge_Impl_Android::getInstance()->callNativeComponent(pageId, ref, method,
+                                                                arguments, argumentsLength, options, optionsLength);
     }
 }
 

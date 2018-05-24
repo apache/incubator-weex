@@ -52,12 +52,18 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   env->DeleteLocalRef(strencode);
   env->DeleteLocalRef(barr);
 
-  std::string stemp(rtn);
-  free(rtn);
-  return stemp;
+  if(rtn != NULL) {
+    std::string stemp(rtn);
+    free(rtn);
+    return stemp;
+  } else {
+    return "";
+  }
 }
 
 static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
+  if (jstr == nullptr)
+    return std::string("");
   const char *nativeString = env->GetStringUTFChars(jstr, JNI_FALSE);
   return std::string(nativeString);
 }
@@ -70,14 +76,29 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
     rtn = (char *) malloc(alen + 1);
     memcpy(rtn, ba, alen);
     rtn[alen] = 0;
-  } else {
-    return "";
   }
   env->ReleaseByteArrayElements(barr, ba, 0);
 
-  std::string stemp(rtn);
-  free(rtn);
-  return stemp;
+  if(rtn != NULL){
+    std::string stemp(rtn);
+    free(rtn);
+    return stemp;
+  } else {
+    return "";
+  }
+
+}
+
+
+static inline jbyteArray newJByteArray(JNIEnv *env, const char* data, int length) {
+  jbyteArray jarray = nullptr;
+  if (data == nullptr || length <= 0)
+    return jarray;
+  int byteSize = length;
+  jbyte *jb =  (jbyte*) data;
+  jarray = env->NewByteArray(byteSize);
+  env->SetByteArrayRegion(jarray, 0, byteSize, jb);
+  return jarray;
 }
 
 static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
@@ -107,13 +128,21 @@ static inline char* getArumentAsCStr(IPCArguments *arguments, int argument) {
       const IPCByteArray *ipcBA = arguments->getByteArray(argument);
       int strLen = ipcBA->length;
       ret = new char[strLen+1];
-      for (int i = 0; i < strLen; ++i) {
-        ret[i] = ipcBA->content[i];
-      }
+      memcpy(ret, ipcBA->content, strLen);
       ret[strLen] = '\0';
     }
 
     return ret;
+}
+
+static inline int getArumentAsCStrLen(IPCArguments *arguments, int argument) {
+  if (argument >= arguments->getCount())
+    return 0;
+  if (arguments->getType(argument) == IPCType::BYTEARRAY) {
+    const IPCByteArray *ipcBA = arguments->getByteArray(argument);
+    return  ipcBA->length;
+  }
+  return 0;
 }
 
 static inline jbyteArray getArgumentAsJByteArray(JNIEnv* env, IPCArguments* arguments, size_t argument)
@@ -166,6 +195,14 @@ static inline void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring
   const uint16_t *chars = scopedString.getChars();
   size_t charsLength = scopedString.getCharsLength();
   serializer->addJSON(chars, charsLength);
+}
+
+static void addBinaryByteArray(JNIEnv* env, IPCSerializer* serializer, jbyteArray array)
+{
+  size_t length = env->GetArrayLength(array);
+  jbyte* data = env->GetByteArrayElements(array, 0);
+  serializer->add((const char*)data, length);
+  env->ReleaseByteArrayElements(array, data, 0);
 }
 }
 #endif //_STRING_UTILS_H_

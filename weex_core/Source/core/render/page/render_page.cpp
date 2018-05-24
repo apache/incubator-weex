@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/parser/dom_parser.h>
 #include <core/render/action/render_action_add_element.h>
 #include <core/render/action/render_action_remove_element.h>
 #include <core/render/action/render_action_move_element.h>
@@ -606,7 +605,6 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageInit() {
-
   }
 
   void RenderPage::OnRenderProcessStart() {
@@ -622,6 +620,5 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageClose() {
-
   }
 } //namespace WeexCore

@@ -110,6 +110,80 @@ namespace WeexCore {
         return param;
     }
 
+    inline void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE *>& params, VALUE_WITH_TYPE *param, std::unique_ptr<IPCSerializer>& serializer, JNIEnv* env, jobject jArg){
+        jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+        jint jTypeInt = env->GetIntField(jArg, jTypeId);
+
+        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        if (jTypeInt == 1) {
+            if (jDoubleValueMethodId == NULL) {
+                jclass jDoubleClazz = env->FindClass("java/lang/Double");
+                jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+                env->DeleteLocalRef(jDoubleClazz);
+            }
+            jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+            if (js_server_api_functions != nullptr) {
+                param->type = ParamsType::DOUBLE;
+                param->value.doubleValue = jDoubleObj;
+            } else {
+                serializer->add(jDoubleObj);
+            }
+
+        } else if (jTypeInt == 2) {
+            jstring jDataStr = (jstring) jDataObj;
+            if (js_server_api_functions != nullptr) {
+                param->type = ParamsType::STRING;
+                param->value.string = jstring2WeexString(env, jDataStr);
+            } else {
+                addString(env, serializer.get(), jDataStr);
+            }
+        } else if (jTypeInt == 3) {
+            jstring jDataStr = (jstring) jDataObj;
+            if (js_server_api_functions != nullptr) {
+                param->type = ParamsType::JSONSTRING;
+                param->value.string = jstring2WeexString(env, jDataStr);
+            } else {
+                addJSONString(env, serializer.get(), jDataStr);
+            }
+        } else if (jTypeInt == 4) {
+            jbyteArray dataArray = (jbyteArray) jDataObj;
+            if (js_server_api_functions != nullptr) {
+                param->type = ParamsType::BYTEARRAY;
+                jbyte* data = env->GetByteArrayElements(dataArray, 0);
+                size_t length = env->GetArrayLength(dataArray);
+                param->value.byteArray = genWeexByteArray((const char *) data, length);
+            } else {
+                addBinaryByteArray(env, serializer.get(), dataArray);
+            }
+        } else {
+            if (js_server_api_functions != nullptr) {
+                param->type = ParamsType::JSUNDEFINED;
+            } else {
+                serializer->addJSUndefined();
+            }
+        }
+
+        if (param != nullptr){
+            params.push_back(param);
+        }
+
+        env->DeleteLocalRef(jDataObj);
+    }
+
+    inline void freeParams(std::vector<VALUE_WITH_TYPE *>& params){
+        for (auto &param : params) {
+            if (param->type == ParamsType::STRING ||
+                param->type == ParamsType::JSONSTRING) {
+                free(param->value.string);
+            }
+            if (param->type == ParamsType::BYTEARRAY) {
+                free(param->value.byteArray);
+            }
+            free(param);
+        }
+    }
+
     jint WeexProxy::doInitFramework(JNIEnv *env, jobject object,
                                     jstring script, jobject params,
                                     jstring cacheDir, jboolean pieSupport) {
@@ -295,55 +369,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
-
-                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-                jint jTypeInt = env->GetIntField(jArg, jTypeId);
-
-                jfieldID jDataId = env->GetFieldID(jWXJSObject,
-                                                   "data", "Ljava/lang/Object;");
-                jobject jDataObj = env->GetObjectField(jArg, jDataId);
-                if (jTypeInt == 1) {
-                    if (jDoubleValueMethodId == NULL) {
-                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz,
-                                                                "doubleValue", "()D");
-                        env->DeleteLocalRef(jDoubleClazz);
-                    }
-                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj,
-                                                               jDoubleValueMethodId);
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::DOUBLE;
-                        param->value.doubleValue = jDoubleObj;
-                    } else {
-                        serializer->add(jDoubleObj);
-                    }
-
-                } else if (jTypeInt == 2) {
-                    jstring jDataStr = (jstring) jDataObj;
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::STRING;
-                        param->value.string = jstring2WeexString(env, jDataStr);
-                    } else {
-                        addString(env, serializer.get(), jDataStr);
-                    }
-                } else if (jTypeInt == 3) {
-                    jstring jDataStr = (jstring) jDataObj;
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::JSONSTRING;
-                        param->value.string = jstring2WeexString(env, jDataStr);
-                    } else {
-                        addJSONString(env, serializer.get(), jDataStr);
-                    }
-                } else {
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::JSUNDEFINED;
-                    } else {
-                        serializer->addJSUndefined();
-                    }
-                }
-                if (param != nullptr)
-                    params.push_back(param);
-                env->DeleteLocalRef(jDataObj);
+                addParamsFromJArgs(params, param,serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
 
@@ -363,13 +389,7 @@ namespace WeexCore {
                                                            name,
                                                            funcChar.getChars(),
                                                            params);
-                for (auto &param : params) {
-                    if (param->type == ParamsType::STRING ||
-                        param->type == ParamsType::JSONSTRING) {
-                        free(param->value.string);
-                    }
-                    free(param);
-                }
+                freeParams(params);
                 return static_cast<bool>(i);
             } else {
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();
@@ -518,7 +538,7 @@ namespace WeexCore {
             soPath += "/libweexjss.so";
             if (access(soPath.c_str(), 00) != 0) {
                 LOGE("so path: %s is not exsist", soPath.c_str());
-                //reportNativeInitStatus("-1004", error);
+                reportNativeInitStatus("-1004", error);
                 //return false;
                 //use libweexjss.so directly
                 soPath = "libweexjss.so";
@@ -531,7 +551,7 @@ namespace WeexCore {
         if (!handle) {
             const char *error = dlerror();
             LOGE("load libweexjss.so failed,error=%s\n", error);
-//        reportNativeInitStatus("-1005", error);
+            reportNativeInitStatus("-1005", error);
             // try again use current path
             dlclose(handle);
             return false;
@@ -545,7 +565,7 @@ namespace WeexCore {
         if (!initMethod) {
             const char *error = dlerror();
             LOGE("load External_InitFrameWork failed,error=%s\n", error);
-//        reportNativeInitStatus("-1006", error);
+            reportNativeInitStatus("-1006", error);
             dlclose(handle);
             return false;
         }
@@ -565,7 +585,7 @@ namespace WeexCore {
             dlclose(handle);
             free(pFunctions);
             free(js_server_api_functions);
-            //reportNativeInitStatus("-1007", "Init Functions failed");
+            reportNativeInitStatus("-1007", "Init Functions failed");
             return false;
         }
     }
@@ -716,8 +736,12 @@ namespace WeexCore {
                     serializer->add(c_value_chars, c_value_len);
                     initFrameworkParams.push_back(
                             genInitFrameworkParams(c_key_chars, c_value_chars));
-                    WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey),
-                                                                jString2Str(env, jvalue));
+                    const std::string &key = jString2Str(env, jkey);
+                    if (key != "") {
+                        WXCoreEnvironment::getInstance()->AddOption(key,
+                                                                    jString2Str(env, jvalue));
+                    }
+
                 }
             }
             env->DeleteLocalRef(jobjArray);
@@ -925,73 +949,26 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
-
-                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-                jint jTypeInt = env->GetIntField(jArg, jTypeId);
-
-                jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-                jobject jDataObj = env->GetObjectField(jArg, jDataId);
-                if (jTypeInt == 1) {
-                    if (jDoubleValueMethodId == NULL) {
-                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
-                                                                "()D");
-                        env->DeleteLocalRef(jDoubleClazz);
-                    }
-                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::DOUBLE;
-                        param->value.doubleValue = jDoubleObj;
-                    } else {
-                        serializer->add(jDoubleObj);
-                    }
-
-                } else if (jTypeInt == 2) {
-                    jstring jDataStr = (jstring) jDataObj;
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::STRING;
-                        param->value.string = jstring2WeexString(env, jDataStr);
-                    } else {
-                        addString(env, serializer.get(), jDataStr);
-                    }
-                } else if (jTypeInt == 3) {
-                    jstring jDataStr = (jstring) jDataObj;
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::JSONSTRING;
-                        param->value.string = jstring2WeexString(env, jDataStr);
-                    } else {
-                        addJSONString(env, serializer.get(), jDataStr);
-                    }
-                } else {
-                    if (js_server_api_functions != nullptr) {
-                        param->type = ParamsType::JSUNDEFINED;
-                    } else {
-                        serializer->addJSUndefined();
-                    }
-                }
-                if (param != nullptr)
-                    params.push_back(param);
-                env->DeleteLocalRef(jDataObj);
+                addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
 
             if (js_server_api_functions != nullptr) {
-                char *result = js_server_api_functions->funcExeJSWithResult(
-                        env->GetStringUTFChars(jinstanceid,
-                                               nullptr),
-                        env->GetStringUTFChars(jnamespace,
-                                               nullptr),
-                        env->GetStringUTFChars(jfunction,
-                                               nullptr),
-                        params);
-                for (auto &param : params) {
-                    if (param->type == ParamsType::STRING ||
-                        param->type == ParamsType::JSONSTRING) {
-                        free(param->value.string);
-                    }
-                    free(param);
+                ScopedJStringUTF8 instanceidChar(env, jinstanceid);
+                const char *namespaceChar;
+                if (jnamespace) {
+                    ScopedJStringUTF8 nameSpaceChar(env, jnamespace);
+                    namespaceChar = nameSpaceChar.getChars();
+                } else {
+                    namespaceChar = nullptr;
                 }
-                return newJByteArray(env, result);
+                ScopedJStringUTF8 functionChar(env, jfunction);
+                WeexJSResult jsResultData = js_server_api_functions->funcExeJSWithResult(
+                        instanceidChar.getChars(), namespaceChar, functionChar.getChars(), params);
+                freeParams(params);
+                jbyteArray  array = newJByteArray(env, jsResultData.data, jsResultData.length);
+                WeexJSResultDataFree(jsResultData);
+                return array;
             } else {
 
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();
