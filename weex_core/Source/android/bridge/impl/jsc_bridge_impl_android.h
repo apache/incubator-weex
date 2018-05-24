@@ -32,7 +32,7 @@ namespace WeexCore {
         //<runTimeId,contextId>
         std::map<uint32_t, std::list<uint32_t> *> vmMap;
 
-    protected:
+    public:
         JSCBridgeAndroid() {
 
         }
@@ -41,6 +41,7 @@ namespace WeexCore {
             for (auto it = vmMap.begin(); it != vmMap.end(); it++) {
                 destroyJSRunTime(it->first);
             }
+            vmMap.clear();
             // delete vmMap;
         }
 

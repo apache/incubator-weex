@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 陈佩翰 on 2018/5/22.
-//
 
 #include "jsc_bridge_impl_android.h"
 
@@ -31,6 +28,9 @@ namespace WeexCore {
         }
 
         //todo createRunTime
+        //INITfRAMEWORK
+
+
 
         bool contextCreated = createJSContext(runTimeId, 0);
         if (contextCreated) {
@@ -38,7 +38,6 @@ namespace WeexCore {
             contextList->push_back(0);
             vmMap.insert(std::pair<uint32_t, std::list<uint32_t> *>(runTimeId, contextList));
         }
-
         return true;
     }
 
@@ -47,16 +46,19 @@ namespace WeexCore {
         if (search == vmMap.end()) {
             return true;
         }
+
         std::list<uint32_t> *contextList = search->second;
         if (!contextList) {
             return true;
         }
-
         for (auto it = contextList->begin(); it != contextList->end(); it++) {
             destroyJSContext(runTimeId, *it);
         }
 
+        contextList->clear();
+        vmMap.erase(search);
         delete contextList;
+        return true;
     }
 
     bool JSCBridgeAndroid::createJSContext(uint32_t runTimeId, uint32_t contextId) {

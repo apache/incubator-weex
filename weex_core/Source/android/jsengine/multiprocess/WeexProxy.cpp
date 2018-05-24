@@ -25,6 +25,7 @@
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <core/api/WeexJSCoreApi.h>
 #include <core/manager/wx_core_manager.h>
+#include <android/bridge/impl/jsc_bridge_impl_android.h>
 
 #include <dlfcn.h>
 #include <errno.h>
@@ -192,6 +193,7 @@ namespace WeexCore {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
         WXCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
+        WXCoreManager::getInstance()->setJSBridge(new JSCBridgeAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,
