@@ -522,7 +522,7 @@ namespace WeexCore {
             soPath += "/libweexjss.so";
             if (access(soPath.c_str(), 00) != 0) {
                 LOGE("so path: %s is not exsist", soPath.c_str());
-                //reportNativeInitStatus("-1004", error);
+                reportNativeInitStatus("-1004", error);
                 //return false;
                 //use libweexjss.so directly
                 soPath = "libweexjss.so";
@@ -535,7 +535,7 @@ namespace WeexCore {
         if (!handle) {
             const char *error = dlerror();
             LOGE("load libweexjss.so failed,error=%s\n", error);
-//        reportNativeInitStatus("-1005", error);
+            reportNativeInitStatus("-1005", error);
             // try again use current path
             dlclose(handle);
             return false;
@@ -549,7 +549,7 @@ namespace WeexCore {
         if (!initMethod) {
             const char *error = dlerror();
             LOGE("load External_InitFrameWork failed,error=%s\n", error);
-//        reportNativeInitStatus("-1006", error);
+            reportNativeInitStatus("-1006", error);
             dlclose(handle);
             return false;
         }
@@ -569,7 +569,7 @@ namespace WeexCore {
             dlclose(handle);
             free(pFunctions);
             free(js_server_api_functions);
-            //reportNativeInitStatus("-1007", "Init Functions failed");
+            reportNativeInitStatus("-1007", "Init Functions failed");
             return false;
         }
     }
@@ -720,8 +720,12 @@ namespace WeexCore {
                     serializer->add(c_value_chars, c_value_len);
                     initFrameworkParams.push_back(
                             genInitFrameworkParams(c_key_chars, c_value_chars));
-                    WXCoreEnvironment::getInstance()->AddOption(jString2Str(env, jkey),
-                                                                jString2Str(env, jvalue));
+                    const std::string &key = jString2Str(env, jkey);
+                    if (key != "") {
+                        WXCoreEnvironment::getInstance()->AddOption(key,
+                                                                    jString2Str(env, jvalue));
+                    }
+
                 }
             }
             env->DeleteLocalRef(jobjArray);

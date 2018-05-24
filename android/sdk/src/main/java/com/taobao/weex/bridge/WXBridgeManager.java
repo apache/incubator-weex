@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -170,7 +170,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static long lastCrashTime = 0;
 
   private static String mRaxApi = null;
-  private static String mRaxExtApi = null;
+//  private static String mRaxExtApi = null;
 
   // add for clound setting, default value is true
   // can use it to control weex sandbox
@@ -753,7 +753,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void callReportCrash(String crashFile, final String instanceId, final String url) {
-    // statistic weexjsc process crash
+    // statistic weex core process crash
     Date date = new Date();
     DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
     String time = format.format(date);
@@ -1176,7 +1176,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     String method = "callReportCrash";
-    String exception = "weexjsc process crash and restart exception";
+    String exception = "weex core process crash and restart exception";
     Map<String, String> extParams = new HashMap<String, String>();
     extParams.put("jscCrashStack", errMsg);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
@@ -1312,29 +1312,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         WXJSObject apiObj;
         if (type == BundType.Rax) {
-          boolean isWindmill = false;
-          try {
-            if (options != null) {
-              String container = (String) options.get("container");
-              isWindmill = "windmill".equals(container);
-            }
-          } catch (Throwable t) {
-            t.printStackTrace();
+          if (mRaxApi == null) {
+            mRaxApi =  WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
           }
-
-          if (isWindmill) {
-            if (mRaxExtApi == null) {
-              mRaxExtApi = WXFileUtils.loadAsset("weex-rax-extra-api.js", WXEnvironment.getApplication());
-            }
-            apiObj = new WXJSObject(WXJSObject.String,
-                mRaxExtApi);
-          } else {
-            if (mRaxApi == null) {
-              mRaxApi = WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
-            }
-            apiObj = new WXJSObject(WXJSObject.String,
-                mRaxApi);
-          }
+          apiObj = new WXJSObject(WXJSObject.String,
+                  mRaxApi);
         } else {
           apiObj = new WXJSObject(WXJSObject.String,
                   "");
