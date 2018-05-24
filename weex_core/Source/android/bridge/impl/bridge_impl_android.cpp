@@ -221,17 +221,16 @@ namespace WeexCore {
   }
 
   jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
-                                                const char *argString, const char *optString) {
+                                                const char *arguments, int argumentsLen,  const char *options, int optionsLen) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jModule = env->NewStringUTF(module);
     jstring jMethod = env->NewStringUTF(method);
-    jbyteArray jArgString = newJByteArray(env, argString);
-    jbyteArray jOptString = newJByteArray(env, optString);
+    jbyteArray jArgString = newJByteArray(env, arguments, argumentsLen);
+    jbyteArray jOptString = newJByteArray(env, options, optionsLen);
     jstring jPageId = getKeyFromCache(env, pageId);
-
     jobject result = nullptr;
 
     if (jModule != nullptr && jMethod != nullptr) {
@@ -258,16 +257,15 @@ namespace WeexCore {
     return result;
   }
 
-  void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref,
-                                                const char *method, const char *argString,
-                                                const char *optString) {
+  void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref, const char *method,
+                                                const char *arguments, int argumentsLength, const char *options, int optionsLength) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jMethod = env->NewStringUTF(method);
-    jbyteArray jArgString = newJByteArray(env, argString);
-    jbyteArray jOptString = newJByteArray(env, optString);
+    jbyteArray jArgString = newJByteArray(env, arguments, argumentsLength);
+    jbyteArray jOptString = newJByteArray(env, options, optionsLength);
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
 

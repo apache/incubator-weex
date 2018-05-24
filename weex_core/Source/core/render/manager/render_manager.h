@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <stdbool.h>
 
 namespace WeexCore {
 
@@ -50,10 +51,11 @@ namespace WeexCore {
     void Batch(const std::string &pageId);
 
     // create root node
-    bool CreatePage(std::string pageId, const std::string &data);
+    bool CreatePage(std::string pageId, const char* data);
 
+    /** use auto constructor is bad idea, it cann't transfer binary, use char* is better */
     bool AddRenderObject(const std::string &pageId, const std::string &parentRef, int index,
-                         const std::string &data);
+                         const char* data);
 
     bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
 
@@ -61,9 +63,9 @@ namespace WeexCore {
     MoveRenderObject(const std::string &pageId, const std::string &ref,
                      const std::string &parentRef, int index);
 
-    bool UpdateAttr(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateAttr(const std::string &pageId, const std::string &ref, const char* data);
 
-    bool UpdateStyle(const std::string &pageId, const std::string &ref, const std::string &data);
+    bool UpdateStyle(const std::string &pageId, const std::string &ref, const char* data);
 
     bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 

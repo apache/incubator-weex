@@ -38,7 +38,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -73,12 +72,12 @@ import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
@@ -554,8 +553,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param tasks      tasks to be executed
    * @param callback   next tick id
    */
-  public int callNative(String instanceId, String tasks, String callback) {
-    if (TextUtils.isEmpty(tasks)) {
+  public int callNative(String instanceId, JSONArray tasks, String callback) {
+    if (tasks == null) {
       String err = "[WXBridgeManager] callNative: call Native tasks is null";
       WXLogUtils.e(err);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -578,7 +577,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
 
     long parseNanos = System.nanoTime();
-    JSONArray array = JSON.parseArray(tasks);
+    JSONArray array = tasks;
     parseNanos = System.nanoTime() - parseNanos;
 
     if (null != array && array.size() > 0) {
@@ -880,7 +879,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           Object[] tasks = {task};
           WXJSObject[] jsArgs = {
                   new WXJSObject(WXJSObject.String, instanceId),
-                  new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(tasks))};
+                  WXWsonJSONSwitch.toWsonOrJsonWXJSObject(tasks)};
           invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, jsArgs, true);
           jsArgs[0] = null;
           jsArgs = null;
@@ -920,13 +919,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           Object[] tasks = {task};
           WXJSObject[] jsArgs = {
                   new WXJSObject(WXJSObject.String, instanceId),
-                  new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(tasks))};
+                  WXWsonJSONSwitch.toWsonOrJsonWXJSObject(tasks)};
           byte[] taskResult = invokeExecJSWithResult(String.valueOf(instanceId), null, METHOD_CALL_JS, jsArgs, true);
           if(eventCallback == null){
             return;
           }
           if(taskResult != null){
-            JSONArray arrayResult = (JSONArray) JSON.parse(new String(taskResult, "UTF-8"));
+            JSONArray arrayResult = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(taskResult);
             if(arrayResult != null && arrayResult.size() > 0){
               result = arrayResult.get(0);
             }
@@ -1602,7 +1601,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private byte[] invokeExecJSWithResult(String instanceId, String namespace, String function,
                                         WXJSObject[] args,boolean logTaskDetail){
-    if (WXEnvironment.isOpenDebugLog()) {
+    if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
       if(logTaskDetail) {
@@ -1767,8 +1766,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       WXJSObject[] args = {
               new WXJSObject(WXJSObject.String, instanceId),
-              new WXJSObject(WXJSObject.JSON,
-                      WXJsonUtils.fromObjectToJSONString(task))};
+              WXWsonJSONSwitch.toWsonOrJsonWXJSObject(task)};
 
       invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, args);
 
@@ -1937,8 +1935,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    WXJSObject[] args = {new WXJSObject(WXJSObject.JSON,
-            WXJsonUtils.fromObjectToJSONString(modules))};
+    WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
     try {
       mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args);
       try {
@@ -1980,8 +1977,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    WXJSObject[] args = {new WXJSObject(WXJSObject.JSON,
-            WXJsonUtils.fromObjectToJSONString(components))};
+    WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(components)};
     try {
       mWXBridge.execJS("", null, METHOD_REGISTER_COMPONENTS, args);
     } catch (Throwable e) {
@@ -2166,6 +2162,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 bridge.nativeUpdateGlobalConfig(globalConfig);
               }
             }
+          }
+          if(globalConfig.contains(WXWsonJSONSwitch.WSON_OFF)){
+            WXWsonJSONSwitch.USE_WSON = false;
+          }else{
+            WXWsonJSONSwitch.USE_WSON = true;
           }
         }
       };
@@ -2530,7 +2531,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             addAction.setIndex(index);
           }
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(pageId, addAction);
-          WXSDKManager.getInstance().getSDKInstance(pageId).removeInActiveAddElmentAction(ref);
+          WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(pageId);
+          if(instance != null){
+            instance.removeInActiveAddElmentAction(ref);
+          }
         }
         else {
           final BasicGraphicAction action = new GraphicActionLayout(pageId, ref, position, size);

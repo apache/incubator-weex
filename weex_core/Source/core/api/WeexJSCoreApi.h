@@ -37,11 +37,11 @@ void _callNative(const char *pageId, const char *task, const char *callback);
 
 
 std::unique_ptr<IPCResult> _callNativeModule(const char *pageId, const char *module, const char *method,
-                       const char *argString, const char *optString);
+                       const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
 void _callNativeComponent(const char *pageId, const char *ref,
-                          const char *method, const char *argString,
-                          const char *optString);
+                          const char *method,
+                          const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
 void _callAddElement(const char *pageId, const char *parentRef, const char *domStr,
                      const char *index_cstr);

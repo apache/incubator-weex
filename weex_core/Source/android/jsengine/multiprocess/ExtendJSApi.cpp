@@ -265,10 +265,13 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
   char* pageId = getArumentAsCStr(arguments, 0);
   char* module = getArumentAsCStr(arguments, 1);
   char* method = getArumentAsCStr(arguments, 2);
-  char* argString = getArumentAsCStr(arguments, 3);
-  char* optString = getArumentAsCStr(arguments, 4);
+  char* argumentsData = getArumentAsCStr(arguments, 3);
+  int   argumentsDataLength = getArumentAsCStrLen(arguments, 3);
+  char* optionsData = getArumentAsCStr(arguments, 4);
+  int   optionsDataLength = getArumentAsCStrLen(arguments, 4);
 
-  std::unique_ptr<IPCResult> ret = _callNativeModule(pageId,module,method,argString,optString);
+  std::unique_ptr<IPCResult> ret = _callNativeModule(pageId,module,method,argumentsData,
+                                                     argumentsDataLength, optionsData, optionsDataLength);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -282,13 +285,13 @@ std::unique_ptr<IPCResult> handleCallNativeModule(IPCArguments *arguments) {
     delete[]method;
     method = nullptr;
   }
-  if (argString != nullptr) {
-    delete[]argString;
-    argString = nullptr;
+  if (argumentsData != nullptr) {
+    delete[]argumentsData;
+    argumentsData = nullptr;
   }
-  if (optString != nullptr) {
-    delete[]optString;
-    optString = nullptr;
+  if (optionsData != nullptr) {
+    delete[]optionsData;
+    optionsData = nullptr;
   }
   return ret;
 }
@@ -297,10 +300,12 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
   char* pageId = getArumentAsCStr(arguments, 0);
   char* ref = getArumentAsCStr(arguments, 1);
   char* method = getArumentAsCStr(arguments, 2);
-  char* argString = getArumentAsCStr(arguments, 3);
-  char* optString = getArumentAsCStr(arguments, 4);
+  char* argumentsData = getArumentAsCStr(arguments, 3);
+  int   argumentsDataLength = getArumentAsCStrLen(arguments, 3);
+  char* optionsData = getArumentAsCStr(arguments, 4);
+  int   optionsDataLength = getArumentAsCStrLen(arguments, 4);
 
-    _callNativeComponent(pageId, ref, method, argString, optString);
+  _callNativeComponent(pageId, ref, method, argumentsData, argumentsDataLength, optionsData, optionsDataLength);
 
   if (pageId != nullptr) {
     delete[]pageId;
@@ -314,13 +319,13 @@ std::unique_ptr<IPCResult> handleCallNativeComponent(IPCArguments *arguments) {
     delete[]method;
     method = nullptr;
   }
-  if (argString != nullptr) {
-    delete[]argString;
-    argString = nullptr;
+  if (argumentsData != nullptr) {
+    delete[]argumentsData;
+    argumentsData = nullptr;
   }
-  if (optString != nullptr) {
-    delete[]optString;
-    optString = nullptr;
+  if (optionsData != nullptr) {
+    delete[]optionsData;
+    optionsData = nullptr;
   }
   return createInt32Result(static_cast<int32_t>(true));
 }

@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -98,11 +97,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
+
 public class WXSDKEngine implements Serializable {
 
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
-
-  private static final String V8_SO_NAME = "weexcore";
+  private static final String V8_SO_NAME = CORE_SO_NAME;
   private volatile static boolean mIsInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";

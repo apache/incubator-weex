@@ -715,6 +715,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @return true means that the property is consumed
    */
   protected boolean setProperty(String key, Object param) {
+    if(key == null){
+      return true;
+    }
     switch (key) {
       case Constants.Name.PREVENT_MOVE_EVENT:
         if (mGesture != null) {

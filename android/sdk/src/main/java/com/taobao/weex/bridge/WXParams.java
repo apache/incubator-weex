@@ -145,7 +145,7 @@ public class WXParams {
   }
 
   public String getUseSingleProcess() {
-    WXLogUtils.e("getUseSingleProcess is running");
+    WXLogUtils.e("getUseSingleProcess is running " + useSingleProcess);
     return useSingleProcess;
   }
 
