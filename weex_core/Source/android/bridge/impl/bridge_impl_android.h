@@ -68,7 +68,7 @@ namespace WeexCore {
 
     int callNative(const char* pageId, const char *task, const char *callback);
 
-    jobject callNativeModule(const char* pageId, const char *module, const char *method,
+    void* callNativeModule(const char* pageId, const char *module, const char *method,
                              const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
     void callNativeComponent(const char* pageId, const char* ref, const char *method,

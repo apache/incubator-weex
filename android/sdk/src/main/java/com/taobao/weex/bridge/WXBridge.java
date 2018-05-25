@@ -66,8 +66,6 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeBindMeasurementToRenderObject(long ptr);
 
-  private native void nativeBindMeasurementToWXCore(String instanceId, String ref);
-
   private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
   public native long[] nativeGetFirstScreenRenderTime(String instanceId);
@@ -477,11 +475,6 @@ public class WXBridge implements IWXBridge {
       }
     }
     return errorCode;
-  }
-
-  @Override
-  public void bindMeasurementToWXCore(String instanceId, String ref) {
-    nativeBindMeasurementToWXCore(instanceId, ref);
   }
 
   @Override

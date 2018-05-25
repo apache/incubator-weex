@@ -143,15 +143,11 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void BindMeasureFuncImplAndroid();
-
-    void BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
+    void BindMeasureFunc();
 
     void onLayoutBefore();
 
     void onLayoutAfter(float width, float height);
-
-
 
     virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
       bool  insert = false;
@@ -283,7 +279,7 @@ namespace WeexCore {
 
     void ApplyDefaultAttr();
 
-    inline jobject GetMeasureFuncImplAndroid() {
+    inline void* GetMeasureFuncFromComponent() {
       if (!haveMeasureFunc()) {
         return nullptr;
       }

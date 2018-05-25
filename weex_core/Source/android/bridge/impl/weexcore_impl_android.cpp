@@ -107,7 +107,7 @@ static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
                                           jlong ptr){
   RenderObject *render =  convert_long_to_render_object(ptr);
   if(render){
-      render->BindMeasureFuncImplAndroid();
+    render->BindMeasureFunc();
   }
 }
 
@@ -180,11 +180,6 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
-
-//#if RENDER_LOG
-//    LOGD("[JNI] NotifyLayout >>>> pageId: %s, needForceLayout: %s, dirty: %s", jString2StrFast(env, instanceId).c_str(),
-//         page->needLayout.load() ? "true" : "false", page->isDirty() ? "true" : "false");
-//#endif
 
     if (!page->needLayout.load()) {
       page->needLayout.store(true);

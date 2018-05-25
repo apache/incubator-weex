@@ -22,7 +22,7 @@
 #include <android/base/jni/scoped_java_ref.h>
 #include <android/bridge/impl/weexcore_impl_android.h>
 #include <android/base/string/string_utils.h>
-#include <string.h>
+#include <core/layout/measure_func_adapter.h>
 
 using namespace std;
 namespace WeexCore {
@@ -35,8 +35,6 @@ namespace WeexCore {
   }
 
   RenderObject::~RenderObject() {
-
-    JNIEnv *env = getJNIEnv();
 
     mParentRender = nullptr;
 
@@ -99,57 +97,27 @@ namespace WeexCore {
     size.height = 0;
     size.width = 0;
 
-    jobject measureFunc = ((RenderObject *) node)->GetMeasureFuncImplAndroid();
-
-    if (node == nullptr || measureFunc == nullptr) {
+    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
       return size;
-    }
 
-    JNIEnv *env = getJNIEnv();
-
-    int widthMode = Unspecified(env);
-    int heightMode = Unspecified(env);
-    if (widthMeasureMode == kExactly)
-      widthMode = Exactly(env);
-    if (heightMeasureMode == kExactly)
-      heightMode = Exactly(env);
-    cumsmeasure_Imple_Android(env, measureFunc,
-                              width, height,
-                              widthMode, heightMode);
-    size.width = GetLayoutWidth(env, measureFunc);
-    size.height = GetLayoutHeight(env, measureFunc);
-
-    env->DeleteLocalRef(measureFunc);
-
-    return size;
+    return RenderManager::GetInstance()->GetMeasureFunctionAdapter()->Measure(node, width, widthMeasureMode, height, heightMeasureMode);
   }
 
-  void RenderObject::BindMeasureFuncImplAndroid() {
+  void RenderObject::BindMeasureFunc() {
      setMeasureFunc(measureFunc_Impl);
   }
 
-  void RenderObject::BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios) {
-    setMeasureFunc(measureFunc_impl_ios);
-  }
-
   void RenderObject::onLayoutBefore() {
-    jobject measureFunc = this->GetMeasureFuncImplAndroid();
-    if(nullptr == measureFunc) {
-       return;
-    }
+    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
+      return;
 
-    JNIEnv *env = getJNIEnv();
-    LayoutBeforeImplAndroid(env, measureFunc);
-    env->DeleteLocalRef(measureFunc);
+    RenderManager::GetInstance()->GetMeasureFunctionAdapter()->LayoutBefore(this);
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
-    jobject measureFunc = this->GetMeasureFuncImplAndroid();
-    if(nullptr == measureFunc) {
-       return;
-    }
-    JNIEnv *env = getJNIEnv();
-    LayoutAfterImplAndroid(env, measureFunc, width, height);
-    env->DeleteLocalRef(measureFunc);
+    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
+      return;
+
+    RenderManager::GetInstance()->GetMeasureFunctionAdapter()->LayoutAfter(this, width, height);
   }
 } //end WeexCore
