@@ -238,6 +238,9 @@
     if (_panGesture) {
         [_panGesture removeTarget:nil action:NULL];
     }
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 9.0) {
+        [self _removeAllEvents];
+    }
     
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
