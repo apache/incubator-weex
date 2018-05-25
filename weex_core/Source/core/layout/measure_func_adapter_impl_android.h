@@ -39,7 +39,7 @@ namespace WeexCore {
       size.height = 0;
       size.width = 0;
 
-      jobject measureFunc = static_cast<jobject>(((RenderObject *) node)->GetMeasureFuncFromComponent());
+      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
 
       if (node == nullptr || measureFunc == nullptr) {
         return size;
@@ -65,7 +65,7 @@ namespace WeexCore {
     }
 
     inline void LayoutBefore(WXCoreLayoutNode *node) {
-      jobject measureFunc = static_cast<jobject>(((RenderObject *) node)->GetMeasureFuncFromComponent());
+      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
       if(nullptr == measureFunc) {
         return;
       }
@@ -76,13 +76,20 @@ namespace WeexCore {
     }
 
     inline void LayoutAfter(WXCoreLayoutNode *node, float width, float height) {
-      jobject measureFunc = static_cast<jobject>(((RenderObject *) node)->GetMeasureFuncFromComponent());
+      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
       if(nullptr == measureFunc) {
         return;
       }
       JNIEnv *env = getJNIEnv();
       LayoutAfterImplAndroid(env, measureFunc, width, height);
       env->DeleteLocalRef(measureFunc);
+    }
+
+    inline void* GetMeasureFuncFromComponent(WXCoreLayoutNode *node) {
+      if (!node->haveMeasureFunc()) {
+        return nullptr;
+      }
+      return Bridge_Impl_Android::getInstance()->getMeasureFunc(((RenderObject *) node)->PageId().c_str(), ((RenderObject *) node)->Ref().c_str());
     }
   };
 }
