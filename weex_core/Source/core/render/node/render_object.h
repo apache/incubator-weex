@@ -32,7 +32,6 @@
 #include <core/render/page/render_page.h>
 #include <core/css/constants_value.h>
 #include <android/base/log_utils.h>
-#include <android/bridge/impl/bridge_impl_android.h>
 #include <functional>
 
 
@@ -278,13 +277,6 @@ namespace WeexCore {
     void ApplyDefaultStyle();
 
     void ApplyDefaultAttr();
-
-    inline void* GetMeasureFuncFromComponent() {
-      if (!haveMeasureFunc()) {
-        return nullptr;
-      }
-      return Bridge_Impl_Android::getInstance()->getMeasureFunc(PageId().c_str(), Ref().c_str());
-    }
 
     inline RenderObject *GetChild(const Index &index) {
       return static_cast<RenderObject*>(getChildAt(index));
