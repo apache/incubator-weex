@@ -22,6 +22,7 @@
 #include <map>
 #include <string>
 #include <stdbool.h>
+#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
 
@@ -59,8 +60,7 @@ namespace WeexCore {
 
     bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
 
-    bool
-    MoveRenderObject(const std::string &pageId, const std::string &ref,
+    bool MoveRenderObject(const std::string &pageId, const std::string &ref,
                      const std::string &parentRef, int index);
 
     bool UpdateAttr(const std::string &pageId, const std::string &ref, const char* data);
@@ -84,8 +84,17 @@ namespace WeexCore {
       return m_pInstance;
     }
 
+    void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {
+      this->m_pMeasureFunctionAdapter = measureFunctionAdapter;
+    }
+
+    MeasureFunctionAdapter *GetMeasureFunctionAdapter() {
+      return this->m_pMeasureFunctionAdapter;
+    }
+
   private:
     static RenderManager *m_pInstance;
+    MeasureFunctionAdapter *m_pMeasureFunctionAdapter;
     std::map<std::string, RenderPage *> mPages;
   };
 }

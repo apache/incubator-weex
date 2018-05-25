@@ -111,14 +111,14 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
 
     // add for android support
     jobject result;
-    result = Bridge_Impl_Android::getInstance()->callNativeModule(
-            getCharFromJString(env, instanceId),
-            getCharFromJString(env, module),
-            getCharFromJString(env, method),
-            getCharFromJByte(env, arguments),
-            getJByteArraySize(env, arguments),
-            getCharFromJByte(env, options),
-            getJByteArraySize(env, options));
+    result = static_cast<jobject>(Bridge_Impl_Android::getInstance()->callNativeModule(
+                getCharFromJString(env, instanceId),
+                getCharFromJString(env, module),
+                getCharFromJString(env, method),
+                getCharFromJByte(env, arguments),
+                getJByteArraySize(env, arguments),
+                getCharFromJByte(env, options),
+                getJByteArraySize(env, options)));
 
     jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
     jint jTypeInt = env->GetIntField(result, jTypeId);

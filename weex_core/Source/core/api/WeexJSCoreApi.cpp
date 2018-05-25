@@ -67,8 +67,8 @@ _callNativeModule(const char *pageId, const char *module, const char *method,
 
         // add for android support
         jobject result;
-        result = Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
-                                                                      arguments,  argumentsLength, options, optionsLength);
+        result = static_cast<jobject>(Bridge_Impl_Android::getInstance()->callNativeModule(pageId, module, method,
+                                                                                           arguments, argumentsLength, options, optionsLength));
         if (result == nullptr){
             return ret;
         }
