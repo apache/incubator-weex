@@ -31,6 +31,7 @@ namespace WeexCore {
     mStyles = new StylesMap();
     mAttributes = new AttributesMap();
     mEvents = new EventsSet();
+    mMeasureFunc_Impl_Android = nullptr;
     mIsRootRender = false;
   }
 
@@ -51,6 +52,11 @@ namespace WeexCore {
     if (mEvents != nullptr) {
       delete mEvents;
       mEvents = nullptr;
+    }
+
+    if (mMeasureFunc_Impl_Android != nullptr) {
+      env->DeleteGlobalRef(mMeasureFunc_Impl_Android);
+      mMeasureFunc_Impl_Android = nullptr;
     }
 
     for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
@@ -119,17 +125,24 @@ namespace WeexCore {
     size.width = GetLayoutWidth(env, measureFunc);
     size.height = GetLayoutHeight(env, measureFunc);
 
-    env->DeleteLocalRef(measureFunc);
+//    env->DeleteLocalRef(measureFunc);
 
     return size;
   }
 
-  void RenderObject::BindMeasureFuncImplAndroid() {
-     setMeasureFunc(measureFunc_Impl);
+  bool RenderObject::BindMeasureFuncImplAndroid(jobject measureFunc_impl_android) {
+    if (measureFunc_impl_android == nullptr)
+      return false;
+    this->mMeasureFunc_Impl_Android = getJNIEnv()->NewGlobalRef(measureFunc_impl_android);
+    setMeasureFunc(measureFunc_Impl);
+    return true;
   }
 
-  void RenderObject::BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios) {
-    setMeasureFunc(measureFunc_impl_ios);
+  bool RenderObject::BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios) {
+      if (measureFunc_impl_ios == nullptr)
+        return false;
+      setMeasureFunc(measureFunc_impl_ios);
+      return true;
   }
 
   void RenderObject::onLayoutBefore() {
@@ -140,7 +153,6 @@ namespace WeexCore {
 
     JNIEnv *env = getJNIEnv();
     LayoutBeforeImplAndroid(env, measureFunc);
-    env->DeleteLocalRef(measureFunc);
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
@@ -150,6 +162,5 @@ namespace WeexCore {
     }
     JNIEnv *env = getJNIEnv();
     LayoutAfterImplAndroid(env, measureFunc, width, height);
-    env->DeleteLocalRef(measureFunc);
   }
 } //end WeexCore

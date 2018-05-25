@@ -69,7 +69,8 @@ static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
 
 static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
-    jlong ptr);
+    jlong ptr,
+    jobject contentBoxMeasurement);
 
 static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
     jboolean wrap,
@@ -212,6 +213,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     { "nativeBindMeasurementToRenderObject",
 "("
 "J"
+"Lcom/taobao/weex/layout/ContentBoxMeasurement;"
 ")"
 "V", reinterpret_cast<void*>(BindMeasurementToRenderObject) },
     { "nativeSetRenderContainerWrapContent",

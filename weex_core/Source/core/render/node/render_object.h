@@ -143,9 +143,9 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void BindMeasureFuncImplAndroid();
+    bool BindMeasureFuncImplAndroid(jobject measureFunc_impl_android);
 
-    void BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
+    bool BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
 
     void onLayoutBefore();
 
@@ -284,10 +284,7 @@ namespace WeexCore {
     void ApplyDefaultAttr();
 
     inline jobject GetMeasureFuncImplAndroid() {
-      if (!haveMeasureFunc()) {
-        return nullptr;
-      }
-      return Bridge_Impl_Android::getInstance()->getMeasureFunc(PageId().c_str(), Ref().c_str());
+      return mMeasureFunc_Impl_Android;
     }
 
     inline RenderObject *GetChild(const Index &index) {
@@ -457,6 +454,7 @@ namespace WeexCore {
     StylesMap *mStyles;
     AttributesMap *mAttributes;
     EventsSet *mEvents;
+    jobject mMeasureFunc_Impl_Android;
     float mViewPortWidth = -1;
     bool mIsRootRender;
     bool mIsSticky = false;
