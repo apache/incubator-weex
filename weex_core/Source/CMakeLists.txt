@@ -40,8 +40,6 @@ set(COMMON_SRCS
   ./core/render/action/render_action_update_attr.cpp
   ./core/render/action/render_action_update_style.cpp
 
-  ./core/parser/dom_parser.cpp
-
   ./core/layout/layout.cpp
   ./core/layout/style.cpp
 
@@ -56,6 +54,9 @@ set(COMMON_SRCS
 
 if (ANDROID)
   set (ANDROID_SRCS
+    ./wson/wson.c
+    ./wson/wson_util.cpp
+    ./wson/wson_parser.cpp
     ./android/jniprebuild/jni_load.cc
     ./android/base/jni/android_jni.cpp
     ./android/base/jni/scoped_java_ref.cpp
@@ -64,6 +65,7 @@ if (ANDROID)
     ./android/base/string/scoped_jstring.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
     ./android/bridge/impl/jsc_bridge_impl_android.cpp
+    ./android/base/string/jstring_cache.cpp
     ./android/bridge/impl/bridge_impl_android.cpp
     ./android/bridge/impl/weexcore_impl_android.cpp
     ./android/bridge/impl/measure_mode_impl_android.cpp
@@ -76,7 +78,11 @@ if (ANDROID)
     ./android/jsengine/multiprocess/WeexProxy.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
 
-        )
+
+    ./core/parser/dom_wson.cpp
+     
+
+  )
 
   add_library(${WEEXCORE_LIBRARY_NAME} SHARED
     ${COMMON_SRCS}

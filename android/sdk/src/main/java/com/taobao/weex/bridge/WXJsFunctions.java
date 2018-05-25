@@ -18,7 +18,10 @@
  */
 package com.taobao.weex.bridge;
 
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.common.IWXJsFunctions;
+import com.taobao.weex.utils.WXWsonJSONSwitch;
+import com.taobao.weex.wson.WsonUtils;
 
 /**
  * Created by darin on 27/03/2018.
@@ -37,16 +40,31 @@ public class WXJsFunctions implements IWXJsFunctions {
     @Override
     public native void jsHandleCallNative(String instanceId, byte[] tasks, String callback);
 
-    @Override
-    public native void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
-
 
     @Override
-    public native void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options);
+    public void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options){
+        jsHandleCallNativeModule(instanceId, module, method,
+                WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments), WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options), true);
+    }
+
+    public native void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options, boolean h5);
 
 
     @Override
-    public native void jsHandleCallAddElement(String instanceId, String ref, String dom, String index);
+    public void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options){
+        jsHandleCallNativeComponent(instanceId, componentRef, method, arguments, options, true);
+    }
+
+
+    public native void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options, boolean from);
+
+
+    @Override
+    public void jsHandleCallAddElement(String instanceId, String ref, String dom, String index){
+        jsHandleCallAddElement(instanceId, ref, WsonUtils.toWson(JSON.parse(dom)), index, true);
+    }
+
+    public native void jsHandleCallAddElement(String instanceId, String ref, byte[] dom, String index, boolean h5);
 
 
     @Override
@@ -58,7 +76,11 @@ public class WXJsFunctions implements IWXJsFunctions {
 
 
     @Override
-    public native void jsFunctionCallCreateBody(String pageId, String domStr);
+    public void jsFunctionCallCreateBody(String pageId, String domStr){
+        jsFunctionCallCreateBody(pageId, WsonUtils.toWson(JSON.parse(domStr)), true);
+    }
+
+    public native void jsFunctionCallCreateBody(String pageId, byte[] domStr, boolean h5);
 
 
     @Override
@@ -74,11 +96,19 @@ public class WXJsFunctions implements IWXJsFunctions {
 
 
     @Override
-    public native void jsFunctionCallUpdateAttrs(String pageId, String ref, String data);
+    public void jsFunctionCallUpdateAttrs(String pageId, String ref, String data){
+        jsFunctionCallUpdateAttrs(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
+    }
+
+    public native void jsFunctionCallUpdateAttrs(String pageId, String ref, byte[] data, boolean h5);
 
 
     @Override
-    public native void jsFunctionCallUpdateStyle(String pageId, String ref, String data);
+    public void jsFunctionCallUpdateStyle(String pageId, String ref, String data){
+        jsFunctionCallUpdateStyle(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
+    }
+
+    public native void jsFunctionCallUpdateStyle(String pageId, String ref, byte[] data, boolean h5);
 
 
     @Override

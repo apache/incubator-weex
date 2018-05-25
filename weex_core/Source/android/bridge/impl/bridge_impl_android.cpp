@@ -24,6 +24,7 @@
 #include "bridge_impl_android.h"
 #include <core/layout/style.h>
 #include <map>
+#include <android/base/string/jstring_cache.h>
 
 static jmethodID jSetJSFrmVersionMethodId;
 static jmethodID jReportExceptionMethodId;
@@ -54,6 +55,7 @@ static jmethodID jCallUpdateAttrsMethodId;
 static jmethodID jCallLayoutMethodId;
 static jmethodID jCallCreateFinishMethodId;
 static jmethodID jCallAppendTreeCreateFinishMethodId;
+static jmethodID jCallGetMeasurementMethodId;
 
 static jmethodID jPostMessage;
 static jmethodID jDispatchMeaasge;
@@ -97,6 +99,8 @@ namespace WeexCore {
     jCallLayoutMethodId = NULL;
     jCallAppendTreeCreateFinishMethodId = NULL;
     jCallCreateFinishMethodId = NULL;
+
+    jCallGetMeasurementMethodId = NULL;
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
@@ -106,10 +110,7 @@ namespace WeexCore {
     jstring jValue;
 
     for (; it != end; ++it) {
-      jKey = getStyleKeyFromCache(it->first.c_str());
-      if (jKey == nullptr) {
-        jKey = putStyleKeyToCache(it->first.c_str());
-      }
+      jKey = getKeyFromCache(env, it->first.c_str());
 
       jValue = env->NewStringUTF(it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
@@ -122,10 +123,9 @@ namespace WeexCore {
     jstring jValue;
 
     for (int i = 0; i < cVector->size(); ++i) {
-      jKey = env->NewStringUTF((*cVector)[i].first.c_str());
+      jKey = getKeyFromCache(env, (*cVector)[i].first.c_str());
       jValue = env->NewStringUTF((*cVector)[i].second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
-      env->DeleteLocalRef(jKey);
       env->DeleteLocalRef(jValue);
     }
   }
@@ -156,8 +156,6 @@ namespace WeexCore {
 
     if (jVersion != nullptr)
       env->DeleteLocalRef(jVersion);
-
-
   }
 
   void Bridge_Impl_Android::reportException(const char* pageId, const char *func, const char *exception_string) {
@@ -168,7 +166,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jstring jFunc = env->NewStringUTF(func);
     jstring jExceptionString = env->NewStringUTF(exception_string);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jReportExceptionMethodId == NULL) {
       jReportExceptionMethodId = env->GetMethodID(jBridgeClazz,
@@ -177,8 +175,6 @@ namespace WeexCore {
     }
     env->CallVoidMethod(jThis, jReportExceptionMethodId, jPageId, jFunc, jExceptionString);
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jFunc != nullptr)
       env->DeleteLocalRef(jFunc);
     if (jExceptionString != nullptr)
@@ -196,7 +192,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     int flag = -1;
 
@@ -214,8 +210,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -226,18 +220,17 @@ namespace WeexCore {
     return flag;
   }
 
-    jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
-                                                const char *argString, const char *optString) {
+  jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
+                                                const char *arguments, int argumentsLen,  const char *options, int optionsLen) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jModule = env->NewStringUTF(module);
     jstring jMethod = env->NewStringUTF(method);
-    jbyteArray jArgString = newJByteArray(env, argString);
-    jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
-
+    jbyteArray jArgString = newJByteArray(env, arguments, argumentsLen);
+    jbyteArray jOptString = newJByteArray(env, options, optionsLen);
+    jstring jPageId = getKeyFromCache(env, pageId);
     jobject result = nullptr;
 
     if (jModule != nullptr && jMethod != nullptr) {
@@ -250,8 +243,6 @@ namespace WeexCore {
       result = env->CallObjectMethod(jThis, jCallNativeModuleMethodId, jPageId, jModule, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jModule != nullptr)
       env->DeleteLocalRef(jModule);
     if (jMethod != nullptr)
@@ -266,18 +257,17 @@ namespace WeexCore {
     return result;
   }
 
-  void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref,
-                                                const char *method, const char *argString,
-                                                const char *optString) {
+  void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref, const char *method,
+                                                const char *arguments, int argumentsLength, const char *options, int optionsLength) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jMethod = env->NewStringUTF(method);
-    jbyteArray jArgString = newJByteArray(env, argString);
-    jbyteArray jOptString = newJByteArray(env, optString);
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+    jbyteArray jArgString = newJByteArray(env, arguments, argumentsLength);
+    jbyteArray jOptString = newJByteArray(env, options, optionsLength);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMethod != nullptr) {
       if (jCallNativeComponentMethodId == NULL) {
@@ -288,10 +278,6 @@ namespace WeexCore {
       env->CallVoidMethod(jThis, jCallNativeComponentMethodId, jPageId, jRef, jMethod, jArgString, jOptString);
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     if (jMethod != nullptr)
       env->DeleteLocalRef(jMethod);
     if (jArgString != nullptr)
@@ -350,7 +336,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jCallUpdateFinishMethodId == NULL) {
       jCallUpdateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -364,8 +350,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -384,7 +368,7 @@ namespace WeexCore {
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
     jstring jCallback = env->NewStringUTF(callback);
-    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jCallRefreshFinishMethodId == NULL) {
       jCallRefreshFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -397,8 +381,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callNative");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
     if (jTask != nullptr)
       env->DeleteLocalRef(jTask);
     if (jCallback != nullptr)
@@ -420,8 +402,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
@@ -445,27 +428,25 @@ namespace WeexCore {
     float c_margins[4];
     float c_paddings[4];
     float c_borders[4];
-    jfloatArray jMargins = env->NewFloatArray(4);
-    jfloatArray jPaddings = env->NewFloatArray(4);
-    jfloatArray jBorders = env->NewFloatArray(4);
 
     c_margins[0] = margins.getMargin(kMarginTop);
     c_margins[1] = margins.getMargin(kMarginBottom);
     c_margins[2] = margins.getMargin(kMarginLeft);
     c_margins[3] = margins.getMargin(kMarginRight);
-    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
 
     c_paddings[0] = paddings.getPadding(kPaddingTop);
     c_paddings[1] = paddings.getPadding(kPaddingBottom);
     c_paddings[2] = paddings.getPadding(kPaddingLeft);
     c_paddings[3] = paddings.getPadding(kPaddingRight);
-    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
 
     c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
     c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
     c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
     c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
-    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
+
+    jfloatArray jMargins = c2jFloatArray(env, c_margins);
+    jfloatArray jPaddings = c2jFloatArray(env, c_paddings);
+    jfloatArray jBorders = c2jFloatArray(env, c_borders);
 
     if (jCallCreateBodyMethodId == NULL)
       jCallCreateBodyMethodId = env->GetMethodID(jBridgeClazz,
@@ -487,10 +468,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateBody");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
@@ -512,11 +489,10 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders,
                                           bool willLayout) {
-
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
-    jstring jParentRef = env->NewStringUTF(parentRef);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
+    jstring jParentRef = getKeyFromCache(env, parentRef);
 
     if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
@@ -540,27 +516,25 @@ namespace WeexCore {
     float c_margins[4];
     float c_paddings[4];
     float c_borders[4];
-    jfloatArray jMargins = env->NewFloatArray(4);
-    jfloatArray jPaddings = env->NewFloatArray(4);
-    jfloatArray jBorders = env->NewFloatArray(4);
 
     c_margins[0] = margins.getMargin(kMarginTop);
     c_margins[1] = margins.getMargin(kMarginBottom);
     c_margins[2] = margins.getMargin(kMarginLeft);
     c_margins[3] = margins.getMargin(kMarginRight);
-    env->SetFloatArrayRegion(jMargins, 0, 4, c_margins);
 
     c_paddings[0] = paddings.getPadding(kPaddingTop);
     c_paddings[1] = paddings.getPadding(kPaddingBottom);
     c_paddings[2] = paddings.getPadding(kPaddingLeft);
     c_paddings[3] = paddings.getPadding(kPaddingRight);
-    env->SetFloatArrayRegion(jPaddings, 0, 4, c_paddings);
 
     c_borders[0] = borders.getBorderWidth(kBorderWidthTop);
     c_borders[1] = borders.getBorderWidth(kBorderWidthBottom);
     c_borders[2] = borders.getBorderWidth(kBorderWidthLeft);
     c_borders[3] = borders.getBorderWidth(kBorderWidthRight);
-    env->SetFloatArrayRegion(jBorders, 0, 4, c_borders);
+
+    jfloatArray jMargins = c2jFloatArray(env, c_margins);
+    jfloatArray jPaddings = c2jFloatArray(env, c_paddings);
+    jfloatArray jBorders = c2jFloatArray(env, c_borders);
 
     if (jCallAddElementMethodId == NULL)
       jCallAddElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -580,12 +554,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-    if (jParentRef != nullptr)
-      env->DeleteLocalRef(jParentRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jAttributes);
     env->DeleteLocalRef(jEvents);
@@ -602,8 +570,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallRemoveElementMethodId == NULL) {
       jCallRemoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -616,11 +585,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
     return 0;
@@ -632,9 +596,10 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
-    jstring jParentRef = env->NewStringUTF(parentRef);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
+    jstring jParentRef = getKeyFromCache(env, parentRef);
 
     if (jCallMoveElementMethodId == NULL) {
       jCallMoveElementMethodId = env->GetMethodID(jBridgeClazz,
@@ -647,13 +612,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-    if (jParentRef != nullptr)
-      env->DeleteLocalRef(jParentRef);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
     return 0;
@@ -665,8 +623,8 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallAddEventMethodId == NULL) {
       jCallAddEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -680,14 +638,9 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAddEvent");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-    env->DeleteLocalRef(jEventId);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
+    env->DeleteLocalRef(jEventId);
     return flag;
   }
 
@@ -697,8 +650,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallRemoveEventMethodId == NULL) {
       jCallRemoveEventMethodId = env->GetMethodID(jBridgeClazz,
@@ -712,14 +666,9 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callRemoveElement");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-    env->DeleteLocalRef(jEventId);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
+    env->DeleteLocalRef(jEventId);
     return flag;
   }
 
@@ -732,8 +681,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
@@ -774,10 +724,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateStyle");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jPaddings);
@@ -794,8 +740,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
@@ -822,10 +769,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callUpdateStyle");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jAttrs);
 
     if (page != nullptr)
@@ -841,8 +784,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallLayoutMethodId == NULL)
       jCallLayoutMethodId = env->GetMethodID(jBridgeClazz,
@@ -857,11 +801,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callLayout");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
     return flag;
@@ -873,7 +812,8 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
 
     if (jCallCreateFinishMethodId == NULL)
       jCallCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -886,9 +826,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callCreateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
     return flag;
@@ -900,8 +837,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jCallAppendTreeCreateFinishMethodId == NULL)
       jCallAppendTreeCreateFinishMethodId = env->GetMethodID(jBridgeClazz,
@@ -915,11 +853,6 @@ namespace WeexCore {
       LOGE("instance destroy JFM must stop callAppendTreeCreateFinish");
     }
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
-
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
     return flag;
@@ -931,8 +864,9 @@ namespace WeexCore {
     long long startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = env->NewStringUTF(pageId);
-    jstring jRef = env->NewStringUTF(ref);
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
 
     if (jMapConstructorMethodId == NULL)
       jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
@@ -954,10 +888,6 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallHasTransitionProsMethodId, jPageId, jRef, jStyles);
 
-    if (jPageId != nullptr)
-      env->DeleteLocalRef(jPageId);
-    if (jRef != nullptr)
-      env->DeleteLocalRef(jRef);
     env->DeleteLocalRef(jStyles);
 
     if (page != nullptr)
@@ -984,5 +914,17 @@ namespace WeexCore {
                                         "(Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;)V");
     }
     env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
+  }
+
+  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
+    JNIEnv *env = getJNIEnv();
+    jstring jPageId = getKeyFromCache(env, pageId);
+    jstring jRef = getKeyFromCache(env, ref);
+    if (jCallGetMeasurementMethodId == NULL) {
+      jCallGetMeasurementMethodId = env->GetMethodID(jBridgeClazz,
+                                                     "getMeasurementFunc",
+                                                     "(Ljava/lang/String;Ljava/lang/String;)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
+    }
+    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, jRef);
   }
 } //end WeexCore

@@ -235,15 +235,15 @@ namespace WeexCore {
       markDirty();
     }
 
+    inline bool haveMeasureFunc() const {
+      return nullptr != measureFunc;
+    }
+
     inline WXCoreMeasureFunc getMeasureFunc() const {
       return measureFunc;
     }
 
-    inline bool haveMeasureFunc() const {
-      return measureFunc != nullptr;
-    }
-
-    /** ================================ context =================================== **/
+      /** ================================ context =================================== **/
 
 
     inline void *getContext() const {

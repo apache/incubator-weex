@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
@@ -32,6 +33,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXWsonJSONSwitch;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -62,8 +64,9 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeTakeHeapSnapshot(String filename);
 
-  private native void nativeBindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
-  private native void nativeBindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement);
+  private native void nativeBindMeasurementToRenderObject(long ptr);
+
+  private native void nativeBindMeasurementToWXCore(String instanceId, String ref);
 
   private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
@@ -164,11 +167,25 @@ public class WXBridge implements IWXBridge {
    * @param callback
    */
   public int callNative(String instanceId, byte[] tasks, String callback) {
-    return callNative(instanceId, new String(tasks), callback);
+    return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
 
   @Override
   public int callNative(String instanceId, String tasks, String callback) {
+    try{
+      return callNative(instanceId, JSONArray.parseArray(tasks), callback);
+    }catch (Exception e){
+      WXLogUtils.e(TAG, "callNative throw exception: " + e.getMessage());
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+  }
+
+  private int callNative(String instanceId, JSONArray tasks, String callback){
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
@@ -202,16 +219,18 @@ public class WXBridge implements IWXBridge {
    */
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-    JSONArray argArray = null;
-    if (arguments != null) {
-      argArray = JSON.parseArray(new String(arguments));
+    try{
+      JSONArray argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+      JSONObject optionsObj = null;
+      if (options != null) {
+        optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
+      }
+      Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
+      return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
+    }catch (Exception e){
+      WXLogUtils.e(TAG,  e);
+      return new WXJSObject(null);
     }
-    JSONObject optionsObj = null;
-    if (options != null) {
-      optionsObj = JSON.parseObject(new String(options));
-    }
-    Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
-    return new WXJSObject(object);
   }
 
   /**
@@ -224,9 +243,14 @@ public class WXBridge implements IWXBridge {
    * @param options      option arguments for extending
    */
   @Override
-  public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] options) {
-    JSONArray argArray = JSON.parseArray(new String(arguments));
-    WXBridgeManager.getInstance().callNativeComponent(instanceId, ref, method, argArray, options);
+  public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
+    try{
+      JSONArray argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+      Object options = WXWsonJSONSwitch.parseWsonOrJSON(optionsData);
+      WXBridgeManager.getInstance().callNativeComponent(instanceId, ref, method, argArray, options);
+    }catch (Exception e){
+      WXLogUtils.e(TAG,  e);
+    }
   }
 
   public void setTimeoutNative(String callbackId, String time) {
@@ -456,13 +480,26 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
-    nativeBindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
+  public void bindMeasurementToWXCore(String instanceId, String ref) {
+    nativeBindMeasurementToWXCore(instanceId, ref);
   }
 
   @Override
-  public void bindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement){
-    nativeBindMeasurementToRenderObject(ptr, contentBoxMeasurement);
+  public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+    ContentBoxMeasurement obj = null;
+    try {
+      obj = WXBridgeManager.getInstance().getMeasurementFunc(instanceId, ref);
+    } catch (Throwable e) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e(TAG, "getMeasurementFunc throw exception:" + e.getMessage());
+      }
+    }
+    return obj;
+  }
+
+  @Override
+  public void bindMeasurementToRenderObject(long ptr){
+    nativeBindMeasurementToRenderObject(ptr);
   }
 
   @Override

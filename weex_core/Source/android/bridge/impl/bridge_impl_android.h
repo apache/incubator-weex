@@ -69,13 +69,11 @@ namespace WeexCore {
     int callNative(const char* pageId, const char *task, const char *callback);
 #ifdef __ANDROID__
     jobject callNativeModule(const char* pageId, const char *module, const char *method,
-                             const char *argString, const char *optString);
-#else
-        WeexCore::
+                             const char *arguments, int argumentsLength, const char *options, int optionsLength);
 #endif
 
     void callNativeComponent(const char* pageId, const char* ref, const char *method,
-                             const char *argString, const char *optString);
+                             const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
     void setTimeout(const char* callbackID, const char* time);
 
@@ -135,6 +133,8 @@ namespace WeexCore {
     void handlePostMessage(jstring jVmId, jbyteArray jData);
 
     void handleDispatchMessage(jstring jClientId, jstring jVmId, jbyteArray jData, jstring jCallback);
+
+    jobject getMeasureFunc(const char* pageId, const char* ref);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

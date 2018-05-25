@@ -220,9 +220,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mType = component.getType();
   }
 
-  protected void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
+  protected final void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr(), contentBoxMeasurement);
+    mInstance.addContentBoxMeasurement(getRef(), contentBoxMeasurement);
+    WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
   }
 
   public void updateStyles(WXComponent component) {
@@ -714,6 +715,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @return true means that the property is consumed
    */
   protected boolean setProperty(String key, Object param) {
+    if(key == null){
+      return true;
+    }
     switch (key) {
       case Constants.Name.PREVENT_MOVE_EVENT:
         if (mGesture != null) {

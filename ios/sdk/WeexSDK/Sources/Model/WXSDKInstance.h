@@ -148,6 +148,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  *
  *  @return instance runtime JavaScript.
+ *  you must call it in brige thread. Learn more at WXPerformBlockOnBridgeThread
  **/
 - (id<WXBridgeProtocol>)instanceJavaScriptContext;
 

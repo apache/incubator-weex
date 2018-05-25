@@ -105,6 +105,7 @@ public interface IWXBridge extends IWXObject {
    */
   int callNative(String instanceId, byte[] tasks, String callback);
 
+
   int callNative(String instanceId, String tasks, String callback);
 
   void reportJSException(String instanceId, String func, String exception);
@@ -153,9 +154,11 @@ public interface IWXBridge extends IWXObject {
 
   int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
 
-  void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement);
+  void bindMeasurementToWXCore(String instanceId, String ref);
 
-  void bindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement);
+  ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref);
+
+  void bindMeasurementToRenderObject(long ptr);
 
   void setRenderContainerWrapContent(boolean wrap, String instanceId);
 
