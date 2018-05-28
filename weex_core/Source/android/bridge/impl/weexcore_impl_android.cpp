@@ -38,6 +38,8 @@ jclass jWMBridgeClazz = nullptr;
 jmethodID jDoubleValueMethodId;
 jobject jThis;
 jobject jWMThis;
+jlongArray jFirstScreenRenderTime = nullptr;
+jlongArray jRenderFinishTime = nullptr;
 std::map<std::string, jobject> componentTypeCache;
 
 JStringCache refCache(2048);
@@ -139,11 +141,17 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean
 }
 
 static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
-  jlongArray jRet = env->NewLongArray(3);
+  jlongArray jTemp = env->NewLongArray(3);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return jRet;
+  if (page == nullptr) {
+    if (jFirstScreenRenderTime != nullptr) {
+      env->DeleteGlobalRef(jFirstScreenRenderTime);
+      jFirstScreenRenderTime = nullptr;
+    }
+    jFirstScreenRenderTime = static_cast<jlongArray>(env->NewGlobalRef(jTemp));
+    return jFirstScreenRenderTime;
+  }
 
   std::vector<long> temp = page->PrintFirstScreenLog();
 
@@ -152,17 +160,30 @@ static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring
   ret[0] = temp[0];
   ret[1] = temp[1];
   ret[2] = temp[2];
-  env->SetLongArrayRegion(jRet, 0, 3, ret);
+  env->SetLongArrayRegion(jTemp, 0, 3, ret);
 
-  return jRet;
+  if (jFirstScreenRenderTime != nullptr) {
+    env->DeleteGlobalRef(jFirstScreenRenderTime);
+    jFirstScreenRenderTime = nullptr;
+  }
+  jFirstScreenRenderTime = static_cast<jlongArray>(env->NewGlobalRef(jTemp));
+
+  env->DeleteLocalRef(jTemp);
+  return jFirstScreenRenderTime;
 }
 
 static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
-  jlongArray jRet = env->NewLongArray(3);
+  jlongArray jTemp = env->NewLongArray(3);
 
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return 0;
+  if (page == nullptr) {
+    if (jRenderFinishTime != nullptr) {
+      env->DeleteGlobalRef(jRenderFinishTime);
+      jRenderFinishTime = nullptr;
+    }
+    jRenderFinishTime = static_cast<jlongArray>(env->NewGlobalRef(jTemp));
+    return jRenderFinishTime;
+  }
 
   std::vector<long> temp = page->PrintRenderSuccessLog();
 
@@ -171,9 +192,16 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
   ret[0] = temp[0];
   ret[1] = temp[1];
   ret[2] = temp[2];
-  env->SetLongArrayRegion(jRet, 0, 3, ret);
+  env->SetLongArrayRegion(jTemp, 0, 3, ret);
 
-  return jRet;
+  if (jRenderFinishTime != nullptr) {
+    env->DeleteGlobalRef(jRenderFinishTime);
+    jRenderFinishTime = nullptr;
+  }
+  jRenderFinishTime = static_cast<jlongArray>(env->NewGlobalRef(jTemp));
+
+  env->DeleteLocalRef(jTemp);
+  return jRenderFinishTime;
 }
 
 //Notice that this method is invoked from main thread.
@@ -546,6 +574,16 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     env->DeleteGlobalRef(jWXJSObject);
     env->DeleteGlobalRef(jWXLogUtils);
     env->DeleteGlobalRef(jMapClazz);
+
+    if (jFirstScreenRenderTime != nullptr) {
+      env->DeleteLocalRef(jFirstScreenRenderTime);
+      jFirstScreenRenderTime = nullptr;
+    }
+
+    if (jRenderFinishTime != nullptr) {
+      env->DeleteLocalRef(jRenderFinishTime);
+      jRenderFinishTime = nullptr;
+    }
 
     for (auto iter = componentTypeCache.begin(); iter != componentTypeCache.end(); iter++) {
       if (iter->second != nullptr) {
