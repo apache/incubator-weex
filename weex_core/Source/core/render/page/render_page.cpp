@@ -557,6 +557,23 @@ namespace WeexCore {
     PostRenderAction(action);
   }
 
+  void RenderPage::SendUpdateAttrAction(RenderObject *render,
+                                        std::map<std::string, std::string> *attrs) {
+    std::vector<std::pair<std::string, std::string>> *vAttrs = new std::vector<std::pair<std::string, std::string>>();
+    for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
+      vAttrs->insert(vAttrs->begin(), std::pair<std::string, std::string>(iter->first, iter->second));
+    }
+
+    render_action *action = new RenderActionUpdateAttr(PageId(), render->Ref(), vAttrs);
+    PostRenderAction(action);
+
+    if (vAttrs != nullptr) {
+      vAttrs->clear();
+      delete vAttrs;
+      vAttrs = nullptr;
+    }
+  }
+
   void RenderPage::SendCreateFinishAction() {
     render_action *action = new RenderActionCreateFinish(PageId());
     PostRenderAction(action);

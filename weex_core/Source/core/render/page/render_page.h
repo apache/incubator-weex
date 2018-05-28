@@ -115,6 +115,8 @@ namespace WeexCore {
 
     void LayoutImmediately();
 
+    void SendUpdateAttrAction(RenderObject *render, std::map<std::string, std::string> *attrs);
+
     inline RenderObject *GetRenderObject(const std::string &ref) {
         std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
         if (iter != mRenderObjectRegisterMap.end()) {

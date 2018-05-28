@@ -40,7 +40,7 @@ public:
     void clearRefCache(JNIEnv *env);
 
 private:
-    void put(std::string key, jobject value);
+    void put(JNIEnv *env, std::string key, jobject value);
 };
 
 #endif
