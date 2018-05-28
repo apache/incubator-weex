@@ -40,10 +40,14 @@
 #import "WXTracingManager.h"
 #import "WXComponent+Events.h"
 #import "WXComponent+Layout.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
+static BOOL bInited = NO;
+static BOOL bNeedRemoveEvents = YES;
 @interface WXComponent () <UIGestureRecognizerDelegate>
 
 @end
@@ -148,7 +152,13 @@
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
-        
+        if (!bInited) {
+            id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+            if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+                bNeedRemoveEvents = [[configCenter configForKey:@"iOS_weex_ext_config.removeEventsOfWXComponentWhenDealloc" defaultValue:@(YES) isDefault:NULL] boolValue];
+                bInited = YES;
+            }
+        }
     }
     
     return self;
@@ -238,8 +248,10 @@
     if (_panGesture) {
         [_panGesture removeTarget:nil action:NULL];
     }
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 9.0) {
-        [self _removeAllEvents];
+    if (bNeedRemoveEvents) {
+        if (WX_SYS_VERSION_LESS_THAN(@"9.0")) {
+            [self _removeAllEvents];
+        }
     }
     
     if (_positionType == WXPositionTypeFixed) {
