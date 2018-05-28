@@ -432,6 +432,18 @@ namespace WeexCore {
       }
     }
 
+    inline const std::string GetStyle(const std::string &key) {
+      if (mStyles == nullptr)
+        return "";
+
+      std::map<std::string, std::string>::iterator iter = mStyles->find(key);
+      if (iter != mStyles->end()) {
+        return iter->second;
+      } else {
+        return "";
+      }
+    }
+
     inline void MarkRootRender() {
       mIsRootRender = true;
     }
