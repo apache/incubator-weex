@@ -106,10 +106,11 @@ static jint InitFrameworkEnv(JNIEnv *env, jobject jcaller,
 }
 
 static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
-                                          jlong ptr){
+                                          jlong ptr,
+                                          jobject contentBoxMeasurement){
   RenderObject *render =  convert_long_to_render_object(ptr);
   if(render){
-      render->BindMeasureFuncImplAndroid();
+    render->BindMeasureFuncImplAndroid(contentBoxMeasurement);
   }
 }
 

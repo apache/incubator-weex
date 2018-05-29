@@ -27,7 +27,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.layout.ContentBoxMeasurement;
-import com.taobao.weex.layout.MeasureSize;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXLogUtils;

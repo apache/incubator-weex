@@ -64,9 +64,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeTakeHeapSnapshot(String filename);
 
-  private native void nativeBindMeasurementToRenderObject(long ptr);
-
-  private native void nativeBindMeasurementToWXCore(String instanceId, String ref);
+  private native void nativeBindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement);
 
   private native void nativeSetRenderContainerWrapContent(boolean wrap, String instanceId);
 
@@ -201,6 +199,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @Override
   public void reportJSException(String instanceId, String func, String exception) {
     WXBridgeManager.getInstance().reportJSException(instanceId, func, exception);
   }
@@ -240,7 +239,6 @@ public class WXBridge implements IWXBridge {
    * @param ref the ref of component
    * @param method       the name of method
    * @param arguments    the arguments of the method
-   * @param options      option arguments for extending
    */
   @Override
   public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
@@ -480,26 +478,8 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public void bindMeasurementToWXCore(String instanceId, String ref) {
-    nativeBindMeasurementToWXCore(instanceId, ref);
-  }
-
-  @Override
-  public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
-    ContentBoxMeasurement obj = null;
-    try {
-      obj = WXBridgeManager.getInstance().getMeasurementFunc(instanceId, ref);
-    } catch (Throwable e) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(TAG, "getMeasurementFunc throw exception:" + e.getMessage());
-      }
-    }
-    return obj;
-  }
-
-  @Override
-  public void bindMeasurementToRenderObject(long ptr){
-    nativeBindMeasurementToRenderObject(ptr);
+  public void bindMeasurementToRenderObject(long ptr, ContentBoxMeasurement contentBoxMeasurement){
+    nativeBindMeasurementToRenderObject(ptr, contentBoxMeasurement);
   }
 
   @Override
@@ -577,6 +557,7 @@ public class WXBridge implements IWXBridge {
     nativeSetViewPortWidth(instanceId, value);
   }
 
+  @Override
   public void reportNativeInitStatus(String statusCode, String errorMsg) {
     if (WXErrorCode.WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS.getErrorCode().equals(statusCode)
             || WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED.getErrorCode().equals(statusCode)) {

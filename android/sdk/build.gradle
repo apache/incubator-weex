@@ -46,6 +46,8 @@ android {
     resourcePrefix "weex"
 
     delete 'libs/armeabi/libweexcore.so'
+    delete 'libs/armeabi-v7a/libweexcore.so'
+    delete 'libs/x86/libweexcore.so'
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
