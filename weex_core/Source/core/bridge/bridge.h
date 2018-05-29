@@ -19,7 +19,9 @@
 #ifndef Bridge_h
 #define Bridge_h
 
+#ifdef __ANDROID__
 #include <jni.h>
+#endif
 #include <string>
 #include <map>
 #include <set>
