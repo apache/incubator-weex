@@ -180,7 +180,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
-  public void setColumnWidth(int columnWidth)  {
+  public void setColumnWidth(float columnWidth)  {
     if(columnWidth != mColumnWidth){
       markComponentUsable();
       updateRecyclerAttr();
