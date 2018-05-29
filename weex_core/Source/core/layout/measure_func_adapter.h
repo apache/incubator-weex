@@ -16,31 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef jstring_cache_h
-#define jstring_cache_h
+#ifndef WEEX_CORE_MEASURE_FUNCTION_H
+#define WEEX_CORE_MEASURE_FUNCTION_H
 
-#include <jni.h>
-#include <list>
-#include <unordered_map>
 
-class JStringCache;
+#include "layout.h"
 
-class JStringCache {
+namespace WeexCore {
 
-public:
-    JStringCache(int capacity) : capacity(capacity) {}
+  class MeasureFunctionAdapter {
+  public:
 
-    ~JStringCache() {}
+    MeasureFunctionAdapter() {}
 
-public:
-    int capacity;
-    std::list<std::pair<std::string, jobject>> cacheList;
-    std::unordered_map<std::string, std::list<std::pair<std::string, jobject>>::iterator> posMap;
-    jstring GetString(JNIEnv *env, std::string key);
-    void clearRefCache(JNIEnv *env);
+    ~MeasureFunctionAdapter() {}
 
-private:
-    void put(JNIEnv *env, std::string key, jobject value);
-};
+    virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+                                      float height, MeasureMode heightMeasureMode) = 0;
 
-#endif
+    virtual void LayoutBefore(WXCoreLayoutNode *node) = 0;
+
+    virtual void LayoutAfter(WXCoreLayoutNode *node, float width, float height) = 0;
+
+  private:
+  };
+
+}
+
+#endif //WEEX_CORE_MEASURE_FUNCTION_H

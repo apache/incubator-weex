@@ -29,6 +29,7 @@
 
 #include <dlfcn.h>
 #include <errno.h>
+#include <core/layout/measure_func_adapter_impl_android.h>
 
 const char *s_cacheDir;
 bool s_start_pie = true;
@@ -266,8 +267,7 @@ namespace WeexCore {
                                     jobject params) {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
-        WXCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
-        WXCoreManager::getInstance()->setJSBridge(new JSCBridgeAndroid());
+        RenderManager::GetInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,

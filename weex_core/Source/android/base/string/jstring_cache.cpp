@@ -33,11 +33,12 @@ void JStringCache::clearRefCache(JNIEnv *env) {
     cacheList.clear();
 }
 
-void JStringCache::put(std::string key, jobject value) {
+void JStringCache::put(JNIEnv *env, std::string key, jobject value) {
 //    LOGD("Remove cache jstring_cache key: %s, find: %s, max: %s", key.c_str(), posMap.find(key) != posMap.end() ? "TRUE" : "FALSE", cacheList.size() >= capacity ? "TRUE" : "FALSE");
     if (posMap.find(key) != posMap.end()) {
         cacheList.erase(posMap[key]);
     } else if (cacheList.size() >= capacity) {
+        env->DeleteWeakGlobalRef(cacheList.back().second);
         posMap.erase(cacheList.back().first);
         cacheList.pop_back();
     }
@@ -51,19 +52,21 @@ jstring JStringCache::GetString(JNIEnv *env, std::string key) {
         jobject obj = posMap[key]->second;
         if (env->IsSameObject(obj, NULL) == JNI_FALSE) {
             // JObject is still active
-            put(key, obj);
+            put(env, key, obj);
 //            LOGE("FOUND cache jstring_cache GetString key: %s,for cache key: %s", key.c_str(), env->GetStringUTFChars((jstring) obj, JNI_FALSE));
             return (jstring) posMap[key]->second;
         }
-        if (env->IsSameObject(obj, NULL) == JNI_TRUE) {
+        else if (env->IsSameObject(obj, NULL) == JNI_TRUE) {
             // Should delete WeakGlobalRef.
 //            LOGD("delete WeakGlobalRef: key: %s", key.c_str());
-            env->DeleteWeakGlobalRef(obj);
+          cacheList.erase(posMap[key]);
+          posMap.erase(key);
+          env->DeleteWeakGlobalRef(obj);
         }
     }
     const jstring jRef = env->NewStringUTF(key.c_str());
     const jobject jGlobalRef = env->NewWeakGlobalRef(jRef);
-    put(key, jGlobalRef);
+    put(env, key, jGlobalRef);
     env->DeleteLocalRef(jRef);
     return (jstring) jGlobalRef;
 }

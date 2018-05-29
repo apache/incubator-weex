@@ -144,15 +144,11 @@ namespace WeexCore {
 
     ~RenderObject();
 
-    void BindMeasureFuncImplAndroid();
-
-    void BindMeasureFuncImplIOS(WXCoreMeasureFunc measureFunc_impl_ios);
+    void BindMeasureFunc();
 
     void onLayoutBefore();
 
     void onLayoutAfter(float width, float height);
-
-
 
     virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
       bool  insert = false;
@@ -283,13 +279,6 @@ namespace WeexCore {
     void ApplyDefaultStyle();
 
     void ApplyDefaultAttr();
-
-    inline jobject GetMeasureFuncImplAndroid() {
-      if (!haveMeasureFunc()) {
-        return nullptr;
-      }
-      return Bridge_Impl_Android::getInstance()->getMeasureFunc(PageId().c_str(), Ref().c_str());
-    }
 
     inline RenderObject *GetChild(const Index &index) {
       return static_cast<RenderObject*>(getChildAt(index));
@@ -427,6 +416,18 @@ namespace WeexCore {
 
       std::map<std::string, std::string>::iterator iter = mAttributes->find(key);
       if (iter != mAttributes->end()) {
+        return iter->second;
+      } else {
+        return "";
+      }
+    }
+
+    inline const std::string GetStyle(const std::string &key) {
+      if (mStyles == nullptr)
+        return "";
+
+      std::map<std::string, std::string>::iterator iter = mStyles->find(key);
+      if (iter != mStyles->end()) {
         return iter->second;
       } else {
         return "";

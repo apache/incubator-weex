@@ -1,3 +1,6 @@
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
 
 apply plugin: 'com.android.library'
 
@@ -66,4 +69,11 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-legacy:1.6.4'
     testCompile 'org.powermock:powermock-module-testng:1.6.4'
     testCompile 'org.robolectric:robolectric:3.0-rc3'
+}
+
+if(file('../license/LICENSE').exists()){
+    license {
+        header = file('../license/LICENSE')
+    }
+    preBuild.dependsOn licenseFormat
 }

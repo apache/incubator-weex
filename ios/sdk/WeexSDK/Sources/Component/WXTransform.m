@@ -23,6 +23,8 @@
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
 #import "WXConvert.h"
+#import "WXSDKEngine.h"
+#import "WXConfigCenterProtocol.h"
 
 @interface WXTransform()
 
@@ -257,7 +259,18 @@
         SEL method = NSSelectorFromString([NSString stringWithFormat:@"parse%@:", [name capitalizedString]]);
         if ([self respondsToSelector:method]) {
             @try {
-                [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
+                id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+                if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+                    BOOL parseTransformIfWaitUntilDone = [[configCenter configForKey:@"iOS_weex_ext_config.parseTransformIfWaitUntilDone" defaultValue:@(NO) isDefault:NULL] boolValue];
+                    if (parseTransformIfWaitUntilDone) {
+                        [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
+                    }
+                    else{
+                        IMP imp = [self methodForSelector:method];
+                        void (*func)(id, SEL,NSArray *) = (void *)imp;
+                        func(self, method,value);
+                    }
+                }
             }
             @catch (NSException *exception) {
                 WXLogError(@"WXTransform exception:%@", [exception reason]);

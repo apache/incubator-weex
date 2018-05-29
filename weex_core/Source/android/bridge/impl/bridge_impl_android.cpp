@@ -220,7 +220,7 @@ namespace WeexCore {
     return flag;
   }
 
-  jobject Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
+  void* Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
                                                 const char *arguments, int argumentsLen,  const char *options, int optionsLen) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     long long startTime = getCurrentTime();

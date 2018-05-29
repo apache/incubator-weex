@@ -43,8 +43,8 @@ namespace WeexCore {
     virtual void reportException(const char* pageId, const char *func, const char *exception_string) = 0;
 
     virtual int callNative(const char* pageId, const char *task, const char *callback) = 0;
-#ifdef __ANDROID__
-    virtual jobject callNativeModule(const char* pageId, const char *module, const char *method,
+
+    virtual void* callNativeModule(const char* pageId, const char *module, const char *method,
                                      const char *arguments, int argumentsLength, const char *options, int optionsLength) = 0;
 
 #else

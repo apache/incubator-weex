@@ -42,11 +42,16 @@ namespace WeexCore {
       style->insert(std::pair<std::string, std::string>(PADDING_LEFT, "0"));
       style->insert(std::pair<std::string, std::string>(PADDING_RIGHT, "0"));
 
-      if (!appbar_color.empty() && appbar_color != "")
+      if (!appbar_color.empty() && appbar_color != "" && !StyleExist(appbar_color))
         style->insert(std::pair<std::string, std::string>(COLOR, appbar_color));
-      if (!appbar_background_color.empty() && appbar_background_color != "")
+      if (!appbar_background_color.empty() && appbar_background_color != "" && !StyleExist(appbar_background_color))
         style->insert(std::pair<std::string, std::string>(BACKGROUND_COLOR, appbar_background_color));
       return style;
+    }
+
+    inline bool StyleExist(const std::string &key) {
+      std::string value = GetStyle(key);
+      return !value.empty() && value != "";
     }
 
   public:

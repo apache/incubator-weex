@@ -53,10 +53,14 @@ set(COMMON_SRCS
         )
 
 if (ANDROID)
+  ## add_subdirectory for subdirectory has a CMakeLists.txt
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  ## include_directories for include head file
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+
   set (ANDROID_SRCS
-    ./wson/wson.c
-    ./wson/wson_util.cpp
-    ./wson/wson_parser.cpp
     ./android/jniprebuild/jni_load.cc
     ./android/base/jni/android_jni.cpp
     ./android/base/jni/scoped_java_ref.cpp
@@ -91,5 +95,5 @@ if (ANDROID)
 
   target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 
-  target_link_libraries(${WEEXCORE_LIBRARY_NAME} android weexipc log z)
+  target_link_libraries(${WEEXCORE_LIBRARY_NAME} wson android weexipc log z)
 endif (ANDROID)
