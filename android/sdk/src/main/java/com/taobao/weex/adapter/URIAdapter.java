@@ -76,4 +76,5 @@ public interface URIAdapter {
    * @return
    */
   @NonNull Uri rewrite(WXSDKInstance instance, String type, Uri uri);
+  @NonNull Uri rewrite(String bundleURL, String type, Uri uri);
 }

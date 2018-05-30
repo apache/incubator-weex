@@ -37,14 +37,20 @@ public class DefaultUriAdapter implements URIAdapter {
   @NonNull
   @Override
   public Uri rewrite(WXSDKInstance instance, String type, Uri uri) {
-    if (TextUtils.isEmpty(instance.getBundleUrl())) {
+    return rewrite(instance.getBundleUrl(), type, uri);
+  }
+
+  @NonNull
+  @Override
+  public Uri rewrite(String bundleURL, String type, Uri uri) {
+    if (TextUtils.isEmpty(bundleURL)) {
       return uri;
     }
 
-    Uri base = Uri.parse(instance.getBundleUrl());
+    Uri base = Uri.parse(bundleURL);
     Uri.Builder resultBuilder = uri.buildUpon();
-    
-   if (uri.isRelative()) {
+
+    if (uri.isRelative()) {
       //When uri is empty, means use the base url instead. Web broswer behave this way.
       if(uri.getEncodedPath().length() == 0){
         if(URIAdapter.IMAGE.equals(type)){
