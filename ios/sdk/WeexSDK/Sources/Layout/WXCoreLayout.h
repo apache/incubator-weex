@@ -157,7 +157,16 @@ namespace WeexCore {
         mHasNewLayout = true;
         dirty = true;
         measureFunc = nullptr;
+        if(nullptr != mParent){
+            mParent->removeChild(this);
+        }
         mParent = nullptr;
+        for(WXCoreLayoutNode* childNode : mChildList){
+            if(nullptr != childNode){
+                childNode->mParent = nullptr;
+            }
+        }
+        
         mChildList.clear();
         BFCs.clear();
         NonBFCs.clear();
