@@ -20,43 +20,66 @@
 #include "bridge_impl_ios.h"
 #include <core/bridge/wx_type_define.h>
 
+
 namespace WeexCore {
     
-    void setJSVersion(const char* version){
-        
+    void Bridge_Impl_iOS::setJSVersion(const char* version){
+        bridgeImpl->setJSVersion(version);
     }
     
-    void reportException(const char* pageId, const char *func, const char *exception_string){}
+    void Bridge_Impl_iOS::reportException(const char* pageId, const char *func, const char *exception_string){
+        bridgeImpl->reportException(pageId, func, exception_string);
+    }
     
-    int callNative(const char* pageId, const char *task, const char *callback){}
+    int Bridge_Impl_iOS::callNative(const char* pageId, const char *task, const char *callback){
+        return bridgeImpl->callNative(pageId, task, callback);
+    }
     
-    WeexCore::WXValue callNativeModule(const char* pageId, const char *module, const char *method,
-                                       const char *argString, const char *optString){}
+    void* Bridge_Impl_iOS::callNativeModule(const char* pageId, const char *module, const char *method,
+                                   const char *arguments, int argumentsLength, const char *options, int optionsLength){
+        return bridgeImpl->callNativeModule(pageId, module, method, arguments, argumentsLength, options, optionsLength);
+    }
     
-    void callNativeComponent(const char* pageId, const char* ref, const char *method,
-                             const char *argString, const char *optString){}
+    void Bridge_Impl_iOS::callNativeComponent(const char* pageId, const char* ref, const char *method,
+                             const char *arguments, int argumentsLength, const char *options, int optionsLength){
+        bridgeImpl->callNativeComponent(pageId, ref, method, arguments, argumentsLength, options, optionsLength);
+    }
     
-    void setTimeout(const char* callbackID, const char* time){}
+    void Bridge_Impl_iOS::setTimeout(const char* callbackID, const char* time){
+        bridgeImpl->setTimeout(callbackID, time);
+    }
     
-    void callNativeLog(const char* str_array){}
+    void Bridge_Impl_iOS::callNativeLog(const char* str_array){
+        bridgeImpl->callNativeLog(str_array);
+    }
     
-    int callUpdateFinish(const char* pageId, const char *task, const char *callback){}
+    int Bridge_Impl_iOS::callUpdateFinish(const char* pageId, const char *task, const char *callback){
+        return bridgeImpl->callUpdateFinish(pageId, task, callback);
+    }
     
-    int callRefreshFinish(const char* pageId, const char *task, const char *callback){}
+    int Bridge_Impl_iOS::callRefreshFinish(const char* pageId, const char *task, const char *callback){
+        return bridgeImpl->callRefreshFinish(pageId, task, callback);
+    }
     
-    int callAddEvent(const char* pageId, const char* ref, const char *event){}
+    int Bridge_Impl_iOS::callAddEvent(const char* pageId, const char* ref, const char *event){
+        return bridgeImpl->callAddEvent(pageId, ref, event);
+    }
     
-    int callRemoveEvent(const char* pageId, const char* ref, const char *event){}
+    int Bridge_Impl_iOS::callRemoveEvent(const char* pageId, const char* ref, const char *event){
+        return bridgeImpl->callRemoveEvent(pageId, ref, event);
+    }
     
-    int callCreateBody(const char* pageId, const char *componentType, const char* ref,
+    int Bridge_Impl_iOS::callCreateBody(const char* pageId, const char *componentType, const char* ref,
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
                        std::set<std::string> *events,
                        const WXCoreMargin &margins,
                        const WXCorePadding &paddings,
-                       const WXCoreBorderWidth &borders){}
+                       const WXCoreBorderWidth &borders){
+        return bridgeImpl->callCreateBody(pageId, componentType, ref, styles, attributes, events, margins, paddings, borders);
+    }
     
-    int callAddElement(const char* pageId, const char *componentType, const char* ref,
+    int Bridge_Impl_iOS::callAddElement(const char* pageId, const char *componentType, const char* ref,
                        int &index, const char* parentRef,
                        std::map<std::string, std::string> *styles,
                        std::map<std::string, std::string> *attributes,
@@ -64,26 +87,42 @@ namespace WeexCore {
                        const WXCoreMargin &margins,
                        const WXCorePadding &paddings,
                        const WXCoreBorderWidth &borders,
-                       bool willLayout= true){}
+                       bool willLayout){
+        return bridgeImpl->callAddElement(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
+    }
     
-    int callLayout(const char* pageId, const char* ref,
+    int Bridge_Impl_iOS::callLayout(const char* pageId, const char* ref,
                    int top, int bottom, int left, int right,
-                   int height, int width, int index){}
+                   int height, int width, int index){
+        return bridgeImpl->callLayout(pageId, ref, top, bottom, left, right, height, width, index);
+    }
     
-    int callUpdateStyle(const char* pageId, const char* ref,
+    int Bridge_Impl_iOS::callUpdateStyle(const char* pageId, const char* ref,
                         std::vector<std::pair<std::string, std::string>> *style,
                         std::vector<std::pair<std::string, std::string>> *margin,
                         std::vector<std::pair<std::string, std::string>> *padding,
-                        std::vector<std::pair<std::string, std::string>> *border){}
+                        std::vector<std::pair<std::string, std::string>> *border){
+        return bridgeImpl->callUpdateStyle(pageId, ref, style, margin, padding, border);
+    }
     
-    int callUpdateAttr(const char* pageId, const char* ref,
-                       std::vector<std::pair<std::string, std::string>> *attrs){}
+    int Bridge_Impl_iOS::callUpdateAttr(const char* pageId, const char* ref,
+                       std::vector<std::pair<std::string, std::string>> *attrs){
+        return bridgeImpl->callUpdateAttr(pageId, ref, attrs);
+    }
     
-    int callCreateFinish(const char* pageId){}
+    int Bridge_Impl_iOS::callCreateFinish(const char* pageId){
+        return bridgeImpl->callCreateFinish(pageId);
+    }
     
-    int callRemoveElement(const char* pageId, const char* ref){}
+    int Bridge_Impl_iOS::callRemoveElement(const char* pageId, const char* ref){
+        return bridgeImpl->callRemoveElement(pageId, ref);
+    }
     
-    int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index){}
+    int Bridge_Impl_iOS::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index){
+        return bridgeImpl->callMoveElement(pageId, ref, parentRef, index);
+    }
     
-    int callAppendTreeCreateFinish(const char* pageId, const char* ref){}
+    int Bridge_Impl_iOS::callAppendTreeCreateFinish(const char* pageId, const char* ref){
+        return bridgeImpl->callAppendTreeCreateFinish(pageId, ref);
+    }
 }

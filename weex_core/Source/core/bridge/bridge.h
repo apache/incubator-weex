@@ -47,10 +47,6 @@ namespace WeexCore {
     virtual void* callNativeModule(const char* pageId, const char *module, const char *method,
                                      const char *arguments, int argumentsLength, const char *options, int optionsLength) = 0;
 
-#else
-        virtual WeexCore::WXValue callNativeModule(const char* pageId, const char *module, const char *method,
-                                         const char *argString, const char *optString) = 0;
-#endif
     virtual void callNativeComponent(const char* pageId, const char* ref, const char *method,
                                      const char *arguments, int argumentsLength, const char *options, int optionsLength) = 0;
 

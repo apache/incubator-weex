@@ -17,15 +17,30 @@
  * under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "iOS/bridge/bridge_impl_ios.h"
 #include "core/bridge/bridge.h"
 
-
-
-//@interface WXCoreBridgeImpl：NSObject
-//
-//@end
+enum WeexCoreEventBlockType {
+    WeexCoreEventBlockTypeSetJSVersion,
+    WeexCoreEventBlockTypeReportException,
+    WeexCoreEventBlockTypeCallNative,
+    WeexCoreEventBlockTypeCallNativeModule,
+    WeexCoreEventBlockTypeCallNativeComponent,
+    WeexCoreEventBlockTypeSetTimeout,
+    WeexCoreEventBlockTypeCallNativeLog,
+    WeexCoreEventBlockTypeCallUpdateFinish,
+    WeexCoreEventBlockTypeCallRefreshFinish,
+    WeexCoreEventBlockTypeCallAddEvent,
+    WeexCoreEventBlockTypeCallRemoveEvent,
+    WeexCoreEventBlockTypeCallCreateBody,
+    WeexCoreEventBlockTypeCallAddElement,
+    WeexCoreEventBlockTypeCallLayout,
+    WeexCoreEventBlockTypeCallUpdateStyle,
+    WeexCoreEventBlockTypeCallUpdateAttr,
+    WeexCoreEventBlockTypeCallCreateFinish,
+    WeexCoreEventBlockTypeCallRemoveElement,
+    WeexCoreEventBlockTypeCallMoveElement,
+    WeexCoreEventBlockTypeCallAppendTreeCreateFinish,
+};
 
 namespace WeexCore {
     struct WXCoreBridgeImpl;
@@ -34,17 +49,26 @@ namespace WeexCore {
         
     private:
         WXCoreBridgeImpl *impl;
+        std::map<WeexCoreEventBlockType,void *> eventMap;
         
     public:
         
         WXCoreBridge();
         ~WXCoreBridge();
         
-        WeexCore::WXValue callNativeModule(const char* pageId, const char *module, const char *method,
-                                           const char *argString, const char *optString);
+        void registerEventWithType(WeexCoreEventBlockType type,void* block);
+        
+        void setJSVersion(const char* version);
+        
+        void reportException(const char* pageId, const char *func, const char *exception_string);
+        
+        int callNative(const char* pageId, const char *task, const char *callback);
+        
+        void* callNativeModule(const char* pageId, const char *module, const char *method,
+                               const char *arguments, int argumentsLength, const char *options, int optionsLength);
         
         void callNativeComponent(const char* pageId, const char* ref, const char *method,
-                                 const char *argString, const char *optString);
+                                 const char *arguments, int argumentsLength, const char *options, int optionsLength);
         
         void setTimeout(const char* callbackID, const char* time);
         
@@ -97,5 +121,5 @@ namespace WeexCore {
         
         int callAppendTreeCreateFinish(const char* pageId, const char* ref);
     
-    }
+    };
 }

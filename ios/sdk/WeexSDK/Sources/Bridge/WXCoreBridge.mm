@@ -69,14 +69,7 @@
 }
 
 - (void)implCallAddEventWithPageId:(const char*)pageId ref:(const char*)ref event:(const char *)event{
-    
-    NSString *instanceIdString = [NSString stringWithUTF8String:pageId];
-    NSString *refString = [NSString stringWithUTF8String:ref];
-    NSString *eventString = [NSString stringWithUTF8String:event];
-    
-    WXLogDebug(@"callAddEvent...%@, %@, %@", instanceIdString, refString,eventString);
-    [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addEvent" options:nil];
-    return [JSValue valueWithInt32:(int32_t)callAddEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
+
 }
 
 #pragma mark inner method
@@ -127,11 +120,27 @@ namespace WeexCore {
         delete impl;
     }
     
-    WeexCore::WXValue WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
-                                           const char *argString, const char *optString){}
+    void WXCoreBridge::setJSVersion(const char* version){
+#warning todo
+    }
+    
+    void WXCoreBridge::reportException(const char* pageId, const char *func, const char *exception_string){
+#warning todo
+    }
+    
+    int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback){
+#warning todo
+    }
+    
+    void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
+                                         const char *arguments, int argumentsLength, const char *options, int optionsLength){
+#warning todo
+    }
         
     void WXCoreBridge::callNativeComponent(const char* pageId, const char* ref, const char *method,
-                                 const char *argString, const char *optString){}
+                                           const char *arguments, int argumentsLength, const char *options, int optionsLength){
+#warning todo
+    }
         
     void WXCoreBridge::setTimeout(const char* callbackID, const char* time){
             // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
@@ -152,11 +161,11 @@ namespace WeexCore {
     }
         
     int WXCoreBridge::callAddEvent(const char* pageId, const char* ref, const char *event){
-        
+#warning todo
     }
         
     int WXCoreBridge::callRemoveEvent(const char* pageId, const char* ref, const char *event){
-        
+#warning todo
     }
         
     int WXCoreBridge::callCreateBody(const char* pageId, const char *componentType, const char* ref,
@@ -165,7 +174,9 @@ namespace WeexCore {
                                      std::set<std::string> *events,
                                      const WXCoreMargin &margins,
                                      const WXCorePadding &paddings,
-                                     const WXCoreBorderWidth &borders){}
+                                     const WXCoreBorderWidth &borders){
+#warning todo
+    }
         
     int WXCoreBridge::callAddElement(const char* pageId, const char *componentType, const char* ref,
                            int &index, const char* parentRef,
@@ -175,28 +186,44 @@ namespace WeexCore {
                            const WXCoreMargin &margins,
                            const WXCorePadding &paddings,
                            const WXCoreBorderWidth &borders,
-                           bool willLayout= true){}
+                           bool willLayout){
+#warning todo
+    }
         
     int WXCoreBridge::callLayout(const char* pageId, const char* ref,
                        int top, int bottom, int left, int right,
-                       int height, int width, int index){}
+                       int height, int width, int index){
+#warning todo
+    }
         
     int WXCoreBridge::callUpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
                             std::vector<std::pair<std::string, std::string>> *padding,
-                            std::vector<std::pair<std::string, std::string>> *border){}
+                            std::vector<std::pair<std::string, std::string>> *border){
+#warning todo
+    }
         
     int WXCoreBridge::callUpdateAttr(const char* pageId, const char* ref,
-                           std::vector<std::pair<std::string, std::string>> *attrs){}
+                           std::vector<std::pair<std::string, std::string>> *attrs){
+#warning todo
+    }
         
-    int WXCoreBridge::callCreateFinish(const char* pageId){}
+    int WXCoreBridge::callCreateFinish(const char* pageId){
+#warning todo
+    }
         
-    int WXCoreBridge::callRemoveElement(const char* pageId, const char* ref){}
+    int WXCoreBridge::callRemoveElement(const char* pageId, const char* ref){
+#warning todo
+    }
         
-    int WXCoreBridge::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index){}
+    int WXCoreBridge::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index){
+#warning todo
+    }
         
-    int WXCoreBridge::callAppendTreeCreateFinish(const char* pageId, const char* ref){}
+    int WXCoreBridge::callAppendTreeCreateFinish(const char* pageId, const char* ref){
+#warning todo
+    }
         
     
 }

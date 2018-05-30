@@ -22,12 +22,14 @@
 
 #include <core/bridge/bridge.h>
 #include <core/bridge/wx_type_define.h>
+#include "WXCoreBridge.h"
 
 namespace WeexCore {
     
     class Bridge_Impl_iOS : public Bridge {
     
-    private: 
+    private:
+        WXCoreBridge *bridgeImpl;
         
     public:
         static Bridge_Impl_iOS *m_instance;
@@ -44,9 +46,13 @@ namespace WeexCore {
         
         static Garbo garbo;
         
-        Bridge_Impl_iOS();
+        Bridge_Impl_iOS(){
+            bridgeImpl = new WXCoreBridge();
+        }
         
-        ~Bridge_Impl_iOS();
+        ~Bridge_Impl_iOS(){
+            delete bridgeImpl;
+        }
         
         static Bridge_Impl_iOS *getInstance() {
             if (m_instance == nullptr) {
@@ -61,11 +67,11 @@ namespace WeexCore {
         
         int callNative(const char* pageId, const char *task, const char *callback);
 
-        WeexCore::WXValue callNativeModule(const char* pageId, const char *module, const char *method,
-                                                   const char *argString, const char *optString);
+        virtual void* callNativeModule(const char* pageId, const char *module, const char *method,
+                                       const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
         void callNativeComponent(const char* pageId, const char* ref, const char *method,
-                            const char *arguments, int argumentsLength, const char *options, int optionsLength);
+                                 const char *arguments, int argumentsLength, const char *options, int optionsLength);
         
         void setTimeout(const char* callbackID, const char* time);
         

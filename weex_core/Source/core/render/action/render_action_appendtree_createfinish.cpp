@@ -17,7 +17,6 @@
  * under the License.
  */
 #include "render_action_appendtree_createfinish.h"
-#include "../../../android/bridge/impl/bridge_impl_android.h"
 
 namespace WeexCore {
 
@@ -27,6 +26,7 @@ namespace WeexCore {
   }
 
   void RenderActionAppendTreeCreateFinish::ExecuteAction() {
-    Bridge_Impl_Android::getInstance()->callAppendTreeCreateFinish(mPageId.c_str(), mRef.c_str());
+      WXCoreManager::getInstance()->getPlatformBridge()->callAppendTreeCreateFinish(mPageId.c_str(), mRef.c_str());
+//    Bridge_Impl_Android::getInstance()->callAppendTreeCreateFinish(mPageId.c_str(), mRef.c_str());
   }
 }
