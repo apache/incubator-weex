@@ -35,6 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.gesture.WXGestureType.GestureInfo;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION;
+import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION_RAX;
 
 public class WXGesture extends GestureDetector.SimpleOnGestureListener implements OnTouchListener {
 
@@ -127,10 +129,30 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
 
 
   /**
+   * stoppropagation
+   * */
+  public static boolean isStopPropagation(String type){
+    return  Constants.Event.STOP_PROPAGATION.equals(type) || Constants.Event.STOP_PROPAGATION_RAX.equals(type);
+  }
+
+  public static boolean hasStopPropagation(WXComponent component){
+    WXEvent event = component.getEvents();
+    if(event == null){
+      return false;
+    }
+    for(String type : event){
+      if(isStopPropagation(type)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * shouldBubbleEvent default true
    * */
   private boolean shouldBubbleTouchEvent(MotionEvent event){
-    if(component.containsEvent(STOP_PROPAGATION)){
+    if(hasStopPropagation(component)){
       if(shouldBubbleInterval > 0 && shouldBubbleCallRemainTimes > 0){
         shouldBubbleCallRemainTimes--;
         return  shouldBubbleResult;
@@ -145,7 +167,12 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
       }else{
         eventMap.put("action", MOVE);
       }
-      EventResult result = component.fireEventWait(STOP_PROPAGATION, eventMap);
+
+      String name = STOP_PROPAGATION;
+      if(!component.getEvents().contains(STOP_PROPAGATION)){
+         name = STOP_PROPAGATION_RAX;
+      }
+      EventResult result = component.fireEventWait(name, eventMap);
       if(result.isSuccess() && result.getResult() != null){
         boolean stopPropagation = WXUtils.getBoolean(result.getResult(), !shouldBubbleResult);
         shouldBubbleResult = !stopPropagation;
@@ -196,7 +223,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           result |= handlePanMotionEvent(event);
           break;
       }
-      if(component.containsEvent(STOP_PROPAGATION)){
+      if(hasStopPropagation(component)){
         ViewGroup parent = (ViewGroup) v.getParent();
         boolean requestDisallowInterceptTouchEvent = false;
         if(parent != null){

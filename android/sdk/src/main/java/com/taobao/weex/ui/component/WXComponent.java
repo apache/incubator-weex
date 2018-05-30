@@ -1199,10 +1199,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       AccessibilityDelegateCompat delegate = new AccessibilityDelegateCompat() {
         @Override
         public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
-          super.onInitializeAccessibilityNodeInfo(host, info);
           try {
+            super.onInitializeAccessibilityNodeInfo(host, info);
             info.setRoleDescription(finalRole);
-          } catch (Exception e) {
+          } catch (Throwable e) {
             WXLogUtils.e("SetRole failed!");
           }
         }
@@ -1268,7 +1268,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         }
       }
     }
-    if(Constants.Event.STOP_PROPAGATION.equals(type)){
+    if(WXGesture.isStopPropagation(type)){
       return  true;
     }
     return false;
