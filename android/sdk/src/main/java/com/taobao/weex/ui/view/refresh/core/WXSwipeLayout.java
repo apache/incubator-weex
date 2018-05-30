@@ -24,6 +24,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
@@ -41,6 +42,9 @@ import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent, NestedScrollingChild {
 
   private NestedScrollingParentHelper mNestedScrollingParentHelper;
@@ -52,6 +56,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   private WXOnLoadingListener onLoadingListener;
 
   private ViewParent mNestedScrollAcceptedParent;
+
+  private final List<OnRefreshOffsetChangedListener> mRefreshOffsetChangedListeners = new LinkedList<>();
+
+  public interface OnRefreshOffsetChangedListener {
+    void onOffsetChanged(int verticalOffset);
+  }
 
   /**
    * On refresh Callback, call on start refresh
@@ -479,6 +489,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       }
       headerView.setLayoutParams(lp);
       onRefreshListener.onPullingDown(distanceY, lp.height, refreshViewFlowHeight);
+      notifyOnRefreshOffsetChangedListener(lp.height);
       headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       moveTargetView(lp.height);
       return true;
@@ -557,6 +568,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       public void onAnimationUpdate(ValueAnimator animation) {
         LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
         lp.height = (int) ((Float) animation.getAnimatedValue()).floatValue();
+        notifyOnRefreshOffsetChangedListener(lp.height);
         headerView.setLayoutParams(lp);
         moveTargetView(lp.height);
       }
@@ -588,6 +600,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       public void onAnimationUpdate(ValueAnimator animation) {
         LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
         lp.height = (int) ((Float) animation.getAnimatedValue()).floatValue();
+        notifyOnRefreshOffsetChangedListener(lp.height);
         headerView.setLayoutParams(lp);
         moveTargetView(lp.height);
       }
@@ -736,6 +749,27 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   public void setOnRefreshListener(WXOnRefreshListener onRefreshListener) {
     this.onRefreshListener = onRefreshListener;
+  }
+
+  @SuppressWarnings("unused")
+  public void addOnRefreshOffsetChangedListener(@Nullable OnRefreshOffsetChangedListener listener) {
+    if(listener != null && !mRefreshOffsetChangedListeners.contains(listener)) {
+      mRefreshOffsetChangedListeners.add(listener);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public boolean removeOnRefreshOffsetChangedListener(@Nullable OnRefreshOffsetChangedListener listener) {
+    if(listener != null) {
+      return mRefreshOffsetChangedListeners.remove(listener);
+    }
+    return false;
+  }
+
+  private void notifyOnRefreshOffsetChangedListener(int verticalOffset) {
+    for(OnRefreshOffsetChangedListener listener : mRefreshOffsetChangedListeners) {
+      listener.onOffsetChanged(verticalOffset);
+    }
   }
 
   /**
