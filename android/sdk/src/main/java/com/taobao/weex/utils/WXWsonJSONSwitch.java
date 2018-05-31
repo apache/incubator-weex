@@ -41,7 +41,11 @@ public class WXWsonJSONSwitch {
         if(json == null){
             return null;
         }
-        return WsonUtils.toWson(JSON.parse(json));
+        String str = new String(json);
+        if(str.startsWith("[")){
+            return WsonUtils.toWson(JSON.parseArray(str));
+        }
+        return WsonUtils.toWson(JSON.parse(str));
     }
 
     /**
@@ -81,6 +85,15 @@ public class WXWsonJSONSwitch {
             return new WXJSObject(WXJSObject.WSON, Wson.toWson(tasks));
         }else{
             return new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(tasks));
+        }
+    }
+
+
+    public static  final Object convertWXJSObjectDataToJSON(WXJSObject object){
+        if(object.type == WXJSObject.WSON){
+            return JSON.parse(Wson.parse((byte[]) object.data).toString());
+        }else{
+            return JSON.parse(object.data.toString());
         }
     }
 

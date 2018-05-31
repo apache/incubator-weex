@@ -54,6 +54,7 @@ if (ANDROID)
   set (ANDROID_SRCS
     ./android/jniprebuild/jni_load.cc
     ./android/base/jni/android_jni.cpp
+    ./android/base/jni/jbytearray_ref.cpp
     ./android/base/jni/scoped_java_ref.cpp
     ./android/base/base64/base64.cpp
     ./android/base/base64/modp_base64/modp_b64.cc

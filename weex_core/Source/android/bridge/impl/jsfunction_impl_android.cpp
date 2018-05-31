@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/base/jni/jbytearray_ref.h>
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
 #include "../../jniprebuild/jniheader/WXJsFunctions_jni.h"
@@ -40,6 +41,7 @@ static const char *getCharFromJByte(JNIEnv *env, jbyteArray jbyteArray1) {
 
     return jByteArray2Str(env, jbyteArray1).c_str();
 }
+
 
 static const int getJByteArraySize(JNIEnv *env, jbyteArray array){
     if(array == nullptr){
@@ -108,6 +110,9 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
          jString2StrFast(env, instanceId).c_str(), jString2StrFast(env, module).c_str(),
          jString2StrFast(env, method).c_str(), jByteArray2Str(env, arguments).c_str());
 #endif
+    JByteArrayRef argumentsRef(env, arguments);
+    JByteArrayRef optionsRef(env, options);
+
 
     // add for android support
     jobject result;
@@ -115,10 +120,10 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
                 getCharFromJString(env, instanceId),
                 getCharFromJString(env, module),
                 getCharFromJString(env, method),
-                getCharFromJByte(env, arguments),
-                getJByteArraySize(env, arguments),
-                getCharFromJByte(env, options),
-                getJByteArraySize(env, options)));
+                argumentsRef.getBytes(),
+                argumentsRef.length(),
+                optionsRef.getBytes(),
+                optionsRef.length()));
 
     jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
     jint jTypeInt = env->GetIntField(result, jTypeId);
@@ -158,13 +163,15 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
                             jstring method,
                             jbyteArray arguments, jbyteArray options, jboolean from) {
 
+    JByteArrayRef argumentsRef(env, arguments);
+    JByteArrayRef optionsRef(env, options);
     Bridge_Impl_Android::getInstance()->callNativeComponent(getCharFromJString(env, instanceId),
                                                             getCharFromJString(env, componentRef),
                                                             getCharFromJString(env, method),
-                                                            getCharFromJByte(env, arguments),
-                                                            getJByteArraySize(env, arguments),
-                                                            getCharFromJByte(env, options),
-                                                            getJByteArraySize(env, options));
+                                                            argumentsRef.getBytes(),
+                                                            argumentsRef.length(),
+                                                            optionsRef.getBytes(),
+                                                            optionsRef.length());
 
 }
 
@@ -174,16 +181,16 @@ jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring 
 
     const char *instanceChar = env->GetStringUTFChars(instanceId, 0);
     const char *refChar = env->GetStringUTFChars(ref, 0);
-    const char *domChar = getCharFromJByte(env, dom);
+    JByteArrayRef domRef(env, dom);
     const char *indexChar = env->GetStringUTFChars(index, 0);
 
     int indexI = atoi(indexChar);
-    if (instanceChar == nullptr || refChar == nullptr || domChar == nullptr ||
+    if (instanceChar == nullptr || refChar == nullptr || domRef.length() == 0 ||
         indexChar == nullptr ||
         indexI < -1)
         return;
 
-    RenderManager::GetInstance()->AddRenderObject(instanceChar, refChar, indexI, domChar);
+    RenderManager::GetInstance()->AddRenderObject(instanceChar, refChar, indexI,  domRef.getBytes());
 }
 
 void jsHandleSetTimeout(JNIEnv *env, jobject object, jstring callbackId, jstring time) {
@@ -202,10 +209,10 @@ void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyte
         return;
 
     const char *page = env->GetStringUTFChars(pageId, NULL);
-    const char *dom = getCharFromJByte(env, domStr);
-    if (page == nullptr || dom == nullptr || strlen(dom) == 0)
+    JByteArrayRef dom(env, domStr);
+    if (page == nullptr || dom.length() == 0)
         return;
-    RenderManager::GetInstance()->CreatePage(page, dom);
+    RenderManager::GetInstance()->CreatePage(page, dom.getBytes());
 }
 
 void
@@ -232,16 +239,20 @@ jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jby
 
 void
 jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from) {
+
+    JByteArrayRef dataRef(env, data);
     RenderManager::GetInstance()->UpdateAttr(env->GetStringUTFChars(pageId, 0),
                                              env->GetStringUTFChars(ref, 0),
-                                             getCharFromJByte(env, data));
+                                             dataRef.getBytes());
 }
 
 void
 jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data, jboolean from) {
+
+    JByteArrayRef dataRef(env, data);
     RenderManager::GetInstance()->UpdateStyle(env->GetStringUTFChars(pageId, 0),
                                               env->GetStringUTFChars(ref, 0),
-                                              getCharFromJByte(env, data));
+                                              dataRef.getBytes());
 }
 
 void jsFunctionCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref) {
