@@ -37,6 +37,7 @@
 #import "WXPolyfillSet.h"
 #import "WXAppMonitorProtocol.h"
 #import "JSContext+Weex.h"
+#import "WXCoreBridge.h"
 
 #import <dlfcn.h>
 
@@ -53,6 +54,10 @@
 @property (nonatomic)  long long intervalTimerId;
 @property (nonatomic, strong)  NSMutableDictionary *callbacks;
 
+#ifdef WX_IMPORT_WEEXCORE
+@property (nonatomic, assign) WeexCore::WXCoreBridge *coreBridge;
+#endif
+
 @end
 
 @implementation WXJSCoreBridge
@@ -62,6 +67,10 @@
     self = [super init];
     
     if(self){
+#ifdef WX_IMPORT_WEEXCORE
+        _coreBridge = new WeexCore::WXCoreBridge();
+#endif
+        
         _jsContext = [[JSContext alloc] init];
         if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             _jsContext.name = @"Weex Context";
@@ -112,6 +121,7 @@
 - (void)dealloc
 {
     _jsContext.instanceId = nil;
+    delete _coreBridge;
 }
 
 - (void)setJSContext:(JSContext *)context
@@ -199,7 +209,7 @@
         
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
     };
-
+    
     _jsContext[@"callAddElement"] = callAddElementBlock;
 }
 
@@ -284,6 +294,7 @@
 
 - (void)registerCallAddEvent:(WXJSCallAddEvent)callAddEvent
 {
+#ifndef WX_IMPORT_WEEXCORE
     id WXJSCallAddEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
@@ -296,6 +307,18 @@
     };
     
     _jsContext[@"callAddEvent"] = WXJSCallAddEventBlock;
+#else
+    id WXJSCallAddEventBlock = ^NSInteger(NSString *instanceId,NSString *ref,NSString *event){
+        
+        WXLogDebug(@"callAddEvent...%@, %@, %@", instanceId, ref,event);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addEvent" options:nil];
+        
+        return callAddEvent(instanceId,ref,event);
+    };
+    
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallAddEvent, (__bridge void*)WXJSCallAddEventBlock);
+#endif
+    
 }
 
 - (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent

@@ -17,6 +17,11 @@
  * under the License.
  */
 
+#ifndef WXCORE_BRIDGE_PLATFORM_H
+#define WXCORE_BRIDGE_PLATFORM_H
+
+#define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
+
 #include "core/bridge/bridge.h"
 
 enum WeexCoreEventBlockType {
@@ -49,7 +54,6 @@ namespace WeexCore {
         
     private:
         WXCoreBridgeImpl *impl;
-        std::map<WeexCoreEventBlockType,void *> eventMap;
         
     public:
         
@@ -123,3 +127,5 @@ namespace WeexCore {
     
     };
 }
+
+#endif

@@ -24,6 +24,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXLog.h"
 #import "WXTracingManager.h"
+#import "WXBridgeProtocol.h"
 
 #pragma mark - OC related
 @interface WXCoreBridgeOCImpl:NSObject
@@ -69,7 +70,7 @@
 }
 
 - (void)implCallAddEventWithPageId:(const char*)pageId ref:(const char*)ref event:(const char *)event{
-
+    
 }
 
 #pragma mark inner method
@@ -107,6 +108,7 @@ namespace WeexCore {
     
     struct WXCoreBridgeImpl{
         WXCoreBridgeOCImpl *ocImpl;
+        std::map<WeexCoreEventBlockType,void *> blockMap;
     };
     
     WXCoreBridge::WXCoreBridge(){
@@ -116,8 +118,13 @@ namespace WeexCore {
     WXCoreBridge::~WXCoreBridge(){
         if(impl){
             impl->ocImpl = nil;
+            impl->blockMap.clear();
         }
         delete impl;
+    }
+    
+    void WXCoreBridge::registerEventWithType(WeexCoreEventBlockType type,void* block){
+        impl->blockMap[type] = block;
     }
     
     void WXCoreBridge::setJSVersion(const char* version){
@@ -153,15 +160,23 @@ namespace WeexCore {
     }
         
     int WXCoreBridge::callUpdateFinish(const char* pageId, const char *task, const char *callback){
-        [impl->ocImpl implCallUpdateFinishWithPageId:pageId task:task callback:callback];
+        return [impl->ocImpl implCallUpdateFinishWithPageId:pageId task:task callback:callback];
     }
         
     int WXCoreBridge::callRefreshFinish(const char* pageId, const char *task, const char *callback){
-        [impl->ocImpl implCallRefreshFinishWithPageId:pageId task:task callback:callback];
+        return [impl->ocImpl implCallRefreshFinishWithPageId:pageId task:task callback:callback];
     }
         
     int WXCoreBridge::callAddEvent(const char* pageId, const char* ref, const char *event){
-#warning todo
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallAddEvent];
+        if(func != nullptr){
+            WXJSCallAddEvent targetFunc = (__bridge WXJSCallAddEvent)func;
+            NSString *pageIDString = [NSString stringWithUTF8String:pageId];
+            NSString *refString = [NSString stringWithUTF8String:ref];
+            NSString *eventString = [NSString stringWithUTF8String:event];
+            return (int)targetFunc(pageIDString,refString,eventString);
+        }
+        return -1;
     }
         
     int WXCoreBridge::callRemoveEvent(const char* pageId, const char* ref, const char *event){
