@@ -41,7 +41,12 @@ set(COMMON_SRCS
   ./core/config/core_environment.cpp
 
   ./core/moniter/render_performance.cpp
+  ./core/manager/weex_core_manager.cpp )
+
+SET(FINAL_ADD_LIBRARY
+        ${COMMON_SRCS}
 )
+SET(FINAL_TARGET_LINK_LIBRARIES )
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
@@ -77,13 +82,25 @@ if (ANDROID)
      
 
   )
+  SET(FINAL_ADD_LIBRARY
+          ${FINAL_ADD_LIBRARY}
+          ${ANDROID_SRCS}
+          )
 
-  add_library(${WEEXCORE_LIBRARY_NAME} SHARED
-    ${COMMON_SRCS}
-    ${ANDROID_SRCS}
-  )
+  SET(FINAL_TARGET_LINK_LIBRARIES
+          ${FINAL_TARGET_LINK_LIBRARIES}
+          wson
+          android
+          weexipc
+          log
+          z
+          )
 
-  target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
-
-  target_link_libraries(${WEEXCORE_LIBRARY_NAME} wson android weexipc log z)
 endif (ANDROID)
+
+add_library(${WEEXCORE_LIBRARY_NAME} SHARED
+        ${FINAL_ADD_LIBRARY}
+        )
+
+target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
+target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})

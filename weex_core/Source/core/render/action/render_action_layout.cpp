@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_layout.h"
 
 namespace WeexCore {
@@ -28,9 +29,9 @@ namespace WeexCore {
   }
 
   void RenderActionLayout::ExecuteAction() {
-    Bridge_Impl_Android::getInstance()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                   mTop, mBottom, mLeft, mRight,
-                                                   mHeight, mWidth, index);
+      WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
+                                                                      mTop, mBottom, mLeft, mRight,
+                                                                      mHeight, mWidth, index);
   }
 
   void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {

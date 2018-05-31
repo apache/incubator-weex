@@ -17,6 +17,7 @@
  * under the License.
  */
 #include "render_action_remove_event.h"
+#include <core/manager/weex_core_manager.h>
 
 namespace WeexCore {
 
@@ -27,7 +28,8 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveEvent::ExecuteAction() {
-    Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    //Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
   }
 
 }

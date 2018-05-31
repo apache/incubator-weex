@@ -97,6 +97,9 @@ namespace WeexCore {
     virtual int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) = 0;
 
     virtual int callAppendTreeCreateFinish(const char* pageId, const char* ref) = 0;
+    
+    virtual int callHasTransitionPros(const char* pageId, const char* ref,
+                                        std::vector<std::pair<std::string, std::string>> *style)=0;
   };
 } //end WeexCore
 #endif //Bridge_h

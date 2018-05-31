@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_update_attr.h"
 
 namespace WeexCore {
@@ -28,6 +29,6 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateAttr::ExecuteAction() {
-    Bridge_Impl_Android::getInstance()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
+      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
   }
 }

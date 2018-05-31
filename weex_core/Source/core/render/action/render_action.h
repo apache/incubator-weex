@@ -23,7 +23,6 @@
 #include <core/render/node/render_object.h>
 #include <core/render/manager/render_manager.h>
 #include <core/render/page/render_page.h>
-#include <android/bridge/impl/bridge_impl_android.h>
 #include <string>
 #include <base/TimeUtils.h>
 

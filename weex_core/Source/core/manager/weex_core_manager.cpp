@@ -16,19 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_add_event.h"
+//
+// Created by 陈佩翰 on 2018/5/31.
+//
+
+#include "weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionAddEvent::RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mEvent = event;
-  }
+    WeexCoreManager *WeexCoreManager::m_pInstance = nullptr;
 
-  void RenderActionAddEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
-  }
+    WeexCoreManager *WeexCoreManager::setPlatformBridge(Bridge *pBridge) {
+        this->platformBridge = pBridge;
+    }
 
+    Bridge *WeexCoreManager::getPlatformBridge() {
+        return this->platformBridge;
+    }
 }
