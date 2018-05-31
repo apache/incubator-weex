@@ -2605,15 +2605,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+  public ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr) {
     ContentBoxMeasurement contentBoxMeasurement = null;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
-      contentBoxMeasurement = instance.getContentBoxMeasurement(ref);
+      contentBoxMeasurement = instance.getContentBoxMeasurement(renderObjectPtr);
     }
     return contentBoxMeasurement;
   }
-
+  
   public void bindMeasurementToRenderObject(long ptr){
     mWXBridge.bindMeasurementToRenderObject(ptr);
   }

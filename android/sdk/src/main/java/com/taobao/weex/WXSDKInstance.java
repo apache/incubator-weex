@@ -189,7 +189,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private ComponentObserver mComponentObserver;
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
-  private Map<String, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
+  private Map<Long, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
 
   /**
    * set make weexCore run in single process mode
@@ -1946,11 +1946,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  public void addContentBoxMeasurement(String ref, ContentBoxMeasurement contentBoxMeasurement) {
-    mContentBoxMeasurements.put(ref, contentBoxMeasurement);
+  public void addContentBoxMeasurement(long renderObjectPtr, ContentBoxMeasurement contentBoxMeasurement) {
+    mContentBoxMeasurements.put(renderObjectPtr, contentBoxMeasurement);
   }
 
-  public ContentBoxMeasurement getContentBoxMeasurement(String ref) {
-    return mContentBoxMeasurements.get(ref);
+  public ContentBoxMeasurement getContentBoxMeasurement(long renderObjectPtr) {
+    return mContentBoxMeasurements.get(renderObjectPtr);
   }
 }

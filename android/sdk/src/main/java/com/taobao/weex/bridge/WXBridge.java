@@ -478,10 +478,10 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+  public ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr) {
     ContentBoxMeasurement obj = null;
     try {
-      obj = WXBridgeManager.getInstance().getMeasurementFunc(instanceId, ref);
+      obj = WXBridgeManager.getInstance().getMeasurementFunc(instanceId, renderObjectPtr);
     } catch (Throwable e) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e(TAG, "getMeasurementFunc throw exception:" + e.getMessage());

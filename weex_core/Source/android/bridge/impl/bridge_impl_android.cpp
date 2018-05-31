@@ -916,15 +916,14 @@ namespace WeexCore {
     env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
   }
 
-  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
+  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, jlong renderObjectPtr) {
     JNIEnv *env = getJNIEnv();
     jstring jPageId = getKeyFromCache(env, pageId);
-    jstring jRef = getKeyFromCache(env, ref);
     if (jCallGetMeasurementMethodId == NULL) {
       jCallGetMeasurementMethodId = env->GetMethodID(jBridgeClazz,
                                                      "getMeasurementFunc",
-                                                     "(Ljava/lang/String;Ljava/lang/String;)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
+                                                     "(Ljava/lang/String;J)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
     }
-    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, jRef);
+    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, renderObjectPtr);
   }
 } //end WeexCore

@@ -210,6 +210,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
+
+
   @Override
   protected final void bindComponent(WXComponent component) {
     super.bindComponent(component);
@@ -222,7 +224,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected final void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    mInstance.addContentBoxMeasurement(getRef(), contentBoxMeasurement);
+    mInstance.addContentBoxMeasurement(getRenderObjectPtr(), contentBoxMeasurement);
     WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
   }
 
