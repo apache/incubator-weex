@@ -15,7 +15,6 @@ add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
 set(COMMON_SRCS
-  ./core/api/WeexJSCoreApi.cpp
 
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
@@ -41,7 +40,9 @@ set(COMMON_SRCS
   ./core/config/core_environment.cpp
 
   ./core/moniter/render_performance.cpp
-  ./core/manager/weex_core_manager.cpp )
+  ./core/manager/weex_core_manager.cpp
+  ./core/bridge/js_bridge.cpp
+        )
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
@@ -79,6 +80,7 @@ if (ANDROID)
 
 
     ./core/parser/dom_wson.cpp
+    ./android/jsengine/api/WeexJSCoreApi.cpp
      
 
   )
