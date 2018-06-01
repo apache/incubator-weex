@@ -30,7 +30,16 @@ namespace WeexCore {
         this->platformBridge = pBridge;
     }
 
-    Bridge *WeexCoreManager::getPlatformBridge() {
+    Bridge* WeexCoreManager::getPlatformBridge() {
         return this->platformBridge;
     }
+
+    WeexCoreManager *WeexCoreManager::setJSBridge(JSBridge *jsBridge) {
+        this->jsBridge = jsBridge;
+    }
+
+    JSBridge* WeexCoreManager::getJSBridge() {
+        return this->jsBridge;
+    }
+
 }

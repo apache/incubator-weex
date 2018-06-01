@@ -19,7 +19,7 @@
 #ifndef Bridge_h
 #define Bridge_h
 
-#include <jni.h>
+//#include <jni.h>
 #include <string>
 #include <map>
 #include <set>

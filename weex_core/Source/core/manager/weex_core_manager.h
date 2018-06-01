@@ -21,17 +21,24 @@
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
 #include <core/bridge/bridge.h>
+#include <core/bridge/js_bridge.h>
 
 namespace WeexCore {
     class WeexCoreManager {
     private:
         Bridge *platformBridge = nullptr;
         static WeexCoreManager *m_pInstance;
+        JSBridge* jsBridge = nullptr;
 
     private:
         WeexCoreManager() {};
 
-        ~WeexCoreManager() {};
+        ~WeexCoreManager() {
+            delete platformBridge;
+            platformBridge = nullptr;
+            delete jsBridge;
+            jsBridge = nullptr;
+        };
 
         //just to release singleton object
         class Garbo {
@@ -56,6 +63,10 @@ namespace WeexCore {
         Bridge *getPlatformBridge();
 
         WeexCoreManager *setPlatformBridge(Bridge *pBridge);
+
+        JSBridge* getJSBridge();
+        WeexCoreManager *setJSBridge(JSBridge *jsBridge);
+
     };
 }
 
