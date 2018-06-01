@@ -25,6 +25,7 @@
 #import "WXLog.h"
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
+#import "WXUtility.h"
 
 #pragma mark - OC related
 @interface WXCoreBridgeOCImpl:NSObject
@@ -136,12 +137,36 @@ namespace WeexCore {
     }
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback){
-#warning todo
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallNative];
+        if(func != nullptr){
+            WXJSCallNative targetFunc = (__bridge WXJSCallNative)func;
+            NSString *pageIDString = [NSString stringWithUTF8String:pageId];
+            NSData *taskData = [NSData dataWithBytes:task length:strlen(task)];
+            NSError *error = nil;
+            NSArray *taskArray = [WXUtility JSONObject:taskData error:&error];
+            NSString *callBackString = [NSString stringWithUTF8String:callback];
+            return (int)targetFunc(pageIDString,taskArray,callBackString);
+        }
+        return -1;
     }
     
     void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
                                          const char *arguments, int argumentsLength, const char *options, int optionsLength){
 #warning todo
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallNativeModule];
+        if(func != nullptr){
+            WXJSCallNativeModule targetFunc = (__bridge WXJSCallNativeModule)func;
+            NSString *pageIdString = [NSString stringWithUTF8String:pageId];
+            NSString *moduleString = [NSString stringWithUTF8String:module];
+            NSString *methodString = [NSString stringWithUTF8String:method];
+            NSError *error = nil;
+            NSData *argumentsData = [NSData dataWithBytes:arguments length:argumentsLength];
+            NSArray *argumentsArray = [WXUtility JSONObject:argumentsData error:&error];
+            NSData *optionsData = [NSData dataWithBytes:options length:optionsLength];
+            NSDictionary *optinionsDic = [WXUtility JSONObject:optionsData error:&error];
+            return (__bridge void *) targetFunc(pageIdString,moduleString,methodString,argumentsArray,optinionsDic);
+        }
+        return nil;
     }
         
     void WXCoreBridge::callNativeComponent(const char* pageId, const char* ref, const char *method,

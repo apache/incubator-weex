@@ -169,6 +169,7 @@
 
 - (void)registerCallNative:(WXJSCallNative)callNative
 {
+#ifndef WX_IMPORT_WEEXCORE
     JSValue* (^callNativeBlock)(JSValue *, JSValue *, JSValue *) = ^JSValue*(JSValue *instance, JSValue *tasks, JSValue *callback){
         NSString *instanceId = [instance toString];
         NSArray *tasksArray = [tasks toArray];
@@ -178,6 +179,18 @@
     };
     
     _jsContext[@"callNative"] = callNativeBlock;
+#else
+    id WXJSCallNativeBlock = ^NSInteger(NSString *instance, NSArray *tasks, NSString *callback){
+        
+        WXLogDebug(@"Calling native... instance:%@, tasks:%@, callback:%@", instance, tasks, callback);
+        
+        return callNative(instance,tasks,callback);
+    };
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallAddEvent, (__bridge void*)WXJSCallNativeBlock);
+#warning todo
+//    _jsContext[@"callNative"] = callNativeBlock;
+#endif
+    
 }
 
 - (void)executeJavascript:(NSString *)script
@@ -317,6 +330,9 @@
     };
     
     _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallAddEvent, (__bridge void*)WXJSCallAddEventBlock);
+    
+#warning todo
+//    _jsContext[@"callAddEvent"] = WXJSCallAddEventBlock;
 #endif
     
 }
@@ -353,6 +369,7 @@
 
 - (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock
 {
+#ifndef WX_IMPORT_WEEXCORE
     _jsContext[@"callNativeModule"] = ^JSValue *(JSValue *instanceId, JSValue *moduleName, JSValue *methodName, JSValue *args, JSValue *options) {
         NSString *instanceIdString = [instanceId toString];
         NSString *moduleNameString = [moduleName toString];
@@ -367,6 +384,21 @@
         [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:moduleNameString phase:WXTracingInstant functionName:methodNameString options:nil];
         return returnValue;
     };
+#else
+    
+    WXJSCallNativeModule targetFunc = ^NSInvocation *(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options){
+        
+        WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceId, moduleName, methodName, args);
+        
+        NSInvocation *invocation = callNativeModuleBlock(instanceId, moduleName, methodName, args, options);
+        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:moduleName phase:WXTracingInstant functionName:methodName options:nil];
+        return invocation;
+    };
+    
+#warning todo
+//    _jsContext[@"callNativeModule"]=
+#endif
 }
 
 - (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock
