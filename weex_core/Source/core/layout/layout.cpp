@@ -99,6 +99,12 @@ namespace WeexCore {
         width = containingBlockWidth -
             mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft) -
             mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
+        if (!isnan(mCssStyle->mMargin.getMargin(kMarginLeft))) {
+          width -= mCssStyle->mMargin.getMargin(kMarginLeft);
+        }
+        if (!isnan(mCssStyle->mMargin.getMargin(kMarginRight))) {
+          width -= mCssStyle->mMargin.getMargin(kMarginRight);
+        }
         setWidthMeasureMode(kExactly);
         sizeChanged = true;
       }
@@ -128,6 +134,12 @@ namespace WeexCore {
         height = containingBlockHeight -
             mCssStyle->mStylePosition.getPosition(kPositionEdgeTop) -
             mCssStyle->mStylePosition.getPosition(kPositionEdgeBottom);
+        if (!isnan(mCssStyle->mMargin.getMargin(kMarginTop))) {
+          height -= mCssStyle->mMargin.getMargin(kMarginTop);
+        }
+        if (!isnan(mCssStyle->mMargin.getMargin(kMarginBottom))) {
+          height -= mCssStyle->mMargin.getMargin(kMarginBottom);
+        }
         setHeightMeasureMode(kExactly);
         sizeChanged = true;
       }
