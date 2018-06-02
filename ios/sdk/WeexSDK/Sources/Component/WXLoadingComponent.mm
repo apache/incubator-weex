@@ -120,7 +120,11 @@
         contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
         [_indicator stop];
     }
-    [scrollerProtocol setContentOffset:contentOffset animated:YES];
+    if (contentOffset.y > 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [scrollerProtocol setContentOffset:contentOffset animated:YES];
+        });
+    }
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
