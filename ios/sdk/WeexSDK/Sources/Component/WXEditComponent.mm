@@ -220,6 +220,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 -(void)blur
 {
     if(self.view) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIKeyboardWillHideNotification object:nil];
         [self.view resignFirstResponder];
     }
 }
@@ -658,12 +659,33 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
+    // WXRootView offset, iPhone X is 10, others is 20 (iOS 11)
+    CGFloat offsetY = 0.f;
+    // reset to the original y, iPhone X is 44, others is 20
+    CGFloat originY = 0.f;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+        originY = screenSize.height == 812.0f ? 44 : 20;
+        if (@available(iOS 11.0, *)) {
+            offsetY = screenSize.height == 812.0f ? 10 : 20;
+        } else {
+            offsetY = screenSize.height == 812.0f ? 0 : 0;
+        }
+    }
+    CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height - offsetY);
     if (movedUp) {
-        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
                 .origin.y = rect.origin.y - offset,
+                .size = rootViewFrame.size
+            };
+        }
+    } else {
+        if (offset > 0) {
+            rect = (CGRect){
+                .origin.x = 0.f,
+                .origin.y = originY,
                 .size = rootViewFrame.size
             };
         }
@@ -910,6 +932,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)closeKeyboard
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIKeyboardWillHideNotification object:nil];
     [self.view resignFirstResponder];
 }
 
