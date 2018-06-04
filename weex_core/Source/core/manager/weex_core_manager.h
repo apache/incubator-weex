@@ -22,12 +22,14 @@
 
 #include <core/bridge/bridge.h>
 #include <core/bridge/js_bridge.h>
+#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
     class WeexCoreManager {
     private:
-        Bridge *platformBridge = nullptr;
         static WeexCoreManager *m_pInstance;
+        Bridge *platformBridge = nullptr;
+        MeasureFunctionAdapter *m_pMeasureFunctionAdapter = nullptr;
         JSBridge* jsBridge = nullptr;
 
     private:
@@ -65,7 +67,12 @@ namespace WeexCore {
         WeexCoreManager *setPlatformBridge(Bridge *pBridge);
 
         JSBridge* getJSBridge();
+
         WeexCoreManager *setJSBridge(JSBridge *jsBridge);
+
+        void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
+
+        MeasureFunctionAdapter *GetMeasureFunctionAdapter();
 
     };
 }

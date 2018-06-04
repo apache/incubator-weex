@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 陈佩翰 on 2018/5/31.
-//
 
 #include "weex_core_manager.h"
 
@@ -42,4 +39,11 @@ namespace WeexCore {
         return this->jsBridge;
     }
 
+    void WeexCoreManager::SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {
+      this->m_pMeasureFunctionAdapter = measureFunctionAdapter;
+    }
+
+    MeasureFunctionAdapter * WeexCoreManager::GetMeasureFunctionAdapter() {
+      return this->m_pMeasureFunctionAdapter;
+    }
 }
