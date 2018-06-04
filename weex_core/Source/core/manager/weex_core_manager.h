@@ -29,7 +29,7 @@ namespace WeexCore {
     private:
         static WeexCoreManager *m_pInstance;
         Bridge *platformBridge = nullptr;
-        MeasureFunctionAdapter *m_pMeasureFunctionAdapter = nullptr;
+        MeasureFunctionAdapter *measureFunctionAdapter = nullptr;
         JSBridge* jsBridge = nullptr;
 
     private:
