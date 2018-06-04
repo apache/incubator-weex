@@ -40,10 +40,10 @@ namespace WeexCore {
     }
 
     void WeexCoreManager::SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {
-      this->m_pMeasureFunctionAdapter = measureFunctionAdapter;
+      this->measureFunctionAdapter = measureFunctionAdapter;
     }
 
     MeasureFunctionAdapter * WeexCoreManager::GetMeasureFunctionAdapter() {
-      return this->m_pMeasureFunctionAdapter;
+      return this->measureFunctionAdapter;
     }
 }
