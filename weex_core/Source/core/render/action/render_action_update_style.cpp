@@ -35,7 +35,7 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
                                                                            mPadding, mBorder);
   }
 }

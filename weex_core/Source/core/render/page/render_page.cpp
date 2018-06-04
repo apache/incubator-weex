@@ -241,8 +241,8 @@ namespace WeexCore {
     std::vector<std::pair<std::string, std::string>> *border = nullptr;
 
     bool flag = false;
-    int result = WeexCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
-    //int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    int result = WeexCoreManager::GetInstance()->GetPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    //int result = Bridge_Impl_Android::GetInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
 
     if (result == 1) {
       SendUpdateStyleAction(render, src, margin, padding, border);

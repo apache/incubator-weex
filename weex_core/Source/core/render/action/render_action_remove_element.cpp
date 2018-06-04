@@ -27,6 +27,6 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
   }
 }

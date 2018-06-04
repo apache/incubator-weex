@@ -34,7 +34,7 @@ namespace WeexCore {
   }
 
   void RenderActionCreateBody::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callCreateBody(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
                                                                           mStyles, mAttributes, mEvents,
                                                                           mMargins, mPaddings, mBorders);
   }

@@ -26,6 +26,6 @@ namespace WeexCore {
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callCreateFinish(mPageId.c_str());
   }
 }

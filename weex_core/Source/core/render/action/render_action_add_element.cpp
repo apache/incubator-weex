@@ -38,7 +38,7 @@ namespace WeexCore {
   }
 
   void RenderActionAddElement::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
                                                                           mIndex, mParentRef.c_str(), mStyles, mAttributes,
                                                                           mEvents, mMargins, mPaddings, mBorders, mWillLayout);
   }

@@ -28,8 +28,8 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
-    //Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    //Bridge_Impl_Android::GetInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
   }
 
 }
