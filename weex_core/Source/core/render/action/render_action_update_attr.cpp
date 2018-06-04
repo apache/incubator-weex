@@ -29,6 +29,6 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateAttr::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
   }
 }

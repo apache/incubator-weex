@@ -30,6 +30,6 @@ namespace WeexCore {
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
   }
 }

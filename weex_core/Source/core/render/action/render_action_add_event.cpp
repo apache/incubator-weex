@@ -28,7 +28,7 @@ namespace WeexCore {
   }
 
   void RenderActionAddEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callAddEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
   }
 
 }

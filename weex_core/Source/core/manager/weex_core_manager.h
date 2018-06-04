@@ -21,12 +21,15 @@
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
 #include <core/bridge/bridge.h>
+#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
     class WeexCoreManager {
+
     private:
         Bridge *platformBridge = nullptr;
         static WeexCoreManager *m_pInstance;
+        MeasureFunctionAdapter *m_pMeasureFunctionAdapter;
 
     private:
         WeexCoreManager() {};
@@ -46,16 +49,20 @@ namespace WeexCore {
         static Garbo garbo;
 
     public:
-        static WeexCoreManager *getInstance() {
+        static WeexCoreManager *GetInstance() {
             if (nullptr == m_pInstance) {
                 m_pInstance = new WeexCoreManager();
             }
             return m_pInstance;
         };
 
-        Bridge *getPlatformBridge();
+        Bridge *GetPlatformBridge();
 
-        WeexCoreManager *setPlatformBridge(Bridge *pBridge);
+        WeexCoreManager *SetPlatformBridge(Bridge *pBridge);
+
+        void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
+
+        MeasureFunctionAdapter *GetMeasureFunctionAdapter();
     };
 }
 

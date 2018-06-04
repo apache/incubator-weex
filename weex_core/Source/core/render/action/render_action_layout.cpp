@@ -29,7 +29,7 @@ namespace WeexCore {
   }
 
   void RenderActionLayout::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
+    WeexCoreManager::GetInstance()->GetPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
                                                                       mTop, mBottom, mLeft, mRight,
                                                                       mHeight, mWidth, index);
   }
