@@ -22,7 +22,6 @@
 #include <string>
 #include <map>
 #include <set>
-#include <jni.h>
 #include <core/css/constants_name.h>
 #include <core/css/css_value_getter.h>
 #include <core/layout/layout.h>
@@ -31,7 +30,6 @@
 #include <base/ViewUtils.h>
 #include <core/render/page/render_page.h>
 #include <core/css/constants_value.h>
-#include <android/base/log_utils.h>
 #include <functional>
 
 

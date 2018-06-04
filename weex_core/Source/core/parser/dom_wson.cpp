@@ -20,7 +20,6 @@
 // Created by furture on 2018/5/15.
 //
 
-#include <jni.h>
 #include <core/render/node/render_object.h>
 #include <core/render/page/render_page.h>
 #include <core/render/node/factory/render_creator.h>

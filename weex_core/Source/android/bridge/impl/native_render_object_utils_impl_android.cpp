@@ -28,6 +28,7 @@
 #include <core/render/node/factory/render_type.h>
 #include <android/log.h>
 #include <core/render/node/render_list.h>
+#include <android/base/log_utils.h>
 
 
 using namespace WeexCore;
