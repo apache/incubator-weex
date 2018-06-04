@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 set(WEEXCORE_LIBRARY_NAME weexcore)
 
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#add_compile_options(-std=c++11)
 add_compile_options(-fexceptions)
 
 add_definitions(-DGNU_SUPPORT=1)
@@ -42,20 +43,21 @@ set(COMMON_SRCS
   ./core/moniter/render_performance.cpp
   ./core/manager/weex_core_manager.cpp
   ./core/bridge/js_bridge.cpp
+  ./core/parser/dom_wson.cpp
         )
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
 )
-SET(FINAL_TARGET_LINK_LIBRARIES )
+SET(FINAL_TARGET_LINK_LIBRARIES wson)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
   ## include_directories for include head file
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 
   set (ANDROID_SRCS
     ./android/jniprebuild/jni_load.cc
@@ -79,7 +81,6 @@ if (ANDROID)
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
 
 
-    ./core/parser/dom_wson.cpp
     ./android/jsengine/api/WeexJSCoreApi.cpp
      
 
@@ -100,9 +101,6 @@ if (ANDROID)
 
 endif (ANDROID)
 
-add_library(${WEEXCORE_LIBRARY_NAME} SHARED
-        ${FINAL_ADD_LIBRARY}
-        )
-
+add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})

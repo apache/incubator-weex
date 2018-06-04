@@ -22,7 +22,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <jni.h>
 #include <cmath>
 #include <atomic>
 
