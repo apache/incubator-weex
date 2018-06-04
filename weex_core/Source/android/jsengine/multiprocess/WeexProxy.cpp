@@ -268,7 +268,7 @@ namespace WeexCore {
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
         WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
         WeexCoreManager::getInstance()->setJSBridge(new JSBridge());
-        RenderManager::GetInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
+        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,
