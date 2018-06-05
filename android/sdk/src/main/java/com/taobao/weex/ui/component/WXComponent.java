@@ -69,6 +69,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.CSSShorthand.CORNER;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.layout.ContentBoxMeasurement;
@@ -287,7 +288,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private void applyEvents() {
     if (getEvents() == null || getEvents().isEmpty())
       return;
-    for (String type : getEvents()) {
+    WXEvent event = getEvents();
+    int size = event.size();
+    for(int i=0; i<size; i++){
+      if(i >= event.size()){
+        break;
+      }
+      String type = event.get(i);
       addEvent(type);
     }
     setActiveTouchListener();
