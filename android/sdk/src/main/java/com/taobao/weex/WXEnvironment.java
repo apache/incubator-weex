@@ -43,7 +43,12 @@ import java.util.Map;
 public class WXEnvironment {
 
   public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
+  public static String SYS_VERSION = android.os.Build.VERSION.RELEASE;
+  static{
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("P")){
+        SYS_VERSION = "9.0.0";
+    }
+  }
   public static final String SYS_MODEL = android.os.Build.MODEL;
   public static final String ENVIRONMENT = "environment";
   public static final String WEEX_CURRENT_KEY = "wx_current_url";
