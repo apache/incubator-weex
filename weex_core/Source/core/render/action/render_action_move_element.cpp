@@ -18,7 +18,7 @@
  */
 #include <core/manager/weex_core_manager.h>
 #include "render_action_move_element.h"
-#include <core/manager/wx_core_manager.h>
+#include <core/manager/weex_core_manager.h>
 
 namespace WeexCore {
 

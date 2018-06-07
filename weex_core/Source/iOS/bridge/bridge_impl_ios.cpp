@@ -125,4 +125,9 @@ namespace WeexCore {
     int Bridge_Impl_iOS::callAppendTreeCreateFinish(const char* pageId, const char* ref){
         return bridgeImpl->callAppendTreeCreateFinish(pageId, ref);
     }
+    
+    int callHasTransitionPros(const char* pageId, const char* ref,
+                              std::vector<std::pair<std::string, std::string>> *style){
+        return 0;
+    }
 }
