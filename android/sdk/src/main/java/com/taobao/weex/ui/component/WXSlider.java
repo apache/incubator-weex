@@ -64,6 +64,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   private float offsetXAccuracy = 0.1f;
   private int initIndex = -1;
   private boolean keepIndex = false;
+  private Runnable initRunnable;
+
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -186,8 +188,19 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     mAdapter.addPageView(view);
     hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
-      mViewPager.setCurrentItem(initIndex);
-      initIndex = -1;
+      if(initRunnable == null){
+        initRunnable = new Runnable() {
+          @Override
+          public void run() {
+            initIndex = getInitIndex();
+            mViewPager.setCurrentItem(initIndex);
+            initIndex = -1;
+            initRunnable = null;
+          }
+        };
+      }
+      mViewPager.removeCallbacks(initRunnable);
+      mViewPager.postDelayed(initRunnable, 50);
     } else {
       if (!keepIndex) {
         mViewPager.setCurrentItem(0);
@@ -250,6 +263,20 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
 
   }
+
+
+  private int getInitIndex(){
+    Object index = getAttrs().get(Constants.Name.INDEX);
+    int select = WXUtils.getInteger(index, initIndex);
+    if(mAdapter == null || mAdapter.getCount() == 0){
+      return  0;
+    }
+    if(select >= mAdapter.getRealCount()){
+      select = select%mAdapter.getRealCount();
+    }
+    return select;
+  }
+
 
   @Override
   protected boolean setProperty(String key, Object param) {

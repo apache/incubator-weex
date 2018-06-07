@@ -224,7 +224,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void destroy() {
-    if(mAppearChangeRunnable != null) {
+    if(mAppearChangeRunnable != null &&  getHostView() != null) {
       getHostView().removeCallbacks(mAppearChangeRunnable);
       mAppearChangeRunnable = null;
     }
