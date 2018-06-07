@@ -74,7 +74,8 @@ namespace WeexCore {
     static constexpr bool useVSync = true;
     std::atomic_bool needLayout{false};
     std::atomic_bool hasForeLayoutAction{false};
-    RenderPage(std::string pageId);
+
+    explicit RenderPage(std::string pageId);
 
     ~RenderPage();
 

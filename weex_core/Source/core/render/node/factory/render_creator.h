@@ -28,7 +28,7 @@ namespace WeexCore {
   class RenderCreator {
 
   private:
-    RenderCreator() {}
+    explicit RenderCreator() {}
 
     ~RenderCreator() {}
 
