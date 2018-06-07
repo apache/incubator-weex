@@ -35,6 +35,7 @@ namespace WeexCore {
 
   class Bridge {
   public:
+    /**  platform  impl **/
     virtual void setJSVersion(const char* version) = 0;
 
     virtual void reportException(const char* pageId, const char *func, const char *exception_string) = 0;
@@ -100,6 +101,33 @@ namespace WeexCore {
     
     virtual int callHasTransitionPros(const char* pageId, const char* ref,
                                         std::vector<std::pair<std::string, std::string>> *style)=0;
+
+    /**  core api **/
+    void setStyleWidth(const char *instanceId, const char *ref, float value);
+    void setStyleHeight(const char *instanceId, const char *ref, float value);
+
+    void setMargin(const char *instanceId,const char *ref, int32_t edge, float value);
+
+    void setPadding(const char *instanceId, const char *ref, int32_t edge, float value);
+
+    void setPosition(const char *instanceId, const char *ref, int32_t edge, float value);
+
+    void markDirty(const char *instanceId,const  char *ref, bool dirty);
+
+    void setViewPortWidth(const char *instanceId, float value);
+
+    void setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth, const float defaultHeight,
+                                             const bool isWidthWrapContent, const bool isHeightWrapContent);
+    void setRenderContainerWrapContent(const char* instanceId,bool wrap);
+
+    /**Notice that this method is invoked from JS thread.**/
+    void forceLayout(const char *instanceId);
+
+    /**Notice that this method is invoked from JS thread.**/
+    bool notifyLayout(const char *instanceId);
+
+
+    void onInstanceClose(const char *instanceId) ;
   };
 } //end WeexCore
 #endif //Bridge_h
