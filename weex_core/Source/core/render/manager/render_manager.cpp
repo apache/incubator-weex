@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/render/manager/render_manager.h>
+#include "render_manager.h"
 #include <core/render/page/render_page.h>
 #include <core/render/node/render_object.h>
 #include <base/TimeUtils.h>

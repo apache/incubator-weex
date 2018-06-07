@@ -22,7 +22,6 @@
 #include <map>
 #include <string>
 #include <stdbool.h>
-#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
 

@@ -18,12 +18,8 @@
  */
 #include "measure_func_adapter.h"
 #include <core/render/node/render_object.h>
-#include <android/bridge/impl/content_box_measurement_impl_android.h>
-#include <android/bridge/impl/measure_mode_impl_android.h>
-#include <android/base/jni/scoped_java_ref.h>
 
 namespace WeexCore {
-
 
   class MeasureFunctionAdapterImplIOS : public MeasureFunctionAdapter {
   public:
@@ -32,24 +28,10 @@ namespace WeexCore {
 
     ~MeasureFunctionAdapterImplIOS() {}
 
-    inline WXCoreSize Measure(WXCoreLayoutNode *node, float width,
-                       MeasureMode widthMeasureMode, float height,
-                       MeasureMode heightMeasureMode) {
-      WXCoreSize size;
-      size.height = 0;
-      size.width = 0;
+    WXCoreSize Measure(WXCoreLayoutNode *node, float width,MeasureMode widthMeasureMode, float height,MeasureMode heightMeasureMode) ;
 
-      // TODO
+    void LayoutBefore(WXCoreLayoutNode *node);
 
-      return size;
-    }
-
-    inline void LayoutBefore(WXCoreLayoutNode *node) {
-
-    }
-
-    inline void LayoutAfter(WXCoreLayoutNode *node, float width, float height) {
-
-    }
+    void LayoutAfter(WXCoreLayoutNode *node, float width, float height) ;
   };
 }
