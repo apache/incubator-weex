@@ -39,11 +39,6 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
 
-#ifdef __ANDROID__
-#include <android/bridge/impl/bridge_impl_android.h>
-#endif
-
-
 namespace WeexCore {
 
   static bool splitScreenRendering = false;
@@ -239,10 +234,6 @@ namespace WeexCore {
     if (render == nullptr || src == nullptr || src->empty())
       return false;
 
-    bool flag = false;
-
-#warning todo complement iOS implementation or change transition implementation
-#ifdef __ANDROID__
     std::vector<std::pair<std::string, std::string>> *style = nullptr;
     std::vector<std::pair<std::string, std::string>> *margin = nullptr;
     std::vector<std::pair<std::string, std::string>> *padding = nullptr;
@@ -346,7 +337,7 @@ namespace WeexCore {
       delete border;
       border = nullptr;
     }
-#endif
+
     return flag;
   }
 

@@ -24,7 +24,6 @@
 #include <android/bridge/impl/bridge_impl_android.h>
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <android/base/string/string_utils.h>
-#include <core/manager/wx_core_manager.h>
 #include <wson/wson_parser.h>
 #include <core/manager/weex_core_manager.h>
 
@@ -66,8 +65,6 @@ _callNativeModule(const char *pageId, const char *module, const char *method,
          pageId, module, method, argString, optString);
 #endif
 
-       // WXCoreManager::getInstance()->getPlatformBridge()->callNativeModule(pageId, module, method,
-//                                                                            argString, optString);
         // add for android support
         jobject result;
         result = static_cast<jobject>(

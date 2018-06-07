@@ -15,13 +15,6 @@ add_definitions(-DLAYOUT_LOG=0)
 add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
-
-## add_subdirectory for subdirectory has a CMakeLists.txt
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
-
-## include_directories for include head file
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
-
 set(COMMON_SRCS
 
   ./core/render/manager/render_manager.cpp
@@ -75,7 +68,6 @@ if (ANDROID)
     ./android/base/base64/modp_base64/modp_b64.cc
     ./android/base/string/scoped_jstring.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
-    ./android/bridge/impl/jsc_bridge_impl_android.cpp
     ./android/base/string/jstring_cache.cpp
     ./android/bridge/impl/bridge_impl_android.cpp
     ./android/bridge/impl/weexcore_impl_android.cpp
@@ -83,7 +75,6 @@ if (ANDROID)
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
     ./android/bridge/impl/native_render_object_utils_impl_android.cpp
-    ./android/bridge/impl/jsc_bridge_impl_android.cpp
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
     ./android/jsengine/multiprocess/WeexProxy.cpp

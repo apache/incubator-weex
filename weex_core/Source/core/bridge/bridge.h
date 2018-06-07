@@ -24,7 +24,6 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <core/bridge/wx_type_define.h>
 
 namespace WeexCore {
 

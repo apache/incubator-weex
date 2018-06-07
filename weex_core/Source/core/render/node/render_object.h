@@ -32,10 +32,6 @@
 #include <core/css/constants_value.h>
 #include <functional>
 
-#ifdef __ANDROID__
-#include <jni.h>
-#include <android/bridge/impl/bridge_impl_android.h>
-#endif
 
 #define JSON_OBJECT_MARK_CHAR  '{'
 #define JSON_ARRAY_MARK_CHAR  '['

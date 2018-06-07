@@ -70,7 +70,6 @@ namespace WeexCore {
 
     void* callNativeModule(const char* pageId, const char *module, const char *method,
                              const char *arguments, int argumentsLength, const char *options, int optionsLength);
-#endif
 
     void callNativeComponent(const char* pageId, const char* ref, const char *method,
                              const char *arguments, int argumentsLength, const char *options, int optionsLength);
