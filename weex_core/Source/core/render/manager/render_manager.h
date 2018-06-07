@@ -31,7 +31,7 @@ namespace WeexCore {
   class RenderManager {
 
   private:
-    RenderManager() {}
+    explicit RenderManager() {}
 
     ~RenderManager() {}
 

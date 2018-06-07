@@ -26,7 +26,7 @@ namespace WeexCore {
   class RenderActionUpdateAttr : public render_action {
 
   public:
-    RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
+    explicit RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
                            std::vector<std::pair<std::string, std::string>> *mAttrs);
 
     void ExecuteAction();

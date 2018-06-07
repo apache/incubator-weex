@@ -136,7 +136,7 @@ namespace WeexCore {
 
   public:
 
-    RenderObject();
+    explicit RenderObject();
 
     ~RenderObject();
 

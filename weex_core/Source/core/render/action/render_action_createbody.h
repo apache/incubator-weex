@@ -25,7 +25,7 @@ namespace WeexCore {
   class RenderActionCreateBody : public render_action {
 
   public:
-    RenderActionCreateBody(const std::string &pageId, const RenderObject *render);
+    explicit RenderActionCreateBody(const std::string &pageId, const RenderObject *render);
 
     void ExecuteAction();
 

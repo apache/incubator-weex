@@ -27,7 +27,7 @@ namespace WeexCore {
 
   public:
 
-    RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
+    explicit RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
                             std::vector<std::pair<std::string, std::string>> *padding,

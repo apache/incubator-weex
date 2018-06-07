@@ -26,7 +26,7 @@ namespace WeexCore {
   class RenderActionAddElement : public render_action {
 
   public:
-    RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
+    explicit RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
                            int index, bool willLayout= true);
 
     void ExecuteAction();

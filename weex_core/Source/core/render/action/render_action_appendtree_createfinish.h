@@ -26,7 +26,7 @@ namespace WeexCore {
   class RenderActionAppendTreeCreateFinish : public render_action {
 
   public:
-    RenderActionAppendTreeCreateFinish(const std::string &pageId, const std::string &ref);
+    explicit RenderActionAppendTreeCreateFinish(const std::string &pageId, const std::string &ref);
 
     void ExecuteAction();
 
