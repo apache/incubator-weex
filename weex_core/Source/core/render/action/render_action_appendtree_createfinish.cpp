@@ -17,6 +17,7 @@
  * under the License.
  */
 #include "render_action_appendtree_createfinish.h"
+#include <core/manager/wx_core_manager.h>
 
 namespace WeexCore {
 

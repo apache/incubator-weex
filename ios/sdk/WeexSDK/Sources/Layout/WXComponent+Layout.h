@@ -20,7 +20,8 @@
 #import "WXComponent.h"
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
-#import "WXCoreLayout.h"
+
+#include <core/layout/layout.h>
 
 #define FlexUndefined NAN
 

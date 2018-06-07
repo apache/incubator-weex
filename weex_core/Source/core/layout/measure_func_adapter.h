@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifdef __cplusplus
 #ifndef WEEX_CORE_MEASURE_FUNCTION_H
 #define WEEX_CORE_MEASURE_FUNCTION_H
 
 
-#include "layout.h"
+//#include "layout.h"
+#include <core/layout/layout.h>
 
 namespace WeexCore {
 
@@ -31,7 +33,7 @@ namespace WeexCore {
 
     ~MeasureFunctionAdapter() {}
 
-    virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+      virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
                                       float height, MeasureMode heightMeasureMode) = 0;
 
     virtual void LayoutBefore(WXCoreLayoutNode *node) = 0;
@@ -44,3 +46,4 @@ namespace WeexCore {
 }
 
 #endif //WEEX_CORE_MEASURE_FUNCTION_H
+#endif //__cplusplus

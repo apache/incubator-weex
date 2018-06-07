@@ -22,7 +22,7 @@
 
 #define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 
-#include "core/bridge/bridge.h"
+#include <core/bridge/bridge.h>
 
 enum WeexCoreEventBlockType {
     WeexCoreEventBlockTypeSetJSVersion,

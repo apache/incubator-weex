@@ -94,7 +94,7 @@ static NSThread *WXComponentThread;
 - (void)dealloc
 {
     if(_rootFlexCSSNode){
-        delete _rootFlexCSSNode;
+//        delete _rootFlexCSSNode;
         
        // WeexCore::WXCoreLayoutNode::freeNodeTree(_rootFlexCSSNode);
         _rootFlexCSSNode=nullptr;
@@ -939,7 +939,8 @@ static NSThread *WXComponentThread;
 }
 - (void)_initRootFlexCssNode
 {
-    _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
+//WeexCore::WXCoreLayoutNode() is a protected method
+//    _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
     [self _applyRootFrame:self.weexInstance.frame];
     _rootFlexCSSNode->setFlexWrap(WeexCore::kNoWrap);
     _rootFlexCSSNode->setContext((__bridge void *)(self));

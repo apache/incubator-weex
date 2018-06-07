@@ -30,8 +30,9 @@
 #import "WXSDKEngine.h"
 #import "WXComponent+Events.h"
 #import "WXScrollerComponent+Layout.h"
-#import "WXCoreLayout.h"
 #import "WXPageEventNotifyEvent.h"
+
+#include <core/layout/layout.h>
 
 @interface WXScrollerComponentView:UIScrollView
 @end
@@ -156,7 +157,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
+//WeexCore::WXCoreLayoutNode() is a protected method
+//            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
             // let scroller fill the rest space if it is a child component and has no fixed height & width
             if (((_scrollDirection == WXScrollDirectionVertical &&
                   flexIsUndefined(self.flexCssNode->getStyleHeight())) ||
@@ -247,7 +249,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
         if(_flexScrollerCSSNode){
-            delete _flexScrollerCSSNode;
+//            delete _flexScrollerCSSNode;
             
             //WeexCore::WXCoreLayoutNode::freeNodeTree(_flexScrollerCSSNode);
             

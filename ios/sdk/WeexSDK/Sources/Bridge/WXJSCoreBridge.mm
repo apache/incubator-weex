@@ -121,7 +121,11 @@
 - (void)dealloc
 {
     _jsContext.instanceId = nil;
-    delete _coreBridge;
+#ifdef WX_IMPORT_WEEXCORE
+    WeexCore::WXCoreBridge *t = _coreBridge;
+    _coreBridge = nullptr;
+    delete t;
+#endif
 }
 
 - (void)setJSContext:(JSContext *)context
@@ -339,6 +343,7 @@
 
 - (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent
 {
+#ifndef WX_IMPORT_WEEXCORE
     id WXJSCallRemoveEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
@@ -349,8 +354,16 @@
         [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
         return [JSValue valueWithInt32:(int32_t)callRemoveEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
     };
+#else
+    id WXJSCallRemoveEventBlock = ^NSInteger (NSString *instanceId,NSString *ref,NSString *event){
+        WXLogDebug(@"callRemoveEvent...%@, %@, %@", instanceId, ref,event);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
+        return callRemoveEvent(instanceId,ref,event);
+    };
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallRemoveEvent, (__bridge void *)WXJSCallRemoveEventBlock);
+#endif
     
-    _jsContext[@"callRemoveEvent"] = WXJSCallRemoveEventBlock;
+//    _jsContext[@"callRemoveEvent"] = WXJSCallRemoveEventBlock;
 }
     
 - (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish
@@ -386,7 +399,7 @@
     };
 #else
     
-    WXJSCallNativeModule targetFunc = ^NSInvocation *(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options){
+    id targetFunc = ^NSInvocation *(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options){
         
         WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceId, moduleName, methodName, args);
         
@@ -395,6 +408,7 @@
         [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:moduleName phase:WXTracingInstant functionName:methodName options:nil];
         return invocation;
     };
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallNativeModule, (__bridge void*)targetFunc);
     
 #warning todo
 //    _jsContext[@"callNativeModule"]=
@@ -403,6 +417,7 @@
 
 - (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock
 {
+#ifndef WX_IMPORT_WEEXCORE
     _jsContext[@"callNativeComponent"] = ^void(JSValue *instanceId, JSValue *componentName, JSValue *methodName, JSValue *args, JSValue *options) {
         NSString *instanceIdString = [instanceId toString];
         NSString *componentNameString = [componentName toString];
@@ -414,6 +429,13 @@
         
         callNativeComponentBlock(instanceIdString, componentNameString, methodNameString, argsArray, optionsDic);
     };
+#else
+    id targetFunc = ^(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options){
+        WXLogDebug(@"callNativeComponent...%@,%@,%@,%@", instanceId, componentRef, methodName, args);
+        callNativeComponentBlock(instanceId,componentRef,methodName,args,options);
+    };
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallNativeComponent, (__bridge void*) targetFunc);
+#endif
 }
 
 - (JSValue*)exception

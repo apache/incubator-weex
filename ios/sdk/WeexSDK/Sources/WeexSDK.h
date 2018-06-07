@@ -59,9 +59,6 @@
 #import "WXErrorView.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
-#import "WXCoreStyle.h"
-#import "WXCoreLayout.h"
-#import "WXCoreFlexEnum.h"
 #import "WXConvert.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponentManager.h"
@@ -77,5 +74,9 @@
 #import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
 #import "JSContext+Weex.h"
+
+#include "core/layout/style.h"
+#include "core/layout/flex_enum.h"
+#include <core/layout/layout.h>
 
 #endif /* __OBJC__ */

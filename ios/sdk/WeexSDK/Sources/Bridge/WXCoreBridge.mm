@@ -26,6 +26,10 @@
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
+#include <core/render/manager/render_manager.h>
+#include <core/render/page/render_page.h>
+#include <base/TimeUtils.h>
+
 
 #pragma mark - OC related
 @interface WXCoreBridgeOCImpl:NSObject
@@ -36,18 +40,18 @@
 
 #pragma mark interface
 - (void)implSetTimeOutWithCallback:(const char *)callbackID timeout:(const char *)timeout{
-    NSString *timeoutString = [NSString stringWithUTF8String:timeout];
+    NSString *timeoutString = [NSString stringWithCString:timeout encoding:NSUnicodeStringEncoding];
     __weak typeof(self) weakSelf = self;
     [self performSelector: @selector(triggerTimeout:) withObject:^() {
         JSContext *context = [weakSelf defaultJsContext];
-        NSString *callbackIdString = [NSString stringWithUTF8String:callbackID];
+        NSString *callbackIdString = [NSString stringWithCString:callbackID encoding:NSUnicodeStringEncoding];
         JSValue *targetFunction = context[callbackIdString];
         [targetFunction callWithArguments:@[]];
     } afterDelay:[timeoutString doubleValue] / 1000];
 }
 
 - (int)implCallUpdateFinishWithPageId:(const char*)pageId task:(const char *)task callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithUTF8String:pageId]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding]];
     if (instance) {
         WXComponentManager *componentManager = instance.componentManager;
         [componentManager updateFinish];
@@ -59,7 +63,7 @@
 }
 
 - (int)implCallRefreshFinishWithPageId:(const char*)pageId task:(const char *)task callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithUTF8String:pageId]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding]];
     if (instance) {
         WXComponentManager *componentManager = instance.componentManager;
         [componentManager refreshFinish];
@@ -92,11 +96,11 @@
 }
 
 - (void)callJsCallBackWithInstanceId:(const char*)instanceId callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithUTF8String:instanceId]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:instanceId encoding:NSUnicodeStringEncoding]];
     if (!instance) {
         return;
     }
-    NSString *callbackString = [NSString stringWithUTF8String:callback];
+    NSString *callbackString = [NSString stringWithCString:callback encoding:NSUnicodeStringEncoding];
     if (callbackString && callbackString.length>0) {
         JSContext *context = instance.instanceJavaScriptContext;
         JSValue *callbackFunction = context[callbackString];
@@ -113,6 +117,7 @@ namespace WeexCore {
     };
     
     WXCoreBridge::WXCoreBridge(){
+        impl = new WXCoreBridgeImpl();
         impl->ocImpl = [[WXCoreBridgeOCImpl alloc] init];
     }
     
@@ -137,41 +142,72 @@ namespace WeexCore {
     }
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback){
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
+        int flag = -1;
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallNative];
         if(func != nullptr){
             WXJSCallNative targetFunc = (__bridge WXJSCallNative)func;
-            NSString *pageIDString = [NSString stringWithUTF8String:pageId];
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
             NSData *taskData = [NSData dataWithBytes:task length:strlen(task)];
             NSError *error = nil;
             NSArray *taskArray = [WXUtility JSONObject:taskData error:&error];
-            NSString *callBackString = [NSString stringWithUTF8String:callback];
-            return (int)targetFunc(pageIDString,taskArray,callBackString);
+            NSString *callBackString = [NSString stringWithCString:callback encoding:NSUnicodeStringEncoding];
+            flag = (int)targetFunc(pageIDString,taskArray,callBackString);
         }
-        return -1;
+        if (flag == -1) {
+            WXLog(@"%@",@"instance destroy JFM must stop callNative");
+        }
+        
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
     
     void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
                                          const char *arguments, int argumentsLength, const char *options, int optionsLength){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallNativeModule];
+        void *result = nullptr;
         if(func != nullptr){
             WXJSCallNativeModule targetFunc = (__bridge WXJSCallNativeModule)func;
-            NSString *pageIdString = [NSString stringWithUTF8String:pageId];
-            NSString *moduleString = [NSString stringWithUTF8String:module];
-            NSString *methodString = [NSString stringWithUTF8String:method];
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+            NSString *moduleString = [NSString stringWithCString:module encoding:NSUnicodeStringEncoding];
+            NSString *methodString = [NSString stringWithCString:method encoding:NSUnicodeStringEncoding];
             NSError *error = nil;
             NSData *argumentsData = [NSData dataWithBytes:arguments length:argumentsLength];
             NSArray *argumentsArray = [WXUtility JSONObject:argumentsData error:&error];
             NSData *optionsData = [NSData dataWithBytes:options length:optionsLength];
             NSDictionary *optinionsDic = [WXUtility JSONObject:optionsData error:&error];
-            return (__bridge void *) targetFunc(pageIdString,moduleString,methodString,argumentsArray,optinionsDic);
+            result = (__bridge void *) targetFunc(pageIdString,moduleString,methodString,argumentsArray,optinionsDic);
         }
-        return nil;
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return result;
     }
         
     void WXCoreBridge::callNativeComponent(const char* pageId, const char* ref, const char *method,
                                            const char *arguments, int argumentsLength, const char *options, int optionsLength){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallNativeComponent];
+        if(func != nullptr){
+            WXJSCallNativeComponent targetFunc = (__bridge WXJSCallNativeComponent)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
+            NSString *methodString = [NSString stringWithCString:method encoding:NSUnicodeStringEncoding];
+            NSError *error = nil;
+            NSData *argumentsData = [NSData dataWithBytes:arguments length:argumentsLength];
+            NSArray *argumentsArray = [WXUtility JSONObject:argumentsData error:&error];
+            NSData *optionsData = [NSData dataWithBytes:options length:optionsLength];
+            NSDictionary *optionsDic = [WXUtility JSONObject:optionsData error:&error];
+            targetFunc(pageIdString,refString,methodString,argumentsArray,optionsDic);
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
     }
         
     void WXCoreBridge::setTimeout(const char* callbackID, const char* time){
@@ -180,32 +216,60 @@ namespace WeexCore {
     }
         
     void WXCoreBridge::callNativeLog(const char* str_array){
-        NSString *logString = [NSString stringWithUTF8String:str_array];
+        NSString *logString = [NSString stringWithCString:str_array encoding:NSUnicodeStringEncoding];
         NSLog(@"%@",logString);
     }
         
     int WXCoreBridge::callUpdateFinish(const char* pageId, const char *task, const char *callback){
-        return [impl->ocImpl implCallUpdateFinishWithPageId:pageId task:task callback:callback];
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = [impl->ocImpl implCallUpdateFinishWithPageId:pageId task:task callback:callback];
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callRefreshFinish(const char* pageId, const char *task, const char *callback){
-        return [impl->ocImpl implCallRefreshFinishWithPageId:pageId task:task callback:callback];
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = [impl->ocImpl implCallRefreshFinishWithPageId:pageId task:task callback:callback];
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callAddEvent(const char* pageId, const char* ref, const char *event){
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallAddEvent];
+        int flag = -1;
         if(func != nullptr){
             WXJSCallAddEvent targetFunc = (__bridge WXJSCallAddEvent)func;
-            NSString *pageIDString = [NSString stringWithUTF8String:pageId];
-            NSString *refString = [NSString stringWithUTF8String:ref];
-            NSString *eventString = [NSString stringWithUTF8String:event];
-            return (int)targetFunc(pageIDString,refString,eventString);
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
+            NSString *eventString = [NSString stringWithCString:event encoding:NSUnicodeStringEncoding];
+            flag = (int)targetFunc(pageIDString,refString,eventString);
         }
-        return -1;
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callRemoveEvent(const char* pageId, const char* ref, const char *event){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = -1;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallRemoveEvent];
+        if(func != nullptr){
+            WXJSCallRemoveEvent targetFunc = (__bridge WXJSCallRemoveEvent)func;
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
+            NSString *eventString = [NSString stringWithCString:event encoding:NSUnicodeStringEncoding];
+            flag = (int)targetFunc(pageIDString,refString,eventString);
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callCreateBody(const char* pageId, const char *componentType, const char* ref,
@@ -215,7 +279,21 @@ namespace WeexCore {
                                      const WXCoreMargin &margins,
                                      const WXCorePadding &paddings,
                                      const WXCoreBorderWidth &borders){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallCreateBody];
+        int flag = 0;
+        if(func != nullptr){
+            WXJSCallCreateBody targetFunc = (__bridge WXJSCallCreateBody)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+
+            
+            
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callAddElement(const char* pageId, const char *componentType, const char* ref,

@@ -226,7 +226,7 @@ static BOOL bNeedRemoveEvents = YES;
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
 #endif
-        delete self.flexCssNode;
+//        delete self.flexCssNode;
     }
     
     // remove all gesture and all
