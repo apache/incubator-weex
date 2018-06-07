@@ -70,7 +70,6 @@ namespace WeexCore {
 
     void* callNativeModule(const char* pageId, const char *module, const char *method,
                              const char *arguments, int argumentsLength, const char *options, int optionsLength);
-#endif
 
     void callNativeComponent(const char* pageId, const char* ref, const char *method,
                              const char *arguments, int argumentsLength, const char *options, int optionsLength);
@@ -134,7 +133,7 @@ namespace WeexCore {
 
     void handleDispatchMessage(jstring jClientId, jstring jVmId, jbyteArray jData, jstring jCallback);
 
-    jobject getMeasureFunc(const char* pageId, const char* ref);
+    jobject getMeasureFunc(const char* pageId, jlong renderObjectPtr);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

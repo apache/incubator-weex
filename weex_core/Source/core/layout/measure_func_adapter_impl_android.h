@@ -89,7 +89,7 @@ namespace WeexCore {
       if (!node->haveMeasureFunc()) {
         return nullptr;
       }
-      return Bridge_Impl_Android::getInstance()->getMeasureFunc(((RenderObject *) node)->PageId().c_str(), ((RenderObject *) node)->Ref().c_str());
+      return Bridge_Impl_Android::getInstance()->getMeasureFunc(((RenderObject *) node)->PageId().c_str(), convert_render_object_to_long(node));
     }
   };
 }

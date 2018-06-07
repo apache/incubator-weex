@@ -222,11 +222,12 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (void)dealloc
 {
-    if(self.flexCssNode){
+    if(_flexCssNode){
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
 #endif
-//        delete self.flexCssNode;
+        [WXComponent recycleNodeOnComponentThread:_flexCssNode gabRef:_ref];
+        _flexCssNode=nullptr;
     }
     
     // remove all gesture and all

@@ -17,51 +17,66 @@
  * under the License.
  */
 //
-// Created by 陈佩翰 on 2018/5/21.
+// Created by 陈佩翰 on 2018/6/1.
 //
 
-#ifndef WEEXV8_JSBRIDGE_H
-#define WEEXV8_JSBRIDGE_H
-
-
-#include "wx_type_define.h"
-#include <map>
-
+#ifndef WEEXCORE_JS_BRIDGE_H
+#define WEEXCORE_JS_BRIDGE_H
 
 namespace WeexCore {
-
     class JSBridge {
+    public:
+        JSBridge(){};
 
-    protected:
-        JSBridge() {}
+        ~JSBridge(){};
 
     public:
-        virtual bool createJSRunTime(uint32_t runTimeId, std::map<std::string, std::string> &params)=0;
 
-        virtual bool destroyJSRunTime(uint32_t runTimeId)=0;
+        void onSetJSVersion(const char *jsVersion);
 
-        virtual bool createJSContext(uint32_t runTimeId, uint32_t contextId) =0;
+        void onReportException(const char *pageId, const char *func, const char *exception_string);
 
-        virtual bool destroyJSContext(uint32_t runTimeId, uint32_t contextId) =0;
+        void onCallNative(const char *pageId, const char *task, const char *callback);
 
-        virtual WXValue
-        execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName, WXValue args[], uint8_t argsLength)=0;
 
-        virtual WXValue executeJavascript(uint32_t runTimeId, uint32_t contextId, char *script)=0;
+        void *onCallNativeModule(const char *pageId, const char *module, const char *method,
+                                 const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
-        virtual void reigsterJSVale(uint32_t runTimeId, uint32_t contextId, char *name, WXValue value)=0;
+        void onCallNativeComponent(const char *pageId, const char *ref,
+                                   const char *method,
+                                   const char *arguments, int argumentsLength, const char *options, int optionsLength);
 
-        virtual WXValue getJSVale(uint32_t runTimeId, uint32_t contextId, char *name)=0;
+        void onCallAddElement(const char *pageId, const char *parentRef, const char *domStr,
+                              const char *index_cstr);
 
-        virtual void reigsterJSFunc(uint32_t runTimeId, uint32_t contextId, WXFuncSignature func)=0;
+        void onSetTimeout(const char *callbackId, const char *time);
 
-        WXValue callExecNative(uint32_t runTimeId, uint32_t contextId, WXValue args[], uint8_t argsLength);
+        void onCallNativeLog(const char *str_array);
 
-        void callReportJSException(int32_t runTimeId, int32_t contextId, char *exception,
-                                   std::map<std::string, std::string> &extInfos);
+        void onCallCreateBody(const char *pageId, const char *domStr);
 
-        void callSetJSVersion(const char *jsVersion);
+        int onCallUpdateFinish(const char *pageId, const char *task, const char *callback);
+
+        void onCallCreateFinish(const char *pageId);
+
+        int onCallRefreshFinish(const char *pageId, const char *task, const char *callback);
+
+        void onCallUpdateAttrs(const char *pageId, const char *ref, const char *data);
+
+        void onCallUpdateStyle(const char *pageId, const char *ref, const char *data);
+
+        void onCallRemoveElement(const char *pageId, const char *ref);
+
+        void onCallMoveElement(const char *pageId, const char *ref, const char *parentRef, int index);
+
+        void onCallAddEvent(const char *pageId, const char *ref, const char *event);
+
+        void onCallRemoveEvent(const char *pageId, const char *ref, const char *event);
+
+        int onSetInterval(const char *pageId, const char *callbackId, const char *_time);
+
+        void onClearInterval(const char *pageId, const char *callbackId);
     };
 }
 
-#endif //WEEXV8_JSBRIDGE_H
+#endif //WEEXCORE_JS_BRIDGE_H

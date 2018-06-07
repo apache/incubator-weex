@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_add_element.h"
 
 namespace WeexCore {
@@ -37,11 +38,8 @@ namespace WeexCore {
   }
 
   void RenderActionAddElement::ExecuteAction() {
-    WXCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                       mIndex, mParentRef.c_str(), mStyles, mAttributes,
-                                                       mEvents, mMargins, mPaddings, mBorders, mWillLayout);
-    // Bridge_Impl_Android::getInstance()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-    //                                                    mIndex, mParentRef.c_str(), mStyles, mAttributes,
-    //                                                    mEvents, mMargins, mPaddings, mBorders, mWillLayout);
+      WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
+                                                                          mIndex, mParentRef.c_str(), mStyles, mAttributes,
+                                                                          mEvents, mMargins, mPaddings, mBorders, mWillLayout);
   }
 }

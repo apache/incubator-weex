@@ -52,7 +52,7 @@ public class WXJsFunctions implements IWXJsFunctions {
 
     @Override
     public void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options){
-        jsHandleCallNativeComponent(instanceId, componentRef, method, arguments, options, true);
+        jsHandleCallNativeComponent(instanceId, componentRef, method, WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments), WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options), true);
     }
 
 

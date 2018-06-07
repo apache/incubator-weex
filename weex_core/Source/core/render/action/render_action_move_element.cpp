@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_move_element.h"
 #include <core/manager/wx_core_manager.h>
 
@@ -30,7 +31,6 @@ namespace WeexCore {
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    WXCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
-    //Bridge_Impl_Android::getInstance()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
   }
 }

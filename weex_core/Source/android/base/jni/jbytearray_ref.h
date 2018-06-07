@@ -16,19 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_add_event.h"
+//
+// Created by furture on 2018/5/31.
+//
+
+#ifndef WEEX_PROJECT_JBYTEARRAYREF_H
+#define WEEX_PROJECT_JBYTEARRAYREF_H
+#include <jni.h>
+
 
 namespace WeexCore {
 
-  RenderActionAddEvent::RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mEvent = event;
-  }
+    class JByteArrayRef {
 
-  void RenderActionAddEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
-  }
+    public:
+        JByteArrayRef(JNIEnv* env, jbyteArray array);
+        ~JByteArrayRef();
+        char* getBytes(){
+            return bytes;
+        }
+        int length(){
+            if(array == nullptr){
+                return 0;
+            }
+            return env->GetArrayLength(array);
+        }
 
+    private:
+        jbyteArray array;
+        JNIEnv* env;
+        char* bytes;
+    };
 }
+
+
+
+
+#endif //WEEX_PROJECT_JBYTEARRAYREF_H

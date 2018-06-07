@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_update_style.h"
 
 namespace WeexCore {
@@ -34,9 +35,7 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-    WXCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
-                                                        mPadding, mBorder);
-    // Bridge_Impl_Android::getInstance()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
-    //                                                     mPadding, mBorder);
+      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
+                                                                           mPadding, mBorder);
   }
 }

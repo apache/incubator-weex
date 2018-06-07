@@ -638,5 +638,22 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 }
 
 
++ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref {
+    if (nullptr == garbageNode) {
+#ifdef DEBUG
+        WXLogDebug(@"flexlayout->recycle garbageNode ref:%@ is null ",ref);
+#endif
+        return;
+    }
+    WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+        WXLogDebug(@"flexlayout->recycle  ref:%@ ,node:%p",ref,garbageNode );
+#endif
+        if(nullptr != garbageNode){
+            delete garbageNode;
+        }
+    });
+    //domthread
+}
 
 @end

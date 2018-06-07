@@ -18,7 +18,7 @@
  */
 #include <android/base/string/string_utils.h>
 #include <base/ViewUtils.h>
-#include <core/api/WeexJSCoreApi.h>
+#include <android/jsengine/api/WeexJSCoreApi.h>
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;

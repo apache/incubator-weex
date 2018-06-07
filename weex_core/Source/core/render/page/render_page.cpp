@@ -34,14 +34,10 @@
 #include <core/css/constants_value.h>
 #include <core/render/node/factory/render_type.h>
 #include <core/render/node/render_list.h>
+#include <core/manager/weex_core_manager.h>
 #include "render_page.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
-
-#ifdef __ANDROID__
-#include <android/bridge/impl/bridge_impl_android.h>
-#endif
-
 
 namespace WeexCore {
 
@@ -238,17 +234,14 @@ namespace WeexCore {
     if (render == nullptr || src == nullptr || src->empty())
       return false;
 
-    bool flag = false;
-
-#warning todo complement iOS implementation or change transition implementation
-#ifdef __ANDROID__
     std::vector<std::pair<std::string, std::string>> *style = nullptr;
     std::vector<std::pair<std::string, std::string>> *margin = nullptr;
     std::vector<std::pair<std::string, std::string>> *padding = nullptr;
     std::vector<std::pair<std::string, std::string>> *border = nullptr;
 
-  //  int result= WXCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
-    int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    bool flag = false;
+    int result = WeexCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    //int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
 
     if (result == 1) {
       SendUpdateStyleAction(render, src, margin, padding, border);
@@ -344,7 +337,7 @@ namespace WeexCore {
       delete border;
       border = nullptr;
     }
-#endif
+
     return flag;
   }
 

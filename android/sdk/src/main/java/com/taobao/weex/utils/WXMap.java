@@ -16,20 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.utils;
 
-#include "wx_core_manager.h"
+import java.io.Serializable;
+import java.util.HashMap;
 
+public class WXMap extends HashMap<String, String> implements Serializable {
 
-
-//void WeexCore::WXCoreManager::init(Bridge *platformBridge, JSBridge *jsBridge) {
-//    getInstance()->platform_bridge = platformBridge;
-//    getInstance()->js_bridge=jsBridge;
-//}
-//
-//WeexCore::Bridge *WeexCore::WXCoreManager::getPlatformBridge() {
-//    return getInstance()->platform_bridge;
-//}
-//
-//WeexCore::JSBridge *WeexCore::WXCoreManager::getJSBridge() {
-//    return getInstance()->js_bridge;
-//}
+  public String put(String key, byte[] value) {
+    return super.put(key, new String(value));
+  }
+}

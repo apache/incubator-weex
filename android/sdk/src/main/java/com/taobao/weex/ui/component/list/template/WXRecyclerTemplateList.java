@@ -829,14 +829,13 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @WXComponentProp(name = Constants.Name.SCROLL_DIRECTION)
     public void setScrollDirection(String direction){
-        // TODO
-//        if(orientation != mDomObject.getOrientation()) {
-//            orientation = mDomObject.getOrientation();
-//            updateRecyclerAttr();
-//            WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-//            wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap, getOrientation());
-//
-//        }
+        if(orientation != getAttrs().getOrientation()) {
+            orientation = getAttrs().getOrientation();
+            updateRecyclerAttr();
+            WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+            wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap, getOrientation());
+
+        }
     }
 
     @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)

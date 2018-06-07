@@ -18,26 +18,6 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.dom.CSSShorthand.CORNER;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import com.alibaba.fastjson.JSONArray;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -71,6 +51,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOverlay;
 import android.widget.FrameLayout;
+
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
@@ -82,9 +64,11 @@ import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.dom.CSSShorthand.CORNER;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.layout.ContentBoxMeasurement;
@@ -121,6 +105,22 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * abstract component
@@ -210,6 +210,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
+
+
   @Override
   protected final void bindComponent(WXComponent component) {
     super.bindComponent(component);
@@ -222,7 +224,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   protected final void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
-    mInstance.addContentBoxMeasurement(getRef(), contentBoxMeasurement);
+    mInstance.addContentBoxMeasurement(getRenderObjectPtr(), contentBoxMeasurement);
     WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
   }
 
@@ -1199,10 +1201,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       AccessibilityDelegateCompat delegate = new AccessibilityDelegateCompat() {
         @Override
         public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
-          super.onInitializeAccessibilityNodeInfo(host, info);
           try {
+            super.onInitializeAccessibilityNodeInfo(host, info);
             info.setRoleDescription(finalRole);
-          } catch (Exception e) {
+          } catch (Throwable e) {
             WXLogUtils.e("SetRole failed!");
           }
         }
@@ -1268,7 +1270,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         }
       }
     }
-    if(Constants.Event.STOP_PROPAGATION.equals(type)){
+    if(WXGesture.isStopPropagation(type)){
       return  true;
     }
     return false;
@@ -1402,7 +1404,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mAbsoluteX;
   }
 
-  public final void removeEvent(String type) {
+  public void removeEvent(String type) {
     if (TextUtils.isEmpty(type)) {
       return;
     }
@@ -1436,7 +1438,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public final void removeAllEvent() {
+  public void removeAllEvent() {
     if (getEvents().size() < 1) {
       return;
     }

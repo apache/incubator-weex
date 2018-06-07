@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/manager/weex_core_manager.h>
 #include "render_action_remove_element.h"
 
 namespace WeexCore {
@@ -26,7 +27,6 @@ namespace WeexCore {
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-    WXCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
-    //Bridge_Impl_Android::getInstance()->callRemoveElement(mPageId.c_str(), mRef.c_str());
+      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
   }
 }

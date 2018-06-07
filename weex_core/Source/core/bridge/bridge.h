@@ -19,14 +19,11 @@
 #ifndef Bridge_h
 #define Bridge_h
 
-#ifdef __ANDROID__
-#include <jni.h>
-#endif
+//#include <jni.h>
 #include <string>
 #include <map>
 #include <set>
 #include <vector>
-#include <core/bridge/wx_type_define.h>
 
 namespace WeexCore {
 
@@ -100,6 +97,9 @@ namespace WeexCore {
     virtual int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) = 0;
 
     virtual int callAppendTreeCreateFinish(const char* pageId, const char* ref) = 0;
+    
+    virtual int callHasTransitionPros(const char* pageId, const char* ref,
+                                        std::vector<std::pair<std::string, std::string>> *style)=0;
   };
 } //end WeexCore
 #endif //Bridge_h
