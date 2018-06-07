@@ -26,6 +26,7 @@
 #include <core/render/node/render_object.h>
 #include <core/config/core_environment.h>
 #include <map>
+#include <core/manager/weex_core_manager.h>
 
 using namespace WeexCore;
 
@@ -119,30 +120,28 @@ static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
 }
 
 static void OnInstanceClose(JNIEnv *env, jobject jcaller, jstring instanceId) {
-  RenderManager::GetInstance()->ClosePage(jString2StrFast(env, instanceId));
+    WeexCoreManager::getInstance()->getPlatformBridge()->onInstanceClose(
+            env->GetStringUTFChars(instanceId, JNI_FALSE)
+    );
 }
 
 static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv *env, jobject jcaller,
                                                 jstring instanceId, jfloat defaultWidth, jfloat defaultHeight,
                                                 jboolean isWidthWrapContent, jboolean isHeightWrapContent) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-#if RENDER_LOG
-  LOGD("[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %s, defaultWidth: %f, defaultHeight: %f",
-       page->PageId().c_str(), defaultWidth,defaultHeight);
-#endif
-
-  page->SetDefaultHeightAndWidthIntoRootRender(defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+  WeexCoreManager::getInstance()->getPlatformBridge()->setDefaultHeightAndWidthIntoRootDom(
+          env->GetStringUTFChars(instanceId, JNI_FALSE),
+          defaultWidth,
+          defaultHeight,
+          isWidthWrapContent,
+          isHeightWrapContent
+  );
 }
 
 static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean wrap, jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  page->set_is_render_container_width_wrap_content(wrap);
+    const char *cInstanceId = env->GetStringUTFChars(instanceId, JNI_FALSE);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setRenderContainerWrapContent(
+            cInstanceId,wrap
+    );
 }
 
 static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
@@ -211,153 +210,77 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
 
 //Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page != nullptr) {
-
-    if (!page->need_layout_.load()) {
-      page->need_layout_.store(true);
-    }
-
-    bool ret = !page->has_fore_layout_action_.load() && page->is_dirty();
-    if (ret) {
-      page->has_fore_layout_action_.store(true);
-    }
+    bool ret = WeexCoreManager::getInstance()->getPlatformBridge()->notifyLayout(
+            env->GetStringUTFChars(instanceId, JNI_FALSE)
+    );
     return ret ? JNI_TRUE : JNI_FALSE;
-  }
 }
 
 //Notice that this method is invoked from JS thread.
 static void ForceLayout(JNIEnv *env, jobject jcaller, jstring instanceId) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page != nullptr) {
-
-#if RENDER_LOG
-    LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", jString2StrFast(env, instanceId).c_str(), page->hasForeLayoutAction.load()?"true":"false");
-#endif
-
-    page->LayoutImmediately();
-    page->has_fore_layout_action_.store(false);
-  }
+    WeexCoreManager::getInstance()->getPlatformBridge()->forceLayout(
+            env->GetStringUTFChars(instanceId, JNI_FALSE)
+    );
 }
 
 static void SetStyleWidth(JNIEnv *env, jobject jcaller,
                           jstring instanceId, jstring ref, jfloat value) {
 
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
 
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  render->setStyleWidthLevel(CSS_STYLE);
-  render->setStyleWidth(value, true);
-  page->set_is_dirty(true);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setStyleWidth(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            value
+    );
 }
 
 static void SetStyleHeight(JNIEnv *env, jobject jcaller,
                            jstring instanceId, jstring ref, jfloat value) {
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  render->setStyleHeightLevel(CSS_STYLE);
-  render->setStyleHeight(value);
-  page->set_is_dirty(true);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setStyleHeight(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            value
+    );
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
                       jstring instanceId, jstring ref, jint edge, jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  if (edge == 0) {
-    render->setMargin(kMarginTop, value);
-  } else if (edge == 1) {
-    render->setMargin(kMarginBottom, value);
-  } else if (edge == 2) {
-    render->setMargin(kMarginLeft, value);
-  } else if (edge == 3) {
-    render->setMargin(kMarginRight, value);
-  } else if (edge == 4) {
-    render->setMargin(kMarginALL, value);
-  }
-  page->set_is_dirty(true);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setMargin(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            edge,
+            value
+    );
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
                        jstring instanceId, jstring ref, jint edge, jfloat value) {
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  if (edge == 0) {
-    render->setPadding(kPaddingTop, value);
-  } else if (edge == 1) {
-    render->setPadding(kPaddingBottom, value);
-  } else if (edge == 2) {
-    render->setPadding(kPaddingLeft, value);
-  } else if (edge == 3) {
-    render->setPadding(kPaddingRight, value);
-  } else if (edge == 4) {
-    render->setPadding(kPaddingALL, value);
-  }
-  page->set_is_dirty(true);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setPadding(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            edge,
+            value
+    );
 }
 
 
 static void SetPosition(JNIEnv *env, jobject jcaller,
                         jstring instanceId, jstring ref, jint edge, jfloat value) {
-
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-  if (render == nullptr)
-    return;
-
-  if (edge == 0) {
-    render->setStylePosition(kPositionEdgeTop, value);
-  } else if (edge == 1) {
-    render->setStylePosition(kPositionEdgeBottom, value);
-  } else if (edge == 2) {
-    render->setStylePosition(kPositionEdgeLeft, value);
-  } else if (edge == 3) {
-    render->setStylePosition(kPositionEdgeRight, value);
-  }
-  page->set_is_dirty(true);
+  WeexCoreManager::getInstance()->getPlatformBridge()->setPosition(
+          env->GetStringUTFChars(instanceId, JNI_FALSE),
+          env->GetStringUTFChars(ref, JNI_FALSE),
+          edge,
+          value
+  );
 }
 
 static void MarkDirty(JNIEnv *env, jobject jcaller,
                       jstring instanceId, jstring ref, jboolean dirty) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  if (dirty) {
-
-    RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-    if (render == nullptr)
-      return;
-    render->markDirty();
-  }
+    WeexCoreManager::getInstance()->getPlatformBridge()->markDirty(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            dirty
+    );
 }
 
 static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring value) {
@@ -367,11 +290,10 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring v
 }
 
 static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  page->set_viewport_width(value);
+    const char *cInstanceId = env->GetStringUTFChars(instanceId, JNI_FALSE);
+    WeexCoreManager::getInstance()->getPlatformBridge()->setViewPortWidth(
+            cInstanceId,value
+    );
 }
 
 
