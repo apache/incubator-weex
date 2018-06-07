@@ -94,9 +94,11 @@ static NSThread *WXComponentThread;
 - (void)dealloc
 {
     if(_rootFlexCSSNode){
-        delete _rootFlexCSSNode;
-        
-       // WeexCore::WXCoreLayoutNode::freeNodeTree(_rootFlexCSSNode);
+        if ([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME]) {
+            delete _rootFlexCSSNode;
+        }else{
+            [WXComponent recycleNodeOnComponentThread:_rootFlexCSSNode gabRef:@"_root_p"];
+        }
         _rootFlexCSSNode=nullptr;
     }
     [NSMutableArray wx_releaseArray:_fixedComponents];
