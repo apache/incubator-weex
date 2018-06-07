@@ -34,6 +34,7 @@
 #include <core/css/constants_value.h>
 #include <core/render/node/factory/render_type.h>
 #include <core/render/node/render_list.h>
+#include <core/manager/weex_core_manager.h>
 #include "render_page.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
@@ -247,8 +248,9 @@ namespace WeexCore {
     std::vector<std::pair<std::string, std::string>> *padding = nullptr;
     std::vector<std::pair<std::string, std::string>> *border = nullptr;
 
-  //  int result= WXCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
-    int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    bool flag = false;
+    int result = WeexCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    //int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
 
     if (result == 1) {
       SendUpdateStyleAction(render, src, margin, padding, border);

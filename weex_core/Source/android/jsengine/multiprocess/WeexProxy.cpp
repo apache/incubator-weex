@@ -23,13 +23,12 @@
 #include <android/base/string/string_utils.h>
 #include <core/config/core_environment.h>
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
-#include <core/api/WeexJSCoreApi.h>
-#include <core/manager/wx_core_manager.h>
-#include <android/bridge/impl/jsc_bridge_impl_android.h>
+#include <android/jsengine/api/WeexJSCoreApi.h>
 
 #include <dlfcn.h>
 #include <errno.h>
 #include <core/layout/measure_func_adapter_impl_android.h>
+#include <core/manager/weex_core_manager.h>
 
 const char *s_cacheDir;
 bool s_start_pie = true;
@@ -267,7 +266,9 @@ namespace WeexCore {
                                     jobject params) {
 
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
-        RenderManager::GetInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
+        WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
+        WeexCoreManager::getInstance()->setJSBridge(new JSBridge());
+        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,

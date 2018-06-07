@@ -84,17 +84,8 @@ namespace WeexCore {
       return m_pInstance;
     }
 
-    void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {
-      this->m_pMeasureFunctionAdapter = measureFunctionAdapter;
-    }
-
-    MeasureFunctionAdapter *GetMeasureFunctionAdapter() {
-      return this->m_pMeasureFunctionAdapter;
-    }
-
   private:
     static RenderManager *m_pInstance;
-    MeasureFunctionAdapter *m_pMeasureFunctionAdapter;
     std::map<std::string, RenderPage *> mPages;
   };
 }

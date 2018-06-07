@@ -41,12 +41,6 @@ static jmethodID jCallRemoveElementMethodId;
 static jmethodID jCallMoveElementMethodId;
 static jmethodID jCallAddEventMethodId;
 static jmethodID jCallRemoveEventMethodId;
-
-static jmethodID jMapConstructorMethodId;
-static jmethodID jMapPutMethodId;
-static jmethodID jSetConstructorMethodId;
-static jmethodID jSetAddMethodId;
-
 static jmethodID jCallCreateBodyMethodId;
 static jmethodID jCallAddElementMethodId;
 static jmethodID jCallUpdateStyleMethodId;
@@ -86,11 +80,6 @@ namespace WeexCore {
     jCallAddEventMethodId = NULL;
     jCallRemoveEventMethodId = NULL;
 
-    jMapConstructorMethodId = NULL;
-    jMapPutMethodId = NULL;
-    jSetConstructorMethodId = NULL;
-    jSetAddMethodId = NULL;
-
     jCallCreateBodyMethodId = NULL;
     jCallAddElementMethodId = NULL;
     jCallUpdateStyleMethodId = NULL;
@@ -104,33 +93,35 @@ namespace WeexCore {
   }
 
   void static cpyCMap2JMap(std::map<std::string, std::string> *cMap, jobject &jMap, JNIEnv *env) {
+
     std::map<std::string, std::string>::const_iterator it = cMap->begin();
     std::map<std::string, std::string>::const_iterator end = cMap->end();
     jstring jKey;
-    jstring jValue;
+    jbyteArray jValue;
 
     for (; it != end; ++it) {
       jKey = getKeyFromCache(env, it->first.c_str());
-
-      jValue = env->NewStringUTF(it->second.c_str());
+      jValue = newJByteArray(env, it->second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
       env->DeleteLocalRef(jValue);
     }
   }
 
   void static cpyCVector2JMap(std::vector<std::pair<std::string, std::string>> *cVector, jobject &jMap, JNIEnv *env) {
+
     jstring jKey;
-    jstring jValue;
+    jbyteArray jValue;
 
     for (int i = 0; i < cVector->size(); ++i) {
       jKey = getKeyFromCache(env, (*cVector)[i].first.c_str());
-      jValue = env->NewStringUTF((*cVector)[i].second.c_str());
+      jValue = newJByteArray(env, (*cVector)[i].second.c_str());
       env->CallObjectMethod(jMap, jMapPutMethodId, jKey, jValue);
       env->DeleteLocalRef(jValue);
     }
   }
 
   void static cpyCSet2JSet(std::set<std::string> *cSet, jobject &jSet, JNIEnv *env) {
+
     jstring jValue;
     std::set<std::string>::const_iterator it = cSet->begin();
     std::set<std::string>::const_iterator end = cSet->end();
@@ -406,17 +397,6 @@ namespace WeexCore {
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
 
-    if (jMapConstructorMethodId == NULL)
-      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    if (jMapPutMethodId == NULL)
-      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
-                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-    if (jSetConstructorMethodId == NULL)
-      jSetConstructorMethodId = env->GetMethodID(jSetClazz, "<init>", "()V");
-    if (jSetAddMethodId == NULL)
-      jSetAddMethodId = env->GetMethodID(jSetClazz, "add",
-                                         "(Ljava/lang/Object;)Z");
-
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
@@ -493,17 +473,6 @@ namespace WeexCore {
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
     jstring jParentRef = getKeyFromCache(env, parentRef);
-
-    if (jMapConstructorMethodId == NULL)
-      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    if (jMapPutMethodId == NULL)
-      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
-                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-    if (jSetConstructorMethodId == NULL)
-      jSetConstructorMethodId = env->GetMethodID(jSetClazz, "<init>", "()V");
-    if (jSetAddMethodId == NULL)
-      jSetAddMethodId = env->GetMethodID(jSetClazz, "add",
-                                         "(Ljava/lang/Object;)Z");
 
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
@@ -685,12 +654,6 @@ namespace WeexCore {
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
 
-    if (jMapConstructorMethodId == NULL)
-      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    if (jMapPutMethodId == NULL)
-      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
-                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jMargins = env->NewObject(jMapClazz, jMapConstructorMethodId);
     jobject jPaddings = env->NewObject(jMapClazz, jMapConstructorMethodId);
@@ -743,12 +706,6 @@ namespace WeexCore {
 
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
-
-    if (jMapConstructorMethodId == NULL)
-      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    if (jMapPutMethodId == NULL)
-      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
-                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
     jobject jAttrs = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
@@ -868,12 +825,6 @@ namespace WeexCore {
     jstring jPageId = getKeyFromCache(env, pageId);
     jstring jRef = getKeyFromCache(env, ref);
 
-    if (jMapConstructorMethodId == NULL)
-      jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
-    if (jMapPutMethodId == NULL)
-      jMapPutMethodId = env->GetMethodID(jMapClazz, "put",
-                                         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-
     jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
 
     if (style != nullptr) {
@@ -916,15 +867,14 @@ namespace WeexCore {
     env->CallVoidMethod(jWMThis, jDispatchMeaasge, jClientId, jVmId, jData, jCallback);
   }
 
-  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, const char* ref) {
+  jobject Bridge_Impl_Android::getMeasureFunc(const char* pageId, jlong renderObjectPtr) {
     JNIEnv *env = getJNIEnv();
     jstring jPageId = getKeyFromCache(env, pageId);
-    jstring jRef = getKeyFromCache(env, ref);
     if (jCallGetMeasurementMethodId == NULL) {
       jCallGetMeasurementMethodId = env->GetMethodID(jBridgeClazz,
                                                      "getMeasurementFunc",
-                                                     "(Ljava/lang/String;Ljava/lang/String;)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
+                                                     "(Ljava/lang/String;J)Lcom/taobao/weex/layout/ContentBoxMeasurement;");
     }
-    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, jRef);
+    return env->CallObjectMethod(jThis, jCallGetMeasurementMethodId, jPageId, renderObjectPtr);
   }
 } //end WeexCore

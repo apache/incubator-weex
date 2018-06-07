@@ -16,19 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_add_event.h"
+package com.taobao.weex.utils;
 
-namespace WeexCore {
+import java.io.Serializable;
+import java.util.HashMap;
 
-  RenderActionAddEvent::RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mEvent = event;
+public class WXMap extends HashMap<String, String> implements Serializable {
+
+  public String put(String key, byte[] value) {
+    return super.put(key, new String(value));
   }
-
-  void RenderActionAddEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
-  }
-
 }

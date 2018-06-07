@@ -247,9 +247,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
         if(_flexScrollerCSSNode){
-            delete _flexScrollerCSSNode;
-            
-            //WeexCore::WXCoreLayoutNode::freeNodeTree(_flexScrollerCSSNode);
+            [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
             
             _flexScrollerCSSNode=nullptr;
         }

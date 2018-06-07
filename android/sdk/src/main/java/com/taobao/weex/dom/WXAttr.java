@@ -261,7 +261,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   public int getOrientation() {
     String direction = getScrollDirection();
     if(!TextUtils.isEmpty(direction)){
-      if(direction.equals(Constants.Value.HORIZONTAL.equals(direction))){
+      if(direction.equals(Constants.Value.HORIZONTAL)){
         return Constants.Orientation.HORIZONTAL;
       }
     }

@@ -34,6 +34,11 @@ jclass jWXJSObject;
 jclass jWXLogUtils;
 jclass jMapClazz;
 jclass jSetClazz;
+jmethodID jMapConstructorMethodId = nullptr;
+jmethodID jMapPutMethodId = nullptr;
+jmethodID jSetConstructorMethodId = nullptr;
+jmethodID jSetAddMethodId = nullptr;
+
 jclass jWMBridgeClazz = nullptr;
 jmethodID jDoubleValueMethodId;
 jobject jThis;
@@ -529,11 +534,16 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     tempClass = env->FindClass("com/taobao/weex/utils/WXLogUtils");
     jWXLogUtils = (jclass) env->NewGlobalRef(tempClass);
 
-    tempClass = env->FindClass("java/util/HashMap");
+    tempClass = env->FindClass("com/taobao/weex/utils/WXMap");
     jMapClazz = (jclass) env->NewGlobalRef(tempClass);
 
     tempClass = env->FindClass("java/util/HashSet");
     jSetClazz = (jclass) env->NewGlobalRef(tempClass);
+
+    jMapConstructorMethodId = env->GetMethodID(jMapClazz, "<init>", "()V");
+    jMapPutMethodId = env->GetMethodID(jMapClazz, "put", "(Ljava/lang/String;[B)Ljava/lang/String;");
+    jSetConstructorMethodId = env->GetMethodID(jSetClazz, "<init>", "()V");
+    jSetAddMethodId = env->GetMethodID(jSetClazz, "add", "(Ljava/lang/Object;)Z");
 
     // can use this code to manal register jni
     tempClass = nullptr;
@@ -569,6 +579,11 @@ jint OnLoad(JavaVM *vm, void *reserved) {
     env->DeleteGlobalRef(jWXJSObject);
     env->DeleteGlobalRef(jWXLogUtils);
     env->DeleteGlobalRef(jMapClazz);
+
+    jMapConstructorMethodId = nullptr;
+    jMapPutMethodId = nullptr;
+    jSetConstructorMethodId = nullptr;
+    jSetAddMethodId = nullptr;
 
     if (jFirstScreenRenderTime != nullptr) {
       env->DeleteLocalRef(jFirstScreenRenderTime);

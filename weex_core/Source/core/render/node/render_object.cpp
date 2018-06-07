@@ -17,7 +17,7 @@
  * under the License.
  */
 #include <core/render/node/render_object.h>
-#include <core/layout/measure_func_adapter.h>
+#include <core/manager/weex_core_manager.h>
 
 using namespace std;
 namespace WeexCore {
@@ -92,10 +92,10 @@ namespace WeexCore {
     size.height = 0;
     size.width = 0;
 
-    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
+    if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return size;
 
-    return RenderManager::GetInstance()->GetMeasureFunctionAdapter()->Measure(node, width, widthMeasureMode, height, heightMeasureMode);
+    return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(node, width, widthMeasureMode, height, heightMeasureMode);
   }
 
   void RenderObject::BindMeasureFunc() {
@@ -103,16 +103,14 @@ namespace WeexCore {
   }
 
   void RenderObject::onLayoutBefore() {
-    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
+    if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return;
-
-    RenderManager::GetInstance()->GetMeasureFunctionAdapter()->LayoutBefore(this);
+    WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(this);
   }
 
   void RenderObject::onLayoutAfter(float width, float height) {
-    if (RenderManager::GetInstance()->GetMeasureFunctionAdapter() == nullptr)
+    if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return;
-
-    RenderManager::GetInstance()->GetMeasureFunctionAdapter()->LayoutAfter(this, width, height);
+    WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(this, width, height);
   }
 } //end WeexCore

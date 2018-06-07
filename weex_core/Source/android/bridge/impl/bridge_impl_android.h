@@ -134,7 +134,7 @@ namespace WeexCore {
 
     void handleDispatchMessage(jstring jClientId, jstring jVmId, jbyteArray jData, jstring jCallback);
 
-    jobject getMeasureFunc(const char* pageId, const char* ref);
+    jobject getMeasureFunc(const char* pageId, jlong renderObjectPtr);
   };
 } //end WeexCore
 #endif //BridgeAndroid_h

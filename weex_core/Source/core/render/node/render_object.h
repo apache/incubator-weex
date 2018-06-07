@@ -30,7 +30,6 @@
 #include <base/ViewUtils.h>
 #include <core/render/page/render_page.h>
 #include <core/css/constants_value.h>
-#include <base/LogDefines.h>
 #include <functional>
 
 #ifdef __ANDROID__

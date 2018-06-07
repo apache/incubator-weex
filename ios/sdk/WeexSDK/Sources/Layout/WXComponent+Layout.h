@@ -59,4 +59,7 @@ extern "C" {
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
 - (void)_rmChildCssNode:(WXComponent*)subcomponent;
 - (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;
+#ifdef __cplusplus
++ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref;
+#endif
 @end

@@ -46,6 +46,9 @@ android {
     resourcePrefix "weex"
 
     delete 'libs/armeabi/libweexcore.so'
+    delete 'libs/armeabi-v7a/libweexcore.so'
+    delete 'libs/x86/libweexcore.so'
+
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
@@ -71,6 +74,7 @@ android {
         into new File(projectDir,"assets")
         include 'weex-rax-api.js'
     }
+
 
 //    copy {
 //        from '../../pre-build'
