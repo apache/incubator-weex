@@ -157,8 +157,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-//WeexCore::WXCoreLayoutNode() is a protected method
-//            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
+
+            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
             // let scroller fill the rest space if it is a child component and has no fixed height & width
             if (((_scrollDirection == WXScrollDirectionVertical &&
                   flexIsUndefined(self.flexCssNode->getStyleHeight())) ||

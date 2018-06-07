@@ -48,17 +48,18 @@ Pod::Spec.new do |s|
   s.subspec 'WeexCore' do |w|
     w.source_files= 'weex_core/Source/base/**/*.{h,m,mm,c,cpp}',
                     'weex_core/Source/core/**/*.{h,m,mm,c,cpp}',
-                    'weex_core/Source/include/**/*.{h,m,mm,c,cpp}',
                     'weex_core/Source/wson/**/*.{h,m,mm,c,cpp}',
                     'weex_core/Source/iOS/**/*.{h,m,mm,c,cpp}'
     w.exclude_files = 'weex_core/Source/base/Compatible.cpp',
                     'weex_core/Source/core/api/WeexJSCoreApi.cpp'
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/base/.."/**' }
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/core/.."/**' }  
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/include/.."/**' }  
+    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/core/.."/**' }   
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/wson/.."/**' }
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/iOS/.."/**' }
     w.header_mappings_dir = 'weex_core/Source'
+
+
+    
 
     w.libraries = "stdc++"
 

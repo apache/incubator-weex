@@ -76,8 +76,7 @@ bool flexIsUndefined(float value) {
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-//WeexCore::WXCoreLayoutNode() is a protected method
-//        _flexCssNode = new WeexCore::WXCoreLayoutNode();
+        _flexCssNode = new WeexCore::WXCoreLayoutNode();
         if ([self measureBlock]) {
             _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
         }

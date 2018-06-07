@@ -939,8 +939,7 @@ static NSThread *WXComponentThread;
 }
 - (void)_initRootFlexCssNode
 {
-//WeexCore::WXCoreLayoutNode() is a protected method
-//    _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
+    _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
     [self _applyRootFrame:self.weexInstance.frame];
     _rootFlexCSSNode->setFlexWrap(WeexCore::kNoWrap);
     _rootFlexCSSNode->setContext((__bridge void *)(self));
