@@ -16,12 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-//  measure_func_adapter_impl_ios.cpp
-//  Pods-WeexDemo
-//
-//  Created by 陈佩翰 on 2018/6/7.
-//
 
 #include "measure_func_adapter_impl_ios.h"
 
