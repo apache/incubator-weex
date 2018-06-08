@@ -44,6 +44,7 @@ set(COMMON_SRCS
   ./core/manager/weex_core_manager.cpp
   ./core/bridge/js_bridge.cpp
   ./core/parser/dom_wson.cpp
+   ./core/bridge/bridge.cpp
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
@@ -55,9 +56,9 @@ SET(FINAL_TARGET_LINK_LIBRARIES wson)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/IPC)
   ## include_directories for include head file
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/android/IPC)
 
   set (ANDROID_SRCS
     ./android/jniprebuild/jni_load.cc
