@@ -130,13 +130,21 @@ namespace WeexCore {
     }
     
     void static cpyCMap2OCMap(std::map<std::string, std::string> *cMap, NSMutableDictionary *targetDic) {
-        
         std::map<std::string, std::string>::const_iterator it = cMap->begin();
         std::map<std::string, std::string>::const_iterator end = cMap->end();
-        
         for (; it != end; ++it) {
             NSString *key = [NSString stringWithCString:it->first.c_str() encoding:NSUTF8StringEncoding];
             NSString *value = [NSString stringWithCString:it->second.c_str() encoding:NSUTF8StringEncoding];
+            [targetDic setValue:value forKey:key];
+        }
+    }
+    
+    void static cpyCVector2OCMap(std::vector<std::pair<std::string, std::string>> *cVector, NSMutableDictionary *targetDic) {
+        for (int i = 0; i < cVector->size(); ++i) {
+            NSString *key = [NSString stringWithCString:(*cVector)[i].first.c_str()
+                                               encoding:NSUTF8StringEncoding];
+            NSString *value = [NSString stringWithCString:(*cVector)[i].second.c_str()
+                                                 encoding:NSUTF8StringEncoding];
             [targetDic setValue:value forKey:key];
         }
     }
@@ -336,7 +344,6 @@ namespace WeexCore {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         long long startTime = getCurrentTime();
         
-#warning todo
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallCreateBody];
         int flag = 0;
         if(func != nullptr){
@@ -371,7 +378,19 @@ namespace WeexCore {
     int WXCoreBridge::callLayout(const char* pageId, const char* ref,
                        int top, int bottom, int left, int right,
                        int height, int width, int index){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallLayout];
+        if(func != nullptr){
+#warning todo 原来没有注册这个回调，需要和android沟通这个回调具体做什么事情。
+            
+            
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callUpdateStyle(const char* pageId, const char* ref,
@@ -379,7 +398,25 @@ namespace WeexCore {
                             std::vector<std::pair<std::string, std::string>> *margin,
                             std::vector<std::pair<std::string, std::string>> *padding,
                             std::vector<std::pair<std::string, std::string>> *border){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallUpdateStyle];
+        if(func != nullptr){
+            WXJSCallUpdateStyle targetFunc = (__bridge WXJSCallUpdateStyle)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            
+            NSMutableDictionary *stylesDic = [[NSMutableDictionary alloc] init];
+            cpyCVector2OCMap(style,stylesDic);
+            
+            flag = (int)targetFunc(pageIdString,refString,stylesDic);
+        }
+        
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callUpdateAttr(const char* pageId, const char* ref,
