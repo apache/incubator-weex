@@ -26,7 +26,9 @@
 namespace WeexCore {
 
   class IRenderObject : public WXCoreLayoutNode {
+
   public:
+
     inline void SetRef(std::string ref) {
       mRef = ref;
     }
@@ -59,6 +61,7 @@ namespace WeexCore {
     }
 
   private:
+
     std::string mPageId = "";
     std::string mRef = "";
     std::string mType = "";
