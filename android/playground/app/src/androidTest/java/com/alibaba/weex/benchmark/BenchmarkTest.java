@@ -34,11 +34,13 @@ import android.support.test.uiautomator.Direction;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.Until;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.text.TextUtils;
 import android.util.Log;
 import com.alibaba.weex.BenchmarkActivity;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -119,7 +121,7 @@ public class BenchmarkTest {
   }
 
   @Repeat(TIMES)
-  @Test
+  //@Test
   @SdkSuppress(minSdkVersion = 23)
   public void testFlingFPS() {
     UiObject2 uiObject2 = loadPageForFPS();
@@ -133,7 +135,7 @@ public class BenchmarkTest {
   }
 
   @Repeat(TIMES)
-  @Test
+  //@Test
   @SdkSuppress(minSdkVersion = 23)
   public void testScrollFPS() {
     UiObject2 uiObject2 = loadPageForFPS();
