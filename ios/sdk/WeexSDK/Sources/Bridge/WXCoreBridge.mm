@@ -40,18 +40,18 @@
 
 #pragma mark interface
 - (void)implSetTimeOutWithCallback:(const char *)callbackID timeout:(const char *)timeout{
-    NSString *timeoutString = [NSString stringWithCString:timeout encoding:NSUnicodeStringEncoding];
+    NSString *timeoutString = [NSString stringWithCString:timeout encoding:NSUTF8StringEncoding];
     __weak typeof(self) weakSelf = self;
     [self performSelector: @selector(triggerTimeout:) withObject:^() {
         JSContext *context = [weakSelf defaultJsContext];
-        NSString *callbackIdString = [NSString stringWithCString:callbackID encoding:NSUnicodeStringEncoding];
+        NSString *callbackIdString = [NSString stringWithCString:callbackID encoding:NSUTF8StringEncoding];
         JSValue *targetFunction = context[callbackIdString];
         [targetFunction callWithArguments:@[]];
     } afterDelay:[timeoutString doubleValue] / 1000];
 }
 
 - (int)implCallUpdateFinishWithPageId:(const char*)pageId task:(const char *)task callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUTF8StringEncoding]];
     if (instance) {
         WXComponentManager *componentManager = instance.componentManager;
         [componentManager updateFinish];
@@ -63,7 +63,7 @@
 }
 
 - (int)implCallRefreshFinishWithPageId:(const char*)pageId task:(const char *)task callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:pageId encoding:NSUTF8StringEncoding]];
     if (instance) {
         WXComponentManager *componentManager = instance.componentManager;
         [componentManager refreshFinish];
@@ -96,11 +96,11 @@
 }
 
 - (void)callJsCallBackWithInstanceId:(const char*)instanceId callback:(const char *)callback{
-    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:instanceId encoding:NSUnicodeStringEncoding]];
+    WXSDKInstance *instance = [self instanceWithId:[NSString stringWithCString:instanceId encoding:NSUTF8StringEncoding]];
     if (!instance) {
         return;
     }
-    NSString *callbackString = [NSString stringWithCString:callback encoding:NSUnicodeStringEncoding];
+    NSString *callbackString = [NSString stringWithCString:callback encoding:NSUTF8StringEncoding];
     if (callbackString && callbackString.length>0) {
         JSContext *context = instance.instanceJavaScriptContext;
         JSValue *callbackFunction = context[callbackString];
@@ -129,6 +129,18 @@ namespace WeexCore {
         delete impl;
     }
     
+    void static cpyCMap2OCMap(std::map<std::string, std::string> *cMap, NSMutableDictionary *targetDic) {
+        
+        std::map<std::string, std::string>::const_iterator it = cMap->begin();
+        std::map<std::string, std::string>::const_iterator end = cMap->end();
+        
+        for (; it != end; ++it) {
+            NSString *key = [NSString stringWithCString:it->first.c_str() encoding:NSUTF8StringEncoding];
+            NSString *value = [NSString stringWithCString:it->second.c_str() encoding:NSUTF8StringEncoding];
+            [targetDic setValue:value forKey:key];
+        }
+    }
+    
     void WXCoreBridge::registerEventWithType(WeexCoreEventBlockType type,void* block){
         impl->blockMap[type] = block;
     }
@@ -149,11 +161,11 @@ namespace WeexCore {
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallNative];
         if(func != nullptr){
             WXJSCallNative targetFunc = (__bridge WXJSCallNative)func;
-            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
             NSData *taskData = [NSData dataWithBytes:task length:strlen(task)];
             NSError *error = nil;
             NSArray *taskArray = [WXUtility JSONObject:taskData error:&error];
-            NSString *callBackString = [NSString stringWithCString:callback encoding:NSUnicodeStringEncoding];
+            NSString *callBackString = [NSString stringWithCString:callback encoding:NSUTF8StringEncoding];
             flag = (int)targetFunc(pageIDString,taskArray,callBackString);
         }
         if (flag == -1) {
@@ -174,9 +186,9 @@ namespace WeexCore {
         void *result = nullptr;
         if(func != nullptr){
             WXJSCallNativeModule targetFunc = (__bridge WXJSCallNativeModule)func;
-            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
-            NSString *moduleString = [NSString stringWithCString:module encoding:NSUnicodeStringEncoding];
-            NSString *methodString = [NSString stringWithCString:method encoding:NSUnicodeStringEncoding];
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *moduleString = [NSString stringWithCString:module encoding:NSUTF8StringEncoding];
+            NSString *methodString = [NSString stringWithCString:method encoding:NSUTF8StringEncoding];
             NSError *error = nil;
             NSData *argumentsData = [NSData dataWithBytes:arguments length:argumentsLength];
             NSArray *argumentsArray = [WXUtility JSONObject:argumentsData error:&error];
@@ -196,9 +208,9 @@ namespace WeexCore {
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallNativeComponent];
         if(func != nullptr){
             WXJSCallNativeComponent targetFunc = (__bridge WXJSCallNativeComponent)func;
-            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
-            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
-            NSString *methodString = [NSString stringWithCString:method encoding:NSUnicodeStringEncoding];
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            NSString *methodString = [NSString stringWithCString:method encoding:NSUTF8StringEncoding];
             NSError *error = nil;
             NSData *argumentsData = [NSData dataWithBytes:arguments length:argumentsLength];
             NSArray *argumentsArray = [WXUtility JSONObject:argumentsData error:&error];
@@ -216,7 +228,7 @@ namespace WeexCore {
     }
         
     void WXCoreBridge::callNativeLog(const char* str_array){
-        NSString *logString = [NSString stringWithCString:str_array encoding:NSUnicodeStringEncoding];
+        NSString *logString = [NSString stringWithCString:str_array encoding:NSUTF8StringEncoding];
         NSLog(@"%@",logString);
     }
         
@@ -245,9 +257,9 @@ namespace WeexCore {
         int flag = -1;
         if(func != nullptr){
             WXJSCallAddEvent targetFunc = (__bridge WXJSCallAddEvent)func;
-            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
-            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
-            NSString *eventString = [NSString stringWithCString:event encoding:NSUnicodeStringEncoding];
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            NSString *eventString = [NSString stringWithCString:event encoding:NSUTF8StringEncoding];
             flag = (int)targetFunc(pageIDString,refString,eventString);
         }
         if (page != nullptr)
@@ -262,9 +274,9 @@ namespace WeexCore {
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallRemoveEvent];
         if(func != nullptr){
             WXJSCallRemoveEvent targetFunc = (__bridge WXJSCallRemoveEvent)func;
-            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
-            NSString *refString = [NSString stringWithCString:ref encoding:NSUnicodeStringEncoding];
-            NSString *eventString = [NSString stringWithCString:event encoding:NSUnicodeStringEncoding];
+            NSString *pageIDString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            NSString *eventString = [NSString stringWithCString:event encoding:NSUTF8StringEncoding];
             flag = (int)targetFunc(pageIDString,refString,eventString);
         }
         if (page != nullptr)
@@ -286,10 +298,25 @@ namespace WeexCore {
         int flag = 0;
         if(func != nullptr){
             WXJSCallCreateBody targetFunc = (__bridge WXJSCallCreateBody)func;
-            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUnicodeStringEncoding];
-
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSMutableDictionary *bodyData = [[NSMutableDictionary alloc] init];
+            // attr\style\type\ref
             
+            NSMutableDictionary *attrDic = [[NSMutableDictionary alloc] init];
+            cpyCMap2OCMap(attributes,attrDic);
+            [bodyData setValue:attrDic forKey:@"attr"];
             
+            NSMutableDictionary *styleDic = [[NSMutableDictionary alloc] init];
+            cpyCMap2OCMap(styles,styleDic);
+            [bodyData setValue:styleDic forKey:@"style"];
+            
+            NSString *type = [NSString stringWithCString:componentType encoding:NSUTF8StringEncoding];
+            [bodyData setValue:type forKey:@"type"];
+            
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            [bodyData setValue:refString forKey:@"type"];
+            
+            flag = (int)targetFunc(pageIdString,bodyData);
         }
         if (page != nullptr)
             page->CallBridgeTime(getCurrentTime() - startTime);
@@ -305,7 +332,40 @@ namespace WeexCore {
                            const WXCorePadding &paddings,
                            const WXCoreBorderWidth &borders,
                            bool willLayout){
+        
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
 #warning todo
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallCreateBody];
+        int flag = 0;
+        if(func != nullptr){
+            WXJSCallAddElement targetFunc = (__bridge WXJSCallAddElement)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *parentRefString = [NSString stringWithCString:parentRef encoding:NSUTF8StringEncoding];
+            
+            NSMutableDictionary *elementData = [[NSMutableDictionary alloc] init];
+            // attr\style\type\ref
+            
+            NSMutableDictionary *attrDic = [[NSMutableDictionary alloc] init];
+            cpyCMap2OCMap(attributes,attrDic);
+            [elementData setValue:attrDic forKey:@"attr"];
+            
+            NSMutableDictionary *styleDic = [[NSMutableDictionary alloc] init];
+            cpyCMap2OCMap(styles,styleDic);
+            [elementData setValue:styleDic forKey:@"style"];
+            
+            NSString *type = [NSString stringWithCString:componentType encoding:NSUTF8StringEncoding];
+            [elementData setValue:type forKey:@"type"];
+            
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            [elementData setValue:refString forKey:@"type"];
+            
+            flag = (int)targetFunc(pageIdString,parentRefString,elementData,index);
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callLayout(const char* pageId, const char* ref,
@@ -342,8 +402,6 @@ namespace WeexCore {
     int WXCoreBridge::callAppendTreeCreateFinish(const char* pageId, const char* ref){
 #warning todo
     }
-        
-    
 }
 
 @end
