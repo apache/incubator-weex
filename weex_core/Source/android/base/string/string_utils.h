@@ -20,10 +20,10 @@
 #define _STRING_UTILS_H_
 
 #include <jni.h>
-#include <IPC/IPCArguments.h>
-#include <IPC/Serializing/IPCSerializer.h>
-#include <IPC/IPCString.h>
-#include <IPC/IPCByteArray.h>
+#include <android/IPC/IPCArguments.h>
+#include <android/IPC/Serializing/IPCSerializer.h>
+#include <android/IPC/IPCString.h>
+#include <android/IPC/IPCByteArray.h>
 #include <malloc.h>
 #include "scoped_jstring.h"
 #include "scoped_jstring_utf8.h"

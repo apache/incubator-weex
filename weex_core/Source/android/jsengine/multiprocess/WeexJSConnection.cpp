@@ -27,9 +27,9 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <IPC/IPCFutexPageQueue.h>
-#include <IPC/IPCException.h>
-#include <IPC/IPCSender.h>
+#include <android/IPC/IPCFutexPageQueue.h>
+#include <android/IPC/IPCException.h>
+#include <android/IPC/IPCSender.h>
 #include <unistd.h>
 #include <android/base/log_utils.h>
 #include <errno.h>
