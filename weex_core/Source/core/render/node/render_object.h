@@ -24,7 +24,7 @@
 #include <set>
 #include <functional>
 
-#include "core/render/node/factory/i_render_object.h"
+#include "core/render/node/factory/render_object_interface.h"
 
 #define JSON_OBJECT_MARK_CHAR  '{'
 #define JSON_ARRAY_MARK_CHAR  '['

@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "core/render/action/render_action.h"
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 

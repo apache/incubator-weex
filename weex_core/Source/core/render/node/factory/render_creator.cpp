@@ -17,8 +17,8 @@
  * under the License.
  */
 #include "core/render/node/factory/render_creator.h"
-#include "core/render/node/factory/i_render_object.h"
-#include "core/render/node/factory/i_render_factory.h"
+#include "core/render/node/factory/render_object_interface.h"
+#include "core/render/node/factory/render_factory_interface.h"
 #include "core/render/node/factory/render_text_factory.h"
 #include "core/render/node/factory/simple_render_factory.h"
 #include "core/render/node/factory/render_list_factory.h"
