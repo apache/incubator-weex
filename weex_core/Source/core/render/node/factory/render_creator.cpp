@@ -16,21 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "render_creator.h"
-#include "i_render_object.h"
-#include "i_render_factory.h"
-#include "render_text_factory.h"
-#include "simple_render_factory.h"
-#include "render_cell_factory.h"
-#include "render_type.h"
-#include "render_indicator_factory.h"
-#include "render_input_factory.h"
-#include "render_list_factory.h"
-#include "render_mask_factory.h"
-#include "render_scroller_factory.h"
-#include "render_switch_factory.h"
-#include "render_textarea_factory.h"
-#include "render_appbar_factory.h"
+#include "core/render/node/factory/render_creator.h"
+#include "core/render/node/factory/i_render_object.h"
+#include "core/render/node/factory/i_render_factory.h"
+#include "core/render/node/factory/render_text_factory.h"
+#include "core/render/node/factory/simple_render_factory.h"
+#include "core/render/node/factory/render_list_factory.h"
+#include "core/render/node/factory/render_mask_factory.h"
+#include "core/render/node/factory/render_scroller_factory.h"
+#include "core/render/node/factory/render_appbar_factory.h"
+#include "core/render/node/factory/render_type.h"
 
 namespace WeexCore {
 
@@ -40,24 +35,12 @@ namespace WeexCore {
     IRenderFactory *factory;
     if (type == kRenderText) {
       factory = new RenderTextFactory();
-    } else if (type == kRenderCell
-               || type == kRenderHeader
-               || type == kRenderCellSlot) {
-      factory = new RenderCellFactory();
-    } else if (type == kRenderIndicator) {
-      factory = new RenderIndicatorFactory();
-    } else if (type == kRenderInput) {
-      factory = new RenderInputFactory();
     } else if (type == kRenderList || type == kRenderWaterfall || type == kRenderRecycleList) {
       factory = new RenderListFactory();
     } else if (type == kRenderMask) {
       factory = new RenderMaskFactory();
     } else if (type == kRenderScroller) {
       factory = new RenderScrollerFactory();
-    } else if (type == kRenderSwitch) {
-      factory = new RenderSwitchFactory();
-    } else if (type == kRenderTextArea) {
-      factory = new RenderTextAreaFactory();
     } else if (type == kRenderAppBar) {
       factory = new RenderAppBarFactory();
     } else {

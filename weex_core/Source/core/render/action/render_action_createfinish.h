@@ -19,11 +19,13 @@
 #ifndef WEEX_PROJECT_CREATEFINISHACTION_H
 #define WEEX_PROJECT_CREATEFINISHACTION_H
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionCreateFinish : public render_action {
+  class RenderActionCreateFinish : public RenderAction {
 
   public:
     explicit RenderActionCreateFinish(const std::string &pageId);

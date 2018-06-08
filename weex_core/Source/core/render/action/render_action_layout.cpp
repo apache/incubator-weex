@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_layout.h"
+
+#include "core/render/node/render_object.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_layout.h"
 
 namespace WeexCore {
 
-  RenderActionLayout::RenderActionLayout(const std::string &pageId, const RenderObject *render,int index) {
+  RenderActionLayout::RenderActionLayout(const std::string &pageId, const RenderObject *render,
+                                         int index) {
     this->mPageId = pageId;
     this->mRef = render->Ref();
     this->index = index;
@@ -29,9 +32,9 @@ namespace WeexCore {
   }
 
   void RenderActionLayout::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                                      mTop, mBottom, mLeft, mRight,
-                                                                      mHeight, mWidth, index);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
+                                                                    mTop, mBottom, mLeft, mRight,
+                                                                    mHeight, mWidth, index);
   }
 
   void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {

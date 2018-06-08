@@ -24,16 +24,12 @@
 namespace WeexCore {
   constexpr char kRenderCell[] = "cell";
   constexpr char kRenderCellSlot[] = "cell-slot";
-  constexpr char kRenderIndicator[] = "indicator";
-  constexpr char kRenderInput[] = "input";
   constexpr char kRenderList[] = "list";
   constexpr char kHList[] = "hlist";
   constexpr char kRenderRecycleList[] = "recycle-list";
   constexpr char kRenderMask[] = "mask";
   constexpr char kRenderScroller[] = "scroller";
-  constexpr char kRenderSwitch[] = "switch";
   constexpr char kRenderText[] = "text";
-  constexpr char kRenderTextArea[] = "textarea";
   constexpr char kRenderHeader[] = "header";
   constexpr char kRenderFooter[] = "footer";
   constexpr char kRenderWaterfall[] = "waterfall";

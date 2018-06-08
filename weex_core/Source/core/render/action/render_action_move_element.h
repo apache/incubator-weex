@@ -19,15 +19,17 @@
 #ifndef WEEX_PROJECT_RENDERACTIONMOVEELEMENT_H
 #define WEEX_PROJECT_RENDERACTIONMOVEELEMENT_H
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionMoveElement : public render_action {
+  class RenderActionMoveElement : public RenderAction {
 
   public:
     explicit RenderActionMoveElement(const std::string &pageId, const std::string &ref,
-                            const std::string &parentRef, int index);
+                                     const std::string &parentRef, int index);
 
     void ExecuteAction();
 

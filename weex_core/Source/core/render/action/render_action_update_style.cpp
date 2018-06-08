@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_update_style.h"
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_update_style.h"
 
 namespace WeexCore {
 
-  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
+  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &pageId,
+                                                   const std::string &ref,
                                                    std::vector<std::pair<std::string, std::string>> *style,
                                                    std::vector<std::pair<std::string, std::string>> *margin,
                                                    std::vector<std::pair<std::string, std::string>> *padding,
@@ -35,7 +37,9 @@ namespace WeexCore {
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(), mRef.c_str(), mStyle, mMargin,
-                                                                           mPadding, mBorder);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(),
+                                                                         mRef.c_str(), mStyle,
+                                                                         mMargin,
+                                                                         mPadding, mBorder);
   }
 }

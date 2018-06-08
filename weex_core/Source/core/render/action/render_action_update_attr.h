@@ -19,15 +19,18 @@
 #ifndef WEEX_PROJECT_UPDATEATTRACTION_H
 #define WEEX_PROJECT_UPDATEATTRACTION_H
 
-#include "render_action.h"
+#include <string>
+#include <vector>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionUpdateAttr : public render_action {
+  class RenderActionUpdateAttr : public RenderAction {
 
   public:
     explicit RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
-                           std::vector<std::pair<std::string, std::string>> *mAttrs);
+                                    std::vector<std::pair<std::string, std::string>> *mAttrs);
 
     void ExecuteAction();
 

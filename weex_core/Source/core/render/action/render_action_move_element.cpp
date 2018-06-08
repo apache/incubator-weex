@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_move_element.h"
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_move_element.h"
 
 namespace WeexCore {
 
-  RenderActionMoveElement::RenderActionMoveElement(const std::string &pageId, const std::string &ref,
+  RenderActionMoveElement::RenderActionMoveElement(const std::string &pageId,
+                                                   const std::string &ref,
                                                    const std::string &parentRef, int index) {
     this->mPageId = pageId;
     this->mRef = ref;
@@ -30,6 +32,9 @@ namespace WeexCore {
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(), mRef.c_str(), mParentRef.c_str(), mIndex);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(),
+                                                                         mRef.c_str(),
+                                                                         mParentRef.c_str(),
+                                                                         mIndex);
   }
 }

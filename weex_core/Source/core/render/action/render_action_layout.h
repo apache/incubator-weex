@@ -19,21 +19,29 @@
 #ifndef WEEX_PROJECT_RELAYOUTRENDERACTION_H
 #define WEEX_PROJECT_RELAYOUTRENDERACTION_H
 
-#include "render_action.h"
+#include <string>
+#include <set>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionLayout : public render_action {
+  class RenderObject;
+
+  class WXCoreLayoutNode;
+
+  class RenderActionLayout : public RenderAction {
 
   public:
-    explicit RenderActionLayout(const std::string &pageId, const RenderObject *render, const int index);
+    explicit RenderActionLayout(const std::string &pageId, const RenderObject *render,
+                                const int index);
 
     void ExecuteAction();
 
     void GetLayoutInfo(const WXCoreLayoutNode *node);
 
   public:
-    EventsSet *mEvents;
+    std::set<std::string> *mEvents;
     std::string mPageId;
     std::string mRef;
     float mWidth;

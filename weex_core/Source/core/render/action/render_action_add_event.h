@@ -19,14 +19,17 @@
 #ifndef WEEX_PROJECT_ADDEVENTACTION_H
 #define WEEX_PROJECT_ADDEVENTACTION_H
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionAddEvent : public render_action {
+  class RenderActionAddEvent : public RenderAction {
 
   public:
-    explicit RenderActionAddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    explicit RenderActionAddEvent(const std::string &pageId, const std::string &ref,
+                                  const std::string &event);
 
     void ExecuteAction();
 

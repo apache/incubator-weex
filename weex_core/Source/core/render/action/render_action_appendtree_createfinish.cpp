@@ -16,17 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "render_action_appendtree_createfinish.h"
-#include <core/manager/weex_core_manager.h>
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_appendtree_createfinish.h"
 
 namespace WeexCore {
 
-  RenderActionAppendTreeCreateFinish::RenderActionAppendTreeCreateFinish(const std::string &pageId, const std::string &ref) {
+  RenderActionAppendTreeCreateFinish::RenderActionAppendTreeCreateFinish(const std::string &pageId,
+                                                                         const std::string &ref) {
     this->mPageId = pageId;
     this->mRef = ref;
   }
 
   void RenderActionAppendTreeCreateFinish::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callAppendTreeCreateFinish(mPageId.c_str(), mRef.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callAppendTreeCreateFinish(mPageId.c_str(),
+                                                                                    mRef.c_str());
   }
 }

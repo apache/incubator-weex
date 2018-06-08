@@ -29,7 +29,7 @@ namespace WeexCore {
 
   constexpr float kLayoutFirstScreenOverflowRadio = 1.2f;
 
-  class render_action;
+  class RenderAction;
 
   class RenderObject;
 
@@ -55,12 +55,11 @@ namespace WeexCore {
 
     void SendLayoutAction(RenderObject *render, int index);
 
-    void
-    SendUpdateStyleAction(RenderObject *render,
-                          std::vector<std::pair<std::string, std::string>> *style,
-                          std::vector<std::pair<std::string, std::string>> *margin,
-                          std::vector<std::pair<std::string, std::string>> *padding,
-                          std::vector<std::pair<std::string, std::string>> *border);
+    void SendUpdateStyleAction(RenderObject *render,
+                               std::vector <std::pair<std::string, std::string>> *style,
+                               std::vector <std::pair<std::string, std::string>> *margin,
+                               std::vector <std::pair<std::string, std::string>> *padding,
+                               std::vector <std::pair<std::string, std::string>> *border);
 
     void SendUpdateAttrAction(RenderObject *render, std::vector<std::pair<std::string, std::string>> *attrs);
 
@@ -68,12 +67,9 @@ namespace WeexCore {
 
     void SendAppendTreeCreateFinish(const std::string &ref);
 
-    void PostRenderAction(render_action *action);
+    void PostRenderAction(RenderAction *action);
 
   public:
-    static constexpr bool useVSync = true;
-    std::atomic_bool needLayout{false};
-    std::atomic_bool hasForeLayoutAction{false};
 
     explicit RenderPage(std::string pageId);
 
@@ -93,7 +89,8 @@ namespace WeexCore {
 
     bool UpdateAttr(const std::string &ref, std::vector<std::pair<std::string, std::string>> *attrs);
 
-    void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight, const bool isWidthWrapContent, const bool isHeightWrapContent);
+    void SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth, const float defaultHeight,
+                                                const bool isWidthWrapContent, const bool isHeightWrapContent);
 
     bool AddEvent(const std::string &ref, const std::string &event);
 
@@ -117,16 +114,22 @@ namespace WeexCore {
 
     void SendUpdateAttrAction(RenderObject *render, std::map<std::string, std::string> *attrs);
 
-    inline RenderObject *GetRenderObject(const std::string &ref) {
-        std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
-        if (iter != mRenderObjectRegisterMap.end()) {
-            return iter->second;
-        } else {
-            return nullptr;
-        }
-    }
+    RenderObject *GetRenderObject(const std::string &ref);
 
     void SetRootRenderObject(RenderObject *root);
+
+    // ****** Life Cycle ****** //
+
+    void OnRenderPageInit();
+
+    void OnRenderProcessStart();
+
+    void OnRenderProcessExited();
+
+    void OnRenderProcessGone();
+
+    void OnRenderPageClose();
+
 
     inline std::string PageId() {
       return mPageId;
@@ -156,19 +159,14 @@ namespace WeexCore {
       return isRenderContainerWidthWrapContent.load();
     }
 
-    // ****** Life Cycle ****** //
+  public:
 
-    void OnRenderPageInit();
-
-    void OnRenderProcessStart();
-
-    void OnRenderProcessExited();
-
-    void OnRenderProcessGone();
-
-    void OnRenderPageClose();
+    static constexpr bool useVSync = true;
+    std::atomic_bool needLayout{false};
+    std::atomic_bool hasForeLayoutAction{false};
 
   private:
+
     bool mAlreadyCreateFinish = false;
     float mViewPortWidth;
     RenderObject *render_root = nullptr;
