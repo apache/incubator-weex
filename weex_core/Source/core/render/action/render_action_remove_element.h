@@ -19,11 +19,13 @@
 #ifndef WEEX_PROJECT_RENDERACTIONREMOVEELEMENT_H
 #define WEEX_PROJECT_RENDERACTIONREMOVEELEMENT_H
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionRemoveElement : public render_action {
+  class RenderActionRemoveElement : public RenderAction {
   public:
     explicit RenderActionRemoveElement(const std::string &pageId, const std::string &ref);
 

@@ -19,16 +19,9 @@
 #ifndef WEEXV8_RENDERACTION_H
 #define WEEXV8_RENDERACTION_H
 
-#include <core/layout/layout.h>
-#include <core/render/node/render_object.h>
-#include <core/render/manager/render_manager.h>
-#include <core/render/page/render_page.h>
-#include <string>
-#include <base/TimeUtils.h>
-
 namespace WeexCore {
 
-  class render_action {
+  class RenderAction {
   public:
     virtual void ExecuteAction() = 0;
   };

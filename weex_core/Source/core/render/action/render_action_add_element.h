@@ -19,22 +19,30 @@
 #ifndef WEEX_PROJECT_ADDELEMENTACTION_H
 #define WEEX_PROJECT_ADDELEMENTACTION_H
 
-#include "render_action.h"
+#include <string>
+#include <map>
+#include <set>
+
+#include "core/render/action/render_action.h"
+#include "core/layout/style.h"
 
 namespace WeexCore {
 
-  class RenderActionAddElement : public render_action {
+  class RenderObject;
+
+  class RenderActionAddElement : public RenderAction {
 
   public:
-    explicit RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
-                           int index, bool willLayout= true);
+    explicit RenderActionAddElement(const std::string &pageId, const RenderObject *render,
+                                    const RenderObject *parent,
+                                    int index, bool willLayout = true);
 
     void ExecuteAction();
 
   public:
-    StylesMap *mStyles;
-    AttributesMap *mAttributes;
-    EventsSet *mEvents;
+    std::map<std::string, std::string> *mStyles;
+    std::map<std::string, std::string> *mAttributes;
+    std::set<std::string> *mEvents;
     WXCoreMargin mMargins;
     WXCorePadding mPaddings;
     WXCoreBorderWidth mBorders;

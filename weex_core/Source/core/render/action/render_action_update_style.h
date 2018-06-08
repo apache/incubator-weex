@@ -19,19 +19,22 @@
 #ifndef WEEX_PROJECT_UPDATESTYLEACTION_H
 #define WEEX_PROJECT_UPDATESTYLEACTION_H
 
-#include "render_action.h"
+#include <string>
+#include <vector>
+
+#include "core/render/action/render_action.h"
 
 namespace WeexCore {
 
-  class RenderActionUpdateStyle : public render_action {
+  class RenderActionUpdateStyle : public RenderAction {
 
   public:
 
     explicit RenderActionUpdateStyle(const std::string &pageId, const std::string &ref,
-                            std::vector<std::pair<std::string, std::string>> *style,
-                            std::vector<std::pair<std::string, std::string>> *margin,
-                            std::vector<std::pair<std::string, std::string>> *padding,
-                            std::vector<std::pair<std::string, std::string>> *border);
+                                     std::vector<std::pair<std::string, std::string>> *style,
+                                     std::vector<std::pair<std::string, std::string>> *margin,
+                                     std::vector<std::pair<std::string, std::string>> *padding,
+                                     std::vector<std::pair<std::string, std::string>> *border);
 
     void ExecuteAction();
 

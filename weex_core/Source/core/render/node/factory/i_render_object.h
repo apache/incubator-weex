@@ -20,7 +20,8 @@
 #define WEEX_PROJECT_IRENDEROBJECT_H
 
 #include <string>
-#include <core/layout/layout.h>
+
+#include "core/layout/layout.h"
 
 namespace WeexCore {
 
@@ -50,11 +51,11 @@ namespace WeexCore {
       return mType;
     }
 
-    void copyFrom(IRenderObject* src){
-        WXCoreLayoutNode::copyFrom(src);
-        SetRef(src->Ref());
-        SetPageId(src->PageId());
-        SetType(src->Type());
+    inline void copyFrom(IRenderObject *src) {
+      WXCoreLayoutNode::copyFrom(src);
+      SetRef(src->Ref());
+      SetPageId(src->PageId());
+      SetType(src->Type());
     }
 
   private:

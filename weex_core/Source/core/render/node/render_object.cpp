@@ -16,16 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/render/node/render_object.h>
-#include <core/manager/weex_core_manager.h>
+#include "core/render/node/render_object.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/css/constants_name.h"
+#include "core/css/constants_value.h"
+#include "core/css/css_value_getter.h"
+#include "core/layout/layout.h"
+#include "core/render/manager/render_manager.h"
+#include "core/render/page/render_page.h"
+#include "base/ViewUtils.h"
 
-using namespace std;
 namespace WeexCore {
 
   RenderObject::RenderObject() {
-    mStyles = new StylesMap();
-    mAttributes = new AttributesMap();
-    mEvents = new EventsSet();
+    mStyles = new std::map<std::string, std::string>();
+    mAttributes = new std::map<std::string, std::string>();
+    mEvents = new std::set<std::string>();
     mIsRootRender = false;
   }
 
@@ -37,17 +43,19 @@ namespace WeexCore {
       delete mStyles;
       mStyles = nullptr;
     }
+
     if (mAttributes != nullptr) {
       delete mAttributes;
       mAttributes = nullptr;
     }
+
     if (mEvents != nullptr) {
       delete mEvents;
       mEvents = nullptr;
     }
 
-    for(auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
-      RenderObject* child = static_cast<RenderObject*>(*it);
+    for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      RenderObject *child = static_cast<RenderObject *>(*it);
       if (child != nullptr) {
         delete child;
         child = nullptr;
@@ -77,7 +85,7 @@ namespace WeexCore {
       return;
 
     for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
-        UpdateAttr(iter->first, iter->second);
+      UpdateAttr(iter->first, iter->second);
     }
 
     if (attrs != nullptr) {
@@ -95,11 +103,14 @@ namespace WeexCore {
     if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return size;
 
-    return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(node, width, widthMeasureMode, height, heightMeasureMode);
+    return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(node, width,
+                                                                                widthMeasureMode,
+                                                                                height,
+                                                                                heightMeasureMode);
   }
 
   void RenderObject::BindMeasureFunc() {
-     setMeasureFunc(measureFunc_Impl);
+    setMeasureFunc(measureFunc_Impl);
   }
 
   void RenderObject::onLayoutBefore() {
@@ -112,5 +123,295 @@ namespace WeexCore {
     if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return;
     WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(this, width, height);
+  }
+
+  StyleType
+  RenderObject::ApplyStyle(const std::string &key, const std::string &value, const bool updating) {
+    bool insert = false;
+    if (value.length() > 0 &&
+        (value.at(0) == JSON_OBJECT_MARK_CHAR || value.at(0) == JSON_ARRAY_MARK_CHAR)) {
+      mapInsertOrAssign(mStyles, key, value);
+      insert = true;
+    }
+
+    if (key == ALIGN_ITEMS) {
+      setAlignItems(GetWXCoreAlignItem(value));
+      return kTypeLayout;
+    } else if (key == ALIGN_SELF) {
+      setAlignSelf(GetWXCoreAlignSelf(value));
+      return kTypeLayout;
+    } else if (key == FLEX) {
+      if (value.empty()) {
+        setFlex(0);
+      } else {
+        float ret = getFloat(value.c_str());
+        if (!isnan(ret)) {
+          setFlex(ret);
+        }
+      }
+      return kTypeLayout;
+    } else if (key == FLEX_DIRECTION) {
+      setFlexDirection(GetWXCoreFlexDirection(value), updating);
+      return kTypeLayout;
+    } else if (key == JUSTIFY_CONTENT) {
+      setJustifyContent(GetWXCoreJustifyContent(value));
+      return kTypeLayout;
+    } else if (key == FLEX_WRAP) {
+      setFlexWrap(GetWXCoreFlexWrap(value));
+      return kTypeLayout;
+    } else if (key == MIN_WIDTH) {
+      UpdateStyleInternal(key, value, NAN, [=](float foo) { setMinWidth(foo, updating); });
+      return kTypeLayout;
+    } else if (key == MIN_HEIGHT) {
+      UpdateStyleInternal(key, value, NAN, [=](float foo) { setMinHeight(foo); });
+      return kTypeLayout;
+    } else if (key == MAX_WIDTH) {
+      UpdateStyleInternal(key, value, NAN, [=](float foo) { setMaxWidth(foo, updating); });
+      return kTypeLayout;
+    } else if (key == MAX_HEIGHT) {
+      UpdateStyleInternal(key, value, NAN, [=](float foo) { setMaxHeight(foo); });
+      return kTypeLayout;
+    } else if (key == HEIGHT) {
+      if (UpdateStyleInternal(key, value, NAN, [=](float foo) { setStyleHeight(foo); })) {
+        setStyleHeightLevel(CSS_STYLE);
+      }
+      return kTypeLayout;
+    } else if (key == WIDTH) {
+      if (UpdateStyleInternal(key, value, NAN, [=](float foo) { setStyleWidth(foo, updating); })) {
+        setStyleWidthLevel(CSS_STYLE);
+      }
+      return kTypeLayout;
+    } else if (key == POSITION) {
+      setStylePositionType(GetWXCorePositionType(value));
+      if (value == STICKY) {
+        mIsSticky = true;
+      }
+      mapInsertOrAssign(mStyles, key, value);
+      return kTypeStyle;
+    } else if (key == LEFT) {
+      UpdateStyleInternal(key, value, NAN,
+                          [=](float foo) { setStylePosition(kPositionEdgeLeft, foo); });
+      return kTypeLayout;
+    } else if (key == TOP) {
+      UpdateStyleInternal(key, value, NAN,
+                          [=](float foo) { setStylePosition(kPositionEdgeTop, foo); });
+      return kTypeLayout;
+    } else if (key == RIGHT) {
+      UpdateStyleInternal(key, value, NAN,
+                          [=](float foo) { setStylePosition(kPositionEdgeRight, foo); });
+      return kTypeLayout;
+    } else if (key == BOTTOM) {
+      UpdateStyleInternal(key, value, NAN,
+                          [=](float foo) { setStylePosition(kPositionEdgeBottom, foo); });
+      return kTypeLayout;
+    } else if (key == MARGIN) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setMargin(kMarginALL, foo); });
+      return kTypeMargin;
+    } else if (key == MARGIN_LEFT) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setMargin(kMarginLeft, foo); });
+      return kTypeMargin;
+    } else if (key == MARGIN_TOP) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setMargin(kMarginTop, foo); });
+      return kTypeMargin;
+    } else if (key == MARGIN_RIGHT) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setMargin(kMarginRight, foo); });
+      return kTypeMargin;
+    } else if (key == MARGIN_BOTTOM) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setMargin(kMarginBottom, foo); });
+      return kTypeMargin;
+    } else if (key == BORDER_WIDTH) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setBorderWidth(kBorderWidthALL, foo); });
+      return kTypeBorder;
+    } else if (key == BORDER_TOP_WIDTH) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setBorderWidth(kBorderWidthTop, foo); });
+      return kTypeBorder;
+    } else if (key == BORDER_RIGHT_WIDTH) {
+      UpdateStyleInternal(key, value, 0,
+                          [=](float foo) { setBorderWidth(kBorderWidthRight, foo); });
+      return kTypeBorder;
+    } else if (key == BORDER_BOTTOM_WIDTH) {
+      UpdateStyleInternal(key, value, 0,
+                          [=](float foo) { setBorderWidth(kBorderWidthBottom, foo); });
+      return kTypeBorder;
+    } else if (key == BORDER_LEFT_WIDTH) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setBorderWidth(kBorderWidthLeft, foo); });
+      return kTypeBorder;
+    } else if (key == PADDING) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setPadding(kPaddingALL, foo); });
+      return kTypePadding;
+    } else if (key == PADDING_LEFT) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setPadding(kPaddingLeft, foo); });
+      return kTypePadding;
+    } else if (key == PADDING_TOP) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setPadding(kPaddingTop, foo); });
+      return kTypePadding;
+    } else if (key == PADDING_RIGHT) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setPadding(kPaddingRight, foo); });
+      return kTypePadding;
+    } else if (key == PADDING_BOTTOM) {
+      UpdateStyleInternal(key, value, 0, [=](float foo) { setPadding(kPaddingBottom, foo); });
+      return kTypePadding;
+    } else {
+      if (!insert) {
+        mapInsertOrAssign(mStyles, key, value);
+      }
+      return kTypeStyle;
+    }
+  }
+
+  const std::string RenderObject::GetStyle(const std::string &key) {
+    if (mStyles == nullptr)
+      return "";
+
+    std::map<std::string, std::string>::iterator iter = mStyles->find(key);
+    if (iter != mStyles->end()) {
+      return iter->second;
+    } else {
+      return "";
+    }
+  }
+
+  const std::string RenderObject::GetAttr(const std::string &key) {
+    if (mAttributes == nullptr)
+      return "";
+
+    std::map<std::string, std::string>::iterator iter = mAttributes->find(key);
+    if (iter != mAttributes->end()) {
+      return iter->second;
+    } else {
+      return "";
+    }
+  }
+
+  float RenderObject::GetViewPortWidth() {
+    if (mViewPortWidth >= 0)
+      return mViewPortWidth;
+
+    RenderPage *page = GetRenderPage();
+    if (page == nullptr)
+      return kDefaultViewPortWidth;
+
+    return page->ViewPortWidth();
+  }
+
+  int RenderObject::AddRenderObject(int index, RenderObject *child) {
+    if (child == nullptr || index < -1) {
+      return index;
+    }
+
+    Index count = getChildCount();
+    index = index >= count ? -1 : index;
+    if (index == -1) {
+      addChildAt(child, getChildCount());
+    } else {
+      addChildAt(child, index);
+    }
+
+    child->SetParentRender(this);
+
+    return index;
+  }
+
+  Index RenderObject::IndexOf(const RenderObject *render) {
+    if (render == nullptr) {
+      return -1;
+    } else {
+      int i = 0;
+      for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+        RenderObject *child = static_cast<RenderObject *>(*it);
+        if (child != nullptr) {
+          if (render->Ref() == child->Ref())
+            return i;
+        }
+        ++i;
+      }
+    }
+    return -1;
+  }
+
+  bool RenderObject::UpdateStyleInternal(const std::string key, const std::string value,
+                                         float fallback,
+                                         std::function<void(float)> functor) {
+    bool ret = false;
+    if (value.empty()) {
+      functor(fallback);
+      ret = true;
+    } else {
+      float fvalue = getFloatByViewport(value, GetViewPortWidth());
+      if (!isnan(fvalue)) {
+        functor(fvalue);
+        ret = true;
+      }
+    }
+    return ret;
+  }
+
+  void RenderObject::LayoutBefore() {
+    if (isDirty()) {
+      onLayoutBefore();
+    }
+
+    for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      RenderObject *child = static_cast<RenderObject *>(*it);
+      if (child != nullptr) {
+        child->LayoutBefore();
+      }
+    }
+  }
+
+  void RenderObject::LayoutAfter() {
+    if (hasNewLayout()) {
+      onLayoutAfter(getLayoutWidth(), getLayoutHeight());
+    }
+
+    for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+      RenderObject *child = static_cast<RenderObject *>(*it);
+      if (child != nullptr) {
+        child->LayoutAfter();
+      }
+    }
+  }
+
+  void RenderObject::copyFrom(RenderObject *src) {
+    IRenderObject::copyFrom(src);
+    this->mStyles->insert(src->mStyles->begin(), src->mStyles->end());
+    this->mAttributes->insert(src->mAttributes->begin(), src->mAttributes->end());
+    this->mEvents->insert(src->mEvents->begin(), src->mEvents->end());
+  }
+
+  void RenderObject::mapInsertOrAssign(std::map<std::string, std::string> *targetMap,
+                                       const std::string &key, const std::string &value) {
+    std::map<std::string, std::string>::iterator it = targetMap->find(key);
+    if (it != targetMap->end()) {
+      it->second = value;
+    } else {
+      targetMap->insert({key, value});
+    }
+  }
+
+  bool RenderObject::ViewInit() {
+    return (!isnan(getStyleWidth()) && getStyleWidth() > 0) ||
+           (IsRootRender() && GetRenderPage() != nullptr &&
+            GetRenderPage()->GetRenderContainerWidthWrapContent());
+  }
+
+  RenderPage *RenderObject::GetRenderPage() {
+    return RenderManager::GetInstance()->GetPage(PageId());
+  }
+
+  bool RenderObject::IsAppendTree() {
+    std::string append = GetAttr(APPEND);
+    if (append == "tree") {
+      return true;
+    }
+    return false;
+  }
+
+  void RenderObject::UpdateAttr(std::string key, std::string value) {
+    mapInsertOrAssign(mAttributes, key, value);
+  }
+
+  StyleType RenderObject::UpdateStyle(std::string key, std::string value) {
+    return ApplyStyle(key, value, true);
   }
 } //end WeexCore

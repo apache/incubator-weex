@@ -19,8 +19,8 @@
 #ifndef WEEX_PROJECT_RENDERCELLFACTORY_H
 #define WEEX_PROJECT_RENDERCELLFACTORY_H
 
-#include <core/render/node/render_cell.h>
-#include "i_render_factory.h"
+#include "core/render/node/render_cell.h"
+#include "core/render/node/factory/i_render_factory.h"
 
 namespace WeexCore {
 

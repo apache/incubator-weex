@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_createbody.h"
+
+#include "core/render/node/render_object.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_createbody.h"
 
 namespace WeexCore {
 
-  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId, const RenderObject *render) {
+  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId,
+                                                 const RenderObject *render) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
@@ -34,8 +37,12 @@ namespace WeexCore {
   }
 
   void RenderActionCreateBody::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                                          mStyles, mAttributes, mEvents,
-                                                                          mMargins, mPaddings, mBorders);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(mPageId.c_str(),
+                                                                        mComponentType.c_str(),
+                                                                        mRef.c_str(),
+                                                                        mStyles, mAttributes,
+                                                                        mEvents,
+                                                                        mMargins, mPaddings,
+                                                                        mBorders);
   }
 }

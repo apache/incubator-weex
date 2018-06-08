@@ -16,17 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_remove_element.h"
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_remove_element.h"
 
 namespace WeexCore {
 
-  RenderActionRemoveElement::RenderActionRemoveElement(const std::string &pageId, const std::string &ref) {
+  RenderActionRemoveElement::RenderActionRemoveElement(const std::string &pageId,
+                                                       const std::string &ref) {
     this->mPageId = pageId;
     this->mRef = ref;
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(), mRef.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(mPageId.c_str(),
+                                                                           mRef.c_str());
   }
 }

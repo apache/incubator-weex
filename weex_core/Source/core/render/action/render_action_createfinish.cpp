@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_createfinish.h"
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_createfinish.h"
 
 namespace WeexCore {
 
@@ -26,6 +27,6 @@ namespace WeexCore {
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
   }
 }

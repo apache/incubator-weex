@@ -16,26 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/render/action/render_action_add_element.h>
-#include <core/render/action/render_action_remove_element.h>
-#include <core/render/action/render_action_move_element.h>
-#include <core/render/action/render_action_createbody.h>
-#include <core/render/action/render_action_update_style.h>
-#include <core/render/action/render_action_update_attr.h>
-#include <core/render/action/render_action_layout.h>
-#include <core/render/action/render_action_createfinish.h>
-#include <core/render/action/render_action_appendtree_createfinish.h>
-#include <core/layout/layout.h>
-#include <core/moniter/render_performance.h>
-#include <core/config/core_environment.h>
-#include <base/ViewUtils.h>
-#include <core/render/action/render_action_add_event.h>
-#include <core/render/action/render_action_remove_event.h>
-#include <core/css/constants_value.h>
-#include <core/render/node/factory/render_type.h>
-#include <core/render/node/render_list.h>
-#include <core/manager/weex_core_manager.h>
-#include "render_page.h"
+#include "core/render/action/render_action_add_element.h"
+#include "core/render/action/render_action_remove_element.h"
+#include "core/render/action/render_action_move_element.h"
+#include "core/render/action/render_action_createbody.h"
+#include "core/render/action/render_action_update_style.h"
+#include "core/render/action/render_action_update_attr.h"
+#include "core/render/action/render_action_layout.h"
+#include "core/render/action/render_action_createfinish.h"
+#include "core/render/action/render_action_appendtree_createfinish.h"
+#include "core/layout/layout.h"
+#include "core/moniter/render_performance.h"
+#include "core/config/core_environment.h"
+#include "base/ViewUtils.h"
+#include "core/render/action/render_action_add_event.h"
+#include "core/render/action/render_action_remove_event.h"
+#include "core/css/constants_value.h"
+#include "core/render/node/factory/render_type.h"
+#include "core/render/node/render_list.h"
+#include "core/manager/weex_core_manager.h"
+#include "base/TimeUtils.h"
+#include "core/render/page/render_page.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
 
@@ -259,40 +260,40 @@ namespace WeexCore {
             if (margin == nullptr) {
               margin = new std::vector<std::pair<std::string, std::string>>();
             }
-            render->UpdateStyle((*iter).first,
-                                (*iter).second,
-                                0,
-                                [=, &flag](float foo) {
-                                  (*iter).second = to_string(foo),
-                                      margin->insert(margin->end(), (*iter)),
-                                  flag = true;
-                                });
+            render->UpdateStyleInternal((*iter).first,
+                                        (*iter).second,
+                                        0,
+                                        [=, &flag](float foo) {
+                                          (*iter).second = to_string(foo),
+                                              margin->insert(margin->end(), (*iter)),
+                                          flag = true;
+                                        });
             break;
           case kTypePadding:
             if (padding == nullptr) {
               padding = new std::vector<std::pair<std::string, std::string>>();
             }
-            render->UpdateStyle((*iter).first,
-                                (*iter).second,
-                                0,
-                                [=, &flag](float foo) {
-                                  (*iter).second = to_string(foo),
-                                      padding->insert(padding->end(), (*iter)),
-                                  flag = true;
-                                });
+            render->UpdateStyleInternal((*iter).first,
+                                        (*iter).second,
+                                        0,
+                                        [=, &flag](float foo) {
+                                          (*iter).second = to_string(foo),
+                                              padding->insert(padding->end(), (*iter)),
+                                          flag = true;
+                                        });
             break;
           case kTypeBorder:
             if (border == nullptr) {
               border = new std::vector<std::pair<std::string, std::string>>();
             }
-            render->UpdateStyle((*iter).first,
-                                (*iter).second,
-                                0,
-                                [=, &flag](float foo) {
-                                  (*iter).second = to_string(foo),
-                                      border->insert(border->end(), (*iter)),
-                                  flag = true;
-                                });
+            render->UpdateStyleInternal((*iter).first,
+                                        (*iter).second,
+                                        0,
+                                        [=, &flag](float foo) {
+                                          (*iter).second = to_string(foo),
+                                              border->insert(border->end(), (*iter)),
+                                          flag = true;
+                                        });
             break;
         }
       }
@@ -397,7 +398,7 @@ namespace WeexCore {
 
     render->AddEvent(event);
 
-    render_action *action = new RenderActionAddEvent(mPageId, ref, event);
+    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event);
     PostRenderAction(action);
     return true;
   }
@@ -409,7 +410,7 @@ namespace WeexCore {
 
     render->RemoveEvent(event);
 
-    render_action *action = new RenderActionRemoveEvent(mPageId, ref, event);
+    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event);
     PostRenderAction(action);
     return true;
   }
@@ -432,7 +433,7 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::PostRenderAction(render_action *action) {
+  void RenderPage::PostRenderAction(RenderAction *action) {
     if (action != nullptr) {
       action->ExecuteAction();
     }
@@ -471,7 +472,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    render_action *action = new RenderActionCreateBody(PageId(), render);
+    RenderAction *action = new RenderActionCreateBody(PageId(), render);
     PostRenderAction(action);
 
     Index i = 0;
@@ -495,7 +496,7 @@ namespace WeexCore {
         willLayout = false;
     }
 
-    render_action *action = new RenderActionAddElement(PageId(), child, parent, index, willLayout);
+    RenderAction *action = new RenderActionAddElement(PageId(), child, parent, index, willLayout);
     PostRenderAction(action);
 
     Index i = 0;
@@ -525,12 +526,12 @@ namespace WeexCore {
   }
 
   void RenderPage::SendRemoveElementAction(const std::string &ref) {
-    render_action *action = new RenderActionRemoveElement(PageId(), ref);
+    RenderAction *action = new RenderActionRemoveElement(PageId(), ref);
     PostRenderAction(action);
   }
 
   void RenderPage::SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index) {
-    render_action *action = new RenderActionMoveElement(PageId(), ref, parentRef, index);
+    RenderAction *action = new RenderActionMoveElement(PageId(), ref, parentRef, index);
     PostRenderAction(action);
   }
 
@@ -538,7 +539,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    render_action *action = new RenderActionLayout(PageId(), render, index);
+    RenderAction *action = new RenderActionLayout(PageId(), render, index);
     PostRenderAction(action);
   }
 
@@ -547,13 +548,13 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string>> *margin,
                                          std::vector<std::pair<std::string, std::string>> *padding,
                                          std::vector<std::pair<std::string, std::string>> *border) {
-    render_action *action = new RenderActionUpdateStyle(PageId(), render->Ref(), style, margin, padding, border);
+    RenderAction *action = new RenderActionUpdateStyle(PageId(), render->Ref(), style, margin, padding, border);
     PostRenderAction(action);
   }
 
   void RenderPage::SendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string>> *attrs) {
-    render_action *action = new RenderActionUpdateAttr(PageId(), render->Ref(), attrs);
+    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(), attrs);
     PostRenderAction(action);
   }
 
@@ -564,7 +565,7 @@ namespace WeexCore {
       vAttrs->insert(vAttrs->begin(), std::pair<std::string, std::string>(iter->first, iter->second));
     }
 
-    render_action *action = new RenderActionUpdateAttr(PageId(), render->Ref(), vAttrs);
+    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(), vAttrs);
     PostRenderAction(action);
 
     if (vAttrs != nullptr) {
@@ -575,12 +576,12 @@ namespace WeexCore {
   }
 
   void RenderPage::SendCreateFinishAction() {
-    render_action *action = new RenderActionCreateFinish(PageId());
+    RenderAction *action = new RenderActionCreateFinish(PageId());
     PostRenderAction(action);
   }
 
   void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {
-    render_action *action = new RenderActionAppendTreeCreateFinish(PageId(), ref);
+    RenderAction *action = new RenderActionAppendTreeCreateFinish(PageId(), ref);
     PostRenderAction(action);
   }
 
@@ -618,6 +619,15 @@ namespace WeexCore {
       CalculateLayout();
       needLayout.store(false);
       updateDirty(false);
+    }
+  }
+
+  RenderObject* RenderPage::GetRenderObject(const std::string &ref) {
+    std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
+    if (iter != mRenderObjectRegisterMap.end()) {
+      return iter->second;
+    } else {
+      return nullptr;
     }
   }
 

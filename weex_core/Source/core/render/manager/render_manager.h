@@ -21,8 +21,6 @@
 
 #include <map>
 #include <string>
-#include <stdbool.h>
-#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
 
@@ -52,20 +50,20 @@ namespace WeexCore {
     void Batch(const std::string &pageId);
 
     // create root node
-    bool CreatePage(std::string pageId, const char* data);
+    bool CreatePage(std::string pageId, const char *data);
 
     /** use auto constructor is bad idea, it cann't transfer binary, use char* is better */
     bool AddRenderObject(const std::string &pageId, const std::string &parentRef, int index,
-                         const char* data);
+                         const char *data);
 
     bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
 
     bool MoveRenderObject(const std::string &pageId, const std::string &ref,
-                     const std::string &parentRef, int index);
+                          const std::string &parentRef, int index);
 
-    bool UpdateAttr(const std::string &pageId, const std::string &ref, const char* data);
+    bool UpdateAttr(const std::string &pageId, const std::string &ref, const char *data);
 
-    bool UpdateStyle(const std::string &pageId, const std::string &ref, const char* data);
+    bool UpdateStyle(const std::string &pageId, const std::string &ref, const char *data);
 
     bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
 

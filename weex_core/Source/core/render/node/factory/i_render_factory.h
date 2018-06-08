@@ -19,7 +19,7 @@
 #ifndef WEEX_PROJECT_IRENDERFACTORY_H
 #define WEEX_PROJECT_IRENDERFACTORY_H
 
-#include "i_render_object.h"
+#include "core/render/node/factory/i_render_object.h"
 
 namespace WeexCore {
   class IRenderFactory {

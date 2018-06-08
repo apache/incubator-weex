@@ -16,21 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERTEXTAREAFACTORY_H
-#define WEEX_PROJECT_RENDERTEXTAREAFACTORY_H
-
-#include <core/render/node/render_textarea.h>
-#include "i_render_factory.h"
+#include "core/render/node/render_text.h"
+#include "core/render/page/render_page.h"
 
 namespace WeexCore {
 
-  class RenderTextAreaFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderTextArea();
-    }
-  };
+  void RenderText::UpdateAttr(std::string key, std::string value) {
+    RenderObject::UpdateAttr(key, value);
+    markDirty();
+  }
 
+  StyleType RenderText::UpdateStyle(std::string key, std::string value) {
+    StyleType resultType = RenderObject::ApplyStyle(key, value, true);
+    markDirty();
+    return resultType;
+  }
 }
-
-#endif //WEEX_PROJECT_RENDERTEXTAREAFACTORY_H

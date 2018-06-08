@@ -19,22 +19,16 @@
 #ifndef WEEX_PROJECT_RENDERTEXT_H
 #define WEEX_PROJECT_RENDERTEXT_H
 
-#include <core/render/node/render_object.h>
-#include <core/render/page/render_page.h>
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
   class RenderText : public RenderObject {
-  private:
-    inline void UpdateAttr(std::string key, std::string value) {
-      RenderObject::UpdateAttr(key, value);
-      markDirty();
-    }
 
-    inline StyleType UpdateStyle(std::string key, std::string value) {
-      StyleType resultType = RenderObject::ApplyStyle(key, value, true);
-      markDirty();
-      return resultType;
-    }
+  private:
+
+    void UpdateAttr(std::string key, std::string value);
+
+    StyleType UpdateStyle(std::string key, std::string value);
   };
 }
 

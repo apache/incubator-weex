@@ -16,17 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/render/manager/render_manager.h>
-#include <core/render/page/render_page.h>
-#include <core/render/node/render_object.h>
-#include <base/TimeUtils.h>
-#include <core/parser/dom_wson.h>
+#include "core/render/manager/render_manager.h"
+#include "core/render/page/render_page.h"
+#include "core/render/node/render_object.h"
+#include "base/TimeUtils.h"
+#include "core/parser/dom_wson.h"
+#include "core/layout/measure_func_adapter.h"
 
 namespace WeexCore {
 
   RenderManager *RenderManager::m_pInstance = nullptr;
 
-  bool RenderManager::CreatePage(std::string pageId, const  char* data) {
+  bool RenderManager::CreatePage(std::string pageId, const char *data) {
 
 #if RENDER_LOG
     wson_parser parser(data);
@@ -45,7 +46,7 @@ namespace WeexCore {
   }
 
   bool RenderManager::AddRenderObject(const std::string &pageId, const std::string &parentRef,
-                                      int index, const char* data) {
+                                      int index, const char *data) {
 
     RenderPage *page = GetPage(pageId);
     if (page == nullptr)
@@ -99,7 +100,7 @@ namespace WeexCore {
   }
 
   bool RenderManager::UpdateAttr(const std::string &pageId, const std::string &ref,
-                                 const char* data) {
+                                 const char *data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
@@ -111,7 +112,7 @@ namespace WeexCore {
 #endif
 
     long long startTime = getCurrentTime();
-    std::vector<std::pair<std::string, std::string>> *attrs = Wson2Pairs(data);
+    std::vector <std::pair<std::string, std::string>> *attrs = Wson2Pairs(data);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     page->updateDirty(true);
@@ -119,7 +120,7 @@ namespace WeexCore {
   }
 
   bool RenderManager::UpdateStyle(const std::string &pageId, const std::string &ref,
-                                  const char* data) {
+                                  const char *data) {
     RenderPage *page = this->GetPage(pageId);
     if (page == nullptr)
       return false;
@@ -131,7 +132,7 @@ namespace WeexCore {
 #endif
 
     long long startTime = getCurrentTime();
-    std::vector<std::pair<std::string, std::string>> *styles = Wson2Pairs(data);
+    std::vector <std::pair<std::string, std::string>> *styles = Wson2Pairs(data);
     page->ParseJsonTime(getCurrentTime() - startTime);
 
     page->updateDirty(true);

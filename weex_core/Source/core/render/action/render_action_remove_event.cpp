@@ -16,20 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "render_action_remove_event.h"
-#include <core/manager/weex_core_manager.h>
+
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_remove_event.h"
 
 namespace WeexCore {
 
-  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event) {
+  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &pageId,
+                                                   const std::string &ref,
+                                                   const std::string &event) {
     this->mPageId = pageId;
     this->mRef = ref;
     this->mEvent = event;
   }
 
   void RenderActionRemoveEvent::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
-    //Bridge_Impl_Android::getInstance()->callRemoveEvent(mPageId.c_str(), mRef.c_str(), mEvent.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(),
+                                                                         mRef.c_str(),
+                                                                         mEvent.c_str());
   }
-
 }

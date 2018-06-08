@@ -16,13 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_add_element.h"
+
+#include "core/render/node/render_object.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/action/render_action_add_element.h"
 
 namespace WeexCore {
 
-  RenderActionAddElement::RenderActionAddElement(const std::string &pageId, const RenderObject *render,
-                                                 const RenderObject *parent, int index, bool willLayout) {
+  RenderActionAddElement::RenderActionAddElement(const std::string &pageId,
+                                                 const RenderObject *render,
+                                                 const RenderObject *parent, int index,
+                                                 bool willLayout) {
     this->mAttributes = render->Attributes();
     this->mStyles = render->Styles();
     this->mEvents = render->Events();
@@ -38,8 +42,14 @@ namespace WeexCore {
   }
 
   void RenderActionAddElement::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                                          mIndex, mParentRef.c_str(), mStyles, mAttributes,
-                                                                          mEvents, mMargins, mPaddings, mBorders, mWillLayout);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(),
+                                                                        mComponentType.c_str(),
+                                                                        mRef.c_str(),
+                                                                        mIndex, mParentRef.c_str(),
+                                                                        mStyles,
+                                                                        mAttributes,
+                                                                        mEvents, mMargins,
+                                                                        mPaddings, mBorders,
+                                                                        mWillLayout);
   }
 }
