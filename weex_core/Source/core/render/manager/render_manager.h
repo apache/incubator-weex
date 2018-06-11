@@ -84,7 +84,7 @@ namespace WeexCore {
 
   private:
     static RenderManager *g_pInstance;
-    std::map<std::string, RenderPage *> pages;
+    std::map<std::string, RenderPage *> pages_;
   };
 }
 

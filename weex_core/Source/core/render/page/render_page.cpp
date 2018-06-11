@@ -83,9 +83,9 @@ namespace WeexCore {
 #endif
 
     long long startTime = getCurrentTime();
-    this->render_root->LayoutBefore();
+    this->render_root->LayoutBeforeImpl();
     this->render_root->calculateLayout(this->render_page_size);
-    this->render_root->LayoutAfter();
+    this->render_root->LayoutAfterImpl();
     CssLayoutTime(getCurrentTime() - startTime);
     TraverseTree(this->render_root, 0);
   }
@@ -133,7 +133,7 @@ namespace WeexCore {
   void RenderPage::SetRootRenderObject(RenderObject *root) {
     if (root != nullptr) {
       this->render_root = root;
-      this->render_root->MarkRootRender();
+      this->render_root->set_is_root_render();
     }
   }
 
@@ -161,7 +161,7 @@ namespace WeexCore {
     if (child == nullptr)
       return false;
 
-    RenderObject *parent = child->GetParentRender();
+    RenderObject *parent = child->parent_render();
     if (parent == nullptr)
       return false;
 
@@ -179,12 +179,12 @@ namespace WeexCore {
     if (child == nullptr)
       return false;
 
-    RenderObject *oldParent = child->GetParentRender();
+    RenderObject *oldParent = child->parent_render();
     RenderObject *newParent = GetRenderObject(parent_ref);
     if (oldParent == nullptr || newParent == nullptr)
       return false;
 
-    if (oldParent->Ref() == newParent->Ref()) {
+    if (oldParent->ref() == newParent->ref()) {
       if (oldParent->IndexOf(child) < 0) {
         return false;
       } else if (oldParent->IndexOf(child) == index) {
@@ -415,7 +415,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    std::string ref = render->Ref();
+    std::string ref = render->ref();
     this->render_object_registers.insert(std::pair<std::string, RenderObject *>(ref, render));
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
@@ -430,7 +430,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    this->render_object_registers.erase(render->Ref());
+    this->render_object_registers.erase(render->ref());
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
@@ -457,14 +457,14 @@ namespace WeexCore {
     }
 
     if (i > 0 && render->IsAppendTree()) {
-      SendAppendTreeCreateFinish(render->Ref());
+      SendAppendTreeCreateFinish(render->ref());
     }
   }
 
   void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion, bool will_layout) {
     if (child == nullptr || parent == nullptr)
       return;
-    if(parent != nullptr && parent->Type() == WeexCore::kRenderRecycleList){
+    if(parent != nullptr && parent->type() == WeexCore::kRenderRecycleList){
         will_layout = false;
     }
 
@@ -480,7 +480,7 @@ namespace WeexCore {
       ++i;
     }
 
-    if(child->Type() == WeexCore::kRenderRecycleList){
+    if(child->type() == WeexCore::kRenderRecycleList){
       RenderList* renderList = (RenderList*)child;
       std::vector<RenderObject*>& cellSlots = renderList->CellSlots();
       for(auto it = cellSlots.begin(); it != cellSlots.end(); it++) {
@@ -493,7 +493,7 @@ namespace WeexCore {
     }
 
     if (!is_recursion && i > 0 && child->IsAppendTree()) {
-      SendAppendTreeCreateFinish(child->Ref());
+      SendAppendTreeCreateFinish(child->ref());
     }
   }
 
@@ -520,13 +520,13 @@ namespace WeexCore {
                                          std::vector<std::pair<std::string, std::string>> *margin,
                                          std::vector<std::pair<std::string, std::string>> *padding,
                                          std::vector<std::pair<std::string, std::string>> *border) {
-    RenderAction *action = new RenderActionUpdateStyle(PageId(), render->Ref(), style, margin, padding, border);
+    RenderAction *action = new RenderActionUpdateStyle(PageId(), render->ref(), style, margin, padding, border);
     PostRenderAction(action);
   }
 
   void RenderPage::SendUpdateAttrAction(RenderObject *render,
                                         std::vector<std::pair<std::string, std::string>> *attrs) {
-    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(), attrs);
+    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->ref(), attrs);
     PostRenderAction(action);
   }
 
@@ -537,7 +537,7 @@ namespace WeexCore {
       vAttrs->insert(vAttrs->begin(), std::pair<std::string, std::string>(iter->first, iter->second));
     }
 
-    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->Ref(), vAttrs);
+    RenderAction *action = new RenderActionUpdateAttr(PageId(), render->ref(), vAttrs);
     PostRenderAction(action);
 
     if (vAttrs != nullptr) {

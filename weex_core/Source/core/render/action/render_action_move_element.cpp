@@ -25,16 +25,16 @@ namespace WeexCore {
   RenderActionMoveElement::RenderActionMoveElement(const std::string &page_id,
                                                    const std::string &ref,
                                                    const std::string &parent_ref, int index) {
-    this->page_id = page_id;
-    this->ref = ref;
-    this->parent_ref = parent_ref;
-    this->index = index;
+    this->page_id_ = page_id;
+    this->ref_ = ref;
+    this->parent_ref_ = parent_ref;
+    this->index_ = index;
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(this->page_id.c_str(),
-                                                                         this->ref.c_str(),
-                                                                         this->parent_ref.c_str(),
-                                                                         this->index);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(this->page_id_.c_str(),
+                                                                         this->ref_.c_str(),
+                                                                         this->parent_ref_.c_str(),
+                                                                         this->index_);
   }
 }

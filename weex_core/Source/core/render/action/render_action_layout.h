@@ -41,15 +41,15 @@ namespace WeexCore {
     void GetLayoutInfo(const WXCoreLayoutNode *node);
 
   public:
-    std::string page_id;
-    std::string ref;
-    float width;
-    float height;
-    float top;
-    float left;
-    float bottom;
-    float right;
-    int index;
+    std::string page_id_;
+    std::string ref_;
+    float width_;
+    float height_;
+    float top_;
+    float left_;
+    float bottom_;
+    float right_;
+    int index_;
   };
 }
 

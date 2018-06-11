@@ -24,12 +24,12 @@ namespace WeexCore {
 
   RenderActionRemoveElement::RenderActionRemoveElement(const std::string &page_id,
                                                        const std::string &ref) {
-    this->page_id = page_id;
-    this->ref = ref;
+    this->page_id_ = page_id;
+    this->ref_ = ref;
   }
 
   void RenderActionRemoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(this->page_id.c_str(),
-                                                                           this->ref.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveElement(this->page_id_.c_str(),
+                                                                           this->ref_.c_str());
   }
 }

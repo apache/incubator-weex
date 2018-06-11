@@ -29,42 +29,42 @@ namespace WeexCore {
 
   public:
 
-    inline void SetRef(std::string ref) {
-      this->ref = ref;
+    inline void set_ref(std::string ref) {
+      this->ref_ = ref;
     }
 
-    inline const std::string &Ref() const {
-      return this->ref;
+    inline const std::string &ref() const {
+      return this->ref_;
     }
 
-    inline void SetPageId(std::string page_id) {
-      this->page_id = page_id;
+    inline void set_page_id(std::string page_id) {
+      this->page_id_ = page_id;
     }
 
-    inline const std::string &PageId() const {
-      return this->page_id;
+    inline const std::string &page_id() const {
+      return this->page_id_;
     }
 
-    inline void SetType(std::string type) {
-      this->tyle = type;
+    inline void set_type(std::string type) {
+      this->tyle_ = type;
     }
 
-    inline const std::string &Type() const {
-      return this->tyle;
+    inline const std::string &type() const {
+      return this->tyle_;
     }
 
-    inline void copyFrom(IRenderObject *src) {
+    inline void CopyFrom(IRenderObject *src) {
       WXCoreLayoutNode::copyFrom(src);
-      SetRef(src->Ref());
-      SetPageId(src->PageId());
-      SetType(src->Type());
+      set_ref(src->ref());
+      set_page_id(src->page_id());
+      set_type(src->type());
     }
 
   private:
 
-    std::string page_id = "";
-    std::string ref = "";
-    std::string tyle = "";
+    std::string page_id_ = "";
+    std::string ref_ = "";
+    std::string tyle_ = "";
   };
 }
 

@@ -35,9 +35,9 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    std::string page_id;
-    std::string ref;
-    std::vector<std::pair<std::string, std::string>> *attrs;
+    std::string page_id_;
+    std::string ref_;
+    std::vector<std::pair<std::string, std::string>> *attrs_;
   };
 }
 

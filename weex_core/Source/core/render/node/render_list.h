@@ -30,19 +30,19 @@ namespace WeexCore {
 
     ~RenderList();
 
-    void addCellSlotCopyTrack(RenderObject *cellSlot);
+    void set_flex(const float flex);
 
-    void setFlex(const float flex);
+    void AddCellSlotCopyTrack(RenderObject *cellSlot);
 
-    std::map <std::string, std::string> *GetDefaultStyle();
+    std::map<std::string, std::string> *GetDefaultStyle();
 
-    std::map <std::string, std::string> *GetDefaultAttr();
+    std::map<std::string, std::string> *GetDefaultAttr();
 
-    void preCalculateCellWidth();
+    void PreCalculateCellWidth();
 
-    std::string calcSpanOffset();
+    std::string CalculateSpanOffset();
 
-    float getStyleWidth();
+    float TakeStyleWidth();
 
     int AddRenderObject(int index, RenderObject *child);
 
@@ -50,38 +50,39 @@ namespace WeexCore {
 
     void UpdateAttr(std::string key, std::string value);
 
-    float getColumnCount();
+    float TakeColumnCount();
 
-    float getColumnGap();
+    float TakeColumnGap();
 
-    float getColumnWidth();
+    float TakeColumnWidth();
 
-    float getLeftGap();
+    float TakeLeftGap();
 
-    float getRightGap();
+    float TakeRightGap();
 
-    int getOrientation();
+    int TakeOrientation();
 
-    inline float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
+    inline float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
+                                                 const float &currentLength) const override {
       return NAN;
     }
 
     inline std::vector<RenderObject *> &CellSlots() {
-      return cell_slots;
+      return cell_slots_;
     }
 
   private:
 
-    bool is_pre_calculate_cell_width = false;
-    int column_count = COLUMN_COUNT_NORMAL;
-    float column_width = AUTO_VALUE;
-    float available_width = 0;
-    float column_gap = COLUMN_GAP_NORMAL;
-    bool is_set_flex = false;
-    std::vector<RenderObject *> cell_slots;
-    std::vector<RenderObject *> cell_slots_copys;
-    float left_gap = 0;
-    float right_gap = 0;
+    bool is_pre_calculate_cell_width_ = false;
+    int column_count_ = COLUMN_COUNT_NORMAL;
+    float column_width_ = AUTO_VALUE;
+    float available_width_ = 0;
+    float column_gap_ = COLUMN_GAP_NORMAL;
+    bool is_set_flex_ = false;
+    std::vector<RenderObject *> cell_slots_;
+    std::vector<RenderObject *> cell_slots_copys_;
+    float left_gap_ = 0;
+    float right_gap_ = 0;
   };
 }
 

@@ -34,10 +34,10 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    std::string page_id;
-    std::string ref;
-    std::string parent_ref;
-    int index;
+    std::string page_id_;
+    std::string ref_;
+    std::string parent_ref_;
+    int index_;
   };
 }
 

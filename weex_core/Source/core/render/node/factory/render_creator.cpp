@@ -48,8 +48,8 @@ namespace WeexCore {
     }
 
     IRenderObject *render = factory->CreateRender();
-    render->SetRef(ref);
-    render->SetType(type);
+    render->set_ref(ref);
+    render->set_type(type);
     delete factory;
     return render;
   }

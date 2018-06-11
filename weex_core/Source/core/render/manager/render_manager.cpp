@@ -35,7 +35,7 @@ namespace WeexCore {
 #endif
 
     RenderPage *page = new RenderPage(page_id);
-    this->pages.insert(std::pair<std::string, RenderPage *>(page_id, page));
+    this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
     long long startTime = getCurrentTime();
     RenderObject *root = Wson2RenderObject(data, page_id);
@@ -183,8 +183,8 @@ namespace WeexCore {
   }
 
   RenderPage *RenderManager::GetPage(const std::string &page_id) {
-    std::map<std::string, RenderPage *>::iterator iter = this->pages.find(page_id);
-    if (iter != this->pages.end()) {
+    std::map<std::string, RenderPage *>::iterator iter = this->pages_.find(page_id);
+    if (iter != this->pages_.end()) {
       return iter->second;
     } else {
       return nullptr;
@@ -200,7 +200,7 @@ namespace WeexCore {
     LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
 #endif
     page->OnRenderPageClose();
-    this->pages.erase(page_id);
+    this->pages_.erase(page_id);
     delete page;
     page = nullptr;
   }

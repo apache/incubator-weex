@@ -35,17 +35,17 @@ namespace WeexCore {
 
     std::string prop = isVertical ? HEIGHT : WIDTH;
 
-    if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex) {
+    if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex_) {
       style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-    } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex) {
+    } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex_) {
       style->insert(std::pair<std::string, std::string>(FLEX, "1"));
     }
 
     return style;
   }
 
-  void RenderScroller::setFlex(const float flex) {
-    this->is_set_flex = true;
-    WXCoreLayoutNode::setFlex(flex);
+  void RenderScroller::set_flex(const float flex) {
+    this->is_set_flex_ = true;
+    WXCoreLayoutNode::set_flex(flex);
   }
 }
