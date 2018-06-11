@@ -23,33 +23,35 @@
 
 namespace WeexCore {
 
-  RenderActionAddElement::RenderActionAddElement(const std::string &pageId,
+  RenderActionAddElement::RenderActionAddElement(const std::string &page_id,
                                                  const RenderObject *render,
                                                  const RenderObject *parent, int index,
-                                                 bool willLayout) {
-    this->mAttributes = render->Attributes();
-    this->mStyles = render->Styles();
-    this->mEvents = render->Events();
-    this->mMargins = render->GetMargins();
-    this->mPaddings = render->GetPaddings();
-    this->mBorders = render->GetBorders();
-    this->mPageId = pageId;
-    this->mComponentType = render->Type();
-    this->mRef = render->Ref();
-    this->mParentRef = parent->Ref();
-    this->mIndex = index;
-    this->mWillLayout = willLayout;
+                                                 bool will_layout) {
+    this->attributes = render->Attributes();
+    this->styles = render->Styles();
+    this->events = render->Events();
+    this->margins = render->GetMargins();
+    this->paddings = render->GetPaddings();
+    this->borders = render->GetBorders();
+    this->page_id = page_id;
+    this->component_type = render->Type();
+    this->ref = render->Ref();
+    this->parent_ref = parent->Ref();
+    this->index = index;
+    this->will_layout = will_layout;
   }
 
   void RenderActionAddElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(),
-                                                                        mComponentType.c_str(),
-                                                                        mRef.c_str(),
-                                                                        mIndex, mParentRef.c_str(),
-                                                                        mStyles,
-                                                                        mAttributes,
-                                                                        mEvents, mMargins,
-                                                                        mPaddings, mBorders,
-                                                                        mWillLayout);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(this->page_id.c_str(),
+                                                                        this->component_type.c_str(),
+                                                                        this->ref.c_str(),
+                                                                        this->index,
+                                                                        this->parent_ref.c_str(),
+                                                                        this->styles,
+                                                                        this->attributes,
+                                                                        this->events, this->margins,
+                                                                        this->paddings,
+                                                                        this->borders,
+                                                                        this->will_layout);
   }
 }

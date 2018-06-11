@@ -23,26 +23,28 @@
 
 namespace WeexCore {
 
-  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId,
+  RenderActionCreateBody::RenderActionCreateBody(const std::string &page_id,
                                                  const RenderObject *render) {
-    this->mAttributes = render->Attributes();
-    this->mStyles = render->Styles();
-    this->mEvents = render->Events();
-    this->mMargins = render->GetMargins();
-    this->mPaddings = render->GetPaddings();
-    this->mBorders = render->GetBorders();
-    this->mPageId = pageId;
-    this->mComponentType = render->Type();
-    this->mRef = render->Ref();
+    this->attributes = render->Attributes();
+    this->styles = render->Styles();
+    this->events = render->Events();
+    this->margins = render->GetMargins();
+    this->paddings = render->GetPaddings();
+    this->borders = render->GetBorders();
+    this->page_id = page_id;
+    this->component_type = render->Type();
+    this->ref = render->Ref();
   }
 
   void RenderActionCreateBody::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(mPageId.c_str(),
-                                                                        mComponentType.c_str(),
-                                                                        mRef.c_str(),
-                                                                        mStyles, mAttributes,
-                                                                        mEvents,
-                                                                        mMargins, mPaddings,
-                                                                        mBorders);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(this->page_id.c_str(),
+                                                                        this->component_type.c_str(),
+                                                                        this->ref.c_str(),
+                                                                        this->styles,
+                                                                        this->attributes,
+                                                                        this->events,
+                                                                        this->margins,
+                                                                        this->paddings,
+                                                                        this->borders);
   }
 }

@@ -22,15 +22,16 @@
 
 namespace WeexCore {
 
-  RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string>> *mAttrs) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mAttrs = mAttrs;
+  RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &page_id, const std::string &ref,
+                                                 std::vector<std::pair<std::string, std::string>> *attrs) {
+    this->page_id = page_id;
+    this->ref = ref;
+    this->attrs = attrs;
   }
 
   void RenderActionUpdateAttr::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(mPageId.c_str(),
-                                                                        mRef.c_str(), mAttrs);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(this->page_id.c_str(),
+                                                                        this->ref.c_str(),
+                                                                        this->attrs);
   }
 }

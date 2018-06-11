@@ -22,17 +22,17 @@
 
 namespace WeexCore {
 
-  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &pageId,
+  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &page_id,
                                                    const std::string &ref,
                                                    const std::string &event) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mEvent = event;
+    this->page_id = page_id;
+    this->ref = ref;
+    this->event = event;
   }
 
   void RenderActionRemoveEvent::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(mPageId.c_str(),
-                                                                         mRef.c_str(),
-                                                                         mEvent.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(this->page_id.c_str(),
+                                                                         this->ref.c_str(),
+                                                                         this->event.c_str());
   }
 }

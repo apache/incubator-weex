@@ -33,25 +33,25 @@ namespace WeexCore {
   class RenderActionAddElement : public RenderAction {
 
   public:
-    explicit RenderActionAddElement(const std::string &pageId, const RenderObject *render,
+    explicit RenderActionAddElement(const std::string &page_id, const RenderObject *render,
                                     const RenderObject *parent,
-                                    int index, bool willLayout = true);
+                                    int index, bool will_layout = true);
 
     void ExecuteAction();
 
   public:
-    std::map<std::string, std::string> *mStyles;
-    std::map<std::string, std::string> *mAttributes;
-    std::set<std::string> *mEvents;
-    WXCoreMargin mMargins;
-    WXCorePadding mPaddings;
-    WXCoreBorderWidth mBorders;
-    std::string mPageId;
-    std::string mComponentType;
-    std::string mParentRef;
-    std::string mRef;
-    int mIndex;
-    bool mWillLayout;
+    std::map<std::string, std::string> *styles;
+    std::map<std::string, std::string> *attributes;
+    std::set<std::string> *events;
+    WXCoreMargin margins;
+    WXCorePadding paddings;
+    WXCoreBorderWidth borders;
+    std::string page_id;
+    std::string component_type;
+    std::string parent_ref;
+    std::string ref;
+    int index;
+    bool will_layout;
   };
 }
 

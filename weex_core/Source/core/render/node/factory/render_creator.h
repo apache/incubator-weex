@@ -36,8 +36,8 @@ namespace WeexCore {
     class Garbo {
     public:
       ~Garbo() {
-        if (RenderCreator::m_pInstance) {
-          delete RenderCreator::m_pInstance;
+        if (RenderCreator::g_pInstance) {
+          delete RenderCreator::g_pInstance;
         }
       }
     };
@@ -47,16 +47,16 @@ namespace WeexCore {
   public:
 
     static RenderCreator *GetInstance() {
-      if (!m_pInstance) {
-        m_pInstance = new RenderCreator();
+      if (!g_pInstance) {
+        g_pInstance = new RenderCreator();
       }
-      return m_pInstance;
+      return g_pInstance;
     }
 
     IRenderObject *CreateRender(const std::string &type, const std::string &ref);
 
   private:
-    static RenderCreator *m_pInstance;
+    static RenderCreator *g_pInstance;
   };
 }
 

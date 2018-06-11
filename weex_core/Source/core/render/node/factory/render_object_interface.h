@@ -30,27 +30,27 @@ namespace WeexCore {
   public:
 
     inline void SetRef(std::string ref) {
-      mRef = ref;
+      this->ref = ref;
     }
 
     inline const std::string &Ref() const {
-      return mRef;
+      return this->ref;
     }
 
-    inline void SetPageId(std::string pageId) {
-      this->mPageId = pageId;
+    inline void SetPageId(std::string page_id) {
+      this->page_id = page_id;
     }
 
     inline const std::string &PageId() const {
-      return mPageId;
+      return this->page_id;
     }
 
     inline void SetType(std::string type) {
-      mType = type;
+      this->tyle = type;
     }
 
     inline const std::string &Type() const {
-      return mType;
+      return this->tyle;
     }
 
     inline void copyFrom(IRenderObject *src) {
@@ -62,9 +62,9 @@ namespace WeexCore {
 
   private:
 
-    std::string mPageId = "";
-    std::string mRef = "";
-    std::string mType = "";
+    std::string page_id = "";
+    std::string ref = "";
+    std::string tyle = "";
   };
 }
 

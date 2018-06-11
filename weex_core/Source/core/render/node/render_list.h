@@ -67,21 +67,21 @@ namespace WeexCore {
     }
 
     inline std::vector<RenderObject *> &CellSlots() {
-      return cellSlots;
+      return cell_slots;
     }
 
   private:
 
-    bool mIsPreCalculateCellWidth = false;
-    int mColumnCount = COLUMN_COUNT_NORMAL;
-    float mColumnWidth = AUTO_VALUE;
-    float mAvailableWidth = 0;
-    float mColumnGap = COLUMN_GAP_NORMAL;
-    bool mIsSetFlex = false;
-    std::vector<RenderObject *> cellSlots;
-    std::vector<RenderObject *> cellSlotsCopys;
-    float mLeftGap = 0;
-    float mRightGap = 0;
+    bool is_pre_calculate_cell_width = false;
+    int column_count = COLUMN_COUNT_NORMAL;
+    float column_width = AUTO_VALUE;
+    float available_width = 0;
+    float column_gap = COLUMN_GAP_NORMAL;
+    bool is_set_flex = false;
+    std::vector<RenderObject *> cell_slots;
+    std::vector<RenderObject *> cell_slots_copys;
+    float left_gap = 0;
+    float right_gap = 0;
   };
 }
 

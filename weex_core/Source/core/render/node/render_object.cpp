@@ -29,29 +29,29 @@
 namespace WeexCore {
 
   RenderObject::RenderObject() {
-    mStyles = new std::map<std::string, std::string>();
-    mAttributes = new std::map<std::string, std::string>();
-    mEvents = new std::set<std::string>();
-    mIsRootRender = false;
+    this->styles = new std::map<std::string, std::string>();
+    this->attributes = new std::map<std::string, std::string>();
+    this->events = new std::set<std::string>();
+    this->is_root_render = false;
   }
 
   RenderObject::~RenderObject() {
 
-    mParentRender = nullptr;
+    this->parent_render = nullptr;
 
-    if (mStyles != nullptr) {
-      delete mStyles;
-      mStyles = nullptr;
+    if (this->styles != nullptr) {
+      delete this->styles;
+      this->styles = nullptr;
     }
 
-    if (mAttributes != nullptr) {
-      delete mAttributes;
-      mAttributes = nullptr;
+    if (this->attributes != nullptr) {
+      delete this->attributes;
+      this->attributes = nullptr;
     }
 
-    if (mEvents != nullptr) {
-      delete mEvents;
-      mEvents = nullptr;
+    if (this->events != nullptr) {
+      delete this->events;
+      this->events = nullptr;
     }
 
     for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
@@ -130,7 +130,7 @@ namespace WeexCore {
     bool insert = false;
     if (value.length() > 0 &&
         (value.at(0) == JSON_OBJECT_MARK_CHAR || value.at(0) == JSON_ARRAY_MARK_CHAR)) {
-      mapInsertOrAssign(mStyles, key, value);
+      mapInsertOrAssign(this->styles, key, value);
       insert = true;
     }
 
@@ -184,9 +184,9 @@ namespace WeexCore {
     } else if (key == POSITION) {
       setStylePositionType(GetWXCorePositionType(value));
       if (value == STICKY) {
-        mIsSticky = true;
+        this->is_sticky = true;
       }
-      mapInsertOrAssign(mStyles, key, value);
+      mapInsertOrAssign(this->styles, key, value);
       return kTypeStyle;
     } else if (key == LEFT) {
       UpdateStyleInternal(key, value, NAN,
@@ -253,18 +253,18 @@ namespace WeexCore {
       return kTypePadding;
     } else {
       if (!insert) {
-        mapInsertOrAssign(mStyles, key, value);
+        mapInsertOrAssign(this->styles, key, value);
       }
       return kTypeStyle;
     }
   }
 
   const std::string RenderObject::GetStyle(const std::string &key) {
-    if (mStyles == nullptr)
+    if (this->styles == nullptr)
       return "";
 
-    std::map<std::string, std::string>::iterator iter = mStyles->find(key);
-    if (iter != mStyles->end()) {
+    std::map<std::string, std::string>::iterator iter = this->styles->find(key);
+    if (iter != this->styles->end()) {
       return iter->second;
     } else {
       return "";
@@ -272,11 +272,11 @@ namespace WeexCore {
   }
 
   const std::string RenderObject::GetAttr(const std::string &key) {
-    if (mAttributes == nullptr)
+    if (this->attributes == nullptr)
       return "";
 
-    std::map<std::string, std::string>::iterator iter = mAttributes->find(key);
-    if (iter != mAttributes->end()) {
+    std::map<std::string, std::string>::iterator iter = this->attributes->find(key);
+    if (iter != this->attributes->end()) {
       return iter->second;
     } else {
       return "";
@@ -284,8 +284,8 @@ namespace WeexCore {
   }
 
   float RenderObject::GetViewPortWidth() {
-    if (mViewPortWidth >= 0)
-      return mViewPortWidth;
+    if (this->viewport_width >= 0)
+      return this->viewport_width;
 
     RenderPage *page = GetRenderPage();
     if (page == nullptr)
@@ -374,9 +374,9 @@ namespace WeexCore {
 
   void RenderObject::copyFrom(RenderObject *src) {
     IRenderObject::copyFrom(src);
-    this->mStyles->insert(src->mStyles->begin(), src->mStyles->end());
-    this->mAttributes->insert(src->mAttributes->begin(), src->mAttributes->end());
-    this->mEvents->insert(src->mEvents->begin(), src->mEvents->end());
+    this->styles->insert(src->styles->begin(), src->styles->end());
+    this->attributes->insert(src->attributes->begin(), src->attributes->end());
+    this->events->insert(src->events->begin(), src->events->end());
   }
 
   void RenderObject::mapInsertOrAssign(std::map<std::string, std::string> *targetMap,
@@ -408,7 +408,7 @@ namespace WeexCore {
   }
 
   void RenderObject::UpdateAttr(std::string key, std::string value) {
-    mapInsertOrAssign(mAttributes, key, value);
+    mapInsertOrAssign(this->attributes, key, value);
   }
 
   StyleType RenderObject::UpdateStyle(std::string key, std::string value) {

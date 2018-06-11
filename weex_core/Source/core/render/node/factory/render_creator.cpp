@@ -29,7 +29,7 @@
 
 namespace WeexCore {
 
-  RenderCreator *RenderCreator::m_pInstance = nullptr;
+  RenderCreator *RenderCreator::g_pInstance = nullptr;
 
   IRenderObject *RenderCreator::CreateRender(const std::string &type, const std::string &ref) {
     IRenderFactory *factory;
