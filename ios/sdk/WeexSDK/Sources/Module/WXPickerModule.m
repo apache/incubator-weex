@@ -269,7 +269,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
         tapGesture.delegate = self;
     }
     [self.backgroundView addGestureRecognizer:tapGesture];
@@ -471,7 +471,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
         tapGesture.delegate = self;
     }
     [self.backgroundView addGestureRecognizer:tapGesture];
