@@ -44,7 +44,7 @@
     "build:runtime": "node build/build.js runtime",
     "build:legacy": "node build/build.js legacy",
     "build:vanilla": "node build/build.js vanilla",
-    "install:buildtools": "npm i webpack@^1.0 rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime",
+    "install:buildtools": "npm i webpack@^1.0 rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime uglify-es eslint-plugin-flowtype eslint",
     "build:source": "npm run build:native",
     "build:examples": "npm run build:examples:native && npm run build:examples:web",
     "build:examples:native": "webpack --config build/webpack.examples.config.js",

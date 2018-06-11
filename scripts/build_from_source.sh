@@ -31,8 +31,8 @@ npm run build:source
 echo "Javascript Framework and HTML5 SDK build completed."
 sleep 2
 
-cp packages/weex-js-framework/index.min.js ios_sdk/WeexSDK/Resources/main.js
-cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js
+cp pre-build/weex-js-framework.min.js ios_sdk/WeexSDK/Resources/main.js
+cp pre-build/weex-js-framework.min.js android_sdk/assets/main.js
 
 gradle wrapper --gradle-version 3.3
 echo 'include ":android_sdk"'>settings.gradle
