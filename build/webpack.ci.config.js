@@ -48,7 +48,8 @@ walk();
 
 var banner = '// { "framework": "Vue" }\n'
 
-var bannerPlugin = new webpack.BannerPlugin(banner, {
+var bannerPlugin = new webpack.BannerPlugin({
+  banner,
   raw: true,
   exclude: bannerExcludeFiles
 })
@@ -56,14 +57,14 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
 module.exports = {
   entry: entry,
   output : {
-    path: '.',
+    path: path.resolve(__dirname, '..'),
     filename: '[name].js'
   },
   module: {
     loaders: [
       {
         test: /\.(we|vue)(\?[^?]+)?$/,
-        loader: 'weex'
+        loader: 'weex-loader'
       }
     ]
   },

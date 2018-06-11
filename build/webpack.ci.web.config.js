@@ -56,7 +56,8 @@ walk();
 
 var banner = '// NOTE: for vue2.0 and platform:web only.\n'
 
-var bannerPlugin = new webpack.BannerPlugin(banner, {
+var bannerPlugin = new webpack.BannerPlugin({
+  banner,
   raw: true,
   exclude: bannerExcludeFiles
 })
@@ -67,7 +68,7 @@ module.exports = {
     // 'examples/build/web/vue-bundle': path.resolve('examples/vue', 'entry.js')
   // },
   output: {
-    path: '.',
+    path: path.resolve(__dirname, '..'),
     filename: '[name].js'
   },
   module: {
