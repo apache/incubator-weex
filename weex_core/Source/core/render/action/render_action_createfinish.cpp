@@ -23,10 +23,10 @@
 namespace WeexCore {
 
   RenderActionCreateFinish::RenderActionCreateFinish(const std::string &page_id) {
-    this->page_id = page_id;
+    this->page_id_ = page_id;
   }
 
   void RenderActionCreateFinish::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(this->page_id.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(this->page_id_.c_str());
   }
 }

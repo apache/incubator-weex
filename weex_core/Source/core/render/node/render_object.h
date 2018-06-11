@@ -49,13 +49,14 @@ namespace WeexCore {
 
   public:
 
-    void LayoutBefore();
+    void LayoutBeforeImpl();
 
-    void LayoutAfter();
+    void LayoutAfterImpl();
 
-    void copyFrom(RenderObject* src);
+    void CopyFrom(RenderObject *src);
 
-    void mapInsertOrAssign(std::map<std::string, std::string> *targetMap, const std::string& key, const std::string& value);
+    void MapInsertOrAssign(std::map<std::string, std::string> *targetMap, const std::string &key,
+                           const std::string &value);
 
     bool ViewInit();
 
@@ -80,9 +81,9 @@ namespace WeexCore {
 
     void BindMeasureFunc();
 
-    void onLayoutBefore();
+    void OnLayoutBefore();
 
-    void onLayoutAfter(float width, float height);
+    void OnLayoutAfter(float width, float height);
 
     virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating);
 
@@ -108,74 +109,61 @@ namespace WeexCore {
 
     bool IsAppendTree();
 
-    inline RenderObject *GetChild(const Index &index) {
-      return static_cast<RenderObject*>(getChildAt(index));
+    RenderObject *GetChild(const Index &index);
+
+    void RemoveRenderObject(RenderObject *child);
+
+    void AddAttr(std::string key, std::string value);
+
+    StyleType AddStyle(std::string key, std::string value);
+
+    void AddEvent(std::string event);
+
+    void RemoveEvent(const std::string &event);
+
+  public:
+
+    inline void set_parent_render(RenderObject *render) {
+      this->parent_render_ = render;
     }
 
-    inline void RemoveRenderObject(RenderObject *child) {
-      removeChild(child);
+    inline RenderObject *parent_render() {
+      return this->parent_render_;
     }
 
-    inline void AddAttr(std::string key, std::string value) {
-      mapInsertOrAssign(this->attributes, key, value);
+    inline std::map<std::string, std::string> *styles() const {
+      return this->styles_;
     }
 
-    inline StyleType AddStyle(std::string key, std::string value) {
-      return ApplyStyle(key, value, false);
+    inline std::map<std::string, std::string> * attributes() const {
+      return this->attributes_;
     }
 
-    inline void AddEvent(std::string event) {
-      if (this->events == nullptr || this->events->empty()) {
-        this->events = new std::set<std::string>();
-      }
-      this->events->insert(event);
+    inline std::set<std::string> *events() const {
+      return this->events_;
     }
 
-    inline void RemoveEvent(const std::string &event) {
-      this->events->erase(event);
+    inline void set_is_root_render() {
+      this->is_root_render_ = true;
     }
 
-    inline void SetParentRender(RenderObject *render) {
-      this->parent_render = render;
+    inline bool is_root_render() {
+      return this->is_root_render_;
     }
 
-    inline RenderObject *GetParentRender() {
-      return this->parent_render;
-    }
-
-    inline std::map<std::string, std::string> *Styles() const {
-      return this->styles;
-    }
-
-    inline std::map<std::string, std::string> * Attributes() const {
-      return this->attributes;
-    }
-
-    inline std::set<std::string> *Events() const {
-      return this->events;
-    }
-
-    inline void MarkRootRender() {
-      this->is_root_render = true;
-    }
-
-    inline bool IsRootRender() {
-      return this->is_root_render;
-    }
-
-    inline bool IsSticky() {
-      return this->is_sticky;
+    inline bool is_sticky() {
+      return this->is_sticky_;
     }
 
   private:
 
-    RenderObject *parent_render;
-    std::map<std::string, std::string> *styles;
-    std::map<std::string, std::string> *attributes;
-    std::set<std::string> *events;
-    float viewport_width = -1;
-    bool is_root_render;
-    bool is_sticky = false;
+    RenderObject *parent_render_;
+    std::map<std::string, std::string> *styles_;
+    std::map<std::string, std::string> *attributes_;
+    std::set<std::string> *events_;
+    float viewport_width_ = -1;
+    bool is_root_render_;
+    bool is_sticky_ = false;
   };
 } //end WeexCore
 #endif //RenderObject_h

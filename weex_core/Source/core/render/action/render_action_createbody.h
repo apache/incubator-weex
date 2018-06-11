@@ -37,15 +37,15 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    std::map<std::string, std::string> *styles;
-    std::map<std::string, std::string> *attributes;
-    std::set<std::string> *events;
-    WXCoreMargin margins;
-    WXCorePadding paddings;
-    WXCoreBorderWidth borders;
-    std::string page_id;
-    std::string component_type;
-    std::string ref;
+    std::map<std::string, std::string> *styles_;
+    std::map<std::string, std::string> *attributes_;
+    std::set<std::string> *events_;
+    WXCoreMargin margins_;
+    WXCorePadding paddings_;
+    WXCoreBorderWidth borders_;
+    std::string page_id_;
+    std::string component_type_;
+    std::string ref_;
   };
 }
 

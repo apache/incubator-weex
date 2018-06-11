@@ -39,12 +39,12 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    std::string page_id;
-    std::string ref;
-    std::vector<std::pair<std::string, std::string>> *style;
-    std::vector<std::pair<std::string, std::string>> *margin;
-    std::vector<std::pair<std::string, std::string>> *padding;
-    std::vector<std::pair<std::string, std::string>> *border;
+    std::string page_id_;
+    std::string ref_;
+    std::vector<std::pair<std::string, std::string>> *style_;
+    std::vector<std::pair<std::string, std::string>> *margin_;
+    std::vector<std::pair<std::string, std::string>> *padding_;
+    std::vector<std::pair<std::string, std::string>> *border_;
   };
 }
 

@@ -28,20 +28,20 @@ namespace WeexCore {
                                                    std::vector<std::pair<std::string, std::string>> *margin,
                                                    std::vector<std::pair<std::string, std::string>> *padding,
                                                    std::vector<std::pair<std::string, std::string>> *border) {
-    this->page_id = page_id;
-    this->ref = ref;
-    this->style = style;
-    this->margin = margin;
-    this->padding = padding;
-    this->border = border;
+    this->page_id_ = page_id;
+    this->ref_ = ref;
+    this->style_ = style;
+    this->margin_ = margin;
+    this->padding_ = padding;
+    this->border_ = border;
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(this->page_id.c_str(),
-                                                                         this->ref.c_str(),
-                                                                         this->style,
-                                                                         this->margin,
-                                                                         this->padding,
-                                                                         this->border);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(this->page_id_.c_str(),
+                                                                         this->ref_.c_str(),
+                                                                         this->style_,
+                                                                         this->margin_,
+                                                                         this->padding_,
+                                                                         this->border_);
   }
 }

@@ -80,12 +80,13 @@ static void UpdateRenderObjectAttr(JNIEnv* env, jclass jcaller,
 
 static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
     RenderObject *render = convert_long_to_render_object(ptr);
-    RenderObject *copy = (RenderObject*)RenderCreator::GetInstance()->CreateRender(render->Type(), render->Ref());
-    copy->copyFrom(render);
-    if(render->Type() == WeexCore::kRenderCellSlot || render->Type() == WeexCore::kRenderCell){
+    RenderObject *copy = (RenderObject*)RenderCreator::GetInstance()->CreateRender(render->type(),
+                                                                                   render->ref());
+    copy->CopyFrom(render);
+    if(render->type() == WeexCore::kRenderCellSlot || render->type() == WeexCore::kRenderCell){
         RenderList* renderList = static_cast<RenderList*>(render->getParent());
         if(renderList != nullptr){
-            renderList->addCellSlotCopyTrack(copy);
+            renderList->AddCellSlotCopyTrack(copy);
         }else{
             __android_log_print(ANDROID_LOG_ERROR, " LayoutRenderObject","copy error parent null");
         }
@@ -94,7 +95,7 @@ static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
 }
 
 static  void showRenderObjectLayout(RenderObject *renderObject, int level){
-    LOGE("RenderObject layout %s %d %p %f %f %f %f ",  renderObject->Type().c_str(),
+    LOGE("RenderObject layout %s %d %p %f %f %f %f ", renderObject->type().c_str(),
          renderObject->getStypePositionType(),
          renderObject, renderObject->getLayoutHeight(), renderObject->getLayoutWidth(),
          renderObject->getLayoutPositionLeft(), renderObject->getLayoutPositionRight());
@@ -123,11 +124,11 @@ static jint LayoutRenderObject(JNIEnv* env, jclass jcaller,
     }
 
     RenderObject *render = convert_long_to_render_object(ptr);
-    if(render->Type() == WeexCore::kRenderCell ||  render->Type() == WeexCore::kRenderCellSlot){
+    if(render->type() == WeexCore::kRenderCell || render->type() == WeexCore::kRenderCellSlot){
         RenderList* renderList = static_cast<RenderList*>(render->getParent());
         if(renderList != nullptr){
-            if(renderList->getColumnCount() > 1  && renderList->getColumnWidth() > 0){
-                renderPageSize.first = renderList->getColumnWidth();
+            if(renderList->TakeColumnCount() > 1  && renderList->TakeColumnWidth() > 0){
+                renderPageSize.first = renderList->TakeColumnWidth();
             }
         }
     }
@@ -137,9 +138,9 @@ static jint LayoutRenderObject(JNIEnv* env, jclass jcaller,
         render->setStyleWidthLevel(CSS_STYLE);
     }
 
-    render->LayoutBefore();
+  render->LayoutBeforeImpl();
     render->calculateLayout(renderPageSize);
-    render->LayoutAfter();
+    render->LayoutAfterImpl();
 
     return (jint)render->getLayoutHeight();
 }

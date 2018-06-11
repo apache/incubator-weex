@@ -24,15 +24,15 @@ namespace WeexCore {
 
   RenderActionAddEvent::RenderActionAddEvent(const std::string &page_id, const std::string &ref,
                                              const std::string &event) {
-    this->page_id = page_id;
-    this->ref = ref;
-    this->event = event;
+    this->page_id_ = page_id;
+    this->ref_ = ref;
+    this->event_ = event;
   }
 
   void RenderActionAddEvent::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(this->page_id.c_str(),
-                                                                      this->ref.c_str(),
-                                                                      this->event.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(this->page_id_.c_str(),
+                                                                      this->ref_.c_str(),
+                                                                      this->event_.c_str());
   }
 
 }

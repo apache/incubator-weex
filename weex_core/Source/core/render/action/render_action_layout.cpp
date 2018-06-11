@@ -25,27 +25,27 @@ namespace WeexCore {
 
   RenderActionLayout::RenderActionLayout(const std::string &page_id, const RenderObject *render,
                                          int index) {
-    this->page_id = page_id;
-    this->ref = render->Ref();
-    this->index = index;
+    this->page_id_ = page_id;
+    this->ref_ = render->ref();
+    this->index_ = index;
     GetLayoutInfo(render);
   }
 
   void RenderActionLayout::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(this->page_id.c_str(),
-                                                                    this->ref.c_str(),
-                                                                    this->top, this->bottom,
-                                                                    this->left, this->right,
-                                                                    this->height, this->width,
-                                                                    this->index);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(this->page_id_.c_str(),
+                                                                    this->ref_.c_str(),
+                                                                    this->top_, this->bottom_,
+                                                                    this->left_, this->right_,
+                                                                    this->height_, this->width_,
+                                                                    this->index_);
   }
 
   void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
-    this->top = node->getLayoutPositionTop();
-    this->bottom = node->getLayoutPositionBottom();
-    this->right = node->getLayoutPositionRight();
-    this->left = node->getLayoutPositionLeft();
-    this->height = node->getLayoutHeight();
-    this->width = node->getLayoutWidth();
+    this->top_ = node->getLayoutPositionTop();
+    this->bottom_ = node->getLayoutPositionBottom();
+    this->right_ = node->getLayoutPositionRight();
+    this->left_ = node->getLayoutPositionLeft();
+    this->height_ = node->getLayoutHeight();
+    this->width_ = node->getLayoutWidth();
   }
 }

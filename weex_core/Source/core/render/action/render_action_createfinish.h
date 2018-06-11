@@ -33,7 +33,7 @@ namespace WeexCore {
     void ExecuteAction();
 
   public:
-    std::string page_id;
+    std::string page_id_;
   };
 }
 

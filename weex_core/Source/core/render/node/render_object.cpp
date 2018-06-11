@@ -29,29 +29,29 @@
 namespace WeexCore {
 
   RenderObject::RenderObject() {
-    this->styles = new std::map<std::string, std::string>();
-    this->attributes = new std::map<std::string, std::string>();
-    this->events = new std::set<std::string>();
-    this->is_root_render = false;
+    this->styles_ = new std::map<std::string, std::string>();
+    this->attributes_ = new std::map<std::string, std::string>();
+    this->events_ = new std::set<std::string>();
+    this->is_root_render_ = false;
   }
 
   RenderObject::~RenderObject() {
 
-    this->parent_render = nullptr;
+    this->parent_render_ = nullptr;
 
-    if (this->styles != nullptr) {
-      delete this->styles;
-      this->styles = nullptr;
+    if (this->styles_ != nullptr) {
+      delete this->styles_;
+      this->styles_ = nullptr;
     }
 
-    if (this->attributes != nullptr) {
-      delete this->attributes;
-      this->attributes = nullptr;
+    if (this->attributes_ != nullptr) {
+      delete this->attributes_;
+      this->attributes_ = nullptr;
     }
 
-    if (this->events != nullptr) {
-      delete this->events;
-      this->events = nullptr;
+    if (this->events_ != nullptr) {
+      delete this->events_;
+      this->events_ = nullptr;
     }
 
     for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
@@ -113,13 +113,13 @@ namespace WeexCore {
     setMeasureFunc(measureFunc_Impl);
   }
 
-  void RenderObject::onLayoutBefore() {
+  void RenderObject::OnLayoutBefore() {
     if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return;
     WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(this);
   }
 
-  void RenderObject::onLayoutAfter(float width, float height) {
+  void RenderObject::OnLayoutAfter(float width, float height) {
     if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
       return;
     WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(this, width, height);
@@ -130,7 +130,7 @@ namespace WeexCore {
     bool insert = false;
     if (value.length() > 0 &&
         (value.at(0) == JSON_OBJECT_MARK_CHAR || value.at(0) == JSON_ARRAY_MARK_CHAR)) {
-      mapInsertOrAssign(this->styles, key, value);
+      MapInsertOrAssign(this->styles_, key, value);
       insert = true;
     }
 
@@ -142,11 +142,11 @@ namespace WeexCore {
       return kTypeLayout;
     } else if (key == FLEX) {
       if (value.empty()) {
-        setFlex(0);
+        set_flex(0);
       } else {
         float ret = getFloat(value.c_str());
         if (!isnan(ret)) {
-          setFlex(ret);
+          set_flex(ret);
         }
       }
       return kTypeLayout;
@@ -184,9 +184,9 @@ namespace WeexCore {
     } else if (key == POSITION) {
       setStylePositionType(GetWXCorePositionType(value));
       if (value == STICKY) {
-        this->is_sticky = true;
+        this->is_sticky_ = true;
       }
-      mapInsertOrAssign(this->styles, key, value);
+      MapInsertOrAssign(this->styles_, key, value);
       return kTypeStyle;
     } else if (key == LEFT) {
       UpdateStyleInternal(key, value, NAN,
@@ -253,18 +253,18 @@ namespace WeexCore {
       return kTypePadding;
     } else {
       if (!insert) {
-        mapInsertOrAssign(this->styles, key, value);
+        MapInsertOrAssign(this->styles_, key, value);
       }
       return kTypeStyle;
     }
   }
 
   const std::string RenderObject::GetStyle(const std::string &key) {
-    if (this->styles == nullptr)
+    if (this->styles_ == nullptr)
       return "";
 
-    std::map<std::string, std::string>::iterator iter = this->styles->find(key);
-    if (iter != this->styles->end()) {
+    std::map<std::string, std::string>::iterator iter = this->styles_->find(key);
+    if (iter != this->styles_->end()) {
       return iter->second;
     } else {
       return "";
@@ -272,11 +272,11 @@ namespace WeexCore {
   }
 
   const std::string RenderObject::GetAttr(const std::string &key) {
-    if (this->attributes == nullptr)
+    if (this->attributes_ == nullptr)
       return "";
 
-    std::map<std::string, std::string>::iterator iter = this->attributes->find(key);
-    if (iter != this->attributes->end()) {
+    std::map<std::string, std::string>::iterator iter = this->attributes_->find(key);
+    if (iter != this->attributes_->end()) {
       return iter->second;
     } else {
       return "";
@@ -284,8 +284,8 @@ namespace WeexCore {
   }
 
   float RenderObject::GetViewPortWidth() {
-    if (this->viewport_width >= 0)
-      return this->viewport_width;
+    if (this->viewport_width_ >= 0)
+      return this->viewport_width_;
 
     RenderPage *page = GetRenderPage();
     if (page == nullptr)
@@ -307,7 +307,7 @@ namespace WeexCore {
       addChildAt(child, index);
     }
 
-    child->SetParentRender(this);
+    child->set_parent_render(this);
 
     return index;
   }
@@ -320,7 +320,7 @@ namespace WeexCore {
       for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
         RenderObject *child = static_cast<RenderObject *>(*it);
         if (child != nullptr) {
-          if (render->Ref() == child->Ref())
+          if (render->ref() == child->ref())
             return i;
         }
         ++i;
@@ -346,40 +346,40 @@ namespace WeexCore {
     return ret;
   }
 
-  void RenderObject::LayoutBefore() {
+  void RenderObject::LayoutBeforeImpl() {
     if (isDirty()) {
-      onLayoutBefore();
+      OnLayoutBefore();
     }
 
     for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
       RenderObject *child = static_cast<RenderObject *>(*it);
       if (child != nullptr) {
-        child->LayoutBefore();
+        child->LayoutBeforeImpl();
       }
     }
   }
 
-  void RenderObject::LayoutAfter() {
+  void RenderObject::LayoutAfterImpl() {
     if (hasNewLayout()) {
-      onLayoutAfter(getLayoutWidth(), getLayoutHeight());
+      OnLayoutAfter(getLayoutWidth(), getLayoutHeight());
     }
 
     for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
       RenderObject *child = static_cast<RenderObject *>(*it);
       if (child != nullptr) {
-        child->LayoutAfter();
+        child->LayoutAfterImpl();
       }
     }
   }
 
-  void RenderObject::copyFrom(RenderObject *src) {
-    IRenderObject::copyFrom(src);
-    this->styles->insert(src->styles->begin(), src->styles->end());
-    this->attributes->insert(src->attributes->begin(), src->attributes->end());
-    this->events->insert(src->events->begin(), src->events->end());
+  void RenderObject::CopyFrom(RenderObject *src) {
+    IRenderObject::CopyFrom(src);
+    this->styles_->insert(src->styles_->begin(), src->styles_->end());
+    this->attributes_->insert(src->attributes_->begin(), src->attributes_->end());
+    this->events_->insert(src->events_->begin(), src->events_->end());
   }
 
-  void RenderObject::mapInsertOrAssign(std::map<std::string, std::string> *targetMap,
+  void RenderObject::MapInsertOrAssign(std::map<std::string, std::string> *targetMap,
                                        const std::string &key, const std::string &value) {
     std::map<std::string, std::string>::iterator it = targetMap->find(key);
     if (it != targetMap->end()) {
@@ -391,12 +391,12 @@ namespace WeexCore {
 
   bool RenderObject::ViewInit() {
     return (!isnan(getStyleWidth()) && getStyleWidth() > 0) ||
-           (IsRootRender() && GetRenderPage() != nullptr &&
+           (is_root_render() && GetRenderPage() != nullptr &&
             GetRenderPage()->GetRenderContainerWidthWrapContent());
   }
 
   RenderPage *RenderObject::GetRenderPage() {
-    return RenderManager::GetInstance()->GetPage(PageId());
+    return RenderManager::GetInstance()->GetPage(page_id());
   }
 
   bool RenderObject::IsAppendTree() {
@@ -408,10 +408,37 @@ namespace WeexCore {
   }
 
   void RenderObject::UpdateAttr(std::string key, std::string value) {
-    mapInsertOrAssign(this->attributes, key, value);
+    MapInsertOrAssign(this->attributes_, key, value);
   }
 
   StyleType RenderObject::UpdateStyle(std::string key, std::string value) {
     return ApplyStyle(key, value, true);
+  }
+
+  RenderObject* RenderObject::GetChild(const Index &index) {
+    return static_cast<RenderObject*>(getChildAt(index));
+  }
+
+  void RenderObject::RemoveRenderObject(RenderObject *child) {
+    removeChild(child);
+  }
+
+  void RenderObject::AddAttr(std::string key, std::string value) {
+    MapInsertOrAssign(this->attributes_, key, value);
+  }
+
+  StyleType RenderObject::AddStyle(std::string key, std::string value) {
+    return ApplyStyle(key, value, false);
+  }
+
+  void RenderObject::AddEvent(std::string event) {
+    if (this->events_ == nullptr || this->events_->empty()) {
+      this->events_ = new std::set<std::string>();
+    }
+    this->events_->insert(event);
+  }
+
+  void RenderObject::RemoveEvent(const std::string &event) {
+    this->events_->erase(event);
   }
 } //end WeexCore

@@ -24,14 +24,14 @@ namespace WeexCore {
 
   RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &page_id, const std::string &ref,
                                                  std::vector<std::pair<std::string, std::string>> *attrs) {
-    this->page_id = page_id;
-    this->ref = ref;
-    this->attrs = attrs;
+    this->page_id_ = page_id;
+    this->ref_ = ref;
+    this->attrs_ = attrs;
   }
 
   void RenderActionUpdateAttr::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(this->page_id.c_str(),
-                                                                        this->ref.c_str(),
-                                                                        this->attrs);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(this->page_id_.c_str(),
+                                                                        this->ref_.c_str(),
+                                                                        this->attrs_);
   }
 }
