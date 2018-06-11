@@ -42,19 +42,17 @@
 
 namespace WeexCore {
 
-  static bool splitScreenRendering = false;
-
-  RenderPage::RenderPage(std::string pageId) {
+  RenderPage::RenderPage(std::string page_id) {
 
 #if RENDER_LOG
     LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
 #endif
 
-    mPageId = pageId;
-    mWXCorePerformance = new RenderPerformance();
-    mViewPortWidth = kDefaultViewPortWidth;
-    renderPageSize.first = WXCoreEnvironment::getInstance()->DeviceWidth();
-    renderPageSize.second = NAN;
+    this->page_id = page_id;
+    this->render_performance = new RenderPerformance();
+    this->viewport_width = kDefaultViewPortWidth;
+    this->render_page_size.first = WXCoreEnvironment::getInstance()->DeviceWidth();
+    this->render_page_size.second = NAN;
   }
 
   RenderPage::~RenderPage() {
@@ -63,21 +61,21 @@ namespace WeexCore {
     LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
 #endif
 
-    mRenderObjectRegisterMap.clear();
+    this->render_object_registers.clear();
 
-    if (render_root != nullptr) {
-      delete render_root;
-      render_root = nullptr;
+    if (this->render_root != nullptr) {
+      delete this->render_root;
+      this->render_root = nullptr;
     }
 
-    if (mWXCorePerformance != nullptr) {
-      delete mWXCorePerformance;
-      mWXCorePerformance = nullptr;
+    if (this->render_performance != nullptr) {
+      delete this->render_performance;
+      this->render_performance = nullptr;
     }
   }
 
   void RenderPage::CalculateLayout() {
-    if (render_root == nullptr || !render_root->ViewInit())
+    if (this->render_root == nullptr || !this->render_root->ViewInit())
       return;
 
 #if RENDER_LOG
@@ -85,38 +83,11 @@ namespace WeexCore {
 #endif
 
     long long startTime = getCurrentTime();
-    render_root->LayoutBefore();
-    render_root->calculateLayout(renderPageSize);
-    render_root->LayoutAfter();
+    this->render_root->LayoutBefore();
+    this->render_root->calculateLayout(this->render_page_size);
+    this->render_root->LayoutAfter();
     CssLayoutTime(getCurrentTime() - startTime);
-
-    if (splitScreenRendering) {
-      if (mAlreadyCreateFinish) {
-        TraverseTree(render_root, 0);
-      } else {
-        float deviceHeight = WXCoreEnvironment::getInstance()->DeviceHeight();
-        float deviceWidth = WXCoreEnvironment::getInstance()->DeviceWidth();
-        float radio = deviceWidth / (mViewPortWidth * kLayoutFirstScreenOverflowRadio);
-
-        switch (render_root->getFlexDirection()) {
-          case kFlexDirectionColumn:
-          case kFlexDirectionColumnReverse:
-            if (render_root->getLargestMainSize() * radio > deviceHeight / 3) {
-              TraverseTree(render_root, 0);
-            }
-            break;
-          case kFlexDirectionRow:
-          case kFlexDirectionRowReverse:
-          default:
-            if (render_root->getLargestMainSize() * radio > deviceWidth / 3) {
-              TraverseTree(render_root, 0);
-            }
-            break;
-        }
-      }
-    } else {
-      TraverseTree(render_root, 0);
-    }
+    TraverseTree(this->render_root, 0);
   }
 
   void RenderPage::TraverseTree(RenderObject *render,int index) {
@@ -144,14 +115,14 @@ namespace WeexCore {
 
     SetRootRenderObject(root);
 
-    if (isnan(render_root->getStyleWidth())) {
-      render_root->setStyleWidthLevel(FALLBACK_STYLE);
+    if (isnan(this->render_root->getStyleWidth())) {
+      this->render_root->setStyleWidthLevel(FALLBACK_STYLE);
       if (GetRenderContainerWidthWrapContent())
-        render_root->setStyleWidthToNAN();
+        this->render_root->setStyleWidthToNAN();
       else
-        render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
+        this->render_root->setStyleWidth(WXCoreEnvironment::getInstance()->DeviceWidth(), false);
     } else {
-      render_root->setStyleWidthLevel(CSS_STYLE);
+      this->render_root->setStyleWidthLevel(CSS_STYLE);
     }
     PushRenderToRegisterMap(root);
 
@@ -161,25 +132,25 @@ namespace WeexCore {
 
   void RenderPage::SetRootRenderObject(RenderObject *root) {
     if (root != nullptr) {
-      render_root = root;
-      render_root->MarkRootRender();
+      this->render_root = root;
+      this->render_root->MarkRootRender();
     }
   }
 
-  bool RenderPage::AddRenderObject(const std::string &parentRef, int insertPosition, RenderObject *child) {
-    RenderObject *parent = GetRenderObject(parentRef);
+  bool RenderPage::AddRenderObject(const std::string &parent_ref, int insert_posiotn, RenderObject *child) {
+    RenderObject *parent = GetRenderObject(parent_ref);
     if (parent == nullptr || child == nullptr) {
       return false;
     }
 
     // add child to Render Tree
-    insertPosition = parent->AddRenderObject(insertPosition, child);
-    if (insertPosition < -1) {
+    insert_posiotn = parent->AddRenderObject(insert_posiotn, child);
+    if (insert_posiotn < -1) {
       return false;
     }
 
     PushRenderToRegisterMap(child);
-    SendAddElementAction(child, parent, insertPosition, false);
+    SendAddElementAction(child, parent, insert_posiotn, false);
 
     Batch();
     return true;
@@ -203,13 +174,13 @@ namespace WeexCore {
     return true;
   }
 
-  bool RenderPage::MoveRenderObject(const std::string &ref, const std::string &parentRef, int index) {
+  bool RenderPage::MoveRenderObject(const std::string &ref, const std::string &parent_ref, int index) {
     RenderObject *child = GetRenderObject(ref);
     if (child == nullptr)
       return false;
 
     RenderObject *oldParent = child->GetParentRender();
-    RenderObject *newParent = GetRenderObject(parentRef);
+    RenderObject *newParent = GetRenderObject(parent_ref);
     if (oldParent == nullptr || newParent == nullptr)
       return false;
 
@@ -226,7 +197,7 @@ namespace WeexCore {
     child->getParent()->removeChild(child);
     newParent->addChildAt(child, index);
 
-    SendMoveElementAction(ref, parentRef, index);
+    SendMoveElementAction(ref, parent_ref, index);
     return true;
   }
 
@@ -241,7 +212,7 @@ namespace WeexCore {
     std::vector<std::pair<std::string, std::string>> *border = nullptr;
 
     bool flag = false;
-    int result = WeexCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
+    int result = WeexCoreManager::getInstance()->getPlatformBridge()->callHasTransitionPros(this->page_id.c_str(), ref.c_str(), src);
     //int result = Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(), ref.c_str(), src);
 
     if (result == 1) {
@@ -363,27 +334,27 @@ namespace WeexCore {
     return true;
   }
 
-  void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float defaultWidth,
-                                                          const float defaultHeight,
-                                                          const bool isWidthWrapContent, const bool isHeightWrapContent) {
-    renderPageSize.first = defaultWidth;
-    renderPageSize.second = defaultHeight;
-    if (render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
-      render_root->setStyleWidthLevel(INSTANCE_STYLE);
-      if (isWidthWrapContent) {
+  void RenderPage::SetDefaultHeightAndWidthIntoRootRender(const float default_width,
+                                                          const float default_height,
+                                                          const bool is_width_wrap_content, const bool is_height_wrap_content) {
+    this->render_page_size.first = default_width;
+    this->render_page_size.second = default_height;
+    if (this->render_root->getStyleWidthLevel() >= INSTANCE_STYLE) {
+      this->render_root->setStyleWidthLevel(INSTANCE_STYLE);
+      if (is_width_wrap_content) {
         SetRenderContainerWidthWrapContent(true);
-        render_root->setStyleWidthToNAN();
-        renderPageSize.first = NAN;
+        this->render_root->setStyleWidthToNAN();
+        this->render_page_size.first = NAN;
       } else {
-        render_root->setStyleWidth(defaultWidth, true);
+        this->render_root->setStyleWidth(default_width, true);
       }
       updateDirty(true);
     }
 
-    if (render_root->getStyleHeightLevel() >= INSTANCE_STYLE) {
-      if(!isHeightWrapContent) {
-        render_root->setStyleHeightLevel(INSTANCE_STYLE);
-        render_root->setStyleHeight(defaultHeight);
+    if (this->render_root->getStyleHeightLevel() >= INSTANCE_STYLE) {
+      if(!is_height_wrap_content) {
+        this->render_root->setStyleHeightLevel(INSTANCE_STYLE);
+        this->render_root->setStyleHeight(default_height);
         updateDirty(true);
       }
     }
@@ -398,7 +369,7 @@ namespace WeexCore {
 
     render->AddEvent(event);
 
-    RenderAction *action = new RenderActionAddEvent(mPageId, ref, event);
+    RenderAction *action = new RenderActionAddEvent(this->page_id, ref, event);
     PostRenderAction(action);
     return true;
   }
@@ -410,25 +381,24 @@ namespace WeexCore {
 
     render->RemoveEvent(event);
 
-    RenderAction *action = new RenderActionRemoveEvent(mPageId, ref, event);
+    RenderAction *action = new RenderActionRemoveEvent(this->page_id, ref, event);
     PostRenderAction(action);
     return true;
   }
 
   bool RenderPage::CreateFinish() {
-    if (render_root == nullptr) {
+    if (this->render_root == nullptr) {
       return false;
     }
-    mAlreadyCreateFinish = true;
     Batch();
     SendCreateFinishAction();
     return true;
   }
 
   void RenderPage::LayoutImmediately() {
-    if(isDirty() && useVSync){
+    if(isDirty() && kUseVSync){
       CalculateLayout();
-      needLayout.store(false);
+      this->need_layout.store(false);
       updateDirty(false);
     }
   }
@@ -444,7 +414,7 @@ namespace WeexCore {
       return;
 
     std::string ref = render->Ref();
-    mRenderObjectRegisterMap.insert(std::pair<std::string, RenderObject *>(ref, render));
+    this->render_object_registers.insert(std::pair<std::string, RenderObject *>(ref, render));
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
@@ -458,7 +428,7 @@ namespace WeexCore {
     if (render == nullptr)
       return;
 
-    mRenderObjectRegisterMap.erase(render->Ref());
+    this->render_object_registers.erase(render->Ref());
 
     for(auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it++) {
       RenderObject* child = static_cast<RenderObject*>(*it);
@@ -489,21 +459,21 @@ namespace WeexCore {
     }
   }
 
-  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion, bool willLayout) {
+  void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion, bool will_layout) {
     if (child == nullptr || parent == nullptr)
       return;
     if(parent != nullptr && parent->Type() == WeexCore::kRenderRecycleList){
-        willLayout = false;
+        will_layout = false;
     }
 
-    RenderAction *action = new RenderActionAddElement(PageId(), child, parent, index, willLayout);
+    RenderAction *action = new RenderActionAddElement(PageId(), child, parent, index, will_layout);
     PostRenderAction(action);
 
     Index i = 0;
     for(auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd(); it++) {
       RenderObject* grandson = static_cast<RenderObject*>(*it);
       if (grandson != nullptr) {
-        SendAddElementAction(grandson, child, i, true, willLayout);
+        SendAddElementAction(grandson, child, i, true, will_layout);
       }
       ++i;
     }
@@ -514,7 +484,7 @@ namespace WeexCore {
       for(auto it = cellSlots.begin(); it != cellSlots.end(); it++) {
         RenderObject* grandson = static_cast<RenderObject*>(*it);
         if (grandson != nullptr) {
-          SendAddElementAction(grandson, child, -1, true, willLayout);
+          SendAddElementAction(grandson, child, -1, true, will_layout);
         }
         ++i;
       }
@@ -530,8 +500,8 @@ namespace WeexCore {
     PostRenderAction(action);
   }
 
-  void RenderPage::SendMoveElementAction(const std::string &ref, const std::string &parentRef, int index) {
-    RenderAction *action = new RenderActionMoveElement(PageId(), ref, parentRef, index);
+  void RenderPage::SendMoveElementAction(const std::string &ref, const std::string &parent_ref, int index) {
+    RenderAction *action = new RenderActionMoveElement(PageId(), ref, parent_ref, index);
     PostRenderAction(action);
   }
 
@@ -586,45 +556,45 @@ namespace WeexCore {
   }
 
   void RenderPage::CssLayoutTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->cssLayoutTime += time;
+    if (this->render_performance != nullptr)
+      this->render_performance->cssLayoutTime += time;
   }
 
   void RenderPage::ParseJsonTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->parseJsonTime += time;
+    if (this->render_performance != nullptr)
+      this->render_performance->parseJsonTime += time;
   }
 
   void RenderPage::CallBridgeTime(const long long &time) {
-    if (mWXCorePerformance != nullptr)
-      mWXCorePerformance->callBridgeTime += time;
+    if (this->render_performance != nullptr)
+      this->render_performance->callBridgeTime += time;
   }
 
   std::vector<long> RenderPage::PrintFirstScreenLog() {
     std::vector<long> ret;
-    if (mWXCorePerformance != nullptr)
-      ret = mWXCorePerformance->PrintPerformanceLog(onFirstScreen);
+    if (this->render_performance != nullptr)
+      ret = this->render_performance->PrintPerformanceLog(onFirstScreen);
     return ret;
   }
 
   std::vector<long> RenderPage::PrintRenderSuccessLog() {
     std::vector<long> ret;
-    if (mWXCorePerformance != nullptr)
-      ret = mWXCorePerformance->PrintPerformanceLog(onRenderSuccess);
+    if (this->render_performance != nullptr)
+      ret = this->render_performance->PrintPerformanceLog(onRenderSuccess);
     return ret;
   }
 
   void RenderPage::Batch() {
-    if ((useVSync && needLayout.load()) || !useVSync) {
+    if ((kUseVSync && this->need_layout.load()) || !kUseVSync) {
       CalculateLayout();
-      needLayout.store(false);
+      this->need_layout.store(false);
       updateDirty(false);
     }
   }
 
   RenderObject* RenderPage::GetRenderObject(const std::string &ref) {
-    std::map<std::string, RenderObject *>::iterator iter = mRenderObjectRegisterMap.find(ref);
-    if (iter != mRenderObjectRegisterMap.end()) {
+    std::map<std::string, RenderObject *>::iterator iter = this->render_object_registers.find(ref);
+    if (iter != this->render_object_registers.end()) {
       return iter->second;
     } else {
       return nullptr;
@@ -632,6 +602,7 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageInit() {
+
   }
 
   void RenderPage::OnRenderProcessStart() {
@@ -647,5 +618,6 @@ namespace WeexCore {
   }
 
   void RenderPage::OnRenderPageClose() {
+
   }
 } //namespace WeexCore

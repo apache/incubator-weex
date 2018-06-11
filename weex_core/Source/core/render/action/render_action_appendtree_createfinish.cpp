@@ -22,14 +22,15 @@
 
 namespace WeexCore {
 
-  RenderActionAppendTreeCreateFinish::RenderActionAppendTreeCreateFinish(const std::string &pageId,
+  RenderActionAppendTreeCreateFinish::RenderActionAppendTreeCreateFinish(const std::string &page_id,
                                                                          const std::string &ref) {
-    this->mPageId = pageId;
-    this->mRef = ref;
+    this->page_id = page_id;
+    this->ref = ref;
   }
 
   void RenderActionAppendTreeCreateFinish::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callAppendTreeCreateFinish(mPageId.c_str(),
-                                                                                    mRef.c_str());
+    WeexCoreManager::getInstance()->getPlatformBridge()->callAppendTreeCreateFinish(
+        this->page_id.c_str(),
+        this->ref.c_str());
   }
 }

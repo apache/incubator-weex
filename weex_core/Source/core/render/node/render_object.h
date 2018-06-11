@@ -117,7 +117,7 @@ namespace WeexCore {
     }
 
     inline void AddAttr(std::string key, std::string value) {
-      mapInsertOrAssign(mAttributes, key, value);
+      mapInsertOrAssign(this->attributes, key, value);
     }
 
     inline StyleType AddStyle(std::string key, std::string value) {
@@ -125,57 +125,57 @@ namespace WeexCore {
     }
 
     inline void AddEvent(std::string event) {
-      if (mEvents == nullptr || mEvents->empty()) {
-          mEvents = new std::set<std::string>();
+      if (this->events == nullptr || this->events->empty()) {
+        this->events = new std::set<std::string>();
       }
-      mEvents->insert(event);
+      this->events->insert(event);
     }
 
     inline void RemoveEvent(const std::string &event) {
-      mEvents->erase(event);
+      this->events->erase(event);
     }
 
     inline void SetParentRender(RenderObject *render) {
-      mParentRender = render;
+      this->parent_render = render;
     }
 
     inline RenderObject *GetParentRender() {
-      return mParentRender;
+      return this->parent_render;
     }
 
     inline std::map<std::string, std::string> *Styles() const {
-      return mStyles;
+      return this->styles;
     }
 
     inline std::map<std::string, std::string> * Attributes() const {
-      return mAttributes;
+      return this->attributes;
     }
 
     inline std::set<std::string> *Events() const {
-      return mEvents;
+      return this->events;
     }
 
     inline void MarkRootRender() {
-      mIsRootRender = true;
+      this->is_root_render = true;
     }
 
     inline bool IsRootRender() {
-      return mIsRootRender;
+      return this->is_root_render;
     }
 
     inline bool IsSticky() {
-      return mIsSticky;
+      return this->is_sticky;
     }
 
   private:
 
-    RenderObject *mParentRender;
-    std::map<std::string, std::string> *mStyles;
-    std::map<std::string, std::string> *mAttributes;
-    std::set<std::string> *mEvents;
-    float mViewPortWidth = -1;
-    bool mIsRootRender;
-    bool mIsSticky = false;
+    RenderObject *parent_render;
+    std::map<std::string, std::string> *styles;
+    std::map<std::string, std::string> *attributes;
+    std::set<std::string> *events;
+    float viewport_width = -1;
+    bool is_root_render;
+    bool is_sticky = false;
   };
 } //end WeexCore
 #endif //RenderObject_h

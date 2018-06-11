@@ -37,8 +37,8 @@ namespace WeexCore {
     class Garbo {
     public:
       ~Garbo() {
-        if (RenderManager::m_pInstance) {
-          delete RenderManager::m_pInstance;
+        if (RenderManager::g_pInstance) {
+          delete RenderManager::g_pInstance;
         }
       }
     };
@@ -47,44 +47,44 @@ namespace WeexCore {
 
   public:
 
-    void Batch(const std::string &pageId);
+    void Batch(const std::string &page_id);
 
     // create root node
-    bool CreatePage(std::string pageId, const char *data);
+    bool CreatePage(std::string page_id, const char *data);
 
     /** use auto constructor is bad idea, it cann't transfer binary, use char* is better */
-    bool AddRenderObject(const std::string &pageId, const std::string &parentRef, int index,
+    bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,
                          const char *data);
 
-    bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
+    bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 
-    bool MoveRenderObject(const std::string &pageId, const std::string &ref,
-                          const std::string &parentRef, int index);
+    bool MoveRenderObject(const std::string &page_id, const std::string &ref,
+                          const std::string &parent_ref, int index);
 
-    bool UpdateAttr(const std::string &pageId, const std::string &ref, const char *data);
+    bool UpdateAttr(const std::string &page_id, const std::string &ref, const char *data);
 
-    bool UpdateStyle(const std::string &pageId, const std::string &ref, const char *data);
+    bool UpdateStyle(const std::string &page_id, const std::string &ref, const char *data);
 
-    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool AddEvent(const std::string &page_id, const std::string &ref, const std::string &event);
 
-    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
+    bool RemoveEvent(const std::string &page_id, const std::string &ref, const std::string &event);
 
-    bool CreateFinish(const std::string &pageId);
+    bool CreateFinish(const std::string &page_id);
 
-    RenderPage *GetPage(const std::string &id);
+    RenderPage *GetPage(const std::string &page_id);
 
-    bool ClosePage(const std::string &pageId);
+    bool ClosePage(const std::string &page_id);
 
     static RenderManager *GetInstance() {
-      if (!m_pInstance) {
-        m_pInstance = new RenderManager();
+      if (!g_pInstance) {
+        g_pInstance = new RenderManager();
       }
-      return m_pInstance;
+      return g_pInstance;
     }
 
   private:
-    static RenderManager *m_pInstance;
-    std::map<std::string, RenderPage *> mPages;
+    static RenderManager *g_pInstance;
+    std::map<std::string, RenderPage *> pages;
   };
 }
 

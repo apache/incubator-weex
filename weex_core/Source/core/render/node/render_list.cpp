@@ -28,32 +28,32 @@
 namespace WeexCore {
 
   RenderList::~RenderList() {
-    if (cellSlotsCopys.size() > 0) {
-      for (auto it = cellSlotsCopys.begin(); it != cellSlotsCopys.end(); ++it) {
+    if (this->cell_slots_copys.size() > 0) {
+      for (auto it = this->cell_slots_copys.begin(); it != this->cell_slots_copys.end(); ++it) {
         RenderObject *child = *it;
         if (child) {
           delete child;
           child = nullptr;
         }
       }
-      cellSlotsCopys.clear();
+      this->cell_slots_copys.clear();
     }
 
-    if (cellSlots.size() > 0) {
-      for (auto it = cellSlots.begin(); it != cellSlots.end(); ++it) {
+    if (this->cell_slots.size() > 0) {
+      for (auto it = this->cell_slots.begin(); it != this->cell_slots.end(); ++it) {
         RenderObject *child = *it;
         if (child) {
           delete child;
           child = nullptr;
         }
       }
-      cellSlots.clear();
+      this->cell_slots.clear();
     }
   }
 
   void RenderList::addCellSlotCopyTrack(RenderObject *cellSlot) {
     cellSlot->setParent(this, cellSlot);
-    cellSlotsCopys.push_back(cellSlot);
+    this->cell_slots_copys.push_back(cellSlot);
   }
 
   std::map<std::string, std::string> *RenderList::GetDefaultStyle() {
@@ -72,11 +72,11 @@ namespace WeexCore {
 
     std::string prop = isVertical ? HEIGHT : WIDTH;
 
-    if (prop == HEIGHT && isnan(getStyleHeight()) && !mIsSetFlex) {
-      mIsSetFlex = true;
+    if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex) {
+      this->is_set_flex = true;
       style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-    } else if (prop == WIDTH && isnan(getStyleWidth()) && !mIsSetFlex) {
-      mIsSetFlex = true;
+    } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex) {
+      this->is_set_flex = true;
       style->insert(std::pair<std::string, std::string>(FLEX, "1"));
     }
 
@@ -84,12 +84,12 @@ namespace WeexCore {
   }
 
   void RenderList::setFlex(const float flex) {
-    mIsSetFlex = true;
+    this->is_set_flex = true;
     WXCoreLayoutNode::setFlex(flex);
   }
 
   std::map<std::string, std::string> *RenderList::GetDefaultAttr() {
-    if (!mIsPreCalculateCellWidth) {
+    if (!this->is_pre_calculate_cell_width) {
       preCalculateCellWidth();
     }
     return nullptr;
@@ -98,55 +98,65 @@ namespace WeexCore {
   void RenderList::preCalculateCellWidth() {
     std::map<std::string, std::string> *attrs = new std::map<std::string, std::string>();
     if (Attributes() != nullptr) {
-      mColumnCount = getColumnCount();
-      mColumnWidth = getColumnWidth();
-      mColumnGap = getColumnGap();
+      this->column_count = getColumnCount();
+      this->column_width = getColumnWidth();
+      this->column_gap = getColumnGap();
 
-      mLeftGap = getLeftGap();
-      mRightGap = getRightGap();
+      this->left_gap = getLeftGap();
+      this->right_gap = getRightGap();
 
-      mAvailableWidth =
+      this->available_width =
           getStyleWidth() - getWebPxByWidth(getPaddingLeft(), GetRenderPage()->ViewPortWidth()) -
           getWebPxByWidth(getPaddingRight(), GetRenderPage()->ViewPortWidth());
 
-      if (AUTO_VALUE == mColumnCount && AUTO_VALUE == mColumnWidth) {
-        mColumnCount = COLUMN_COUNT_NORMAL;
-        mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
-        mColumnWidth = mColumnWidth > 0 ? mColumnWidth : 0;
-      } else if (AUTO_VALUE == mColumnWidth && AUTO_VALUE != mColumnCount) {
-        mColumnWidth =
-            (mAvailableWidth - mLeftGap - mRightGap - ((mColumnCount - 1) * mColumnGap)) /
-            mColumnCount;
-        mColumnWidth = mColumnWidth > 0 ? mColumnWidth : 0;
-      } else if (AUTO_VALUE != mColumnWidth && AUTO_VALUE == mColumnCount) {
-        mColumnCount = (int) round(
-            (mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap) - 0.5f);
-        mColumnCount = mColumnCount > 0 ? mColumnCount : 1;
-        if (mColumnCount <= 0) {
-          mColumnCount = COLUMN_COUNT_NORMAL;
-        }
-        mColumnWidth =
-            ((mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / mColumnCount) - mColumnGap;
-
-      } else if (AUTO_VALUE != mColumnWidth && AUTO_VALUE != mColumnCount) {
-        int columnCount = (int) round(
-            (mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / (mColumnWidth + mColumnGap) -
+      if (AUTO_VALUE == this->column_count && AUTO_VALUE == this->column_width) {
+        this->column_count = COLUMN_COUNT_NORMAL;
+        this->column_width =
+            (this->available_width - ((this->column_count - 1) * this->column_gap)) /
+            this->column_count;
+        this->column_width = this->column_width > 0 ? this->column_width : 0;
+      } else if (AUTO_VALUE == this->column_width && AUTO_VALUE != this->column_count) {
+        this->column_width =
+            (this->available_width - this->left_gap - this->right_gap -
+             ((this->column_count - 1) * this->column_gap)) /
+            this->column_count;
+        this->column_width = this->column_width > 0 ? this->column_width : 0;
+      } else if (AUTO_VALUE != this->column_width && AUTO_VALUE == this->column_count) {
+        this->column_count = (int) round(
+            (this->available_width + this->column_gap) / (this->column_width + this->column_gap) -
             0.5f);
-        mColumnCount = columnCount > mColumnCount ? mColumnCount : columnCount;
-        if (mColumnCount <= 0) {
-          mColumnCount = COLUMN_COUNT_NORMAL;
+        this->column_count = this->column_count > 0 ? this->column_count : 1;
+        if (this->column_count <= 0) {
+          this->column_count = COLUMN_COUNT_NORMAL;
         }
-        mColumnWidth =
-            ((mAvailableWidth + mColumnGap - mLeftGap - mRightGap) / mColumnCount) - mColumnGap;
+        this->column_width =
+            ((this->available_width + this->column_gap - this->left_gap - this->right_gap) /
+             this->column_count) - this->column_gap;
+
+      } else if (AUTO_VALUE != this->column_width && AUTO_VALUE != this->column_count) {
+        int columnCount = (int) round(
+            (this->available_width + this->column_gap - this->left_gap - this->right_gap) /
+            (this->column_width + this->column_gap) -
+            0.5f);
+        this->column_count = columnCount > this->column_count ? this->column_count : columnCount;
+        if (this->column_count <= 0) {
+          this->column_count = COLUMN_COUNT_NORMAL;
+        }
+        this->column_width =
+            ((this->available_width + this->column_gap - this->left_gap - this->right_gap) /
+             this->column_count) - this->column_gap;
       }
 
       std::string spanOffsets = calcSpanOffset();
 
-      mIsPreCalculateCellWidth = true;
-      if (getColumnCount() > 0 || getColumnWidth() > 0 || mColumnCount > COLUMN_COUNT_NORMAL) {
-        attrs->insert(std::pair<std::string, std::string>(COLUMN_COUNT, to_string(mColumnCount)));
-        attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, to_string(mColumnGap)));
-        attrs->insert(std::pair<std::string, std::string>(COLUMN_WIDTH, to_string(mColumnWidth)));
+      this->is_pre_calculate_cell_width = true;
+      if (getColumnCount() > 0 || getColumnWidth() > 0 ||
+          this->column_count > COLUMN_COUNT_NORMAL) {
+        attrs->insert(
+            std::pair<std::string, std::string>(COLUMN_COUNT, to_string(this->column_count)));
+        attrs->insert(std::pair<std::string, std::string>(COLUMN_GAP, to_string(this->column_gap)));
+        attrs->insert(
+            std::pair<std::string, std::string>(COLUMN_WIDTH, to_string(this->column_width)));
       }
       if (spanOffsets.length() > 0) {
         attrs->insert(std::pair<std::string, std::string>(SPAN_OFFSETS, to_string(spanOffsets)));
@@ -171,13 +181,14 @@ namespace WeexCore {
 
   std::string RenderList::calcSpanOffset() {
     std::string spanOffsets;
-    if (mLeftGap > 0 || mRightGap > 0) {
+    if (this->left_gap > 0 || this->right_gap > 0) {
       spanOffsets.append("[");
-      for (int i = 0; i < mColumnCount; i++) {
-        float spanOffset = mLeftGap + i * ((mColumnWidth + mColumnGap) -
-                                           (mAvailableWidth + mColumnGap) / mColumnCount);
+      for (int i = 0; i < this->column_count; i++) {
+        float spanOffset = this->left_gap + i * ((this->column_width + this->column_gap) -
+                                                 (this->available_width + this->column_gap) /
+                                                 this->column_count);
         spanOffsets.append(to_string(spanOffset));
-        if (i != mColumnCount - 1) {
+        if (i != this->column_count - 1) {
           spanOffsets.append(",");
         }
       }
@@ -207,17 +218,17 @@ namespace WeexCore {
         && (child->Type() == kRenderCellSlot || child->Type() == kRenderCell ||
             child->Type() == kRenderHeader)) {
       child->setParent(this, child);
-      cellSlots.insert(cellSlots.end(), child);
+      this->cell_slots.insert(this->cell_slots.end(), child);
       index = -1;
     } else {
       index = RenderObject::AddRenderObject(index, child);
     }
 
-    if (!mIsPreCalculateCellWidth) {
+    if (!this->is_pre_calculate_cell_width) {
       preCalculateCellWidth();
     }
 
-    if (mColumnWidth != 0 && !isnan(mColumnWidth)) {
+    if (this->column_width != 0 && !isnan(this->column_width)) {
       AddRenderObjectWidth(child, false);
     }
     return index;
@@ -226,11 +237,11 @@ namespace WeexCore {
   void RenderList::AddRenderObjectWidth(RenderObject *child, const bool updating) {
     if (Type() == kRenderWaterfall || Type() == kRenderRecycleList) {
       if (child->Type() == kRenderHeader || child->Type() == kRenderFooter) {
-        child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
+        child->ApplyStyle(WIDTH, to_string(this->available_width), updating);
       } else if (child->IsSticky()) {
-        child->ApplyStyle(WIDTH, to_string(mAvailableWidth), updating);
+        child->ApplyStyle(WIDTH, to_string(this->available_width), updating);
       } else if (child->Type() == kRenderCell || child->Type() == kRenderCellSlot) {
-        child->ApplyStyle(WIDTH, to_string(mColumnWidth), updating);
+        child->ApplyStyle(WIDTH, to_string(this->column_width), updating);
       }
     }
   }
@@ -242,7 +253,7 @@ namespace WeexCore {
         !GetAttr(COLUMN_WIDTH).empty()) {
       preCalculateCellWidth();
 
-      if (mColumnWidth == 0 && isnan(mColumnWidth)) {
+      if (this->column_width == 0 && isnan(this->column_width)) {
         return;
       }
 

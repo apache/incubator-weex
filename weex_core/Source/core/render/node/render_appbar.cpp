@@ -24,10 +24,10 @@
 namespace WeexCore {
 
   std::map<std::string, std::string> *RenderAppBar::GetDefaultStyle() {
-    defaultNavWidth = getFloat(
+    this->default_nav_width = getFloat(
         WXCoreEnvironment::getInstance()->GetOption("defaultNavWidth").c_str());
 
-    defaultOverflowWidth = getFloat(
+    this->default_overflow_width = getFloat(
         WXCoreEnvironment::getInstance()->GetOption("defaultOverflowWidth").c_str());
 
     std::string appbar_color = WXCoreEnvironment::getInstance()->GetOption("appbar_color");
@@ -58,8 +58,8 @@ namespace WeexCore {
                           value,
                           0,
                           [=](float foo) {
-                            setPadding(kPaddingLeft, foo + defaultNavWidth),
-                                setPadding(kPaddingRight, foo + defaultOverflowWidth),
+                            setPadding(kPaddingLeft, foo + this->default_nav_width),
+                                setPadding(kPaddingRight, foo + this->default_overflow_width),
                                 setPadding(kPaddingTop, foo),
                                 setPadding(kPaddingBottom, foo);
                           });
@@ -68,14 +68,14 @@ namespace WeexCore {
       UpdateStyleInternal(key,
                           value,
                           0,
-                          [=](float foo) { setPadding(kPaddingLeft, foo + defaultNavWidth); });
+                          [=](float foo) { setPadding(kPaddingLeft, foo + this->default_nav_width); });
       return kTypePadding;
     } else if (key == PADDING_RIGHT) {
       UpdateStyleInternal(key,
                           value,
                           0,
                           [=](float foo) {
-                            setPadding(kPaddingRight, foo + defaultOverflowWidth);
+                            setPadding(kPaddingRight, foo + this->default_overflow_width);
                           });
       return kTypePadding;
     } else {

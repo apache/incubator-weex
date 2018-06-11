@@ -214,13 +214,13 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
-    if (!page->needLayout.load()) {
-      page->needLayout.store(true);
+    if (!page->need_layout.load()) {
+      page->need_layout.store(true);
     }
 
-    bool ret = !page->hasForeLayoutAction.load() && page->isDirty();
+    bool ret = !page->has_fore_layout_action.load() && page->isDirty();
     if (ret) {
-      page->hasForeLayoutAction.store(true);
+      page->has_fore_layout_action.store(true);
     }
     return ret ? JNI_TRUE : JNI_FALSE;
   }
@@ -236,7 +236,7 @@ static void ForceLayout(JNIEnv *env, jobject jcaller, jstring instanceId) {
 #endif
 
     page->LayoutImmediately();
-    page->hasForeLayoutAction.store(false);
+    page->has_fore_layout_action.store(false);
   }
 }
 

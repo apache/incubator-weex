@@ -28,13 +28,13 @@ namespace WeexCore {
   class RenderActionAppendTreeCreateFinish : public RenderAction {
 
   public:
-    explicit RenderActionAppendTreeCreateFinish(const std::string &pageId, const std::string &ref);
+    explicit RenderActionAppendTreeCreateFinish(const std::string &page_id, const std::string &ref);
 
     void ExecuteAction();
 
   public:
-    std::string mPageId;
-    std::string mRef;
+    std::string page_id;
+    std::string ref;
   };
 }
 

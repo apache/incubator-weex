@@ -22,19 +22,19 @@
 
 namespace WeexCore {
 
-  RenderActionMoveElement::RenderActionMoveElement(const std::string &pageId,
+  RenderActionMoveElement::RenderActionMoveElement(const std::string &page_id,
                                                    const std::string &ref,
-                                                   const std::string &parentRef, int index) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mParentRef = parentRef;
-    this->mIndex = index;
+                                                   const std::string &parent_ref, int index) {
+    this->page_id = page_id;
+    this->ref = ref;
+    this->parent_ref = parent_ref;
+    this->index = index;
   }
 
   void RenderActionMoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(mPageId.c_str(),
-                                                                         mRef.c_str(),
-                                                                         mParentRef.c_str(),
-                                                                         mIndex);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(this->page_id.c_str(),
+                                                                         this->ref.c_str(),
+                                                                         this->parent_ref.c_str(),
+                                                                         this->index);
   }
 }

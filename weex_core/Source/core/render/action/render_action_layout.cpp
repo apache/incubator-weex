@@ -23,26 +23,29 @@
 
 namespace WeexCore {
 
-  RenderActionLayout::RenderActionLayout(const std::string &pageId, const RenderObject *render,
+  RenderActionLayout::RenderActionLayout(const std::string &page_id, const RenderObject *render,
                                          int index) {
-    this->mPageId = pageId;
-    this->mRef = render->Ref();
+    this->page_id = page_id;
+    this->ref = render->Ref();
     this->index = index;
     GetLayoutInfo(render);
   }
 
   void RenderActionLayout::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                                    mTop, mBottom, mLeft, mRight,
-                                                                    mHeight, mWidth, index);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(this->page_id.c_str(),
+                                                                    this->ref.c_str(),
+                                                                    this->top, this->bottom,
+                                                                    this->left, this->right,
+                                                                    this->height, this->width,
+                                                                    this->index);
   }
 
   void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
-    mTop = node->getLayoutPositionTop();
-    mBottom = node->getLayoutPositionBottom();
-    mRight = node->getLayoutPositionRight();
-    mLeft = node->getLayoutPositionLeft();
-    mHeight = node->getLayoutHeight();
-    mWidth = node->getLayoutWidth();
+    this->top = node->getLayoutPositionTop();
+    this->bottom = node->getLayoutPositionBottom();
+    this->right = node->getLayoutPositionRight();
+    this->left = node->getLayoutPositionLeft();
+    this->height = node->getLayoutHeight();
+    this->width = node->getLayoutWidth();
   }
 }

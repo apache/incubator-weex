@@ -38,8 +38,8 @@ namespace WeexCore {
 
   private:
 
-    float defaultNavWidth;
-    float defaultOverflowWidth;
+    float default_nav_width;
+    float default_overflow_width;
 
   };
 }

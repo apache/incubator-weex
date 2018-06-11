@@ -22,24 +22,26 @@
 
 namespace WeexCore {
 
-  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &pageId,
+  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &page_id,
                                                    const std::string &ref,
                                                    std::vector<std::pair<std::string, std::string>> *style,
                                                    std::vector<std::pair<std::string, std::string>> *margin,
                                                    std::vector<std::pair<std::string, std::string>> *padding,
                                                    std::vector<std::pair<std::string, std::string>> *border) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mStyle = style;
-    this->mMargin = margin;
-    this->mPadding = padding;
-    this->mBorder = border;
+    this->page_id = page_id;
+    this->ref = ref;
+    this->style = style;
+    this->margin = margin;
+    this->padding = padding;
+    this->border = border;
   }
 
   void RenderActionUpdateStyle::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(mPageId.c_str(),
-                                                                         mRef.c_str(), mStyle,
-                                                                         mMargin,
-                                                                         mPadding, mBorder);
+    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(this->page_id.c_str(),
+                                                                         this->ref.c_str(),
+                                                                         this->style,
+                                                                         this->margin,
+                                                                         this->padding,
+                                                                         this->border);
   }
 }
