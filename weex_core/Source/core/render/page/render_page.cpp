@@ -406,6 +406,8 @@ namespace WeexCore {
   void RenderPage::PostRenderAction(RenderAction *action) {
     if (action != nullptr) {
       action->ExecuteAction();
+      delete action;
+      action = nullptr;
     }
   }
 
