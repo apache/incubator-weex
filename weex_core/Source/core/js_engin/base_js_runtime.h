@@ -1,4 +1,3 @@
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,46 +17,38 @@
  * under the License.
  */
 
-#ifndef WEEXV8_WXTYPEDEFINE_H
-#define WEEXV8_WXTYPEDEFINE_H
-
+#ifndef WEEXCORE_BASE_JS_RUNTIME_H
+#define WEEXCORE_BASE_JS_RUNTIME_H
 
 #include <cstdint>
+#include <map>
+#include "base_js_context.h"
 
 namespace WeexCore {
+    class BaseJSContext;
 
-    enum wx_type_define {
-        VOID = 1,
-        INTEGER,
-        DOUBLE,
-        STRING,
-        JSON,
-        WSON
-    };
+    class BaseJSRunTime {
+    protected:
+        std::map<uint32_t, BaseJSContext *> contextMap;
+    public:
+        uint32_t runTimeId;
 
-    union WXValeDefine {
-        int64_t intValue;
-        double doubleValue;
-        char* string;
-    };
+        BaseJSRunTime() {}
 
+        ~BaseJSRunTime() {
+            contextMap.clear();
+        }
 
-    struct WXValue {
-        wx_type_define type;
-        WXValeDefine value;
-    };
+    public:
 
-    struct WXFuncSignature {
-        char*            methodName;
-        wx_type_define    returnType;
-        wx_type_define   *argsType;
-        uint8_t         argsLength;
-        void*           fucnAddr;
+        bool initRunTime();
+
+        void destroy();
+
+        BaseJSContext *createContext();
+
+        void destroyContext(BaseJSContext *context);
     };
 }
 
-
-
-
-
-#endif //WEEXV8_WXTYPEDEFINE_H
+#endif //WEEXCORE_BASE_JS_RUNTIME_H

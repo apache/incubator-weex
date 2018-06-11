@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #add_compile_options(-std=c++11)
 add_compile_options(-fexceptions)
 
+
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
@@ -44,8 +45,11 @@ set(COMMON_SRCS
   ./core/manager/weex_core_manager.cpp
   ./core/bridge/js_bridge.cpp
   ./core/parser/dom_wson.cpp
-   ./core/bridge/bridge.cpp
-        )
+  ./core/bridge/bridge.cpp
+  ./core/js_engin/base_js_runtime.cpp
+        core/js_engin/base_js_context.cpp)
+
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 
@@ -83,7 +87,7 @@ if (ANDROID)
 
 
     ./android/jsengine/api/WeexJSCoreApi.cpp
-     
+
 
   )
   SET(FINAL_ADD_LIBRARY

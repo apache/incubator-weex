@@ -23,7 +23,15 @@
 #ifndef WEEXCORE_JS_BRIDGE_H
 #define WEEXCORE_JS_BRIDGE_H
 
+#include <cstdint>
+#include <string>
+#include <map>
+#include "wx_type_define.h"
+#include <wson/wson.h>
+
 namespace WeexCore {
+  
+    
     class JSBridge {
     public:
         JSBridge(){};
@@ -76,6 +84,31 @@ namespace WeexCore {
         int onSetInterval(const char *pageId, const char *callbackId, const char *_time);
 
         void onClearInterval(const char *pageId, const char *callbackId);
+
+        /** new api  **/
+
+        virtual bool createJSRunTime(uint32_t runTimeId, std::map<std::string, std::string> *params)=0;
+
+        virtual bool destroyJSRunTime(uint32_t runTimeId)=0;
+
+        virtual bool createJSContext(uint32_t runTimeId, uint32_t contextId) =0;
+
+        virtual bool destroyJSContext(uint32_t runTimeId, uint32_t contextId) =0;
+
+        virtual void
+        execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args)=0;
+        
+        virtual wson_buffer*
+        execJSMethodWithResult(uint32_t runTimeId, uint32_t contextId, char *methodName, wson_buffer* args)=0;
+
+        virtual bool executeJavascript(uint32_t runTimeId, uint32_t contextId, char *script)=0;
+
+        virtual void reigsterJSVale(uint32_t runTimeId, uint32_t contextId, char *name, wson_buffer* valuse)=0;
+
+        virtual wson_buffer* getJSVale(uint32_t runTimeId, uint32_t contextId, char *name)=0;
+
+        virtual void reigsterJSFunc(uint32_t runTimeId, uint32_t contextId, wson_buffer* func)=0;
+
     };
 }
 

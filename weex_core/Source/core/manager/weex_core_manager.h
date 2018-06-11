@@ -25,6 +25,8 @@
 #include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore {
+
+
     class WeexCoreManager {
     private:
         static WeexCoreManager *m_pInstance;

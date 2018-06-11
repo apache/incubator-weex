@@ -1,4 +1,3 @@
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,46 +17,47 @@
  * under the License.
  */
 
-#ifndef WEEXV8_WXTYPEDEFINE_H
-#define WEEXV8_WXTYPEDEFINE_H
+#ifndef WEEXCORE_BASE_JS_CONTEXT_H
+#define WEEXCORE_BASE_JS_CONTEXT_H
 
 
 #include <cstdint>
+#include <wson.h>
+#include "base_js_runtime.h"
 
 namespace WeexCore {
+    class BaseJSRunTime;
 
-    enum wx_type_define {
-        VOID = 1,
-        INTEGER,
-        DOUBLE,
-        STRING,
-        JSON,
-        WSON
-    };
+    class BaseJSContext {
 
-    union WXValeDefine {
-        int64_t intValue;
-        double doubleValue;
-        char* string;
-    };
+    public:
+        BaseJSRunTime *jsRunTime;
+        uint32_t contextId;
 
 
-    struct WXValue {
-        wx_type_define type;
-        WXValeDefine value;
-    };
+        BaseJSContext() {};
 
-    struct WXFuncSignature {
-        char*            methodName;
-        wx_type_define    returnType;
-        wx_type_define   *argsType;
-        uint8_t         argsLength;
-        void*           fucnAddr;
+        ~BaseJSContext() {};
+    public:
+
+        bool onInit();
+
+        void onDestroy();
+
+        void execJSMethod(char *methodName, wson_buffer *args);
+
+        wson_buffer *execJSMethodWithResult(char *methodName, wson_buffer *args);
+
+        bool executeJavascript(char *script);
+
+        void reigsterJSVale(char *name, wson_buffer *valuse);
+
+        wson_buffer *getJSVale(char *name);
+
+        void reigsterJSFunc(wson_buffer *func);
+
     };
 }
 
 
-
-
-
-#endif //WEEXV8_WXTYPEDEFINE_H
+#endif //WEEXCORE_BASE_JS_CONTEXT_H

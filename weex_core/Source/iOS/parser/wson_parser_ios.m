@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "WsonParser.h"
+#import "wson_parser_ios.h"
 #include <objc/runtime.h>
 #include <inttypes.h>
 #include <CoreGraphics/CoreGraphics.h>
