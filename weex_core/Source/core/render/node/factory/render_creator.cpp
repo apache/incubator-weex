@@ -17,40 +17,42 @@
  * under the License.
  */
 #include "core/render/node/factory/render_creator.h"
-#include "core/render/node/factory/render_object_interface.h"
+#include "core/render/node/factory/render_appbar_factory.h"
 #include "core/render/node/factory/render_factory_interface.h"
-#include "core/render/node/factory/render_text_factory.h"
-#include "core/render/node/factory/simple_render_factory.h"
 #include "core/render/node/factory/render_list_factory.h"
 #include "core/render/node/factory/render_mask_factory.h"
+#include "core/render/node/factory/render_object_interface.h"
 #include "core/render/node/factory/render_scroller_factory.h"
-#include "core/render/node/factory/render_appbar_factory.h"
+#include "core/render/node/factory/render_text_factory.h"
 #include "core/render/node/factory/render_type.h"
+#include "core/render/node/factory/simple_render_factory.h"
 
 namespace WeexCore {
 
-  RenderCreator *RenderCreator::g_pInstance = nullptr;
+RenderCreator *RenderCreator::g_pInstance = nullptr;
 
-  IRenderObject *RenderCreator::CreateRender(const std::string &type, const std::string &ref) {
-    IRenderFactory *factory;
-    if (type == kRenderText) {
-      factory = new RenderTextFactory();
-    } else if (type == kRenderList || type == kRenderWaterfall || type == kRenderRecycleList) {
-      factory = new RenderListFactory();
-    } else if (type == kRenderMask) {
-      factory = new RenderMaskFactory();
-    } else if (type == kRenderScroller) {
-      factory = new RenderScrollerFactory();
-    } else if (type == kRenderAppBar) {
-      factory = new RenderAppBarFactory();
-    } else {
-      factory = new RenderCommonFactory();
-    }
-
-    IRenderObject *render = factory->CreateRender();
-    render->set_ref(ref);
-    render->set_type(type);
-    delete factory;
-    return render;
+IRenderObject *RenderCreator::CreateRender(const std::string &type,
+                                           const std::string &ref) {
+  IRenderFactory *factory;
+  if (type == kRenderText) {
+    factory = new RenderTextFactory();
+  } else if (type == kRenderList || type == kRenderWaterfall ||
+             type == kRenderRecycleList) {
+    factory = new RenderListFactory();
+  } else if (type == kRenderMask) {
+    factory = new RenderMaskFactory();
+  } else if (type == kRenderScroller) {
+    factory = new RenderScrollerFactory();
+  } else if (type == kRenderAppBar) {
+    factory = new RenderAppBarFactory();
+  } else {
+    factory = new RenderCommonFactory();
   }
+
+  IRenderObject *render = factory->CreateRender();
+  render->set_ref(ref);
+  render->set_type(type);
+  delete factory;
+  return render;
 }
+}  // namespace WeexCore

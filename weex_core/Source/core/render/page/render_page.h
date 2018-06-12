@@ -16,172 +16,167 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef RenderPage_H
-#define RenderPage_H
+#ifndef CORE_RENDER_PAGE_RENDER_PAGE_H_
+#define CORE_RENDER_PAGE_RENDER_PAGE_H_
 
-#include <vector>
-#include <string>
-#include <map>
-#include <cmath>
 #include <atomic>
+#include <cmath>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace WeexCore {
 
-  class RenderAction;
+class RenderAction;
 
-  class RenderObject;
+class RenderObject;
 
-  class RenderPerformance;
+class RenderPerformance;
 
-  class RenderPage {
+class RenderPage {
+ private:
+  void TraverseTree(RenderObject *render, int index);
 
-  private:
+  void PushRenderToRegisterMap(RenderObject *render);
 
-    void TraverseTree(RenderObject *render, int index);
+  void RemoveRenderFromRegisterMap(RenderObject *render);
 
-    void PushRenderToRegisterMap(RenderObject *render);
+  void SendCreateBodyAction(RenderObject *render);
 
-    void RemoveRenderFromRegisterMap(RenderObject *render);
+  void SendAddElementAction(RenderObject *child, RenderObject *parent,
+                            int index, bool is_recursion,
+                            bool will_layout = true);
 
-    void SendCreateBodyAction(RenderObject *render);
+  void SendRemoveElementAction(const std::string &ref);
 
-    void
-    SendAddElementAction(RenderObject *child, RenderObject *parent, int index, bool is_recursion,
-                         bool will_layout = true);
+  void SendMoveElementAction(const std::string &ref,
+                             const std::string &parent_ref, int index);
 
-    void SendRemoveElementAction(const std::string &ref);
+  void SendLayoutAction(RenderObject *render, int index);
 
-    void SendMoveElementAction(const std::string &ref, const std::string &parent_ref, int index);
+  void SendUpdateStyleAction(
+      RenderObject *render,
+      std::vector<std::pair<std::string, std::string>> *style,
+      std::vector<std::pair<std::string, std::string>> *margin,
+      std::vector<std::pair<std::string, std::string>> *padding,
+      std::vector<std::pair<std::string, std::string>> *border);
 
-    void SendLayoutAction(RenderObject *render, int index);
+  void SendUpdateAttrAction(
+      RenderObject *render,
+      std::vector<std::pair<std::string, std::string>> *attrs);
 
-    void SendUpdateStyleAction(RenderObject *render,
-                               std::vector<std::pair<std::string, std::string>> *style,
-                               std::vector<std::pair<std::string, std::string>> *margin,
-                               std::vector<std::pair<std::string, std::string>> *padding,
-                               std::vector<std::pair<std::string, std::string>> *border);
+  void SendCreateFinishAction();
 
-    void SendUpdateAttrAction(RenderObject *render,
-                              std::vector<std::pair<std::string, std::string>> *attrs);
+  void SendAppendTreeCreateFinish(const std::string &ref);
 
-    void SendCreateFinishAction();
+  void PostRenderAction(RenderAction *action);
 
-    void SendAppendTreeCreateFinish(const std::string &ref);
+ public:
 
-    void PostRenderAction(RenderAction *action);
+  explicit RenderPage(std::string page_id);
 
-  public:
+  ~RenderPage();
 
-    explicit RenderPage(std::string page_id);
+  void CalculateLayout();
 
-    ~RenderPage();
+  bool CreateRootRender(RenderObject *root);
 
-    void CalculateLayout();
+  bool AddRenderObject(const std::string &parent_ref, int insert_posiotn,
+                       RenderObject *child);
 
-    bool CreateRootRender(RenderObject *root);
+  bool RemoveRenderObject(const std::string &ref);
 
-    bool AddRenderObject(const std::string &parent_ref, int insert_posiotn, RenderObject *child);
+  bool MoveRenderObject(const std::string &ref, const std::string &parent_ref,
+                        int index);
 
-    bool RemoveRenderObject(const std::string &ref);
+  bool UpdateStyle(const std::string &ref,
+                   std::vector<std::pair<std::string, std::string>> *styles);
 
-    bool MoveRenderObject(const std::string &ref, const std::string &parent_ref, int index);
+  bool UpdateAttr(const std::string &ref,
+                  std::vector<std::pair<std::string, std::string>> *attrs);
 
-    bool
-    UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *styles);
+  void SetDefaultHeightAndWidthIntoRootRender(
+      const float default_width, const float default_height,
+      const bool is_width_wrap_content, const bool is_height_wrap_content);
 
-    bool
-    UpdateAttr(const std::string &ref, std::vector<std::pair<std::string, std::string>> *attrs);
+  bool AddEvent(const std::string &ref, const std::string &event);
 
-    void
-    SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,
-                                           const bool is_width_wrap_content,
-                                           const bool is_height_wrap_content);
+  bool RemoveEvent(const std::string &ref, const std::string &event);
 
-    bool AddEvent(const std::string &ref, const std::string &event);
+  bool CreateFinish();
 
-    bool RemoveEvent(const std::string &ref, const std::string &event);
+  void Batch();
 
-    bool CreateFinish();
+  void CssLayoutTime(const int64_t &time);
 
-    void Batch();
+  void ParseJsonTime(const int64_t &time);
 
-    void CssLayoutTime(const long long &time);
+  void CallBridgeTime(const int64_t &time);
 
-    void ParseJsonTime(const long long &time);
+  std::vector<int64_t> PrintFirstScreenLog();
 
-    void CallBridgeTime(const long long &time);
+  std::vector<int64_t> PrintRenderSuccessLog();
 
-    std::vector<long> PrintFirstScreenLog();
+  void LayoutImmediately();
 
-    std::vector<long> PrintRenderSuccessLog();
+  void SendUpdateAttrAction(RenderObject *render,
+                            std::map<std::string, std::string> *attrs);
 
-    void LayoutImmediately();
+  RenderObject *GetRenderObject(const std::string &ref);
 
-    void SendUpdateAttrAction(RenderObject *render, std::map<std::string, std::string> *attrs);
+  void SetRootRenderObject(RenderObject *root);
 
-    RenderObject *GetRenderObject(const std::string &ref);
+  // ****** Life Cycle ****** //
 
-    void SetRootRenderObject(RenderObject *root);
+  void OnRenderPageInit();
 
-    // ****** Life Cycle ****** //
+  void OnRenderProcessStart();
 
-    void OnRenderPageInit();
+  void OnRenderProcessExited();
 
-    void OnRenderProcessStart();
+  void OnRenderProcessGone();
 
-    void OnRenderProcessExited();
+  void OnRenderPageClose();
 
-    void OnRenderProcessGone();
+public:
 
-    void OnRenderPageClose();
+  inline std::string page_id() { return this->page_id_; }
 
+  inline float viewport_width() const { return this->viewport_width_; }
 
-    inline std::string PageId() {
-      return this->page_id;
-    }
+  inline void set_viewport_width(float viewport_width) {
+    this->viewport_width_ = viewport_width;
+  }
 
-    inline float ViewPortWidth() const {
-      return this->viewport_width;
-    }
+  inline bool is_dirty() { return this->is_dirty_.load(); }
 
-    inline void SetViewPortWidth(float viewport_width) {
-      this->viewport_width = viewport_width;
-    }
+  inline void set_is_dirty(bool dirty) { this->is_dirty_.store(dirty); }
 
-    inline bool isDirty() {
-      return this->dirty.load();
-    }
+  inline void set_is_render_container_width_wrap_content(bool wrap) {
+    this->is_render_container_width_wrap_content_.store(wrap);
+  }
 
-    inline void updateDirty(bool dirty) {
-      this->dirty.store(dirty);
-    }
+  inline bool is_render_container_width_wrap_content() {
+    return this->is_render_container_width_wrap_content_.load();
+  }
 
-    inline void SetRenderContainerWidthWrapContent(bool wrap) {
-      this->is_render_container_width_wrap_content.store(wrap);
-    }
+ public:
+  static constexpr bool kUseVSync = true;
+  std::atomic_bool need_layout_{false};
+  std::atomic_bool has_fore_layout_action_{false};
 
-    inline bool GetRenderContainerWidthWrapContent() {
-      return this->is_render_container_width_wrap_content.load();
-    }
+ private:
+  float viewport_width_;
+  RenderObject *render_root_ = nullptr;
+  std::string page_id_;
+  std::pair<float, float> render_page_size_;
+  std::map<std::string, RenderObject *> render_object_registers_;
+  RenderPerformance *render_performance_;
+  std::atomic_bool is_dirty_{true};
+  std::atomic_bool is_render_container_width_wrap_content_{false};
+  std::atomic_bool is_render_container_height_wrap_content_{false};
+};
+}  // namespace WeexCore
 
-  public:
-
-    static constexpr bool kUseVSync = true;
-    std::atomic_bool need_layout{false};
-    std::atomic_bool has_fore_layout_action{false};
-
-  private:
-
-    float viewport_width;
-    RenderObject *render_root = nullptr;
-    std::string page_id;
-    std::pair<float, float> render_page_size;
-    std::map<std::string, RenderObject *> render_object_registers;
-    RenderPerformance *render_performance;
-    std::atomic_bool dirty{true};
-    std::atomic_bool is_render_container_width_wrap_content{false};
-    std::atomic_bool is_render_container_height_wrap_content{false};
-  };
-}
-
-#endif //RenderManager_h
+#endif  // CORE_RENDER_PAGE_RENDER_PAGE_H_

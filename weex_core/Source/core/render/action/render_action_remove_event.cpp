@@ -17,22 +17,21 @@
  * under the License.
  */
 
-#include "core/manager/weex_core_manager.h"
 #include "core/render/action/render_action_remove_event.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &page_id,
-                                                   const std::string &ref,
-                                                   const std::string &event) {
-    this->page_id_ = page_id;
-    this->ref_ = ref;
-    this->event_ = event;
-  }
-
-  void RenderActionRemoveEvent::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(this->page_id_.c_str(),
-                                                                         this->ref_.c_str(),
-                                                                         this->event_.c_str());
-  }
+RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &page_id,
+                                                 const std::string &ref,
+                                                 const std::string &event) {
+  this->page_id_ = page_id;
+  this->ref_ = ref;
+  this->event_ = event;
 }
+
+void RenderActionRemoveEvent::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(
+      this->page_id_.c_str(), this->ref_.c_str(), this->event_.c_str());
+}
+}  // namespace WeexCore

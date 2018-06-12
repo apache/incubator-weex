@@ -16,37 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_CREATEBODYACTION_H
-#define WEEX_PROJECT_CREATEBODYACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_CREATEBODY_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_CREATEBODY_H_
 
-#include <string>
 #include <map>
 #include <set>
+#include <string>
 
+#include "core/layout/style.h"
 #include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderObject;
+class RenderObject;
 
-  class RenderActionCreateBody : public RenderAction {
+class RenderActionCreateBody : public RenderAction {
+ public:
+  explicit RenderActionCreateBody(const std::string &page_id,
+                                  const RenderObject *render);
 
-  public:
-    explicit RenderActionCreateBody(const std::string &page_id, const RenderObject *render);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::map<std::string, std::string> *styles_;
+  std::map<std::string, std::string> *attributes_;
+  std::set<std::string> *events_;
+  WXCoreMargin margins_;
+  WXCorePadding paddings_;
+  WXCoreBorderWidth borders_;
+  std::string page_id_;
+  std::string component_type_;
+  std::string ref_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::map<std::string, std::string> *styles_;
-    std::map<std::string, std::string> *attributes_;
-    std::set<std::string> *events_;
-    WXCoreMargin margins_;
-    WXCorePadding paddings_;
-    WXCoreBorderWidth borders_;
-    std::string page_id_;
-    std::string component_type_;
-    std::string ref_;
-  };
-}
-
-#endif //WEEX_PROJECT_CREATEBODYACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_CREATEBODY_H_

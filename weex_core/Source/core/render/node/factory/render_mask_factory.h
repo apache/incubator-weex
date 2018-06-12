@@ -16,21 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERMASKFACTORY_H
-#define WEEX_PROJECT_RENDERMASKFACTORY_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_MASK_FACTORY_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_MASK_FACTORY_H_
 
-#include "core/render/node/render_mask.h"
 #include "core/render/node/factory/render_factory_interface.h"
+#include "core/render/node/render_mask.h"
 
 namespace WeexCore {
 
-  class RenderMaskFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderMask();
-    }
-  };
+class RenderMaskFactory : public IRenderFactory {
+ public:
+  IRenderObject *CreateRender() { return new RenderMask(); }
+};
 
-}
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_RENDERMASKFACTORY_H
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_MASK_FACTORY_H_

@@ -16,29 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_UPDATEATTRACTION_H
-#define WEEX_PROJECT_UPDATEATTRACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_ATTR_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_ATTR_H_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionUpdateAttr : public RenderAction {
+class RenderActionUpdateAttr : public RenderAction {
+ public:
+  explicit RenderActionUpdateAttr(
+      const std::string &page_id, const std::string &ref,
+      std::vector<std::pair<std::string, std::string>> *attrs);
 
-  public:
-    explicit RenderActionUpdateAttr(const std::string &page_id, const std::string &ref,
-                                    std::vector<std::pair<std::string, std::string>> *attrs);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::vector<std::pair<std::string, std::string>> *attrs_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string page_id_;
-    std::string ref_;
-    std::vector<std::pair<std::string, std::string>> *attrs_;
-  };
-}
-
-#endif //WEEX_PROJECT_UPDATEATTRACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_ATTR_H_

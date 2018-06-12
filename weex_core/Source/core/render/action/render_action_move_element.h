@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERACTIONMOVEELEMENT_H
-#define WEEX_PROJECT_RENDERACTIONMOVEELEMENT_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_MOVE_ELEMENT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_MOVE_ELEMENT_H_
 
 #include <string>
 
@@ -25,20 +25,20 @@
 
 namespace WeexCore {
 
-  class RenderActionMoveElement : public RenderAction {
+class RenderActionMoveElement : public RenderAction {
+ public:
+  explicit RenderActionMoveElement(const std::string &page_id,
+                                   const std::string &ref,
+                                   const std::string &parent_ref, int index);
 
-  public:
-    explicit RenderActionMoveElement(const std::string &page_id, const std::string &ref,
-                                     const std::string &parent_ref, int index);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::string parent_ref_;
+  int index_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string page_id_;
-    std::string ref_;
-    std::string parent_ref_;
-    int index_;
-  };
-}
-
-#endif //WEEX_PROJECT_RENDERACTIONMOVEELEMENT_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_MOVE_ELEMENT_H_

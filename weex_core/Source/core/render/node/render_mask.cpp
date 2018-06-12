@@ -17,38 +17,47 @@
  * under the License.
  */
 #include <cstdlib>
+#include <utility>
 
-#include "core/render/node/render_mask.h"
+#include "base/ViewUtils.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_name.h"
-#include "base/ViewUtils.h"
+#include "core/render/node/render_mask.h"
 
 namespace WeexCore {
 
-  std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
-    std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
+std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
+  std::map<std::string, std::string> *style =
+      new std::map<std::string, std::string>();
 
-    int width = WXCoreEnvironment::getInstance()->DeviceWidth();
-    int height = WXCoreEnvironment::getInstance()->DeviceHeight();
+  int width = WXCoreEnvironment::getInstance()->DeviceWidth();
+  int height = WXCoreEnvironment::getInstance()->DeviceHeight();
 
-    if (WXCoreEnvironment::getInstance()->GetOption("screen_width_pixels") != "" &&
-        WXCoreEnvironment::getInstance()->GetOption("screen_height_pixels") != "") {
-      width = atoi(WXCoreEnvironment::getInstance()->GetOption("screen_width_pixels").c_str());
-      height = atoi(WXCoreEnvironment::getInstance()->GetOption("screen_height_pixels").c_str());
-    }
-
-    if (WXCoreEnvironment::getInstance()->GetOption("status_bar_height") != "") {
-      int statusBarHeight = atoi(
-          WXCoreEnvironment::getInstance()->GetOption("status_bar_height").c_str());
-      height -= statusBarHeight;
-    }
-
-    style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
-    style->insert(std::pair<std::string, std::string>(WIDTH, to_string(
-        getWebPxByWidth(width, GetViewPortWidth()))));
-    style->insert(std::pair<std::string, std::string>(HEIGHT, to_string(
-        getWebPxByWidth(height, GetViewPortWidth()))));
-    style->insert(std::pair<std::string, std::string>(TOP, "0"));
-    return style;
+  if (WXCoreEnvironment::getInstance()->GetOption("screen_width_pixels") !=
+          "" &&
+      WXCoreEnvironment::getInstance()->GetOption("screen_height_pixels") !=
+          "") {
+    width = atoi(WXCoreEnvironment::getInstance()
+                     ->GetOption("screen_width_pixels")
+                     .c_str());
+    height = atoi(WXCoreEnvironment::getInstance()
+                      ->GetOption("screen_height_pixels")
+                      .c_str());
   }
+
+  if (WXCoreEnvironment::getInstance()->GetOption("status_bar_height") != "") {
+    int status_bar_height = atoi(WXCoreEnvironment::getInstance()
+                                   ->GetOption("status_bar_height")
+                                   .c_str());
+    height -= status_bar_height;
+  }
+
+  style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
+  style->insert(std::pair<std::string, std::string>(
+      WIDTH, to_string(getWebPxByWidth(width, GetViewPortWidth()))));
+  style->insert(std::pair<std::string, std::string>(
+      HEIGHT, to_string(getWebPxByWidth(height, GetViewPortWidth()))));
+  style->insert(std::pair<std::string, std::string>(TOP, "0"));
+  return style;
 }
+}  // namespace WeexCore

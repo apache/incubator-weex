@@ -152,7 +152,7 @@ namespace WeexCore {
   void Bridge_Impl_Android::reportException(const char* pageId, const char *func, const char *exception_string) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jFunc = env->NewStringUTF(func);
@@ -178,7 +178,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callNative(const char* pageId, const char *task, const char *callback) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
@@ -214,7 +214,7 @@ namespace WeexCore {
   void* Bridge_Impl_Android::callNativeModule(const char* pageId, const char *module, const char *method,
                                                 const char *arguments, int argumentsLen,  const char *options, int optionsLen) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jModule = env->NewStringUTF(module);
@@ -251,7 +251,7 @@ namespace WeexCore {
   void Bridge_Impl_Android::callNativeComponent(const char* pageId, const char* ref, const char *method,
                                                 const char *arguments, int argumentsLength, const char *options, int optionsLength) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jMethod = env->NewStringUTF(method);
@@ -322,7 +322,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callUpdateFinish(const char* pageId, const char *task, const char *callback) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
@@ -354,7 +354,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRefreshFinish(const char* pageId, const char *task, const char *callback) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jbyteArray jTask = newJByteArray(env, task);
@@ -390,7 +390,7 @@ namespace WeexCore {
                                           const WXCorePadding &paddings,
                                           const WXCoreBorderWidth &borders) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -536,7 +536,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveElement(const char* pageId, const char* ref) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -562,7 +562,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -589,7 +589,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callAddEvent(const char* pageId, const char* ref, const char *event) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
     jstring jPageId = getKeyFromCache(env, pageId);
@@ -616,7 +616,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callRemoveEvent(const char* pageId, const char* ref, const char *event) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -647,7 +647,7 @@ namespace WeexCore {
                                            std::vector<std::pair<std::string, std::string>> *padding,
                                            std::vector<std::pair<std::string, std::string>> *border) {
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -700,7 +700,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callUpdateAttr(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *attrs) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -738,7 +738,7 @@ namespace WeexCore {
                                       int height, int width, int index) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -766,7 +766,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callCreateFinish(const char* pageId) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -791,7 +791,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callAppendTreeCreateFinish(const char *pageId, const char *ref) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 
@@ -818,7 +818,7 @@ namespace WeexCore {
   int Bridge_Impl_Android::callHasTransitionPros(const char* pageId, const char* ref, std::vector<std::pair<std::string, std::string>> *style) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-    long long startTime = getCurrentTime();
+    int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
 

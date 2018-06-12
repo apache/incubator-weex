@@ -16,74 +16,74 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERLIST_H
-#define WEEX_PROJECT_RENDERLIST_H
+#ifndef CORE_RENDER_NODE_RENDER_LIST_H_
+#define CORE_RENDER_NODE_RENDER_LIST_H_
 
-#include "core/render/node/render_object.h"
+#include <map>
+#include <string>
+#include <vector>
+
 #include "core/css/constants_value.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
-  class RenderList : public RenderObject {
+class RenderList : public RenderObject {
+ public:
+  ~RenderList();
 
-  public:
+  void set_flex(const float flex);
 
-    ~RenderList();
+  void AddCellSlotCopyTrack(RenderObject *cell_slot);
 
-    void set_flex(const float flex);
+  std::map<std::string, std::string> *GetDefaultStyle();
 
-    void AddCellSlotCopyTrack(RenderObject *cellSlot);
+  std::map<std::string, std::string> *GetDefaultAttr();
 
-    std::map<std::string, std::string> *GetDefaultStyle();
+  void PreCalculateCellWidth();
 
-    std::map<std::string, std::string> *GetDefaultAttr();
+  std::string CalculateSpanOffset();
 
-    void PreCalculateCellWidth();
+  float TakeStyleWidth();
 
-    std::string CalculateSpanOffset();
+  int AddRenderObject(int index, RenderObject *child);
 
-    float TakeStyleWidth();
+  void AddRenderObjectWidth(RenderObject *child, const bool updating);
 
-    int AddRenderObject(int index, RenderObject *child);
+  void UpdateAttr(std::string key, std::string value);
 
-    void AddRenderObjectWidth(RenderObject *child, const bool updating);
+  float TakeColumnCount();
 
-    void UpdateAttr(std::string key, std::string value);
+  float TakeColumnGap();
 
-    float TakeColumnCount();
+  float TakeColumnWidth();
 
-    float TakeColumnGap();
+  float TakeLeftGap();
 
-    float TakeColumnWidth();
+  float TakeRightGap();
 
-    float TakeLeftGap();
+  int TakeOrientation();
 
-    float TakeRightGap();
+  inline float CalculateFreeSpaceAlongMainAxis(
+      const float &width, const float &height,
+      const float &currentLength) const override {
+    return NAN;
+  }
 
-    int TakeOrientation();
+  inline std::vector<RenderObject *> &CellSlots() { return cell_slots_; }
 
-    inline float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
-                                                 const float &currentLength) const override {
-      return NAN;
-    }
+ private:
+  bool is_pre_calculate_cell_width_ = false;
+  int column_count_ = COLUMN_COUNT_NORMAL;
+  float column_width_ = AUTO_VALUE;
+  float available_width_ = 0;
+  float column_gap_ = COLUMN_GAP_NORMAL;
+  bool is_set_flex_ = false;
+  std::vector<RenderObject *> cell_slots_;
+  std::vector<RenderObject *> cell_slots_copys_;
+  float left_gap_ = 0;
+  float right_gap_ = 0;
+};
+}  // namespace WeexCore
 
-    inline std::vector<RenderObject *> &CellSlots() {
-      return cell_slots_;
-    }
-
-  private:
-
-    bool is_pre_calculate_cell_width_ = false;
-    int column_count_ = COLUMN_COUNT_NORMAL;
-    float column_width_ = AUTO_VALUE;
-    float available_width_ = 0;
-    float column_gap_ = COLUMN_GAP_NORMAL;
-    bool is_set_flex_ = false;
-    std::vector<RenderObject *> cell_slots_;
-    std::vector<RenderObject *> cell_slots_copys_;
-    float left_gap_ = 0;
-    float right_gap_ = 0;
-  };
-}
-
-#endif //WEEX_PROJECT_RENDERLIST_H
+#endif  // CORE_RENDER_NODE_RENDER_LIST_H_

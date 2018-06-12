@@ -16,154 +16,144 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef RenderObject_h
-#define RenderObject_h
+#ifndef CORE_RENDER_NODE_RENDER_OBJECT_H_
+#define CORE_RENDER_NODE_RENDER_OBJECT_H_
 
-#include <string>
+#include <functional>
 #include <map>
 #include <set>
-#include <functional>
+#include <string>
 
 #include "core/render/node/factory/render_object_interface.h"
 
-#define JSON_OBJECT_MARK_CHAR  '{'
-#define JSON_ARRAY_MARK_CHAR  '['
+#define JSON_OBJECT_MARK_CHAR '{'
+#define JSON_ARRAY_MARK_CHAR '['
 
-#define convert_render_object_to_long(render)    ((jlong)((intptr_t)render))
+#define convert_render_object_to_long(render) ((jlong)((intptr_t)render))
 
-#define convert_long_to_render_object(ptr)   ((RenderObject *)((intptr_t)ptr))
+#define convert_long_to_render_object(ptr) \
+  (static_cast<RenderObject *>((intptr_t)ptr))
 
 namespace WeexCore {
 
-  class RenderObject;
+class RenderObject;
 
-  class RenderPage;
+class RenderPage;
 
-  typedef enum StyleType {
-    kTypeStyle, kTypeLayout, kTypeMargin, kTypePadding, kTypeBorder
-  } StyleType;
+typedef enum StyleType {
+  kTypeStyle,
+  kTypeLayout,
+  kTypeMargin,
+  kTypePadding,
+  kTypeBorder
+} StyleType;
 
-  class RenderObject : public IRenderObject {
+class RenderObject : public IRenderObject {
+  friend class RenderPage;
 
-    friend class RenderPage;
+ public:
+  void LayoutBeforeImpl();
 
-  public:
+  void LayoutAfterImpl();
 
-    void LayoutBeforeImpl();
+  void CopyFrom(RenderObject *src);
 
-    void LayoutAfterImpl();
+  void MapInsertOrAssign(std::map<std::string, std::string> *targetMap,
+                         const std::string &key, const std::string &value);
 
-    void CopyFrom(RenderObject *src);
+  bool ViewInit();
 
-    void MapInsertOrAssign(std::map<std::string, std::string> *targetMap, const std::string &key,
-                           const std::string &value);
+  virtual std::map<std::string, std::string> *GetDefaultStyle() {
+    return nullptr;
+  }
 
-    bool ViewInit();
+  virtual std::map<std::string, std::string> *GetDefaultAttr() {
+    return nullptr;
+  }
 
-    virtual std::map<std::string, std::string> *GetDefaultStyle() {
-      return nullptr;
-    }
+ protected:
+  bool UpdateStyleInternal(const std::string key, const std::string value,
+                           float fallback, std::function<void(float)> functor);
 
-    virtual std::map<std::string, std::string> *GetDefaultAttr() {
-      return nullptr;
-    }
+ public:
+  RenderObject();
 
-  protected:
+  ~RenderObject();
 
-    bool UpdateStyleInternal(const std::string key, const std::string value, float fallback,
-                             std::function<void(float)> functor);
+  void BindMeasureFunc();
 
-  public:
+  void OnLayoutBefore();
 
-    explicit RenderObject();
+  void OnLayoutAfter(float width, float height);
 
-    ~RenderObject();
+  virtual StyleType ApplyStyle(const std::string &key, const std::string &value,
+                               const bool updating);
 
-    void BindMeasureFunc();
+  void ApplyDefaultStyle();
 
-    void OnLayoutBefore();
+  void ApplyDefaultAttr();
 
-    void OnLayoutAfter(float width, float height);
+  Index IndexOf(const RenderObject *render);
 
-    virtual StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating);
+  virtual int AddRenderObject(int index, RenderObject *child);
 
-    void ApplyDefaultStyle();
+  float GetViewPortWidth();
 
-    void ApplyDefaultAttr();
+  const std::string GetAttr(const std::string &key);
 
-    Index IndexOf(const RenderObject *render);
+  const std::string GetStyle(const std::string &key);
 
-    virtual int AddRenderObject(int index, RenderObject *child);
+  RenderPage *GetRenderPage();
 
-    float GetViewPortWidth();
+  virtual void UpdateAttr(std::string key, std::string value);
 
-    const std::string GetAttr(const std::string &key);
+  virtual StyleType UpdateStyle(std::string key, std::string value);
 
-    const std::string GetStyle(const std::string &key);
+  bool IsAppendTree();
 
-    RenderPage *GetRenderPage();
+  RenderObject *GetChild(const Index &index);
 
-    virtual void UpdateAttr(std::string key, std::string value);
+  void RemoveRenderObject(RenderObject *child);
 
-    virtual StyleType UpdateStyle(std::string key, std::string value);
+  void AddAttr(std::string key, std::string value);
 
-    bool IsAppendTree();
+  StyleType AddStyle(std::string key, std::string value);
 
-    RenderObject *GetChild(const Index &index);
+  void AddEvent(std::string event);
 
-    void RemoveRenderObject(RenderObject *child);
+  void RemoveEvent(const std::string &event);
 
-    void AddAttr(std::string key, std::string value);
+ public:
+  inline void set_parent_render(RenderObject *render) {
+    this->parent_render_ = render;
+  }
 
-    StyleType AddStyle(std::string key, std::string value);
+  inline RenderObject *parent_render() { return this->parent_render_; }
 
-    void AddEvent(std::string event);
+  inline std::map<std::string, std::string> *styles() const {
+    return this->styles_;
+  }
 
-    void RemoveEvent(const std::string &event);
+  inline std::map<std::string, std::string> *attributes() const {
+    return this->attributes_;
+  }
 
-  public:
+  inline std::set<std::string> *events() const { return this->events_; }
 
-    inline void set_parent_render(RenderObject *render) {
-      this->parent_render_ = render;
-    }
+  inline void set_is_root_render() { this->is_root_render_ = true; }
 
-    inline RenderObject *parent_render() {
-      return this->parent_render_;
-    }
+  inline bool is_root_render() { return this->is_root_render_; }
 
-    inline std::map<std::string, std::string> *styles() const {
-      return this->styles_;
-    }
+  inline bool is_sticky() { return this->is_sticky_; }
 
-    inline std::map<std::string, std::string> * attributes() const {
-      return this->attributes_;
-    }
-
-    inline std::set<std::string> *events() const {
-      return this->events_;
-    }
-
-    inline void set_is_root_render() {
-      this->is_root_render_ = true;
-    }
-
-    inline bool is_root_render() {
-      return this->is_root_render_;
-    }
-
-    inline bool is_sticky() {
-      return this->is_sticky_;
-    }
-
-  private:
-
-    RenderObject *parent_render_;
-    std::map<std::string, std::string> *styles_;
-    std::map<std::string, std::string> *attributes_;
-    std::set<std::string> *events_;
-    float viewport_width_ = -1;
-    bool is_root_render_;
-    bool is_sticky_ = false;
-  };
-} //end WeexCore
-#endif //RenderObject_h
+ private:
+  RenderObject *parent_render_;
+  std::map<std::string, std::string> *styles_;
+  std::map<std::string, std::string> *attributes_;
+  std::set<std::string> *events_;
+  float viewport_width_ = -1;
+  bool is_root_render_;
+  bool is_sticky_ = false;
+};
+}  // namespace WeexCore
+#endif  // CORE_RENDER_NODE_RENDER_OBJECT_H_

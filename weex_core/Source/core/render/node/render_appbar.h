@@ -16,32 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERAPPBAR_H
-#define WEEX_PROJECT_RENDERAPPBAR_H
+#ifndef CORE_RENDER_NODE_RENDER_APPBAR_H_
+#define CORE_RENDER_NODE_RENDER_APPBAR_H_
 
+#include <map>
 #include <string>
 
 #include "core/render/node/render_object.h"
 
 namespace WeexCore {
-  class RenderAppBar : public RenderObject {
+class RenderAppBar : public RenderObject {
+ private:
+  std::map<std::string, std::string> *GetDefaultStyle();
 
-  private:
+  bool StyleExist(const std::string &key);
 
-    std::map<std::string, std::string> *GetDefaultStyle();
+ public:
+  StyleType ApplyStyle(const std::string &key, const std::string &value,
+                       const bool updating);
 
-    bool StyleExist(const std::string &key);
+ private:
+  float default_nav_width_;
+  float default_overflow_width_;
+};
+}  // namespace WeexCore
 
-  public:
-
-    StyleType ApplyStyle(const std::string &key, const std::string &value, const bool updating);
-
-  private:
-
-    float default_nav_width_;
-    float default_overflow_width_;
-
-  };
-}
-
-#endif //WEEX_PROJECT_RENDERAPPBAR_H
+#endif  // CORE_RENDER_NODE_RENDER_APPBAR_H_

@@ -17,31 +17,28 @@
  * under the License.
  */
 
-#include "core/manager/weex_core_manager.h"
 #include "core/render/action/render_action_update_style.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionUpdateStyle::RenderActionUpdateStyle(const std::string &page_id,
-                                                   const std::string &ref,
-                                                   std::vector<std::pair<std::string, std::string>> *style,
-                                                   std::vector<std::pair<std::string, std::string>> *margin,
-                                                   std::vector<std::pair<std::string, std::string>> *padding,
-                                                   std::vector<std::pair<std::string, std::string>> *border) {
-    this->page_id_ = page_id;
-    this->ref_ = ref;
-    this->style_ = style;
-    this->margin_ = margin;
-    this->padding_ = padding;
-    this->border_ = border;
-  }
-
-  void RenderActionUpdateStyle::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(this->page_id_.c_str(),
-                                                                         this->ref_.c_str(),
-                                                                         this->style_,
-                                                                         this->margin_,
-                                                                         this->padding_,
-                                                                         this->border_);
-  }
+RenderActionUpdateStyle::RenderActionUpdateStyle(
+    const std::string &page_id, const std::string &ref,
+    std::vector<std::pair<std::string, std::string>> *style,
+    std::vector<std::pair<std::string, std::string>> *margin,
+    std::vector<std::pair<std::string, std::string>> *padding,
+    std::vector<std::pair<std::string, std::string>> *border) {
+  this->page_id_ = page_id;
+  this->ref_ = ref;
+  this->style_ = style;
+  this->margin_ = margin;
+  this->padding_ = padding;
+  this->border_ = border;
 }
+
+void RenderActionUpdateStyle::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(
+      this->page_id_.c_str(), this->ref_.c_str(), this->style_, this->margin_,
+      this->padding_, this->border_);
+}
+}  // namespace WeexCore

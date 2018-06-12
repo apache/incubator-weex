@@ -16,19 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <string>
+
 #include "core/render/node/render_text.h"
 #include "core/render/page/render_page.h"
 
 namespace WeexCore {
 
-  void RenderText::UpdateAttr(std::string key, std::string value) {
-    RenderObject::UpdateAttr(key, value);
-    markDirty();
-  }
-
-  StyleType RenderText::UpdateStyle(std::string key, std::string value) {
-    StyleType resultType = RenderObject::ApplyStyle(key, value, true);
-    markDirty();
-    return resultType;
-  }
+void RenderText::UpdateAttr(std::string key, std::string value) {
+  RenderObject::UpdateAttr(key, value);
+  markDirty();
 }
+
+StyleType RenderText::UpdateStyle(std::string key, std::string value) {
+  StyleType result_type = RenderObject::ApplyStyle(key, value, true);
+  markDirty();
+  return result_type;
+}
+}  // namespace WeexCore

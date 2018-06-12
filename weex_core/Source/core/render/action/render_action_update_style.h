@@ -16,36 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_UPDATESTYLEACTION_H
-#define WEEX_PROJECT_UPDATESTYLEACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_STYLE_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_STYLE_H_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionUpdateStyle : public RenderAction {
+class RenderActionUpdateStyle : public RenderAction {
+ public:
+  explicit RenderActionUpdateStyle(
+      const std::string &page_id, const std::string &ref,
+      std::vector<std::pair<std::string, std::string>> *style,
+      std::vector<std::pair<std::string, std::string>> *margin,
+      std::vector<std::pair<std::string, std::string>> *padding,
+      std::vector<std::pair<std::string, std::string>> *border);
 
-  public:
+  void ExecuteAction();
 
-    explicit RenderActionUpdateStyle(const std::string &page_id, const std::string &ref,
-                                     std::vector<std::pair<std::string, std::string>> *style,
-                                     std::vector<std::pair<std::string, std::string>> *margin,
-                                     std::vector<std::pair<std::string, std::string>> *padding,
-                                     std::vector<std::pair<std::string, std::string>> *border);
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::vector<std::pair<std::string, std::string>> *style_;
+  std::vector<std::pair<std::string, std::string>> *margin_;
+  std::vector<std::pair<std::string, std::string>> *padding_;
+  std::vector<std::pair<std::string, std::string>> *border_;
+};
+}  // namespace WeexCore
 
-    void ExecuteAction();
-
-  public:
-    std::string page_id_;
-    std::string ref_;
-    std::vector<std::pair<std::string, std::string>> *style_;
-    std::vector<std::pair<std::string, std::string>> *margin_;
-    std::vector<std::pair<std::string, std::string>> *padding_;
-    std::vector<std::pair<std::string, std::string>> *border_;
-  };
-}
-
-#endif //WEEX_PROJECT_UPDATESTYLEACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_UPDATE_STYLE_H_
