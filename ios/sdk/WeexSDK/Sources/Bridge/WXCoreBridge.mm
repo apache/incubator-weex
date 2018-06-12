@@ -26,10 +26,10 @@
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
+#import "WXAppConfiguration.h"
 #include <core/render/manager/render_manager.h>
 #include <core/render/page/render_page.h>
 #include <base/TimeUtils.h>
-
 
 #pragma mark - OC related
 @interface WXCoreBridgeOCImpl:NSObject
@@ -154,11 +154,16 @@ namespace WeexCore {
     }
     
     void WXCoreBridge::setJSVersion(const char* version){
-#warning todo
+        NSString *jsVersion = [NSString stringWithCString:version encoding:NSUTF8StringEncoding];
+        if (jsVersion && jsVersion.length>0 ) {
+            [WXAppConfiguration setJSFrameworkVersion:jsVersion];
+        }
     }
     
     void WXCoreBridge::reportException(const char* pageId, const char *func, const char *exception_string){
 #warning todo
+        
+        
     }
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback){
@@ -384,7 +389,7 @@ namespace WeexCore {
         int flag = 0;
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallLayout];
         if(func != nullptr){
-#warning todo 原来没有注册这个回调，需要和android沟通这个回调具体做什么事情。
+#warning todo 原来没有注册这个回调，需要和android沟通这个回调具体做什么事情。待补充
             
             
         }
@@ -421,23 +426,91 @@ namespace WeexCore {
         
     int WXCoreBridge::callUpdateAttr(const char* pageId, const char* ref,
                            std::vector<std::pair<std::string, std::string>> *attrs){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallUpdateAttr];
+        if(func != nullptr){
+            WXJSCallUpdateAttrs targetFunc = (__bridge WXJSCallUpdateAttrs)func;
+            
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            NSMutableDictionary *attrDic = [[NSMutableDictionary alloc] init];
+            cpyCVector2OCMap(attrs,attrDic);
+            
+            flag = (int)targetFunc(pageIdString,refString,attrDic);
+        }
+        
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callCreateFinish(const char* pageId){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallCreateFinish];
+        if(func != nullptr){
+            WXJSCallCreateFinish targetFunc = (__bridge WXJSCallCreateFinish)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            flag = (int)targetFunc(pageIdString);
+        }
+        
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callRemoveElement(const char* pageId, const char* ref){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallRemoveElement];
+        if(func != nullptr){
+            WXJSCallRemoveElement targetFunc = (__bridge WXJSCallRemoveElement)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            flag = (int)targetFunc(pageIdString,refString);
+        }
+        
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallMoveElement];
+        if(func != nullptr){
+            WXJSCallMoveElement targetFunc = (__bridge WXJSCallMoveElement)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
+            NSString *parentRefString = [NSString stringWithCString:parentRef encoding:NSUTF8StringEncoding];
+            NSInteger indexValue = (NSInteger)index;
+            flag = (int)targetFunc(pageIdString,refString,parentRefString,indexValue);
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
         
     int WXCoreBridge::callAppendTreeCreateFinish(const char* pageId, const char* ref){
-#warning todo
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        long long startTime = getCurrentTime();
+        int flag = 0;
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallAppendTreeCreateFinish];
+        if(func != nullptr){
+#warning todo 给recycler做hack用，待补充
+            
+            
+        }
+        if (page != nullptr)
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        return flag;
     }
 }
 
