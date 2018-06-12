@@ -16,21 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERSCROLLERFACTORY_H
-#define WEEX_PROJECT_RENDERSCROLLERFACTORY_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_SCROLLER_FACTORY_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_SCROLLER_FACTORY_H_
 
-#include "core/render/node/render_scroller.h"
 #include "core/render/node/factory/render_factory_interface.h"
+#include "core/render/node/render_scroller.h"
 
 namespace WeexCore {
 
-  class RenderScrollerFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderScroller();
-    }
-  };
+class RenderScrollerFactory : public IRenderFactory {
+ public:
+  IRenderObject *CreateRender() { return new RenderScroller(); }
+};
 
-}
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_RENDERSCROLLERFACTORY_H
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_SCROLLER_FACTORY_H_

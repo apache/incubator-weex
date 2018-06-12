@@ -16,19 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERMASK_H
-#define WEEX_PROJECT_RENDERMASK_H
+#ifndef CORE_RENDER_NODE_RENDER_MASK_H_
+#define CORE_RENDER_NODE_RENDER_MASK_H_
+
+#include <map>
+#include <string>
 
 #include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
-  class RenderMask : public RenderObject {
-
-  public:
-
-    std::map <std::string, std::string> *GetDefaultStyle();
-
-  };
-}
-#endif //WEEX_PROJECT_RENDERMASK_H
+class RenderMask : public RenderObject {
+ public:
+  std::map<std::string, std::string> *GetDefaultStyle();
+};
+}  // namespace WeexCore
+#endif  // CORE_RENDER_NODE_RENDER_MASK_H_

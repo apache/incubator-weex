@@ -142,7 +142,7 @@ static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller, jboolean
   if (page == nullptr)
     return;
 
-  page->SetRenderContainerWidthWrapContent(wrap);
+  page->set_is_render_container_width_wrap_content(wrap);
 }
 
 static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring instanceId) {
@@ -158,7 +158,7 @@ static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring
     return jFirstScreenRenderTime;
   }
 
-  std::vector<long> temp = page->PrintFirstScreenLog();
+  std::vector<int64_t> temp = page->PrintFirstScreenLog();
 
   jlong ret[3];
 
@@ -190,7 +190,7 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
     return jRenderFinishTime;
   }
 
-  std::vector<long> temp = page->PrintRenderSuccessLog();
+  std::vector<int64_t> temp = page->PrintRenderSuccessLog();
 
   jlong ret[3];
 
@@ -214,13 +214,13 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
   if (page != nullptr) {
 
-    if (!page->need_layout.load()) {
-      page->need_layout.store(true);
+    if (!page->need_layout_.load()) {
+      page->need_layout_.store(true);
     }
 
-    bool ret = !page->has_fore_layout_action.load() && page->isDirty();
+    bool ret = !page->has_fore_layout_action_.load() && page->is_dirty();
     if (ret) {
-      page->has_fore_layout_action.store(true);
+      page->has_fore_layout_action_.store(true);
     }
     return ret ? JNI_TRUE : JNI_FALSE;
   }
@@ -236,7 +236,7 @@ static void ForceLayout(JNIEnv *env, jobject jcaller, jstring instanceId) {
 #endif
 
     page->LayoutImmediately();
-    page->has_fore_layout_action.store(false);
+    page->has_fore_layout_action_.store(false);
   }
 }
 
@@ -253,7 +253,7 @@ static void SetStyleWidth(JNIEnv *env, jobject jcaller,
 
   render->setStyleWidthLevel(CSS_STYLE);
   render->setStyleWidth(value, true);
-  page->updateDirty(true);
+  page->set_is_dirty(true);
 }
 
 static void SetStyleHeight(JNIEnv *env, jobject jcaller,
@@ -269,7 +269,7 @@ static void SetStyleHeight(JNIEnv *env, jobject jcaller,
 
   render->setStyleHeightLevel(CSS_STYLE);
   render->setStyleHeight(value);
-  page->updateDirty(true);
+  page->set_is_dirty(true);
 }
 
 static void SetMargin(JNIEnv *env, jobject jcaller,
@@ -293,7 +293,7 @@ static void SetMargin(JNIEnv *env, jobject jcaller,
   } else if (edge == 4) {
     render->setMargin(kMarginALL, value);
   }
-  page->updateDirty(true);
+  page->set_is_dirty(true);
 }
 
 static void SetPadding(JNIEnv *env, jobject jcaller,
@@ -318,7 +318,7 @@ static void SetPadding(JNIEnv *env, jobject jcaller,
   } else if (edge == 4) {
     render->setPadding(kPaddingALL, value);
   }
-  page->updateDirty(true);
+  page->set_is_dirty(true);
 }
 
 
@@ -342,7 +342,7 @@ static void SetPosition(JNIEnv *env, jobject jcaller,
   } else if (edge == 3) {
     render->setStylePosition(kPositionEdgeRight, value);
   }
-  page->updateDirty(true);
+  page->set_is_dirty(true);
 }
 
 static void MarkDirty(JNIEnv *env, jobject jcaller,
@@ -371,7 +371,7 @@ static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, j
   if (page == nullptr)
     return;
 
-  page->SetViewPortWidth(value);
+  page->set_viewport_width(value);
 }
 
 

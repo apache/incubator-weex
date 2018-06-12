@@ -17,21 +17,21 @@
  * under the License.
  */
 
-#include "core/manager/weex_core_manager.h"
 #include "core/render/action/render_action_update_attr.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &page_id, const std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string>> *attrs) {
-    this->page_id_ = page_id;
-    this->ref_ = ref;
-    this->attrs_ = attrs;
-  }
-
-  void RenderActionUpdateAttr::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(this->page_id_.c_str(),
-                                                                        this->ref_.c_str(),
-                                                                        this->attrs_);
-  }
+RenderActionUpdateAttr::RenderActionUpdateAttr(
+    const std::string &page_id, const std::string &ref,
+    std::vector<std::pair<std::string, std::string>> *attrs) {
+  this->page_id_ = page_id;
+  this->ref_ = ref;
+  this->attrs_ = attrs;
 }
+
+void RenderActionUpdateAttr::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(
+      this->page_id_.c_str(), this->ref_.c_str(), this->attrs_);
+}
+}  // namespace WeexCore

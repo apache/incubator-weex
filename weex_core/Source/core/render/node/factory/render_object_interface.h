@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_IRENDEROBJECT_H
-#define WEEX_PROJECT_IRENDEROBJECT_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_OBJECT_INTERFACE_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_OBJECT_INTERFACE_H_
 
 #include <string>
 
@@ -25,47 +25,32 @@
 
 namespace WeexCore {
 
-  class IRenderObject : public WXCoreLayoutNode {
+class IRenderObject : public WXCoreLayoutNode {
+ public:
+  inline void set_ref(std::string ref) { this->ref_ = ref; }
 
-  public:
+  inline const std::string &ref() const { return this->ref_; }
 
-    inline void set_ref(std::string ref) {
-      this->ref_ = ref;
-    }
+  inline void set_page_id(std::string page_id) { this->page_id_ = page_id; }
 
-    inline const std::string &ref() const {
-      return this->ref_;
-    }
+  inline const std::string &page_id() const { return this->page_id_; }
 
-    inline void set_page_id(std::string page_id) {
-      this->page_id_ = page_id;
-    }
+  inline void set_type(std::string type) { this->tyle_ = type; }
 
-    inline const std::string &page_id() const {
-      return this->page_id_;
-    }
+  inline const std::string &type() const { return this->tyle_; }
 
-    inline void set_type(std::string type) {
-      this->tyle_ = type;
-    }
+  inline void CopyFrom(IRenderObject *src) {
+    WXCoreLayoutNode::copyFrom(src);
+    set_ref(src->ref());
+    set_page_id(src->page_id());
+    set_type(src->type());
+  }
 
-    inline const std::string &type() const {
-      return this->tyle_;
-    }
+ private:
+  std::string page_id_ = "";
+  std::string ref_ = "";
+  std::string tyle_ = "";
+};
+}  // namespace WeexCore
 
-    inline void CopyFrom(IRenderObject *src) {
-      WXCoreLayoutNode::copyFrom(src);
-      set_ref(src->ref());
-      set_page_id(src->page_id());
-      set_type(src->type());
-    }
-
-  private:
-
-    std::string page_id_ = "";
-    std::string ref_ = "";
-    std::string tyle_ = "";
-  };
-}
-
-#endif //WEEX_PROJECT_IRENDEROBJECT_H
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_OBJECT_INTERFACE_H_

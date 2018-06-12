@@ -16,15 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEXV8_RENDERACTION_H
-#define WEEXV8_RENDERACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_INTERFACE_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_INTERFACE_H_
 
 namespace WeexCore {
 
-  class RenderAction {
-  public:
-    virtual void ExecuteAction() = 0;
-  };
-}
+class RenderAction {
+ public:
+  virtual void ExecuteAction() = 0;
+};
+}  // namespace WeexCore
 
-#endif //WEEXV8_RENDERACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_INTERFACE_H_

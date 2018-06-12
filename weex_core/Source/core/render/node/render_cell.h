@@ -16,15 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERCELL_H
-#define WEEX_PROJECT_RENDERCELL_H
+#ifndef CORE_RENDER_NODE_RENDER_CELL_H_
+#define CORE_RENDER_NODE_RENDER_CELL_H_
 
 #include "core/render/node/render_object.h"
 
 namespace WeexCore {
-  class RenderCell : public RenderObject {
+class RenderCell : public RenderObject {};
+}  // namespace WeexCore
 
-  };
-}
-
-#endif //WEEX_PROJECT_RENDERCELL_H
+#endif  // CORE_RENDER_NODE_RENDER_CELL_H_

@@ -16,25 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERSCROLLER_H
-#define WEEX_PROJECT_RENDERSCROLLER_H
+#ifndef CORE_RENDER_NODE_RENDER_SCROLLER_H_
+#define CORE_RENDER_NODE_RENDER_SCROLLER_H_
+
+#include <map>
+#include <string>
 
 #include "core/render/node/render_object.h"
 
 namespace WeexCore {
-  class RenderScroller : public RenderObject {
+class RenderScroller : public RenderObject {
+  bool is_set_flex_ = false;
 
-    bool is_set_flex_ = false;
+  std::map<std::string, std::string> *GetDefaultStyle();
 
-    std::map<std::string, std::string> *GetDefaultStyle();
+  void set_flex(const float flex);
 
-    void set_flex(const float flex);
-
-    inline float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
-                                     const float &current_length) const override {
-      return NAN;
-    }
-
-  };
-}
-#endif //WEEX_PROJECT_RENDERSCROLLER_H
+  inline float CalculateFreeSpaceAlongMainAxis(
+      const float &width, const float &height,
+      const float &current_length) const override {
+    return NAN;
+  }
+};
+}  // namespace WeexCore
+#endif  // CORE_RENDER_NODE_RENDER_SCROLLER_H_

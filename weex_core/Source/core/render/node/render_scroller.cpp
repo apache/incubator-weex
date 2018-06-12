@@ -16,36 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/render/node/render_scroller.h"
+
+#include <utility>
+
 #include "core/css/constants_name.h"
+#include "core/render/node/render_scroller.h"
 
 namespace WeexCore {
 
-  std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
-    std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
+std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
+  std::map<std::string, std::string> *style =
+      new std::map<std::string, std::string>();
 
-    bool isVertical = true;
-    RenderObject *parent = (RenderObject *) getParent();
+  bool is_vertical = true;
+  RenderObject *parent = dynamic_cast<RenderObject *>(getParent());
 
-    if (parent != nullptr) {
-      if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {
-        isVertical = false;
-      }
+  if (parent != nullptr) {
+    if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {
+      is_vertical = false;
     }
-
-    std::string prop = isVertical ? HEIGHT : WIDTH;
-
-    if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex_) {
-      style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-    } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex_) {
-      style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-    }
-
-    return style;
   }
 
-  void RenderScroller::set_flex(const float flex) {
-    this->is_set_flex_ = true;
-    WXCoreLayoutNode::set_flex(flex);
+  std::string prop = is_vertical ? HEIGHT : WIDTH;
+
+  if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex_) {
+    style->insert(std::pair<std::string, std::string>(FLEX, "1"));
+  } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex_) {
+    style->insert(std::pair<std::string, std::string>(FLEX, "1"));
   }
+
+  return style;
 }
+
+void RenderScroller::set_flex(const float flex) {
+  this->is_set_flex_ = true;
+  WXCoreLayoutNode::set_flex(flex);
+}
+}  // namespace WeexCore

@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_ADDEVENTACTION_H
-#define WEEX_PROJECT_ADDEVENTACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_ADD_EVENT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_ADD_EVENT_H_
 
 #include <string>
 
@@ -25,19 +25,19 @@
 
 namespace WeexCore {
 
-  class RenderActionAddEvent : public RenderAction {
+class RenderActionAddEvent : public RenderAction {
+ public:
+  explicit RenderActionAddEvent(const std::string &page_id,
+                                const std::string &ref,
+                                const std::string &event);
 
-  public:
-    explicit RenderActionAddEvent(const std::string &page_id, const std::string &ref,
-                                  const std::string &event);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::string event_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string page_id_;
-    std::string ref_;
-    std::string event_;
-  };
-}
-
-#endif //WEEX_PROJECT_ADDEVENTACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_ADD_EVENT_H_

@@ -16,20 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERCELLFACTORY_H
-#define WEEX_PROJECT_RENDERCELLFACTORY_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_CELL_FACTORY_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_CELL_FACTORY_H_
 
-#include "core/render/node/render_cell.h"
 #include "core/render/node/factory/render_factory_interface.h"
+#include "core/render/node/render_cell.h"
 
 namespace WeexCore {
 
-  class RenderCellFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderCell();
-    }
-  };
+class RenderCellFactory : public IRenderFactory {
+ public:
+  IRenderObject *CreateRender() { return new RenderCell(); }
+};
 
-}
-#endif //WEEX_PROJECT_RENDERCELLFACTORY_H
+}  // namespace WeexCore
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_CELL_FACTORY_H_

@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_REMOVEEVENTACTION_H
-#define WEEX_PROJECT_REMOVEEVENTACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_EVENT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_EVENT_H_
 
 #include <string>
 
@@ -25,19 +25,19 @@
 
 namespace WeexCore {
 
-  class RenderActionRemoveEvent : public RenderAction {
+class RenderActionRemoveEvent : public RenderAction {
+ public:
+  explicit RenderActionRemoveEvent(const std::string &page_id,
+                                   const std::string &ref,
+                                   const std::string &event);
 
-  public:
-    explicit RenderActionRemoveEvent(const std::string &page_id, const std::string &ref,
-                                     const std::string &event);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::string event_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string page_id_;
-    std::string ref_;
-    std::string event_;
-  };
-}
-
-#endif //WEEX_PROJECT_REMOVEEVENTACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_EVENT_H_

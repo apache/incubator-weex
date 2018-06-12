@@ -16,48 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERCREATOR_H
-#define WEEX_PROJECT_RENDERCREATOR_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_CREATOR_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_CREATOR_H_
 
 #include <string>
 
 namespace WeexCore {
 
-  class IRenderObject;
+class IRenderObject;
 
-  class RenderCreator {
+class RenderCreator {
+ private:
+  RenderCreator() {}
 
-  private:
-    explicit RenderCreator() {}
+  ~RenderCreator() {}
 
-    ~RenderCreator() {}
-
-    //just to release singleton object
-    class Garbo {
-    public:
-      ~Garbo() {
-        if (RenderCreator::g_pInstance) {
-          delete RenderCreator::g_pInstance;
-        }
+  // just to release singleton object
+  class Garbo {
+   public:
+    ~Garbo() {
+      if (RenderCreator::g_pInstance) {
+        delete RenderCreator::g_pInstance;
       }
-    };
-
-    static Garbo garbo;
-
-  public:
-
-    static RenderCreator *GetInstance() {
-      if (!g_pInstance) {
-        g_pInstance = new RenderCreator();
-      }
-      return g_pInstance;
     }
-
-    IRenderObject *CreateRender(const std::string &type, const std::string &ref);
-
-  private:
-    static RenderCreator *g_pInstance;
   };
-}
 
-#endif //WEEX_PROJECT_RENDERCREATOR_H
+  static Garbo garbo;
+
+ public:
+  static RenderCreator *GetInstance() {
+    if (!g_pInstance) {
+      g_pInstance = new RenderCreator();
+    }
+    return g_pInstance;
+  }
+
+  IRenderObject *CreateRender(const std::string &type, const std::string &ref);
+
+ private:
+  static RenderCreator *g_pInstance;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_CREATOR_H_

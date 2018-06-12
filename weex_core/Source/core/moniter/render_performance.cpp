@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <cstdint>
 #include "render_performance.h"
 
 namespace WeexCore {
 
-  std::vector<long> RenderPerformance::PrintPerformanceLog(PerformanceStage performanceStage) {
+  std::vector<int64_t> RenderPerformance::PrintPerformanceLog(PerformanceStage performanceStage) {
 
-    std::vector<long> ret(3);
+    std::vector<int64_t> ret(3);
 
     if (performanceStage == onFirstScreen) {
       firstScreenCallBridgeTime = callBridgeTime;

@@ -16,76 +16,80 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef RenderManager_h
-#define RenderManager_h
+#ifndef CORE_RENDER_MANAGER_RENDER_MANAGER_H_
+#define CORE_RENDER_MANAGER_RENDER_MANAGER_H_
 
 #include <map>
 #include <string>
 
 namespace WeexCore {
 
-  class RenderPage;
+class RenderPage;
 
-  class RenderManager {
+class RenderManager {
+ private:
+  RenderManager() {}
 
-  private:
-    explicit RenderManager() {}
+  ~RenderManager() {}
 
-    ~RenderManager() {}
-
-    //just to release singleton object
-    class Garbo {
-    public:
-      ~Garbo() {
-        if (RenderManager::g_pInstance) {
-          delete RenderManager::g_pInstance;
-        }
+  // just to release singleton object
+  class Garbo {
+   public:
+    ~Garbo() {
+      if (RenderManager::g_pInstance) {
+        delete RenderManager::g_pInstance;
       }
-    };
-
-    static Garbo garbo;
-
-  public:
-
-    void Batch(const std::string &page_id);
-
-    // create root node
-    bool CreatePage(std::string page_id, const char *data);
-
-    /** use auto constructor is bad idea, it cann't transfer binary, use char* is better */
-    bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,
-                         const char *data);
-
-    bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
-
-    bool MoveRenderObject(const std::string &page_id, const std::string &ref,
-                          const std::string &parent_ref, int index);
-
-    bool UpdateAttr(const std::string &page_id, const std::string &ref, const char *data);
-
-    bool UpdateStyle(const std::string &page_id, const std::string &ref, const char *data);
-
-    bool AddEvent(const std::string &page_id, const std::string &ref, const std::string &event);
-
-    bool RemoveEvent(const std::string &page_id, const std::string &ref, const std::string &event);
-
-    bool CreateFinish(const std::string &page_id);
-
-    RenderPage *GetPage(const std::string &page_id);
-
-    bool ClosePage(const std::string &page_id);
-
-    static RenderManager *GetInstance() {
-      if (!g_pInstance) {
-        g_pInstance = new RenderManager();
-      }
-      return g_pInstance;
     }
-
-  private:
-    static RenderManager *g_pInstance;
-    std::map<std::string, RenderPage *> pages_;
   };
-}
 
-#endif //RenderManager_h
+  static Garbo garbo;
+
+ public:
+  void Batch(const std::string &page_id);
+
+  // create root node
+  bool CreatePage(std::string page_id, const char *data);
+
+  /** use auto constructor is bad idea, it cann't transfer binary, use char* is
+   * better */
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       const char *data);
+
+  bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
+
+  bool MoveRenderObject(const std::string &page_id, const std::string &ref,
+                        const std::string &parent_ref, int index);
+
+  bool UpdateAttr(const std::string &page_id, const std::string &ref,
+                  const char *data);
+
+  bool UpdateStyle(const std::string &page_id, const std::string &ref,
+                   const char *data);
+
+  bool AddEvent(const std::string &page_id, const std::string &ref,
+                const std::string &event);
+
+  bool RemoveEvent(const std::string &page_id, const std::string &ref,
+                   const std::string &event);
+
+  bool CreateFinish(const std::string &page_id);
+
+  RenderPage *GetPage(const std::string &page_id);
+
+  bool ClosePage(const std::string &page_id);
+
+  static RenderManager *GetInstance() {
+    if (!g_pInstance) {
+      g_pInstance = new RenderManager();
+    }
+    return g_pInstance;
+  }
+
+ private:
+  static RenderManager *g_pInstance;
+  std::map<std::string, RenderPage *> pages_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_MANAGER_RENDER_MANAGER_H_

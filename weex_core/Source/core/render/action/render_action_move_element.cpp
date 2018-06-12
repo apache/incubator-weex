@@ -17,24 +17,24 @@
  * under the License.
  */
 
-#include "core/manager/weex_core_manager.h"
 #include "core/render/action/render_action_move_element.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionMoveElement::RenderActionMoveElement(const std::string &page_id,
-                                                   const std::string &ref,
-                                                   const std::string &parent_ref, int index) {
-    this->page_id_ = page_id;
-    this->ref_ = ref;
-    this->parent_ref_ = parent_ref;
-    this->index_ = index;
-  }
-
-  void RenderActionMoveElement::ExecuteAction() {
-    WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(this->page_id_.c_str(),
-                                                                         this->ref_.c_str(),
-                                                                         this->parent_ref_.c_str(),
-                                                                         this->index_);
-  }
+RenderActionMoveElement::RenderActionMoveElement(const std::string &page_id,
+                                                 const std::string &ref,
+                                                 const std::string &parent_ref,
+                                                 int index) {
+  this->page_id_ = page_id;
+  this->ref_ = ref;
+  this->parent_ref_ = parent_ref;
+  this->index_ = index;
 }
+
+void RenderActionMoveElement::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(
+      this->page_id_.c_str(), this->ref_.c_str(), this->parent_ref_.c_str(),
+      this->index_);
+}
+}  // namespace WeexCore
