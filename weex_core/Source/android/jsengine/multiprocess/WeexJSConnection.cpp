@@ -19,6 +19,7 @@
 #include "WeexJSConnection.h"
 
 #include "ashmem.h"
+#include "WeexProxy.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -35,6 +36,8 @@
 #include <errno.h>
 
 extern const char *s_cacheDir;
+extern const char *g_jssSoPath;
+extern const char *g_jssSoName;
 extern bool s_start_pie;
 
 static void doExec(int fd, bool traceEnable, bool startupPie = true);
@@ -167,10 +170,7 @@ void printLogOnFile(const char *log) {
 #endif
 }
 
-static std::string __attribute__((noinline)) findPath();
-
-static void findPath(std::string &executablePath, std::string &icuDataPath) {
-  unsigned long target = reinterpret_cast<unsigned long>(__builtin_return_address(0));
+static void findIcuDataPath(std::string &icuDataPath) {
   FILE *f = fopen("/proc/self/maps", "r");
   if (!f) {
     return;
@@ -181,30 +181,9 @@ static void findPath(std::string &executablePath, std::string &icuDataPath) {
     if (icuDataPath.empty() && strstr(line, "icudt")) {
       icuDataPath.assign(strstr(line, "/"));
       icuDataPath = icuDataPath.substr(0, icuDataPath.length() - 1);
-      continue;
     }
-    char *end;
-    unsigned long val;
-    errno = 0;
-    val = strtoul(line, &end, 16);
-    if (errno)
-      continue;
-    if (val > target)
-      continue;
-    end += 1;
-    errno = 0;
-    val = strtoul(end, &end, 16);
-    if (errno)
-      continue;
-    if (val > target) {
-      executablePath.assign(strstr(end, "/"));
-      std::size_t found = executablePath.rfind('/');
-      if (found != std::string::npos) {
-        executablePath = executablePath.substr(0, found);
-      }
-    }
-    if (!executablePath.empty()
-        && !icuDataPath.empty()) {
+
+    if (!icuDataPath.empty()) {
       break;
     }
   }
@@ -257,13 +236,24 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
 void doExec(int fd, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
-  findPath(executablePath, icuDataPath);
+  findIcuDataPath(icuDataPath);
+  if(g_jssSoPath != nullptr) {
+    executablePath = g_jssSoPath;
+  }
+  if (executablePath.empty()) {
+    executablePath = WeexCore::WeexProxy::findLibJssSoPath();
+  }
 #if PRINT_LOG_CACHEFILE
   std::ofstream mcfile;
   mcfile.open(logFilePath, std::ios::app);
   mcfile << "jsengine WeexJSConnection::doExec executablePath:" << executablePath << std::endl;
   mcfile << "jsengine WeexJSConnection::doExec icuDataPath:" << icuDataPath << std::endl;
 #endif
+  std::string::size_type pos = std::string::npos;
+  std::string libName = g_jssSoName;
+  pos = executablePath.find(libName);
+  if (pos != std::string::npos) {
+    executablePath.replace(pos, libName.length(), "");
 
   if (executablePath.empty()) {
     LOGE("executablePath is empty");
@@ -274,7 +264,9 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
 #endif
 
     return;
-  }
+  } else {
+    LOGE("executablePath is %s", executablePath.c_str());
+  }}
   if (icuDataPath.empty()) {
     LOGE("icuDataPath is empty");
 #if PRINT_LOG_CACHEFILE

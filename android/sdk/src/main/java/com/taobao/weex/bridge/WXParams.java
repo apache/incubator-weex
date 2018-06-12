@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.bridge;
 
-import android.util.Log;
-
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Map;
@@ -39,6 +37,7 @@ public class WXParams {
   private String needInitV8;
   private String cacheDir;
   private String useSingleProcess;
+  private String libJssPath;
 
   private Map<String, String> options;
 
@@ -170,5 +169,14 @@ public class WXParams {
     } else {
       this.needInitV8 = "0";
     }
+  }
+
+  public String getLibJssPath() {
+    WXLogUtils.e("getLibJssPath is running " + libJssPath);
+    return libJssPath;
+  }
+
+  public void setLibJssPath(String libJssPath) {
+    this.libJssPath = libJssPath;
   }
 }
