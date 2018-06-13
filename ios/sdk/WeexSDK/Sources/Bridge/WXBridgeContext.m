@@ -409,6 +409,14 @@ _Pragma("clang diagnostic pop") \
         WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
         [method invoke];
     }];
+    
+#ifdef WX_IMPORT_WEEXCORE
+    [_jsBridge registerCallLayout:^NSInteger(NSString *instanceId, NSString *ref, NSInteger top, NSInteger bottom, NSInteger left, NSInteger right, NSInteger height, NSInteger width, NSInteger index) {
+#warning todo [WeexCore send needLayout action]
+        
+        return 1;
+    }];
+#endif
 }
 
 - (NSMutableArray *)insStack

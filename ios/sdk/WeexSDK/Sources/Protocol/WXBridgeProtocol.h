@@ -31,6 +31,9 @@ typedef NSInteger(^WXJSCallRemoveEvent)(NSString *instanceId,NSString *ref,NSStr
 typedef NSInteger(^WXJSCallCreateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
+#ifdef WX_IMPORT_WEEXCORE
+typedef NSInteger(^WXCoreCallLayout)(NSString *instanceId,NSString *ref,NSInteger top,NSInteger bottom,NSInteger left,NSInteger right,NSInteger height,NSInteger width,NSInteger index);
+#endif
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -123,6 +126,10 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  * Register callback for global js function `callNativeComponent`
  */
 - (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock;
+
+#ifdef WX_IMPORT_WEEXCORE
+- (void)registerCallLayout:(WXCoreCallLayout)callLayoutBlock;
+#endif
 
 @optional
 

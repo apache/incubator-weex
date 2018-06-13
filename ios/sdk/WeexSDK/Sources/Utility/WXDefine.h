@@ -24,9 +24,12 @@
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
-#define WX_IMPORT_WEEXCORE
 #else
 #define WX_EXTERN extern __attribute__((visibility("default")))
+#endif
+
+#ifdef DEBUG
+#define WX_IMPORT_WEEXCORE
 #endif
 
 /*

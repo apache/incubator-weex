@@ -389,9 +389,11 @@ namespace WeexCore {
         int flag = 0;
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallLayout];
         if(func != nullptr){
-#warning todo 原来没有注册这个回调，需要和android沟通这个回调具体做什么事情。待补充
+            WXCoreCallLayout targetFunc = (__bridge WXCoreCallLayout)func;
+            NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
+            NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
             
-            
+            flag = (int)targetFunc(pageIdString,refString,(NSInteger)top,(NSInteger)bottom,(NSInteger)left,(NSInteger)right,(NSInteger)height,(NSInteger)width,(NSInteger)index);
         }
         if (page != nullptr)
             page->CallBridgeTime(getCurrentTime() - startTime);

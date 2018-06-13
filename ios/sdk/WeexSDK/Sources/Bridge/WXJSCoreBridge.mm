@@ -438,6 +438,20 @@
 #endif
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+
+- (void)registerCallLayout:(WXCoreCallLayout)callLayoutBlock
+{
+    //when WeexCore finish calculate frame
+    id targetFunc = ^NSInteger(NSString *instanceId,NSString *ref,NSInteger top,NSInteger bottom,NSInteger left,NSInteger right,NSInteger height,NSInteger width,NSInteger index){
+        WXLogDebug(@"callLayout...%@,%@,%ld,%ld,%ld,%ld", instanceId, ref, top, bottom, left,right);
+        return callLayoutBlock(instanceId,ref,top,bottom,left,right,height,width,index);
+    };
+    _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallLayout, (__bridge void*)targetFunc);
+}
+
+#endif
+
 - (JSValue*)exception
 {
     return _jsContext.exception;
