@@ -166,6 +166,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
+  public int deepInComponentTree = 0;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 

@@ -267,9 +267,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  private int mMaxDeepLayer;
-  private int mMaxVDomDeepLayer;
-
   public boolean isTrackComponent() {
     return trackComponent;
   }
@@ -919,7 +916,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
         mWXPerformance.useScroller=1;
       }
-      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
       mWXPerformance.wxDims = mwxDims;
       mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
@@ -1186,7 +1182,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   /**
-   * when add/rm element
+   * when add/rm/mv element
    */
   public void onElementChange(){
     if (isDestroy() || !mEnd ||null == mRenderContainer || mRenderContainer.isPageHasEvent() ||
@@ -1427,6 +1423,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
+    this.mRootComp.deepInComponentTree=1;
     mRenderContainer.addView(root.getHostView());
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
@@ -1656,21 +1653,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  public int getMaxDeepLayer() {
-    return mMaxDeepLayer;
-  }
-
-  public void setMaxDeepLayer(int maxDeepLayer) {
-    mMaxDeepLayer = maxDeepLayer;
-  }
-
-  public int getMaxDomDeep() {
-    return mMaxVDomDeepLayer;
-  }
-
   public void setMaxDomDeep(int maxDomDeep){
-    mMaxVDomDeepLayer = maxDomDeep;
-    mWXPerformance.maxDeepVDomLayer = maxDomDeep;
+    if (null == mWXPerformance){
+      return;
+    }
+    if (mWXPerformance.maxDeepVDomLayer <= maxDomDeep){
+      mWXPerformance.maxDeepVDomLayer = maxDomDeep;
+    }
   }
 
   public void onHttpStart(){
