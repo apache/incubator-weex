@@ -986,8 +986,25 @@ static NSThread *WXComponentThread;
 - (void)removeFixedComponent:(WXComponent *)fixComponent
 {
     [_fixedComponents removeObject:fixComponent];
-        _rootFlexCSSNode->removeChild(fixComponent->_flexCssNode);
+    [self removeFixFlexNode:fixComponent->_flexCssNode];
 }
+
+- (void)removeFixFlexNode:(WeexCore::WXCoreLayoutNode* )fixNode{
+    if (nullptr == fixNode) {
+        return;
+    }
+    if ([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME]) {
+        _rootFlexCSSNode->removeChild(fixNode);
+    }else{
+        WXPerformBlockOnComponentThread(^{
+            if (nullptr == fixNode) {
+                return;
+            }
+            _rootFlexCSSNode->removeChild(fixNode);
+        });
+    }
+}
+
 
 @end
 
