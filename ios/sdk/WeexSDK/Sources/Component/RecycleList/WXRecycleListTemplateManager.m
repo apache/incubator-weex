@@ -31,12 +31,14 @@
 
 @implementation WXRecycleListTemplateManager
 {
+    NSMutableSet<NSString *> *_registeredTemplates;
     NSMapTable<NSString *, WXCellSlotComponent *> *_templateTypeMap;
 }
 
 - (instancetype)init
 {
     if (self = [super init]) {
+        _registeredTemplates = [NSMutableSet set];
         _templateTypeMap = [NSMapTable strongToWeakObjectsMapTable];
     }
     
@@ -87,7 +89,7 @@
 - (void)_registerCellClassForReuseID:(NSString *)templateID
 {
     WXLogDebug(@"register cell class for template id:%@", templateID);
-    //TODO: register class update TemplateId
+    [_registeredTemplates addObject:templateID];
     [_collectionView registerClass:[WXReusableCollectionViewCell class] forCellWithReuseIdentifier:templateID];
 }
 
@@ -101,6 +103,18 @@
         }
     }
     return cellTemplate;
+}
+
+- (BOOL)isTemplateRegistered:(NSString *)aTemplate
+{
+    WXAssertMainThread();
+    return [_registeredTemplates containsObject:aTemplate];
+}
+
+- (NSString *)anyRegisteredTemplate
+{
+    WXAssertMainThread();
+    return [_registeredTemplates anyObject];
 }
 
 @end
