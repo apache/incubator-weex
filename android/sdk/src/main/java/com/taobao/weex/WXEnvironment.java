@@ -27,18 +27,25 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import dalvik.system.PathClassLoader;
 
 public class WXEnvironment {
 
@@ -100,6 +107,9 @@ public class WXEnvironment {
   private static String sGlobalFontFamily;
 
   public static final String CORE_SO_NAME = "weexcore";
+  public static final String CORE_JSS_SO_NAME = "weexjss";
+
+  private static  String CORE_JSS_SO_PATH = null;
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -333,5 +343,66 @@ public class WXEnvironment {
     if(!isApkDebug){
       openDebugLog = false;
     }
+  }
+
+  public static String findSoPath(String libName) {
+    final String libPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
+    WXLogUtils.e(libName + "'s Path is" + libPath);
+    return libPath;
+  }
+
+  public static String getCacheDir() {
+    final Application application = getApplication();
+    if (application == null || application.getApplicationContext() == null)
+      return null;
+    return application.getApplicationContext().getCacheDir().getPath();
+  }
+
+  public static boolean extractSo() {
+    File sourceFile = new File(getApplication().getApplicationContext().getApplicationInfo().sourceDir);
+    final String cacheDir = getCacheDir();
+    if (sourceFile.exists() && !TextUtils.isEmpty(cacheDir)) {
+      try {
+        WXFileUtils.extractSo(sourceFile.getAbsolutePath(), cacheDir);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private static String findLibJssRealPath() {
+    String soPath = findSoPath(CORE_JSS_SO_NAME);
+    String realName = "lib" + CORE_JSS_SO_NAME + ".so";
+    if (TextUtils.isEmpty(soPath)) {
+      String cacheDir = getCacheDir();
+      if (TextUtils.isEmpty(cacheDir)) {
+        return "";
+      }
+      if (cacheDir.indexOf("/cache") > 0) {
+        soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+      }
+    }
+    final File soFile = new File(soPath);
+    if (soFile.exists())
+      return soPath;
+    else {
+      //unzip from apk file
+      final boolean success = extractSo();
+      if (success)
+        return new File(getCacheDir(), realName).getAbsolutePath();
+    }
+    return "";
+  }
+
+  public static String getLibJssRealPath() {
+    if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
+      CORE_JSS_SO_PATH = findLibJssRealPath();
+      WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
+    }
+
+    return CORE_JSS_SO_PATH;
   }
 }

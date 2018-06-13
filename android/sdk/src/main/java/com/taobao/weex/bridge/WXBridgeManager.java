@@ -30,7 +30,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -1795,6 +1794,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
+    wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);

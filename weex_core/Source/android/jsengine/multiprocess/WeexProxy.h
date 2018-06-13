@@ -63,6 +63,7 @@ public:
 
     static bool execJSService(JNIEnv *env, jobject object, jstring script);
 
+    static std::string findLibJssSoPath();
     static bool
     execJS(JNIEnv *env, jobject jthis, jstring jinstanceid, jstring jnamespace, jstring jfunction,
            jobjectArray jargs);
