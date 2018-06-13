@@ -150,7 +150,6 @@ class RenderObject : public IRenderObject {
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
   std::set<std::string> *events_;
-  float viewport_width_ = -1;
   bool is_root_render_;
   bool is_sticky_ = false;
 };
