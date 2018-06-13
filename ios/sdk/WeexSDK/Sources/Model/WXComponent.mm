@@ -222,6 +222,9 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (void)dealloc
 {
+    if (_positionType == WXPositionTypeFixed) {
+        [self.weexInstance.componentManager removeFixedComponent:self];
+    }
     if(_flexCssNode){
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
@@ -255,10 +258,6 @@ static BOOL bNeedRemoveEvents = YES;
         if (WX_SYS_VERSION_LESS_THAN(@"9.0")) {
             [self _removeAllEvents];
         }
-    }
-
-    if (_positionType == WXPositionTypeFixed) {
-        [self.weexInstance.componentManager removeFixedComponent:self];
     }
 
     pthread_mutex_destroy(&_propertyMutex);
