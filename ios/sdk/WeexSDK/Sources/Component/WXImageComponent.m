@@ -381,7 +381,7 @@ WX_EXPORT_METHOD(@selector(save:))
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
-            __strong typeof(weakSelf) strongSelf =  weakSelf;
+            __strong typeof(weakSelf) strongSelf = weakSelf;
             if (strongSelf == nil) {
                 return;
             }
@@ -434,7 +434,7 @@ WX_EXPORT_METHOD(@selector(save:))
             [strongSelf cancelImage];
 
             void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
-                strongSelf.imageDownloadFinish = YES;
+                weakSelf.imageDownloadFinish = YES;
                 WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
             };
 
