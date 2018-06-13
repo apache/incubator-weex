@@ -382,10 +382,22 @@ WX_EXPORT_METHOD(@selector(save:))
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
             __strong typeof(weakSelf) strongSelf =  weakSelf;
-            weakSelf.imageDownloadFinish = YES;
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            strongSelf.imageDownloadFinish = YES;
             if (error) {
                 // log error message for error
                 WXLogError(@"Error downloading image: %@, detail:%@", imageURL.absoluteString, [error localizedDescription]);
+                
+                // retry set placeholder, maybe placeholer image can be downloaded
+                if (strongSelf.placeholdSrc) {
+                    NSString *newURL = [strongSelf.placeholdSrc copy];
+                    WX_REWRITE_URL([strongSelf placeholdSrc], WXResourceTypeImage, strongSelf.weexInstance)
+                    [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:nil progress:nil completed:nil];
+                    return;
+                }
             }
             UIImageView *imageView = (UIImageView *)strongSelf.view;
             if (imageView && imageView.image != image) {
@@ -404,9 +416,9 @@ WX_EXPORT_METHOD(@selector(save:))
                 [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
             }
             //check view/img size
-            if (!error && image && weakSelf.view) {
+            if (!error && image && strongSelf.view) {
                 double imageSize = image.size.width * image.scale * image.size.height * image.scale;
-                double viewSize = weakSelf.view.frame.size.height *  weakSelf.view.frame.size.width;
+                double viewSize = strongSelf.view.frame.size.height *  strongSelf.view.frame.size.width;
                 if (imageSize > viewSize) {
                     self.weexInstance.performance.imgWrongSizeNum++;
                 }
@@ -415,10 +427,14 @@ WX_EXPORT_METHOD(@selector(save:))
     } else {
         dispatch_async(WXImageUpdateQueue, ^{
              __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
             [strongSelf cancelImage];
 
             void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
-                weakSelf.imageDownloadFinish = YES;
+                strongSelf.imageDownloadFinish = YES;
                 WXLogError(@"Error downloading image: %@, detail:%@", url, [error localizedDescription]);
             };
 
