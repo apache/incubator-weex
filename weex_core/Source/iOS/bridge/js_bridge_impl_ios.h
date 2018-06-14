@@ -27,8 +27,6 @@
 
 namespace WeexCore {
     
- 
-    
     class JSBridgeIOS : public JSBridge {
     public:
       //  JSBridgeIOS();
@@ -45,19 +43,17 @@ namespace WeexCore {
 
         bool destroyJSContext(uint32_t runTimeId, uint32_t contextId) ;
 
-         void
-        execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args);
+        void execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args);
         
-         wson_buffer*
-        execJSMethodWithResult(uint32_t runTimeId, uint32_t contextId, char *methodName, wson_buffer* args);
+        wson_buffer* execJSMethodWithResult(uint32_t runTimeId, uint32_t contextId, char *methodName, wson_buffer* args);
         
-         bool executeJavascript(uint32_t runTimeId, uint32_t contextId, char *script);
+        bool executeJavascript(uint32_t runTimeId, uint32_t contextId, char *script);
         
-         void reigsterJSVale(uint32_t runTimeId, uint32_t contextId, char *name, wson_buffer* valuse);
+        void reigsterJSVale(uint32_t runTimeId, uint32_t contextId, char *name, wson_buffer* valuse);
         
-         wson_buffer* getJSVale(uint32_t runTimeId, uint32_t contextId, char *name);
+        wson_buffer* getJSVale(uint32_t runTimeId, uint32_t contextId, char *name);
         
-         void reigsterJSFunc(uint32_t runTimeId, uint32_t contextId, wson_buffer* func);
+        void reigsterJSFunc(uint32_t runTimeId, uint32_t contextId, wson_buffer* func);
     };
 }
 

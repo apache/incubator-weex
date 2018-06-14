@@ -5,6 +5,55 @@
 #import <vector>
 #import "wson_parser_ios.h"
 
+@interface VmRecorder :NSObject
+@property (nonatomic,assign) uint32_t vmId;
+@property (nonatomic,strong) JSVirtualMachine * runTime;
+@property (nonatomic,strong) NSMutableDictionary* contextMap;
+@end
+
+
+@implementation VmRecorder
+
+- (instancetype) init
+{
+    self = [super init];
+    if (self) {
+        _runTime = [[JSVirtualMachine alloc] init];
+        _contextMap = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}
+
+-(void)dealloc{
+//    _runTime = nil;
+//    [_contextMap removeAllObjects];
+//    _contextMap = nil;
+}
+
+- (JSContext*)finContext:(uint32_t) contextId{
+    
+}
+- (bool) createContext:(uint32_t) contextId{
+    JSContext* context = [[JSContext alloc] initWithVirtualMachine:self.runTime];
+    NSNumber* key = [NSNumber numberWithUnsignedInt:contextId];
+    [self.contextMap setObject:context forKey:key];
+    return true;
+}
+
+- (void) destroyContext:(uint32_t) contextId{
+    NSNumber* key = [NSNumber numberWithUnsignedInt:contextId];
+    JSContext* context =[self.contextMap objectForKey:key];
+    [self.contextMap removeObjectForKey:key];
+}
+
+@end
+
+
+
+
+
+
+
 namespace WeexCore {
 
     typedef struct JSContextStruct {
@@ -40,7 +89,6 @@ namespace WeexCore {
         }
         return targetContextRecorder;
     }
-
     
     bool JSBridgeIOS::createJSRunTime(uint32_t runTimeId, std::map<std::string, std::string> *params) {
         auto iter = vmMap.find(runTimeId);
@@ -193,6 +241,6 @@ namespace WeexCore {
     }
 
     void JSBridgeIOS::reigsterJSFunc(uint32_t runTimeId, uint32_t contextId, wson_buffer*  func) {
-
+        
     }
 }
