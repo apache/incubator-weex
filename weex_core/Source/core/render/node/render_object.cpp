@@ -305,15 +305,6 @@ const std::string RenderObject::GetAttr(const std::string &key) {
   }
 }
 
-float RenderObject::GetViewPortWidth() {
-  if (this->viewport_width_ >= 0) return this->viewport_width_;
-
-  RenderPage *page = GetRenderPage();
-  if (page == nullptr) return kDefaultViewPortWidth;
-
-  return page->viewport_width();
-}
-
 int RenderObject::AddRenderObject(int index, RenderObject *child) {
   if (child == nullptr || index < -1) {
     return index;
@@ -356,7 +347,7 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
     functor(fallback);
     ret = true;
   } else {
-    float fvalue = getFloatByViewport(value, GetViewPortWidth());
+    float fvalue = getFloatByViewport(value, RenderManager::GetInstance()->viewport_width());
     if (!isnan(fvalue)) {
       functor(fvalue);
       ret = true;

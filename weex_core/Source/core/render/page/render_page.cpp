@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
+#include "core/render/page/render_page.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -49,7 +49,6 @@ RenderPage::RenderPage(std::string page_id) {
 
   this->page_id_ = page_id;
   this->render_performance_ = new RenderPerformance();
-  this->viewport_width_ = kDefaultViewPortWidth;
   this->render_page_size_.first =
       WXCoreEnvironment::getInstance()->DeviceWidth();
   this->render_page_size_.second = NAN;

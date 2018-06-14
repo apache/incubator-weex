@@ -22,13 +22,17 @@
 #include <map>
 #include <string>
 
+#include "core/css/constants_value.h"
+
 namespace WeexCore {
 
 class RenderPage;
 
 class RenderManager {
  private:
-  RenderManager() {}
+  RenderManager() {
+    this->viewport_width_ = kDefaultViewPortWidth;
+  }
 
   ~RenderManager() {}
 
@@ -75,6 +79,12 @@ class RenderManager {
 
   bool CreateFinish(const std::string &page_id);
 
+  bool CallNativeModule(const char *pageId, const char *module, const char *method,
+                        const char *arguments, int argumentsLength, const char *options,
+                        int optionsLength);
+
+  bool CallMetaModule(const char *method, const char *arguments);
+
   RenderPage *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
@@ -86,9 +96,16 @@ class RenderManager {
     return g_pInstance;
   }
 
+  inline float viewport_width() const { return this->viewport_width_; }
+
+  inline void set_viewport_width(float viewport_width) {
+    this->viewport_width_ = viewport_width;
+  }
+
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;
+  float viewport_width_ = -1;
 };
 }  // namespace WeexCore
 

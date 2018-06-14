@@ -186,7 +186,5 @@ public interface IWXBridge extends IWXObject {
 
   void registerCoreEnv(String key, String value);
 
-  void setViewPortWidth(String instanceId, float value);
-
   void reportNativeInitStatus(String statusCode, String errorMsg);
 }
