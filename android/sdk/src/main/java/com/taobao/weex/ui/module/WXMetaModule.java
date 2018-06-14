@@ -65,7 +65,6 @@ public class WXMetaModule extends WXModule {
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
-                        // todo 问题：js -> java -> native，应该在native就拦截下请求，并修改ViewPortWidth
                         mWXSDKInstance.setInstanceViewPortWidth(width);
                     }
                     WXLogUtils.d("[WXMetaModule] setViewport success[width]=" + width);

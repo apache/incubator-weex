@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "base/ViewUtils.h"
+#include "core/render/manager/render_manager.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_name.h"
 #include "core/render/node/render_mask.h"
@@ -54,9 +55,9 @@ std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
 
   style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
   style->insert(std::pair<std::string, std::string>(
-      WIDTH, to_string(getWebPxByWidth(width, GetViewPortWidth()))));
+      WIDTH, to_string(getWebPxByWidth(width, RenderManager::GetInstance()->viewport_width()))));
   style->insert(std::pair<std::string, std::string>(
-      HEIGHT, to_string(getWebPxByWidth(height, GetViewPortWidth()))));
+      HEIGHT, to_string(getWebPxByWidth(height, RenderManager::GetInstance()->viewport_width()))));
   style->insert(std::pair<std::string, std::string>(TOP, "0"));
   return style;
 }

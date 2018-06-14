@@ -366,15 +366,6 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring v
   WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
-static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat value) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-  if (page == nullptr)
-    return;
-
-  page->set_viewport_width(value);
-}
-
-
 static jint InitFramework(JNIEnv *env, jobject object, jstring script, jobject params) {
   jThis = env->NewGlobalRef(object);
   jclass tempClass = env->FindClass(
