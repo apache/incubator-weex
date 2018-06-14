@@ -272,6 +272,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
+  private int mMaxDeepLayer;
+
   public boolean isTrackComponent() {
     return trackComponent;
   }
@@ -920,6 +922,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
         mWXPerformance.useScroller=1;
       }
+      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
       mWXPerformance.wxDims = mwxDims;
       mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
@@ -1656,6 +1659,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(this.mUserTrackParams != null){
       this.mUserTrackParams.remove(key);
     }
+  }
+
+  public int getMaxDeepLayer() {
+    return mMaxDeepLayer;
+  }
+
+  public void setMaxDeepLayer(int maxDeepLayer) {
+    mMaxDeepLayer = maxDeepLayer;
   }
 
   public void setMaxDomDeep(int maxDomDeep){
