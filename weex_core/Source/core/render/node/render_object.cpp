@@ -306,11 +306,11 @@ const std::string RenderObject::GetAttr(const std::string &key) {
 }
 
 float RenderObject::GetViewPortWidth() {
-  if (this->viewport_width_ >= 0) return this->viewport_width_;
-
   RenderPage *page = GetRenderPage();
   if (page == nullptr) return kDefaultViewPortWidth;
 
+  if (page->viewport_width() < 0)
+    return kDefaultViewPortWidth;
   return page->viewport_width();
 }
 

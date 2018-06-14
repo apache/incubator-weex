@@ -167,7 +167,7 @@ public:
   std::atomic_bool has_fore_layout_action_{false};
 
  private:
-  float viewport_width_;
+  float viewport_width_ = -1.0f;
   RenderObject *render_root_ = nullptr;
   std::string page_id_;
   std::pair<float, float> render_page_size_;
