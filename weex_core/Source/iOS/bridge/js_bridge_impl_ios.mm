@@ -6,8 +6,8 @@
 #import "wson_parser_ios.h"
 
 @interface VmRecorder :NSObject
-@property (nonatomic,assign) uint32_t vmId;
-@property (nonatomic,strong) JSVirtualMachine * runTime;
+@property (nonatomic,strong) NSNumber* vmId;
+@property (nonatomic,strong) JSVirtualMachine * vm;
 @property (nonatomic,strong) NSMutableDictionary* contextMap;
 @end
 
@@ -18,7 +18,7 @@
 {
     self = [super init];
     if (self) {
-        _runTime = [[JSVirtualMachine alloc] init];
+        _vm = [[JSVirtualMachine alloc] init];
         _contextMap = [[NSMutableDictionary alloc] init];
     }
     return self;
@@ -30,170 +30,169 @@
 //    _contextMap = nil;
 }
 
-- (JSContext*)finContext:(uint32_t) contextId{
-    
-}
-- (bool) createContext:(uint32_t) contextId{
-    JSContext* context = [[JSContext alloc] initWithVirtualMachine:self.runTime];
-    NSNumber* key = [NSNumber numberWithUnsignedInt:contextId];
-    [self.contextMap setObject:context forKey:key];
+- (bool) createContext:(NSNumber *) contextId{
+    if ([self.contextMap objectForKey:contextId]) {
+        return false;
+    }
+    JSContext* context = [[JSContext alloc] initWithVirtualMachine:self.vm];
+    [self.contextMap setObject:context forKey:contextId];
     return true;
 }
 
-- (void) destroyContext:(uint32_t) contextId{
-    NSNumber* key = [NSNumber numberWithUnsignedInt:contextId];
-    JSContext* context =[self.contextMap objectForKey:key];
-    [self.contextMap removeObjectForKey:key];
+- (void) destroyContext:(NSNumber *) contextId{
+    JSContext* context =[self.contextMap objectForKey:contextId];
+    if (nil == context) {
+        return;
+    }
+    [self.contextMap removeObjectForKey:contextId];
 }
 
 @end
 
+@interface JSBridgeIOSImpl :NSObject
+@end
+
+@implementation JSBridgeIOSImpl
+
++ (bool) createJSVM:(NSNumber*) vmId withParams:(NSDictionary*) params{
+    VmRecorder* vm = [[self getVMDic] objectForKey:vmId];
+    if (nil != vm) {
+        return false;
+    }
+    VmRecorder* recorder = [[VmRecorder alloc] init];
+    recorder.vmId= vmId;
+    [[JSBridgeIOSImpl getVMDic] setObject:recorder forKey: recorder.vmId];
+    return true;
+}
+
++ (void) destroyJSVM:(NSNumber*) vmId {
+    VmRecorder* vm = [[self getVMDic] objectForKey:vmId];
+    if (nil == vm) {
+        return;
+    }
+    [[self getVMDic] removeObjectForKey:vmId];
+    //do sth ?
+}
+
++ (JSContext*) findContext:(NSNumber*)contextId atVM:(NSNumber*) vmId {
+    VmRecorder* vm = [[self getVMDic] objectForKey:vmId];
+    if (nil == vm) {
+        return nil;
+    }
+    return [vm.contextMap objectForKey:contextId];
+}
+
++ (bool) createJSContext:(NSNumber*)contextId atVM:(NSNumber*) vmId {
+    VmRecorder* vm = [[JSBridgeIOSImpl getVMDic] objectForKey:vmId];
+    if (nil == vm) {
+        return false;
+    }
+    [vm createContext:contextId];
+    return true;
+}
+
++ (void) destroyJSContext:(NSNumber*)contextId atVM:(NSNumber*) vmId {
+    VmRecorder* vm = [[JSBridgeIOSImpl getVMDic] objectForKey:vmId];
+    if (nil == vm) {
+        return;
+    }
+    [vm destroyContext:contextId];
+}
+
++(JSValue*) doExecJSMethodInContext:(NSNumber*)contextId atVM:(NSNumber*) vmId method:(NSString*)name withArgs:(NSArray*)args {
+    JSContext* jsContext = [JSBridgeIOSImpl findContext:contextId atVM:vmId];
+    if (nil == jsContext) {
+        return nil;
+    }
+    return [[jsContext globalObject] invokeMethod:name withArguments:args];
+}
+
++ (void) executeJavascriptInContext:(NSNumber*)contextId atVM:(NSNumber*) vmId withScript:(NSString*)script{
+    JSContext* jsContext = [JSBridgeIOSImpl findContext:contextId atVM:vmId];
+    if (nil == jsContext) {
+        return;
+    }
+    [jsContext evaluateScript:script];
+}
+
++ (void) reigsterJSValeInContext:(NSNumber*)contextId atVM:(NSNumber*) vmId name:(NSString*)name val:(id)val {
+    JSContext* jsContext = [JSBridgeIOSImpl findContext:contextId atVM:vmId];
+    if (nil == jsContext) {
+        return;
+    }
+    jsContext[name]=val;
+}
+
++(id) getJSValeInContext:(NSNumber*)contextId atVM:(NSNumber*) vmId name:(NSString*)name  {
+    JSContext* jsContext = [JSBridgeIOSImpl findContext:contextId atVM:vmId];
+    if (nil == jsContext) {
+        return nil;
+    }
+    return jsContext[name];
+}
+
++(void) reigsterJSFuncInContext:(NSNumber*)contextId atVM:(NSNumber*) vmId methodName:(NSString*)method args:(NSArray*)args {
+    
+}
 
 
-
-
++ (NSMutableDictionary *) getVMDic{
+    static NSMutableDictionary* vmMap;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        vmMap = [[NSMutableDictionary alloc] init];
+    });
+    return vmMap;
+}
+@end
 
 
 namespace WeexCore {
-
-    typedef struct JSContextStruct {
-        int32_t contextId;
-        JSContext *context;
-        int32_t vmId;
-    } JSContextRecorder;
-    typedef struct JSVMStruct {
-        int32_t id;
-        JSVirtualMachine *jsVM;
-        std::vector<JSContextRecorder *> contextList;
-    } JSVMRecorder;
-
-    std::map<uint32_t, JSVMStruct *> vmMap;
     
-    JSBridgeIOS::~JSBridgeIOS(){
-        vmMap.clear();
+    NSNumber* convertId(uint32_t val){
+        return [NSNumber numberWithUnsignedInt:val];
     }
-    
-    JSContextRecorder* findContext(uint32_t runTimeId, uint32_t contextId)
-    {
-        auto iter = vmMap.find(runTimeId);
-        if (iter == vmMap.end()) {
-            return nullptr;
-        }
-        JSVMRecorder *vmRecorder = vmMap.at(runTimeId);
-        JSContextRecorder *targetContextRecorder = nullptr;
-        for (size_t i =0; i<vmRecorder->contextList.size(); i++) {
-            targetContextRecorder=vmRecorder->contextList[i];
-            if (contextId == targetContextRecorder->contextId) {
-                break;
-            }
-        }
-        return targetContextRecorder;
-    }
-    
+   
     bool JSBridgeIOS::createJSRunTime(uint32_t runTimeId, std::map<std::string, std::string> *params) {
-        auto iter = vmMap.find(runTimeId);
-        if (iter == vmMap.end()) {
-            return true;
-        }
-        JSVirtualMachine * runTime = [[JSVirtualMachine alloc] init];
-        JSVMRecorder *vm = new JSVMRecorder();
-        vm->id = runTimeId;
-        vm->jsVM = runTime;
-        vmMap.insert(std::pair<uint32_t, JSVMStruct *>(runTimeId, vm));
-        return true;
+        NSNumber* ocVmId = convertId(runTimeId);
+       return [JSBridgeIOSImpl createJSVM:ocVmId withParams:nil];
     }
 
-    bool JSBridgeIOS::destroyJSRunTime(uint32_t runTimeId) {
-        auto iter = vmMap.find(runTimeId);
-        if (iter == vmMap.end()) {
-            return true;
-        }
-        JSVMRecorder* vm = vmMap.at(runTimeId);
-        while (vm->contextList.size()>0) {
-            destroyJSContext(runTimeId, vm->contextList[0]->contextId);
-        }
-
-        vmMap.erase(runTimeId);
-        vm->contextList.clear();
-        delete vm;
-        vm = nullptr;
-        //todo call js destroy vm ?
-        return true;
+    void JSBridgeIOS::destroyJSRunTime(uint32_t runTimeId) {
+        NSNumber* ocVmId = convertId(runTimeId);
+        [JSBridgeIOSImpl destroyJSVM:ocVmId];
     }
 
     bool JSBridgeIOS::createJSContext(uint32_t runTimeId, uint32_t contextId) {
-        auto iter = vmMap.find(runTimeId);
-        if (iter == vmMap.end()) {
-            return false;
-        }
-        JSVMRecorder *vmRecorder = vmMap.at(runTimeId);
-        for (size_t i =0; i<vmRecorder->contextList.size(); i++) {
-            if (contextId == vmRecorder->contextList[i]->contextId) {
-                return false;
-            }
-        }
-        JSContext * context = [[JSContext alloc] initWithVirtualMachine:vmRecorder->jsVM];
-        JSContextRecorder *contextRecorder = new JSContextRecorder();
-        contextRecorder->vmId=runTimeId;
-        contextRecorder->context=context;
-        contextRecorder->contextId=contextId;
-        vmRecorder->contextList.push_back(contextRecorder);
-        return true;
+        NSNumber* ocVmId =convertId(runTimeId);
+        NSNumber* ocContextId = convertId(contextId);
+        return  [JSBridgeIOSImpl createJSContext:ocContextId atVM:ocVmId];
     }
 
-    bool JSBridgeIOS::destroyJSContext(uint32_t runTimeId, uint32_t contextId) {
-        auto iter = vmMap.find(runTimeId);
-        if (iter == vmMap.end()) {
-            return true;
-        }
-        JSVMRecorder *vmRecorder = vmMap.at(runTimeId);
-        JSContextRecorder *targetContextRecorder = nullptr;
-        
-        size_t targetIndex = 0;
-        while (targetIndex < vmRecorder->contextList.size()) {
-            targetContextRecorder = vmRecorder->contextList[targetIndex];
-            if (contextId == targetContextRecorder->contextId) {
-                break;
-            }
-            targetIndex++;
-        }
-    
-        if (targetIndex < vmRecorder->contextList.size()) {
-            targetContextRecorder->context = nullptr;
-            vmRecorder->contextList.erase(vmRecorder->contextList.begin() + targetIndex);
-            delete targetContextRecorder;
-            targetContextRecorder = nullptr;
-            //execJSMethod
-        }
-        return true;
+    void JSBridgeIOS::destroyJSContext(uint32_t runTimeId, uint32_t contextId) {
+        NSNumber* ocVmId =convertId(runTimeId);
+        NSNumber* ocContextId = convertId(contextId);
+        [JSBridgeIOSImpl destroyJSContext:ocContextId atVM:ocVmId];
     }
     
     JSValue* doExecJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args){
-        JSContextRecorder *targetContextRecorder = findContext(runTimeId,contextId);
-        if (nullptr == targetContextRecorder) {
-            return nil;
-        }
-        JSContext* jsContext = targetContextRecorder->context;
-        
-        NSString* jsMethod=[[NSString alloc] initWithUTF8String:methodName];
-        
+        NSNumber* ocVmId =convertId(runTimeId);
+        NSNumber* ocContextId = convertId(contextId);
+        NSString* ocMethod=[[NSString alloc] initWithUTF8String:methodName];
         id jsArgs = [WsonParser toVal:args];
         if (![jsArgs isKindOfClass:[NSArray class]]) {
             return nil;
         }
-        NSArray* arrayArgs = (NSArray*)jsArgs;
-        
-        // WXLogDebug(@"Calling JS... method:%@, args:%@", jsMethod, jsArgs);
-        
-       return [[jsContext globalObject] invokeMethod:jsMethod withArguments:arrayArgs];
+        NSArray* ocArrayArgs = (NSArray*)jsArgs;
+        return [JSBridgeIOSImpl doExecJSMethodInContext:ocContextId atVM:ocVmId method:ocMethod withArgs:ocArrayArgs];
     }
 
     void JSBridgeIOS::execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args) {
         doExecJSMethod(runTimeId,contextId,methodName,args);
     }
     
-    wson_buffer*
-    JSBridgeIOS::execJSMethodWithResult(uint32_t runTimeId, uint32_t contextId, char *methodName, wson_buffer* args){
+    wson_buffer* JSBridgeIOS::execJSMethodWithResult(uint32_t runTimeId, uint32_t contextId, char *methodName, wson_buffer* args){
         JSValue* result = doExecJSMethod(runTimeId, contextId, methodName, args);
         if (result == nil) {
             return nullptr;

@@ -37,11 +37,11 @@ namespace WeexCore {
 
         bool createJSRunTime(uint32_t runTimeId, std::map<std::string, std::string> *params);
 
-        bool destroyJSRunTime(uint32_t runTimeId);
+        void destroyJSRunTime(uint32_t runTimeId);
 
         bool createJSContext(uint32_t runTimeId, uint32_t contextId) ;
 
-        bool destroyJSContext(uint32_t runTimeId, uint32_t contextId) ;
+        void destroyJSContext(uint32_t runTimeId, uint32_t contextId) ;
 
         void execJSMethod(uint32_t runTimeId, uint32_t contextId, char *methodName,wson_buffer* args);
         
