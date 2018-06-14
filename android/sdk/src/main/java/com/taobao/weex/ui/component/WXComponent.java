@@ -290,7 +290,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (getEvents() == null || getEvents().isEmpty())
       return;
     WXEvent event = getEvents();
-    for(int i=0; i<event.size(); i++){
+    int size = event.size();
+    for (int i=0; i<size; i++) {
+      if(i >= event.size()){
+        break;
+      }
       String type = event.get(i);
       addEvent(type);
     }
@@ -1447,7 +1451,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
     WXEvent events = getEvents();
-    for (int i=0; i<events.size(); i++) {
+    int size = events.size();
+    for (int i=0; i<size; i++) {
+      if(i >= events.size()){
+        break;
+      }
       String event = events.get(i);
       if (event == null) {
         continue;
