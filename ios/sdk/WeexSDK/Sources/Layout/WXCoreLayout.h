@@ -703,9 +703,10 @@ namespace WeexCore {
       return mChildList.cend();
     }
 
-    inline void removeChild(const WXCoreLayoutNode* const child) {
+    inline void removeChild(WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
+          child->mParent = nullptr;
           mChildList.erase(mChildList.begin() + index);
           break;
         }

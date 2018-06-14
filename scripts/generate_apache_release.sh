@@ -13,6 +13,7 @@ rsync -rvv  --include-from=scripts/release_files.rules ./ $dest
 
 #repackage
 find $dest/android/sdk/src -type f -name '*.java' -exec sed -i '' 's/com\.taobao\.weex/org\.apache\.weex/g' {} \;
+find $dest/android/sdk/src -type f -name 'AndroidManifest.xml' -exec sed -i '' 's/com\.taobao\.weex/org\.apache\.weex/g' {} \;
 
 mkdir -p $dest/android/sdk/src/main/java/org
 mkdir -p $dest/android/sdk/src/main/java/org/apache

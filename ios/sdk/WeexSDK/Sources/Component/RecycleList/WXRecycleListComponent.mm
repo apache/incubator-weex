@@ -499,12 +499,18 @@ WX_EXPORT_METHOD(@selector(setListData:))
     // 1. get the data relating to the cell
     id data = [_dataManager dataAtIndex:indexPath.row];
     
-    // 2. get the template type specified by data
+    // 2. get the template type specified by data, and if template is not found, return an empty view of any template to avoid crash.
     NSString * templateType = [self templateType:indexPath];
     _templateManager.collectionView = collectionView;
-    if (!templateType) {
-        WXLogError(@"Each data should have a value for %@ to indicate template type", _templateSwitchKey);
-        return nil;
+    if (!templateType || (templateType && ![_templateManager isTemplateRegistered:templateType])) {
+        WXLogError(@"Template %@ not registered for collection view.", templateType);
+        UICollectionViewCell *cellView = [_collectionView dequeueReusableCellWithReuseIdentifier:[_templateManager anyRegisteredTemplate] forIndexPath:indexPath];
+        for (UIView *view in cellView.contentView.subviews) {
+            [view removeFromSuperview];
+        }
+        cellView.wx_component = nil;
+        [cellView setAccessibilityIdentifier:nil];
+        return cellView;
     }
     
     // 3. dequeue a cell component by template type
@@ -607,7 +613,7 @@ WX_EXPORT_METHOD(@selector(setListData:))
         return templateType;
     }
     
-    if (_templateSwitchKey &&data[_templateSwitchKey]){
+    if (_templateSwitchKey && data[_templateSwitchKey]){
         templateType = data[_templateSwitchKey];
     } else if (data[WXDefaultRecycleTemplateType]){
         // read the default type.
