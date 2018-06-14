@@ -19,7 +19,10 @@
 
 #include <utility>
 #include <vector>
+#include <wson_parser.h>
 
+#include "base/ViewUtils.h"
+#include "core/css/constants_name.h"
 #include "base/TimeUtils.h"
 #include "core/layout/measure_func_adapter.h"
 #include "core/parser/dom_wson.h"
@@ -181,6 +184,37 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
 
   page->set_is_dirty(true);
   return page->CreateFinish();
+}
+
+bool RenderManager::CallNativeModule(const char *pageId, const char *module, const char *method,
+                                     const char *arguments, int argumentsLength,
+                                     const char *options, int optionsLength) {
+  if (strcmp(module, "meta") == 0) {
+    CallMetaModule(method, arguments);
+  }
+}
+
+bool RenderManager::CallMetaModule(const char *method, const char *arguments) {
+
+  if (strcmp(method, "setViewport") == 0) {
+    wson_parser parser(arguments);
+    if (parser.isArray(parser.nextType())) {
+      int size = parser.nextArraySize();
+      for (int i = 0; i < size; i++) {
+        uint8_t value_type = parser.nextType();
+        if (parser.isMap(value_type)) {
+          int map_size = parser.nextMapSize();
+          for (int j = 0; j < map_size; j++) {
+            std::string key = parser.nextMapKeyUTF8();
+            std::string value = parser.nextStringUTF8(parser.nextType());
+            if (strcmp(key.c_str(), WIDTH) == 0) {
+              RenderManager::GetInstance()->set_viewport_width(getFloat(value.c_str()));
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 RenderPage *RenderManager::GetPage(const std::string &page_id) {

@@ -47,6 +47,10 @@ namespace WeexCore {
     void *JSBridge::onCallNativeModule(const char *pageId, const char *module, const char *method,
                                        const char *arguments, int argumentsLength, const char *options,
                                        int optionsLength) {
+
+        RenderManager::GetInstance()->CallNativeModule(pageId, module, method, arguments, argumentsLength,
+                                                       options, optionsLength);
+
         return WeexCoreManager::getInstance()->getPlatformBridge()->callNativeModule(
                 pageId, module, method, arguments,
                 argumentsLength, options,

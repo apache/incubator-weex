@@ -289,14 +289,6 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring v
   WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
-static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat value) {
-    const char *cInstanceId = env->GetStringUTFChars(instanceId, JNI_FALSE);
-    WeexCoreManager::getInstance()->getPlatformBridge()->setViewPortWidth(
-            cInstanceId,value
-    );
-}
-
-
 static jint InitFramework(JNIEnv *env, jobject object, jstring script, jobject params) {
   jThis = env->NewGlobalRef(object);
   jclass tempClass = env->FindClass(

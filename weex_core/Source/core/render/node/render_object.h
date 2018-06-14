@@ -31,8 +31,7 @@
 
 #define convert_render_object_to_long(render) ((jlong)((intptr_t)render))
 
-#define convert_long_to_render_object(ptr) \
-  ((RenderObject *)((intptr_t)ptr))
+#define convert_long_to_render_object(ptr) ((RenderObject *)((intptr_t)ptr))
 
 namespace WeexCore {
 
@@ -151,7 +150,6 @@ class RenderObject : public IRenderObject {
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
   std::set<std::string> *events_;
-  float viewport_width_ = -1;
   bool is_root_render_;
   bool is_sticky_ = false;
 };

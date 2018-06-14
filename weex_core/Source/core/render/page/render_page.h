@@ -143,12 +143,6 @@ public:
 
   inline std::string page_id() { return this->page_id_; }
 
-  inline float viewport_width() const { return this->viewport_width_; }
-
-  inline void set_viewport_width(float viewport_width) {
-    this->viewport_width_ = viewport_width;
-  }
-
   inline bool is_dirty() { return this->is_dirty_.load(); }
 
   inline void set_is_dirty(bool dirty) { this->is_dirty_.store(dirty); }
@@ -167,7 +161,6 @@ public:
   std::atomic_bool has_fore_layout_action_{false};
 
  private:
-  float viewport_width_;
   RenderObject *render_root_ = nullptr;
   std::string page_id_;
   std::pair<float, float> render_page_size_;

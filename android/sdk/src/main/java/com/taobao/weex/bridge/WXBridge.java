@@ -94,9 +94,6 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
-  private native void nativeSetViewPortWidth(String instanceId, float value);
-
-
   /**
    * update global config,
    * @param config params
@@ -563,11 +560,6 @@ public class WXBridge implements IWXBridge {
   @Override
   public void registerCoreEnv(String key, String value) {
     nativeRegisterCoreEnv(key, value);
-  }
-
-  @Override
-  public void setViewPortWidth(String instanceId, float value) {
-    nativeSetViewPortWidth(instanceId, value);
   }
 
   public void reportNativeInitStatus(String statusCode, String errorMsg) {
