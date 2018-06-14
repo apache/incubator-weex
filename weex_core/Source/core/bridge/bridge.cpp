@@ -132,13 +132,6 @@ namespace WeexCore {
         }
     }
 
-    void Bridge::setViewPortWidth(const char *instanceId, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
-         if (page == nullptr)
-           return;
-         page->set_viewport_width(value);
-    }
-
     void Bridge::setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth,
                                                      const float defaultHeight,
                                                      const bool isWidthWrapContent, const bool isHeightWrapContent) {
