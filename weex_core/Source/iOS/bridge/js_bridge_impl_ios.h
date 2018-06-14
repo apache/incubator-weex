@@ -29,7 +29,7 @@ namespace WeexCore {
     
     class JSBridgeIOS : public JSBridge {
     public:
-      //  JSBridgeIOS();
+        JSBridgeIOS();
         ~JSBridgeIOS();
     public:
         
