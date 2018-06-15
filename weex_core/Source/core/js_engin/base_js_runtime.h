@@ -28,26 +28,17 @@ namespace WeexCore {
     class BaseJSContext;
 
     class BaseJSRunTime {
-    protected:
-        std::map<uint32_t, BaseJSContext *> contextMap;
-    public:
-        uint32_t runTimeId;
-
-        BaseJSRunTime() {}
-
-        ~BaseJSRunTime() {
-            contextMap.clear();
-        }
-
     public:
 
-        bool initRunTime();
+        virtual bool initRunTime()=0;
 
-        void destroy();
+        virtual void destroy()=0;
 
-        BaseJSContext *createContext();
+        virtual BaseJSContext *createContext()=0;
 
-        void destroyContext(BaseJSContext *context);
+        virtual void destroyContext(BaseJSContext *context)=0;
+        
+        virtual uint32_t getRunTimeId()=0;
     };
 }
 
