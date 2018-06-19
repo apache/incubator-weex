@@ -375,12 +375,13 @@ namespace WeexCore {
 
     inline bool isWrapRequired(const float &width, const float &height,
                                const float &currentLength, const float &childLength) const {
-      float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
+      float freeMainSize = CalculateFreeSpaceAlongMainAxis(width, height, currentLength);
       return !isSingleFlexLine(freeMainSize) && freeMainSize < childLength;
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.
-    virtual float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
+    virtual float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
+                                                  const float &currentLength) const{
       float ret;
       if(isMainAxisHorizontal(this)){
         ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
@@ -641,11 +642,11 @@ namespace WeexCore {
 
     std::tuple<bool, float, float> calculateBFCDimension(const std::pair<float,float>&);
 
-    virtual void onLayoutBefore() {
+    virtual void OnLayoutBefore() {
 
     }
 
-    virtual void onLayoutAfter(float width, float height) {
+    virtual void OnLayoutAfter(float width, float height) {
 
     }
 
@@ -1017,7 +1018,7 @@ namespace WeexCore {
       return mCssStyle->mAlignSelf;
     }
 
-    virtual void setFlex(const float flex) {
+    virtual void set_flex(const float flex) {
       if (mCssStyle->mFlexGrow != flex) {
         mCssStyle->mFlexGrow = flex;
         markDirty();

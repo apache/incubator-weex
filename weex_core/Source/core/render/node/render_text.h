@@ -16,26 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERTEXT_H
-#define WEEX_PROJECT_RENDERTEXT_H
+#ifndef CORE_RENDER_NODE_RENDER_TEXT_H_
+#define CORE_RENDER_NODE_RENDER_TEXT_H_
 
-#include <core/render/node/render_object.h>
-#include <core/render/page/render_page.h>
+#include <string>
+
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
-  class RenderText : public RenderObject {
-  private:
-    inline void UpdateAttr(std::string key, std::string value) {
-      RenderObject::UpdateAttr(key, value);
-      markDirty();
-    }
+class RenderText : public RenderObject {
+ private:
+  void UpdateAttr(std::string key, std::string value);
 
-    inline StyleType UpdateStyle(std::string key, std::string value) {
-      StyleType resultType = RenderObject::ApplyStyle(key, value, true);
-      markDirty();
-      return resultType;
-    }
-  };
-}
+  StyleType UpdateStyle(std::string key, std::string value);
+};
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_RENDERTEXT_H
+#endif  // CORE_RENDER_NODE_RENDER_TEXT_H_

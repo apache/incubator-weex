@@ -157,7 +157,7 @@ static jlongArray GetFirstScreenRenderTime(JNIEnv *env, jobject jcaller, jstring
     return jFirstScreenRenderTime;
   }
 
-  std::vector<long> temp = page->PrintFirstScreenLog();
+  std::vector<int64_t> temp = page->PrintFirstScreenLog();
 
   jlong ret[3];
 
@@ -189,7 +189,7 @@ static jlongArray GetRenderFinishTime(JNIEnv *env, jobject jcaller, jstring inst
     return jRenderFinishTime;
   }
 
-  std::vector<long> temp = page->PrintRenderSuccessLog();
+  std::vector<int64_t> temp = page->PrintRenderSuccessLog();
 
   jlong ret[3];
 
@@ -226,11 +226,12 @@ static void ForceLayout(JNIEnv *env, jobject jcaller, jstring instanceId) {
 static void SetStyleWidth(JNIEnv *env, jobject jcaller,
                           jstring instanceId, jstring ref, jfloat value) {
 
-  WeexCoreManager::getInstance()->getPlatformBridge()->setStyleWidth(
-          env->GetStringUTFChars(instanceId, JNI_FALSE),
-          env->GetStringUTFChars(ref, JNI_FALSE),
-          value
-  );
+
+    WeexCoreManager::getInstance()->getPlatformBridge()->setStyleWidth(
+            env->GetStringUTFChars(instanceId, JNI_FALSE),
+            env->GetStringUTFChars(ref, JNI_FALSE),
+            value
+    );
 }
 
 static void SetStyleHeight(JNIEnv *env, jobject jcaller,
@@ -287,14 +288,6 @@ static void RegisterCoreEnv(JNIEnv *env, jobject jcaller, jstring key, jstring v
        jString2StrFast(env, value).c_str());
   WXCoreEnvironment::getInstance()->AddOption(jString2StrFast(env, key), jString2StrFast(env, value));
 }
-
-static void SetViewPortWidth(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat value) {
-    const char *cInstanceId = env->GetStringUTFChars(instanceId, JNI_FALSE);
-    WeexCoreManager::getInstance()->getPlatformBridge()->setViewPortWidth(
-            cInstanceId,value
-    );
-}
-
 
 static jint InitFramework(JNIEnv *env, jobject object, jstring script, jobject params) {
   jThis = env->NewGlobalRef(object);

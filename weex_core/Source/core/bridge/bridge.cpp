@@ -16,10 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 陈佩翰 on 2018/6/7.
-//
-
 
 #include "bridge.h"
 #include <core/render/manager/render_manager.h>
@@ -38,7 +34,7 @@ namespace WeexCore {
 
         render->setStyleWidthLevel(CSS_STYLE);
         render->setStyleWidth(value, true);
-        page->updateDirty(true);
+        page->set_is_dirty(true);
     }
 
     void Bridge::setStyleHeight(const char *instanceId, const char *ref, float value) {
@@ -52,54 +48,54 @@ namespace WeexCore {
 
         render->setStyleHeightLevel(CSS_STYLE);
         render->setStyleHeight(value);
-        page->updateDirty(true);
+        page->set_is_dirty(true);
     }
 
 
     void Bridge::setMargin(const char *instanceId, const char *ref, int32_t edge, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
-        if (page == nullptr)
-            return;
+         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+         if (page == nullptr)
+           return;
 
-        RenderObject *render = page->GetRenderObject(std::string(ref));
-        if (render == nullptr)
-            return;
+         RenderObject *render = page->GetRenderObject(std::string(ref));
+         if (render == nullptr)
+           return;
 
-        if (edge == 0) {
-            render->setMargin(kMarginTop, value);
-        } else if (edge == 1) {
-            render->setMargin(kMarginBottom, value);
-        } else if (edge == 2) {
-            render->setMargin(kMarginLeft, value);
-        } else if (edge == 3) {
-            render->setMargin(kMarginRight, value);
-        } else if (edge == 4) {
-            render->setMargin(kMarginALL, value);
-        }
-        page->updateDirty(true);
+         if (edge == 0) {
+           render->setMargin(kMarginTop, value);
+         } else if (edge == 1) {
+           render->setMargin(kMarginBottom, value);
+         } else if (edge == 2) {
+           render->setMargin(kMarginLeft, value);
+         } else if (edge == 3) {
+           render->setMargin(kMarginRight, value);
+         } else if (edge == 4) {
+           render->setMargin(kMarginALL, value);
+         }
+         page->set_is_dirty(true);
     }
 
     void Bridge::setPadding(const char *instanceId, const char *ref, int32_t edge, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
-        if (page == nullptr)
-            return;
+         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+         if (page == nullptr)
+           return;
 
-        RenderObject *render = page->GetRenderObject(std::string(ref));
-        if (render == nullptr)
-            return;
+         RenderObject *render = page->GetRenderObject(std::string(ref));
+         if (render == nullptr)
+           return;
 
-        if (edge == 0) {
-            render->setPadding(kPaddingTop, value);
-        } else if (edge == 1) {
-            render->setPadding(kPaddingBottom, value);
-        } else if (edge == 2) {
-            render->setPadding(kPaddingLeft, value);
-        } else if (edge == 3) {
-            render->setPadding(kPaddingRight, value);
-        } else if (edge == 4) {
-            render->setPadding(kPaddingALL, value);
-        }
-        page->updateDirty(true);
+         if (edge == 0) {
+           render->setPadding(kPaddingTop, value);
+         } else if (edge == 1) {
+           render->setPadding(kPaddingBottom, value);
+         } else if (edge == 2) {
+           render->setPadding(kPaddingLeft, value);
+         } else if (edge == 3) {
+           render->setPadding(kPaddingRight, value);
+         } else if (edge == 4) {
+           render->setPadding(kPaddingALL, value);
+         }
+         page->set_is_dirty(true);
     }
 
     void Bridge::setPosition(const char *instanceId, const char *ref, int32_t edge, float value) {
@@ -120,7 +116,7 @@ namespace WeexCore {
         } else if (edge == 3) {
             render->setStylePosition(kPositionEdgeRight, value);
         }
-        page->updateDirty(true);
+        page->set_is_dirty(true);
     }
 
     void Bridge::markDirty(const char *instanceId, const char *ref, bool dirty) {
@@ -134,14 +130,6 @@ namespace WeexCore {
                 return;
             render->markDirty();
         }
-    }
-
-    void Bridge::setViewPortWidth(const char *instanceId, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
-        if (page == nullptr)
-            return;
-
-        page->SetViewPortWidth(value);
     }
 
     void Bridge::setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth,
@@ -165,7 +153,8 @@ namespace WeexCore {
         if (page == nullptr)
             return;
 
-        page->SetRenderContainerWidthWrapContent(wrap);
+        page->set_is_render_container_width_wrap_content(wrap);
+
     }
 
     void Bridge::forceLayout(const char *instanceId) {
@@ -175,9 +164,8 @@ namespace WeexCore {
 #if RENDER_LOG
             LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", jString2StrFast(env, instanceId).c_str(), page->hasForeLayoutAction.load()?"true":"false");
 #endif
-
             page->LayoutImmediately();
-            page->hasForeLayoutAction.store(false);
+            page->has_fore_layout_action_.store(false);
         }
     }
 
@@ -185,15 +173,14 @@ namespace WeexCore {
         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
         if (page != nullptr) {
 
-            if (!page->needLayout.load()) {
-                page->needLayout.store(true);
+            if (!page->need_layout_.load()) {
+                page->need_layout_.store(true);
             }
 
-            bool ret = !page->hasForeLayoutAction.load() && page->isDirty();
+            bool ret = !page->has_fore_layout_action_.load() && page->is_dirty();
             if (ret) {
-                page->hasForeLayoutAction.store(true);
+                page->has_fore_layout_action_.store(true);
             }
-            return ret;
         }
     }
 

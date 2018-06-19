@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_createfinish.h"
+
+#include "core/render/action/render_action_createfinish.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionCreateFinish::RenderActionCreateFinish(const std::string &pageId) {
-    this->mPageId = pageId;
-  }
-
-  void RenderActionCreateFinish::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(mPageId.c_str());
-  }
+RenderActionCreateFinish::RenderActionCreateFinish(const std::string &page_id) {
+  this->page_id_ = page_id;
 }
+
+void RenderActionCreateFinish::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(
+      this->page_id_.c_str());
+}
+}  // namespace WeexCore

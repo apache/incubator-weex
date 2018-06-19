@@ -16,19 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_update_attr.h"
+
+#include "core/render/action/render_action_update_attr.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-  RenderActionUpdateAttr::RenderActionUpdateAttr(const std::string &pageId, const std::string &ref,
-                                                 std::vector<std::pair<std::string, std::string>> *mAttrs) {
-    this->mPageId = pageId;
-    this->mRef = ref;
-    this->mAttrs = mAttrs;
-  }
-
-  void RenderActionUpdateAttr::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(mPageId.c_str(), mRef.c_str(), mAttrs);
-  }
+RenderActionUpdateAttr::RenderActionUpdateAttr(
+    const std::string &page_id, const std::string &ref,
+    std::vector<std::pair<std::string, std::string>> *attrs) {
+  this->page_id_ = page_id;
+  this->ref_ = ref;
+  this->attrs_ = attrs;
 }
+
+void RenderActionUpdateAttr::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(
+      this->page_id_.c_str(), this->ref_.c_str(), this->attrs_);
+}
+}  // namespace WeexCore

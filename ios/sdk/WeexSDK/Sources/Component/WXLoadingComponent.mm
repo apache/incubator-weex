@@ -78,10 +78,8 @@
 - (void)viewDidLoad
 {
     _initFinished = YES;
-    
-    if (!_displayState) {
-        [_indicator.view setHidden:YES];
-    }
+
+    [self setDisplay];
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -115,12 +113,20 @@
     CGPoint contentOffset = [scrollerProtocol contentOffset];
     if (_displayState) {
         contentOffset.y = [scrollerProtocol contentSize].height - scroller.calculatedFrame.size.height + self.calculatedFrame.size.height;
+        self.view.hidden = NO;
         [_indicator start];
     } else {
         contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
         [_indicator stop];
+        self.view.hidden = YES;
     }
-    [scrollerProtocol setContentOffset:contentOffset animated:YES];
+    if (contentOffset.y > 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.25 animations:^{
+                [scrollerProtocol setContentOffset:contentOffset animated:NO];
+            } completion:nil];
+        });
+    }
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index

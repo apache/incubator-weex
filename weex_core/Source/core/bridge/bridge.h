@@ -114,8 +114,6 @@ namespace WeexCore {
 
     void markDirty(const char *instanceId,const  char *ref, bool dirty);
 
-    void setViewPortWidth(const char *instanceId, float value);
-
     void setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth, const float defaultHeight,
                                              const bool isWidthWrapContent, const bool isHeightWrapContent);
     void setRenderContainerWrapContent(const char* instanceId,bool wrap);

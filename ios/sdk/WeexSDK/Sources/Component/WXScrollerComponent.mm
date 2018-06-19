@@ -165,7 +165,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                  (_scrollDirection == WXScrollDirectionHorizontal &&
                   flexIsUndefined(self.flexCssNode->getStyleWidth()))) &&
                 self.flexCssNode->getFlex() <= 0.0) {
-                self.flexCssNode->setFlex(1.0);
+                self.flexCssNode->set_flex(1.0);
             }
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {

@@ -226,11 +226,11 @@ bool flexIsUndefined(float value) {
 {
         // flex
         if (styles[@"flex"]) {
-            _flexCssNode->setFlex([WXConvert CGFloat:styles[@"flex"]]);
+            _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
         }
         if (isnan(_flexCssNode->getFlex())) {
             // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
-            _flexCssNode->setFlex(0);
+            _flexCssNode->set_flex(0);
         }
         
         if (styles[@"flexDirection"]) {

@@ -16,30 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_add_element.h"
+
+#include "core/render/action/render_action_add_element.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
-  RenderActionAddElement::RenderActionAddElement(const std::string &pageId, const RenderObject *render,
-                                                 const RenderObject *parent, int index, bool willLayout) {
-    this->mAttributes = render->Attributes();
-    this->mStyles = render->Styles();
-    this->mEvents = render->Events();
-    this->mMargins = render->GetMargins();
-    this->mPaddings = render->GetPaddings();
-    this->mBorders = render->GetBorders();
-    this->mPageId = pageId;
-    this->mComponentType = render->Type();
-    this->mRef = render->Ref();
-    this->mParentRef = parent->Ref();
-    this->mIndex = index;
-    this->mWillLayout = willLayout;
-  }
-
-  void RenderActionAddElement::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                                          mIndex, mParentRef.c_str(), mStyles, mAttributes,
-                                                                          mEvents, mMargins, mPaddings, mBorders, mWillLayout);
-  }
+RenderActionAddElement::RenderActionAddElement(const std::string &page_id,
+                                               const RenderObject *render,
+                                               const RenderObject *parent,
+                                               int index, bool will_layout) {
+  this->attributes_ = render->attributes();
+  this->styles_ = render->styles();
+  this->events_ = render->events();
+  this->margins_ = render->GetMargins();
+  this->paddings_ = render->GetPaddings();
+  this->borders_ = render->GetBorders();
+  this->page_id_ = page_id;
+  this->component_type_ = render->type();
+  this->ref_ = render->ref();
+  this->parent_ref_ = parent->ref();
+  this->index_ = index;
+  this->will_layout_ = will_layout;
 }
+
+void RenderActionAddElement::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(
+      this->page_id_.c_str(), this->component_type_.c_str(), this->ref_.c_str(),
+      this->index_, this->parent_ref_.c_str(), this->styles_, this->attributes_,
+      this->events_, this->margins_, this->paddings_, this->borders_,
+      this->will_layout_);
+}
+}  // namespace WeexCore

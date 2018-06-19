@@ -16,34 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RELAYOUTRENDERACTION_H
-#define WEEX_PROJECT_RELAYOUTRENDERACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_LAYOUT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_LAYOUT_H_
 
-#include "render_action.h"
+#include <set>
+#include <string>
+
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionLayout : public render_action {
+class RenderObject;
 
-  public:
-    RenderActionLayout(const std::string &pageId, const RenderObject *render, const int index);
+class WXCoreLayoutNode;
 
-    void ExecuteAction();
+class RenderActionLayout : public RenderAction {
+ public:
+  explicit RenderActionLayout(const std::string &page_id,
+                              const RenderObject *render, const int index);
 
-    void GetLayoutInfo(const WXCoreLayoutNode *node);
+  void ExecuteAction();
 
-  public:
-    EventsSet *mEvents;
-    std::string mPageId;
-    std::string mRef;
-    float mWidth;
-    float mHeight;
-    float mTop;
-    float mLeft;
-    float mBottom;
-    float mRight;
-    int index;
-  };
-}
+  void GetLayoutInfo(const WXCoreLayoutNode *node);
 
-#endif //WEEX_PROJECT_RELAYOUTRENDERACTION_H
+ public:
+  std::string page_id_;
+  std::string ref_;
+  float width_;
+  float height_;
+  float top_;
+  float left_;
+  float bottom_;
+  float right_;
+  int index_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_LAYOUT_H_

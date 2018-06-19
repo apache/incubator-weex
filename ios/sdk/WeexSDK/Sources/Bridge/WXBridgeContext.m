@@ -372,7 +372,7 @@ _Pragma("clang diagnostic pop") \
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: callNativeModule : %@ . %@",moduleName,methodName);
 #endif
-        NSMutableDictionary * newOptions = [options mutableCopy];
+        NSMutableDictionary * newOptions = options ? [options mutableCopy] : [NSMutableDictionary new];
         NSMutableArray * newArguments = [arguments mutableCopy];
         
         if ([WXSDKManager sharedInstance].multiContext && [instance.bundleType.lowercaseString isEqualToString:@"rax"]) {

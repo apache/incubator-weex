@@ -120,6 +120,11 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       child.applyLayoutAndEvent(child);
 
       child.bindData(child);
+      WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+      if (null!=instance){
+        instance.onElementChange();
+       // instance.setma
+      }
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

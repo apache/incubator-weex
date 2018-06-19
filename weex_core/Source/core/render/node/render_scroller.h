@@ -16,49 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERSCROLLER_H
-#define WEEX_PROJECT_RENDERSCROLLER_H
+#ifndef CORE_RENDER_NODE_RENDER_SCROLLER_H_
+#define CORE_RENDER_NODE_RENDER_SCROLLER_H_
 
-#include <core/render/node/render_object.h>
+#include <map>
+#include <string>
+
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
-  class RenderScroller : public RenderObject {
+class RenderScroller : public RenderObject {
+  bool is_set_flex_ = false;
 
-    bool mIsSetFlex = false;
+  std::map<std::string, std::string> *GetDefaultStyle();
 
-    std::map<std::string, std::string> *GetDefaultStyle() {
-      std::map<std::string, std::string> *style = new std::map<std::string, std::string>();
+  void set_flex(const float flex);
 
-      bool isVertical = true;
-      RenderObject *parent = (RenderObject *) getParent();
-
-      if (parent != nullptr) {
-        if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {
-          isVertical = false;
-        }
-      }
-
-      std::string prop = isVertical ? HEIGHT : WIDTH;
-
-      if (prop == HEIGHT && isnan(getStyleHeight()) &&  !mIsSetFlex) {
-        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      } else if (prop == WIDTH && isnan(getStyleWidth()) &&  !mIsSetFlex) {
-        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-      }
-
-      return style;
-    }
-
-    inline void setFlex(const float flex) {
-       mIsSetFlex = true;
-       WXCoreLayoutNode::setFlex(flex);
-    }
-
-
-      float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const override {
-      return NAN;
-    }
-
-  };
-}
-#endif //WEEX_PROJECT_RENDERSCROLLER_H
+  inline float CalculateFreeSpaceAlongMainAxis(
+      const float &width, const float &height,
+      const float &current_length) const override {
+    return NAN;
+  }
+};
+}  // namespace WeexCore
+#endif  // CORE_RENDER_NODE_RENDER_SCROLLER_H_

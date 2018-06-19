@@ -16,30 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_layout.h"
+
+#include "core/render/action/render_action_layout.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
-  RenderActionLayout::RenderActionLayout(const std::string &pageId, const RenderObject *render,int index) {
-    this->mPageId = pageId;
-    this->mRef = render->Ref();
-    this->index = index;
-    GetLayoutInfo(render);
-  }
-
-  void RenderActionLayout::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(mPageId.c_str(), mRef.c_str(),
-                                                                      mTop, mBottom, mLeft, mRight,
-                                                                      mHeight, mWidth, index);
-  }
-
-  void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
-    mTop = node->getLayoutPositionTop();
-    mBottom = node->getLayoutPositionBottom();
-    mRight = node->getLayoutPositionRight();
-    mLeft = node->getLayoutPositionLeft();
-    mHeight = node->getLayoutHeight();
-    mWidth = node->getLayoutWidth();
-  }
+RenderActionLayout::RenderActionLayout(const std::string &page_id,
+                                       const RenderObject *render, int index) {
+  this->page_id_ = page_id;
+  this->ref_ = render->ref();
+  this->index_ = index;
+  GetLayoutInfo(render);
 }
+
+void RenderActionLayout::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(
+      this->page_id_.c_str(), this->ref_.c_str(), this->top_, this->bottom_,
+      this->left_, this->right_, this->height_, this->width_, this->index_);
+}
+
+void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
+  this->top_ = node->getLayoutPositionTop();
+  this->bottom_ = node->getLayoutPositionBottom();
+  this->right_ = node->getLayoutPositionRight();
+  this->left_ = node->getLayoutPositionLeft();
+  this->height_ = node->getLayoutHeight();
+  this->width_ = node->getLayoutWidth();
+}
+}  // namespace WeexCore

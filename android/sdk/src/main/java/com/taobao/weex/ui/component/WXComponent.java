@@ -166,6 +166,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
+  public int deepInComponentTree = 0;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -290,7 +291,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     WXEvent event = getEvents();
     int size = event.size();
-    for(int i=0; i<size; i++){
+    for (int i=0; i<size; i++) {
       if(i >= event.size()){
         break;
       }
@@ -1449,7 +1450,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (getEvents().size() < 1) {
       return;
     }
-    for (String event : getEvents()) {
+    WXEvent events = getEvents();
+    int size = events.size();
+    for (int i=0; i<size; i++) {
+      if(i >= events.size()){
+        break;
+      }
+      String event = events.get(i);
       if (event == null) {
         continue;
       }
