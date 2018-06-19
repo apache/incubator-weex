@@ -20,8 +20,6 @@
 #ifndef WXCORE_BRIDGE_PLATFORM_H
 #define WXCORE_BRIDGE_PLATFORM_H
 
-#define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
-
 #include <core/bridge/bridge.h>
 
 enum WeexCoreEventBlockType {
