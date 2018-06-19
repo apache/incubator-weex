@@ -16,33 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifdef __cplusplus
 
-#ifndef WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
-#define WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
+#include "weex_instance_manager.h"
 
+#ifdef iOS
+#include <iOS/bridge/jsc_runtime_ios.h>
+#include <iOS/bridge/jsc_context_ios.h>
+#endif
 
-#include "layout.h"
 
 namespace WeexCore {
 
-  class MeasureFunctionAdapter {
-  public:
+    void WXInstanceManager::doInit() {
+#ifdef iOS
+        this->jsRunTime = new JSCRunTimeIOS();
+#endif
+        this->jsRunTime->initRunTime();
+        this->defaultContext = this->jsRunTime->createContext();
+    }
 
-    MeasureFunctionAdapter() {}
+    int WXInstanceManager::createInstance() {
+        BaseJSContext *instanceContext = this->jsRunTime->createContext();
+        this->instanceMap.insert(
+                std::pair<uint32_t, BaseJSContext *>(instanceContext->getContextId(), instanceContext)
+        );
+    }
 
-    ~MeasureFunctionAdapter() {}
+    int WXInstanceManager::destroyInstance(uint32_t instanceId) {
 
-    virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
-                                      float height, MeasureMode heightMeasureMode) = 0;
-
-    virtual void LayoutBefore(WXCoreLayoutNode *node) = 0;
-
-    virtual void LayoutAfter(WXCoreLayoutNode *node, float width, float height) = 0;
-
-  };
-
+    }
 }
 
-#endif //WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
-#endif //__cplusplus

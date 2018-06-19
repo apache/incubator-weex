@@ -16,41 +16,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef jsc_context_ios_h
-#define jsc_context_ios_h
 
+#ifdef __cplusplus
+
+#ifndef WEEXCORE_WEEX_INSTANCE_MANAGER_H
+#define WEEXCORE_WEEX_INSTANCE_MANAGER_H
+
+
+#include <core/js_engin/base_js_runtime.h>
 #include <core/js_engin/base_js_context.h>
-#include "jsc_runtime_ios.h"
+
 
 namespace WeexCore {
-    class JSCContextIOS: public BaseJSContext{
+    class WXInstanceManager {
+
     protected:
-        uint32_t contextId;
+        BaseJSRunTime *jsRunTime;
+        BaseJSContext *defaultContext;
+        std::map<uint32_t, BaseJSContext *> instanceMap;
+
     public:
-        ~JSCContextIOS();
+
+        WXInstanceManager() {
+            jsRunTime = nullptr;
+            defaultContext = nullptr;
+        }
+
+        ~WXInstanceManager() {
+            if (nullptr != jsRunTime) {
+                delete jsRunTime;
+                jsRunTime = nullptr;
+            }
+            if (nullptr != defaultContext) {
+               // delete defaultContext;
+                defaultContext = nullptr;
+            }
+            instanceMap.clear();
+        }
+
+        void doInit();
+
+
     public:
-    
-        void onInit(uint32_t contextId,void* impl, JSCRunTimeIOS* runTime);
-        
-    public:
-        void execJSMethod(char *methodName, wson_buffer *args);
-        
-        wson_buffer *execJSMethodWithResult(char *methodName, wson_buffer *args);
-        
-        bool executeJavascript(const char *script,const char* url);
-        
-        void reigsterJSVale(char *name, wson_buffer *valuse);
-        
-        wson_buffer *getJSVale(char *name);
-        
-        void reigsterJSFunc(wson_buffer *func);
-        
-        uint32_t getContextId();
-        
-        BaseJSRunTime* getJsRunTime();
+        int createInstance();
+
+        int destroyInstance(uint32_t instanceId);
 
     };
 }
 
+#endif //WEEXCORE_WEEX_INSTANCE_MANAGER_H
 
-#endif /* jsc_context_ios_h */
+#endif

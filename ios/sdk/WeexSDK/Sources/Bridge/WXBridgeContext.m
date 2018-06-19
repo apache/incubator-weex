@@ -563,7 +563,10 @@ _Pragma("clang diagnostic pop") \
                 sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [[instanceContextEnvironment toDictionary] allKeys]];
                 JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
                 JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
-                for (NSString * key in [[instanceContextEnvironment toDictionary] allKeys]) {
+                
+                NSDictionary* envDic = [instanceContextEnvironment toDictionary] ;
+                
+                for (NSString * key in [envDic allKeys]) {
                     JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
                     if ([key isEqualToString:@"Vue"]) {
                         JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));

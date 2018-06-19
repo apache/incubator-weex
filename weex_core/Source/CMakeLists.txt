@@ -53,11 +53,8 @@ set(COMMON_SRCS
   ./core/bridge/js_bridge.cpp
   ./core/parser/dom_wson.cpp
   ./core/bridge/bridge.cpp
-  ./core/js_engin/base_js_runtime.cpp
-  ./core/js_engin/base_js_context.cpp
   ./core/bridge/bridge.cpp
-        
-        )
+  ./core/manager/weex_instance_manager.cpp )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 

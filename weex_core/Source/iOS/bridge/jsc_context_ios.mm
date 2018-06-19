@@ -36,7 +36,7 @@ namespace WeexCore {
         return [WsonParser toWson:[result toString]];
     }
     
-    bool JSCContextIOS::executeJavascript(char *script){
+    bool JSCContextIOS::executeJavascript(const char *script,const char* url){
         NSString* ocScript = [[NSString alloc] initWithUTF8String:script];
         [jsContextImpl evaluateScript:ocScript];
         return true;
@@ -77,13 +77,13 @@ namespace WeexCore {
             WeexCoreManager::getInstance()->getJSBridge()->onCallNative(cPageId, cTask, cCallBack);
         };
         
-        jsContextImpl[@"callCreabody"]=^(JSValue* pageId,JSValue* task,JSValue *callBack,JSValue *AAAA){
-            const char* cPageId = [[pageId toString] UTF8String];
-            const char* cTask = [[task toString] UTF8String];
-            const char* cCallBack = [[callBack toString] UTF8String];
-            
-            WeexCoreManager::getInstance()->getJSBridge()->onCallNative(cPageId, cTask, cCallBack);
-        };
+//        jsContextImpl[@"callCreabody"]=^(JSValue* pageId,JSValue* task,JSValue *callBack,JSValue *AAAA){
+//            const char* cPageId = [[pageId toString] UTF8String];
+//            const char* cTask = [[task toString] UTF8String];
+//            const char* cCallBack = [[callBack toString] UTF8String];
+//
+//            WeexCoreManager::getInstance()->getJSBridge()->on
+//        };
         
         jsContextImpl[@"callNativeModule"]=^(JSValue* pageId,JSValue* module,JSValue *method,JSValue *arguments,JSValue *argumentsLength,
                                              JSValue *options,JSValue* optionsLength){

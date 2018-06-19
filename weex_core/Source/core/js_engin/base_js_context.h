@@ -37,7 +37,7 @@ namespace WeexCore {
 
         virtual wson_buffer *execJSMethodWithResult(char *methodName, wson_buffer *args)=0;
 
-        virtual bool executeJavascript(char *script)=0;
+        virtual bool executeJavascript(const char *script,const char* url)=0;
 
         virtual void reigsterJSVale(char *name, wson_buffer *valuse)=0;
 

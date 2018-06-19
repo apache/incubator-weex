@@ -387,6 +387,7 @@ namespace WeexCore {
         long long startTime = getCurrentTime();
         
         int flag = 0;
+#ifdef WX_IMPORT_WEEXCORE
         void *func = impl->blockMap[WeexCoreEventBlockTypeCallLayout];
         if(func != nullptr){
             WXCoreCallLayout targetFunc = (__bridge WXCoreCallLayout)func;
@@ -397,6 +398,7 @@ namespace WeexCore {
         }
         if (page != nullptr)
             page->CallBridgeTime(getCurrentTime() - startTime);
+#endif
         return flag;
     }
         
