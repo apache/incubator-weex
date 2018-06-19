@@ -27,7 +27,7 @@
 
 #include <dlfcn.h>
 #include <errno.h>
-#include <android/adapter/measure_func_adapter_impl_android.h>
+#include <core/layout/measure_func_adapter_impl_android.h>
 #include <core/manager/weex_core_manager.h>
 
 const char *s_cacheDir;

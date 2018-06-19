@@ -60,9 +60,9 @@ SET(FINAL_TARGET_LINK_LIBRARIES wson)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/IPC)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
   ## include_directories for include head file
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/android/IPC)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
 
   set (ANDROID_SRCS
     ./android/jniprebuild/jni_load.cc

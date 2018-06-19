@@ -22,20 +22,20 @@
 
 #include <jni.h>
 #include <unistd.h>
-#include <android/IPC/Serializing/IPCSerializer.h>
-#include <android/IPC/IPCHandler.h>
+#include <IPC/Serializing/IPCSerializer.h>
+#include <IPC/IPCHandler.h>
 #include <android/bridge/impl/bridge_impl_android.h>
-#include <android/IPC/Buffering/IPCBuffer.h>
-#include <android/IPC/IPCArguments.h>
-#include <android/IPC/IPCByteArray.h>
-#include <android/IPC/IPCException.h>
-#include <android/IPC/IPCHandler.h>
-#include <android/IPC/IPCMessageJS.h>
-#include <android/IPC/IPCResult.h>
-#include <android/IPC/IPCSender.h>
-#include <android/IPC/IPCString.h>
-#include <android/IPC/Serializing/IPCSerializer.h>
-#include "android/include/WeexApiHeader.h"
+#include <IPC/Buffering/IPCBuffer.h>
+#include <IPC/IPCArguments.h>
+#include <IPC/IPCByteArray.h>
+#include <IPC/IPCException.h>
+#include <IPC/IPCHandler.h>
+#include <IPC/IPCMessageJS.h>
+#include <IPC/IPCResult.h>
+#include <IPC/IPCSender.h>
+#include <IPC/IPCString.h>
+#include <IPC/Serializing/IPCSerializer.h>
+#include "core/../include/WeexApiHeader.h"
 
 namespace WeexCore {
 

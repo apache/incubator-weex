@@ -21,12 +21,12 @@
 
 #include <android/base/log_utils.h>
 #include <android/bridge/impl/bridge_impl_android.h>
-#include "android/IPC/IPCHandler.h"
-#include "android/IPC/IPCMessageJS.h"
-#include "android/IPC/IPCResult.h"
-#include "android/IPC/IPCSender.h"
-#include "android/IPC/IPCString.h"
-#include "android/IPC/Serializing/IPCSerializer.h"
+#include "IPC/IPCHandler.h"
+#include "IPC/IPCMessageJS.h"
+#include "IPC/IPCResult.h"
+#include "IPC/IPCSender.h"
+#include "IPC/IPCString.h"
+#include "IPC/Serializing/IPCSerializer.h"
 #include <core/render/manager/render_manager.h>
 #include <jni.h>
 #include <sys/types.h>
