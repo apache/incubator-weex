@@ -29,8 +29,10 @@ import android.view.View;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -100,7 +102,7 @@ public class TransformParser {
         return holders;
     }
 
-    public static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
+    public static Map<Property<View,Float>, Float> parseTransForm(String instanceId, @Nullable String rawTransform, final int width,
                                                                   final int height, final int viewportW) {
         try{
 
@@ -229,6 +231,11 @@ public class TransformParser {
             }
         }catch (Exception e){
             WXLogUtils.e("TransformParser", e);
+            WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+                    WXErrorCode.WX_RENDER_ERR_TRANSITION,
+                    "parse animation transition",
+                    WXErrorCode.WX_RENDER_ERR_TRANSITION.getErrorMsg() + "parse transition error: " +  e.getMessage(),
+                    null);
         }
         return new LinkedHashMap<>();
     }
