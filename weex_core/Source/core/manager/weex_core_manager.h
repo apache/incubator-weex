@@ -17,12 +17,15 @@
  * under the License.
  */
 
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_WEEX_CORE_MANAGER_H
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
 #include <core/bridge/bridge.h>
 #include <core/bridge/js_bridge.h>
 #include <core/layout/measure_func_adapter.h>
+
 
 namespace WeexCore {
 
@@ -80,3 +83,4 @@ namespace WeexCore {
 }
 
 #endif //WEEXCORE_WEEX_CORE_MANAGER_H
+#endif //#ifdef __cplusplus

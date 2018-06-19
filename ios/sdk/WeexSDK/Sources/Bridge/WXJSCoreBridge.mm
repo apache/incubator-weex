@@ -43,6 +43,18 @@
 
 #import <mach/mach.h>
 
+#ifdef WX_IMPORT_WEEXCORE
+
+//#import <core/manager/weex_core_manager.h>
+#import <iOS/bridge/jsc_runtime_ios.h>
+#import <iOS/bridge/bridge_impl_ios.h>
+//#import <core/bridge/js_bridge.h>
+//#import <iOS/bridge/measure_func_adapter_impl_ios.h>
+//#import <core/layout/measure_func_adapter.h>
+
+
+#endif
+
 @interface WXJSCoreBridge ()
 {
     NSString * _weexInstanceId;
@@ -56,6 +68,9 @@
 
 #ifdef WX_IMPORT_WEEXCORE
 @property (nonatomic, assign) WeexCore::WXCoreBridge *coreBridge;
+@property (nonatomic, assign) WeexCore::BaseJSRunTime* jsRunTime;
+//@property (nonatomic, assign) WeexCore::Bridge_Impl_iOS* bridgeImplIOS;
+
 #endif
 
 @end
@@ -67,14 +82,25 @@
     self = [super init];
     
     if(self){
-#ifdef WX_IMPORT_WEEXCORE
-        _coreBridge = new WeexCore::WXCoreBridge();
-#endif
-        
+#ifndef WX_IMPORT_WEEXCORE
         _jsContext = [[JSContext alloc] init];
         if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             _jsContext.name = @"Weex Context";
         }
+#else
+//        _coreBridge = new WeexCore::WXCoreBridge();
+//        _bridgeImplIOS = new WeexCore::Bridge_Impl_iOS();
+//        WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(_bridgeImplIOS);
+//        WeexCore::WeexCoreManager::getInstance()->setJSBridge(new WeexCore::JSBridge());
+//        WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
+//
+//        _jsRunTime = new WeexCore::JSCRunTimeIOS();
+        
+        
+        
+        
+      
+#endif
         _timers = [NSMutableArray new];
         _callbacks = [NSMutableDictionary new];
         _intervalTimerId = 0;
@@ -82,7 +108,7 @@
         _multiContext = NO;
 
         __weak typeof(self) weakSelf = self;
-        
+#ifndef WX_IMPORT_WEEXCORE
         [WXBridgeContext mountContextEnvironment:_jsContext];
         
         _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
@@ -114,6 +140,7 @@
         _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
             return [weakSelf extendCallNative:[value toDictionary]];
         };
+#endif
     }
     return self;
 }

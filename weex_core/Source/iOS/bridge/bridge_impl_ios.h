@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#ifndef bridge_impl_ios_h
-#define bridge_impl_ios_h
+#ifndef WEEX_CORE_BRIDGE_IMPL_IOS_H
+#define WEEX_CORE_BRIDGE_IMPL_IOS_H
 
 #include <core/bridge/bridge.h>
 #include <core/bridge/wx_type_define.h>
@@ -130,4 +130,4 @@ namespace WeexCore {
     
 }
 
-#endif /* bridge_impl_ios_h */
+#endif /* WEEX_CORE_BRIDGE_IMPL_IOS_H */

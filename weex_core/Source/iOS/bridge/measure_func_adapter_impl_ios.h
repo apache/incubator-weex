@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "measure_func_adapter.h"
-#include <core/render/node/render_object.h>
+
+#ifdef __cplusplus
+#ifndef WEEX_CORE_MEASURE_FUNCTION_ADAPTER_IOS_H
+#define WEEX_CORE_MEASURE_FUNCTION_ADAPTER_IOS_H
+
+#include <core/layout/measure_func_adapter.h>
+
 
 namespace WeexCore {
 
@@ -35,3 +40,5 @@ namespace WeexCore {
     void LayoutAfter(WXCoreLayoutNode *node, float width, float height) ;
   };
 }
+#endif //WEEX_CORE_MEASURE_FUNCTION_ADAPTER_IOS_H
+#endif //__cplusplus

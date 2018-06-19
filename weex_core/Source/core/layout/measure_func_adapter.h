@@ -17,12 +17,13 @@
  * under the License.
  */
 #ifdef __cplusplus
-#ifndef WEEX_CORE_MEASURE_FUNCTION_H
-#define WEEX_CORE_MEASURE_FUNCTION_H
+
+#ifndef WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
+#define WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
 
 
-//#include "layout.h"
-#include <core/layout/layout.h>
+#include "layout.h"
+//#include <core/layout/layout.h>
 
 namespace WeexCore {
 
@@ -45,5 +46,5 @@ namespace WeexCore {
 
 }
 
-#endif //WEEX_CORE_MEASURE_FUNCTION_H
+#endif //WEEX_CORE_MEASURE_FUNCTION_ADAPTER_H
 #endif //__cplusplus

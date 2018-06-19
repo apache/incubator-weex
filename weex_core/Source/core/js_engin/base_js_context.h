@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+#ifdef __cplusplus
 #ifndef WEEXCORE_BASE_JS_CONTEXT_H
 #define WEEXCORE_BASE_JS_CONTEXT_H
 
@@ -99,3 +99,4 @@ namespace WeexCore {
 
 
 #endif //WEEXCORE_BASE_JS_CONTEXT_H
+#endif //ifdef __cplusplus
