@@ -31,7 +31,7 @@ namespace WeexCore {
     class BaseJSContext {
     protected:
         BaseJSContext(){};
-        ~BaseJSContext(){};
+        virtual ~BaseJSContext(){};
     public:
         virtual void execJSMethod(char *methodName, wson_buffer *args)=0;
 

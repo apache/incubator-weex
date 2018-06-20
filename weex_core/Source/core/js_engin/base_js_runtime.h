@@ -30,6 +30,7 @@ namespace WeexCore {
 
     class BaseJSRunTime {
     public:
+        virtual ~BaseJSRunTime() {}
 
         virtual bool initRunTime()=0;
 

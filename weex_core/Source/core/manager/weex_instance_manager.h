@@ -31,15 +31,13 @@ namespace WeexCore {
     class WXInstanceManager {
 
     protected:
-        BaseJSRunTime *jsRunTime;
-        BaseJSContext *defaultContext;
+        BaseJSRunTime *jsRunTime = nullptr;
+        BaseJSContext *defaultContext = nullptr;
         std::map<uint32_t, BaseJSContext *> instanceMap;
 
     public:
 
         WXInstanceManager() {
-            jsRunTime = nullptr;
-            defaultContext = nullptr;
         }
 
         ~WXInstanceManager() {

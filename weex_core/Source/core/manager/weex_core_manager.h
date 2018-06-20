@@ -34,17 +34,22 @@ namespace WeexCore {
     private:
         static WeexCoreManager *m_pInstance;
         Bridge *platformBridge = nullptr;
+        JSBridge *jsBridge = nullptr;
         MeasureFunctionAdapter *measureFunctionAdapter = nullptr;
-        JSBridge* jsBridge = nullptr;
 
     private:
         WeexCoreManager() {};
 
         ~WeexCoreManager() {
-            delete platformBridge;
-            platformBridge = nullptr;
-            delete jsBridge;
-            jsBridge = nullptr;
+            if (platformBridge != nullptr) {
+                delete platformBridge;
+                platformBridge = nullptr;
+            }
+            
+            if (jsBridge != nullptr) {
+                delete jsBridge;
+                jsBridge = nullptr;
+            }
         };
 
         //just to release singleton object
@@ -53,6 +58,7 @@ namespace WeexCore {
             ~Garbo() {
                 if (WeexCoreManager::m_pInstance) {
                     delete WeexCoreManager::m_pInstance;
+                    WeexCoreManager::m_pInstance = nullptr;
                 }
             }
         };

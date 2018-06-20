@@ -33,7 +33,7 @@ namespace WeexCore {
     public:
         JSBridge(){};
 
-        ~JSBridge(){};
+        virtual ~JSBridge(){};
 
     public:
 

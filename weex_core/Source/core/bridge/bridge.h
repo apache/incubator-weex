@@ -35,6 +35,8 @@ namespace WeexCore {
 
   class Bridge {
   public:
+    virtual ~Bridge() {}
+      
     /**  platform  impl **/
     virtual void setJSVersion(const char* version) = 0;
 
