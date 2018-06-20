@@ -85,6 +85,7 @@ import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -929,7 +930,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
 
-    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+    if (this instanceof WXCell && realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
       mInstance.getWXPerformance().cellExceedNum++;
     }
 

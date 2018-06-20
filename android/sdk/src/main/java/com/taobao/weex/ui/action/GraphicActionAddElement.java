@@ -39,6 +39,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private WXComponent child;
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
+  private boolean isJSCreateFinish = false;
 
   public GraphicActionAddElement(String pageId, String ref,
                                  String componentType, String parentRef,
@@ -72,6 +73,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
           mParentRef);
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
+      isJSCreateFinish = instance.isJSCreateFinish;
 
       if (child == null || parent == null) {
         return;
@@ -122,7 +124,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       child.bindData(child);
       WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
       if (null!=instance){
-        instance.onElementChange();
+        instance.onElementChange(isJSCreateFinish);
        // instance.setma
       }
     } catch (Exception e) {
