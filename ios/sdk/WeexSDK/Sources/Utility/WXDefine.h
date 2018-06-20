@@ -29,7 +29,7 @@
 #endif
 
 #ifdef DEBUG
-//#define WX_IMPORT_WEEXCORE
+#define WX_IMPORT_WEEXCORE
 #endif
 
 /*

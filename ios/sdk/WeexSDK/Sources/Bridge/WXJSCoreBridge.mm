@@ -46,12 +46,9 @@
 #ifdef WX_IMPORT_WEEXCORE
 
 #import <core/manager/weex_core_manager.h>
-#import <iOS/bridge/jsc_runtime_ios.h>
 #import <iOS/bridge/bridge_impl_ios.h>
 #import <core/bridge/js_bridge.h>
 #import <iOS/bridge/measure_func_adapter_impl_ios.h>
-#import <core/layout/measure_func_adapter.h>
-
 
 #endif
 
@@ -69,8 +66,6 @@
 #ifdef WX_IMPORT_WEEXCORE
 @property (nonatomic, assign) WeexCore::WXCoreBridge *coreBridge;
 @property (nonatomic, assign) WeexCore::Bridge_Impl_iOS* bridgeImplIOS;
-@property (nonatomic, assign) WeexCore::BaseJSRunTime* jsRunTime;
-@property (nonatomic, assign) WeexCore::BaseJSContext* defaultContext;
 
 #endif
 
@@ -83,26 +78,17 @@
     self = [super init];
     
     if(self){
-#ifndef WX_IMPORT_WEEXCORE
+
         _jsContext = [[JSContext alloc] init];
         if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             _jsContext.name = @"Weex Context";
         }
-#else
+#ifdef WX_IMPORT_WEEXCORE
         _coreBridge = new WeexCore::WXCoreBridge();
         _bridgeImplIOS = new WeexCore::Bridge_Impl_iOS();
         WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(_bridgeImplIOS);
         WeexCore::WeexCoreManager::getInstance()->setJSBridge(new WeexCore::JSBridge());
         WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
-
-        _jsRunTime = new WeexCore::JSCRunTimeIOS();
-        _jsRunTime->initRunTime();
-       _defaultContext =_jsRunTime->createContext();
-        
-        
-        
-        
-      
 #endif
         _timers = [NSMutableArray new];
         _callbacks = [NSMutableDictionary new];
@@ -111,7 +97,7 @@
         _multiContext = NO;
 
         __weak typeof(self) weakSelf = self;
-#ifndef WX_IMPORT_WEEXCORE
+
         [WXBridgeContext mountContextEnvironment:_jsContext];
         
         _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
@@ -143,7 +129,7 @@
         _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
             return [weakSelf extendCallNative:[value toDictionary]];
         };
-#endif
+
     }
     return self;
 }
@@ -185,7 +171,6 @@
 {
 
     WXAssertParam(frameworkScript);
-#ifndef WX_IMPORT_WEEXCORE
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
         NSString * fileName = @"native-bundle-main.js";
         if ([WXSDKManager sharedInstance].multiContext) {
@@ -195,9 +180,6 @@
     }else{
         [_jsContext evaluateScript:frameworkScript];
     }
-#else
-    _defaultContext->executeJavascript([frameworkScript UTF8String],"");
-#endif
 }
 
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
@@ -226,10 +208,15 @@
         return callNative(instance,tasks,callback);
     };
     _coreBridge->registerEventWithType(WeexCoreEventBlockTypeCallAddEvent, (__bridge void*)WXJSCallNativeBlock);
-#warning todo
-//    _jsContext[@"callNative"] = callNativeBlock;
+
+    _jsContext[@"callNative"] = ^JSValue*(JSValue *instance, JSValue *tasks, JSValue *callback){
+        const char* cPageId = [[instance toString] UTF8String];
+        const char* cTask = [[tasks toString] UTF8String];
+        const char* cCallBack = [[callback toString] UTF8String];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallNative(cPageId, cTask, cCallBack);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
+    };
 #endif
-    
 }
 
 - (void)executeJavascript:(NSString *)script
@@ -241,15 +228,12 @@
 - (JSValue*)executeJavascript:(NSString *)script withSourceURL:(NSURL*)sourceURL
 {
     WXAssertParam(script);
-#ifndef WX_IMPORT_WEEXCORE
+
     if (sourceURL) {
         return [_jsContext evaluateScript:script withSourceURL:sourceURL];
     } else {
         return [_jsContext evaluateScript:script];
     }
-#else
-    _defaultContext->executeJavascript([script UTF8String],"");
-#endif
 }
 
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement

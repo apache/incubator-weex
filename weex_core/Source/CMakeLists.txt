@@ -54,7 +54,7 @@ set(COMMON_SRCS
   ./core/parser/dom_wson.cpp
   ./core/bridge/bridge.cpp
   ./core/bridge/bridge.cpp
-  ./core/manager/weex_instance_manager.cpp )
+        )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 
@@ -110,6 +110,12 @@ if (ANDROID)
           )
 
 endif (ANDROID)
+
+##if(iOS)
+  add_definitions(-DTARGET_OS_IPHONE=1)
+
+##endif(iOS)
+
 
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
