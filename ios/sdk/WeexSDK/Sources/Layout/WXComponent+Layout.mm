@@ -138,6 +138,16 @@ bool flexIsUndefined(float value) {
         __weak typeof(self) weakSelf = self;
         [self.weexInstance.componentManager _addUITask:^{
             __strong typeof(weakSelf) strongSelf = weakSelf;
+            
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            // Check again incase that this property is set to NO in another UI task.
+            if (![strongSelf isViewFrameSyncWithCalculated]) {
+                return;
+            }
+            
             if (strongSelf->_transform && !CATransform3DEqualToTransform(strongSelf.layer.transform, CATransform3DIdentity)) {
                 // From the UIView's frame documentation:
                 // https://developer.apple.com/reference/uikit/uiview#//apple_ref/occ/instp/UIView/frame

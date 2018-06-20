@@ -1,21 +1,6 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+//
+// Created by furture on 2017/8/4.
+//
 
 #include "wson.h"
 #include <stdio.h>
@@ -35,16 +20,16 @@ union float_number{
 #define WSON_BUFFER_SIZE  1024
 
 #define WSON_BUFFER_ENSURE_SIZE(size)  {if((buffer->length) < (buffer->position + size)){\
-msg_buffer_resize(buffer, size);\
-}}
+                                           msg_buffer_resize(buffer, size);\
+                                      }}
 
 static inline void msg_buffer_resize(wson_buffer* buffer, uint32_t size){
     if(size < buffer->length){
-        if(buffer->length < 1024*16){
+         if(buffer->length < 1024*16){
             size = 1024*16;
-        }else{
+         }else{
             size = buffer->length;
-        }
+         }
     }else{
         size +=WSON_BUFFER_SIZE;
     }
@@ -63,10 +48,10 @@ static inline int32_t msg_buffer_varint_Zag(uint32_t ziggedValue)
 static inline uint32_t msg_buffer_varint_Zig(int32_t value)
 {
     return (uint32_t)((value << 1) ^ (value >> 31));
-    
+
 }
 
-wson_buffer* wson_buffer_new(void){
+ wson_buffer* wson_buffer_new(void){
     wson_buffer* ptr = malloc(sizeof(wson_buffer));
     ptr->data = malloc(sizeof(int8_t)*WSON_BUFFER_SIZE);
     ptr->position = 0;
@@ -121,15 +106,15 @@ inline void wson_push_type(wson_buffer *buffer, uint8_t bt){
 
 
 inline void wson_push_type_boolean(wson_buffer *buffer, uint8_t value){
-    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t) + sizeof(uint8_t));
+      WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t) + sizeof(uint8_t));
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
     if(value){
-        *data = WSON_BOOLEAN_TYPE_TRUE;
+       *data = WSON_BOOLEAN_TYPE_TRUE;
     }else{
         *data = WSON_BOOLEAN_TYPE_FALSE;
     }
     buffer->position += sizeof(uint8_t);
-}
+ }
 
 
 inline void wson_push_type_int(wson_buffer *buffer, int32_t num){
@@ -140,14 +125,6 @@ inline void wson_push_type_int(wson_buffer *buffer, int32_t num){
     wson_push_int(buffer, num);
 }
 
-inline void wson_push_type_float(wson_buffer *buffer, float num){
-    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
-    uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
-    *data = WSON_NUMBER_FLOAT_TYPE;
-    buffer->position += (sizeof(uint8_t));
-    wson_push_float(buffer, num);
-}
-
 inline void wson_push_type_double(wson_buffer *buffer, double num){
     WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
@@ -155,8 +132,6 @@ inline void wson_push_type_double(wson_buffer *buffer, double num){
     buffer->position += (sizeof(uint8_t));
     wson_push_double(buffer, num);
 }
-
-
 
 inline void wson_push_type_long(wson_buffer *buffer, int64_t num){
     WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
@@ -303,7 +278,7 @@ uint32_t wson_next_uint(wson_buffer *buffer){
         buffer->position += 3;
         return  num;
     }
-    
+
     chunk = ptr[3];
     num |= (chunk & 0x7F) << 21;
     if((chunk & 0x80) == 0){
@@ -324,13 +299,13 @@ inline uint64_t wson_next_ulong(wson_buffer *buffer){
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
     buffer->position += sizeof(uint64_t);
     return (((uint64_t)data[7]) & 0xFF)
-    + ((((uint64_t)data[6]) & 0xFF) << 8)
-    + ((((uint64_t)data[5]) & 0xFF) << 16)
-    + ((((uint64_t)data[4]) & 0xFF) << 24)
-    + ((((uint64_t)data[3]) & 0xFF) << 32)
-    + ((((uint64_t)data[2]) & 0xFF) << 40)
-    + ((((uint64_t)data[1]) & 0xFF) << 48)
-    + ((((uint64_t)data[0]) & 0xFF) << 56);
+           + ((((uint64_t)data[6]) & 0xFF) << 8)
+           + ((((uint64_t)data[5]) & 0xFF) << 16)
+           + ((((uint64_t)data[4]) & 0xFF) << 24)
+           + ((((uint64_t)data[3]) & 0xFF) << 32)
+           + ((((uint64_t)data[2]) & 0xFF) << 40)
+           + ((((uint64_t)data[1]) & 0xFF) << 48)
+           + ((((uint64_t)data[0]) & 0xFF) << 56);
 }
 
 double wson_next_double(wson_buffer *buffer){
@@ -343,9 +318,9 @@ inline float wson_next_float(wson_buffer *buffer){
     union float_number fn;
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
     fn.i = ((data[3]) & 0xFF)
-    + (((data[2]) & 0xFF) << 8)
-    + (((data[1]) & 0xFF) << 16)
-    + (((data[0]) & 0xFF) << 24);
+           + (((data[2]) & 0xFF) << 8)
+           + (((data[1]) & 0xFF) << 16)
+           + (((data[0]) & 0xFF) << 24);
     buffer->position += sizeof(uint32_t);
     return fn.f;
 }
@@ -355,10 +330,6 @@ inline uint8_t* wson_next_bts(wson_buffer *buffer, uint32_t length){
     uint8_t * ptr = ((uint8_t*)buffer->data + buffer->position);
     buffer->position += length;
     return ptr;
-}
-
-inline bool wson_has_next(wson_buffer *buffer){
-    return buffer->position < buffer->length;
 }
 
 void wson_buffer_free(wson_buffer *buffer){
@@ -371,3 +342,4 @@ void wson_buffer_free(wson_buffer *buffer){
         buffer = NULL;
     }
 }
+
