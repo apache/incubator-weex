@@ -64,6 +64,8 @@ static NSThread *WXComponentThread;
     NSMutableArray *_fixedComponents;
     WeexCore::WXCoreLayoutNode* _rootFlexCSSNode;
     CADisplayLink *_displayLink;
+    pthread_mutex_t _propertyMutex;
+    pthread_mutexattr_t _propertMutexAttr;
 }
 
 + (instancetype)sharedManager
@@ -85,6 +87,9 @@ static NSThread *WXComponentThread;
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
         _isValid = YES;
+        pthread_mutexattr_init(&_propertMutexAttr);
+        pthread_mutexattr_settype(&_propertMutexAttr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&_propertyMutex, &_propertMutexAttr);
         [self _startDisplayLink];
     }
     
@@ -102,6 +107,8 @@ static NSThread *WXComponentThread;
         _rootFlexCSSNode=nullptr;
     }
     [NSMutableArray wx_releaseArray:_fixedComponents];
+    pthread_mutex_destroy(&_propertyMutex);
+    pthread_mutexattr_destroy(&_propertMutexAttr);
 }
 
 #pragma mark Thread Management
@@ -979,13 +986,17 @@ static NSThread *WXComponentThread;
 
 - (void)addFixedComponent:(WXComponent *)fixComponent
 {
+    pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents addObject:fixComponent];
-        _rootFlexCSSNode->addChildAt(fixComponent.flexCssNode, (uint32_t)([_fixedComponents count]-1));
+    _rootFlexCSSNode->addChildAt(fixComponent.flexCssNode, (uint32_t)([_fixedComponents count]-1));
+    pthread_mutex_unlock(&_propertyMutex);
 }
 
 - (void)removeFixedComponent:(WXComponent *)fixComponent
 {
+    pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents removeObject:fixComponent];
+    pthread_mutex_unlock(&_propertyMutex);
     [self removeFixFlexNode:fixComponent->_flexCssNode];
 }
 
