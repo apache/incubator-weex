@@ -252,11 +252,12 @@ do {\
     }
     if (styles[@"transform"]) {
         id transformOrigin = styles[@"transformOrigin"] ?: self.styles[@"transformOrigin"];
-        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
+        WXTransform* transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-            [_transform applyTransformForView:_view];
+            [transform applyTransformForView:_view];
             [_layer setNeedsDisplay];
         }
+        self.transform = transform;
     }else if (styles[@"transformOrigin"]) {
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {

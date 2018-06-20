@@ -152,6 +152,11 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
+/* _transform may be modified in mutiple threads. DO NOT use "_transform = XXX" directly.
+ Ivar access in ObjC is compiled to code with additional release or retain. So use Ivar in mutiple
+ thread may lead to crash. Use an ATOMIC property is well enough. */
+@property (atomic, strong) WXTransform *transform;
+
 ///--------------------------------------
 /// @name Package Internal Methods
 ///--------------------------------------

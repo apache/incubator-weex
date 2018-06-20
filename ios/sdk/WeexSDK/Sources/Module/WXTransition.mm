@@ -256,7 +256,7 @@
                 info.perValue = @([wxTransform.translateY floatValue] - [oldTransform.translateY floatValue]);
                 [_propertyArray addObject:info];
             }
-            _targetComponent->_transform = wxTransform;
+            _targetComponent.transform = wxTransform;
         }
         else
         {
@@ -355,8 +355,13 @@
             [_oldFilterStyles setObject:@(currentValue) forKey:info.propertyName];
         }
     }
+    
+    /* _oldFilterStyles could be modified in current thread while _updateViewStyles uses it in main thread.
+     This may lead to crash in _updateViewStyles because the dictionary items may be retained or
+     released multiple times by code like styles[@"transform"]. So we copy _oldFilterStyles and use a duplicate.*/
+    NSDictionary* dupStyles = [NSDictionary dictionaryWithDictionary:_oldFilterStyles];
     WXPerformBlockOnMainThread(^{
-        [_targetComponent _updateViewStyles:_oldFilterStyles];
+        [_targetComponent _updateViewStyles:dupStyles];
     });
     [_targetComponent _updateCSSNodeStyles:_oldFilterStyles];
     [_targetComponent.weexInstance.componentManager startComponentTasks];
