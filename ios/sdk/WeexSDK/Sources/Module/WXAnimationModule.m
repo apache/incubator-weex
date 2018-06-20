@@ -264,7 +264,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 newInfo.toValue = @([wxTransform.translateY valueForMaximum:view.bounds.size.height]);
                 [infos addObject:newInfo];
             }
-            target->_transform = wxTransform;
+            target.transform = wxTransform;
         } else if ([property isEqualToString:@"backgroundColor"]) {
             info.propertyName = @"backgroundColor";
             info.fromValue = (__bridge id)(layer.backgroundColor);

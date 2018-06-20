@@ -69,6 +69,8 @@ static BOOL bNeedRemoveEvents = YES;
     __weak WXSDKInstance *_weexInstance;
 }
 
+@synthesize transform = _transform;
+
 #pragma mark Life Cycle
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -758,7 +760,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     WXAssertMainThread();
     
-    _transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
+    self.transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
         [_layer setNeedsDisplay];
