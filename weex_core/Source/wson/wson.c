@@ -133,6 +133,14 @@ inline void wson_push_type_double(wson_buffer *buffer, double num){
     wson_push_double(buffer, num);
 }
 
+inline void wson_push_type_float(wson_buffer *buffer, float num) {
+    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
+    uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
+    *data = WSON_NUMBER_FLOAT_TYPE;
+    buffer->position += (sizeof(uint8_t));
+    wson_push_float(buffer, num);
+}
+
 inline void wson_push_type_long(wson_buffer *buffer, int64_t num){
     WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
