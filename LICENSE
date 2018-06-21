@@ -205,12 +205,12 @@
 */
 
 For the vuejs components:
-html5/frameworks/legacy/core/array.js
-html5/frameworks/legacy/core/dep.js
-html5/frameworks/legacy/core/object.js
-html5/frameworks/legacy/core/observer.js
-html5/frameworks/legacy/core/state.js
-html5/frameworks/legacy/core/watcher.js
+runtime/frameworks/legacy/core/array.js
+runtime/frameworks/legacy/core/dep.js
+runtime/frameworks/legacy/core/object.js
+runtime/frameworks/legacy/core/observer.js
+runtime/frameworks/legacy/core/state.js
+runtime/frameworks/legacy/core/watcher.js
 /*
 The MIT License (MIT)
 
