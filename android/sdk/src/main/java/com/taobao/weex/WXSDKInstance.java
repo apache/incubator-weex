@@ -133,6 +133,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
+  /**
+   * bundle type
+   */
+  public WXBridgeManager.BundType bundleType;
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
 
