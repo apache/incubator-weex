@@ -19,7 +19,6 @@
 package com.taobao.weex.bridge;
 
 import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -214,11 +213,29 @@ public class WXBridge implements IWXBridge {
    */
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-    try{
-      JSONArray argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+    try {
+      JSONArray argArray = null;
+      if (arguments != null)
+        argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
       JSONObject optionsObj = null;
       if (options != null) {
         optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
+      } else if (argArray != null) {
+        final WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if (sdkInstance != null) {
+          if (WXBridgeManager.BundType.Rax.equals(sdkInstance.bundleType)) {
+            Object weex_options__ = null;
+            for (Object object: argArray) {
+              if (object instanceof JSONObject && ((JSONObject) object).containsKey("__weex_options__")) {
+                weex_options__ = ((JSONObject) object).get("__weex_options__");
+              }
+            }
+
+            if (weex_options__ instanceof JSONObject)
+              optionsObj = (JSONObject) weex_options__;
+          }
+        }
+
       }
       Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
       return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
