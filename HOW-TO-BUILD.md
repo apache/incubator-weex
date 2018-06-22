@@ -12,16 +12,16 @@ See our [guide in our website](http://weex.apache.org/guide/integrate-to-your-ap
 ## Build Environment
 The environment required to build weex as follow:
 * Android SDK:
-    * NodeJS 8.0+
+    * NodeJS 4.0+
     * JDK 1.6+
     * Android SDK(`$ANDROID_HOME` must be set properly)
-    * Android NDK(`$ANDROID_NDK` must be set properly)
+    * Android NDK(version <= 16, `$ANDROID_NDK` must be set properly)
     * Gradle 2.0+
 * iOS SDK:
-    * NodeJS 8.0+
+    * NodeJS 4.0+
     * XCode & Command Tools 8.0+
 * Mobile web SDK:
-    * NodeJS 8.0+
+    * NodeJS 4.0+
 
 This article was tested in MacOSX system.
 
