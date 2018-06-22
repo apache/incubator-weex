@@ -16,6 +16,8 @@ The environment required to build weex as follow:
     * JDK 1.6+
     * Android SDK(`$ANDROID_HOME` must be set properly)
     * Gradle 2.0+
+    * NDK r16
+    * CMake 3.9.0+
 * iOS SDK:
     * NodeJS 4.0+
     * XCode & Command Tools 8.0+
