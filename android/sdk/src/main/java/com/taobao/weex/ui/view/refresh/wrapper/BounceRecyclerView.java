@@ -20,8 +20,11 @@ package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 
+import com.taobao.weex.R;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.component.list.ListComponentView;
 import com.taobao.weex.ui.component.list.StickyHeaderHelper;
 import com.taobao.weex.ui.component.list.WXCell;
@@ -76,7 +79,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
 
   @Override
   public WXRecyclerView setInnerView(Context context) {
-    WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
+    WXRecyclerView wxRecyclerView = new WXRecyclerView(new ContextThemeWrapper(context, getOrientation() == Constants.Orientation.HORIZONTAL ? R.style.WeexHorizontalRecyclerView : R.style.WeexVerticalRecyclerView));
     wxRecyclerView.initView(context, mLayoutType,mColumnCount,mColumnGap,getOrientation());
     return wxRecyclerView;
   }
