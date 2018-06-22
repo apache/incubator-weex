@@ -37,6 +37,8 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
     * `npm install`, install project
     * `./start`
     * Install [Android Environment](http://developer.android.com/training/basics/firstapp/index.html)
+    * Install [NDK](https://developer.android.com/ndk/) r16
+    * Install [Cmake](https://cmake.org/download/) 3.9.0+
 * Run playground, In Android Studio
     * Open `android/playground`
     * In `app/java/com.alibaba.weex/IndexActivity`, modify `CURRENT_IP` to your local IP
