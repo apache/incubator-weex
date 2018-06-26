@@ -155,6 +155,12 @@ public:
     return this->is_render_container_width_wrap_content_.load();
   }
 
+  inline float viewport_width() const { return this->viewport_width_; }
+
+  inline void set_viewport_width(float viewport_width) {
+    this->viewport_width_ = viewport_width;
+  }
+
  public:
   static constexpr bool kUseVSync = true;
   std::atomic_bool need_layout_{false};
@@ -169,6 +175,7 @@ public:
   std::atomic_bool is_dirty_{true};
   std::atomic_bool is_render_container_width_wrap_content_{false};
   std::atomic_bool is_render_container_height_wrap_content_{false};
+  float viewport_width_ = -1;
 };
 }  // namespace WeexCore
 
