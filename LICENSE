@@ -205,12 +205,12 @@
 */
 
 For the vuejs components:
-html5/frameworks/legacy/core/array.js
-html5/frameworks/legacy/core/dep.js
-html5/frameworks/legacy/core/object.js
-html5/frameworks/legacy/core/observer.js
-html5/frameworks/legacy/core/state.js
-html5/frameworks/legacy/core/watcher.js
+runtime/frameworks/legacy/core/array.js
+runtime/frameworks/legacy/core/dep.js
+runtime/frameworks/legacy/core/object.js
+runtime/frameworks/legacy/core/observer.js
+runtime/frameworks/legacy/core/state.js
+runtime/frameworks/legacy/core/watcher.js
 /*
 The MIT License (MIT)
 
@@ -319,7 +319,6 @@ android/sdk/src/main/java/com/taobao/weex/utils/WXDataStructureUtil.java
 
  For IPC
  weex_core/Source/IPC
- weex_core/Source/base
  /*
   * Copyright (C) 2008 The Android Open Source Project
   * All rights reserved.
@@ -349,9 +348,34 @@ android/sdk/src/main/java/com/taobao/weex/utils/WXDataStructureUtil.java
   */
 
  For JNI
- weex_core/Source/android/jniprebuild
+ weex_core/Source/android/jniprebuild/jniheader
  /*
   * Copyright 2014 The Chromium Authors. All rights reserved.
+  * Use of this source code is governed by a BSD-style license that can be
+  * found in the LICENSE file.
+  */
+
+ For modp
+ weex_core/Source/android/base
+ /*
+  * Copyright &copy; 2005, 2006, Nick Galbreath -- nickg [at] modp [dot] com
+  * All rights reserved.
+  *
+  * http://modp.com/release/base64
+  *
+  * Released under bsd license.  See modp_b64.c for details.
+  *
+  * The default implementation is the standard b64 encoding with padding.
+  * It's easy to change this to use "URL safe" characters and to remove
+  * padding.  See the modp_b64.c source code for details.
+  *
+  */
+
+ For jni_generator
+ weex_core/Source/android/jniprebuild/jni_generator.py
+ /*
+  * !/usr/bin/env python
+  * Copyright (c) 2012 The Chromium Authors. All rights reserved.
   * Use of this source code is governed by a BSD-style license that can be
   * found in the LICENSE file.
   */
