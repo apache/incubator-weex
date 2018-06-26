@@ -30,6 +30,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.ui.config.ConfigModuleFactory;
 import com.taobao.weex.ui.module.WXDomModule;
@@ -183,7 +184,7 @@ public class WXModuleManager {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
     } finally {
-      if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
+      if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule || wxModule instanceof WXInstanceWrap) {
         wxModule.mWXSDKInstance = null;
       }
     }
