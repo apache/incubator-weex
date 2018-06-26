@@ -113,8 +113,8 @@ void RenderList::PreCalculateCellWidth() {
 
     this->available_width_ =
         TakeStyleWidth() -
-        getWebPxByWidth(getPaddingLeft(), RenderManager::GetInstance()->viewport_width()) -
-        getWebPxByWidth(getPaddingRight(), RenderManager::GetInstance()->viewport_width());
+        getWebPxByWidth(getPaddingLeft(), RenderManager::GetInstance()->viewport_width(page_id())) -
+        getWebPxByWidth(getPaddingRight(), RenderManager::GetInstance()->viewport_width(page_id()));
 
     if (AUTO_VALUE == this->column_count_ &&
         AUTO_VALUE == this->column_width_) {
@@ -217,19 +217,19 @@ std::string RenderList::CalculateSpanOffset() {
 
 float RenderList::TakeStyleWidth() {
   float width =
-      getWebPxByWidth(getLayoutWidth(), RenderManager::GetInstance()->viewport_width());
+      getWebPxByWidth(getLayoutWidth(), RenderManager::GetInstance()->viewport_width(page_id()));
   if (isnan(width) || width <= 0) {
     if (getParent() != nullptr) {
       width = getWebPxByWidth(getParent()->getLayoutWidth(),
-                              RenderManager::GetInstance()->viewport_width());
+                              RenderManager::GetInstance()->viewport_width(page_id()));
     }
     if (isnan(width) || width <= 0) {
       width = getWebPxByWidth(RenderObject::getStyleWidth(),
-                              RenderManager::GetInstance()->viewport_width());
+                              RenderManager::GetInstance()->viewport_width(page_id()));
     }
   }
   if (isnan(width) || width <= 0) {
-    width = RenderManager::GetInstance()->viewport_width();
+    width = RenderManager::GetInstance()->viewport_width(page_id());
   }
   return width;
 }

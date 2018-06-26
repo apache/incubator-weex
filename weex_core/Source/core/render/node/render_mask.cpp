@@ -55,9 +55,9 @@ std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
 
   style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
   style->insert(std::pair<std::string, std::string>(
-      WIDTH, to_string(getWebPxByWidth(width, RenderManager::GetInstance()->viewport_width()))));
+      WIDTH, to_string(getWebPxByWidth(width, RenderManager::GetInstance()->viewport_width(page_id())))));
   style->insert(std::pair<std::string, std::string>(
-      HEIGHT, to_string(getWebPxByWidth(height, RenderManager::GetInstance()->viewport_width()))));
+      HEIGHT, to_string(getWebPxByWidth(height, RenderManager::GetInstance()->viewport_width(page_id())))));
   style->insert(std::pair<std::string, std::string>(TOP, "0"));
   return style;
 }

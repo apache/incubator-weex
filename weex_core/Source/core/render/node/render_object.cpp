@@ -347,7 +347,7 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
     functor(fallback);
     ret = true;
   } else {
-    float fvalue = getFloatByViewport(value, RenderManager::GetInstance()->viewport_width());
+    float fvalue = getFloatByViewport(value, RenderManager::GetInstance()->viewport_width(page_id()));
     if (!isnan(fvalue)) {
       functor(fvalue);
       ret = true;

@@ -30,9 +30,7 @@ class RenderPage;
 
 class RenderManager {
  private:
-  RenderManager() {
-    this->viewport_width_ = kDefaultViewPortWidth;
-  }
+  RenderManager() {}
 
   ~RenderManager() {}
 
@@ -79,15 +77,19 @@ class RenderManager {
 
   bool CreateFinish(const std::string &page_id);
 
-  bool CallNativeModule(const char *pageId, const char *module, const char *method,
-                        const char *arguments, int argumentsLength, const char *options,
-                        int optionsLength);
+  bool CallNativeModule(const char *page_id, const char *module, const char *method,
+                        const char *arguments, int arguments_length, const char *options,
+                        int options_length);
 
-  bool CallMetaModule(const char *method, const char *arguments);
+  bool CallMetaModule(const char *page_id, const char *method, const char *arguments);
 
   RenderPage *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
+
+  float viewport_width(const std::string &page_id);
+
+  void set_viewport_width(const std::string &page_id, float viewport_width);
 
   static RenderManager *GetInstance() {
     if (!g_pInstance) {
@@ -96,16 +98,10 @@ class RenderManager {
     return g_pInstance;
   }
 
-  inline float viewport_width() const { return this->viewport_width_; }
-
-  inline void set_viewport_width(float viewport_width) {
-    this->viewport_width_ = viewport_width;
-  }
-
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;
-  float viewport_width_ = -1;
+  std::map<std::string, float> viewports_;
 };
 }  // namespace WeexCore
 
