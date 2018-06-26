@@ -42,6 +42,8 @@
 #import "WXComponent+Layout.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXSDKInstance_performance.h"
+#import "WXComponent_performance.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -442,6 +444,7 @@ static BOOL bNeedRemoveEvents = YES;
 
         [self _handleFirstScreenTime];
         
+        [self.weexInstance.performance onViewLoad:self];
         return _view;
     }
 }
