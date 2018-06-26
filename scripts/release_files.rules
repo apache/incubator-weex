@@ -41,6 +41,8 @@
 + /packages
 + /build
 + /build/**
++ /pre-build
++ /pre-build/**
 
 ###### weexcore ######
 + /weex_core
