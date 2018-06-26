@@ -48,7 +48,7 @@ enum WeexCoreEventBlockType {
 namespace WeexCore {
     struct WXCoreBridgeImpl;
     
-    class WXCoreBridge{
+    class WXCoreBridge : public Bridge{
         
     private:
         WXCoreBridgeImpl *impl;
@@ -123,6 +123,8 @@ namespace WeexCore {
         
         int callAppendTreeCreateFinish(const char* pageId, const char* ref);
     
+        int callHasTransitionPros(const char* pageId, const char* ref,
+                                          std::vector<std::pair<std::string, std::string>> *style);
     };
 }
 

@@ -349,7 +349,7 @@ namespace WeexCore {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         long long startTime = getCurrentTime();
         
-        void *func = impl->blockMap[WeexCoreEventBlockTypeCallCreateBody];
+        void *func = impl->blockMap[WeexCoreEventBlockTypeCallAddElement];
         int flag = 0;
         if(func != nullptr){
             WXJSCallAddElement targetFunc = (__bridge WXJSCallAddElement)func;
@@ -372,7 +372,7 @@ namespace WeexCore {
             
             NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
             [elementData setValue:refString forKey:@"type"];
-            
+#warning todo: function needs to add usage of margins and paddings instead of primary implement
             flag = (int)targetFunc(pageIdString,parentRefString,elementData,index);
         }
         if (page != nullptr)
@@ -515,6 +515,13 @@ namespace WeexCore {
         if (page != nullptr)
             page->CallBridgeTime(getCurrentTime() - startTime);
         return flag;
+    }
+    
+    int WXCoreBridge::callHasTransitionPros(const char* pageId, const char* ref,
+                              std::vector<std::pair<std::string, std::string>> *style){
+        
+#warning todo apply for dom operation
+        return 0;
     }
 }
 
