@@ -971,8 +971,18 @@ do {\
         aWidth = CGFLOAT_MAX;
     }
     aWidth = [attributedStringCpy boundingRectWithSize:CGSizeMake(aWidth, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading context:nil].size.width;
+    
+    /* Must get ceil of aWidth. Or core text may not return correct bounds.
+     Maybe aWidth without ceiling triggered some critical conditions. */
+    aWidth = ceil(aWidth);
     CTFramesetterRef ctframesetterRef = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(attributedStringCpy));
     suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(ctframesetterRef, CFRangeMake(0, 0), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
+    
+    if (_lines == 0) {
+        // If not line limit use suggestSize directly.
+        CFRelease(ctframesetterRef);
+        return CGSizeMake(aWidth, suggestSize.height);
+    }
     
     CGMutablePathRef path = NULL;
     path = CGPathCreateMutable();
@@ -982,15 +992,14 @@ do {\
     CTFrameRef frameRef = NULL;
     frameRef = CTFramesetterCreateFrame(ctframesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
     CGPathRelease(path);
+    CFRelease(ctframesetterRef);
     
-    CFArrayRef lines = NULL;
     if (NULL == frameRef) {
         //try to protect unexpected crash.
         return suggestSize;
     }
-    CFRelease(ctframesetterRef);
-    ctframesetterRef = NULL;
-    lines = CTFrameGetLines(frameRef);
+    
+    CFArrayRef lines = CTFrameGetLines(frameRef);
     CFIndex lineCount = CFArrayGetCount(lines);
     CGFloat ascent = 0;
     CGFloat descent = 0;
@@ -1010,7 +1019,6 @@ do {\
     
     totalHeight = totalHeight + actualLineCount * leading;
     CFRelease(frameRef);
-    frameRef = NULL;
     
     if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
         // there is something wrong with coreText drawing text height, trying to fix this with more efficent way.
