@@ -48,7 +48,7 @@ enum WeexCoreEventBlockType {
 namespace WeexCore {
     struct WXCoreBridgeImpl;
     
-    class WXCoreBridge : public Bridge{
+    class WXCoreBridge : public Bridge {
         
     private:
         WXCoreBridgeImpl *impl;

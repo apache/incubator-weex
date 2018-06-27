@@ -31,9 +31,6 @@ typedef NSInteger(^WXJSCallRemoveEvent)(NSString *instanceId,NSString *ref,NSStr
 typedef NSInteger(^WXJSCallCreateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
-#ifdef WX_IMPORT_WEEXCORE
-typedef NSInteger(^WXCoreCallLayout)(NSString *instanceId,NSString *ref,NSInteger top,NSInteger bottom,NSInteger left,NSInteger right,NSInteger height,NSInteger width,NSInteger index);
-#endif
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -57,16 +54,17 @@ typedef NSInteger(^WXCoreCallLayout)(NSString *instanceId,NSString *ref,NSIntege
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray*)args;
 
 /**
- * Register callback when call native tasks occur
- */
-- (void)registerCallNative:(WXJSCallNative)callNative;
-
-/**
  * Reset js engine environment, called when any environment variable is changed.
  */
 - (void)resetEnvironment;
 
 @optional
+
+/**
+ * Register weex core functions.
+ */
+- (void)registerForWeexCore;
+
 /**
  * Remove instance's timer.
  */
@@ -76,6 +74,11 @@ typedef NSInteger(^WXCoreCallLayout)(NSString *instanceId,NSString *ref,NSIntege
  * Called when garbage collection is wanted by sdk.
  */
 - (void)garbageCollect;
+
+/**
+ * Register callback when call native tasks occur
+ */
+- (void)registerCallNative:(WXJSCallNative)callNative;
 
 /**
  * Register callback when addElement tasks occur
@@ -126,10 +129,6 @@ typedef NSInteger(^WXCoreCallLayout)(NSString *instanceId,NSString *ref,NSIntege
  * Register callback for global js function `callNativeComponent`
  */
 - (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock;
-
-#ifdef WX_IMPORT_WEEXCORE
-- (void)registerCallLayout:(WXCoreCallLayout)callLayoutBlock;
-#endif
 
 @optional
 

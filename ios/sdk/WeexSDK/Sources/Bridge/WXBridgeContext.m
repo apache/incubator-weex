@@ -49,6 +49,10 @@
 #import "WXSDKInstance_performance.h"
 #import "JSContext+Weex.h"
 
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreJSHandler.h"
+#endif
+
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
 _Pragma("clang diagnostic push") \
@@ -93,7 +97,11 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     _debugJS = [WXDebugTool isDevToolDebug];
     
+#ifdef WX_IMPORT_WEEXCORE
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXCoreJSHandler class];
+#else
     Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+#endif
     
     if (_jsBridge && [_jsBridge isKindOfClass:bridgeClass]) {
         return _jsBridge;
@@ -104,7 +112,7 @@ _Pragma("clang diagnostic pop") \
         _frameworkLoadFinished = NO;
     }
     
-    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _jsBridge = [[bridgeClass alloc] init];
     
     [self registerGlobalFunctions];
     
@@ -122,6 +130,11 @@ _Pragma("clang diagnostic pop") \
 
 - (void)registerGlobalFunctions
 {
+#ifdef WX_IMPORT_WEEXCORE
+    if ([_jsBridge respondsToSelector:@selector(registerForWeexCore)]) {
+        [_jsBridge registerForWeexCore];
+    }
+#else
     __weak typeof(self) weakSelf = self;
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
@@ -408,13 +421,6 @@ _Pragma("clang diagnostic pop") \
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
         [method invoke];
-    }];
-    
-#ifdef WX_IMPORT_WEEXCORE
-    [_jsBridge registerCallLayout:^NSInteger(NSString *instanceId, NSString *ref, NSInteger top, NSInteger bottom, NSInteger left, NSInteger right, NSInteger height, NSInteger width, NSInteger index) {
-#warning todo [WeexCore send needLayout action]
-        
-        return 1;
     }];
 #endif
 }
