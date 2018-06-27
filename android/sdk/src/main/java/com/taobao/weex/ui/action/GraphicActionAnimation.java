@@ -116,7 +116,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
         mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
             mAnimationBean.styles.transform, (int) component.getLayoutWidth(),
             (int) component.getLayoutHeight(),
-            instance.getInstanceViewPortWidth());
+            instance.getInstanceViewPortWidth(), instance);
       }
       startAnimation(instance, component);
     }

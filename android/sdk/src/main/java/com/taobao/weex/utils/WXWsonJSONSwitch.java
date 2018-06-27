@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.utils;
 
+import android.support.annotation.NonNull;
+
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.wson.Wson;
@@ -108,6 +110,19 @@ public class WXWsonJSONSwitch {
 
     /**wson off */
     public static final String WSON_OFF = "wson_off";
+
+
+    public @NonNull
+    static String fromObjectToJSONString(WXJSObject obj) {
+        if(obj != null && obj.type == WXJSObject.WSON){
+            Object data = Wson.parse((byte[]) obj.data);
+            if(data != null){
+                return  data.toString();
+            }
+        }
+        return WXJsonUtils.fromObjectToJSONString(obj,false);
+    }
+
 
 
 }

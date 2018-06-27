@@ -2223,7 +2223,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           int width = (int) getLayoutWidth();
           int height = (int) getLayoutHeight();
           animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()));
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()),
+                  getInstance());
           return animationBean;
         }
       }catch (RuntimeException e){

@@ -1535,7 +1535,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-    if (WXEnvironment.isOpenDebugLog()) {
+    if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
       if (logTaskDetail) {
@@ -1616,7 +1616,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     StringBuilder builder = new StringBuilder();
     builder.append("[");
     for(WXJSObject object : args){
-      builder.append(WXJsonUtils.fromObjectToJSONString(object));
+      builder.append(WXWsonJSONSwitch.fromObjectToJSONString(object));
       builder.append(",");
     }
     builder.append("]");
