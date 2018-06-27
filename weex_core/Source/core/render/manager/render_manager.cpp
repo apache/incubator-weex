@@ -44,6 +44,13 @@ bool RenderManager::CreatePage(std::string page_id, const char *data) {
   RenderPage *page = new RenderPage(page_id);
   this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
+  std::map<std::string, float>::iterator iter =
+      this->viewports_.find(page_id);
+  if (iter != this->viewports_.end()) {
+    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+    this->viewports_.erase(page_id);
+  }
+
   int64_t start_time = getCurrentTime();
   RenderObject *root = Wson2RenderObject(data, page_id);
   page->ParseJsonTime(getCurrentTime() - start_time);
@@ -186,15 +193,15 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
   return page->CreateFinish();
 }
 
-bool RenderManager::CallNativeModule(const char *pageId, const char *module, const char *method,
-                                     const char *arguments, int argumentsLength,
-                                     const char *options, int optionsLength) {
+bool RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
+                                     const char *arguments, int arguments_length,
+                                     const char *options, int options_length) {
   if (strcmp(module, "meta") == 0) {
-    CallMetaModule(method, arguments);
+    CallMetaModule(page_id, method, arguments);
   }
 }
 
-bool RenderManager::CallMetaModule(const char *method, const char *arguments) {
+bool RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
 
   if (strcmp(method, "setViewport") == 0) {
     wson_parser parser(arguments);
@@ -208,7 +215,7 @@ bool RenderManager::CallMetaModule(const char *method, const char *arguments) {
             std::string key = parser.nextMapKeyUTF8();
             std::string value = parser.nextStringUTF8(parser.nextType());
             if (strcmp(key.c_str(), WIDTH) == 0) {
-              RenderManager::GetInstance()->set_viewport_width(getFloat(value.c_str()));
+              viewports_.insert(std::pair<std::string, float>(page_id, getFloat(value.c_str())));
             }
           }
         }
@@ -238,6 +245,20 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   this->pages_.erase(page_id);
   delete page;
   page = nullptr;
+}
+
+float RenderManager::viewport_width(const std::string &page_id) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return kDefaultViewPortWidth;
+
+  return page->viewport_width();
+}
+
+void RenderManager::set_viewport_width(const std::string &page_id, float viewport_width) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return;
+
+  page->set_viewport_width(viewport_width);
 }
 
 void RenderManager::Batch(const std::string &page_id) {

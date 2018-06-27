@@ -61,6 +61,8 @@ public class GraphicActionAnimation extends BasicGraphicAction {
 
   private final static String TAG = "GraphicActionAnimation";
 
+  private final boolean styleNeedInit;
+
   @Nullable
   private
   final String callback;
@@ -71,6 +73,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
 
   public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
     super(pageId, ref);
+    this.styleNeedInit = false;
     this.callback = null;
     this.mAnimationBean = animationBean;
   }
@@ -78,6 +81,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
   public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @Nullable String animation,
                                 @Nullable final String callBack) {
     super(pageId, ref);
+    this.styleNeedInit = true;
     this.callback = callBack;
     if (!TextUtils.isEmpty(animation)) {
       this.mAnimationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
@@ -86,6 +90,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
   public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean,
                                 @Nullable final String callBack) {
     super(pageId, ref);
+    this.styleNeedInit = false;
     this.mAnimationBean = animationBean;
     this.callback = callBack;
   }
@@ -107,9 +112,12 @@ public class GraphicActionAnimation extends BasicGraphicAction {
     }
 
     if (null != mAnimationBean.styles) {
-      mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
-              mAnimationBean.styles.transform, (int) component.getLayoutWidth(), (int) component.getLayoutHeight(),
-              instance.getInstanceViewPortWidth(), instance);
+      if(styleNeedInit) {
+        mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
+            mAnimationBean.styles.transform, (int) component.getLayoutWidth(),
+            (int) component.getLayoutHeight(),
+            instance.getInstanceViewPortWidth());
+      }
       startAnimation(instance, component);
     }
   }
