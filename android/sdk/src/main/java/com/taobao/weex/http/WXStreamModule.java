@@ -324,13 +324,8 @@ public class WXStreamModule extends WXModule {
         Iterator<Map.Entry<String, List<String>>> it = headers.entrySet().iterator();
         while (it.hasNext()) {
           Map.Entry<String, List<String>> entry = it.next();
-          if (entry.getValue().size() == 0) {
-            continue;
-          } else if (entry.getValue().size() == 1)
+          if (entry.getValue().size() > 0) {
             simpleHeaders.put(entry.getKey() == null ? "_" : entry.getKey(), entry.getValue().get(0));
-          else {
-            simpleHeaders.put(entry.getKey() == null ? "_" : entry.getKey(), entry.getValue().toString());
-
           }
         }
       }
