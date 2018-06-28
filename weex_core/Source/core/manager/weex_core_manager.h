@@ -64,11 +64,11 @@ namespace WeexCore {
 
         Bridge *getPlatformBridge();
 
-        WeexCoreManager *setPlatformBridge(Bridge *pBridge);
+        void setPlatformBridge(Bridge *pBridge);
 
         JSBridge* getJSBridge();
 
-        WeexCoreManager *setJSBridge(JSBridge *jsBridge);
+        void setJSBridge(JSBridge *jsBridge);
 
         void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
 

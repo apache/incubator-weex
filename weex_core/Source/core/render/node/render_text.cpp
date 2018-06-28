@@ -16,21 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERSWITCHFACTORY_H
-#define WEEX_PROJECT_RENDERSWITCHFACTORY_H
+#include <string>
 
-#include <core/render/node/render_switch.h>
-#include "i_render_factory.h"
+#include "core/render/node/render_text.h"
+#include "core/render/page/render_page.h"
 
 namespace WeexCore {
 
-  class RenderSwitchFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderSwitch();
-    }
-  };
-
+void RenderText::UpdateAttr(std::string key, std::string value) {
+  RenderObject::UpdateAttr(key, value);
+  markDirty();
 }
 
-#endif //WEEX_PROJECT_RENDERSWITCHFACTORY_H
+StyleType RenderText::UpdateStyle(std::string key, std::string value) {
+  StyleType result_type = RenderObject::ApplyStyle(key, value, true);
+  markDirty();
+  return result_type;
+}
+}  // namespace WeexCore

@@ -73,6 +73,9 @@
 // disable move rootView up as the keyboard show up.
 @property (nonatomic, assign) BOOL disableMoveViewUp;
 
+// avoid keyboardWillHide executes twice
+@property (nonatomic, assign) BOOL keyboardHidden;
+
 @end
 
 @implementation WXEditComponent
@@ -98,6 +101,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _returnEvent = NO;
         _clickEvent = NO;
         _keyboardEvent = NO;
+        _keyboardHidden = YES;
         // handle attributes
         _autofocus = [attributes[@"autofocus"] boolValue];
         _disabled = [attributes[@"disabled"] boolValue];
@@ -220,6 +224,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 -(void)blur
 {
     if(self.view) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIKeyboardWillHideNotification object:nil];
         [self.view resignFirstResponder];
     }
 }
@@ -659,7 +664,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + 20;
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -889,11 +894,13 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if (_keyboardEvent) {
         [self fireEvent:@"keyboard" params:@{ @"isShow": @YES }];
     }
+    
+    _keyboardHidden = NO;
 }
 
 - (void)keyboardWillHide:(NSNotification*)notification
 {
-    if (![self.view isFirstResponder]) {
+    if (![self.view isFirstResponder] || _keyboardHidden) {
         return;
     }
     if (!_disableMoveViewUp) {
@@ -906,10 +913,13 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if (_keyboardEvent) {
         [self fireEvent:@"keyboard" params:@{ @"isShow": @NO }];
     }
+    
+    _keyboardHidden = YES;
 }
 
 - (void)closeKeyboard
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIKeyboardWillHideNotification object:nil];
     [self.view resignFirstResponder];
 }
 

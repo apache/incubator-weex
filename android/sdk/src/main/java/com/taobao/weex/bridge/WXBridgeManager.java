@@ -30,7 +30,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -1536,7 +1535,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-    if (WXEnvironment.isOpenDebugLog()) {
+    if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
       if (logTaskDetail) {
@@ -1617,7 +1616,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     StringBuilder builder = new StringBuilder();
     builder.append("[");
     for(WXJSObject object : args){
-      builder.append(WXJsonUtils.fromObjectToJSONString(object));
+      builder.append(WXWsonJSONSwitch.fromObjectToJSONString(object));
       builder.append(",");
     }
     builder.append("]");
@@ -1795,6 +1794,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
+    wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
@@ -2670,10 +2670,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public long[] getRenderFinishTime(String instanceId) {
     return mWXBridge.getRenderFinishTime(instanceId);
-  }
-
-  public void setViewPortWidth(String instanceId, float value) {
-    mWXBridge.setViewPortWidth(instanceId, value);
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {

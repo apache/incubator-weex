@@ -31,6 +31,8 @@
 #include <core/manager/weex_core_manager.h>
 
 const char *s_cacheDir;
+const char *g_jssSoPath = nullptr;
+const char *g_jssSoName = "libweexjss.so";
 bool s_start_pie = true;
 
 static IPCSender *sSender;
@@ -112,7 +114,9 @@ namespace WeexCore {
         return param;
     }
 
-    inline void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE *>& params, VALUE_WITH_TYPE *param, std::unique_ptr<IPCSerializer>& serializer, JNIEnv* env, jobject jArg){
+    inline void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE *> &params, VALUE_WITH_TYPE *param,
+                                   std::unique_ptr<IPCSerializer> &serializer, JNIEnv *env,
+                                   jobject jArg) {
         jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
         jint jTypeInt = env->GetIntField(jArg, jTypeId);
 
@@ -152,7 +156,7 @@ namespace WeexCore {
             jbyteArray dataArray = (jbyteArray) jDataObj;
             if (js_server_api_functions != nullptr) {
                 param->type = ParamsType::BYTEARRAY;
-                jbyte* data = env->GetByteArrayElements(dataArray, 0);
+                jbyte *data = env->GetByteArrayElements(dataArray, 0);
                 size_t length = env->GetArrayLength(dataArray);
                 param->value.byteArray = genWeexByteArray((const char *) data, length);
             } else {
@@ -166,14 +170,14 @@ namespace WeexCore {
             }
         }
 
-        if (param != nullptr){
+        if (param != nullptr) {
             params.push_back(param);
         }
 
         env->DeleteLocalRef(jDataObj);
     }
 
-    inline void freeParams(std::vector<VALUE_WITH_TYPE *>& params){
+    inline void freeParams(std::vector<VALUE_WITH_TYPE *> &params) {
         for (auto &param : params) {
             if (param->type == ParamsType::STRING ||
                 param->type == ParamsType::JSONSTRING) {
@@ -268,7 +272,8 @@ namespace WeexCore {
         Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
         WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
         WeexCoreManager::getInstance()->setJSBridge(new JSBridge());
-        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
+        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
+                new MeasureFunctionAdapterImplAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,
@@ -374,7 +379,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
-                addParamsFromJArgs(params, param,serializer, env, jArg);
+                addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
 
@@ -418,7 +423,7 @@ namespace WeexCore {
         return true;
     }
 
-    static std::string findPath() {
+    std::string WeexProxy::findLibJssSoPath() {
         std::string executablePath = "";
         unsigned long target = reinterpret_cast<unsigned long>(__builtin_return_address(0));
         FILE *f = fopen("/proc/self/maps", "r");
@@ -455,7 +460,44 @@ namespace WeexCore {
             }
         }
         fclose(f);
-        return executablePath;
+        LOGE("find so path: %s", executablePath.c_str());
+        std::string::size_type pos = std::string::npos;
+        // dynamic deploy
+        if (!executablePath.empty() && executablePath.find(".maindex") != std::string::npos) {
+            std::string libs[] = {"/opt", "/oat/arm"};
+            auto libsCount = sizeof(libs) / sizeof(std::string);
+            for (int i = 0; i < libsCount; ++i) {
+                auto lib = libs[i];
+                pos = executablePath.find(lib);
+                if (pos != std::string::npos) {
+                    executablePath.replace(pos, lib.length(), "/lib");
+                    break;
+                }
+            }
+        }
+        std::string soPath = executablePath + "/" + g_jssSoName;
+        // -------------------------------------------------
+        // -------------------------------------------------
+        if (access(soPath.c_str(), 00) == 0) {
+            return soPath;
+        } else {
+            const char *error = soPath.c_str();
+            LOGE("so path: %s is not exsist, use full package lib", error);
+            executablePath = s_cacheDir;
+            std::string lib = "/cache";
+            if ((pos = soPath.find(lib)) != std::string::npos) {
+                executablePath.replace(pos, lib.length(), "/lib");
+            }
+            soPath = executablePath + "/" + g_jssSoName;
+            if (access(soPath.c_str(), 00) != 0) {
+                LOGE("so path: %s is not exsist", soPath.c_str());
+                reportNativeInitStatus("-1004", error);
+                //return false;
+                //use libweexjss.so directly
+                soPath = g_jssSoName;
+            }
+            return soPath;
+        }
     }
 
     static WEEX_CORE_JS_API_FUNCTIONS *getWeexCoreApiFunctions() {
@@ -510,44 +552,12 @@ namespace WeexCore {
         // -----------------------------------------------
         // use find path to get lib path
         // use set path is better idea, should change in future
-        soPath = findPath();
-
-        std::string::size_type pos = std::string::npos;
-        LOGE("find so path: %s", soPath.c_str());
-        // dynamic deploy
-        if (!soPath.empty() && soPath.find(".maindex") != std::string::npos) {
-            std::string libs[] = {"/opt", "/oat/arm"};
-            auto libsCount = sizeof(libs) / sizeof(std::string);
-            for (int i = 0; i < libsCount; ++i) {
-                auto lib = libs[i];
-                pos = soPath.find(lib);
-                if (pos != std::string::npos) {
-                    soPath.replace(pos, lib.length(), "/lib");
-                    break;
-                }
-            }
-            soPath += "/libweexjss.so";
-        } else {
-            soPath += "libweexjss.so";
+        if (g_jssSoPath != nullptr) {
+            soPath = g_jssSoPath;
         }
-        // -------------------------------------------------
-        // -------------------------------------------------
-        if (access(soPath.c_str(), 00) != 0) {
-            LOGE("so path: %s is not exsist, use full package lib", soPath.c_str());
-            const char *error = soPath.c_str();
-            soPath = s_cacheDir;
-            std::string lib = "/cache";
-            if ((pos = soPath.find(lib)) != std::string::npos) {
-                soPath.replace(pos, lib.length(), "/lib");
-            }
-            soPath += "/libweexjss.so";
-            if (access(soPath.c_str(), 00) != 0) {
-                LOGE("so path: %s is not exsist", soPath.c_str());
-                reportNativeInitStatus("-1004", error);
-                //return false;
-                //use libweexjss.so directly
-                soPath = "libweexjss.so";
-            }
+
+        if (soPath.empty()) {
+            soPath = findLibJssSoPath();
         }
 
         LOGE("final executablePath:%s", soPath.c_str());
@@ -555,7 +565,7 @@ namespace WeexCore {
         void *handle = dlopen(soPath.c_str(), RTLD_NOW);
         if (!handle) {
             const char *error = dlerror();
-            LOGE("load libweexjss.so failed,error=%s\n", error);
+            LOGE("load %s failed,error=%s\n", g_jssSoName, error);
             reportNativeInitStatus("-1005", error);
             // try again use current path
             dlclose(handle);
@@ -643,6 +653,18 @@ namespace WeexCore {
                     nullptr);
             LOGE("g_use_single_process is %s ", use_single_process);
             g_use_single_process = strstr(use_single_process, "true") != nullptr;
+        }
+
+        jmethodID m_get_jss_so_path = env->GetMethodID(c_params, "getLibJssPath",
+                                                       "()Ljava/lang/String;");
+        if (m_get_jss_so_path != nullptr) {
+            jobject j_get_jss_so_path = env->CallObjectMethod(params, m_get_jss_so_path);
+            if (j_get_jss_so_path != nullptr) {
+                g_jssSoPath = env->GetStringUTFChars(
+                        (jstring) (j_get_jss_so_path),
+                        nullptr);
+                LOGE("g_jssSoPath is %s ", g_jssSoPath);
+            }
         }
 
         jmethodID m_osVersion = env->GetMethodID(
@@ -971,7 +993,7 @@ namespace WeexCore {
                 WeexJSResult jsResultData = js_server_api_functions->funcExeJSWithResult(
                         instanceidChar.getChars(), namespaceChar, functionChar.getChars(), params);
                 freeParams(params);
-                jbyteArray  array = newJByteArray(env, jsResultData.data, jsResultData.length);
+                jbyteArray array = newJByteArray(env, jsResultData.data, jsResultData.length);
                 WeexJSResultDataFree(jsResultData);
                 return array;
             } else {

@@ -16,23 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERACTIONREMOVEELEMENT_H
-#define WEEX_PROJECT_RENDERACTIONREMOVEELEMENT_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_ELEMENT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_ELEMENT_H_
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionRemoveElement : public render_action {
-  public:
-    RenderActionRemoveElement(const std::string &pageId, const std::string &ref);
+class RenderActionRemoveElement : public RenderAction {
+ public:
+  explicit RenderActionRemoveElement(const std::string &page_id,
+                                     const std::string &ref);
 
-    void ExecuteAction();
+  void ExecuteAction();
 
-  public:
-    std::string mPageId;
-    std::string mRef;
-  };
-}
+ public:
+  std::string page_id_;
+  std::string ref_;
+};
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_RENDERACTIONREMOVEELEMENT_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_ELEMENT_H_

@@ -85,6 +85,7 @@ import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -166,6 +167,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
+  public int deepInComponentTree = 0;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -290,7 +292,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     WXEvent event = getEvents();
     int size = event.size();
-    for(int i=0; i<size; i++){
+    for (int i=0; i<size; i++) {
       if(i >= event.size()){
         break;
       }
@@ -928,7 +930,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       return;
     }
 
-    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+    if (this instanceof WXCell && realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
       mInstance.getWXPerformance().cellExceedNum++;
     }
 
@@ -1449,7 +1451,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (getEvents().size() < 1) {
       return;
     }
-    for (String event : getEvents()) {
+    WXEvent events = getEvents();
+    int size = events.size();
+    for (int i=0; i<size; i++) {
+      if(i >= events.size()){
+        break;
+      }
+      String event = events.get(i);
       if (event == null) {
         continue;
       }
@@ -2215,7 +2223,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           int width = (int) getLayoutWidth();
           int height = (int) getLayoutHeight();
           animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()));
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()),
+                  getInstance());
           return animationBean;
         }
       }catch (RuntimeException e){

@@ -140,7 +140,12 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     if(event == null){
       return false;
     }
-    for(String type : event){
+    int size = event.size();
+    for (int i=0; i<size; i++) {
+      if(i >= event.size()){
+        break;
+      }
+      String type = event.get(i);
       if(isStopPropagation(type)){
         return true;
       }

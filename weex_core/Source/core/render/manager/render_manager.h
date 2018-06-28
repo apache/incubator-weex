@@ -16,78 +16,93 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef RenderManager_h
-#define RenderManager_h
+#ifndef CORE_RENDER_MANAGER_RENDER_MANAGER_H_
+#define CORE_RENDER_MANAGER_RENDER_MANAGER_H_
 
 #include <map>
 #include <string>
-#include <stdbool.h>
-#include <core/layout/measure_func_adapter.h>
+
+#include "core/css/constants_value.h"
 
 namespace WeexCore {
 
-  class RenderPage;
+class RenderPage;
 
-  class RenderManager {
+class RenderManager {
+ private:
+  RenderManager() {}
 
-  private:
-    RenderManager() {}
+  ~RenderManager() {}
 
-    ~RenderManager() {}
-
-    //just to release singleton object
-    class Garbo {
-    public:
-      ~Garbo() {
-        if (RenderManager::m_pInstance) {
-          delete RenderManager::m_pInstance;
-        }
+  // just to release singleton object
+  class Garbo {
+   public:
+    ~Garbo() {
+      if (RenderManager::g_pInstance) {
+        delete RenderManager::g_pInstance;
       }
-    };
-
-    static Garbo garbo;
-
-  public:
-
-    void Batch(const std::string &pageId);
-
-    // create root node
-    bool CreatePage(std::string pageId, const char* data);
-
-    /** use auto constructor is bad idea, it cann't transfer binary, use char* is better */
-    bool AddRenderObject(const std::string &pageId, const std::string &parentRef, int index,
-                         const char* data);
-
-    bool RemoveRenderObject(const std::string &pageId, const std::string &ref);
-
-    bool MoveRenderObject(const std::string &pageId, const std::string &ref,
-                     const std::string &parentRef, int index);
-
-    bool UpdateAttr(const std::string &pageId, const std::string &ref, const char* data);
-
-    bool UpdateStyle(const std::string &pageId, const std::string &ref, const char* data);
-
-    bool AddEvent(const std::string &pageId, const std::string &ref, const std::string &event);
-
-    bool RemoveEvent(const std::string &pageId, const std::string &ref, const std::string &event);
-
-    bool CreateFinish(const std::string &pageId);
-
-    RenderPage *GetPage(const std::string &id);
-
-    bool ClosePage(const std::string &pageId);
-
-    static RenderManager *GetInstance() {
-      if (!m_pInstance) {
-        m_pInstance = new RenderManager();
-      }
-      return m_pInstance;
     }
-
-  private:
-    static RenderManager *m_pInstance;
-    std::map<std::string, RenderPage *> mPages;
   };
-}
 
-#endif //RenderManager_h
+  static Garbo garbo;
+
+ public:
+  void Batch(const std::string &page_id);
+
+  // create root node
+  bool CreatePage(std::string page_id, const char *data);
+
+  /** use auto constructor is bad idea, it cann't transfer binary, use char* is
+   * better */
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       const char *data);
+
+  bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
+
+  bool MoveRenderObject(const std::string &page_id, const std::string &ref,
+                        const std::string &parent_ref, int index);
+
+  bool UpdateAttr(const std::string &page_id, const std::string &ref,
+                  const char *data);
+
+  bool UpdateStyle(const std::string &page_id, const std::string &ref,
+                   const char *data);
+
+  bool AddEvent(const std::string &page_id, const std::string &ref,
+                const std::string &event);
+
+  bool RemoveEvent(const std::string &page_id, const std::string &ref,
+                   const std::string &event);
+
+  bool CreateFinish(const std::string &page_id);
+
+  bool CallNativeModule(const char *page_id, const char *module, const char *method,
+                        const char *arguments, int arguments_length, const char *options,
+                        int options_length);
+
+  bool CallMetaModule(const char *page_id, const char *method, const char *arguments);
+
+  RenderPage *GetPage(const std::string &page_id);
+
+  bool ClosePage(const std::string &page_id);
+
+  float viewport_width(const std::string &page_id);
+
+  void set_viewport_width(const std::string &page_id, float viewport_width);
+
+  static RenderManager *GetInstance() {
+    if (!g_pInstance) {
+      g_pInstance = new RenderManager();
+    }
+    return g_pInstance;
+  }
+
+ private:
+  static RenderManager *g_pInstance;
+  std::map<std::string, RenderPage *> pages_;
+  std::map<std::string, float> viewports_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_MANAGER_RENDER_MANAGER_H_

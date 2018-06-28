@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 陈佩翰 on 2018/6/1.
-//
 
 #ifndef WEEXCORE_JS_BRIDGE_H
 #define WEEXCORE_JS_BRIDGE_H

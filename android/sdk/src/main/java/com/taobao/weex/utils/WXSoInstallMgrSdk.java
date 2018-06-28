@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.BuildConfig;
 import com.taobao.weex.IWXStatisticsListener;
@@ -238,6 +239,8 @@ public class WXSoInstallMgrSdk {
           }
           inputStream.close();
           outputStream.close();
+        } else {
+          WXEnvironment.extractSo();
         }
       }
     } catch (Throwable e) {

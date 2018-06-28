@@ -28,7 +28,7 @@
 #define WXPickerHeight 266
 #define WXPickerToolBarHeight 44
 
-@interface WXPickerModule()
+@interface WXPickerModule() <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong)NSString * pickerType;
 // when resign the picker ,then the focus will be.
@@ -269,6 +269,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
+        tapGesture.delegate = self;
+    }
     [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
@@ -468,6 +471,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
+        tapGesture.delegate = self;
+    }
     [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
@@ -509,6 +515,14 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.callback(@{ @"result": @"success",@"data":value},NO);
         self.callback=nil;
     }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (self.pickerView && [touch.view isDescendantOfView:self.pickerView]) {
+        return NO;
+    }
+    return YES;
 }
 
 @end

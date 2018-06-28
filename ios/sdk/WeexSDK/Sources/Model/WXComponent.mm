@@ -69,6 +69,8 @@ static BOOL bNeedRemoveEvents = YES;
     __weak WXSDKInstance *_weexInstance;
 }
 
+@synthesize transform = _transform;
+
 #pragma mark Life Cycle
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -222,6 +224,9 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (void)dealloc
 {
+    if (_positionType == WXPositionTypeFixed) {
+        [self.weexInstance.componentManager removeFixedComponent:self];
+    }
     if(_flexCssNode){
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
@@ -255,10 +260,6 @@ static BOOL bNeedRemoveEvents = YES;
         if (WX_SYS_VERSION_LESS_THAN(@"9.0")) {
             [self _removeAllEvents];
         }
-    }
-
-    if (_positionType == WXPositionTypeFixed) {
-        [self.weexInstance.componentManager removeFixedComponent:self];
     }
 
     pthread_mutex_destroy(&_propertyMutex);
@@ -759,7 +760,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     WXAssertMainThread();
     
-    _transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
+    self.transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
         [_layer setNeedsDisplay];

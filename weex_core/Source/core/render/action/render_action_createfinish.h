@@ -16,23 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_CREATEFINISHACTION_H
-#define WEEX_PROJECT_CREATEFINISHACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_CREATEFINISH_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_CREATEFINISH_H_
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionCreateFinish : public render_action {
+class RenderActionCreateFinish : public RenderAction {
+ public:
+  explicit RenderActionCreateFinish(const std::string &page_id);
 
-  public:
-    RenderActionCreateFinish(const std::string &pageId);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string mPageId;
-  };
-}
-
-#endif //WEEX_PROJECT_CREATEFINISHACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_CREATEFINISH_H_

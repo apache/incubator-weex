@@ -31,30 +31,30 @@ namespace WeexCore {
 
   public:
 
-    long long callBridgeTime;
+    int64_t callBridgeTime;
 
-    long long cssLayoutTime;
+    int64_t cssLayoutTime;
 
-    long long parseJsonTime;
+    int64_t parseJsonTime;
 
-    long long firstScreenCallBridgeTime;
+    int64_t firstScreenCallBridgeTime;
 
-    long long firstScreenCssLayoutTime;
+    int64_t firstScreenCssLayoutTime;
 
-    long long firstScreenParseJsonTime;
+    int64_t firstScreenParseJsonTime;
 
-    long long onRenderSuccessCallBridgeTime;
+    int64_t onRenderSuccessCallBridgeTime;
 
-    long long onRenderSuccessCssLayoutTime;
+    int64_t onRenderSuccessCssLayoutTime;
 
-    long long onRenderSuccessParseJsonTime;
+    int64_t onRenderSuccessParseJsonTime;
 
     RenderPerformance() : callBridgeTime(0), cssLayoutTime(0), parseJsonTime(0),
                           firstScreenCallBridgeTime(0), firstScreenCssLayoutTime(0),
                           firstScreenParseJsonTime(0), onRenderSuccessCallBridgeTime(0),
                           onRenderSuccessCssLayoutTime(0), onRenderSuccessParseJsonTime(0) {}
 
-    std::vector<long> PrintPerformanceLog(PerformanceStage performanceStage);
+    std::vector<int64_t> PrintPerformanceLog(PerformanceStage performanceStage);
   };
 }
 

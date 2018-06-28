@@ -16,24 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_CORE_RENDER_ACTION_APPENDTREE_CREATEFINISH_H
-#define WEEX_CORE_RENDER_ACTION_APPENDTREE_CREATEFINISH_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_APPENDTREE_CREATEFINISH_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_APPENDTREE_CREATEFINISH_H_
 
-#include "render_action.h"
+#include <string>
+
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionAppendTreeCreateFinish : public render_action {
+class RenderActionAppendTreeCreateFinish : public RenderAction {
+ public:
+  explicit RenderActionAppendTreeCreateFinish(const std::string &page_id,
+                                              const std::string &ref);
 
-  public:
-    RenderActionAppendTreeCreateFinish(const std::string &pageId, const std::string &ref);
+  void ExecuteAction();
 
-    void ExecuteAction();
+ public:
+  std::string page_id_;
+  std::string ref_;
+};
+}  // namespace WeexCore
 
-  public:
-    std::string mPageId;
-    std::string mRef;
-  };
-}
-
-#endif //WEEX_CORE_RENDER_ACTION_APPENDTREE_CREATEFINISH_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_APPENDTREE_CREATEFINISH_H_

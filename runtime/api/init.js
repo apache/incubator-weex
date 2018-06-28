@@ -117,6 +117,7 @@ function createInstanceContext (id, options = {}, data) {
   Object.assign(runtimeContext, services, {
     weex,
     getJSFMVersion,
+    requireModule: (...args) => weex.requireModule(...args),
     __WEEX_CALL_JAVASCRIPT__: receiveTasks,
     services // Temporary compatible with some legacy APIs in Rax
   })

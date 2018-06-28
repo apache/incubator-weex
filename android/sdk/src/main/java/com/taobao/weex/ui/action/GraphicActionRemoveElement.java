@@ -18,14 +18,22 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
+  private boolean isJSCreateFinish = false;
+
   public GraphicActionRemoveElement(String pageId, String ref) {
     super(pageId, ref);
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    if (null != instance){
+      isJSCreateFinish = instance.isJSCreateFinish;
+    }
+
   }
 
   @Override
@@ -51,6 +59,10 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
       for (int i = count - 1; i >= 0; --i) {
         clearRegistryForComponent(container.getChild(i));
       }
+    }
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    if (null!=instance){
+      instance.onElementChange(isJSCreateFinish);
     }
   }
 }

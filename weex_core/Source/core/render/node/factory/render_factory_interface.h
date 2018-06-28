@@ -16,21 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_RENDERTEXTAREAFACTORY_H
-#define WEEX_PROJECT_RENDERTEXTAREAFACTORY_H
+#ifndef CORE_RENDER_NODE_FACTORY_RENDER_FACTORY_INTERFACE_H_
+#define CORE_RENDER_NODE_FACTORY_RENDER_FACTORY_INTERFACE_H_
 
-#include <core/render/node/render_textarea.h>
-#include "i_render_factory.h"
+#include "core/render/node/factory/render_object_interface.h"
 
 namespace WeexCore {
+class IRenderFactory {
+ public:
+  virtual IRenderObject *CreateRender() = 0;
+};
+}  // namespace WeexCore
 
-  class RenderTextAreaFactory : public IRenderFactory {
-  public:
-    IRenderObject *CreateRender() {
-      return new RenderTextArea();
-    }
-  };
-
-}
-
-#endif //WEEX_PROJECT_RENDERTEXTAREAFACTORY_H
+#endif  // CORE_RENDER_NODE_FACTORY_RENDER_FACTORY_INTERFACE_H_

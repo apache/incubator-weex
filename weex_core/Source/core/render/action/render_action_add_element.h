@@ -16,35 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_ADDELEMENTACTION_H
-#define WEEX_PROJECT_ADDELEMENTACTION_H
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_ADD_ELEMENT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_ADD_ELEMENT_H_
 
-#include "render_action.h"
+#include <map>
+#include <set>
+#include <string>
+
+#include "core/layout/style.h"
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
 
-  class RenderActionAddElement : public render_action {
+class RenderObject;
 
-  public:
-    RenderActionAddElement(const std::string &pageId, const RenderObject *render, const RenderObject *parent,
-                           int index, bool willLayout= true);
+class RenderActionAddElement : public RenderAction {
+ public:
+  explicit RenderActionAddElement(const std::string &page_id,
+                                  const RenderObject *render,
+                                  const RenderObject *parent, int index,
+                                  bool will_layout = true);
 
-    void ExecuteAction();
+  void ExecuteAction();
 
-  public:
-    StylesMap *mStyles;
-    AttributesMap *mAttributes;
-    EventsSet *mEvents;
-    WXCoreMargin mMargins;
-    WXCorePadding mPaddings;
-    WXCoreBorderWidth mBorders;
-    std::string mPageId;
-    std::string mComponentType;
-    std::string mParentRef;
-    std::string mRef;
-    int mIndex;
-    bool mWillLayout;
-  };
-}
+ public:
+  std::map<std::string, std::string> *styles_;
+  std::map<std::string, std::string> *attributes_;
+  std::set<std::string> *events_;
+  WXCoreMargin margins_;
+  WXCorePadding paddings_;
+  WXCoreBorderWidth borders_;
+  std::string page_id_;
+  std::string component_type_;
+  std::string parent_ref_;
+  std::string ref_;
+  int index_;
+  bool will_layout_;
+};
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_ADDELEMENTACTION_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_ADD_ELEMENT_H_

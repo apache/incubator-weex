@@ -106,6 +106,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   //Performance
   public boolean mEnd = false;
+  public boolean isJSCreateFinish =false;
   public static final String BUNDLE_URL = "bundleUrl";
   private IWXUserTrackAdapter mUserTrackAdapter;
   private IWXRenderListener mRenderListener;
@@ -267,9 +268,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  private int mMaxDeepLayer;
-  private int mMaxVDomDeepLayer;
-
   public boolean isTrackComponent() {
     return trackComponent;
   }
@@ -321,7 +319,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
     this.mInstanceViewPortWidth = instanceViewPortWidth;
-    WXSDKManager.getInstance().getWXBridgeManager().setViewPortWidth(getInstanceId(), instanceViewPortWidth);
   }
 
   public int getInstanceViewPortWidth(){
@@ -919,7 +916,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
         mWXPerformance.useScroller=1;
       }
-      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
       mWXPerformance.wxDims = mwxDims;
       mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
@@ -1126,6 +1122,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderSuccess(final int width, final int height) {
+    isJSCreateFinish = true;
     firstScreenRenderFinished();
 
     long time = System.currentTimeMillis() - mRenderStartTime;
@@ -1188,8 +1185,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   /**
    * when add/rm element
    */
-  public void onElementChange(){
-    if (isDestroy() || !mEnd ||null == mRenderContainer || mRenderContainer.isPageHasEvent() ||
+  public void onElementChange(boolean afterJSCreateFinish){
+    if (isDestroy() || !afterJSCreateFinish ||null == mRenderContainer || mRenderContainer.isPageHasEvent() ||
             mWXPerformance == null){
       return;
     }
@@ -1427,6 +1424,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
+    this.mRootComp.deepInComponentTree=1;
     mRenderContainer.addView(root.getHostView());
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
@@ -1656,21 +1654,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  public int getMaxDeepLayer() {
-    return mMaxDeepLayer;
-  }
-
-  public void setMaxDeepLayer(int maxDeepLayer) {
-    mMaxDeepLayer = maxDeepLayer;
-  }
-
-  public int getMaxDomDeep() {
-    return mMaxVDomDeepLayer;
-  }
-
   public void setMaxDomDeep(int maxDomDeep){
-    mMaxVDomDeepLayer = maxDomDeep;
-    mWXPerformance.maxDeepVDomLayer = maxDomDeep;
+    if (null == mWXPerformance){
+      return;
+    }
+    if (mWXPerformance.maxDeepVDomLayer <= maxDomDeep){
+      mWXPerformance.maxDeepVDomLayer = maxDomDeep;
+    }
   }
 
   public void onHttpStart(){

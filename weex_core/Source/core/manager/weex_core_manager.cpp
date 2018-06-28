@@ -23,7 +23,7 @@ namespace WeexCore {
 
     WeexCoreManager *WeexCoreManager::m_pInstance = nullptr;
 
-    WeexCoreManager *WeexCoreManager::setPlatformBridge(Bridge *pBridge) {
+    void WeexCoreManager::setPlatformBridge(Bridge *pBridge) {
         this->platformBridge = pBridge;
     }
 
@@ -31,7 +31,7 @@ namespace WeexCore {
         return this->platformBridge;
     }
 
-    WeexCoreManager *WeexCoreManager::setJSBridge(JSBridge *jsBridge) {
+    void WeexCoreManager::setJSBridge(JSBridge *jsBridge) {
         this->jsBridge = jsBridge;
     }
 

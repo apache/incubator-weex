@@ -16,26 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <core/manager/weex_core_manager.h>
-#include "render_action_createbody.h"
+
+#include "core/render/action/render_action_createbody.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
-  RenderActionCreateBody::RenderActionCreateBody(const std::string &pageId, const RenderObject *render) {
-    this->mAttributes = render->Attributes();
-    this->mStyles = render->Styles();
-    this->mEvents = render->Events();
-    this->mMargins = render->GetMargins();
-    this->mPaddings = render->GetPaddings();
-    this->mBorders = render->GetBorders();
-    this->mPageId = pageId;
-    this->mComponentType = render->Type();
-    this->mRef = render->Ref();
-  }
-
-  void RenderActionCreateBody::ExecuteAction() {
-      WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(mPageId.c_str(), mComponentType.c_str(), mRef.c_str(),
-                                                                          mStyles, mAttributes, mEvents,
-                                                                          mMargins, mPaddings, mBorders);
-  }
+RenderActionCreateBody::RenderActionCreateBody(const std::string &page_id,
+                                               const RenderObject *render) {
+  this->attributes_ = render->attributes();
+  this->styles_ = render->styles();
+  this->events_ = render->events();
+  this->margins_ = render->GetMargins();
+  this->paddings_ = render->GetPaddings();
+  this->borders_ = render->GetBorders();
+  this->page_id_ = page_id;
+  this->component_type_ = render->type();
+  this->ref_ = render->ref();
 }
+
+void RenderActionCreateBody::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(
+      this->page_id_.c_str(), this->component_type_.c_str(), this->ref_.c_str(),
+      this->styles_, this->attributes_, this->events_, this->margins_,
+      this->paddings_, this->borders_);
+}
+}  // namespace WeexCore
