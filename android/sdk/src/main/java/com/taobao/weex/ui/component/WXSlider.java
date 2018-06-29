@@ -400,9 +400,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @WXComponentProp(name = Constants.Name.SCROLLABLE)
   public void setScrollable(boolean scrollable) {
     if (mViewPager != null && mAdapter != null) {
-      if(mAdapter.getRealCount() > 0){
-        mViewPager.setScrollable(scrollable);
-      }
+      mViewPager.setScrollable(scrollable);
     }
   }
 
